@@ -2,6 +2,7 @@
 using LuaInterface;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -10,6 +11,8 @@ namespace Nova
     /// </summary>
     public class LuaRuntime
     {
+        private bool isInited = false;
+
         /// <summary>
         /// Inititialize the lua runtime environment
         /// </summary>
@@ -34,6 +37,13 @@ namespace Nova
                 // loadstring is deprecated after Lua 5.2
                 lua_loadstring = lua.GetFunction("load");
             }
+
+            isInited = true;
+        }
+
+        private void CheckInit()
+        {
+            Assert.IsTrue(isInited, "Nova: LuaRuntime methods should be called after Init");
         }
 
         private LuaState lua;
@@ -45,6 +55,7 @@ namespace Nova
         /// <param name="scriptLoader">the script loader to bind</param>
         public void BindScriptLoader(ScriptLoader scriptLoader)
         {
+            CheckInit();
             LuaFunction Lua_BindScriptLoader = lua.GetFunction("bindScriptLoader");
             Lua_BindScriptLoader.BeginPCall();
             Lua_BindScriptLoader.Push(scriptLoader);
@@ -64,17 +75,20 @@ namespace Nova
         /// </returns>
         public LuaFunction WrapClosure(string code)
         {
+            CheckInit();
             Debug.Log("<color=blue>" + code + "</color>");
             return lua_loadstring.Invoke<string, LuaFunction>(code);
         }
 
         public void DoFile(string name)
         {
+            CheckInit();
             lua.DoFile(name);
         }
 
         public void DoString(string code)
         {
+            CheckInit();
             lua.DoString(code);
         }
 
@@ -83,6 +97,7 @@ namespace Nova
         /// </summary>
         public void Dispose()
         {
+            CheckInit();
             lua_loadstring.Dispose();
             lua.Dispose();
         }

@@ -35,5 +35,17 @@ namespace Nova
         /// Type of this flow chart node. The value of this field if default to be normal
         /// </value>
         public FlowChartNodeType type = FlowChartNodeType.Normal;
+
+        // Two flow chart nodes are considered equal if they have the same name
+        public override bool Equals(object obj)
+        {
+            var anotherObject = obj as FlowChartNode;
+            return anotherObject != null && name.Equals(anotherObject.name);
+        }
+
+        public override int GetHashCode()
+        {
+            return name.GetHashCode();
+        }
     }
 }

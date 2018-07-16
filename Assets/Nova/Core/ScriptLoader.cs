@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using LuaInterface;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -12,6 +13,9 @@ namespace Nova
     /// </summary>
     public class ScriptLoader
     {
+        // variable indicates whether the script loader is inited
+        private bool isInited = false;
+
         /// <summary>
         /// Initialize the script loader. This method will load all text asset files in the given folder, parse all the
         /// scripts and generate the flowchart tree of the story.
@@ -34,15 +38,29 @@ namespace Nova
 
             // Bind all lazy binding entries
             BindAllLazyBindingEntries();
+
+            isInited = true;
         }
 
-        private const string FastExecutionStartSymbol = "@[";
-        private const string FastExecutionEndSymbol = "]";
-        private const string LazyExcutionStartSymbol = "[";
-        private const string LazyExcutionEndSymbol = "]";
+        /// <summary>
+        /// Get the flow chart tree
+        /// </summary>
+        /// <remarks>This method should be called after Init</remarks>
+        /// <returns>The constructed flow chart tree</returns>
+        public FlowChartTree GetFlowChartTree()
+        {
+            Assert.IsTrue(isInited, "Nova: ScriptLoader.GetFlowChartTree should be called after ScriptLoader.Init");
 
-        private const string FastExecutionBlockPattern = @"@\[((?:.|[\r\n])*?)\]";
-        private const string LazyExcutionBlockPattern = @"^\[((?:.|[\r\n])*?)\]";
+            return flowChartTree;
+        }
+
+        private const string FastExecutionStartSymbol = "@<|";
+        private const string FastExecutionEndSymbol = "|>";
+        private const string LazyExcutionStartSymbol = "<|";
+        private const string LazyExcutionEndSymbol = "|>";
+
+        private const string FastExecutionBlockPattern = @"@<\|((?:.|[\r\n])*?)\|>";
+        private const string LazyExecutionBlockPattern = @"^<\|((?:.|[\r\n])*?)\|>";
 
         /// <summary>
         /// Parse the given script text
@@ -149,7 +167,7 @@ namespace Nova
             dialogueEntryText = dialogueEntryText.Trim();
             var textStartIndex = 0;
             var dialogueEntry = new DialogueEntry();
-            var lazyExecutionBlockMatch = Regex.Match(dialogueEntryText, LazyExcutionBlockPattern);
+            var lazyExecutionBlockMatch = Regex.Match(dialogueEntryText, LazyExecutionBlockPattern);
             if (lazyExecutionBlockMatch.Success)
             {
                 var code = lazyExecutionBlockMatch.Groups[1].Value;
@@ -287,6 +305,61 @@ namespace Nova
         public void EndRegisterBranch()
         {
             currentNode = null;
+        }
+
+        /// <summary>
+        /// Set the current node as the start up node
+        /// This method is designed to be called externally by scripts
+        /// </summary>
+        /// <remarks>
+        /// A flow chart tree can have multiple entry points. A name can be assigned to a start point,
+        /// if no name is given, the name of the current node will be used
+        /// </remarks>
+        /// <param name="name">
+        /// The name of the start point, which can be differ from that of the node.
+        /// If no name is given, use the name of the current node as the start point name.
+        /// </param>
+        public void SetCurrentAsStarUpNode(string name)
+        {
+            if (currentNode == null)
+            {
+                throw new ArgumentException("Nova: is_start should be called after the definition of a label");
+            }
+
+            if (name == null)
+            {
+                name = currentNode.name;
+            }
+
+            if (flowChartTree.HasStartUp(name))
+            {
+                // It is legal to call is_start under the same label for multiple times
+                if (flowChartTree.GetStartUpNode(name).Equals(currentNode))
+                {
+                    return;
+                }
+
+                throw new ArgumentException("Nova: duplicated definition of the same start up name.");
+            }
+
+            flowChartTree.AddStartUp(name, currentNode);
+        }
+
+        /// <summary>
+        /// Make the current node as the default start point of the game.
+        /// This method is designed to be called externally by scripts.
+        /// </summary>
+        /// <remarks>
+        /// This method will first add the current node as a start point, then set it as default.
+        /// </remarks>
+        /// <param name="name"></param>
+        public void SetCurrentAsDefaultStart(string name)
+        {
+            // add a start up point
+            SetCurrentAsStarUpNode(name);
+
+            // Make current node as the default start point
+            flowChartTree.DefaultStartUpNode = currentNode;
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Nova
             return this.Equals(Defualt);
         }
 
-        // BranchInformation might be used as the key type of Dictionary
+        // BranchInformations are considered equal if they have the same name
         public override bool Equals(object obj)
         {
             var anotherBranch = obj as BranchInformation;
