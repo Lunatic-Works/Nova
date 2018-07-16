@@ -137,12 +137,17 @@ namespace Nova
         /// <param name="flowChartNodeText"></param>
         private void ParseFlowChartNodeText(string flowChartNodeText)
         {
-            if (string.IsNullOrEmpty(flowChartNodeText))
+            if (flowChartNodeText == null)
             {
                 return;
             }
 
             flowChartNodeText = flowChartNodeText.Trim();
+            if (string.IsNullOrEmpty(flowChartNodeText))
+            {
+                return;
+            }
+
             var emptyLinePattern = @"(?:(?:\r\n|\n)\s*){2,}";
             var dialogueEntryTexts = Regex.Split(flowChartNodeText, emptyLinePattern);
             foreach (var text in dialogueEntryTexts)
