@@ -1,6 +1,4 @@
-﻿using System;
-using LuaInterface;
-using UnityEditor;
+﻿using LuaInterface;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,13 +20,18 @@ namespace Nova
         /// </remarks>
         public void Init()
         {
+            if (isInited)
+            {
+                return;
+            }
+
             new LuaResLoader();
             lua = new LuaState();
             lua.Start();
             LuaBinder.Bind(lua);
             lua.AddSearchPath(Application.dataPath + "/Nova/Lua");
             // do default includes
-            lua.DoString(@"require 'defaults'");
+            lua.DoString(@"require 'requires'");
 
             // get the lua load string function
             lua_loadstring = lua.GetFunction("loadstring");
@@ -38,7 +41,10 @@ namespace Nova
                 lua_loadstring = lua.GetFunction("load");
             }
 
+            lua_bind_object = lua.GetFunction("__Nova.bind_object");
+
             isInited = true;
+            isDisposed = false;
         }
 
         private void CheckInit()
@@ -48,24 +54,29 @@ namespace Nova
 
         private LuaState lua;
         private LuaFunction lua_loadstring;
+        private LuaFunction lua_bind_object;
 
         /// <summary>
-        /// Make the script loader visible in lua
+        /// Make an object visible in lua.
         /// </summary>
-        /// <param name="scriptLoader">the script loader to bind</param>
-        public void BindScriptLoader(ScriptLoader scriptLoader)
+        /// <remarks>
+        /// The object will be assigned as an entry of the global variable <code>__Nova</code>, with the given name,
+        /// which can be accessed from lua scripts by <code>__Nova[name]</code>.
+        /// </remarks>
+        /// <param name="name">The name to assign</param>
+        /// <param name="obj">The object to be assigned</param>
+        public void BindObject(string name, object obj)
         {
             CheckInit();
-            LuaFunction Lua_BindScriptLoader = lua.GetFunction("bindScriptLoader");
-            Lua_BindScriptLoader.BeginPCall();
-            Lua_BindScriptLoader.Push(scriptLoader);
-            Lua_BindScriptLoader.PCall();
-            Lua_BindScriptLoader.EndPCall();
-            Lua_BindScriptLoader.Dispose();
+            lua_bind_object.BeginPCall();
+            lua_bind_object.Push(name);
+            lua_bind_object.Push(obj);
+            lua_bind_object.PCall();
+            lua_bind_object.EndPCall();
         }
 
         /// <summary>
-        /// Wrap the given code to closure
+        /// Wrap the given code in a closure
         /// </summary>
         /// <param name="code">
         /// The code that should be wrapped
@@ -92,14 +103,24 @@ namespace Nova
             lua.DoString(code);
         }
 
+        private bool isDisposed = true;
+
         /// <summary>
         /// Dispose the lua runtime environment
         /// </summary>
         public void Dispose()
         {
+            if (isDisposed)
+            {
+                return;
+            }
+
             CheckInit();
+            lua_bind_object.Dispose();
             lua_loadstring.Dispose();
             lua.Dispose();
+
+            isDisposed = true;
         }
 
         // ------------- Below are the essential codes for singleton pattern --------------- //

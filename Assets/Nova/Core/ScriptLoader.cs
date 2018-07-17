@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using LuaInterface;
+using Nova.Exceptions;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -29,7 +30,12 @@ namespace Nova
         /// </param>
         public void Init(string path)
         {
-            LuaRuntime.Instance.BindScriptLoader(this);
+            if (isInited)
+            {
+                return;
+            }
+
+            LuaRuntime.Instance.BindObject("scriptLoader", this);
             var scripts = Resources.LoadAll(path, typeof(TextAsset)).Cast<TextAsset>().ToArray();
             foreach (var script in scripts)
             {
@@ -42,6 +48,11 @@ namespace Nova
             isInited = true;
         }
 
+        private void CheckInit()
+        {
+            Assert.IsTrue(isInited, "Nova: ScriptLoader methods should be called after Init");
+        }
+
         /// <summary>
         /// Get the flow chart tree
         /// </summary>
@@ -49,8 +60,7 @@ namespace Nova
         /// <returns>The constructed flow chart tree</returns>
         public FlowChartTree GetFlowChartTree()
         {
-            Assert.IsTrue(isInited, "Nova: ScriptLoader.GetFlowChartTree should be called after ScriptLoader.Init");
-
+            CheckInit();
             return flowChartTree;
         }
 
@@ -239,8 +249,8 @@ namespace Nova
             }
             catch (ArgumentException ex)
             {
-                throw new ArgumentException(string.Format("Nova: Multiple definition of the same label {0}",
-                    currentNode.name));
+                throw new DuplicatedDefinitionException(
+                    string.Format("Nova: Multiple definition of the same label {0}", currentNode.name));
             }
         }
 
@@ -336,17 +346,6 @@ namespace Nova
                 name = currentNode.name;
             }
 
-            if (flowChartTree.HasStartUp(name))
-            {
-                // It is legal to call is_start under the same label for multiple times
-                if (flowChartTree.GetStartUpNode(name).Equals(currentNode))
-                {
-                    return;
-                }
-
-                throw new ArgumentException("Nova: duplicated definition of the same start up name.");
-            }
-
             flowChartTree.AddStartUp(name, currentNode);
         }
 
@@ -365,6 +364,41 @@ namespace Nova
 
             // Make current node as the default start point
             flowChartTree.DefaultStartUpNode = currentNode;
+        }
+
+        /// <summary>
+        /// Set the current node as an end node
+        /// This method is designed to be called externally by scripts.
+        /// </summary>
+        /// <remarks>
+        /// While a flow chart can have multiple endings, each name of endings should be unique among other endings,
+        /// and a node can only have one end name.
+        /// </remarks>
+        /// <param name="name">The name of the ending</param>
+        /// <exception cref="ArgumentException">
+        /// ArgumentException will been thrown if is_end is called when the label is not defined.
+        /// </exception>
+        public void SetCurrentAsEnd(string name)
+        {
+            if (currentNode == null)
+            {
+                throw new ArgumentException(
+                    string.Format("Nova: is_end({0}) should be called after the definition of a label", name));
+            }
+
+            // Set the current node type as end
+            currentNode.type = FlowChartNodeType.End;
+
+            // Add the node as an end
+            if (name == null)
+            {
+                name = currentNode.name;
+            }
+
+            flowChartTree.AddEnd(name, currentNode);
+
+            // null the current node, is_end will indicates the end of a label
+            currentNode = null;
         }
     }
 }

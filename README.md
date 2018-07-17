@@ -96,13 +96,13 @@ Lets see a trivial example to understand how it works.
 ```
 OK, this is just a demo. It might be better if I could have written that in English, but I'm not a native English speaker, and I don't believe this piece of boring story will attract you :(
 
-As you can see, alongside with normal story contents(those Chinese text), there are two special blocks: `@<| some code |>` and `<| some code |>`. inside which are pure lua code! The difference between these two blocks is the time of execution.
+As you can see, alongside with normal story contents(those Chinese text), there are two special blocks: `@<| some code |>` and `<| some code |>`. inside which are **pure lua code**! The difference between these two blocks is the timing of execution.
 
 Codes inside `@<| ... |>`, let's call it fast execution block, are executed at the script loading time. Codes inside fast execution blocks usually supply important information for the building of the game play flow chart. You can use built in functions like label, branch to define your own graph.
 
 `<| ... |>`, which we call lazy execution blocks, are wrapped as functions and stored on the corresponding positions on the flow chart. Codes inside it can be executed when the player enter these positions as the game play proceeds. Lazy execution blocks are good places to put codes that directly interacts with game objects, like making a girl smile, changing background images, etc.
 
-We does not constrain how the text is written. Only one thing should be care about: text contents are divided in to entries by empty lines. For example, this is two entries:
+We does not constrain how the text is written. Only one thing should be noticed: text contents are divided in to entries by empty lines. For example, this is two entries:
 
 ```lua
 <| girl:shock() |>
@@ -131,6 +131,7 @@ Nova will supply some built in functions that can be called inside execution blo
     + `branch`
     + `is_start`
     + `is_default_start`
+    + `is_end`
 + Called inside lazy execution blocks
     + nothing has been implemented yet
 

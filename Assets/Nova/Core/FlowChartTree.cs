@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nova.Exceptions;
+using UnityEditor;
+using UnityEngine;
 
 namespace Nova
 {
@@ -11,6 +14,8 @@ namespace Nova
         private readonly Dictionary<string, FlowChartNode> tree = new Dictionary<string, FlowChartNode>();
 
         private readonly Dictionary<string, FlowChartNode> startUpNodes = new Dictionary<string, FlowChartNode>();
+
+        private readonly Dictionary<FlowChartNode, string> endNodes = new Dictionary<FlowChartNode, string>();
 
         private FlowChartNode defaultStartUpNode;
 
@@ -63,15 +68,31 @@ namespace Nova
         /// </summary>
         /// <remarks>
         /// This method will check if the given node is already in the tree. it will raise an ArgumentException
-        /// if the node is not found
+        /// if the node is not found. If the name has already been defined before, a DuplicatedDefinitionException
+        /// will been thrown
         /// </remarks>
-        /// <param name="name">the name of the start up</param>
+        /// <param name="name">
+        /// the name of the start up. the name of the starting point can be different from that of the node
+        /// </param>
         /// <param name="node">the start up node</param>
+        /// <exception cref="DuplicatedDefinitionException">
+        /// If the same name has been defined for multiple times, A DuplicatedDefinitionException will been thrown
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// An ArgumentException will be raised if the node is not in the tree
+        /// </exception>
         public void AddStartUp(string name, FlowChartNode node)
         {
             if (!HasNode(node))
             {
-                throw new ArgumentException("Only node in the tree can be setted as a start up node");
+                throw new ArgumentException("Nova: Only node in the tree can be setted as a start up node");
+            }
+
+            var existingStartNode = GetStartUpNode(name);
+            if (existingStartNode != null && !existingStartNode.Equals(node))
+            {
+                throw new DuplicatedDefinitionException(
+                    string.Format("Nova: duplicated definition of the same start up name: {0}", name));
             }
 
             startUpNodes.Add(name, node);
@@ -151,6 +172,78 @@ namespace Nova
                     throw new ArgumentException("Nova: only one node can be the default start point.");
                 }
             }
+        }
+
+        /// <summary>
+        /// Check if the flow chart tree has an end with the given name
+        /// </summary>
+        /// <param name="name">the name of the end</param>
+        /// <returns>true if an end with the given name is found, else return false</returns>
+        public bool HasEnd(string name)
+        {
+            return endNodes.ContainsValue(name);
+        }
+
+        /// <summary>
+        /// Add an end node.
+        /// </summary>
+        /// <remarks>
+        /// This method will check if the given node is already in the tree. it will raise an ArgumentException
+        /// if the node is not found. A node can have only one end name, and an end name can refer to only one node.
+        /// A DuplicatedDefinitionException will been raised of the above bijection rule is violated. 
+        /// </remarks>
+        /// <param name="name">
+        /// the name of the end. the name of the end can be different from that of the node
+        /// </param>
+        /// <param name="node">the end node</param>
+        /// <exception cref="ArgumentException">
+        /// An ArgumentException will be raised if the node if not in the tree
+        /// </exception>
+        public void AddEnd(string name, FlowChartNode node)
+        {
+            if (!HasNode(node))
+            {
+                throw new ArgumentException("Nova: Only node in the tree can be setted as an end node");
+            }
+
+            var existingNodeName = GetEndName(node);
+            if (existingNodeName == null)
+            {
+                // This node has not been defined as an end
+                if (endNodes.ContainsValue(name))
+                {
+                    // but the name has been used
+                    throw new DuplicatedDefinitionException(
+                        string.Format("Nova: duplicated definition of the same end name {0}", name));
+                }
+
+                // The name is legal, add end node
+                endNodes.Add(node, name);
+                return;
+            }
+
+            // This node has already been defined
+            if (existingNodeName != name)
+            {
+                // But the end name of this node is not the same as the current one
+                throw new DuplicatedDefinitionException(
+                    string.Format("Nova: assign two different end name: {0} and {1} to the same node",
+                        existingNodeName, name));
+            }
+        }
+
+        /// <summary>
+        /// Get the name of the end node
+        /// </summary>
+        /// <param name="node">The end node</param>
+        /// <returns>
+        /// the name of the end if the node is an end node, null will been returned if the node is not an end.
+        /// </returns>
+        public string GetEndName(FlowChartNode node)
+        {
+            string name;
+            var hasFound = endNodes.TryGetValue(node, out name);
+            return hasFound ? name : null;
         }
     }
 }
