@@ -58,6 +58,8 @@ end
 --- an end can have a name, different ends should have different names
 --- a label can only have one end name, and an end name can only refer to one label
 --- if no name is given, the name of the current label will be used
+--- all nodes with out child node should be marked as an end. If is_end is not declared under such labels, these nodes
+--- will be marked as ends automatically with the name of label
 function is_end(name)
     __Nova.scriptLoader:SetCurrentAsEnd(name)
 end

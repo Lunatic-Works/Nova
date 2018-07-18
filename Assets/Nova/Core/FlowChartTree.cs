@@ -7,8 +7,12 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// The data structure that stores the flow chart
+    /// The data structure that stores the flow chart.
     /// </summary>
+    /// <remarks>
+    /// A well defined flow chart tree will have at least one start point and all nodes without childs are
+    /// not marked as end
+    /// </remarks>
     public class FlowChartTree
     {
         private readonly Dictionary<string, FlowChartNode> tree = new Dictionary<string, FlowChartNode>();
@@ -244,6 +248,35 @@ namespace Nova
             string name;
             var hasFound = endNodes.TryGetValue(node, out name);
             return hasFound ? name : null;
+        }
+
+        /// <summary>
+        /// Perform a sanity check on the flow char tree
+        /// </summary>
+        /// <remarks>
+        /// The sanity check includes:
+        /// + Whether the flow chart tree have a start point
+        /// + If all the nodes that have no child node are marked as type End
+        /// This method should be called after the construction of the flow chart tree
+        /// </remarks>
+        public void SanityCheck()
+        {
+            if (startUpNodes.Count == 0)
+            {
+                throw new ArgumentException("Nova: At least one start up should exists");
+            }
+
+            foreach (var node in tree.Values)
+            {
+                if (node.branches.Count == 0 && node.type != FlowChartNodeType.End)
+                {
+                    Debug.Log(string.Format(
+                        "<color=red>Nova: Node {0} has no childs. It will be marked as an end with name {0}</color>",
+                        node.name));
+                    node.type = FlowChartNodeType.End;
+                    AddEnd(node.name, node);
+                }
+            }
         }
     }
 }

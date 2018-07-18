@@ -45,6 +45,9 @@ namespace Nova
             // Bind all lazy binding entries
             BindAllLazyBindingEntries();
 
+            // perform sanity check
+            flowChartTree.SanityCheck();
+
             isInited = true;
         }
 
@@ -164,7 +167,7 @@ namespace Nova
             {
                 Debug.Log("<color=green>" + text + "</color>");
                 var dialogueEntry = ParseDialogueEntry(text);
-                currentNode.dialogueEntries.Add(dialogueEntry);
+                currentNode.AddDialogueEntry(dialogueEntry);
             }
         }
 
@@ -186,7 +189,8 @@ namespace Nova
             if (lazyExecutionBlockMatch.Success)
             {
                 var code = lazyExecutionBlockMatch.Groups[1].Value;
-                dialogueEntry.action = LuaRuntime.Instance.WrapClosure(code);
+                var action = LuaRuntime.Instance.WrapClosure(code);
+                dialogueEntry.SetAction(action);
                 textStartIndex += lazyExecutionBlockMatch.Length;
             }
 
@@ -218,7 +222,7 @@ namespace Nova
             LuaRuntime.Instance.DoString(fastExecutionBlockCode);
         }
 
-        // ----------------------- Below are methods called by external scripts ---------------------------- //
+        #region methods called by external scripts
 
         /// <summary>
         /// This method is designed to be called externally by scripts.
@@ -243,11 +247,11 @@ namespace Nova
             {
                 flowChartTree.AddNode(currentNode);
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentNullException)
             {
                 throw new ArgumentException("Nova: A label must have a name");
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 throw new DuplicatedDefinitionException(
                     string.Format("Nova: Multiple definition of the same label {0}", currentNode.name));
@@ -400,5 +404,7 @@ namespace Nova
             // null the current node, is_end will indicates the end of a label
             currentNode = null;
         }
+
+        #endregion
     }
 }
