@@ -5,19 +5,22 @@ namespace Nova
     /// <summary>
     /// The information of branch
     /// </summary>
+    /// <remarks>
+    /// BranchInformation is immutable
+    /// </remarks>
     public class BranchInformation
     {
         /// <value>
         /// The name of this branch.
         /// The name should be unique among all branches that derived from the same flow chart node
         /// </value>
-        public string name;
+        public string name { get; private set; }
 
         /// <summary>
         /// A branch information can have some other data, like descriptions or lua functions,
         /// which can be customized by scripts
         /// </summary>
-        public LuaTable metadata;
+        public LuaTable metadata { get; private set; }
 
 
         /// <summary>
@@ -28,6 +31,11 @@ namespace Nova
         /// </remarks>
         public static readonly BranchInformation Defualt = new BranchInformation {name = "__@default"};
 
+        public BranchInformation(string name = null, LuaTable metadata = null)
+        {
+            this.name = name;
+            this.metadata = metadata;
+        }
 
         /// <summary>
         /// Check if this branch is a default sequential branch

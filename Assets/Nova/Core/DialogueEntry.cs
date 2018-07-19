@@ -5,6 +5,9 @@ namespace Nova
     /// <summary>
     /// A dialogue entry contains the text to display and some actions to execute.
     /// </summary>
+    /// <remarks>
+    /// DialogueEntry is immutable
+    /// </remarks>
     public class DialogueEntry
     {
         /// <value>
@@ -12,25 +15,17 @@ namespace Nova
         /// you want, like showing amazing VFX, changing BGM, make the character smile or cry, as long as
         /// you can imagine.
         /// </value>
-        private LuaFunction _action;
+        private readonly LuaFunction _action;
 
         /// <value>
         /// The text to display. How to display is a problem of UI design
         /// </value>
-        public string text;
+        public string text { get; private set; }
 
-        /// <summary>
-        /// Set the action of this dialogue entry
-        /// </summary>
-        /// <param name="action">A lua function as the action</param>
-        public void SetAction(LuaFunction action)
+        public DialogueEntry(string text, LuaFunction action = null)
         {
-            if (_action != null)
-            {
-                _action.Dispose();
-            }
-
             _action = action;
+            this.text = text;
         }
 
         /// <summary>

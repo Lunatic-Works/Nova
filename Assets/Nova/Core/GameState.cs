@@ -1,5 +1,6 @@
-﻿using Boo.Lang;
-using UnityEditor.Experimental.UIElements.GraphView;
+﻿using System;
+using System.Collections.Generic;
+using Nova.Exceptions;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,6 +13,16 @@ namespace Nova
 
     [System.Serializable]
     public class NodeChangedEvent : UnityEvent<string, string>
+    {
+    }
+
+    [System.Serializable]
+    public class BranchOccursEvent : UnityEvent<IEnumerable<BranchInformation>>
+    {
+    }
+
+    [System.Serializable]
+    public class CurrentRouteEndedEvent : UnityEvent<string>
     {
     }
 
@@ -76,6 +87,22 @@ namespace Nova
         public NodeChangedEvent NodeChanged;
 
         /// <summary>
+        /// This event will be triggered if branches occur. The player has to choose which branch to take
+        /// </summary>
+        /// <remarks>
+        /// The first parameter is an enumerable of BranchInformation 
+        /// </remarks>
+        public BranchOccursEvent BranchOccurs;
+
+        /// <summary>
+        /// This event will be triggered if the story reaches an end
+        /// </summary>
+        /// <remarks>
+        /// The first parameter is the name of the end
+        /// </remarks>
+        public CurrentRouteEndedEvent CurrentRouteEnded;
+
+        /// <summary>
         /// Called after the current node or the index of the current dialogue entry has changed.
         /// </summary>
         /// <remarks>
@@ -132,6 +159,62 @@ namespace Nova
         {
             var startNode = flowChartTree.GetStartUpNode(startName);
             GameStart(startNode);
+        }
+
+        private bool isBranching = false;
+
+        /// <summary>
+        /// Step to the next dialogue entry
+        /// </summary>
+        public void Step()
+        {
+            // if have a next dialogue entry in the current node, directly step to the next
+            if (currentIndex + 1 < currentNode.DialogueEntryCount)
+            {
+                currentIndex += 1;
+                UpdateGameState();
+                return;
+            }
+
+            // Reach the end of a node, do something regards on the flow chart node type
+            switch (currentNode.type)
+            {
+                case FlowChartNodeType.Normal:
+                    // for normal node, just step directly to the next node
+                    MoveToNode(currentNode.Next);
+                    break;
+                case FlowChartNodeType.Branching:
+                    // A branch occurs, inform branch event listeners
+                    isBranching = true;
+                    BranchOccurs.Invoke(currentNode.GetAllBranches());
+                    break;
+                case FlowChartNodeType.End:
+                    CurrentRouteEnded.Invoke(flowChartTree.GetEndName(currentNode));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Call this method to choose a branch
+        /// </summary>
+        /// <remarks>
+        /// This method should be called when a branch happends, Otherwise An InvalidAccessException will be raised
+        /// </remarks>
+        /// <param name="branchName">The name of the branch</param>
+        /// <exception cref="InvalidAccessException">An InvalidAccessException will be thrown if this method
+        /// is not called on branch happens</exception>
+        public void SelectBranch(string branchName)
+        {
+            if (!isBranching)
+            {
+                throw new InvalidAccessException("Nova: Select branch should only be called when a branch happens");
+            }
+
+            isBranching = false;
+            var nextNode = currentNode.GetNext(branchName);
+            MoveToNode(nextNode);
         }
     }
 }

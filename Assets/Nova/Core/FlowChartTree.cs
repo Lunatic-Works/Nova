@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Nova.Exceptions;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -11,17 +12,24 @@ namespace Nova
     /// </summary>
     /// <remarks>
     /// A well defined flow chart tree will have at least one start point and all nodes without childs are
-    /// not marked as end
+    /// not marked as end. Everything in a flow chart tree can not be modified after it is freezed
     /// </remarks>
     public class FlowChartTree
     {
-        private readonly Dictionary<string, FlowChartNode> tree = new Dictionary<string, FlowChartNode>();
+        private readonly Dictionary<string, FlowChartNode> nodes = new Dictionary<string, FlowChartNode>();
 
         private readonly Dictionary<string, FlowChartNode> startUpNodes = new Dictionary<string, FlowChartNode>();
 
         private readonly Dictionary<FlowChartNode, string> endNodes = new Dictionary<FlowChartNode, string>();
 
         private FlowChartNode defaultStartUpNode;
+
+        private bool isFreezed = false;
+
+        private void CheckFreeze()
+        {
+            Assert.IsFalse(isFreezed, "Nova: can NOT modify a flow chart tree after freeze");
+        }
 
         /// <summary>
         /// Add a node to the flow chart tree
@@ -31,8 +39,9 @@ namespace Nova
         /// </param>
         public void AddNode(FlowChartNode node)
         {
+            CheckFreeze();
             var name = node.name;
-            tree.Add(name, node);
+            nodes.Add(name, node);
         }
 
         /// <summary>
@@ -43,7 +52,7 @@ namespace Nova
         public FlowChartNode FindNode(string name)
         {
             FlowChartNode node;
-            tree.TryGetValue(name, out node);
+            nodes.TryGetValue(name, out node);
             return node;
         }
 
@@ -54,7 +63,7 @@ namespace Nova
         /// <returns>true if the tree contains the given node, else return false</returns>
         public bool HasNode(string name)
         {
-            return tree.ContainsKey(name);
+            return nodes.ContainsKey(name);
         }
 
         /// <summary>
@@ -64,7 +73,7 @@ namespace Nova
         /// <returns>true if the node has the given node</returns>
         public bool HasNode(FlowChartNode node)
         {
-            return tree.ContainsKey(node.name);
+            return nodes.ContainsKey(node.name);
         }
 
         /// <summary>
@@ -87,6 +96,7 @@ namespace Nova
         /// </exception>
         public void AddStartUp(string name, FlowChartNode node)
         {
+            CheckFreeze();
             if (!HasNode(node))
             {
                 throw new ArgumentException("Nova: Only node in the tree can be setted as a start up node");
@@ -166,6 +176,7 @@ namespace Nova
             }
             set
             {
+                CheckFreeze();
                 if (defaultStartUpNode == null)
                 {
                     defaultStartUpNode = value;
@@ -205,6 +216,7 @@ namespace Nova
         /// </exception>
         public void AddEnd(string name, FlowChartNode node)
         {
+            CheckFreeze();
             if (!HasNode(node))
             {
                 throw new ArgumentException("Nova: Only node in the tree can be setted as an end node");
@@ -261,14 +273,15 @@ namespace Nova
         /// </remarks>
         public void SanityCheck()
         {
+            CheckFreeze();
             if (startUpNodes.Count == 0)
             {
                 throw new ArgumentException("Nova: At least one start up should exists");
             }
 
-            foreach (var node in tree.Values)
+            foreach (var node in nodes.Values)
             {
-                if (node.branches.Count == 0 && node.type != FlowChartNodeType.End)
+                if (node.BranchCount == 0 && node.type != FlowChartNodeType.End)
                 {
                     Debug.Log(string.Format(
                         "<color=red>Nova: Node {0} has no childs. It will be marked as an end with name {0}</color>",
@@ -276,6 +289,18 @@ namespace Nova
                     node.type = FlowChartNodeType.End;
                     AddEnd(node.name, node);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Freeze all nodes. Should be called after the construction of this tree
+        /// </summary>
+        public void Freeze()
+        {
+            isFreezed = true;
+            foreach (var node in nodes.Values)
+            {
+                node.Freeze();
             }
         }
     }

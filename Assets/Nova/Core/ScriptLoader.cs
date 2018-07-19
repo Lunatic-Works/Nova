@@ -48,6 +48,9 @@ namespace Nova
             // perform sanity check
             flowChartTree.SanityCheck();
 
+            // Construnction finish, freeze the tree status
+            flowChartTree.Freeze();
+
             isInited = true;
         }
 
@@ -184,18 +187,17 @@ namespace Nova
         {
             dialogueEntryText = dialogueEntryText.Trim();
             var textStartIndex = 0;
-            var dialogueEntry = new DialogueEntry();
             var lazyExecutionBlockMatch = Regex.Match(dialogueEntryText, LazyExecutionBlockPattern);
+            LuaFunction action = null;
             if (lazyExecutionBlockMatch.Success)
             {
                 var code = lazyExecutionBlockMatch.Groups[1].Value;
-                var action = LuaRuntime.Instance.WrapClosure(code);
-                dialogueEntry.SetAction(action);
+                action = LuaRuntime.Instance.WrapClosure(code);
                 textStartIndex += lazyExecutionBlockMatch.Length;
             }
 
-            dialogueEntry.text = dialogueEntryText.Substring(textStartIndex);
-            return dialogueEntry;
+            var text = dialogueEntryText.Substring(textStartIndex);
+            return new DialogueEntry(text, action);
         }
 
         /// <summary>
@@ -206,7 +208,7 @@ namespace Nova
             foreach (var entry in lazyBindingLinks)
             {
                 var node = entry.from;
-                node.branches.Add(entry.branchInfo, flowChartTree.FindNode(entry.destination));
+                node.AddBranch(entry.branchInfo, flowChartTree.FindNode(entry.destination));
             }
 
             // remove unnecessary reference
@@ -235,10 +237,10 @@ namespace Nova
         /// <param name="description">the description of the new node</param>
         public void RegisterNewNode(string name, string description)
         {
-            var nextNode = new FlowChartNode {name = name, description = description};
+            var nextNode = new FlowChartNode(name, description);
             if (currentNode != null && currentNode.type == FlowChartNodeType.Normal)
             {
-                currentNode.branches.Add(BranchInformation.Defualt, nextNode);
+                currentNode.AddBranch(BranchInformation.Defualt, nextNode);
             }
 
             currentNode = nextNode;
@@ -308,11 +310,7 @@ namespace Nova
             {
                 from = currentNode,
                 destination = destination,
-                branchInfo = new BranchInformation
-                {
-                    name = name,
-                    metadata = metadata
-                }
+                branchInfo = new BranchInformation(name, metadata)
             });
         }
 
