@@ -1,11 +1,17 @@
 ﻿using Boo.Lang;
+using UnityEditor.Experimental.UIElements.GraphView;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Nova
 {
     [System.Serializable]
-    public class OnDialogueChangeEvent : UnityEvent<string>
+    public class DialogueChangedEvent : UnityEvent<string>
+    {
+    }
+
+    [System.Serializable]
+    public class NodeChangedEvent : UnityEvent<string, string>
     {
     }
 
@@ -23,7 +29,6 @@ namespace Nova
 
         private void Awake()
         {
-            LuaRuntime.Instance.Init();
             scriptLoader.Init(scriptPath);
             flowChartTree = scriptLoader.GetFlowChartTree();
         }
@@ -52,7 +57,23 @@ namespace Nova
 
         #endregion
 
-        public OnDialogueChangeEvent OnDialogueChanged;
+        /// <summary>
+        /// This event will be triggered if the content of the dialogue has changed. New dialogue text will be
+        /// sent to all listeners
+        /// </summary>
+        /// <remarks>
+        /// The first parameter is the new dialogue text
+        /// </remarks>
+        public DialogueChangedEvent DialogueChanged;
+
+        /// <summary>
+        /// This event will be triggered if the node has changed. The name and discription of the new node will be
+        /// sent to all listeners
+        /// </summary>
+        /// <remarks>
+        /// The first parameter give the new node name, the second parameter give the new node description
+        /// </remarks>
+        public NodeChangedEvent NodeChanged;
 
         /// <summary>
         /// Called after the current node or the index of the current dialogue entry has changed.
@@ -67,7 +88,7 @@ namespace Nova
         {
             currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
             currentDialogueEntry.ExecuteAction();
-            OnDialogueChanged.Invoke(currentDialogueEntry.text);
+            DialogueChanged.Invoke(currentDialogueEntry.text);
         }
 
         /// <summary>
@@ -79,6 +100,7 @@ namespace Nova
             walkedThroughNodes.Add(nextNode.name);
             currentNode = nextNode;
             currentIndex = 0;
+            NodeChanged.Invoke(currentNode.name, currentNode.description);
             UpdateGameState();
         }
 
@@ -110,11 +132,6 @@ namespace Nova
         {
             var startNode = flowChartTree.GetStartUpNode(startName);
             GameStart(startNode);
-        }
-
-        private void OnApplicationQuit()
-        {
-            LuaRuntime.Instance.Dispose();
         }
     }
 }

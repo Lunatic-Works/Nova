@@ -7,7 +7,7 @@ namespace Nova
     /// <summary>
     /// A singleton that offers lua runtime environment
     /// </summary>
-    public class LuaRuntime
+    public class LuaRuntime : MonoBehaviour
     {
         private bool isInited = false;
 
@@ -18,7 +18,7 @@ namespace Nova
         /// This method should be called before every Nova related work happens. The begining of the Start or Awake
         /// of the game controller might be a good choice
         /// </remarks>
-        public void Init()
+        private void Init()
         {
             if (isInited)
             {
@@ -44,7 +44,6 @@ namespace Nova
             lua_bind_object = lua.GetFunction("__Nova.bind_object");
 
             isInited = true;
-            isDisposed = false;
         }
 
         private void CheckInit()
@@ -103,29 +102,19 @@ namespace Nova
             lua.DoString(code);
         }
 
-        private bool isDisposed = true;
-
         /// <summary>
         /// Dispose the lua runtime environment
+        /// This method will be called when the Lua Runtime is destroyed
         /// </summary>
-        public void Dispose()
+        private void Dispose()
         {
-            if (isDisposed)
-            {
-                return;
-            }
-
             CheckInit();
             lua_bind_object.Dispose();
             lua_loadstring.Dispose();
             lua.Dispose();
-
-            isDisposed = true;
         }
 
-        // ------------- Below are the essential codes for singleton pattern --------------- //
-
-        private static readonly LuaRuntime instance = new LuaRuntime();
+        #region Singleton Pattern
 
         static LuaRuntime()
         {
@@ -135,11 +124,78 @@ namespace Nova
         {
         }
 
+        // Codes from http://wiki.unity3d.com/index.php/Singleton
+        private static LuaRuntime _instance;
+
+        private static object _lock = new object();
+
         public static LuaRuntime Instance
         {
-            get { return instance; }
+            get
+            {
+                if (applicationIsQuitting)
+                {
+                    Debug.LogWarning("[Singleton] Instance '" + typeof(LuaRuntime) +
+                                     "' already destroyed on application quit." +
+                                     " Won't create again - returning null.");
+                    return null;
+                }
+
+                lock (_lock)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = (LuaRuntime) FindObjectOfType(typeof(LuaRuntime));
+
+                        if (FindObjectsOfType(typeof(LuaRuntime)).Length > 1)
+                        {
+                            Debug.LogError("[Singleton] Something went really wrong " +
+                                           " - there should never be more than 1 singleton!" +
+                                           " Reopening the scene might fix it.");
+                            return _instance;
+                        }
+
+                        if (_instance == null)
+                        {
+                            GameObject singleton = new GameObject();
+                            _instance = singleton.AddComponent<LuaRuntime>();
+                            _instance.Init();
+                            singleton.name = "(singleton) " + typeof(LuaRuntime).ToString();
+
+                            DontDestroyOnLoad(singleton);
+
+                            Debug.Log("[Singleton] An instance of " + typeof(LuaRuntime) +
+                                      " is needed in the scene, so '" + singleton +
+                                      "' was created with DontDestroyOnLoad.");
+                        }
+                        else
+                        {
+                            Debug.Log("[Singleton] Using instance already created: " +
+                                      _instance.gameObject.name);
+                        }
+                    }
+
+                    return _instance;
+                }
+            }
         }
 
-        // ------------- Above are the essential codes for singleton pattern --------------- //
+        private static bool applicationIsQuitting = false;
+
+        /// <summary>
+        /// When Unity quits, it destroys objects in a random order.
+        /// In principle, a Singleton is only destroyed when application quits.
+        /// If any script calls Instance after it have been destroyed, 
+        ///   it will create a buggy ghost object that will stay on the Editor scene
+        ///   even after stopping playing the Application. Really bad!
+        /// So, this was made to be sure we're not creating that buggy ghost object.
+        /// </summary>
+        public void OnDestroy()
+        {
+            applicationIsQuitting = true;
+            Dispose();
+        }
+
+        #endregion
     }
 }
