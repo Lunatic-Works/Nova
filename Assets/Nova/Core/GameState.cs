@@ -35,7 +35,6 @@ namespace Nova
         public string scriptPath;
 
         private readonly ScriptLoader scriptLoader = new ScriptLoader();
-        private readonly AssetsLoader assetsLoader = new AssetsLoader();
         private FlowChartTree flowChartTree;
 
         private void Awake()
