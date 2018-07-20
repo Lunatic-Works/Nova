@@ -19,7 +19,7 @@ namespace Nova
         /// The path of the sprite, the convention is the same as that of <see cref="Resources.Load(string)"/>
         /// </param>
         /// <returns>The specified sprite or null if not found</returns>
-        public Sprite GetSprite(string path)
+        public static Sprite GetSprite(string path)
         {
             return Resources.Load<Sprite>(path);
         }
@@ -31,7 +31,7 @@ namespace Nova
         /// The path of the AudioClip, the convention is the same as that of <see cref="Resources.Load(string)"/>
         /// </param>
         /// <returns>The specified AudioClip or null if not found</returns>
-        public AudioClip GetAudioClip(string path)
+        public static AudioClip GetAudioClip(string path)
         {
             return Resources.Load<AudioClip>(path);
         }

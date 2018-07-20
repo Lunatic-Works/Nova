@@ -4,3 +4,4 @@
 ---
 
 require 'built_in'
+require 'background_controller'

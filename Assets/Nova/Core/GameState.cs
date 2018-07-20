@@ -185,6 +185,13 @@ namespace Nova
                     break;
                 case FlowChartNodeType.Branching:
                     // A branch occurs, inform branch event listeners
+                    if (isBranching)
+                    {
+                        // A branching is happening, but the player have not decided which branch to select yet
+                        // Break directly to avoid duplicated invocations of the same branching event
+                        break;
+                    }
+
                     isBranching = true;
                     BranchOccurs.Invoke(currentNode.GetAllBranches());
                     break;

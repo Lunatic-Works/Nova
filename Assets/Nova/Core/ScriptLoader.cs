@@ -196,7 +196,7 @@ namespace Nova
                 textStartIndex += lazyExecutionBlockMatch.Length;
             }
 
-            var text = dialogueEntryText.Substring(textStartIndex);
+            var text = dialogueEntryText.Substring(textStartIndex).Trim();
             return new DialogueEntry(text, action);
         }
 
