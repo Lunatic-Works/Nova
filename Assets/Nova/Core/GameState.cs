@@ -218,6 +218,13 @@ namespace Nova
                 throw new InvalidAccessException("Nova: Select branch should only be called when a branch happens");
             }
 
+            var branches = currentNode.GetAllBranches();
+
+            foreach (var branch in branches)
+            {
+                Debug.Log(branch.name);
+            }
+            
             isBranching = false;
             var nextNode = currentNode.GetNext(branchName);
             MoveToNode(nextNode);
