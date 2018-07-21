@@ -6,23 +6,69 @@ using UnityEngine.Events;
 
 namespace Nova
 {
-    [System.Serializable]
-    public class DialogueChangedEvent : UnityEvent<string>
+    public class DialogueChangedEventData
     {
+        public DialogueChangedEventData(string labelName, int dialogueIndex, string text)
+        {
+            this.labelName = labelName;
+            this.dialogueIndex = dialogueIndex;
+            this.text = text;
+        }
+
+        public string labelName { get; private set; }
+        public int dialogueIndex { get; private set; }
+        public string text { get; private set; }
     }
 
     [System.Serializable]
-    public class NodeChangedEvent : UnityEvent<string, string>
+    public class DialogueChangedEvent : UnityEvent<DialogueChangedEventData>
     {
     }
 
-    [System.Serializable]
-    public class BranchOccursEvent : UnityEvent<IEnumerable<BranchInformation>>
+    public class NodeChangedEventData
     {
+        public NodeChangedEventData(string nodeName, string nodeDescription)
+        {
+            this.nodeName = nodeName;
+            this.nodeDescription = nodeDescription;
+        }
+
+        public string nodeName { get; private set; }
+        public string nodeDescription { get; private set; }
     }
 
     [System.Serializable]
-    public class CurrentRouteEndedEvent : UnityEvent<string>
+    public class NodeChangedEvent : UnityEvent<NodeChangedEventData>
+    {
+    }
+
+    public class BranchOccursEventData
+    {
+        public BranchOccursEventData(IEnumerable<BranchInformation> branchInformations)
+        {
+            this.branchInformations = branchInformations;
+        }
+
+        public IEnumerable<BranchInformation> branchInformations { get; private set; }
+    }
+
+    [System.Serializable]
+    public class BranchOccursEvent : UnityEvent<BranchOccursEventData>
+    {
+    }
+
+    public class CurrentRouteEndedEventData
+    {
+        public CurrentRouteEndedEventData(string endName)
+        {
+            this.endName = endName;
+        }
+
+        public string endName { get; private set; }
+    }
+
+    [System.Serializable]
+    public class CurrentRouteEndedEvent : UnityEvent<CurrentRouteEndedEventData>
     {
     }
 
@@ -114,7 +160,8 @@ namespace Nova
         {
             currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
             currentDialogueEntry.ExecuteAction();
-            DialogueChanged.Invoke(currentDialogueEntry.text);
+            DialogueChanged.Invoke(
+                new DialogueChangedEventData(currentNode.name, currentIndex, currentDialogueEntry.text));
         }
 
         /// <summary>
@@ -126,7 +173,7 @@ namespace Nova
             walkedThroughNodes.Add(nextNode.name);
             currentNode = nextNode;
             currentIndex = 0;
-            NodeChanged.Invoke(currentNode.name, currentNode.description);
+            NodeChanged.Invoke(new NodeChangedEventData(currentNode.name, currentNode.description));
             UpdateGameState();
         }
 
@@ -192,10 +239,10 @@ namespace Nova
                     }
 
                     isBranching = true;
-                    BranchOccurs.Invoke(currentNode.GetAllBranches());
+                    BranchOccurs.Invoke(new BranchOccursEventData(currentNode.GetAllBranches()));
                     break;
                 case FlowChartNodeType.End:
-                    CurrentRouteEnded.Invoke(flowChartTree.GetEndName(currentNode));
+                    CurrentRouteEnded.Invoke(new CurrentRouteEndedEventData(flowChartTree.GetEndName(currentNode)));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -224,7 +271,7 @@ namespace Nova
             {
                 Debug.Log(branch.name);
             }
-            
+
             isBranching = false;
             var nextNode = currentNode.GetNext(branchName);
             MoveToNode(nextNode);

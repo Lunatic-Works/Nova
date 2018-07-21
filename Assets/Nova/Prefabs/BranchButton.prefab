@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 114881617801617298}
   - component: {fileID: 114312941846281828}
   m_Layer: 5
-  m_Name: Branch Button
+  m_Name: BranchButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

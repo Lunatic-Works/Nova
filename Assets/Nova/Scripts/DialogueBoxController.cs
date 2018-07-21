@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Nova;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -34,8 +35,8 @@ public class DialogueBoxController : MonoBehaviour
 
     private void Start()
     {
-        dialogueTextArea = transform.Find("DialogueText").gameObject.GetComponent<Text>();
-        nameTextArea = transform.Find("Name/NameText").gameObject.GetComponent<Text>();
+        dialogueTextArea = transform.Find("DialogueBox/DialogueText").gameObject.GetComponent<Text>();
+        nameTextArea = transform.Find("DialogueBox/Name/NameText").gameObject.GetComponent<Text>();
     }
 
     private string currentName;
@@ -49,8 +50,9 @@ public class DialogueBoxController : MonoBehaviour
     /// The content of the dialogue box needs to be changed
     /// </summary>
     /// <param name="text"></param>
-    public void OnDialogueChange(string text)
+    public void OnDialogueChange(DialogueChangedEventData dialogueData)
     {
+        var text = dialogueData.text;
         Debug.Log(string.Format("<color=green><b>{0}</b></color>", text));
 
         // Parse dialogue text

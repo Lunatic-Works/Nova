@@ -11,8 +11,9 @@ public class BranchController : MonoBehaviour
 
     public GameState gameState;
 
-    public void OnBranchHappen(IEnumerable<BranchInformation> branchInformations)
+    public void OnBranchHappen(BranchOccursEventData branchOccursEventData)
     {
+        var branchInformations = branchOccursEventData.branchInformations;
         foreach (var branchInformation in branchInformations)
         {
             var childButtom = Instantiate(branchButtomPrefab);
