@@ -5,3 +5,4 @@
 
 require 'built_in'
 require 'background_controller'
+require 'audio'

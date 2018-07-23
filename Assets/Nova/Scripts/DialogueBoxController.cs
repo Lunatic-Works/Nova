@@ -359,6 +359,7 @@ namespace Nova
                 {
                     Debug.LogError("current dialogue not set, Skip mode stop");
                     _state = DialogueBoxState.Normal;
+                    needAniamtion = shouldNeedAnimation;
                     SkipModeStops.Invoke();
                     yield break;
                 }

@@ -149,7 +149,8 @@ public static class CustomSettings
 
         _GT(typeof(Nova.ScriptLoader)),
         _GT(typeof(Nova.BackgroundController)),
-        _GT(typeof(iTween))
+        _GT(typeof(iTween)),
+        _GT(typeof(Nova.AudioController))
     };
 
     public static List<Type> dynamicList = new List<Type>()
