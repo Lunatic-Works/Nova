@@ -28,6 +28,9 @@ namespace Nova
 
         private bool willSaySomething = false;
 
+        /// <summary>
+        /// Stop the voice when the dialogue will change
+        /// </summary>
         private void OnDialogueWillChange()
         {
             if (audioSource.isPlaying)
@@ -36,6 +39,10 @@ namespace Nova
             }
         }
 
+        /// <summary>
+        /// Play the voice when the dialogue actually changes
+        /// </summary>
+        /// <param name="dialogueChangedEventData"></param>
         private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
         {
             if (willSaySomething)

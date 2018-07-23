@@ -13,6 +13,10 @@ namespace Nova
 
         public GameState gameState;
 
+        /// <summary>
+        /// Show branch buttons when branch happens
+        /// </summary>
+        /// <param name="branchOccursEventData"></param>
         public void OnBranchHappen(BranchOccursEventData branchOccursEventData)
         {
             var branchInformations = branchOccursEventData.branchInformations;
@@ -31,6 +35,10 @@ namespace Nova
             }
         }
 
+        /// <summary>
+        /// Select a branch with the given name
+        /// </summary>
+        /// <param name="branchName">the name of the branch to select</param>
         private void Select(string branchName)
         {
             gameState.SelectBranch(branchName);

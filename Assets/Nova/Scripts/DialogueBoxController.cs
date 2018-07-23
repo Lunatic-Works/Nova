@@ -56,6 +56,10 @@ namespace Nova
 
         private DialogueBoxState _state = DialogueBoxState.Normal;
 
+        /// <summary>
+        /// Current state of the dialogue box
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public DialogueBoxState State
         {
             get { return _state; }

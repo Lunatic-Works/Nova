@@ -40,6 +40,10 @@ namespace Nova
         }
 
 
+        /// <summary>
+        /// Play the audio
+        /// </summary>
+        /// <param name="audioName"></param>
         public void PlayAudio(string audioName)
         {
             var audio = GetAudioClip(audioName);
@@ -48,6 +52,9 @@ namespace Nova
             audioSource.Play();
         }
 
+        /// <summary>
+        /// Stop Audio
+        /// </summary>
         public void StopAudio()
         {
             if (audioSource.isPlaying)
@@ -56,6 +63,12 @@ namespace Nova
             }
         }
 
+        /// <summary>
+        /// Play music at a point in space, handy for sound effect
+        /// </summary>
+        /// <param name="audioName"></param>
+        /// <param name="position"></param>
+        /// <param name="clipVolume"></param>
         public void PlayClipAtPoint(string audioName, Vector3 position, float clipVolume)
         {
             var audio = GetAudioClip(audioName);
