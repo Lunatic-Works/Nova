@@ -632,7 +632,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.59362763, g: 0.7002986, b: 0.8679245, a: 0}
+  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -1004,6 +1004,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptPath: Scripts
+  DialogueWillChange:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   DialogueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1093,6 +1098,21 @@ Prefab:
     - target: {fileID: 1535484973274616, guid: 3ea442272877e46ae84c2a32213a9128, type: 2}
       propertyPath: m_Name
       value: BackgroudImage
+      objectReference: {fileID: 0}
+    - target: {fileID: 212552319352052240, guid: 3ea442272877e46ae84c2a32213a9128,
+        type: 2}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 212552319352052240, guid: 3ea442272877e46ae84c2a32213a9128,
+        type: 2}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 212552319352052240, guid: 3ea442272877e46ae84c2a32213a9128,
+        type: 2}
+      propertyPath: m_Color.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3ea442272877e46ae84c2a32213a9128, type: 2}
@@ -1422,6 +1442,69 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 461420701}
   m_Script: {fileID: 11500000, guid: a62cf927628e24326bffdf99556c4ed1, type: 3}
+--- !u!1001 &1984906672
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531, type: 2}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
+        type: 2}
+      propertyPath: gameState
+      value: 
+      objectReference: {fileID: 989165549}
+    - target: {fileID: 212225574257704068, guid: e708087f7cf8343899832a554e39a531,
+        type: 2}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 8af3bc3ce0d8a4397a6c1cef4f09b73a,
+        type: 3}
+    - target: {fileID: 212225574257704068, guid: e708087f7cf8343899832a554e39a531,
+        type: 2}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
+        type: 2}
+      propertyPath: voiceFileFolder
+      value: Audio/
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: e708087f7cf8343899832a554e39a531, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1001 &2069921429
 Prefab:
   m_ObjectHideFlags: 0

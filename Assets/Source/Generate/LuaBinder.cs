@@ -73,6 +73,7 @@ public static class LuaBinder
 		Nova_ScriptLoaderWrap.Register(L);
 		Nova_BackgroundControllerWrap.Register(L);
 		Nova_AudioControllerWrap.Register(L);
+		Nova_CharacterControllerWrap.Register(L);
 		L.EndModule();
 		L.BeginModule("System");
 		L.RegFunction("Action", System_Action);

@@ -9,16 +9,20 @@ namespace Nova
 {
     public class DialogueChangedEventData
     {
-        public DialogueChangedEventData(string labelName, int dialogueIndex, string text)
+        public DialogueChangedEventData(string labelName, int dialogueIndex, string text,
+            IEnumerable<AudioClip> voicesForNextDialogue)
         {
             this.labelName = labelName;
             this.dialogueIndex = dialogueIndex;
             this.text = text;
+            this.voicesForNextDialogue = voicesForNextDialogue;
         }
 
         public string labelName { get; private set; }
         public int dialogueIndex { get; private set; }
         public string text { get; private set; }
+
+        public IEnumerable<AudioClip> voicesForNextDialogue { get; private set; }
     }
 
     [System.Serializable]
@@ -131,6 +135,12 @@ namespace Nova
         #endregion
 
         /// <summary>
+        /// This event will be triggered if whe content of the dialogue will change. It will be triggered before
+        /// the lazy execution block of the next dialogue is invoked.
+        /// </summary>
+        public UnityEvent DialogueWillChange;
+
+        /// <summary>
         /// This event will be triggered if the content of the dialogue has changed. New dialogue text will be
         /// sent to all listeners
         /// </summary>
@@ -157,6 +167,20 @@ namespace Nova
         /// </summary>
         public CurrentRouteEndedEvent CurrentRouteEnded;
 
+        private readonly List<AudioClip> voicesOfNextDialogue = new List<AudioClip>();
+
+        /// <summary>
+        /// Add a voice clip for the next dialogue
+        /// </summary>
+        /// <remarks>
+        /// This method should be called by Character controllers
+        /// </remarks>
+        /// <param name="audioClip"></param>
+        public void AddVoiceClipOfNextDialogue(AudioClip audioClip)
+        {
+            voicesOfNextDialogue.Add(audioClip);
+        }
+
         /// <summary>
         /// Called after the current node or the index of the current dialogue entry has changed.
         /// </summary>
@@ -169,9 +193,12 @@ namespace Nova
         private void UpdateGameState()
         {
             currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
+            DialogueWillChange.Invoke();
             currentDialogueEntry.ExecuteAction();
             DialogueChanged.Invoke(
-                new DialogueChangedEventData(currentNode.name, currentIndex, currentDialogueEntry.text));
+                new DialogueChangedEventData(currentNode.name, currentIndex, currentDialogueEntry.text,
+                    voicesOfNextDialogue));
+            voicesOfNextDialogue.Clear();
         }
 
         /// <summary>

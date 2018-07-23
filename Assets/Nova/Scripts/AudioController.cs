@@ -14,7 +14,6 @@ namespace Nova
         /// </summary>
         public string audioControllerName;
 
-
         /// <summary>
         /// The path to the audio files
         /// </summary>
@@ -22,18 +21,28 @@ namespace Nova
 
         private AudioSource audioSource;
 
+        public float volume
+        {
+            get { return audioSource.volume; }
+            set { audioSource.volume = value; }
+        }
+
         private void Start()
         {
             audioSource = GetComponent<AudioSource>();
             LuaRuntime.Instance.BindObject(audioControllerName, this);
         }
 
-        #region Methods called by external scripts
+        private AudioClip GetAudioClip(string audioName)
+        {
+            audioName = audioPath + audioName;
+            return AssetsLoader.GetAudioClip(audioName);
+        }
+
 
         public void PlayAudio(string audioName)
         {
-            audioName = audioPath + audioName;
-            var audio = AssetsLoader.GetAudioClip(audioName);
+            var audio = GetAudioClip(audioName);
             StopAudio();
             audioSource.clip = audio;
             audioSource.Play();
@@ -47,6 +56,10 @@ namespace Nova
             }
         }
 
-        #endregion
+        public void PlayClipAtPoint(string audioName, Vector3 position, float clipVolume)
+        {
+            var audio = GetAudioClip(audioName);
+            AudioSource.PlayClipAtPoint(audio, position, clipVolume * volume);
+        }
     }
 }

@@ -41,8 +41,6 @@ namespace Nova
                 lua_loadstring = lua.GetFunction("load");
             }
 
-            lua_bind_object = lua.GetFunction("__Nova.bind_object");
-
             isInited = true;
         }
 
@@ -53,7 +51,6 @@ namespace Nova
 
         private LuaState lua;
         private LuaFunction lua_loadstring;
-        private LuaFunction lua_bind_object;
 
         /// <summary>
         /// Make an object visible in lua.
@@ -64,14 +61,12 @@ namespace Nova
         /// </remarks>
         /// <param name="name">The name to assign</param>
         /// <param name="obj">The object to be assigned</param>
-        public void BindObject(string name, object obj)
+        public void BindObject(string name, object obj, string tableName = "__Nova")
         {
             CheckInit();
-            lua_bind_object.BeginPCall();
-            lua_bind_object.Push(name);
-            lua_bind_object.Push(obj);
-            lua_bind_object.PCall();
-            lua_bind_object.EndPCall();
+            var table = lua.GetTable(tableName);
+            table[name] = obj;
+            table.Dispose();
         }
 
         /// <summary>
@@ -109,7 +104,6 @@ namespace Nova
         private void Dispose()
         {
             CheckInit();
-            lua_bind_object.Dispose();
             lua_loadstring.Dispose();
             lua.Dispose();
         }

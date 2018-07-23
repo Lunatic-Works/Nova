@@ -19,6 +19,12 @@ end
 
 --- play sound
 --- this function should have soundController binded
-function play_sound(audio_name)
-    __Nova.soundController:PlayAudio(audio_name)
+function play_sound(audio_name, position, volume)
+    if position == nil then
+        position = Vector3(0, 0, 0)
+    end
+    if volume == nil then
+        volume = 1
+    end
+    __Nova.soundController:PlayClipAtPoint(audio_name, position, volume)
 end 

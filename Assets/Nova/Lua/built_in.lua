@@ -3,11 +3,7 @@
 --- DateTime: 2018/7/15 3:09 PM
 ---
 
-__Nova = {
-    bind_object = function(name, obj)
-        __Nova[name] = obj
-    end
-}
+__Nova = {}
 
 --- define label
 function label(name, description)
