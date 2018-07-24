@@ -315,5 +315,30 @@ namespace Nova
             BranchSelected.Invoke(
                 new BranchSelectedEventData(selectedBranchInfo));
         }
+
+        /// <summary>
+        /// All restorable objects
+        /// </summary>
+        private readonly Dictionary<string, IRestorable> restorables = new Dictionary<string, IRestorable>();
+
+        /// <summary>
+        /// Register a new restorable object to the game state
+        /// </summary>
+        /// <param name="restorable">The restorable to be added</param>
+        /// <exception cref="ArgumentException">
+        /// Throwed when the name of the restorable object is duplicated defined or the name of the restorable object
+        /// is null
+        /// </exception>
+        public void AddRestorable(IRestorable restorable)
+        {
+            try
+            {
+                restorables.Add(restorable.restorableObjectName, restorable);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException("Nova: a restorable should have an unique and not null name", ex);
+            }
+        }
     }
 }
