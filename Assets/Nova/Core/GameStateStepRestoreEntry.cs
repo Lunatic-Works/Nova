@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Nova
 {
@@ -12,6 +13,7 @@ namespace Nova
     /// each step to perfrom a back step. To make the back step functionality still work after loading from
     /// a checkpoint, the CheckpointManager should store all the GameStateStepRestoreEntry for walked passed dialogues.
     /// </remarks>
+    [Serializable]
     public class GameStateStepRestoreEntry
     {
         private readonly Dictionary<string, IRestoreData> restoreDatas;
