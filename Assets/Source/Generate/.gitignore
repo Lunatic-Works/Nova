@@ -1,6 +1,0 @@
-# Generated files
-*.cs
-*.meta
-
-!DelegateFactory.*
-!LuaBinder.*
