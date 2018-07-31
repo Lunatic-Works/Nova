@@ -22,6 +22,17 @@ namespace Nova
             addFavoriteButton = buttons.Find("AddFavoriteButton").gameObject.GetComponent<Button>();
         }
 
+        private void InitButton(Button button, UnityAction onClickAction)
+        {
+            if (onClickAction == null)
+            {
+                button.gameObject.SetActive(false);
+                return;
+            }
+
+            button.onClick.AddListener(onClickAction);
+        }
+
         /// <summary>
         /// Initialize the log entry prefab
         /// </summary>
@@ -33,9 +44,9 @@ namespace Nova
             UnityAction onAddFavoriteButtonClicked)
         {
             text.text = logEntryText;
-            goBackButton.onClick.AddListener(onGoBackButtonClicked);
-            playVoiceButton.onClick.AddListener(onPlayVoiceButtonClicked);
-            addFavoriteButton.onClick.AddListener(onAddFavoriteButtonClicked);
+            InitButton(goBackButton, onGoBackButtonClicked);
+            InitButton(playVoiceButton, onPlayVoiceButtonClicked);
+            InitButton(addFavoriteButton, onAddFavoriteButtonClicked);
         }
     }
 }

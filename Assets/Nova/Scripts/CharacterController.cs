@@ -65,7 +65,8 @@ namespace Nova
         /// <param name="voiceFileName"></param>
         public void Say(string voiceFileName)
         {
-            var audio = AssetsLoader.GetAudioClip(voiceFileFolder + voiceFileName);
+            voiceFileName = voiceFileFolder + voiceFileName;
+            var audio = AssetsLoader.GetAudioClip(voiceFileName);
             // A character has only one mouth
             if (audioSource.isPlaying)
             {
@@ -74,7 +75,7 @@ namespace Nova
 
             willSaySomething = true;
             audioSource.clip = audio;
-            gameState.AddVoiceClipOfNextDialogue(audio);
+            gameState.AddVoiceClipOfNextDialogue(voiceFileName);
         }
 
         /// <summary>
