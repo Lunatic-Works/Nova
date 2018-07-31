@@ -7,17 +7,23 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BranchController : MonoBehaviour
+    public class BranchController : MonoBehaviour, IRestorable
     {
         public Button branchButtomPrefab;
 
         public GameState gameState;
 
+        private void Start()
+        {
+            gameState.BranchOccurs.AddListener(OnBranchHappen);
+            gameState.AddRestorable(this);
+        }
+
         /// <summary>
         /// Show branch buttons when branch happens
         /// </summary>
         /// <param name="branchOccursEventData"></param>
-        public void OnBranchHappen(BranchOccursEventData branchOccursEventData)
+        private void OnBranchHappen(BranchOccursEventData branchOccursEventData)
         {
             var branchInformations = branchOccursEventData.branchInformations;
             foreach (var branchInformation in branchInformations)
@@ -42,10 +48,32 @@ namespace Nova
         private void Select(string branchName)
         {
             gameState.SelectBranch(branchName);
+            RemoveAllSelectButton();
+        }
+
+        private void RemoveAllSelectButton()
+        {
             foreach (Transform child in transform)
             {
                 GameObject.Destroy(child.gameObject);
             }
+        }
+
+        public string restorableName;
+
+        public string restorableObjectName
+        {
+            get { return restorableName; }
+        }
+
+        public IRestoreData GetRestoreData()
+        {
+            return null;
+        }
+
+        public void Restore(IRestoreData restoreData)
+        {
+            RemoveAllSelectButton();
         }
     }
 }

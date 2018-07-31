@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class CharacterController : MonoBehaviour
+    public class CharacterController : MonoBehaviour, IRestorable
     {
         public string characterVariableName;
 
@@ -17,13 +17,14 @@ namespace Nova
 
         private GameObject characterAppearance;
 
-        void Start()
+        private void Start()
         {
             LuaRuntime.Instance.BindObject(characterVariableName, this, "_G");
             audioSource = GetComponent<AudioSource>();
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
             gameState.DialogueWillChange.AddListener(OnDialogueWillChange);
             characterAppearance = transform.Find("Appearance").gameObject;
+            gameState.AddRestorable(this);
         }
 
         private bool willSaySomething = false;
@@ -106,5 +107,31 @@ namespace Nova
         }
 
         #endregion
+
+        private class RestoreData : IRestoreData
+        {
+            public bool isActive { get; private set; }
+
+            public RestoreData(bool isActive)
+            {
+                this.isActive = isActive;
+            }
+        }
+
+        public string restorableObjectName
+        {
+            get { return characterVariableName; }
+        }
+
+        public IRestoreData GetRestoreData()
+        {
+            return new RestoreData(characterAppearance.activeSelf);
+        }
+
+        public void Restore(IRestoreData restoreData)
+        {
+            var data = restoreData as RestoreData;
+            characterAppearance.SetActive(data.isActive);
+        }
     }
 }

@@ -13,22 +13,15 @@ namespace Nova
 
         private GameObject logContent;
 
+        private GameObject logPanel;
+
         private readonly List<GameObject> logEntries = new List<GameObject>();
 
         private void Awake()
         {
-            logContent = transform.Find("ScrollView/Viewport/Content").gameObject;
+            logPanel = transform.Find("LogPanel").gameObject;
+            logContent = logPanel.transform.Find("ScrollView/Viewport/Content").gameObject;
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
-        }
-
-        public bool hideOnStart;
-
-        private void Start()
-        {
-            if (hideOnStart)
-            {
-                gameObject.SetActive(false);
-            }
         }
 
         private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
@@ -72,7 +65,7 @@ namespace Nova
             Debug.Log(string.Format("Remain log entries count: {0}", logEntries.Count));
             if (hideOnGoBackButtonClicked)
             {
-                gameObject.SetActive(false);
+                Hide();
             }
         }
 
@@ -84,6 +77,22 @@ namespace Nova
                 var clip = AssetsLoader.GetAudioClip(audioName);
                 AudioSource.PlayClipAtPoint(clip, new Vector3(0, 0, -10));
             }
+        }
+
+        /// <summary>
+        /// Show log panel
+        /// </summary>
+        public void Show()
+        {
+            logPanel.SetActive(true);
+        }
+
+        /// <summary>
+        /// Hide log panel
+        /// </summary>
+        public void Hide()
+        {
+            logPanel.SetActive(false);
         }
     }
 }

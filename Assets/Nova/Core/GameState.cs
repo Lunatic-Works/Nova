@@ -248,6 +248,9 @@ namespace Nova
             var nodeHistoryRemoveLength = walkedThroughNodes.Count - backNodeIndex - 1;
             walkedThroughNodes.RemoveRange(backNodeIndex + 1, nodeHistoryRemoveLength);
 
+            // its impossible to branch when goes backward
+            isBranching = false;
+
             // update current node
             currentIndex = dialogueIndex;
             if (nodeName != currentNode.name)
