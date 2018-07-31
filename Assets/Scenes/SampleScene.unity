@@ -1267,18 +1267,7 @@ MonoBehaviour:
       PublicKeyToken=null
   BranchOccurs:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2127728455}
-        m_MethodName: OnBranchHappen
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: Nova.BranchOccursEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   BranchSelected:
@@ -1929,9 +1918,3 @@ RectTransform:
   m_PrefabParentObject: {fileID: 224333530190884814, guid: b41742e0d6317446aaf0903bf13917fa,
     type: 2}
   m_PrefabInternal: {fileID: 973673479}
---- !u!114 &2127728455 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114471260457821372, guid: b41742e0d6317446aaf0903bf13917fa,
-    type: 2}
-  m_PrefabInternal: {fileID: 973673479}
-  m_Script: {fileID: 11500000, guid: fb72d3f5a6c0241f6b42bf974d360877, type: 3}
