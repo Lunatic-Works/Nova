@@ -6,7 +6,7 @@ public class UnityEngine_AudioSourceWrap
 {
 	public static void Register(LuaState L)
 	{
-		L.BeginClass(typeof(UnityEngine.AudioSource), typeof(UnityEngine.AudioBehaviour));
+		L.BeginClass(typeof(UnityEngine.AudioSource), typeof(UnityEngine.Behaviour));
 		L.RegFunction("Play", Play);
 		L.RegFunction("PlayDelayed", PlayDelayed);
 		L.RegFunction("PlayScheduled", PlayScheduled);

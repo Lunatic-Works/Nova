@@ -8,6 +8,9 @@ public class UnityEngine_ScreenWrap
 	{
 		L.BeginStaticLibs("Screen");
 		L.RegFunction("SetResolution", SetResolution);
+		L.RegVar("resolutions", get_resolutions, null);
+		L.RegVar("currentResolution", get_currentResolution, null);
+		L.RegVar("fullScreen", get_fullScreen, set_fullScreen);
 		L.RegVar("width", get_width, null);
 		L.RegVar("height", get_height, null);
 		L.RegVar("dpi", get_dpi, null);
@@ -17,11 +20,7 @@ public class UnityEngine_ScreenWrap
 		L.RegVar("autorotateToPortraitUpsideDown", get_autorotateToPortraitUpsideDown, set_autorotateToPortraitUpsideDown);
 		L.RegVar("autorotateToLandscapeLeft", get_autorotateToLandscapeLeft, set_autorotateToLandscapeLeft);
 		L.RegVar("autorotateToLandscapeRight", get_autorotateToLandscapeRight, set_autorotateToLandscapeRight);
-		L.RegVar("currentResolution", get_currentResolution, null);
-		L.RegVar("fullScreen", get_fullScreen, set_fullScreen);
-		L.RegVar("fullScreenMode", get_fullScreenMode, set_fullScreenMode);
 		L.RegVar("safeArea", get_safeArea, null);
-		L.RegVar("resolutions", get_resolutions, null);
 		L.EndStaticLibs();
 	}
 
@@ -32,37 +31,20 @@ public class UnityEngine_ScreenWrap
 		{
 			int count = LuaDLL.lua_gettop(L);
 
-			if (count == 3 && TypeChecker.CheckTypes<bool>(L, 3))
+			if (count == 3)
 			{
 				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
 				int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
-				bool arg2 = LuaDLL.lua_toboolean(L, 3);
+				bool arg2 = LuaDLL.luaL_checkboolean(L, 3);
 				UnityEngine.Screen.SetResolution(arg0, arg1, arg2);
 				return 0;
 			}
-			else if (count == 3 && TypeChecker.CheckTypes<UnityEngine.FullScreenMode>(L, 3))
+			else if (count == 4)
 			{
 				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
 				int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
-				UnityEngine.FullScreenMode arg2 = (UnityEngine.FullScreenMode)ToLua.ToObject(L, 3);
-				UnityEngine.Screen.SetResolution(arg0, arg1, arg2);
-				return 0;
-			}
-			else if (count == 4 && TypeChecker.CheckTypes<UnityEngine.FullScreenMode, int>(L, 3))
-			{
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-				int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
-				UnityEngine.FullScreenMode arg2 = (UnityEngine.FullScreenMode)ToLua.ToObject(L, 3);
-				int arg3 = (int)LuaDLL.lua_tonumber(L, 4);
-				UnityEngine.Screen.SetResolution(arg0, arg1, arg2, arg3);
-				return 0;
-			}
-			else if (count == 4 && TypeChecker.CheckTypes<bool, int>(L, 3))
-			{
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-				int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
-				bool arg2 = LuaDLL.lua_toboolean(L, 3);
-				int arg3 = (int)LuaDLL.lua_tonumber(L, 4);
+				bool arg2 = LuaDLL.luaL_checkboolean(L, 3);
+				int arg3 = (int)LuaDLL.luaL_checknumber(L, 4);
 				UnityEngine.Screen.SetResolution(arg0, arg1, arg2, arg3);
 				return 0;
 			}
@@ -70,6 +52,48 @@ public class UnityEngine_ScreenWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Screen.SetResolution");
 			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_resolutions(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, UnityEngine.Screen.resolutions);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_currentResolution(IntPtr L)
+	{
+		try
+		{
+			ToLua.PushValue(L, UnityEngine.Screen.currentResolution);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_fullScreen(IntPtr L)
+	{
+		try
+		{
+			LuaDLL.lua_pushboolean(L, UnityEngine.Screen.fullScreen);
+			return 1;
 		}
 		catch (Exception e)
 		{
@@ -204,48 +228,6 @@ public class UnityEngine_ScreenWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_currentResolution(IntPtr L)
-	{
-		try
-		{
-			ToLua.PushValue(L, UnityEngine.Screen.currentResolution);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_fullScreen(IntPtr L)
-	{
-		try
-		{
-			LuaDLL.lua_pushboolean(L, UnityEngine.Screen.fullScreen);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_fullScreenMode(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UnityEngine.Screen.fullScreenMode);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_safeArea(IntPtr L)
 	{
 		try
@@ -260,12 +242,13 @@ public class UnityEngine_ScreenWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_resolutions(IntPtr L)
+	static int set_fullScreen(IntPtr L)
 	{
 		try
 		{
-			ToLua.Push(L, UnityEngine.Screen.resolutions);
-			return 1;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			UnityEngine.Screen.fullScreen = arg0;
+			return 0;
 		}
 		catch (Exception e)
 		{
@@ -355,36 +338,6 @@ public class UnityEngine_ScreenWrap
 		{
 			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
 			UnityEngine.Screen.autorotateToLandscapeRight = arg0;
-			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_fullScreen(IntPtr L)
-	{
-		try
-		{
-			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
-			UnityEngine.Screen.fullScreen = arg0;
-			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_fullScreenMode(IntPtr L)
-	{
-		try
-		{
-			UnityEngine.FullScreenMode arg0 = (UnityEngine.FullScreenMode)ToLua.CheckObject(L, 2, typeof(UnityEngine.FullScreenMode));
-			UnityEngine.Screen.fullScreenMode = arg0;
 			return 0;
 		}
 		catch (Exception e)

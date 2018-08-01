@@ -11,7 +11,6 @@ public class UnityEngine_MeshRendererWrap
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("additionalVertexStreams", get_additionalVertexStreams, set_additionalVertexStreams);
-		L.RegVar("subMeshStartIndex", get_subMeshStartIndex, null);
 		L.EndClass();
 	}
 
@@ -73,25 +72,6 @@ public class UnityEngine_MeshRendererWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index additionalVertexStreams on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_subMeshStartIndex(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			UnityEngine.MeshRenderer obj = (UnityEngine.MeshRenderer)o;
-			int ret = obj.subMeshStartIndex;
-			LuaDLL.lua_pushinteger(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index subMeshStartIndex on a nil value");
 		}
 	}
 

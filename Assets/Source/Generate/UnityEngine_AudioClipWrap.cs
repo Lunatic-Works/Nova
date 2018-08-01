@@ -12,6 +12,7 @@ public class UnityEngine_AudioClipWrap
 		L.RegFunction("GetData", GetData);
 		L.RegFunction("SetData", SetData);
 		L.RegFunction("Create", Create);
+		L.RegFunction("New", _CreateUnityEngine_AudioClip);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("length", get_length, null);
@@ -26,6 +27,30 @@ public class UnityEngine_AudioClipWrap
 		L.RegFunction("PCMReaderCallback", UnityEngine_AudioClip_PCMReaderCallback);
 		L.RegFunction("PCMSetPositionCallback", UnityEngine_AudioClip_PCMSetPositionCallback);
 		L.EndClass();
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int _CreateUnityEngine_AudioClip(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 0)
+			{
+				UnityEngine.AudioClip obj = new UnityEngine.AudioClip();
+				ToLua.PushSealed(L, obj);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to ctor method: UnityEngine.AudioClip.New");
+			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]

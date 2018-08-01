@@ -7,11 +7,16 @@ public class UnityEngine_QualitySettingsWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginStaticLibs("QualitySettings");
+		L.RegFunction("GetQualityLevel", GetQualityLevel);
+		L.RegFunction("SetQualityLevel", SetQualityLevel);
 		L.RegFunction("IncreaseLevel", IncreaseLevel);
 		L.RegFunction("DecreaseLevel", DecreaseLevel);
-		L.RegFunction("SetQualityLevel", SetQualityLevel);
-		L.RegFunction("GetQualityLevel", GetQualityLevel);
 		L.RegFunction("__eq", op_Equality);
+		L.RegVar("names", get_names, null);
+		L.RegVar("shadowCascade4Split", get_shadowCascade4Split, set_shadowCascade4Split);
+		L.RegVar("anisotropicFiltering", get_anisotropicFiltering, set_anisotropicFiltering);
+		L.RegVar("maxQueuedFrames", get_maxQueuedFrames, set_maxQueuedFrames);
+		L.RegVar("blendWeights", get_blendWeights, set_blendWeights);
 		L.RegVar("pixelLightCount", get_pixelLightCount, set_pixelLightCount);
 		L.RegVar("shadows", get_shadows, set_shadows);
 		L.RegVar("shadowProjection", get_shadowProjection, set_shadowProjection);
@@ -21,9 +26,7 @@ public class UnityEngine_QualitySettingsWrap
 		L.RegVar("shadowmaskMode", get_shadowmaskMode, set_shadowmaskMode);
 		L.RegVar("shadowNearPlaneOffset", get_shadowNearPlaneOffset, set_shadowNearPlaneOffset);
 		L.RegVar("shadowCascade2Split", get_shadowCascade2Split, set_shadowCascade2Split);
-		L.RegVar("shadowCascade4Split", get_shadowCascade4Split, set_shadowCascade4Split);
 		L.RegVar("lodBias", get_lodBias, set_lodBias);
-		L.RegVar("anisotropicFiltering", get_anisotropicFiltering, set_anisotropicFiltering);
 		L.RegVar("masterTextureLimit", get_masterTextureLimit, set_masterTextureLimit);
 		L.RegVar("maximumLODLevel", get_maximumLODLevel, set_maximumLODLevel);
 		L.RegVar("particleRaycastBudget", get_particleRaycastBudget, set_particleRaycastBudget);
@@ -36,12 +39,56 @@ public class UnityEngine_QualitySettingsWrap
 		L.RegVar("realtimeReflectionProbes", get_realtimeReflectionProbes, set_realtimeReflectionProbes);
 		L.RegVar("billboardsFaceCameraPosition", get_billboardsFaceCameraPosition, set_billboardsFaceCameraPosition);
 		L.RegVar("resolutionScalingFixedDPIFactor", get_resolutionScalingFixedDPIFactor, set_resolutionScalingFixedDPIFactor);
-		L.RegVar("blendWeights", get_blendWeights, set_blendWeights);
-		L.RegVar("names", get_names, null);
-		L.RegVar("maxQueuedFrames", get_maxQueuedFrames, set_maxQueuedFrames);
 		L.RegVar("desiredColorSpace", get_desiredColorSpace, null);
 		L.RegVar("activeColorSpace", get_activeColorSpace, null);
 		L.EndStaticLibs();
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetQualityLevel(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 0);
+			int o = UnityEngine.QualitySettings.GetQualityLevel();
+			LuaDLL.lua_pushinteger(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetQualityLevel(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1)
+			{
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+				UnityEngine.QualitySettings.SetQualityLevel(arg0);
+				return 0;
+			}
+			else if (count == 2)
+			{
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
+				UnityEngine.QualitySettings.SetQualityLevel(arg0, arg1);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.QualitySettings.SetQualityLevel");
+			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -103,53 +150,6 @@ public class UnityEngine_QualitySettingsWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetQualityLevel(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1)
-			{
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-				UnityEngine.QualitySettings.SetQualityLevel(arg0);
-				return 0;
-			}
-			else if (count == 2)
-			{
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
-				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
-				UnityEngine.QualitySettings.SetQualityLevel(arg0, arg1);
-				return 0;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.QualitySettings.SetQualityLevel");
-			}
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetQualityLevel(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 0);
-			int o = UnityEngine.QualitySettings.GetQualityLevel();
-			LuaDLL.lua_pushinteger(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int op_Equality(IntPtr L)
 	{
 		try
@@ -159,6 +159,76 @@ public class UnityEngine_QualitySettingsWrap
 			UnityEngine.Object arg1 = (UnityEngine.Object)ToLua.ToObject(L, 2);
 			bool o = arg0 == arg1;
 			LuaDLL.lua_pushboolean(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_names(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, UnityEngine.QualitySettings.names);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_shadowCascade4Split(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, UnityEngine.QualitySettings.shadowCascade4Split);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_anisotropicFiltering(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, UnityEngine.QualitySettings.anisotropicFiltering);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_maxQueuedFrames(IntPtr L)
+	{
+		try
+		{
+			LuaDLL.lua_pushinteger(L, UnityEngine.QualitySettings.maxQueuedFrames);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_blendWeights(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, UnityEngine.QualitySettings.blendWeights);
 			return 1;
 		}
 		catch (Exception e)
@@ -294,39 +364,11 @@ public class UnityEngine_QualitySettingsWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_shadowCascade4Split(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UnityEngine.QualitySettings.shadowCascade4Split);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_lodBias(IntPtr L)
 	{
 		try
 		{
 			LuaDLL.lua_pushnumber(L, UnityEngine.QualitySettings.lodBias);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_anisotropicFiltering(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UnityEngine.QualitySettings.anisotropicFiltering);
 			return 1;
 		}
 		catch (Exception e)
@@ -504,48 +546,6 @@ public class UnityEngine_QualitySettingsWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_blendWeights(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UnityEngine.QualitySettings.blendWeights);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_names(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UnityEngine.QualitySettings.names);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_maxQueuedFrames(IntPtr L)
-	{
-		try
-		{
-			LuaDLL.lua_pushinteger(L, UnityEngine.QualitySettings.maxQueuedFrames);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_desiredColorSpace(IntPtr L)
 	{
 		try
@@ -566,6 +566,66 @@ public class UnityEngine_QualitySettingsWrap
 		{
 			ToLua.Push(L, UnityEngine.QualitySettings.activeColorSpace);
 			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_shadowCascade4Split(IntPtr L)
+	{
+		try
+		{
+			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			UnityEngine.QualitySettings.shadowCascade4Split = arg0;
+			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_anisotropicFiltering(IntPtr L)
+	{
+		try
+		{
+			UnityEngine.AnisotropicFiltering arg0 = (UnityEngine.AnisotropicFiltering)ToLua.CheckObject(L, 2, typeof(UnityEngine.AnisotropicFiltering));
+			UnityEngine.QualitySettings.anisotropicFiltering = arg0;
+			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_maxQueuedFrames(IntPtr L)
+	{
+		try
+		{
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			UnityEngine.QualitySettings.maxQueuedFrames = arg0;
+			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_blendWeights(IntPtr L)
+	{
+		try
+		{
+			UnityEngine.BlendWeights arg0 = (UnityEngine.BlendWeights)ToLua.CheckObject(L, 2, typeof(UnityEngine.BlendWeights));
+			UnityEngine.QualitySettings.blendWeights = arg0;
+			return 0;
 		}
 		catch (Exception e)
 		{
@@ -709,42 +769,12 @@ public class UnityEngine_QualitySettingsWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_shadowCascade4Split(IntPtr L)
-	{
-		try
-		{
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
-			UnityEngine.QualitySettings.shadowCascade4Split = arg0;
-			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_lodBias(IntPtr L)
 	{
 		try
 		{
 			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
 			UnityEngine.QualitySettings.lodBias = arg0;
-			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_anisotropicFiltering(IntPtr L)
-	{
-		try
-		{
-			UnityEngine.AnisotropicFiltering arg0 = (UnityEngine.AnisotropicFiltering)ToLua.CheckObject(L, 2, typeof(UnityEngine.AnisotropicFiltering));
-			UnityEngine.QualitySettings.anisotropicFiltering = arg0;
 			return 0;
 		}
 		catch (Exception e)
@@ -925,36 +955,6 @@ public class UnityEngine_QualitySettingsWrap
 		{
 			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
 			UnityEngine.QualitySettings.resolutionScalingFixedDPIFactor = arg0;
-			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_blendWeights(IntPtr L)
-	{
-		try
-		{
-			UnityEngine.BlendWeights arg0 = (UnityEngine.BlendWeights)ToLua.CheckObject(L, 2, typeof(UnityEngine.BlendWeights));
-			UnityEngine.QualitySettings.blendWeights = arg0;
-			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_maxQueuedFrames(IntPtr L)
-	{
-		try
-		{
-			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-			UnityEngine.QualitySettings.maxQueuedFrames = arg0;
 			return 0;
 		}
 		catch (Exception e)

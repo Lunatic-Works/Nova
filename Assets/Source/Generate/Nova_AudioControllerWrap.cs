@@ -10,11 +10,15 @@ public class Nova_AudioControllerWrap
 		L.RegFunction("PlayAudio", PlayAudio);
 		L.RegFunction("StopAudio", StopAudio);
 		L.RegFunction("PlayClipAtPoint", PlayClipAtPoint);
+		L.RegFunction("GetRestoreData", GetRestoreData);
+		L.RegFunction("Restore", Restore);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("audioControllerName", get_audioControllerName, set_audioControllerName);
 		L.RegVar("audioPath", get_audioPath, set_audioPath);
+		L.RegVar("gameState", get_gameState, set_gameState);
 		L.RegVar("volume", get_volume, set_volume);
+		L.RegVar("restorableObjectName", get_restorableObjectName, null);
 		L.EndClass();
 	}
 
@@ -62,6 +66,40 @@ public class Nova_AudioControllerWrap
 			UnityEngine.Vector3 arg1 = ToLua.ToVector3(L, 3);
 			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
 			obj.PlayClipAtPoint(arg0, arg1, arg2);
+			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetRestoreData(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			Nova.AudioController obj = (Nova.AudioController)ToLua.CheckObject<Nova.AudioController>(L, 1);
+			Nova.IRestoreData o = obj.GetRestoreData();
+			ToLua.PushObject(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Restore(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			Nova.AudioController obj = (Nova.AudioController)ToLua.CheckObject<Nova.AudioController>(L, 1);
+			Nova.IRestoreData arg0 = (Nova.IRestoreData)ToLua.CheckObject<Nova.IRestoreData>(L, 2);
+			obj.Restore(arg0);
 			return 0;
 		}
 		catch (Exception e)
@@ -127,6 +165,25 @@ public class Nova_AudioControllerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_gameState(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			Nova.AudioController obj = (Nova.AudioController)o;
+			Nova.GameState ret = obj.gameState;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index gameState on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_volume(IntPtr L)
 	{
 		object o = null;
@@ -142,6 +199,25 @@ public class Nova_AudioControllerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index volume on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_restorableObjectName(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			Nova.AudioController obj = (Nova.AudioController)o;
+			string ret = obj.restorableObjectName;
+			LuaDLL.lua_pushstring(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index restorableObjectName on a nil value");
 		}
 	}
 
@@ -180,6 +256,25 @@ public class Nova_AudioControllerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index audioPath on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_gameState(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			Nova.AudioController obj = (Nova.AudioController)o;
+			Nova.GameState arg0 = (Nova.GameState)ToLua.CheckObject<Nova.GameState>(L, 2);
+			obj.gameState = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index gameState on a nil value");
 		}
 	}
 

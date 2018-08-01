@@ -18,7 +18,6 @@ public class UnityEngine_ParticleSystemWrap
 		L.RegFunction("Clear", Clear);
 		L.RegFunction("IsAlive", IsAlive);
 		L.RegFunction("Emit", Emit);
-		L.RegFunction("TriggerSubEmitter", TriggerSubEmitter);
 		L.RegFunction("New", _CreateUnityEngine_ParticleSystem);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -30,7 +29,6 @@ public class UnityEngine_ParticleSystemWrap
 		L.RegVar("particleCount", get_particleCount, null);
 		L.RegVar("randomSeed", get_randomSeed, set_randomSeed);
 		L.RegVar("useAutoRandomSeed", get_useAutoRandomSeed, set_useAutoRandomSeed);
-		L.RegVar("automaticCullingEnabled", get_automaticCullingEnabled, null);
 		L.RegVar("main", get_main, null);
 		L.RegVar("emission", get_emission, null);
 		L.RegVar("shape", get_shape, null);
@@ -404,48 +402,6 @@ public class UnityEngine_ParticleSystemWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int TriggerSubEmitter(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2)
-			{
-				UnityEngine.ParticleSystem obj = (UnityEngine.ParticleSystem)ToLua.CheckObject(L, 1, typeof(UnityEngine.ParticleSystem));
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-				obj.TriggerSubEmitter(arg0);
-				return 0;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes<System.Collections.Generic.List<UnityEngine.ParticleSystem.Particle>>(L, 3))
-			{
-				UnityEngine.ParticleSystem obj = (UnityEngine.ParticleSystem)ToLua.CheckObject(L, 1, typeof(UnityEngine.ParticleSystem));
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-				System.Collections.Generic.List<UnityEngine.ParticleSystem.Particle> arg1 = (System.Collections.Generic.List<UnityEngine.ParticleSystem.Particle>)ToLua.ToObject(L, 3);
-				obj.TriggerSubEmitter(arg0, arg1);
-				return 0;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes<UnityEngine.ParticleSystem.Particle>(L, 3))
-			{
-				UnityEngine.ParticleSystem obj = (UnityEngine.ParticleSystem)ToLua.CheckObject(L, 1, typeof(UnityEngine.ParticleSystem));
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-				UnityEngine.ParticleSystem.Particle arg1 = StackTraits<UnityEngine.ParticleSystem.Particle>.To(L, 3);
-				obj.TriggerSubEmitter(arg0, ref arg1);
-				ToLua.PushValue(L, arg1);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.ParticleSystem.TriggerSubEmitter");
-			}
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int op_Equality(IntPtr L)
 	{
 		try
@@ -612,25 +568,6 @@ public class UnityEngine_ParticleSystemWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index useAutoRandomSeed on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_automaticCullingEnabled(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			UnityEngine.ParticleSystem obj = (UnityEngine.ParticleSystem)o;
-			bool ret = obj.automaticCullingEnabled;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index automaticCullingEnabled on a nil value");
 		}
 	}
 
