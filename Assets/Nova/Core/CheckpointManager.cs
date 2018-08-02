@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Experimental.PlayerLoop;
 
 namespace Nova
 {
@@ -76,9 +77,33 @@ namespace Nova
     [Serializable]
     public class Bookmark
     {
+        private const int ScreenShotHeight = 240;
+        private const int ScreenShotWidth = 320;
+
         public readonly int DialogueIndex;
         public readonly List<string> NodeHistory;
         public long GlobalSaveIdentifier;
+        public readonly DateTime CreationTime = DateTime.Now;
+
+        public Texture2D ScreenShot
+        {
+            get
+            {
+                if (_screenShot == null && _screenShotBytes != null)
+                {
+                    _screenShot = new Texture2D(ScreenShotWidth, ScreenShotHeight);
+                    _screenShot.LoadRawTextureData(_screenShotBytes);
+                }
+                return _screenShot;
+            }
+            set
+            {
+                _screenShot = value;
+                _screenShotBytes = _screenShot.GetRawTextureData();
+            }
+        }
+        private byte[] _screenShotBytes;
+        [NonSerialized] private Texture2D _screenShot;
 
         /// <summary>
         /// Create a bookmark based on all reached nodes in current gameplay.
@@ -110,7 +135,7 @@ namespace Nova
 
         private GlobalSave _globalSave;
 
-
+        private Dictionary<int, Bookmark> _cachedSaveSlots;
         public HashSet<int> UsedSaveSlots { get; private set; }
 
         /// <summary>
@@ -121,12 +146,13 @@ namespace Nova
             _savePathBase = Application.persistentDataPath + "/Save/";
             _globalSavePath = _savePathBase + "global.nsav";
             _fileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
-            _cryptic = new DESCryptoServiceProvider()
+            _cryptic = new DESCryptoServiceProvider
             {
                 Key = Encoding.ASCII.GetBytes("NovaSave"),
                 IV = Encoding.ASCII.GetBytes("novasave")
             };
             _formatter = new BinaryFormatter();
+            _cachedSaveSlots = new Dictionary<int, Bookmark>();
             UsedSaveSlots = new HashSet<int>();
         }
 
@@ -271,7 +297,7 @@ namespace Nova
         }
 
         /// <summary>
-        /// Save a bookmark, and update the global save file too.
+        /// Save a bookmark to disk, and update the global save file too.
         /// Will throw exception if it fails.
         /// </summary>
         /// <param name="saveId">File No. of the bookmark.</param>
@@ -281,15 +307,17 @@ namespace Nova
             using (var fs = File.OpenWrite(ComposeFileName(saveId)))
             {
                 save.GlobalSaveIdentifier = _globalSave.GlobalSaveIdentifier;
-                WriteSave(save, fs);
+                WriteSave(_cachedSaveSlots[saveId] = save, fs);
             }
 
             using (var fs = File.OpenWrite(_globalSavePath))
                 WriteSave(_globalSave, fs);
+
+            UsedSaveSlots.Add(saveId);
         }
 
         /// <summary>
-        /// Load a bookmark.
+        /// Load a bookmark from disk. Never uses cache.
         /// Will throw exception if it fails.
         /// </summary>
         /// <param name="saveId">File No. of the bookmark.</param>
@@ -301,7 +329,7 @@ namespace Nova
                 Bookmark result = ReadSave<Bookmark>(fs);
                 Assert.AreEqual(result.GlobalSaveIdentifier, _globalSave.GlobalSaveIdentifier,
                     "Nova: Save file is incompatible with the global save file");
-                return result;
+                return _cachedSaveSlots[saveId] = result;
             }
         }
 
@@ -312,6 +340,44 @@ namespace Nova
         public void DeleteBookmark(int saveId)
         {
             File.Delete(ComposeFileName(saveId));
+            UsedSaveSlots.Remove(saveId);
+	        _cachedSaveSlots.Remove(saveId);
+        }
+
+		/// <summary>
+		/// Load the contents of all existing bookmark in the given range eagerly.
+		/// </summary>
+		/// <param name="beginSaveId">The beginning of the range, inclusive.</param>
+		/// <param name="endSaveId">The end of the range, exclusive.</param>
+        public void EagerLoadRange(int beginSaveId, int endSaveId)
+        {
+	        for (; beginSaveId < endSaveId; beginSaveId++)
+	        {
+				if (UsedSaveSlots.Contains(beginSaveId))
+					LoadBookmark(beginSaveId);
+	        }
+        }
+
+		/// <summary>
+		/// Load / Save a bookmark by File No.. Will use cached result if exists.
+		/// </summary>
+		/// <param name="saveId">File No. of the bookmark.</param>
+		/// <returns>The cached or loaded bookmark</returns>
+		public Bookmark this[int saveId]
+        {
+            get
+            {
+	            if (!UsedSaveSlots.Contains(saveId))
+		            return null;
+	            if (!_cachedSaveSlots.ContainsKey(saveId))
+		            LoadBookmark(saveId);
+	            return _cachedSaveSlots[saveId];
+            }
+
+	        set
+	        {
+		        SaveBookmark(saveId, value);
+	        }
         }
     }
 }
