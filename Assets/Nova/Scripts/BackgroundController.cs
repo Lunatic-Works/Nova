@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
@@ -36,6 +37,7 @@ namespace Nova
 
         #endregion
 
+        [Serializable]
         private class RestoreData : IRestoreData
         {
             public string currentImageName { get; private set; }

@@ -274,7 +274,14 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: LayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediateLayoutRebuilder.ForceRebuildLayoutImmediate
+  m_Text: Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+    when an unknown printer took a galley of type and scrambled it to make a type
+    specimen book. It has survived not only five centuries, but also the leap into
+    electronic typesetting, remaining essentially unchanged. It was popularised in
+    the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+    and more recently with desktop publishing software like Aldus PageMaker including
+    versions of Lorem Ipsum.
 --- !u!114 &114202405737686142
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -761,10 +768,10 @@ RectTransform:
   m_Father: {fileID: 224219081132633326}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 40, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 120, y: -20}
+  m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224219081132633326
 RectTransform:
@@ -801,10 +808,10 @@ RectTransform:
   m_Father: {fileID: 224219081132633326}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 40, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 70, y: -20}
+  m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224518972446230178
 RectTransform:
@@ -820,10 +827,10 @@ RectTransform:
   m_Father: {fileID: 224219081132633326}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 40, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 20, y: -20}
+  m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224549731278357398
 RectTransform:

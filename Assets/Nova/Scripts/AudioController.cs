@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.Assertions;
@@ -86,6 +87,7 @@ namespace Nova
         /// <summary>
         /// Data used to restore the state of the audio controller
         /// </summary>
+        [Serializable]
         private class RestoreData : IRestoreData
         {
             public string audioName { get; private set; }
