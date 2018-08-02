@@ -7,7 +7,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Boo.Lang.Runtime;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -77,13 +76,18 @@ namespace Nova
     [Serializable]
     public class Bookmark
     {
-        public readonly string NodeName;
         public readonly int DialogueIndex;
+        public readonly List<string> NodeHistory;
         public long GlobalSaveIdentifier;
 
-        public Bookmark(string nodeName, int dialogueIndex)
+        /// <summary>
+        /// Create a bookmark based on all reached nodes in current gameplay.
+        /// </summary>
+        /// <param name="nodeHistory">List of all reached nodes, including the current one as the last node.</param>
+        /// <param name="dialogueIndex">Index of the current dialogue.</param>
+        public Bookmark(List<string> nodeHistory, int dialogueIndex)
         {
-            NodeName = nodeName;
+            NodeHistory = new List<string>(nodeHistory);
             DialogueIndex = dialogueIndex;
         }
     }
@@ -295,8 +299,8 @@ namespace Nova
             using (var fs = File.OpenRead(ComposeFileName(saveId)))
             {
                 Bookmark result = ReadSave<Bookmark>(fs);
-                if (result.GlobalSaveIdentifier != _globalSave.GlobalSaveIdentifier)
-                    throw new RuntimeException("Nova: Save file is incompatible with the global save file");
+                Assert.AreEqual(result.GlobalSaveIdentifier, _globalSave.GlobalSaveIdentifier,
+                    "Nova: Save file is incompatible with the global save file");
                 return result;
             }
         }
