@@ -360,7 +360,7 @@ namespace Nova
             }
 
             _state = DialogueBoxState.Normal;
-            needAniamtion = shouldNeedAnimation;
+            needAnimation = shouldNeedAnimation;
             SkipModeStops.Invoke();
         }
 

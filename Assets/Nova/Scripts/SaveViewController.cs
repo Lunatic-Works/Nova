@@ -107,21 +107,19 @@ namespace Nova
             }
         }
 
-        // TODO
         private void SaveBookmark(int saveId)
         {
-            var bookmark = new Bookmark(currentNodeName, currentDialogueIndex);
+            var bookmark = gameState.GetBookmark();
             gameState.checkpointManager.SaveBookmark(saveId, bookmark);
             Hide();
         }
 
-        // TODO
         private void LoadBookmark(int saveId)
         {
             var bookmark = gameState.checkpointManager.LoadBookmark(saveId);
-            Debug.Log(bookmark.NodeName);
+            Debug.Log(bookmark.NodeHistory.Last());
             Debug.Log(bookmark.DialogueIndex);
-            // gameState.MoveBackTo(bookmark.NodeName, bookmark.DialogueIndex);
+            gameState.LoadBookmark(bookmark);
             Hide();
         }
 
@@ -153,13 +151,13 @@ namespace Nova
                         onButtonClicked = () => SaveBookmark(saveId);
                         onDeleteButtonClicked = () => DeleteBookmark(saveId);
                     }
-                    else  // saveViewMode == SaveViewMode.Load
+                    else // saveViewMode == SaveViewMode.Load
                     {
                         onButtonClicked = () => LoadBookmark(saveId);
                         onDeleteButtonClicked = () => DeleteBookmark(saveId);
                     }
                 }
-                else  // Bookmark with this saveId is not found
+                else // Bookmark with this saveId is not found
                 {
                     newText = saveId.ToString();
 
@@ -168,7 +166,7 @@ namespace Nova
                         onButtonClicked = () => SaveBookmark(saveId);
                         onDeleteButtonClicked = null;
                     }
-                    else  // saveViewMode == SaveViewMode.Load
+                    else // saveViewMode == SaveViewMode.Load
                     {
                         onButtonClicked = null;
                         onDeleteButtonClicked = null;
