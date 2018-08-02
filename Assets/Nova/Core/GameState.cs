@@ -219,7 +219,8 @@ namespace Nova
         /// <param name="forceRefreshNode">refresh the node no matter the node has changed or not</param>
         private void UpdateGameState(bool forceRefreshDialogue = false, bool forceRefreshNode = false)
         {
-            Assert.IsFalse(walkedThroughNodes.Count == 0);
+            Assert.IsFalse(walkedThroughNodes.Count == 0,
+                "Nova: walkedThroughNodes is empty, can not update game state.");
 
             // update current node
             var desiredNodeName = walkedThroughNodes.Last();
@@ -236,6 +237,8 @@ namespace Nova
 
             if (dialogueChanged || forceRefreshDialogue)
             {
+                Assert.IsTrue(currentIndex >= 0 && currentIndex < currentNode.DialogueEntryCount,
+                    "Nova: dialogue index out of range");
                 currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
                 oldIndex = currentIndex;
 
@@ -493,6 +496,24 @@ namespace Nova
             {
                 restorable.Value.Restore(restoreDatas[restorable.Key]);
             }
+        }
+
+        /// <summary>
+        /// Get the Bookmark of current state
+        /// </summary>
+        public Bookmark GetBookmark()
+        {
+            return new Bookmark(walkedThroughNodes, currentIndex);
+        }
+
+        /// <summary>
+        /// Load a Bookmark, restore to the saved state
+        /// </summary>
+        public void LoadBookmark(Bookmark bookmark)
+        {
+            walkedThroughNodes = bookmark.NodeHistory;
+            Assert.IsFalse(walkedThroughNodes.Count == 0);
+            MoveBackTo(walkedThroughNodes.Last(), bookmark.DialogueIndex);
         }
     }
 }
