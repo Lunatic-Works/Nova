@@ -24,7 +24,7 @@ namespace Nova
 
         public GameState gameState;
 
-        public bool needAniamtion;
+        public bool needAnimation;
 
         public float characterDisplayDuration;
 
@@ -129,7 +129,7 @@ namespace Nova
 
             // change display
             nameTextArea.text = currentName;
-            if (!needAniamtion)
+            if (!needAnimation)
             {
                 dialogueTextArea.text = currentDialogue;
                 return;
@@ -308,8 +308,8 @@ namespace Nova
             Assert.AreEqual(State, DialogueBoxState.Normal, "DialogueBoxState State != DialogueBoxState.Normal");
             // Stop character animation
             StopCharacterAnimation();
-            shouldNeedAnimation = needAniamtion;
-            needAniamtion = false;
+            shouldNeedAnimation = needAnimation;
+            needAnimation = false;
             _state = DialogueBoxState.Skip;
             SkipModeStarts.Invoke();
             // Make sure no one stop skip mode after immediately recieves an SkipModeStarts event
@@ -332,7 +332,7 @@ namespace Nova
         private void StopSkip()
         {
             Assert.AreEqual(State, DialogueBoxState.Skip, "DialogueBoxState State != DialogueBoxState.Skip");
-            needAniamtion = shouldNeedAnimation;
+            needAnimation = shouldNeedAnimation;
             _state = DialogueBoxState.Normal;
             // The if condition here is to make sure no error will be raised if someone switch the State immediately
             // after receives SkipModeStarts event

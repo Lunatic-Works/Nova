@@ -286,6 +286,8 @@ namespace Nova
 
             using (var fs = File.OpenWrite(_globalSavePath))
                 WriteSave(_globalSave, fs);
+
+            UsedSaveSlots.Add(saveId);
         }
 
         /// <summary>
@@ -312,6 +314,7 @@ namespace Nova
         public void DeleteBookmark(int saveId)
         {
             File.Delete(ComposeFileName(saveId));
+            UsedSaveSlots.Remove(saveId);
         }
     }
 }

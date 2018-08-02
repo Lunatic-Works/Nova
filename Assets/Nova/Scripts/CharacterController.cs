@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Nova;
 using UnityEngine;
@@ -108,6 +109,7 @@ namespace Nova
 
         #endregion
 
+        [Serializable]
         private class RestoreData : IRestoreData
         {
             public bool isActive { get; private set; }
