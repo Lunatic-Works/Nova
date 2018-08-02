@@ -42,6 +42,7 @@ MonoBehaviour:
   branchButtomPrefab: {fileID: 114312941846281828, guid: 715673b90003e4c0a97eeaa9141dc935,
     type: 2}
   gameState: {fileID: 0}
+  restorableName: BranchController
 --- !u!114 &114553643433357642
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -59,7 +60,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 50
+  m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -77,8 +78,8 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 132.5}
-  m_SizeDelta: {x: 574.1, y: 320.2}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 120}
+  m_SizeDelta: {x: -240, y: -480}
   m_Pivot: {x: 0.5, y: 0.5}
