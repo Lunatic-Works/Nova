@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nova.Exceptions;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -133,10 +134,26 @@ namespace Nova
         /// </summary>
         private FlowChartNode currentNode;
 
+
+        /// <summary>
+        /// This should only be modified by UpdateGameState
+        /// </summary>
+        private int oldIndex = -1;
+
         /// <summary>
         /// The current dialogueEntry
         /// </summary>
         private DialogueEntry currentDialogueEntry;
+
+        /// <summary>
+        /// BranchOccurs has been triggered, but no branch has been selected
+        /// </summary>
+        private bool isBranching = false;
+
+        /// <summary>
+        /// CurrentRouteEnded has been triggered
+        /// </summary>
+        private bool ended = false;
 
         #endregion
 
@@ -195,27 +212,46 @@ namespace Nova
         /// Called after the current node or the index of the current dialogue entry has changed.
         /// </summary>
         /// <remarks>
-        /// The game state will be updated according to the current node and current dialogue index.
-        /// This method will execute the action in the new current dialogue entry and informs all game state listeners
-        /// Since the action inside the dialogue entry will be executed, this method should not be called twice
-        /// if only one update has happen
+        /// The game state will be updated according to walkedThroughNodes and current dialogue index.
+        /// This method will check if the game state has changed and trigger proper events
         /// </remarks>
-        private void UpdateGameState()
+        /// <param name="forceRefreshDialogue">refresh dialogue no matter the game state has change or not</param>
+        /// <param name="forceRefreshNode">refresh the node no matter the node has changed or not</param>
+        private void UpdateGameState(bool forceRefreshDialogue = false, bool forceRefreshNode = false)
         {
-            currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
+            Assert.IsFalse(walkedThroughNodes.Count == 0);
 
-            if (checkpointManager.IsReached(currentNode.name, currentIndex) == null)
+            // update current node
+            var desiredNodeName = walkedThroughNodes.Last();
+            var nodeChanged = currentNode == null || currentNode.name != desiredNodeName;
+
+            if (nodeChanged || forceRefreshNode)
             {
-                // tell the checkpoint manager a new dialogue entry has been reached
-                checkpointManager.SetReached(currentNode.name, currentIndex, GetGameStateStepRestoreEntry());
+                currentNode = flowChartTree.FindNode(desiredNodeName);
+                NodeChanged.Invoke(new NodeChangedEventData(currentNode.name, currentNode.description));
             }
 
-            DialogueWillChange.Invoke();
-            currentDialogueEntry.ExecuteAction();
-            DialogueChanged.Invoke(
-                new DialogueChangedEventData(currentNode.name, currentIndex, currentDialogueEntry.text,
-                    new List<string>(voicesOfNextDialogue)));
-            voicesOfNextDialogue.Clear();
+            // update dialogue
+            var dialogueChanged = nodeChanged || currentIndex != oldIndex;
+
+            if (dialogueChanged || forceRefreshDialogue)
+            {
+                currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
+                oldIndex = currentIndex;
+
+                if (checkpointManager.IsReached(currentNode.name, currentIndex) == null)
+                {
+                    // tell the checkpoint manager a new dialogue entry has been reached
+                    checkpointManager.SetReached(currentNode.name, currentIndex, GetGameStateStepRestoreEntry());
+                }
+
+                DialogueWillChange.Invoke();
+                currentDialogueEntry.ExecuteAction();
+                DialogueChanged.Invoke(
+                    new DialogueChangedEventData(currentNode.name, currentIndex, currentDialogueEntry.text,
+                        new List<string>(voicesOfNextDialogue)));
+                voicesOfNextDialogue.Clear();
+            }
         }
 
         /// <summary>
@@ -224,10 +260,9 @@ namespace Nova
         /// <param name="nextNode">The next node to move to</param>
         private void MoveToNextNode(FlowChartNode nextNode)
         {
+            Assert.IsFalse(walkedThroughNodes.Count != 0 && nextNode.name == walkedThroughNodes.Last());
             walkedThroughNodes.Add(nextNode.name);
-            currentNode = nextNode;
             currentIndex = 0;
-            NodeChanged.Invoke(new NodeChangedEventData(currentNode.name, currentNode.description));
             UpdateGameState();
         }
 
@@ -240,27 +275,21 @@ namespace Nova
         {
             // restore history
             var backNodeIndex = walkedThroughNodes.FindLastIndex(x => x == nodeName);
-            if (backNodeIndex < 0)
-            {
-                throw new ArgumentException(string.Format("Nova: node {0} has not been walked through", nodeName));
-            }
-
-            var nodeHistoryRemoveLength = walkedThroughNodes.Count - backNodeIndex - 1;
-            walkedThroughNodes.RemoveRange(backNodeIndex + 1, nodeHistoryRemoveLength);
+            Assert.IsFalse(backNodeIndex < 0,
+                string.Format("Nova: move back to node {0} that has not been walked through", nodeName));
 
             // its impossible to branch when goes backward
             isBranching = false;
 
-            // update current node
+            // its impossible to be ended when goes backward
+            ended = false;
+
+            var nodeHistoryRemoveLength = walkedThroughNodes.Count - backNodeIndex - 1;
+            walkedThroughNodes.RemoveRange(backNodeIndex + 1, nodeHistoryRemoveLength);
             currentIndex = dialogueIndex;
-            if (nodeName != currentNode.name)
-            {
-                currentNode = flowChartTree.FindNode(nodeName);
-                NodeChanged.Invoke(new NodeChangedEventData(currentNode.name, currentNode.description));
-            }
 
             // restore status
-            Restore(checkpointManager.IsReached(currentNode.name, currentIndex));
+            Restore(checkpointManager.IsReached(nodeName, dialogueIndex));
 
             // Update game state
             UpdateGameState();
@@ -274,6 +303,8 @@ namespace Nova
         {
             // clear possible history
             walkedThroughNodes = new List<string>();
+            isBranching = false;
+            ended = false;
             MoveToNextNode(startNode);
         }
 
@@ -296,12 +327,38 @@ namespace Nova
             GameStart(startNode);
         }
 
-        private bool isBranching = false;
+        /// <summary>
+        /// Check if current state can step forward directly. i.e. something will happen when call Step
+        /// </summary>
+        public bool canStepForward
+        {
+            get
+            {
+                // can step forward when the player is at the middle of a node
+                if (currentIndex + 1 < currentNode.DialogueEntryCount)
+                {
+                    return true;
+                }
+
+                switch (currentNode.type)
+                {
+                    case FlowChartNodeType.Normal:
+                        return true;
+                    case FlowChartNodeType.Branching:
+                        return !isBranching;
+                    case FlowChartNodeType.End:
+                        return !ended;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
 
         /// <summary>
         /// Step to the next dialogue entry
         /// </summary>
-        public void Step()
+        /// <returns>true if successfully stepped to the next dialogue or trigger some events</returns>
+        public bool Step()
         {
             Assert.IsNotNull(currentNode, "Call Step before the game start");
 
@@ -310,7 +367,7 @@ namespace Nova
             {
                 currentIndex += 1;
                 UpdateGameState();
-                return;
+                return true;
             }
 
             // Reach the end of a node, do something regards on the flow chart node type
@@ -319,7 +376,7 @@ namespace Nova
                 case FlowChartNodeType.Normal:
                     // for normal node, just step directly to the next node
                     MoveToNextNode(currentNode.Next);
-                    break;
+                    return true;
                 case FlowChartNodeType.Branching:
                     // A branch occurs, inform branch event listeners
                     if (isBranching)
@@ -333,6 +390,13 @@ namespace Nova
                     BranchOccurs.Invoke(new BranchOccursEventData(currentNode.GetAllBranches()));
                     break;
                 case FlowChartNodeType.End:
+                    if (ended)
+                    {
+                        // game end, avoid duplicated calls to CurrentRouteEnded
+                        break;
+                    }
+
+                    ended = true;
                     var endName = flowChartTree.GetEndName(currentNode);
                     if (!checkpointManager.IsReached(endName))
                     {
@@ -345,6 +409,8 @@ namespace Nova
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            return false;
         }
 
         /// <summary>
@@ -422,6 +488,7 @@ namespace Nova
         /// <param name="restoreDatas">restore datas</param>
         private void Restore(GameStateStepRestoreEntry restoreDatas)
         {
+            Assert.IsNotNull(restoreDatas);
             foreach (var restorable in restorables)
             {
                 restorable.Value.Restore(restoreDatas[restorable.Key]);

@@ -46,7 +46,6 @@ namespace Nova
             gameState.DialogueChanged.AddListener(OnDialogueChange);
             gameState.BranchOccurs.AddListener(OnBranchOcurrs);
             gameState.BranchSelected.AddListener(OnBranchSelected);
-            gameState.CurrentRouteEnded.AddListener(OnCurrentRounteEnded);
         }
 
         private string currentName;
@@ -154,7 +153,6 @@ namespace Nova
         private void OnBranchOcurrs(BranchOccursEventData branchOccursEventData)
         {
             stateBeforeBranch = State;
-            State = DialogueBoxState.Normal;
         }
 
         public bool continueAutoAfterBranch;
@@ -180,15 +178,6 @@ namespace Nova
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        /// <summary>
-        /// Stop all posible coroutine when game ends
-        /// </summary>
-        /// <param name="currentRouteEndedEventData"></param>
-        private void OnCurrentRounteEnded(CurrentRouteEndedEventData currentRouteEndedEventData)
-        {
-            State = DialogueBoxState.Normal;
         }
 
         private void StartCharacterAnimation()
@@ -286,19 +275,20 @@ namespace Nova
 
         private IEnumerator Auto()
         {
-            while (true)
+            while (gameState.canStepForward)
             {
                 if (currentDialogue == null)
                 {
                     Debug.LogError("current dialogue not set, Auto mode stop");
-                    _state = DialogueBoxState.Normal;
-                    AutoModeStops.Invoke();
-                    yield break;
+                    break;
                 }
 
                 yield return new WaitForSeconds(currentDialogue.Length * AutoWaitTimePerCharacter);
                 gameState.Step();
             }
+
+            _state = DialogueBoxState.Normal;
+            AutoModeStops.Invoke();
         }
 
         private Coroutine skipCoroutine = null;
@@ -357,20 +347,21 @@ namespace Nova
 
         private IEnumerator Skip()
         {
-            while (true)
+            while (gameState.canStepForward)
             {
                 if (currentDialogue == null)
                 {
                     Debug.LogError("current dialogue not set, Skip mode stop");
-                    _state = DialogueBoxState.Normal;
-                    needAniamtion = shouldNeedAnimation;
-                    SkipModeStops.Invoke();
-                    yield break;
+                    break;
                 }
 
                 gameState.Step();
                 yield return new WaitForSeconds(SkipDuration);
             }
+
+            _state = DialogueBoxState.Normal;
+            needAniamtion = shouldNeedAnimation;
+            SkipModeStops.Invoke();
         }
 
         public void OnPointerClick(PointerEventData eventData)
