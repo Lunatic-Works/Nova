@@ -27,16 +27,16 @@ namespace Nova
             var branchInformations = branchOccursEventData.branchInformations;
             foreach (var branchInformation in branchInformations)
             {
-                var childButtom = Instantiate(branchButtonPrefab);
-                childButtom.transform.SetParent(transform);
-                var text = childButtom.GetComponent<Text>();
+                var childButton = Instantiate(branchButtonPrefab);
+                childButton.transform.SetParent(transform);
+                var text = childButton.GetComponent<Text>();
                 if (text == null)
                 {
-                    text = childButtom.GetComponentInChildren<Text>();
+                    text = childButton.GetComponentInChildren<Text>();
                 }
 
                 text.text = branchInformation.name;
-                childButtom.onClick.AddListener(() => Select(branchInformation.name));
+                childButton.onClick.AddListener(() => Select(branchInformation.name));
             }
         }
 

@@ -878,11 +878,6 @@ Prefab:
       propertyPath: gameState
       value: 
       objectReference: {fileID: 989165549}
-    - target: {fileID: 114553643433357642, guid: b41742e0d6317446aaf0903bf13917fa,
-        type: 2}
-      propertyPath: m_Spacing
-      value: 30
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b41742e0d6317446aaf0903bf13917fa, type: 2}
   m_IsPrefabParent: 0
