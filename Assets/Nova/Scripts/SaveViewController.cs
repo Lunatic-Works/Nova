@@ -1,8 +1,11 @@
 ﻿// TODO
-// Call GameState's save and load functions
-// Show thumbnail
-// Show save date and time
+// Change left text to edit bookmark's description
 // Infinite pages, calculate maxPage from UsedSaveSlots
+// Visual difference of save and load
+// Call GameState's save and load functions
+// Edit bookmark's description
+// Show date and time, chapter name, description
+// Show thumbnail
 
 using System.Collections;
 using System.Collections.Generic;
@@ -23,11 +26,11 @@ namespace Nova
     {
         public GameState gameState;
         public GameObject SaveEntryPrefab;
-        public int maxPage;
-        public int maxSaveEntry;
+        public int maxPage = 3;
+        public int maxSaveEntry = 9;
+        public int saveEntryPerRow = 3;
 
         private GameObject savePanel;
-        private GameObject saveContent;
         private Button leftButton;
         private Button rightButton;
         private Text pageText;
@@ -48,20 +51,22 @@ namespace Nova
         private void Awake()
         {
             savePanel = transform.Find("SavePanel").gameObject;
-            saveContent = savePanel.transform.Find("SaveEntries").gameObject;
-            leftButton = savePanel.transform.Find("Pager/LeftButton").gameObject.GetComponent<Button>();
-            rightButton = savePanel.transform.Find("Pager/RightButton").gameObject.GetComponent<Button>();
-            pageText = savePanel.transform.Find("Pager/PageText").gameObject.GetComponent<Text>();
+
+            var pager = savePanel.transform.Find("Background/Right/Bottom/Pager").gameObject;
+            leftButton = pager.transform.Find("LeftButton").gameObject.GetComponent<Button>();
+            rightButton = pager.transform.Find("RightButton").gameObject.GetComponent<Button>();
+            pageText = pager.transform.Find("PageText").gameObject.GetComponent<Text>();
 
             leftButton.onClick.AddListener(() => pageLeft());
             rightButton.onClick.AddListener(() => pageRight());
 
+            var saveEntryGrid = savePanel.transform.Find("Background/Right/Top").gameObject;
             for (var i = 0; i < maxSaveEntry; ++i)
             {
-                var saveEntry = Instantiate(SaveEntryPrefab);
-
+                var saveEntry = saveEntryGrid.transform.Find(
+                    string.Format("Row{0}/SaveEntry{1}", i / saveEntryPerRow, i % saveEntryPerRow)
+                    ).gameObject;
                 saveEntries.Add(saveEntry);
-                saveEntry.transform.SetParent(saveContent.transform);
             }
 
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
@@ -126,6 +131,11 @@ namespace Nova
             Hide();
         }
 
+        private void EditBookmark(int saveId)
+        {
+
+        }
+
         private void DeleteBookmark(int saveId)
         {
             gameState.checkpointManager.DeleteBookmark(saveId);
@@ -142,41 +152,55 @@ namespace Nova
                 var saveEntryController = saveEntry.GetComponent<SaveEntryController>();
                 var saveId = (page - 1) * maxSaveEntry + i + 1;
 
-                string newText;
-                UnityAction onButtonClicked;
+                string newIdText;
+                string newHeaderText;
+                string newFooterText;
+                UnityAction onThumbnailButtonClicked;
+                UnityAction onEditButtonClicked;
                 UnityAction onDeleteButtonClicked;
                 if (gameState.checkpointManager.UsedSaveSlots.Contains(saveId))
                 {
-                    newText = saveId.ToString() + " found";
+                    var saveIdString = saveId.ToString();
+                    newIdText = "#" + saveIdString;
+                    newHeaderText = "Chapter Name";
+                    newFooterText = "1926/08/17 12:34";
 
                     if (saveViewMode == SaveViewMode.Save)
                     {
-                        onButtonClicked = () => SaveBookmark(saveId);
+                        onThumbnailButtonClicked = () => SaveBookmark(saveId);
+                        onEditButtonClicked = () => EditBookmark(saveId);
                         onDeleteButtonClicked = () => DeleteBookmark(saveId);
                     }
                     else // saveViewMode == SaveViewMode.Load
                     {
-                        onButtonClicked = () => LoadBookmark(saveId);
+                        onThumbnailButtonClicked = () => LoadBookmark(saveId);
+                        onEditButtonClicked = () => EditBookmark(saveId);
                         onDeleteButtonClicked = () => DeleteBookmark(saveId);
                     }
                 }
                 else // Bookmark with this saveId is not found
                 {
-                    newText = saveId.ToString();
+                    var saveIdString = saveId.ToString();
+                    newIdText = "#" + saveIdString;
+                    newHeaderText = "";
+                    newFooterText = "";
 
                     if (saveViewMode == SaveViewMode.Save)
                     {
-                        onButtonClicked = () => SaveBookmark(saveId);
+                        onThumbnailButtonClicked = () => SaveBookmark(saveId);
+                        onEditButtonClicked = null;
                         onDeleteButtonClicked = null;
                     }
                     else // saveViewMode == SaveViewMode.Load
                     {
-                        onButtonClicked = null;
+                        onThumbnailButtonClicked = null;
+                        onEditButtonClicked = null;
                         onDeleteButtonClicked = null;
                     }
                 }
 
-                saveEntryController.Init(newText, onButtonClicked, onDeleteButtonClicked);
+                saveEntryController.Init(newIdText, newHeaderText, newFooterText,
+                    onThumbnailButtonClicked, onEditButtonClicked, onDeleteButtonClicked);
             }
         }
     }

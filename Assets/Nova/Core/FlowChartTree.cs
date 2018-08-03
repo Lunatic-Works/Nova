@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Nova.Exceptions;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -205,7 +204,7 @@ namespace Nova
         /// <remarks>
         /// This method will check if the given node is already in the tree. it will raise an ArgumentException
         /// if the node is not found. A node can have only one end name, and an end name can refer to only one node.
-        /// A DuplicatedDefinitionException will been raised of the above bijection rule is violated. 
+        /// A DuplicatedDefinitionException will been raised of the above bijection rule is violated.
         /// </remarks>
         /// <param name="name">
         /// the name of the end. the name of the end can be different from that of the node

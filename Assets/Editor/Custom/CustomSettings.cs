@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using LuaInterface;
-using UnityEditor;
 using BindType = ToLuaMenu.BindType;
 using System.Reflection;
 
@@ -53,7 +52,7 @@ public static class CustomSettings
         //_GT(typeof(Dictionary<int, TestAccount>.ValueCollection)),
         //_GT(typeof(TestExport)),
         //_GT(typeof(TestExport.Space)),
-        //-------------------------------------------------------------------        
+        //-------------------------------------------------------------------
 
         _GT(typeof(Debugger)).SetNameSpace(null),
 
@@ -74,7 +73,7 @@ public static class CustomSettings
         _GT(typeof(Camera)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
         _GT(typeof(AudioSource)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
         //_GT(typeof(LineRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
-        //_GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),    
+        //_GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
 #else
 
         _GT(typeof(Component)),
@@ -123,7 +122,7 @@ public static class CustomSettings
 #if !UNITY_5_4_OR_NEWER
         _GT(typeof(ParticleEmitter)),
         _GT(typeof(ParticleRenderer)),
-        _GT(typeof(ParticleAnimator)), 
+        _GT(typeof(ParticleAnimator)),
 #endif
 
         _GT(typeof(BoxCollider)),
@@ -206,7 +205,7 @@ public static class CustomSettings
         typeof(UIEventListener),
         typeof(UIScrollBar),
         typeof(UICenterOnChild),
-        typeof(UIScrollView),        
+        typeof(UIScrollView),
         typeof(UIButton),
         typeof(UITextList),
         typeof(UIPlayTween),

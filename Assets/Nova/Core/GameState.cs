@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nova.Exceptions;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -321,7 +320,7 @@ namespace Nova
         }
 
         /// <summary>
-        /// Start the game from a named start point 
+        /// Start the game from a named start point
         /// </summary>
         /// <param name="startName">the name of the start</param>
         public void Gamestart(string startName)
