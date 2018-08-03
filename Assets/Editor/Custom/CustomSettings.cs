@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using LuaInterface;
 using BindType = ToLuaMenu.BindType;
 using System.Reflection;
+using UnityEditor;
 
 public static class CustomSettings
 {
