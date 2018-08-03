@@ -337,6 +337,12 @@ namespace Nova
         {
             get
             {
+                if (currentNode == null)
+                {
+                    Debug.Log("Nova: Can not call Step before game start.");
+                    return false;
+                }
+
                 // can step forward when the player is at the middle of a node
                 if (currentIndex + 1 < currentNode.DialogueEntryCount)
                 {
@@ -494,7 +500,18 @@ namespace Nova
             Assert.IsNotNull(restoreDatas);
             foreach (var restorable in restorables)
             {
-                restorable.Value.Restore(restoreDatas[restorable.Key]);
+                try
+                {
+                    var restoreData = restoreDatas[restorable.Key];
+                    restorable.Value.Restore(restoreData);
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    Debug.LogError(
+                        string.Format("Key {0} not found in restorableDatas, check if restorable names of " +
+                                      "Restorables has changed. If that is true, try clear all checkpoint " +
+                                      "files, or undo the change of the restorable name", restorable.Key));
+                }
             }
         }
 
