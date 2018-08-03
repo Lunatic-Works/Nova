@@ -18,10 +18,6 @@ namespace Nova
 
     public class DialogueBoxController : MonoBehaviour, IPointerClickHandler
     {
-        private Text dialogueTextArea;
-
-        private Text nameTextArea;
-
         public GameState gameState;
 
         public bool needAnimation;
@@ -38,10 +34,30 @@ namespace Nova
         /// </summary>
         public int nameGroup;
 
+        private Text nameTextArea;
+        private Text dialogueTextArea;
+        private Button saveButton;
+        private Button loadButton;
+        private Button autoButton;
+        private Button skipButton;
+        private Button logButton;
+
         private void Start()
         {
+            nameTextArea = transform.Find("NameBox/NameText").gameObject.GetComponent<Text>();
             dialogueTextArea = transform.Find("DialogueBox/DialogueText").gameObject.GetComponent<Text>();
-            nameTextArea = transform.Find("DialogueBox/Name/NameText").gameObject.GetComponent<Text>();
+            saveButton = transform.Find("Buttons/Save").gameObject.GetComponent<Button>();
+            loadButton = transform.Find("Buttons/Load").gameObject.GetComponent<Button>();
+            autoButton = transform.Find("Buttons/Auto").gameObject.GetComponent<Button>();
+            skipButton = transform.Find("Buttons/Skip").gameObject.GetComponent<Button>();
+            logButton = transform.Find("Buttons/Log").gameObject.GetComponent<Button>();
+
+            autoButton.onClick.AddListener(() => { State = DialogueBoxState.Auto; });
+            skipButton.onClick.AddListener(() => { State = DialogueBoxState.Skip; });
+
+            saveButton.onClick.AddListener(() => { State = DialogueBoxState.Normal; });
+            loadButton.onClick.AddListener(() => { State = DialogueBoxState.Normal; });
+            logButton.onClick.AddListener(() => { State = DialogueBoxState.Normal; });
 
             gameState.DialogueChanged.AddListener(OnDialogueChange);
             gameState.BranchOccurs.AddListener(OnBranchOcurrs);
@@ -59,7 +75,7 @@ namespace Nova
         /// Current state of the dialogue box
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public DialogueBoxState State
+        private DialogueBoxState State
         {
             get { return _state; }
             set
@@ -383,6 +399,21 @@ namespace Nova
         private void OnDestroy()
         {
             StopAllCoroutines();
+        }
+
+        public void StartAuto()
+        {
+            State = DialogueBoxState.Auto;
+        }
+
+        public void StartSkip()
+        {
+            State = DialogueBoxState.Skip;
+        }
+
+        public void StopAutoSkip()
+        {
+            State = DialogueBoxState.Normal;
         }
     }
 }

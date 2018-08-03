@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-
 namespace Nova
 {
     public class ClickToHide : MonoBehaviour, IPointerClickHandler
