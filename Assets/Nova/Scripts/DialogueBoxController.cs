@@ -59,7 +59,7 @@ namespace Nova
             loadButton.onClick.AddListener(() => { State = DialogueBoxState.Normal; });
             logButton.onClick.AddListener(() => { State = DialogueBoxState.Normal; });
 
-            gameState.DialogueChanged.AddListener(OnDialogueChange);
+            gameState.DialogueChanged.AddListener(OnDialogueChanged);
             gameState.BranchOccurs.AddListener(OnBranchOcurrs);
             gameState.BranchSelected.AddListener(OnBranchSelected);
         }
@@ -122,7 +122,7 @@ namespace Nova
         /// The content of the dialogue box needs to be changed
         /// </summary>
         /// <param name="text"></param>
-        private void OnDialogueChange(DialogueChangedEventData dialogueData)
+        private void OnDialogueChanged(DialogueChangedEventData dialogueData)
         {
             var text = dialogueData.text;
             Debug.Log(string.Format("<color=green><b>{0}</b></color>", text));

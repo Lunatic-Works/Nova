@@ -53,6 +53,9 @@ namespace Nova
             rightButton = savePanel.transform.Find("Pager/RightButton").gameObject.GetComponent<Button>();
             pageText = savePanel.transform.Find("Pager/PageText").gameObject.GetComponent<Text>();
 
+            leftButton.onClick.AddListener(() => pageLeft());
+            rightButton.onClick.AddListener(() => pageRight());
+
             for (var i = 0; i < maxSaveEntry; ++i)
             {
                 var saveEntry = Instantiate(SaveEntryPrefab);
