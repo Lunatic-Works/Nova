@@ -8,7 +8,7 @@ namespace Nova
 {
     public class BranchController : MonoBehaviour, IRestorable
     {
-        public Button branchButtomPrefab;
+        public Button branchButtonPrefab;
 
         public GameState gameState;
 
@@ -27,7 +27,7 @@ namespace Nova
             var branchInformations = branchOccursEventData.branchInformations;
             foreach (var branchInformation in branchInformations)
             {
-                var childButtom = Instantiate(branchButtomPrefab);
+                var childButtom = Instantiate(branchButtonPrefab);
                 childButtom.transform.SetParent(transform);
                 var text = childButtom.GetComponent<Text>();
                 if (text == null)

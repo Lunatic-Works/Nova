@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224595701197771078}
   - component: {fileID: 114486548689275498}
+  - component: {fileID: 114018099735118882}
   m_Layer: 5
   m_Name: Buttons
   m_TagString: Untagged
@@ -290,6 +291,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &114018099735118882
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1012954009621324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 531d2408e5a7c1d478419bdc4e6e833f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogueBoxController: {fileID: 114358814597933850}
 --- !u!114 &114036122428796856
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -653,7 +666,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameState: {fileID: 0}
-  needAnimation: 0
+  needAnimation: 1
   characterDisplayDuration: 0.1
   namePattern: "^(.*?)(:?\\:|\uFF1A)"
   nameGroup: 1
