@@ -39,9 +39,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb72d3f5a6c0241f6b42bf974d360877, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  branchButtonPrefab: {fileID: 0}
+  branchButtonPrefab: {fileID: 114312941846281828, guid: 715673b90003e4c0a97eeaa9141dc935,
+    type: 2}
   gameState: {fileID: 0}
-  restorableName: BranchController
+  restorableName: 
 --- !u!114 &114553643433357642
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -59,10 +60,10 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
+  m_Spacing: 30
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
 --- !u!224 &224333530190884814
 RectTransform:
@@ -80,5 +81,5 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 120}
-  m_SizeDelta: {x: -240, y: -480}
+  m_SizeDelta: {x: -480, y: -480}
   m_Pivot: {x: 0.5, y: 0.5}
