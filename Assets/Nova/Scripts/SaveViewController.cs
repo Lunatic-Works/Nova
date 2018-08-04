@@ -1,12 +1,11 @@
 ﻿// TODO
-// Save/Load/Show thumbnail
-// Resize/Clip screenshot, scale thumbnail by shorter axis (some code are in ScreenCapturer.cs)
+// Scale thumbnail by shorter axis
 // Show preview when mouse is hovering
-// GC of Texture and Sprite
 //
 // Page 0 for auto save, last page for new page
 // Auto hide edit and delete buttons
 // UI to edit bookmark's description
+// Compress thumbnail
 //
 // Function to update bookmark's description
 
@@ -60,6 +59,7 @@ namespace Nova
 
         private ScreenCapturer screenCapturer;
         // screenTexture and screenSprite are created when Show is called and savePanel is not active
+        // They are destroyed when Hide is called and savePanel is active
         private Texture2D screenTexture;
         private Sprite screenSprite;
 
@@ -131,8 +131,9 @@ namespace Nova
             currentDialogueText = dialogueChangedEventData.text;
         }
 
-        private Sprite TextureToSprite(Texture2D texture)
+        private Sprite Texture2DToSprite(Texture2D texture)
         {
+            Debug.Log(string.Format("Texture2DToSprite, {0}, {1}", texture.width, texture.height));
             return Sprite.Create(
                     texture,
                     new Rect(0, 0, texture.width, texture.height),
@@ -145,7 +146,7 @@ namespace Nova
             if (!savePanel.activeInHierarchy)
             {
                 screenTexture = screenCapturer.GetTexture();
-                screenSprite = TextureToSprite(screenTexture);
+                screenSprite = Texture2DToSprite(screenTexture);
             }
             savePanel.SetActive(true);
             ShowPreview(screenSprite, string.Format(
@@ -172,6 +173,13 @@ namespace Nova
 
         public void Hide()
         {
+            if (savePanel.activeInHierarchy)
+            {
+                Destroy(screenTexture);
+                Destroy(screenSprite);
+                screenTexture = null;
+                screenSprite = null;
+            }
             savePanel.SetActive(false);
         }
 
@@ -196,7 +204,7 @@ namespace Nova
         private void SaveBookmark(int saveId)
         {
             var bookmark = gameState.GetBookmark();
-            // bookmark.ScreenShot = screenTexture;
+            bookmark.ScreenShot = screenSprite;
             gameState.checkpointManager.SaveBookmark(saveId, bookmark);
             Hide();
         }
@@ -290,8 +298,8 @@ namespace Nova
                         onDeleteButtonClicked = () => DeleteBookmark(saveId);
                     }
 
-                    newThumbnailSprite = testThumbnailSprite;
-                    // newThumbnailSprite = TextureToSprite(bookmark.ScreenShot);
+                    // newThumbnailSprite = testThumbnailSprite;
+                    newThumbnailSprite = bookmark.ScreenShot;
                 }
                 else // Bookmark with this saveId is not found
                 {

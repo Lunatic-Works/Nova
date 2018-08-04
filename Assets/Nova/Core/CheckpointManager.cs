@@ -77,32 +77,46 @@ namespace Nova
     public class Bookmark
     {
         public const int ScreenShotWidth = 320;
-        public const int ScreenShotHeight = 240;
+        public const int ScreenShotHeight = 180;
 
         public readonly int DialogueIndex;
         public readonly List<string> NodeHistory;
         public long GlobalSaveIdentifier;
         public readonly DateTime CreationTime = DateTime.Now;
 
-        public Texture2D ScreenShot
+        private byte[] _screenShotBytes;
+        [NonSerialized] private Texture2D _screenShotTexture;
+        [NonSerialized] private Sprite _screenShotSprite;
+        public Sprite ScreenShot
         {
             get
             {
-                if (_screenShot == null && _screenShotBytes != null)
+                if (_screenShotBytes == null)
                 {
-                    _screenShot = new Texture2D(ScreenShotWidth, ScreenShotHeight);
-                    _screenShot.LoadRawTextureData(_screenShotBytes);
+                    return null;
                 }
-                return _screenShot;
+
+                if (_screenShotSprite == null)
+                {
+                    _screenShotTexture = new Texture2D(ScreenShotWidth, ScreenShotHeight, TextureFormat.RGB24, false);
+                    _screenShotTexture.LoadRawTextureData(_screenShotBytes);
+                    _screenShotTexture.Apply();
+                    _screenShotSprite = Texture2DToSprite(_screenShotTexture);
+                }
+
+                return _screenShotSprite;
             }
             set
             {
-                _screenShot = value;
-                _screenShotBytes = _screenShot.GetRawTextureData();
+                _screenShotSprite = value;
+                _screenShotTexture = _screenShotSprite.texture;
+                _screenShotBytes = _screenShotTexture.GetRawTextureData();
+                Debug.Log("set ScreenShot");
+                Debug.Log(_screenShotTexture.width);
+                Debug.Log(_screenShotTexture.height);
+                Debug.Log(_screenShotBytes.GetLength(0));
             }
         }
-        private byte[] _screenShotBytes;
-        [NonSerialized] private Texture2D _screenShot;
 
         /// <summary>
         /// Create a bookmark based on all reached nodes in current gameplay.
@@ -113,6 +127,16 @@ namespace Nova
         {
             NodeHistory = new List<string>(nodeHistory);
             DialogueIndex = dialogueIndex;
+        }
+
+        private Sprite Texture2DToSprite(Texture2D texture)
+        {
+            Debug.Log(string.Format("Texture2DToSprite, {0}, {1}", texture.width, texture.height));
+            return Sprite.Create(
+                    texture,
+                    new Rect(0, 0, texture.width, texture.height),
+                    new Vector2(0.5f, 0.5f)
+                );
         }
     }
 

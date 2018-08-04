@@ -24,12 +24,10 @@ namespace Nova
             RenderTexture.active = renderTexture;
             texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0, false);
             RenderTexture.active = null;
-
-            // Resize to bookmark's size
-            // TODO: clipping
-            // texture.Resize(Bookmark.ScreenShotWidth, Bookmark.ScreenShotHeight);
-
             texture.Apply();
+
+            TextureScale.Bilinear(texture, Bookmark.ScreenShotWidth, Bookmark.ScreenShotHeight);
+
             return texture;
         }
     }
