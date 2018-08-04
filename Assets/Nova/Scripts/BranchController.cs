@@ -8,9 +8,9 @@ namespace Nova
 {
     public class BranchController : MonoBehaviour, IRestorable
     {
-        public Button branchButtonPrefab;
-
         public GameState gameState;
+        public GameObject BranchButtonPrefab;
+        public GameObject blackPanel;
 
         private void Start()
         {
@@ -24,19 +24,21 @@ namespace Nova
         /// <param name="branchOccursEventData"></param>
         private void OnBranchHappen(BranchOccursEventData branchOccursEventData)
         {
+            blackPanel.SetActive(true);
+
             var branchInformations = branchOccursEventData.branchInformations;
             foreach (var branchInformation in branchInformations)
             {
-                var childButton = Instantiate(branchButtonPrefab);
+                var childButton = Instantiate(BranchButtonPrefab);
                 childButton.transform.SetParent(transform);
                 var text = childButton.GetComponent<Text>();
                 if (text == null)
                 {
                     text = childButton.GetComponentInChildren<Text>();
                 }
-
                 text.text = branchInformation.name;
-                childButton.onClick.AddListener(() => Select(branchInformation.name));
+
+                childButton.GetComponent<Button>().onClick.AddListener(() => Select(branchInformation.name));
             }
         }
 
@@ -46,6 +48,8 @@ namespace Nova
         /// <param name="branchName">the name of the branch to select</param>
         private void Select(string branchName)
         {
+            blackPanel.SetActive(false);
+
             gameState.SelectBranch(branchName);
             RemoveAllSelectButton();
         }
@@ -72,6 +76,8 @@ namespace Nova
 
         public void Restore(IRestoreData restoreData)
         {
+            blackPanel.SetActive(false);
+
             RemoveAllSelectButton();
         }
     }
