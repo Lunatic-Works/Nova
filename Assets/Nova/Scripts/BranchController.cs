@@ -11,6 +11,7 @@ namespace Nova
         public GameState gameState;
         public GameObject BranchButtonPrefab;
         public GameObject blackPanel;
+        public bool dimOnBranch;
 
         private void Start()
         {
@@ -24,7 +25,10 @@ namespace Nova
         /// <param name="branchOccursEventData"></param>
         private void OnBranchHappen(BranchOccursEventData branchOccursEventData)
         {
-            blackPanel.SetActive(true);
+            if (dimOnBranch)
+            {
+                blackPanel.SetActive(true);
+            }
 
             var branchInformations = branchOccursEventData.branchInformations;
             foreach (var branchInformation in branchInformations)

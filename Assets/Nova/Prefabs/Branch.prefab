@@ -43,6 +43,7 @@ MonoBehaviour:
   BranchButtonPrefab: {fileID: 1283954230108114, guid: 715673b90003e4c0a97eeaa9141dc935,
     type: 2}
   blackPanel: {fileID: 0}
+  dimOnBranch: 0
   restorableName: BranchName
 --- !u!114 &114847438731727154
 MonoBehaviour:

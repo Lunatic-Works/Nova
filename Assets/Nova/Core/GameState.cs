@@ -65,7 +65,6 @@ namespace Nova
     {
     }
 
-
     public class BranchSelectedEventData
     {
         public BranchSelectedEventData(BranchInformation selectedBranchInformation)
