@@ -1,13 +1,14 @@
 ﻿// TODO
-// Change left text to edit bookmark's description
-// Infinite pages, calculate maxPage from UsedSaveSlots
+// Page 0 for auto save, last page for new page
 // Visual difference of save and load
-// Call GameState's save and load functions
-// Edit bookmark's description
-// Show date and time, chapter name, description
-// Show thumbnail
+// Auto hide edit and delete buttons
+// UI to edit bookmark's description
+// Capture thumbnail
+//
+// Function to save and load bookmark
+// Function to get bookmark's date and time, chapter name, description, thumbnail
+// Function to update bookmark's description
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -26,15 +27,20 @@ namespace Nova
     {
         public GameState gameState;
         public GameObject SaveEntryPrefab;
-        public readonly int maxPage = 3;
-        public readonly int maxSaveEntry = 9;
-        public readonly int saveEntryPerRow = 3;
+        public GameObject SaveEntryRowPrefab;
+        public readonly int maxRow = 3;
+        public readonly int maxCol = 3;
         public Sprite noThumbnailSprite;
+
+        private int maxSaveEntry;
+        private int page = 1;
+
+        // When ShowPage is called, maxPage is updated
+        // Use a data structure to maintain maximum for usedSaveSlots may improve performance
+        private int maxPage = 1;
 
         private GameObject savePanel;
 
-        private GameObject saveButtonPanel;
-        private GameObject loadButtonPanel;
         private Button saveButton;
         private Button loadButton;
         private Image saveButtonImage;
@@ -42,28 +48,36 @@ namespace Nova
 
         private Button leftButton;
         private Button rightButton;
+        private Text leftButtonText;
+        private Text rightButtonText;
         private Text pageText;
-        private int page = 1;
 
         private readonly List<GameObject> saveEntries = new List<GameObject>();
+        private HashSet<int> usedSaveSlots;
 
         private SaveViewMode saveViewMode;
 
         private void Awake()
         {
+            maxSaveEntry = maxRow * maxCol;
+
             savePanel = transform.Find("SavePanel").gameObject;
 
             var bottom = savePanel.transform.Find("Background/Right/Bottom").gameObject;
-            saveButtonPanel = bottom.transform.Find("SaveButton").gameObject;
-            loadButtonPanel = bottom.transform.Find("LoadButton").gameObject;
+            var saveButtonPanel = bottom.transform.Find("SaveButton").gameObject;
             saveButton = saveButtonPanel.GetComponent<Button>();
-            loadButton = loadButtonPanel.GetComponent<Button>();
             saveButtonImage = saveButtonPanel.GetComponent<Image>();
+            var loadButtonPanel = bottom.transform.Find("LoadButton").gameObject;
+            loadButton = loadButtonPanel.GetComponent<Button>();
             loadButtonImage = loadButtonPanel.GetComponent<Image>();
 
             var pager = bottom.transform.Find("Pager").gameObject;
-            leftButton = pager.transform.Find("LeftButton").gameObject.GetComponent<Button>();
-            rightButton = pager.transform.Find("RightButton").gameObject.GetComponent<Button>();
+            var leftButtonPanel = pager.transform.Find("LeftButton").gameObject;
+            leftButton = leftButtonPanel.GetComponent<Button>();
+            leftButtonText = leftButtonPanel.GetComponent<Text>();
+            var rightButtonPanel = pager.transform.Find("RightButton").gameObject;
+            rightButton = rightButtonPanel.GetComponent<Button>();
+            rightButtonText = rightButtonPanel.GetComponent<Text>();
             pageText = pager.transform.Find("PageText").gameObject.GetComponent<Text>();
 
             leftButton.onClick.AddListener(() => pageLeft());
@@ -73,13 +87,19 @@ namespace Nova
         private void Start()
         {
             var saveEntryGrid = savePanel.transform.Find("Background/Right/Top").gameObject;
-            for (var i = 0; i < maxSaveEntry; ++i)
+            for (var rowIdx = 0; rowIdx < maxRow; ++rowIdx)
             {
-                var saveEntry = Instantiate(SaveEntryPrefab);
-                saveEntries.Add(saveEntry);
-                var saveEntryRow = saveEntryGrid.transform.Find(string.Format("Row{0}", i / saveEntryPerRow)).gameObject;
-                saveEntry.transform.SetParent(saveEntryRow.transform);
+                var saveEntryRow = Instantiate(SaveEntryRowPrefab);
+                saveEntryRow.transform.SetParent(saveEntryGrid.transform);
+                for (var colIdx = 0; colIdx < maxCol; ++colIdx)
+                {
+                    var saveEntry = Instantiate(SaveEntryPrefab);
+                    saveEntry.transform.SetParent(saveEntryRow.transform);
+                    saveEntries.Add(saveEntry);
+                }
             }
+
+            usedSaveSlots = gameState.checkpointManager.UsedSaveSlots;
 
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
         }
@@ -176,7 +196,23 @@ namespace Nova
 
         private void ShowPage()
         {
-            pageText.text = page.ToString();
+            if (usedSaveSlots.Any()){
+                maxPage = (usedSaveSlots.Max() + maxSaveEntry - 1) / maxSaveEntry;
+                // New page to save
+                if (saveViewMode == SaveViewMode.Save)
+                {
+                    ++maxPage;
+                }
+            }
+            else
+            {
+                maxPage = 1;
+            }
+            if (maxPage < page)
+            {
+                page = maxPage;
+            }
+            pageText.text = string.Format("{0} / {1}", page, maxPage);
 
             for (var i = 0; i < maxSaveEntry; ++i)
             {
@@ -191,7 +227,7 @@ namespace Nova
                 UnityAction onEditButtonClicked;
                 UnityAction onDeleteButtonClicked;
                 Sprite newThumbnailSprite;
-                if (gameState.checkpointManager.UsedSaveSlots.Contains(saveId))
+                if (usedSaveSlots.Contains(saveId))
                 {
                     newIdText = "#" + saveId.ToString();
                     newHeaderText = "Chapter Name";
