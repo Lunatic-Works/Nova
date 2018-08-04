@@ -1,6 +1,5 @@
 ﻿// TODO
 // Page 0 for auto save, last page for new page
-// Visual difference of save and load
 // Auto hide edit and delete buttons
 // UI to edit bookmark's description
 // Capture thumbnail
@@ -28,9 +27,10 @@ namespace Nova
         public GameState gameState;
         public GameObject SaveEntryPrefab;
         public GameObject SaveEntryRowPrefab;
-        public readonly int maxRow = 3;
-        public readonly int maxCol = 3;
+        public int maxRow;
+        public int maxCol;
         public Sprite noThumbnailSprite;
+        public bool canSave;
 
         private int maxSaveEntry;
         private int page = 1;
@@ -40,12 +40,8 @@ namespace Nova
         private int maxPage = 1;
 
         private GameObject savePanel;
-
         private Button saveButton;
         private Button loadButton;
-        private Image saveButtonImage;
-        private Image loadButtonImage;
-
         private Button leftButton;
         private Button rightButton;
         private Text leftButtonText;
@@ -62,15 +58,9 @@ namespace Nova
             maxSaveEntry = maxRow * maxCol;
 
             savePanel = transform.Find("SavePanel").gameObject;
-
             var bottom = savePanel.transform.Find("Background/Right/Bottom").gameObject;
-            var saveButtonPanel = bottom.transform.Find("SaveButton").gameObject;
-            saveButton = saveButtonPanel.GetComponent<Button>();
-            saveButtonImage = saveButtonPanel.GetComponent<Image>();
-            var loadButtonPanel = bottom.transform.Find("LoadButton").gameObject;
-            loadButton = loadButtonPanel.GetComponent<Button>();
-            loadButtonImage = loadButtonPanel.GetComponent<Image>();
-
+            saveButton = bottom.transform.Find("SaveButton").gameObject.GetComponent<Button>();
+            loadButton = bottom.transform.Find("LoadButton").gameObject.GetComponent<Button>();
             var pager = bottom.transform.Find("Pager").gameObject;
             var leftButtonPanel = pager.transform.Find("LeftButton").gameObject;
             leftButton = leftButtonPanel.GetComponent<Button>();
@@ -80,8 +70,18 @@ namespace Nova
             rightButtonText = rightButtonPanel.GetComponent<Text>();
             pageText = pager.transform.Find("PageText").gameObject.GetComponent<Text>();
 
-            leftButton.onClick.AddListener(() => pageLeft());
-            rightButton.onClick.AddListener(() => pageRight());
+            if (canSave)
+            {
+                saveButton.onClick.AddListener(() => ShowSave());
+            }
+            else
+            {
+                // Cannot SetActive(false), otherwise layout will break
+                saveButton.gameObject.GetComponent<CanvasGroup>().alpha = 0.0f;
+            }
+            loadButton.onClick.AddListener(() => ShowLoad());
+            leftButton.onClick.AddListener(() => PageLeft());
+            rightButton.onClick.AddListener(() => PageRight());
         }
 
         private void Start()
@@ -102,6 +102,8 @@ namespace Nova
             usedSaveSlots = gameState.checkpointManager.UsedSaveSlots;
 
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
+
+            ShowPage();
         }
 
         /// <summary>
@@ -123,10 +125,6 @@ namespace Nova
         public void ShowSave()
         {
             savePanel.SetActive(true);
-            saveButtonImage.CrossFadeAlpha(1.0f, 0.1f, false);
-            loadButtonImage.CrossFadeAlpha(0.1f, 0.1f, false);
-            saveButton.interactable = false;
-            loadButton.interactable = true;
             saveViewMode = SaveViewMode.Save;
             ShowPage();
         }
@@ -134,10 +132,6 @@ namespace Nova
         public void ShowLoad()
         {
             savePanel.SetActive(true);
-            saveButtonImage.CrossFadeAlpha(0.1f, 0.1f, false);
-            loadButtonImage.CrossFadeAlpha(1.0f, 0.1f, false);
-            saveButton.interactable = true;
-            loadButton.interactable = false;
             saveViewMode = SaveViewMode.Load;
             ShowPage();
         }
@@ -145,11 +139,9 @@ namespace Nova
         public void Hide()
         {
             savePanel.SetActive(false);
-            saveButtonImage.CrossFadeAlpha(1.0f, 0.1f, false);
-            loadButtonImage.CrossFadeAlpha(1.0f, 0.1f, false);
         }
 
-        public void pageLeft()
+        private void PageLeft()
         {
             if (page > 1)
             {
@@ -158,7 +150,7 @@ namespace Nova
             }
         }
 
-        public void pageRight()
+        private void PageRight()
         {
             if (page < maxPage)
             {
@@ -219,6 +211,18 @@ namespace Nova
                 var saveEntry = saveEntries[i];
                 var saveEntryController = saveEntry.GetComponent<SaveEntryController>();
                 var saveId = (page - 1) * maxSaveEntry + i + 1;
+
+                if (saveViewMode == SaveViewMode.Save)
+                {
+                    saveButton.interactable = false;
+                    loadButton.interactable = true;
+
+                }
+                else // saveViewMode == SaveViewMode.Load
+                {
+                    saveButton.interactable = true;
+                    loadButton.interactable = false;
+                }
 
                 string newIdText;
                 string newHeaderText;
