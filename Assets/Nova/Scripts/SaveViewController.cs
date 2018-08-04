@@ -1,13 +1,16 @@
 ﻿// TODO
+// Save/Load/Show thumbnail
+// Resize/Clip screenshot, scale thumbnail by shorter axis (some code are in ScreenCapturer.cs)
+// Show preview when mouse is hovering
+// GC of Texture and Sprite
+//
 // Page 0 for auto save, last page for new page
 // Auto hide edit and delete buttons
 // UI to edit bookmark's description
-// Capture thumbnail
 //
-// Function to save and load bookmark
-// Function to get bookmark's date and time, chapter name, description, thumbnail
 // Function to update bookmark's description
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -27,19 +30,21 @@ namespace Nova
         public GameState gameState;
         public GameObject SaveEntryPrefab;
         public GameObject SaveEntryRowPrefab;
+        public Sprite testThumbnailSprite;
         public int maxRow;
         public int maxCol;
-        public Sprite noThumbnailSprite;
         public bool canSave;
 
         private int maxSaveEntry;
         private int page = 1;
 
-        // When ShowPage is called, maxPage is updated
+        // maxPage is updated when ShowPage is called
         // Use a data structure to maintain maximum for usedSaveSlots may improve performance
         private int maxPage = 1;
 
         private GameObject savePanel;
+        private Image thumbnailImage;
+        private Text thumbnailText;
         private Button saveButton;
         private Button loadButton;
         private Button leftButton;
@@ -53,11 +58,23 @@ namespace Nova
 
         private SaveViewMode saveViewMode;
 
+        private ScreenCapturer screenCapturer;
+        // screenTexture and screenSprite are created when Show is called and savePanel is not active
+        private Texture2D screenTexture;
+        private Sprite screenSprite;
+
+        private const string dateTimeFormat = "yyyy/MM/dd HH:mm";
+        private string previewTextFormat;
+        private string currentNodeName;
+        private string currentDialogueText;
+
         private void Awake()
         {
             maxSaveEntry = maxRow * maxCol;
 
             savePanel = transform.Find("SavePanel").gameObject;
+            thumbnailImage = savePanel.transform.Find("Background/Left/Thumbnail").GetComponent<Image>();
+            thumbnailText = savePanel.transform.Find("Background/Left/TextBox/Text").GetComponent<Text>();
             var bottom = savePanel.transform.Find("Background/Right/Bottom").gameObject;
             saveButton = bottom.transform.Find("SaveButton").gameObject.GetComponent<Button>();
             loadButton = bottom.transform.Find("LoadButton").gameObject.GetComponent<Button>();
@@ -82,10 +99,7 @@ namespace Nova
             loadButton.onClick.AddListener(() => ShowLoad());
             leftButton.onClick.AddListener(() => PageLeft());
             rightButton.onClick.AddListener(() => PageRight());
-        }
 
-        private void Start()
-        {
             var saveEntryGrid = savePanel.transform.Find("Background/Right/Top").gameObject;
             for (var rowIdx = 0; rowIdx < maxRow; ++rowIdx)
             {
@@ -99,39 +113,59 @@ namespace Nova
                 }
             }
 
-            usedSaveSlots = gameState.checkpointManager.UsedSaveSlots;
+            screenCapturer = gameObject.GetComponent<ScreenCapturer>();
 
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
-
-            ShowPage();
+            previewTextFormat = thumbnailText.text;
         }
 
-        /// <summary>
-        /// The name of the current flow chart node
-        /// </summary>
-        private string currentNodeName;
-
-        /// <summary>
-        /// The index of the current dialogue entry in the current node
-        /// </summary>
-        private int currentDialogueIndex;
+        private void Start()
+        {
+            usedSaveSlots = gameState.checkpointManager.UsedSaveSlots;
+            gameState.DialogueChanged.AddListener(OnDialogueChanged);
+            ShowPage();
+        }
 
         private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
         {
             currentNodeName = dialogueChangedEventData.labelName;
-            currentDialogueIndex = dialogueChangedEventData.dialogueIndex;
+            currentDialogueText = dialogueChangedEventData.text;
+        }
+
+        private Sprite TextureToSprite(Texture2D texture)
+        {
+            return Sprite.Create(
+                    texture,
+                    new Rect(0, 0, texture.width, texture.height),
+                    new Vector2(0.5f, 0.5f)
+                );
+        }
+
+        private void Show()
+        {
+            if (!savePanel.activeInHierarchy)
+            {
+                screenTexture = screenCapturer.GetTexture();
+                screenSprite = TextureToSprite(screenTexture);
+            }
+            savePanel.SetActive(true);
+            ShowPreview(screenSprite, string.Format(
+                previewTextFormat,
+                DateTime.Now.ToString(dateTimeFormat),
+                currentNodeName,
+                currentDialogueText
+            ));
         }
 
         public void ShowSave()
         {
-            savePanel.SetActive(true);
+            Show();
             saveViewMode = SaveViewMode.Save;
             ShowPage();
         }
 
         public void ShowLoad()
         {
-            savePanel.SetActive(true);
+            Show();
             saveViewMode = SaveViewMode.Load;
             ShowPage();
         }
@@ -162,6 +196,7 @@ namespace Nova
         private void SaveBookmark(int saveId)
         {
             var bookmark = gameState.GetBookmark();
+            // bookmark.ScreenShot = screenTexture;
             gameState.checkpointManager.SaveBookmark(saveId, bookmark);
             Hide();
         }
@@ -169,8 +204,8 @@ namespace Nova
         private void LoadBookmark(int saveId)
         {
             var bookmark = gameState.checkpointManager.LoadBookmark(saveId);
-            Debug.Log(bookmark.NodeHistory.Last());
-            Debug.Log(bookmark.DialogueIndex);
+            Debug.Log(string.Format("Load bookmark, chapter {0}, index {1}",
+                bookmark.NodeHistory.Last(), bookmark.DialogueIndex));
             gameState.LoadBookmark(bookmark);
             Hide();
         }
@@ -184,6 +219,12 @@ namespace Nova
         {
             gameState.checkpointManager.DeleteBookmark(saveId);
             ShowPage();
+        }
+
+        private void ShowPreview(Sprite newSprite, string newText)
+        {
+            thumbnailImage.sprite = newSprite;
+            thumbnailText.text = newText;
         }
 
         private void ShowPage()
@@ -206,25 +247,24 @@ namespace Nova
             }
             pageText.text = string.Format("{0} / {1}", page, maxPage);
 
+            if (saveViewMode == SaveViewMode.Save)
+            {
+                saveButton.interactable = false;
+                loadButton.interactable = true;
+
+            }
+            else // saveViewMode == SaveViewMode.Load
+            {
+                saveButton.interactable = true;
+                loadButton.interactable = false;
+            }
+
             for (var i = 0; i < maxSaveEntry; ++i)
             {
-                var saveEntry = saveEntries[i];
-                var saveEntryController = saveEntry.GetComponent<SaveEntryController>();
-                var saveId = (page - 1) * maxSaveEntry + i + 1;
+                int saveId = (page - 1) * maxSaveEntry + i + 1;
+                string newIdText = "#" + saveId.ToString();
 
-                if (saveViewMode == SaveViewMode.Save)
-                {
-                    saveButton.interactable = false;
-                    loadButton.interactable = true;
-
-                }
-                else // saveViewMode == SaveViewMode.Load
-                {
-                    saveButton.interactable = true;
-                    loadButton.interactable = false;
-                }
-
-                string newIdText;
+                // Load properties from bookmark
                 string newHeaderText;
                 string newFooterText;
                 UnityAction onThumbnailButtonClicked;
@@ -233,9 +273,9 @@ namespace Nova
                 Sprite newThumbnailSprite;
                 if (usedSaveSlots.Contains(saveId))
                 {
-                    newIdText = "#" + saveId.ToString();
-                    newHeaderText = "Chapter Name";
-                    newFooterText = "1926/08/17 12:34";
+                    Bookmark bookmark = gameState.checkpointManager[saveId];
+                    newHeaderText = bookmark.NodeHistory.Last();
+                    newFooterText = bookmark.CreationTime.ToString(dateTimeFormat);
 
                     if (saveViewMode == SaveViewMode.Save)
                     {
@@ -250,11 +290,11 @@ namespace Nova
                         onDeleteButtonClicked = () => DeleteBookmark(saveId);
                     }
 
-                    newThumbnailSprite = null;
+                    newThumbnailSprite = testThumbnailSprite;
+                    // newThumbnailSprite = TextureToSprite(bookmark.ScreenShot);
                 }
                 else // Bookmark with this saveId is not found
                 {
-                    newIdText = "#" + saveId.ToString();
                     newHeaderText = "";
                     newFooterText = "";
 
@@ -271,9 +311,12 @@ namespace Nova
                         onDeleteButtonClicked = null;
                     }
 
-                    newThumbnailSprite = noThumbnailSprite;
+                    newThumbnailSprite = null;
                 }
 
+                // Update UI of saveEntry
+                var saveEntry = saveEntries[i];
+                var saveEntryController = saveEntry.GetComponent<SaveEntryController>();
                 saveEntryController.Init(newIdText, newHeaderText, newFooterText,
                     onThumbnailButtonClicked, onEditButtonClicked, onDeleteButtonClicked,
                     newThumbnailSprite);

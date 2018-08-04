@@ -76,8 +76,8 @@ namespace Nova
     [Serializable]
     public class Bookmark
     {
-        private const int ScreenShotHeight = 240;
-        private const int ScreenShotWidth = 320;
+        public const int ScreenShotWidth = 320;
+        public const int ScreenShotHeight = 240;
 
         public readonly int DialogueIndex;
         public readonly List<string> NodeHistory;
