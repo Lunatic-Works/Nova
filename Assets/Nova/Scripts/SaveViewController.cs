@@ -26,17 +26,63 @@ namespace Nova
     {
         public GameState gameState;
         public GameObject SaveEntryPrefab;
-        public int maxPage = 3;
-        public int maxSaveEntry = 9;
-        public int saveEntryPerRow = 3;
+        public readonly int maxPage = 3;
+        public readonly int maxSaveEntry = 9;
+        public readonly int saveEntryPerRow = 3;
+        public Sprite noThumbnailSprite;
 
         private GameObject savePanel;
+
+        private GameObject saveButtonPanel;
+        private GameObject loadButtonPanel;
+        private Button saveButton;
+        private Button loadButton;
+        private Image saveButtonImage;
+        private Image loadButtonImage;
+
         private Button leftButton;
         private Button rightButton;
         private Text pageText;
         private int page = 1;
+
         private readonly List<GameObject> saveEntries = new List<GameObject>();
+
         private SaveViewMode saveViewMode;
+
+        private void Awake()
+        {
+            savePanel = transform.Find("SavePanel").gameObject;
+
+            var bottom = savePanel.transform.Find("Background/Right/Bottom").gameObject;
+            saveButtonPanel = bottom.transform.Find("SaveButton").gameObject;
+            loadButtonPanel = bottom.transform.Find("LoadButton").gameObject;
+            saveButton = saveButtonPanel.GetComponent<Button>();
+            loadButton = loadButtonPanel.GetComponent<Button>();
+            saveButtonImage = saveButtonPanel.GetComponent<Image>();
+            loadButtonImage = loadButtonPanel.GetComponent<Image>();
+
+            var pager = bottom.transform.Find("Pager").gameObject;
+            leftButton = pager.transform.Find("LeftButton").gameObject.GetComponent<Button>();
+            rightButton = pager.transform.Find("RightButton").gameObject.GetComponent<Button>();
+            pageText = pager.transform.Find("PageText").gameObject.GetComponent<Text>();
+
+            leftButton.onClick.AddListener(() => pageLeft());
+            rightButton.onClick.AddListener(() => pageRight());
+        }
+
+        private void Start()
+        {
+            var saveEntryGrid = savePanel.transform.Find("Background/Right/Top").gameObject;
+            for (var i = 0; i < maxSaveEntry; ++i)
+            {
+                var saveEntry = Instantiate(SaveEntryPrefab);
+                saveEntries.Add(saveEntry);
+                var saveEntryRow = saveEntryGrid.transform.Find(string.Format("Row{0}", i / saveEntryPerRow)).gameObject;
+                saveEntry.transform.SetParent(saveEntryRow.transform);
+            }
+
+            gameState.DialogueChanged.AddListener(OnDialogueChanged);
+        }
 
         /// <summary>
         /// The name of the current flow chart node
@@ -48,30 +94,6 @@ namespace Nova
         /// </summary>
         private int currentDialogueIndex;
 
-        private void Awake()
-        {
-            savePanel = transform.Find("SavePanel").gameObject;
-
-            var pager = savePanel.transform.Find("Background/Right/Bottom/Pager").gameObject;
-            leftButton = pager.transform.Find("LeftButton").gameObject.GetComponent<Button>();
-            rightButton = pager.transform.Find("RightButton").gameObject.GetComponent<Button>();
-            pageText = pager.transform.Find("PageText").gameObject.GetComponent<Text>();
-
-            leftButton.onClick.AddListener(() => pageLeft());
-            rightButton.onClick.AddListener(() => pageRight());
-
-            var saveEntryGrid = savePanel.transform.Find("Background/Right/Top").gameObject;
-            for (var i = 0; i < maxSaveEntry; ++i)
-            {
-                var saveEntry = saveEntryGrid.transform.Find(
-                    string.Format("Row{0}/SaveEntry{1}", i / saveEntryPerRow, i % saveEntryPerRow)
-                    ).gameObject;
-                saveEntries.Add(saveEntry);
-            }
-
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
-        }
-
         private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
         {
             currentNodeName = dialogueChangedEventData.labelName;
@@ -81,6 +103,10 @@ namespace Nova
         public void ShowSave()
         {
             savePanel.SetActive(true);
+            saveButtonImage.CrossFadeAlpha(1.0f, 0.1f, false);
+            loadButtonImage.CrossFadeAlpha(0.1f, 0.1f, false);
+            saveButton.interactable = false;
+            loadButton.interactable = true;
             saveViewMode = SaveViewMode.Save;
             ShowPage();
         }
@@ -88,6 +114,10 @@ namespace Nova
         public void ShowLoad()
         {
             savePanel.SetActive(true);
+            saveButtonImage.CrossFadeAlpha(0.1f, 0.1f, false);
+            loadButtonImage.CrossFadeAlpha(1.0f, 0.1f, false);
+            saveButton.interactable = true;
+            loadButton.interactable = false;
             saveViewMode = SaveViewMode.Load;
             ShowPage();
         }
@@ -95,6 +125,8 @@ namespace Nova
         public void Hide()
         {
             savePanel.SetActive(false);
+            saveButtonImage.CrossFadeAlpha(1.0f, 0.1f, false);
+            loadButtonImage.CrossFadeAlpha(1.0f, 0.1f, false);
         }
 
         public void pageLeft()
@@ -158,10 +190,10 @@ namespace Nova
                 UnityAction onThumbnailButtonClicked;
                 UnityAction onEditButtonClicked;
                 UnityAction onDeleteButtonClicked;
+                Sprite newThumbnailSprite;
                 if (gameState.checkpointManager.UsedSaveSlots.Contains(saveId))
                 {
-                    var saveIdString = saveId.ToString();
-                    newIdText = "#" + saveIdString;
+                    newIdText = "#" + saveId.ToString();
                     newHeaderText = "Chapter Name";
                     newFooterText = "1926/08/17 12:34";
 
@@ -177,11 +209,12 @@ namespace Nova
                         onEditButtonClicked = () => EditBookmark(saveId);
                         onDeleteButtonClicked = () => DeleteBookmark(saveId);
                     }
+
+                    newThumbnailSprite = null;
                 }
                 else // Bookmark with this saveId is not found
                 {
-                    var saveIdString = saveId.ToString();
-                    newIdText = "#" + saveIdString;
+                    newIdText = "#" + saveId.ToString();
                     newHeaderText = "";
                     newFooterText = "";
 
@@ -197,10 +230,13 @@ namespace Nova
                         onEditButtonClicked = null;
                         onDeleteButtonClicked = null;
                     }
+
+                    newThumbnailSprite = noThumbnailSprite;
                 }
 
                 saveEntryController.Init(newIdText, newHeaderText, newFooterText,
-                    onThumbnailButtonClicked, onEditButtonClicked, onDeleteButtonClicked);
+                    onThumbnailButtonClicked, onEditButtonClicked, onDeleteButtonClicked,
+                    newThumbnailSprite);
             }
         }
     }

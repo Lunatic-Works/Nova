@@ -40,8 +40,8 @@ namespace Nova
 
         private void Start()
         {
-            dialogueTextArea = transform.Find("DialogueBox/DialogueText").gameObject.GetComponent<Text>();
-            nameTextArea = transform.Find("NameBox/NameText").gameObject.GetComponent<Text>();
+            dialogueTextArea = transform.Find("DialogueBox/Text").gameObject.GetComponent<Text>();
+            nameTextArea = transform.Find("NameBox/Text").gameObject.GetComponent<Text>();
 
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
             gameState.BranchOccurs.AddListener(OnBranchOcurrs);

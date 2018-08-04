@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 222467212675376180}
   - component: {fileID: 114044804901080848}
   m_Layer: 5
-  m_Name: DialogueText
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -215,7 +215,7 @@ GameObject:
   - component: {fileID: 222457714226895020}
   - component: {fileID: 114036122428796856}
   m_Layer: 5
-  m_Name: NameText
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -728,7 +728,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1959500556734648}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b72472513d74b36863a842b572b3a1, type: 3}
+  m_Script: {fileID: 11500000, guid: 228fd279dbbda4306b8c6528c8767c74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dialogueBoxController: {fileID: 114358814597933850}
@@ -956,7 +956,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1095008613593784}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1755237c8b18347a8b83715a1699b208, type: 3}
+  m_Script: {fileID: 11500000, guid: 3c1c6de7be4774db083ee0912d013b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dialogueBoxController: {fileID: 114358814597933850}

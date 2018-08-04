@@ -42,7 +42,7 @@ MonoBehaviour:
   branchButtonPrefab: {fileID: 114312941846281828, guid: 715673b90003e4c0a97eeaa9141dc935,
     type: 2}
   gameState: {fileID: 0}
-  restorableName: 
+  restorableName: BranchName
 --- !u!114 &114553643433357642
 MonoBehaviour:
   m_ObjectHideFlags: 1
