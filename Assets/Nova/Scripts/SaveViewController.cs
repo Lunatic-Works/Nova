@@ -1,5 +1,5 @@
 ﻿// TODO
-// Better delete button
+// Better edit and delete buttons
 // Scale thumbnail by shorter axis
 // Page 0 for auto save, last page for new page
 // UI to edit bookmark's description
@@ -39,9 +39,29 @@ namespace Nova
         // Use a data structure to maintain maximum for usedSaveSlots may improve performance
         private int maxPage = 1;
 
-        // selectedSaveId must be a saveId with existing bookmark, or -1
-        // -1 means none is selected
-        private int selectedSaveId = -1;
+        // selectedSaveId == -1 means no bookmark is selected
+        private int _selectedSaveId;
+        private int selectedSaveId
+        {
+            get
+            {
+                return _selectedSaveId;
+            }
+
+            set
+            {
+                Assert.IsTrue(usedSaveSlots.Contains(value) || value == -1, "Nova: selectedSaveId must be a saveId with existing bookmark, or -1");
+                _selectedSaveId = value;
+                if (value == -1)
+                {
+                    ShowPreviewScreen();
+                }
+                else
+                {
+                    ShowPreviewBookmark(value);
+                }
+            }
+        }
 
         private GameObject savePanel;
         private Button backgroundButton;
@@ -95,7 +115,7 @@ namespace Nova
             rightButtonText = rightButtonPanel.GetComponent<Text>();
             pageText = pagerPanel.transform.Find("PageText").gameObject.GetComponent<Text>();
 
-            backgroundButton.onClick.AddListener(() => InitPreview());
+            backgroundButton.onClick.AddListener(() => { selectedSaveId = -1; });
             if (canSave)
             {
                 saveButton.onClick.AddListener(() => ShowSave());
@@ -148,7 +168,7 @@ namespace Nova
                 screenSprite = Utils.Texture2DToSprite(screenTexture);
             }
             savePanel.SetActive(true);
-            InitPreview();
+            selectedSaveId = -1;
         }
 
         public void ShowSave()
@@ -252,7 +272,6 @@ namespace Nova
                         if (usedSaveSlots.Contains(saveId))
                         {
                             selectedSaveId = saveId;
-                            ShowPreviewBookmark(saveId);
                         }
                         else // Bookmark with this saveId does not exist
                         {
@@ -272,12 +291,10 @@ namespace Nova
                         if (usedSaveSlots.Contains(saveId))
                         {
                             selectedSaveId = saveId;
-                            ShowPreviewBookmark(saveId);
                         }
                         else // Bookmark with this saveId does not exist
                         {
                             selectedSaveId = -1;
-                            ShowPreviewScreen();
                         }
                     }
                 }
@@ -290,7 +307,7 @@ namespace Nova
             {
                 if (usedSaveSlots.Contains(saveId))
                 {
-                    ShowPreviewBookmark(saveId);
+                    selectedSaveId = saveId;
                 }
             }
         }
@@ -299,7 +316,7 @@ namespace Nova
         {
             if (Input.touchCount == 0) // Mouse
             {
-                ShowPreviewScreen();
+                selectedSaveId = -1;
             }
         }
 
@@ -335,12 +352,6 @@ namespace Nova
                 bookmark.NodeHistory.Last(),
                 bookmark.Description
             ));
-        }
-
-        private void InitPreview()
-        {
-            selectedSaveId = -1;
-            ShowPreviewScreen();
         }
 
         private void ShowPage()
