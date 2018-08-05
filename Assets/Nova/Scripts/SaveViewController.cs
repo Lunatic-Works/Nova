@@ -36,7 +36,6 @@ namespace Nova
 
         private int maxSaveEntry;
         private int page = 1;
-
         // maxPage is updated when ShowPage is called
         // Use a data structure to maintain maximum for usedSaveSlots may improve performance
         private int maxPage = 1;
@@ -131,22 +130,12 @@ namespace Nova
             currentDialogueText = dialogueChangedEventData.text;
         }
 
-        private Sprite Texture2DToSprite(Texture2D texture)
-        {
-            Debug.Log(string.Format("Texture2DToSprite, {0}, {1}", texture.width, texture.height));
-            return Sprite.Create(
-                    texture,
-                    new Rect(0, 0, texture.width, texture.height),
-                    new Vector2(0.5f, 0.5f)
-                );
-        }
-
         private void Show()
         {
             if (!savePanel.activeInHierarchy)
             {
                 screenTexture = screenCapturer.GetTexture();
-                screenSprite = Texture2DToSprite(screenTexture);
+                screenSprite = Utils.Texture2DToSprite(screenTexture);
             }
             savePanel.SetActive(true);
             ShowPreview(screenSprite, string.Format(

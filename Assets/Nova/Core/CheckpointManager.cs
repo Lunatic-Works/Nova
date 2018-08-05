@@ -93,6 +93,8 @@ namespace Nova
             {
                 if (_screenShotBytes == null)
                 {
+                    Assert.IsTrue(_screenShotTexture == null, "Nova: ScreenShot cache is not consistent");
+                    Assert.IsTrue(_screenShotSprite == null, "Nova: ScreenShot cache is not consistent");
                     return null;
                 }
 
@@ -101,7 +103,7 @@ namespace Nova
                     _screenShotTexture = new Texture2D(ScreenShotWidth, ScreenShotHeight, TextureFormat.RGB24, false);
                     _screenShotTexture.LoadRawTextureData(_screenShotBytes);
                     _screenShotTexture.Apply();
-                    _screenShotSprite = Texture2DToSprite(_screenShotTexture);
+                    _screenShotSprite = Utils.Texture2DToSprite(_screenShotTexture);
                 }
 
                 return _screenShotSprite;
@@ -111,10 +113,6 @@ namespace Nova
                 _screenShotSprite = value;
                 _screenShotTexture = _screenShotSprite.texture;
                 _screenShotBytes = _screenShotTexture.GetRawTextureData();
-                Debug.Log("set ScreenShot");
-                Debug.Log(_screenShotTexture.width);
-                Debug.Log(_screenShotTexture.height);
-                Debug.Log(_screenShotBytes.GetLength(0));
             }
         }
 
@@ -127,16 +125,6 @@ namespace Nova
         {
             NodeHistory = new List<string>(nodeHistory);
             DialogueIndex = dialogueIndex;
-        }
-
-        private Sprite Texture2DToSprite(Texture2D texture)
-        {
-            Debug.Log(string.Format("Texture2DToSprite, {0}, {1}", texture.width, texture.height));
-            return Sprite.Create(
-                    texture,
-                    new Rect(0, 0, texture.width, texture.height),
-                    new Vector2(0.5f, 0.5f)
-                );
         }
     }
 

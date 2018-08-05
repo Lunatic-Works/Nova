@@ -5,25 +5,25 @@ using UnityEngine.EventSystems;
 
 namespace Nova
 {
-    public class SkipTest : MonoBehaviour
+    public class TestAuto : MonoBehaviour
     {
         public DialogueBoxController dialogueBoxController;
 
         void Start()
         {
-            dialogueBoxController.SkipModeStarts.AddListener(OnSkipModeStarts);
-            dialogueBoxController.SkipModeStops.AddListener(OnSkipModeEnds);
+            dialogueBoxController.AutoModeStarts.AddListener(OnAutoModeStarts);
+            dialogueBoxController.AutoModeStops.AddListener(OnAutoModeEnds);
         }
 
-        private void OnSkipModeStarts()
+        private void OnAutoModeStarts()
         {
-            Debug.Log("Skip Start");
+            Debug.Log("Auto Start");
            // dialogueBoxController.State = DialogueBoxState.Normal;
         }
 
-        private void OnSkipModeEnds()
+        private void OnAutoModeEnds()
         {
-            Debug.Log("Skip End");
+            Debug.Log("Auto End");
         }
     }
 }

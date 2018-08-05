@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace Nova
 {
-    public class ClickTest : MonoBehaviour, IPointerClickHandler
+    public class TestClick : MonoBehaviour, IPointerClickHandler
     {
         // Use this for initialization
         void Start () {
