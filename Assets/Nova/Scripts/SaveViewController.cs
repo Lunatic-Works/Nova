@@ -29,18 +29,23 @@ namespace Nova
         public GameState gameState;
         public GameObject SaveEntryPrefab;
         public GameObject SaveEntryRowPrefab;
-        public Sprite testThumbnailSprite;
         public int maxRow;
         public int maxCol;
         public bool canSave;
 
         private int maxSaveEntry;
         private int page = 1;
+
         // maxPage is updated when ShowPage is called
         // Use a data structure to maintain maximum for usedSaveSlots may improve performance
         private int maxPage = 1;
 
+        // selectedSaveId must be a saveId with existing bookmark, or -1
+        // -1 means none is selected
+        private int selectedSaveId = -1;
+
         private GameObject savePanel;
+        private Button backgroundButton;
         private Image thumbnailImage;
         private Text thumbnailText;
         private Button saveButton;
@@ -50,6 +55,7 @@ namespace Nova
         private Text leftButtonText;
         private Text rightButtonText;
         private Text pageText;
+        private Sprite defaultThumbnailSprite;
 
         private readonly List<GameObject> saveEntries = new List<GameObject>();
         private HashSet<int> usedSaveSlots;
@@ -57,6 +63,7 @@ namespace Nova
         private SaveViewMode saveViewMode;
 
         private ScreenCapturer screenCapturer;
+
         // screenTexture and screenSprite are created when Show is called and savePanel is not active
         // They are destroyed when Hide is called and savePanel is active
         private Texture2D screenTexture;
@@ -72,20 +79,23 @@ namespace Nova
             maxSaveEntry = maxRow * maxCol;
 
             savePanel = transform.Find("SavePanel").gameObject;
+            backgroundButton = savePanel.transform.Find("Background").GetComponent<Button>();
             thumbnailImage = savePanel.transform.Find("Background/Left/Thumbnail").GetComponent<Image>();
+            defaultThumbnailSprite = thumbnailImage.sprite;
             thumbnailText = savePanel.transform.Find("Background/Left/TextBox/Text").GetComponent<Text>();
-            var bottom = savePanel.transform.Find("Background/Right/Bottom").gameObject;
-            saveButton = bottom.transform.Find("SaveButton").gameObject.GetComponent<Button>();
-            loadButton = bottom.transform.Find("LoadButton").gameObject.GetComponent<Button>();
-            var pager = bottom.transform.Find("Pager").gameObject;
-            var leftButtonPanel = pager.transform.Find("LeftButton").gameObject;
+            var headerPanel = savePanel.transform.Find("Background/Right/Bottom").gameObject;
+            saveButton = headerPanel.transform.Find("SaveButton").gameObject.GetComponent<Button>();
+            loadButton = headerPanel.transform.Find("LoadButton").gameObject.GetComponent<Button>();
+            var pagerPanel = headerPanel.transform.Find("Pager").gameObject;
+            var leftButtonPanel = pagerPanel.transform.Find("LeftButton").gameObject;
             leftButton = leftButtonPanel.GetComponent<Button>();
             leftButtonText = leftButtonPanel.GetComponent<Text>();
-            var rightButtonPanel = pager.transform.Find("RightButton").gameObject;
+            var rightButtonPanel = pagerPanel.transform.Find("RightButton").gameObject;
             rightButton = rightButtonPanel.GetComponent<Button>();
             rightButtonText = rightButtonPanel.GetComponent<Text>();
-            pageText = pager.transform.Find("PageText").gameObject.GetComponent<Text>();
+            pageText = pagerPanel.transform.Find("PageText").gameObject.GetComponent<Text>();
 
+            backgroundButton.onClick.AddListener(() => InitPreview());
             if (canSave)
             {
                 saveButton.onClick.AddListener(() => ShowSave());
@@ -132,18 +142,13 @@ namespace Nova
 
         private void Show()
         {
-            if (!savePanel.activeInHierarchy)
+            if (!savePanel.activeSelf)
             {
                 screenTexture = screenCapturer.GetTexture();
                 screenSprite = Utils.Texture2DToSprite(screenTexture);
             }
             savePanel.SetActive(true);
-            ShowPreview(screenSprite, string.Format(
-                previewTextFormat,
-                DateTime.Now.ToString(dateTimeFormat),
-                currentNodeName,
-                currentDialogueText
-            ));
+            InitPreview();
         }
 
         public void ShowSave()
@@ -162,7 +167,7 @@ namespace Nova
 
         public void Hide()
         {
-            if (savePanel.activeInHierarchy)
+            if (savePanel.activeSelf)
             {
                 Destroy(screenTexture);
                 Destroy(screenSprite);
@@ -218,10 +223,124 @@ namespace Nova
             ShowPage();
         }
 
-        private void ShowPreview(Sprite newSprite, string newText)
+        private void OnThumbnailButtonClicked(int saveId)
         {
-            thumbnailImage.sprite = newSprite;
+            if (Input.touchCount == 0) // Mouse
+            {
+                if (saveViewMode == SaveViewMode.Save)
+                {
+                    SaveBookmark(saveId);
+                }
+                else // saveViewMode == SaveViewMode.Load
+                {
+                    if (usedSaveSlots.Contains(saveId))
+                    {
+                        LoadBookmark(saveId);
+                    }
+                }
+            }
+            else // Touch
+            {
+                if (saveViewMode == SaveViewMode.Save)
+                {
+                    if (saveId == selectedSaveId)
+                    {
+                        SaveBookmark(saveId);
+                    }
+                    else // Another bookmark selected
+                    {
+                        if (usedSaveSlots.Contains(saveId))
+                        {
+                            selectedSaveId = saveId;
+                            ShowPreviewBookmark(saveId);
+                        }
+                        else // Bookmark with this saveId does not exist
+                        {
+                            selectedSaveId = -1;
+                            SaveBookmark(saveId);
+                        }
+                    }
+                }
+                else // saveViewMode == SaveViewMode.Load
+                {
+                    if (saveId == selectedSaveId)
+                    {
+                        LoadBookmark(saveId);
+                    }
+                    else // Another bookmark selected
+                    {
+                        if (usedSaveSlots.Contains(saveId))
+                        {
+                            selectedSaveId = saveId;
+                            ShowPreviewBookmark(saveId);
+                        }
+                        else // Bookmark with this saveId does not exist
+                        {
+                            selectedSaveId = -1;
+                            ShowPreviewScreen();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void OnThumbnailButtonEnter(int saveId)
+        {
+            if (Input.touchCount == 0) // Mouse
+            {
+                if (usedSaveSlots.Contains(saveId))
+                {
+                    ShowPreviewBookmark(saveId);
+                }
+            }
+        }
+
+        private void OnThumbnailButtonExit(int saveId)
+        {
+            if (Input.touchCount == 0) // Mouse
+            {
+                ShowPreviewScreen();
+            }
+        }
+
+        private void ShowPreview(Sprite newThumbnailSprite, string newText)
+        {
+            if (newThumbnailSprite == null)
+            {
+                thumbnailImage.sprite = defaultThumbnailSprite;
+            }
+            else
+            {
+                thumbnailImage.sprite = newThumbnailSprite;
+            }
             thumbnailText.text = newText;
+        }
+
+        private void ShowPreviewScreen()
+        {
+            ShowPreview(screenSprite, string.Format(
+                previewTextFormat,
+                DateTime.Now.ToString(dateTimeFormat),
+                currentNodeName,
+                currentDialogueText
+            ));
+        }
+
+        private void ShowPreviewBookmark(int saveId)
+        {
+            Bookmark bookmark = gameState.checkpointManager[saveId];
+            ShowPreview(bookmark.ScreenShot, string.Format(
+                previewTextFormat,
+                bookmark.CreationTime.ToString(dateTimeFormat),
+                bookmark.NodeHistory.Last(),
+                bookmark.Description
+            ));
+        }
+
+        private void InitPreview()
+        {
+            selectedSaveId = -1;
+            ShowPreviewScreen();
         }
 
         private void ShowPage()
@@ -248,7 +367,6 @@ namespace Nova
             {
                 saveButton.interactable = false;
                 loadButton.interactable = true;
-
             }
             else // saveViewMode == SaveViewMode.Load
             {
@@ -264,59 +382,37 @@ namespace Nova
                 // Load properties from bookmark
                 string newHeaderText;
                 string newFooterText;
-                UnityAction onThumbnailButtonClicked;
+                Sprite newThumbnailSprite;
                 UnityAction onEditButtonClicked;
                 UnityAction onDeleteButtonClicked;
-                Sprite newThumbnailSprite;
                 if (usedSaveSlots.Contains(saveId))
                 {
                     Bookmark bookmark = gameState.checkpointManager[saveId];
                     newHeaderText = bookmark.NodeHistory.Last();
                     newFooterText = bookmark.CreationTime.ToString(dateTimeFormat);
-
-                    if (saveViewMode == SaveViewMode.Save)
-                    {
-                        onThumbnailButtonClicked = () => SaveBookmark(saveId);
-                        onEditButtonClicked = () => EditBookmark(saveId);
-                        onDeleteButtonClicked = () => DeleteBookmark(saveId);
-                    }
-                    else // saveViewMode == SaveViewMode.Load
-                    {
-                        onThumbnailButtonClicked = () => LoadBookmark(saveId);
-                        onEditButtonClicked = () => EditBookmark(saveId);
-                        onDeleteButtonClicked = () => DeleteBookmark(saveId);
-                    }
-
-                    // newThumbnailSprite = testThumbnailSprite;
                     newThumbnailSprite = bookmark.ScreenShot;
+                    onEditButtonClicked = () => EditBookmark(saveId);
+                    onDeleteButtonClicked = () => DeleteBookmark(saveId);
                 }
-                else // Bookmark with this saveId is not found
+                else
                 {
                     newHeaderText = "";
                     newFooterText = "";
-
-                    if (saveViewMode == SaveViewMode.Save)
-                    {
-                        onThumbnailButtonClicked = () => SaveBookmark(saveId);
-                        onEditButtonClicked = null;
-                        onDeleteButtonClicked = null;
-                    }
-                    else // saveViewMode == SaveViewMode.Load
-                    {
-                        onThumbnailButtonClicked = null;
-                        onEditButtonClicked = null;
-                        onDeleteButtonClicked = null;
-                    }
-
                     newThumbnailSprite = null;
+                    onEditButtonClicked = null;
+                    onDeleteButtonClicked = null;
                 }
+
+                UnityAction onThumbnailButtonClicked = () => OnThumbnailButtonClicked(saveId);
+                UnityAction onThumbnailButtonEnter = () => OnThumbnailButtonEnter(saveId);
+                UnityAction onThumbnailButtonExit = () => OnThumbnailButtonExit(saveId);
 
                 // Update UI of saveEntry
                 var saveEntry = saveEntries[i];
                 var saveEntryController = saveEntry.GetComponent<SaveEntryController>();
-                saveEntryController.Init(newIdText, newHeaderText, newFooterText,
-                    onThumbnailButtonClicked, onEditButtonClicked, onDeleteButtonClicked,
-                    newThumbnailSprite);
+                saveEntryController.Init(newIdText, newHeaderText, newFooterText, newThumbnailSprite,
+                    onEditButtonClicked, onDeleteButtonClicked,
+                    onThumbnailButtonClicked, onThumbnailButtonEnter, onThumbnailButtonExit);
             }
         }
     }

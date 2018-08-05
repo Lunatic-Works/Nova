@@ -30,6 +30,7 @@ namespace Nova
 
         private void InitButton(Button button, UnityAction onClickAction, bool hideButton = true)
         {
+            button.onClick.RemoveAllListeners();
             if (onClickAction == null)
             {
                 if (hideButton)
@@ -40,29 +41,23 @@ namespace Nova
                 {
                     button.gameObject.SetActive(true);
                     button.interactable = false;
-                    button.onClick.RemoveAllListeners();
                 }
-                return;
             }
             else
             {
                 button.gameObject.SetActive(true);
                 button.interactable = true;
-                button.onClick.RemoveAllListeners();
                 button.onClick.AddListener(onClickAction);
             }
         }
 
-        public void Init(string newIdText, string newHeaderText, string newFooterText,
-            UnityAction onThumbnailButtonClicked, UnityAction onEditButtonClicked, UnityAction onDeleteButtonClicked,
-            Sprite newThumbnailSprite)
+        public void Init(string newIdText, string newHeaderText, string newFooterText, Sprite newThumbnailSprite,
+            UnityAction onEditButtonClicked, UnityAction onDeleteButtonClicked,
+            UnityAction onThumbnailButtonClicked, UnityAction onThumbnailButtonEnter, UnityAction onThumbnailButtonExit)
         {
             idText.text = newIdText;
             headerText.text = newHeaderText;
             footerText.text = newFooterText;
-            InitButton(thumbnailButton, onThumbnailButtonClicked, hideButton: false);
-            InitButton(editButton, onEditButtonClicked);
-            InitButton(deleteButton, onDeleteButtonClicked);
 
             if (newThumbnailSprite == null)
             {
@@ -71,6 +66,22 @@ namespace Nova
             else
             {
                 thumbnailImage.sprite = newThumbnailSprite;
+            }
+
+            InitButton(editButton, onEditButtonClicked);
+            InitButton(deleteButton, onDeleteButtonClicked);
+
+            InitButton(thumbnailButton, onThumbnailButtonClicked, hideButton: false);
+            var thumbnailButtonEnterExit = thumbnailButton.gameObject.GetComponent<PointerEnterExit>();
+            thumbnailButtonEnterExit.onPointerEnter.RemoveAllListeners();
+            if (onThumbnailButtonEnter != null)
+            {
+                thumbnailButtonEnterExit.onPointerEnter.AddListener(onThumbnailButtonEnter);
+            }
+            thumbnailButtonEnterExit.onPointerExit.RemoveAllListeners();
+            if (onThumbnailButtonExit != null)
+            {
+                thumbnailButtonEnterExit.onPointerExit.AddListener(onThumbnailButtonExit);
             }
         }
     }

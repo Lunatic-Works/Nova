@@ -93,6 +93,7 @@ GameObject:
   - component: {fileID: 114058226890256182}
   - component: {fileID: 114029966407947648}
   - component: {fileID: 114858857412695864}
+  - component: {fileID: 114392633715717240}
   m_Layer: 5
   m_Name: Thumbnail
   m_TagString: Untagged
@@ -467,6 +468,27 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: 0
   m_LayoutPriority: 1
+--- !u!114 &114392633715717240
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1595277140599260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d39804ac13ff2746a11f06c80e6aa34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnMouseEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  OnMouseExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &114419286021783516
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -518,7 +518,7 @@ namespace Nova
         /// </summary>
         public Bookmark GetBookmark()
         {
-            return new Bookmark(walkedThroughNodes, currentIndex);
+            return new Bookmark(walkedThroughNodes, currentIndex, currentDialogueEntry.text);
         }
 
         /// <summary>

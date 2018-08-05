@@ -83,6 +83,7 @@ namespace Nova
         public readonly List<string> NodeHistory;
         public long GlobalSaveIdentifier;
         public readonly DateTime CreationTime = DateTime.Now;
+        public string Description;
 
         private byte[] _screenShotBytes;
         [NonSerialized] private Texture2D _screenShotTexture;
@@ -121,10 +122,11 @@ namespace Nova
         /// </summary>
         /// <param name="nodeHistory">List of all reached nodes, including the current one as the last node.</param>
         /// <param name="dialogueIndex">Index of the current dialogue.</param>
-        public Bookmark(List<string> nodeHistory, int dialogueIndex)
+        public Bookmark(List<string> nodeHistory, int dialogueIndex, string description)
         {
             NodeHistory = new List<string>(nodeHistory);
             DialogueIndex = dialogueIndex;
+            Description = description;
         }
     }
 
