@@ -122,8 +122,21 @@ namespace Nova
         /// </summary>
         /// <param name="nodeHistory">List of all reached nodes, including the current one as the last node.</param>
         /// <param name="dialogueIndex">Index of the current dialogue.</param>
+        public Bookmark(List<string> nodeHistory, int dialogueIndex)
+        {
+            NodeHistory = new List<string>(nodeHistory);
+            DialogueIndex = dialogueIndex;
+        }
+
+        // NOTE: Do not use default parameter in constructor or it will fail to compile silently...
+
+        /// <summary>
+        /// Create a bookmark based on all reached nodes in current gameplay.
+        /// </summary>
+        /// <param name="nodeHistory">List of all reached nodes, including the current one as the last node.</param>
+        /// <param name="dialogueIndex">Index of the current dialogue.</param>
         /// <param name="description">Description of this bookmark.</param>
-        public Bookmark(List<string> nodeHistory, int dialogueIndex, string description = null)
+        public Bookmark(List<string> nodeHistory, int dialogueIndex, string description)
         {
             NodeHistory = new List<string>(nodeHistory);
             DialogueIndex = dialogueIndex;
