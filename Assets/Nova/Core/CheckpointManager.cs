@@ -87,32 +87,28 @@ namespace Nova
 
         private byte[] _screenShotBytes;
         [NonSerialized] private Texture2D _screenShotTexture;
-        [NonSerialized] private Sprite _screenShotSprite;
-        public Sprite ScreenShot
+        public Texture2D ScreenShot
         {
             get
             {
                 if (_screenShotBytes == null)
                 {
-                    Assert.IsTrue(_screenShotTexture == null, "ScreenShot cache is not consistent");
-                    Assert.IsTrue(_screenShotSprite == null, "ScreenShot cache is not consistent");
+                    Assert.IsTrue(_screenShotTexture == null, "Nova: ScreenShot cache is not consistent");
                     return null;
                 }
 
-                if (_screenShotSprite == null)
+                if (_screenShotTexture == null)
                 {
                     _screenShotTexture = new Texture2D(ScreenShotWidth, ScreenShotHeight, TextureFormat.RGB24, false);
                     _screenShotTexture.LoadRawTextureData(_screenShotBytes);
                     _screenShotTexture.Apply();
-                    _screenShotSprite = Utils.Texture2DToSprite(_screenShotTexture);
                 }
 
-                return _screenShotSprite;
+                return _screenShotTexture;
             }
             set
             {
-                _screenShotSprite = value;
-                _screenShotTexture = _screenShotSprite.texture;
+                _screenShotTexture = value;
                 _screenShotBytes = _screenShotTexture.GetRawTextureData();
             }
         }

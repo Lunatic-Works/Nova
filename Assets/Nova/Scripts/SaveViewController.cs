@@ -1,9 +1,7 @@
 ﻿// TODO
+// Better delete button
 // Scale thumbnail by shorter axis
-// Show preview when mouse is hovering
-//
 // Page 0 for auto save, last page for new page
-// Auto hide edit and delete buttons
 // UI to edit bookmark's description
 // Compress thumbnail
 //
@@ -13,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -59,6 +58,7 @@ namespace Nova
 
         private readonly List<GameObject> saveEntries = new List<GameObject>();
         private HashSet<int> usedSaveSlots;
+        private readonly Dictionary<int, Sprite> _cachedThumbnailSprite = new Dictionary<int, Sprite>();
 
         private SaveViewMode saveViewMode;
 
@@ -198,7 +198,7 @@ namespace Nova
         private void SaveBookmark(int saveId)
         {
             var bookmark = gameState.GetBookmark();
-            bookmark.ScreenShot = screenSprite;
+            bookmark.ScreenShot = screenSprite.texture;
             gameState.checkpointManager.SaveBookmark(saveId, bookmark);
             Hide();
         }
@@ -329,7 +329,7 @@ namespace Nova
         private void ShowPreviewBookmark(int saveId)
         {
             Bookmark bookmark = gameState.checkpointManager[saveId];
-            ShowPreview(bookmark.ScreenShot, string.Format(
+            ShowPreview(getThumbnailSprite(saveId), string.Format(
                 previewTextFormat,
                 bookmark.CreationTime.ToString(dateTimeFormat),
                 bookmark.NodeHistory.Last(),
@@ -390,7 +390,7 @@ namespace Nova
                     Bookmark bookmark = gameState.checkpointManager[saveId];
                     newHeaderText = bookmark.NodeHistory.Last();
                     newFooterText = bookmark.CreationTime.ToString(dateTimeFormat);
-                    newThumbnailSprite = bookmark.ScreenShot;
+                    newThumbnailSprite = getThumbnailSprite(saveId);
                     onEditButtonClicked = () => EditBookmark(saveId);
                     onDeleteButtonClicked = () => DeleteBookmark(saveId);
                 }
@@ -414,6 +414,17 @@ namespace Nova
                     onEditButtonClicked, onDeleteButtonClicked,
                     onThumbnailButtonClicked, onThumbnailButtonEnter, onThumbnailButtonExit);
             }
+        }
+
+        private Sprite getThumbnailSprite(int saveId)
+        {
+            Assert.IsTrue(usedSaveSlots.Contains(saveId), "Nova: getThumbnailSprite must use a saveId with existing bookmark");
+            if (!_cachedThumbnailSprite.ContainsKey(saveId))
+            {
+                Bookmark bookmark = gameState.checkpointManager[saveId];
+                _cachedThumbnailSprite[saveId] = Utils.Texture2DToSprite(bookmark.ScreenShot);
+            }
+            return _cachedThumbnailSprite[saveId];
         }
     }
 }
