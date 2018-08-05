@@ -1158,6 +1158,59 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: Nova.CurrentRouteEndedEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+--- !u!1001 &1010899334
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 114971742472019602, guid: 10b8a1561d89a4ad59007d02da0b1f24,
+        type: 2}
+      propertyPath: AlertPanelPrefab
+      value: 
+      objectReference: {fileID: 1560648569652328, guid: 112d70ab7890f491c8fdbc36981d15ad,
+        type: 2}
+    - target: {fileID: 114971742472019602, guid: 10b8a1561d89a4ad59007d02da0b1f24,
+        type: 2}
+      propertyPath: UICanvas
+      value: 
+      objectReference: {fileID: 156065840}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &1107339665
 GameObject:
   m_ObjectHideFlags: 0
@@ -1897,7 +1950,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4269582755980200, guid: ed28a84bf5bed423a9613c9aefa4dd7b, type: 2}
       propertyPath: m_RootOrder
-      value: 9
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 114878137693043892, guid: ed28a84bf5bed423a9613c9aefa4dd7b,
         type: 2}
