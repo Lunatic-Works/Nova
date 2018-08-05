@@ -94,8 +94,8 @@ namespace Nova
             {
                 if (_screenShotBytes == null)
                 {
-                    Assert.IsTrue(_screenShotTexture == null, "Nova: ScreenShot cache is not consistent");
-                    Assert.IsTrue(_screenShotSprite == null, "Nova: ScreenShot cache is not consistent");
+                    Assert.IsTrue(_screenShotTexture == null, "ScreenShot cache is not consistent");
+                    Assert.IsTrue(_screenShotSprite == null, "ScreenShot cache is not consistent");
                     return null;
                 }
 
@@ -115,18 +115,6 @@ namespace Nova
                 _screenShotTexture = _screenShotSprite.texture;
                 _screenShotBytes = _screenShotTexture.GetRawTextureData();
             }
-        }
-
-        /// <summary>
-        /// Create a bookmark based on all reached nodes in current gameplay.
-        /// </summary>
-        /// <param name="nodeHistory">List of all reached nodes, including the current one as the last node.</param>
-        /// <param name="dialogueIndex">Index of the current dialogue.</param>
-        public Bookmark(List<string> nodeHistory, int dialogueIndex, string description)
-        {
-            NodeHistory = new List<string>(nodeHistory);
-            DialogueIndex = dialogueIndex;
-            Description = description;
         }
 
         // NOTE: Do not use default parameter in constructor or it will fail to compile silently...
