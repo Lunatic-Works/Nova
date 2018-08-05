@@ -1,9 +1,7 @@
 ﻿// TODO
+// Better edit and delete buttons
 // Scale thumbnail by shorter axis
-// Show preview when mouse is hovering
-//
 // Page 0 for auto save, last page for new page
-// Auto hide edit and delete buttons
 // UI to edit bookmark's description
 // Compress thumbnail
 //
@@ -13,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -40,9 +39,29 @@ namespace Nova
         // Use a data structure to maintain maximum for usedSaveSlots may improve performance
         private int maxPage = 1;
 
-        // selectedSaveId must be a saveId with existing bookmark, or -1
-        // -1 means none is selected
-        private int selectedSaveId = -1;
+        // selectedSaveId == -1 means no bookmark is selected
+        private int _selectedSaveId;
+        private int selectedSaveId
+        {
+            get
+            {
+                return _selectedSaveId;
+            }
+
+            set
+            {
+                Assert.IsTrue(usedSaveSlots.ContainsKey(value) || value == -1, "Nova: selectedSaveId must be a saveId with existing bookmark, or -1");
+                _selectedSaveId = value;
+                if (value == -1)
+                {
+                    ShowPreviewScreen();
+                }
+                else
+                {
+                    ShowPreviewBookmark(value);
+                }
+            }
+        }
 
         private GameObject savePanel;
         private Button backgroundButton;
@@ -59,6 +78,7 @@ namespace Nova
 
         private readonly List<GameObject> saveEntries = new List<GameObject>();
         private Dictionary<int, BookmarkMetadata> usedSaveSlots;
+        private readonly Dictionary<int, Sprite> _cachedThumbnailSprite = new Dictionary<int, Sprite>();
 
         private SaveViewMode saveViewMode;
 
@@ -95,7 +115,7 @@ namespace Nova
             rightButtonText = rightButtonPanel.GetComponent<Text>();
             pageText = pagerPanel.transform.Find("PageText").gameObject.GetComponent<Text>();
 
-            backgroundButton.onClick.AddListener(() => InitPreview());
+            backgroundButton.onClick.AddListener(() => { selectedSaveId = -1; });
             if (canSave)
             {
                 saveButton.onClick.AddListener(() => ShowSave());
@@ -148,7 +168,7 @@ namespace Nova
                 screenSprite = Utils.Texture2DToSprite(screenTexture);
             }
             savePanel.SetActive(true);
-            InitPreview();
+            selectedSaveId = -1;
         }
 
         public void ShowSave()
@@ -198,7 +218,7 @@ namespace Nova
         private void SaveBookmark(int saveId)
         {
             var bookmark = gameState.GetBookmark();
-            bookmark.ScreenShot = screenSprite;
+            bookmark.ScreenShot = screenSprite.texture;
             gameState.checkpointManager.SaveBookmark(saveId, bookmark);
             Hide();
         }
@@ -252,7 +272,6 @@ namespace Nova
                         if (usedSaveSlots.ContainsKey(saveId))
                         {
                             selectedSaveId = saveId;
-                            ShowPreviewBookmark(saveId);
                         }
                         else // Bookmark with this saveId does not exist
                         {
@@ -272,12 +291,10 @@ namespace Nova
                         if (usedSaveSlots.ContainsKey(saveId))
                         {
                             selectedSaveId = saveId;
-                            ShowPreviewBookmark(saveId);
                         }
                         else // Bookmark with this saveId does not exist
                         {
                             selectedSaveId = -1;
-                            ShowPreviewScreen();
                         }
                     }
                 }
@@ -290,7 +307,7 @@ namespace Nova
             {
                 if (usedSaveSlots.ContainsKey(saveId))
                 {
-                    ShowPreviewBookmark(saveId);
+                    selectedSaveId = saveId;
                 }
             }
         }
@@ -299,7 +316,7 @@ namespace Nova
         {
             if (Input.touchCount == 0) // Mouse
             {
-                ShowPreviewScreen();
+                selectedSaveId = -1;
             }
         }
 
@@ -329,18 +346,12 @@ namespace Nova
         private void ShowPreviewBookmark(int saveId)
         {
             Bookmark bookmark = gameState.checkpointManager[saveId];
-            ShowPreview(bookmark.ScreenShot, string.Format(
+            ShowPreview(getThumbnailSprite(saveId), string.Format(
                 previewTextFormat,
                 usedSaveSlots[saveId].ModifiedTime.ToString(dateTimeFormat),
                 bookmark.NodeHistory.Last(),
                 bookmark.Description
             ));
-        }
-
-        private void InitPreview()
-        {
-            selectedSaveId = -1;
-            ShowPreviewScreen();
         }
 
         private void ShowPage()
@@ -390,7 +401,7 @@ namespace Nova
                     Bookmark bookmark = gameState.checkpointManager[saveId];
                     newHeaderText = bookmark.NodeHistory.Last();
                     newFooterText = bookmark.CreationTime.ToString(dateTimeFormat);
-                    newThumbnailSprite = bookmark.ScreenShot;
+                    newThumbnailSprite = getThumbnailSprite(saveId);
                     onEditButtonClicked = () => EditBookmark(saveId);
                     onDeleteButtonClicked = () => DeleteBookmark(saveId);
                 }
@@ -414,6 +425,17 @@ namespace Nova
                     onEditButtonClicked, onDeleteButtonClicked,
                     onThumbnailButtonClicked, onThumbnailButtonEnter, onThumbnailButtonExit);
             }
+        }
+
+        private Sprite getThumbnailSprite(int saveId)
+        {
+            Assert.IsTrue(usedSaveSlots.ContainsKey(saveId), "Nova: getThumbnailSprite must use a saveId with existing bookmark");
+            if (!_cachedThumbnailSprite.ContainsKey(saveId))
+            {
+                Bookmark bookmark = gameState.checkpointManager[saveId];
+                _cachedThumbnailSprite[saveId] = Utils.Texture2DToSprite(bookmark.ScreenShot);
+            }
+            return _cachedThumbnailSprite[saveId];
         }
     }
 }
