@@ -128,6 +128,21 @@ namespace Nova
             DialogueIndex = dialogueIndex;
             Description = description;
         }
+
+        // NOTE: Do not use default parameter in constructor or it will fail to compile silently...
+
+        /// <summary>
+        /// Create a bookmark based on all reached nodes in current gameplay.
+        /// </summary>
+        /// <param name="nodeHistory">List of all reached nodes, including the current one as the last node.</param>
+        /// <param name="dialogueIndex">Index of the current dialogue.</param>
+        /// <param name="description">Description of this bookmark.</param>
+        public Bookmark(List<string> nodeHistory, int dialogueIndex, string description)
+        {
+            NodeHistory = new List<string>(nodeHistory);
+            DialogueIndex = dialogueIndex;
+            Description = description;
+        }
     }
 
     #endregion
@@ -301,10 +316,10 @@ namespace Nova
         private T ReadSave<T>(Stream s)
         {
             var bw = new BinaryReader(s);
-            Assert.IsTrue(_fileHeader.SequenceEqual(bw.ReadBytes(_fileHeader.Length)),
-                "Nova: Invalid save file format");
-            Assert.IsTrue(Version >= bw.ReadInt32(),
-                "Nova: Save file is incompatible with the current version of engine");
+            this.RuntimeAssert(_fileHeader.SequenceEqual(bw.ReadBytes(_fileHeader.Length)),
+                "Invalid save file format");
+            this.RuntimeAssert(Version >= bw.ReadInt32(),
+                "Save file is incompatible with the current version of engine");
             using (var stream = new CryptoStream(s, _cryptic.CreateDecryptor(), CryptoStreamMode.Read))
                 return (T) _formatter.Deserialize(stream);
         }
@@ -340,8 +355,8 @@ namespace Nova
             using (var fs = File.OpenRead(ComposeFileName(saveId)))
             {
                 Bookmark result = ReadSave<Bookmark>(fs);
-                Assert.AreEqual(result.GlobalSaveIdentifier, _globalSave.GlobalSaveIdentifier,
-                    "Nova: Save file is incompatible with the global save file");
+                this.RuntimeAssert(result.GlobalSaveIdentifier == _globalSave.GlobalSaveIdentifier,
+                    "Save file is incompatible with the global save file");
                 return _cachedSaveSlots[saveId] = result;
             }
         }
@@ -354,43 +369,43 @@ namespace Nova
         {
             File.Delete(ComposeFileName(saveId));
             UsedSaveSlots.Remove(saveId);
-	        _cachedSaveSlots.Remove(saveId);
+            _cachedSaveSlots.Remove(saveId);
         }
 
-		/// <summary>
-		/// Load the contents of all existing bookmark in the given range eagerly.
-		/// </summary>
-		/// <param name="beginSaveId">The beginning of the range, inclusive.</param>
-		/// <param name="endSaveId">The end of the range, exclusive.</param>
+        /// <summary>
+        /// Load the contents of all existing bookmark in the given range eagerly.
+        /// </summary>
+        /// <param name="beginSaveId">The beginning of the range, inclusive.</param>
+        /// <param name="endSaveId">The end of the range, exclusive.</param>
         public void EagerLoadRange(int beginSaveId, int endSaveId)
         {
-	        for (; beginSaveId < endSaveId; beginSaveId++)
-	        {
-				if (UsedSaveSlots.Contains(beginSaveId))
-					LoadBookmark(beginSaveId);
-	        }
+            for (; beginSaveId < endSaveId; beginSaveId++)
+            {
+                if (UsedSaveSlots.Contains(beginSaveId))
+                    LoadBookmark(beginSaveId);
+            }
         }
 
-		/// <summary>
-		/// Load / Save a bookmark by File No.. Will use cached result if exists.
-		/// </summary>
-		/// <param name="saveId">File No. of the bookmark.</param>
-		/// <returns>The cached or loaded bookmark</returns>
-		public Bookmark this[int saveId]
+        /// <summary>
+        /// Load / Save a bookmark by File No.. Will use cached result if exists.
+        /// </summary>
+        /// <param name="saveId">File No. of the bookmark.</param>
+        /// <returns>The cached or loaded bookmark</returns>
+        public Bookmark this[int saveId]
         {
             get
             {
-	            if (!UsedSaveSlots.Contains(saveId))
-		            return null;
-	            if (!_cachedSaveSlots.ContainsKey(saveId))
-		            LoadBookmark(saveId);
-	            return _cachedSaveSlots[saveId];
+                if (!UsedSaveSlots.Contains(saveId))
+                    return null;
+                if (!_cachedSaveSlots.ContainsKey(saveId))
+                    LoadBookmark(saveId);
+                return _cachedSaveSlots[saveId];
             }
 
-	        set
-	        {
-		        SaveBookmark(saveId, value);
-	        }
+            set
+            {
+                SaveBookmark(saveId, value);
+            }
         }
     }
 }
