@@ -1,4 +1,5 @@
-﻿// Only works on ARGB32, RGB24 and Alpha8 textures that are marked readable
+﻿// http://wiki.unity3d.com/index.php/TextureScale
+// Only works on ARGB32, RGB24 and Alpha8 textures that are marked readable
 
 using System.Threading;
 using UnityEngine;
