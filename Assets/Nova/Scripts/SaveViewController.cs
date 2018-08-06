@@ -54,7 +54,7 @@ namespace Nova
 
             set
             {
-                Assert.IsTrue(usedSaveSlots.Contains(value) || value == -1, "Nova: selectedSaveId must be a saveId with existing bookmark, or -1");
+                Assert.IsTrue(usedSaveSlots.ContainsKey(value) || value == -1, "Nova: selectedSaveId must be a saveId with existing bookmark, or -1");
                 _selectedSaveId = value;
                 if (value == -1)
                 {
@@ -81,7 +81,7 @@ namespace Nova
         private Sprite defaultThumbnailSprite;
 
         private readonly List<GameObject> saveEntries = new List<GameObject>();
-        private HashSet<int> usedSaveSlots;
+        private Dictionary<int, BookmarkMetadata> usedSaveSlots;
         private readonly Dictionary<int, Sprite> _cachedThumbnailSprite = new Dictionary<int, Sprite>();
 
         private SaveViewMode saveViewMode;
@@ -157,7 +157,7 @@ namespace Nova
 
         private void Start()
         {
-            usedSaveSlots = gameState.checkpointManager.UsedSaveSlots;
+            usedSaveSlots = gameState.checkpointManager.SaveSlotsMetadata;
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
             ShowPage();
         }
@@ -291,7 +291,7 @@ namespace Nova
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
-                    if (usedSaveSlots.Contains(saveId))
+                    if (usedSaveSlots.ContainsKey(saveId))
                     {
                         LoadBookmark(saveId);
                     }
@@ -307,7 +307,7 @@ namespace Nova
                     }
                     else // Another bookmark selected
                     {
-                        if (usedSaveSlots.Contains(saveId))
+                        if (usedSaveSlots.ContainsKey(saveId))
                         {
                             selectedSaveId = saveId;
                         }
@@ -327,7 +327,7 @@ namespace Nova
                     }
                     else // Another bookmark selected
                     {
-                        if (usedSaveSlots.Contains(saveId))
+                        if (usedSaveSlots.ContainsKey(saveId))
                         {
                             selectedSaveId = saveId;
                         }
@@ -344,7 +344,7 @@ namespace Nova
         {
             if (Input.touchCount == 0) // Mouse
             {
-                if (usedSaveSlots.Contains(saveId))
+                if (usedSaveSlots.ContainsKey(saveId))
                 {
                     selectedSaveId = saveId;
                 }
@@ -387,7 +387,7 @@ namespace Nova
             Bookmark bookmark = gameState.checkpointManager[saveId];
             ShowPreview(getThumbnailSprite(saveId), string.Format(
                 previewTextFormat,
-                bookmark.CreationTime.ToString(dateTimeFormat),
+                usedSaveSlots[saveId].ModifiedTime.ToString(dateTimeFormat),
                 bookmark.NodeHistory.Last(),
                 bookmark.Description
             ));
@@ -396,7 +396,7 @@ namespace Nova
         private void ShowPage()
         {
             if (usedSaveSlots.Any()){
-                maxPage = (usedSaveSlots.Max() + maxSaveEntry - 1) / maxSaveEntry;
+                maxPage = (usedSaveSlots.Keys.Max() + maxSaveEntry - 1) / maxSaveEntry;
                 // New page to save
                 if (saveViewMode == SaveViewMode.Save)
                 {
@@ -435,7 +435,7 @@ namespace Nova
                 Sprite newThumbnailSprite;
                 UnityAction onEditButtonClicked;
                 UnityAction onDeleteButtonClicked;
-                if (usedSaveSlots.Contains(saveId))
+                if (usedSaveSlots.ContainsKey(saveId))
                 {
                     Bookmark bookmark = gameState.checkpointManager[saveId];
                     newHeaderText = bookmark.NodeHistory.Last();
@@ -468,7 +468,7 @@ namespace Nova
 
         private Sprite getThumbnailSprite(int saveId)
         {
-            Assert.IsTrue(usedSaveSlots.Contains(saveId), "Nova: getThumbnailSprite must use a saveId with existing bookmark");
+            Assert.IsTrue(usedSaveSlots.ContainsKey(saveId), "Nova: getThumbnailSprite must use a saveId with existing bookmark");
             if (!_cachedThumbnailSprite.ContainsKey(saveId))
             {
                 Bookmark bookmark = gameState.checkpointManager[saveId];

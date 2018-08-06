@@ -131,6 +131,35 @@ namespace Nova
 
     #endregion
 
+    public enum BookmarkType
+    {
+        AutoSave = 0,
+        QuickSave = 10,
+        NormalSave = 20
+    }
+
+    public class BookmarkMetadata
+    {
+        public int SaveId
+        {
+            get { return _saveId; }
+
+            set
+            {
+                Type = BookmarkType.AutoSave;
+                if (value >= (int)BookmarkType.QuickSave)
+                    Type = BookmarkType.QuickSave;
+                if (value >= (int)BookmarkType.NormalSave)
+                    Type = BookmarkType.NormalSave;
+                _saveId = value;
+            }
+        }
+        public BookmarkType Type { get; private set; }
+        public DateTime ModifiedTime;
+
+        private int _saveId;
+    }
+
     /// <summary>
     /// Manager component providing ability to manage game progress and save files.
     /// </summary>
@@ -148,7 +177,7 @@ namespace Nova
         private GlobalSave _globalSave;
 
         private Dictionary<int, Bookmark> _cachedSaveSlots;
-        public HashSet<int> UsedSaveSlots { get; private set; }
+        public Dictionary<int, BookmarkMetadata> SaveSlotsMetadata { get; private set; }
 
         /// <summary>
         /// Initalization of members which are unlikely to change in the future
@@ -165,7 +194,7 @@ namespace Nova
             };
             _formatter = new BinaryFormatter();
             _cachedSaveSlots = new Dictionary<int, Bookmark>();
-            UsedSaveSlots = new HashSet<int>();
+            SaveSlotsMetadata = new Dictionary<int, BookmarkMetadata>();
         }
 
         public void Awake()
@@ -187,20 +216,15 @@ namespace Nova
                 {
                     int id;
                     if (int.TryParse(result.Groups[1].Value, out id))
-                        UsedSaveSlots.Add(id);
+                        SaveSlotsMetadata.Add(id, new BookmarkMetadata
+                        {
+                            SaveId = id,
+                            ModifiedTime = File.GetLastWriteTime(name)
+                        });
                 }
             }
 
             Debug.Log("CheckpointManager Initialized");
-        }
-
-        private NodeSaveInfo EnsureSavedNode(string nodeName)
-        {
-            NodeSaveInfo info;
-            if (_globalSave.SavedNodes.TryGetValue(nodeName, out info)) return info;
-            info = new NodeSaveInfo();
-            _globalSave.SavedNodes[nodeName] = info;
-            return info;
         }
 
         /// <summary>
@@ -211,7 +235,7 @@ namespace Nova
         /// <param name="entry">Restore entry for the dialogue</param>
         public void SetReached(string nodeName, int dialogueIndex, GameStateStepRestoreEntry entry)
         {
-            EnsureSavedNode(nodeName).DialogueRestoreEntries[dialogueIndex] = entry;
+            _globalSave.SavedNodes.Ensure(nodeName).DialogueRestoreEntries[dialogueIndex] = entry;
         }
 
         /// <summary>
@@ -221,7 +245,7 @@ namespace Nova
         /// <param name="branchName">The name of the branch.</param>
         public void SetReached(string nodeName, string branchName)
         {
-            EnsureSavedNode(nodeName).ReachedBranches.Add(branchName);
+            _globalSave.SavedNodes.Ensure(nodeName).ReachedBranches.Add(branchName);
         }
 
         /// <summary>
@@ -325,7 +349,7 @@ namespace Nova
             using (var fs = File.OpenWrite(_globalSavePath))
                 WriteSave(_globalSave, fs);
 
-            UsedSaveSlots.Add(saveId);
+            SaveSlotsMetadata.Ensure(saveId).ModifiedTime = DateTime.Now;
         }
 
         /// <summary>
@@ -338,7 +362,7 @@ namespace Nova
         {
             using (var fs = File.OpenRead(ComposeFileName(saveId)))
             {
-                Bookmark result = ReadSave<Bookmark>(fs);
+                var result = ReadSave<Bookmark>(fs);
                 this.RuntimeAssert(result.GlobalSaveIdentifier == _globalSave.GlobalSaveIdentifier,
                     "Save file is incompatible with the global save file");
                 return _cachedSaveSlots[saveId] = result;
@@ -352,7 +376,7 @@ namespace Nova
         public void DeleteBookmark(int saveId)
         {
             File.Delete(ComposeFileName(saveId));
-            UsedSaveSlots.Remove(saveId);
+            SaveSlotsMetadata.Remove(saveId);
             _cachedSaveSlots.Remove(saveId);
         }
 
@@ -365,7 +389,7 @@ namespace Nova
         {
             for (; beginSaveId < endSaveId; beginSaveId++)
             {
-                if (UsedSaveSlots.Contains(beginSaveId))
+                if (SaveSlotsMetadata.ContainsKey(beginSaveId))
                     LoadBookmark(beginSaveId);
             }
         }
@@ -379,7 +403,7 @@ namespace Nova
         {
             get
             {
-                if (!UsedSaveSlots.Contains(saveId))
+                if (!SaveSlotsMetadata.ContainsKey(saveId))
                     return null;
                 if (!_cachedSaveSlots.ContainsKey(saveId))
                     LoadBookmark(saveId);
@@ -390,6 +414,20 @@ namespace Nova
             {
                 SaveBookmark(saveId, value);
             }
+        }
+
+        /// <summary>
+        /// Query the file No. of the latest / earliest bookmark.
+        /// </summary>
+        /// <param name="begin">Beginning file No. of the query range, inclusive.</param>
+        /// <param name="end">Ending file No. of the query range, exclusive.</param>
+        /// <returns>File No. to query. If no bookmark is found in range, the return value will be "begin".</returns>
+        public int QueryLatestSaveId(int begin, int end)
+        {
+            var filtered = SaveSlotsMetadata.Values.Where(m => m.SaveId >= begin && m.SaveId < end);
+            if (!filtered.Any())
+                return begin;
+            return filtered.Aggregate((agg, val) => agg.ModifiedTime > val.ModifiedTime ? agg : val).SaveId;
         }
     }
 }

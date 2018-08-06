@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
@@ -20,6 +21,14 @@ namespace Nova
             {
                 throw new Exception(string.Format("Nova - {0}: {1}", mb.name, msg));
             }
+        }
+
+        public static TV Ensure<TK, TV>(this Dictionary<TK, TV> dict, TK key) where TV : new()
+        {
+            TV info;
+            if (dict.TryGetValue(key, out info))
+                return info;
+            return dict[key] = new TV();
         }
     }
 
