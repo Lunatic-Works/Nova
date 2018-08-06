@@ -12,16 +12,16 @@ namespace Nova
 
     public class DialogueChangedEventData
     {
-        public DialogueChangedEventData(string labelName, int dialogueIndex, string text,
+        public DialogueChangedEventData(string nodeName, int dialogueIndex, string text,
             IEnumerable<string> voicesForNextDialogue)
         {
-            this.labelName = labelName;
+            this.nodeName = nodeName;
             this.dialogueIndex = dialogueIndex;
             this.text = text;
             this.voicesForNextDialogue = voicesForNextDialogue;
         }
 
-        public string labelName { get; private set; }
+        public string nodeName { get; private set; }
         public int dialogueIndex { get; private set; }
         public string text { get; private set; }
 
@@ -92,6 +92,15 @@ namespace Nova
 
     [System.Serializable]
     public class CurrentRouteEndedEvent : UnityEvent<CurrentRouteEndedEventData>
+    {
+    }
+
+    public class BookmarkWillLoadData
+    {
+    }
+
+    [System.Serializable]
+    public class BookmarkWillLoadEvent : UnityEvent<BookmarkWillLoadData>
     {
     }
 
@@ -190,6 +199,11 @@ namespace Nova
         /// </summary>
         public CurrentRouteEndedEvent CurrentRouteEnded;
 
+        /// <summary>
+        /// A book mark will be loaded
+        /// </summary>
+        public BookmarkWillLoadEvent BookmarkWillLoad;
+
         #endregion
 
         private readonly List<string> voicesOfNextDialogue = new List<string>();
@@ -272,7 +286,8 @@ namespace Nova
         /// </summary>
         /// <param name="nodeName">the node to move to</param>
         /// <param name="dialogueIndex">the index of the dialogue to move to</param>
-        public void MoveBackTo(string nodeName, int dialogueIndex)
+        public void MoveBackTo(string nodeName, int dialogueIndex,
+            bool forceRefreshDialogue = false, bool forceRefreshNode = false)
         {
             // restore history
             var backNodeIndex = walkedThroughNodes.FindLastIndex(x => x == nodeName);
@@ -293,7 +308,7 @@ namespace Nova
             Restore(checkpointManager.IsReached(nodeName, dialogueIndex));
 
             // Update game state
-            UpdateGameState();
+            UpdateGameState(forceRefreshDialogue, forceRefreshNode);
         }
 
         /// <summary>
@@ -526,9 +541,10 @@ namespace Nova
         /// </summary>
         public void LoadBookmark(Bookmark bookmark)
         {
+            BookmarkWillLoad.Invoke(new BookmarkWillLoadData());
             walkedThroughNodes = bookmark.NodeHistory;
             Assert.IsFalse(walkedThroughNodes.Count == 0);
-            MoveBackTo(walkedThroughNodes.Last(), bookmark.DialogueIndex);
+            MoveBackTo(walkedThroughNodes.Last(), bookmark.DialogueIndex, true, true);
         }
     }
 }

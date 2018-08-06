@@ -24,6 +24,7 @@ namespace Nova
             logContent = logPanel.transform.Find("ScrollView/Viewport/Content").gameObject;
             alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
+            gameState.BookmarkWillLoad.AddListener(OnBookmarkWillLoad);
         }
 
         private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
@@ -31,7 +32,7 @@ namespace Nova
             var logEntry = Instantiate(LogEntryPrefab);
             var logEntryController = logEntry.GetComponent<LogEntryController>();
             var logEntryIndex = logEntries.Count;
-            var currentNodeName = dialogueChangedEventData.labelName;
+            var currentNodeName = dialogueChangedEventData.nodeName;
             var currentDialogueIndex = dialogueChangedEventData.dialogueIndex;
             var voices = dialogueChangedEventData.voicesForNextDialogue;
 
@@ -55,14 +56,19 @@ namespace Nova
 
         public bool hideOnGoBackButtonClicked;
 
-        private void _onGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
+        private void RemoveLogEntriesRange(int startIndex, int endIndex)
         {
-            for (var i = logEntryIndex; i < logEntries.Count; ++i)
+            for (var i = startIndex; i < endIndex; ++i)
             {
                 Destroy(logEntries[i]);
             }
 
-            logEntries.RemoveRange(logEntryIndex, logEntries.Count - logEntryIndex);
+            logEntries.RemoveRange(startIndex, endIndex - startIndex);
+        }
+
+        private void _onGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
+        {
+            RemoveLogEntriesRange(logEntryIndex, logEntries.Count);
             gameState.MoveBackTo(nodeName, dialogueIndex);
             Debug.Log(string.Format("Remain log entries count: {0}", logEntries.Count));
             if (hideOnGoBackButtonClicked)
@@ -85,6 +91,12 @@ namespace Nova
                 var clip = AssetsLoader.GetAudioClip(audioName);
                 AudioSource.PlayClipAtPoint(clip, new Vector3(0, 0, -10));
             }
+        }
+
+        private void OnBookmarkWillLoad(BookmarkWillLoadData data)
+        {
+            // clear all log entries
+            RemoveLogEntriesRange(0, logEntries.Count);
         }
 
         /// <summary>
