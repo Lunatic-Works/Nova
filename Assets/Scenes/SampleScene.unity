@@ -1153,6 +1153,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: Nova.CurrentRouteEndedEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  BookmarkWillLoad:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Nova.BookmarkWillLoadEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
 --- !u!1001 &1010899334
 Prefab:
   m_ObjectHideFlags: 0
