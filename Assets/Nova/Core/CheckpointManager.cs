@@ -138,6 +138,12 @@ namespace Nova
         NormalSave = 20
     }
 
+    public enum SaveIdQueryType
+    {
+        Latest,
+        Earliest
+    }
+
     public class BookmarkMetadata
     {
         public int SaveId
@@ -421,13 +427,17 @@ namespace Nova
         /// </summary>
         /// <param name="begin">Beginning file No. of the query range, inclusive.</param>
         /// <param name="end">Ending file No. of the query range, exclusive.</param>
+        /// <param name="type">Type of this query.</param>
         /// <returns>File No. to query. If no bookmark is found in range, the return value will be "begin".</returns>
-        public int QueryLatestSaveId(int begin, int end)
+        public int QuerySaveIdByTime(int begin, int end, SaveIdQueryType type)
         {
             var filtered = SaveSlotsMetadata.Values.Where(m => m.SaveId >= begin && m.SaveId < end);
             if (!filtered.Any())
                 return begin;
-            return filtered.Aggregate((agg, val) => agg.ModifiedTime > val.ModifiedTime ? agg : val).SaveId;
+            if (type == SaveIdQueryType.Earliest)
+                return filtered.Aggregate((agg, val) => agg.ModifiedTime < val.ModifiedTime ? agg : val).SaveId;
+            else
+                return filtered.Aggregate((agg, val) => agg.ModifiedTime > val.ModifiedTime ? agg : val).SaveId;
         }
     }
 }
