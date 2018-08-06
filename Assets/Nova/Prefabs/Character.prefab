@@ -164,7 +164,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterVariableName: girl
   voiceFileFolder: Audio/
-  gameState: {fileID: 0}
 --- !u!212 &212225574257704068
 SpriteRenderer:
   m_ObjectHideFlags: 1

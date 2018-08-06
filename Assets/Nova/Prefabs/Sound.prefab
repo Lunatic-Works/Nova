@@ -134,4 +134,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioControllerName: soundController
   audioPath: Audio/
-  gameState: {fileID: 0}

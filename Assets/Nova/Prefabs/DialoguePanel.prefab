@@ -108,8 +108,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 224026901384816642}
-  - component: {fileID: 222247204563569340}
-  - component: {fileID: 114341308568882306}
+  - component: {fileID: 222019282065334570}
+  - component: {fileID: 114330828053177842}
   - component: {fileID: 114358814597933850}
   m_Layer: 5
   m_Name: DialoguePanel
@@ -620,7 +620,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &114341308568882306
+--- !u!114 &114330828053177842
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -640,7 +640,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 0}
-  m_Type: 1
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -658,7 +658,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a62cf927628e24326bffdf99556c4ed1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameState: {fileID: 0}
   needAnimation: 1
   characterDisplayDuration: 0.1
   namePattern: "^(.*?)(:?\\:|\uFF1A)"
@@ -1073,6 +1072,12 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!222 &222019282065334570
+CanvasRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1320876714649712}
 --- !u!222 &222109805711929770
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -1085,12 +1090,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1488427489625420}
---- !u!222 &222247204563569340
-CanvasRenderer:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1320876714649712}
 --- !u!222 &222453802778844306
 CanvasRenderer:
   m_ObjectHideFlags: 1

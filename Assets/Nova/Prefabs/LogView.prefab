@@ -552,7 +552,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c16c47d58d6dc4fc48bc7bb5c9645e83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameState: {fileID: 0}
   LogEntryPrefab: {fileID: 1875120979872830, guid: dfddb504ea35c40f7911f1fc6e70a265,
     type: 2}
   hideOnGoBackButtonClicked: 1

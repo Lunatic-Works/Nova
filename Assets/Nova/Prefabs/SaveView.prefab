@@ -434,7 +434,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f59ec61cb63f52b4885061e3945f5435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameState: {fileID: 0}
   SaveEntryPrefab: {fileID: 1648968802248122, guid: a3adf719197f5ba4eb24448782c6cc8e,
     type: 2}
   SaveEntryRowPrefab: {fileID: 1942869437775124, guid: f7b5935ead1099a44a315ece11248017,

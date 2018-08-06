@@ -8,13 +8,14 @@ namespace Nova
 {
     public class BranchController : MonoBehaviour, IRestorable
     {
-        public GameState gameState;
+        private GameState gameState;
         public GameObject BranchButtonPrefab;
         public GameObject blackPanel;
         public bool dimOnBranch;
 
         private void Start()
         {
+            gameState = GameState.Instance;
             gameState.BranchOccurs.AddListener(OnBranchHappen);
             gameState.AddRestorable(this);
         }
@@ -40,6 +41,7 @@ namespace Nova
                 {
                     text = childButton.GetComponentInChildren<Text>();
                 }
+
                 text.text = branchInformation.name;
 
                 childButton.GetComponent<Button>().onClick.AddListener(() => Select(branchInformation.name));

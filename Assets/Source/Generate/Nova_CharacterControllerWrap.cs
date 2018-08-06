@@ -17,7 +17,6 @@ public class Nova_CharacterControllerWrap
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("characterVariableName", get_characterVariableName, set_characterVariableName);
 		L.RegVar("voiceFileFolder", get_voiceFileFolder, set_voiceFileFolder);
-		L.RegVar("gameState", get_gameState, set_gameState);
 		L.RegVar("restorableObjectName", get_restorableObjectName, null);
 		L.EndClass();
 	}
@@ -178,25 +177,6 @@ public class Nova_CharacterControllerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_gameState(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			Nova.CharacterController obj = (Nova.CharacterController)o;
-			Nova.GameState ret = obj.gameState;
-			ToLua.Push(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index gameState on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_restorableObjectName(IntPtr L)
 	{
 		object o = null;
@@ -250,25 +230,6 @@ public class Nova_CharacterControllerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index voiceFileFolder on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_gameState(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			Nova.CharacterController obj = (Nova.CharacterController)o;
-			Nova.GameState arg0 = (Nova.GameState)ToLua.CheckObject<Nova.GameState>(L, 2);
-			obj.gameState = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index gameState on a nil value");
 		}
 	}
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
+using Nova.Exceptions;
 using UnityEngine;
 
 namespace Nova
@@ -9,10 +11,10 @@ namespace Nova
         public static Sprite Texture2DToSprite(Texture2D texture)
         {
             return Sprite.Create(
-                    texture,
-                    new Rect(0, 0, texture.width, texture.height),
-                    new Vector2(0.5f, 0.5f)
-                );
+                texture,
+                new Rect(0, 0, texture.width, texture.height),
+                new Vector2(0.5f, 0.5f)
+            );
         }
 
         public static void RuntimeAssert(this MonoBehaviour mb, bool conditionToBeTrue, string msg)
@@ -30,7 +32,19 @@ namespace Nova
             {
                 return info;
             }
+
             return dict[key] = new TV();
+        }
+
+        public static GameObject FindGameController()
+        {
+            var gameController = GameObject.FindWithTag("GameController");
+            if (gameController == null)
+            {
+                throw new InvalidAccessException("Nova: Can not find game controller by tag.");
+            }
+
+            return gameController;
         }
     }
 

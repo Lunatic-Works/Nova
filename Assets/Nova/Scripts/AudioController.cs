@@ -23,7 +23,7 @@ namespace Nova
 
         private AudioSource audioSource;
 
-        public GameState gameState;
+        private GameState gameState;
 
         public float volume
         {
@@ -33,6 +33,7 @@ namespace Nova
 
         private void Start()
         {
+            gameState = GameState.Instance;
             audioSource = GetComponent<AudioSource>();
             LuaRuntime.Instance.BindObject(audioControllerName, this);
             gameState.AddRestorable(this);
