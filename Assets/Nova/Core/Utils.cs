@@ -27,7 +27,9 @@ namespace Nova
         {
             TV info;
             if (dict.TryGetValue(key, out info))
+            {
                 return info;
+            }
             return dict[key] = new TV();
         }
     }

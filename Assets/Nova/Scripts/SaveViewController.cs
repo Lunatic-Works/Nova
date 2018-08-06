@@ -40,7 +40,6 @@ namespace Nova
         private int page = 1;
 
         // maxPage is updated when ShowPage is called
-        // Use a data structure to maintain maximum for usedSaveSlots may improve performance
         private int maxPage = 1;
 
         // selectedSaveId == -1 means no bookmark is selected
@@ -279,13 +278,13 @@ namespace Nova
             {
                 if (saveViewMode == SaveViewMode.Save)
                 {
-                    if (usedSaveSlots.Contains(saveId))
+                    if (usedSaveSlots.ContainsKey(saveId))
                     {
                         SaveBookmark(saveId);
                     }
                     else // Bookmark with this saveId does not exist
                     {
-                        // No alert when saving to enpty slot
+                        // No alert when saving to an empty slot
                         _saveBookmark(saveId);
                     }
                 }
@@ -314,7 +313,7 @@ namespace Nova
                         else // Bookmark with this saveId does not exist
                         {
                             selectedSaveId = -1;
-                            // No alert when saving to enpty slot
+                            // No alert when saving to an empty slot
                             _saveBookmark(saveId);
                         }
                     }
@@ -395,7 +394,8 @@ namespace Nova
 
         private void ShowPage()
         {
-            if (usedSaveSlots.Any()){
+            if (usedSaveSlots.Any())
+            {
                 maxPage = (usedSaveSlots.Keys.Max() + maxSaveEntry - 1) / maxSaveEntry;
                 // New page to save
                 if (saveViewMode == SaveViewMode.Save)
