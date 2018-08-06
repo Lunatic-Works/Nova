@@ -11,13 +11,24 @@ namespace Nova
 
         public GameObject AlertPanelPrefab;
 
+        // Pass title/bodyContent/ignore = null to hide these objects
         public void Alert(string title, string bodyContent,
-            UnityAction onClickConfirm = null, UnityAction onClickCancel = null)
+            UnityAction onClickConfirm = null, UnityAction onClickCancel = null,
+            Wrap<bool> ignore = null)
         {
+            if (ignore != null && ignore.value)
+            {
+                if (onClickConfirm != null)
+                {
+                    onClickConfirm();
+                }
+                return;
+            }
+
             var alertPanel = Instantiate(AlertPanelPrefab, UICanvas);
             alertPanel.transform.SetAsLastSibling();
             var alertPanelController = alertPanel.GetComponent<AlertPanelController>();
-            alertPanelController.Init(title, bodyContent, onClickConfirm, onClickCancel);
+            alertPanelController.Init(title, bodyContent, onClickConfirm, onClickCancel, ignore);
         }
     }
 }

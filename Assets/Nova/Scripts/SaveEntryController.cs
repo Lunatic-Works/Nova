@@ -18,13 +18,13 @@ namespace Nova
         private void Awake()
         {
             var header = transform.Find("Header").gameObject;
-            idText = header.transform.Find("Id").gameObject.GetComponent<Text>();
-            headerText = header.transform.Find("Text").gameObject.GetComponent<Text>();
-            footerText = transform.Find("Footer/Text").gameObject.GetComponent<Text>();
-            thumbnailButton = transform.Find("Thumbnail").gameObject.GetComponent<Button>();
-            editButton = header.transform.Find("EditButton").gameObject.GetComponent<Button>();
-            deleteButton = header.transform.Find("DeleteButton").gameObject.GetComponent<Button>();
-            thumbnailImage = transform.Find("Thumbnail").gameObject.GetComponent<Image>();
+            idText = header.transform.Find("Id").GetComponent<Text>();
+            headerText = header.transform.Find("Text").GetComponent<Text>();
+            footerText = transform.Find("Footer/Text").GetComponent<Text>();
+            thumbnailButton = transform.Find("Thumbnail").GetComponent<Button>();
+            editButton = header.transform.Find("EditButton").GetComponent<Button>();
+            deleteButton = header.transform.Find("DeleteButton").GetComponent<Button>();
+            thumbnailImage = transform.Find("Thumbnail").GetComponent<Image>();
             defaultThumbnailSprite = thumbnailImage.sprite;
         }
 

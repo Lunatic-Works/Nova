@@ -32,6 +32,10 @@ namespace Nova
         public int maxCol;
         public bool canSave;
 
+        private const string saveBookmarkComfirmText = "覆盖存档{0}？";
+        private const string loadBookmarkComfirmText = "读取存档{0}？";
+        private const string deleteBookmarkComfirmText = "删除存档{0}？";
+
         private int maxSaveEntry;
         private int page = 1;
 
@@ -94,6 +98,8 @@ namespace Nova
         private string currentNodeName;
         private string currentDialogueText;
 
+        private AlertController alertController;
+
         private void Awake()
         {
             maxSaveEntry = maxRow * maxCol;
@@ -104,8 +110,8 @@ namespace Nova
             defaultThumbnailSprite = thumbnailImage.sprite;
             thumbnailText = savePanel.transform.Find("Background/Left/TextBox/Text").GetComponent<Text>();
             var headerPanel = savePanel.transform.Find("Background/Right/Bottom").gameObject;
-            saveButton = headerPanel.transform.Find("SaveButton").gameObject.GetComponent<Button>();
-            loadButton = headerPanel.transform.Find("LoadButton").gameObject.GetComponent<Button>();
+            saveButton = headerPanel.transform.Find("SaveButton").GetComponent<Button>();
+            loadButton = headerPanel.transform.Find("LoadButton").GetComponent<Button>();
             var pagerPanel = headerPanel.transform.Find("Pager").gameObject;
             var leftButtonPanel = pagerPanel.transform.Find("LeftButton").gameObject;
             leftButton = leftButtonPanel.GetComponent<Button>();
@@ -113,7 +119,7 @@ namespace Nova
             var rightButtonPanel = pagerPanel.transform.Find("RightButton").gameObject;
             rightButton = rightButtonPanel.GetComponent<Button>();
             rightButtonText = rightButtonPanel.GetComponent<Text>();
-            pageText = pagerPanel.transform.Find("PageText").gameObject.GetComponent<Text>();
+            pageText = pagerPanel.transform.Find("PageText").GetComponent<Text>();
 
             backgroundButton.onClick.AddListener(() => { selectedSaveId = -1; });
             if (canSave)
@@ -145,6 +151,8 @@ namespace Nova
             screenCapturer = gameObject.GetComponent<ScreenCapturer>();
 
             previewTextFormat = thumbnailText.text;
+
+            alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
         }
 
         private void Start()
@@ -215,7 +223,7 @@ namespace Nova
             }
         }
 
-        private void SaveBookmark(int saveId)
+        private void _saveBookmark(int saveId)
         {
             var bookmark = gameState.GetBookmark();
             bookmark.ScreenShot = screenSprite.texture;
@@ -223,7 +231,16 @@ namespace Nova
             Hide();
         }
 
-        private void LoadBookmark(int saveId)
+        private void SaveBookmark(int saveId)
+        {
+            alertController.Alert(
+                null,
+                string.Format(saveBookmarkComfirmText, saveId),
+                () => _saveBookmark(saveId)
+            );
+        }
+
+        private void _loadBookmark(int saveId)
         {
             var bookmark = gameState.checkpointManager.LoadBookmark(saveId);
             Debug.Log(string.Format("Load bookmark, chapter {0}, index {1}",
@@ -232,15 +249,28 @@ namespace Nova
             Hide();
         }
 
-        private void EditBookmark(int saveId)
+        private void LoadBookmark(int saveId)
         {
+            alertController.Alert(
+                null,
+                string.Format(loadBookmarkComfirmText, saveId),
+                () => _loadBookmark(saveId)
+            );
+        }
 
+        private void _deleteBookmark(int saveId)
+        {
+            gameState.checkpointManager.DeleteBookmark(saveId);
+            ShowPage();
         }
 
         private void DeleteBookmark(int saveId)
         {
-            gameState.checkpointManager.DeleteBookmark(saveId);
-            ShowPage();
+            alertController.Alert(
+                null,
+                string.Format(deleteBookmarkComfirmText, saveId),
+                () => _deleteBookmark(saveId)
+            );
         }
 
         private void OnThumbnailButtonClicked(int saveId)
@@ -249,7 +279,15 @@ namespace Nova
             {
                 if (saveViewMode == SaveViewMode.Save)
                 {
-                    SaveBookmark(saveId);
+                    if (usedSaveSlots.Contains(saveId))
+                    {
+                        SaveBookmark(saveId);
+                    }
+                    else // Bookmark with this saveId does not exist
+                    {
+                        // No alert when saving to enpty slot
+                        _saveBookmark(saveId);
+                    }
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
@@ -276,7 +314,8 @@ namespace Nova
                         else // Bookmark with this saveId does not exist
                         {
                             selectedSaveId = -1;
-                            SaveBookmark(saveId);
+                            // No alert when saving to enpty slot
+                            _saveBookmark(saveId);
                         }
                     }
                 }
@@ -402,7 +441,7 @@ namespace Nova
                     newHeaderText = bookmark.NodeHistory.Last();
                     newFooterText = bookmark.CreationTime.ToString(dateTimeFormat);
                     newThumbnailSprite = getThumbnailSprite(saveId);
-                    onEditButtonClicked = () => EditBookmark(saveId);
+                    onEditButtonClicked = null;
                     onDeleteButtonClicked = () => DeleteBookmark(saveId);
                 }
                 else

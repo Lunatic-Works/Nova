@@ -22,4 +22,9 @@ namespace Nova
             }
         }
     }
+
+    public class Wrap<T>
+    {
+        public T value;
+    }
 }

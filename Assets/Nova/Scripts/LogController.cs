@@ -8,19 +8,21 @@ namespace Nova
     public class LogController : MonoBehaviour
     {
         public GameState gameState;
-
         public GameObject LogEntryPrefab;
 
+        private const string goBackLogComfirmText = "退回到这句话？";
+
         private GameObject logContent;
-
         private GameObject logPanel;
-
         private readonly List<GameObject> logEntries = new List<GameObject>();
+
+        private AlertController alertController;
 
         private void Awake()
         {
             logPanel = transform.Find("LogPanel").gameObject;
             logContent = logPanel.transform.Find("ScrollView/Viewport/Content").gameObject;
+            alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
         }
 
@@ -53,7 +55,7 @@ namespace Nova
 
         public bool hideOnGoBackButtonClicked;
 
-        private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
+        private void _onGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
         {
             for (var i = logEntryIndex; i < logEntries.Count; ++i)
             {
@@ -67,6 +69,12 @@ namespace Nova
             {
                 Hide();
             }
+        }
+
+        private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
+        {
+            alertController.Alert(null, goBackLogComfirmText,
+                () => _onGoBackButtonClicked(nodeName, dialogueIndex, logEntryIndex));
         }
 
         private void OnPlayVoiceButtonClicked(IEnumerable<string> audioNames)

@@ -13,7 +13,7 @@ namespace Nova
         [SerializeField] private float m_maxWidth = -1f;
         [SerializeField] private float m_maxHeight = -1f;
 
-        private void Awake()
+        private new void Awake()
         {
             _text = GetComponent<Text>();
         }

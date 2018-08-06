@@ -1175,7 +1175,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
       propertyPath: m_LocalRotation.x
@@ -1195,14 +1195,8 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4453175061847816, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 2}
       propertyPath: m_RootOrder
-      value: 9
+      value: 10
       objectReference: {fileID: 0}
-    - target: {fileID: 114971742472019602, guid: 10b8a1561d89a4ad59007d02da0b1f24,
-        type: 2}
-      propertyPath: AlertPanelPrefab
-      value: 
-      objectReference: {fileID: 1560648569652328, guid: 112d70ab7890f491c8fdbc36981d15ad,
-        type: 2}
     - target: {fileID: 114971742472019602, guid: 10b8a1561d89a4ad59007d02da0b1f24,
         type: 2}
       propertyPath: UICanvas
@@ -1687,6 +1681,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114060372357682502, guid: a2da3930c415b6d4cbead0ecdfb099fd,
+        type: 2}
+      propertyPath: alertController
+      value: 
+      objectReference: {fileID: 1486952639}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2da3930c415b6d4cbead0ecdfb099fd, type: 2}
   m_IsPrefabParent: 0
@@ -1745,6 +1744,12 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3ea442272877e46ae84c2a32213a9128, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &1486952639 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114971742472019602, guid: 10b8a1561d89a4ad59007d02da0b1f24,
+    type: 2}
+  m_PrefabInternal: {fileID: 1010899334}
+  m_Script: {fileID: 11500000, guid: 6c34958d4d45f4a0faa3f7665584eb1a, type: 3}
 --- !u!1001 &1506687614
 Prefab:
   m_ObjectHideFlags: 0
@@ -1950,7 +1955,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4269582755980200, guid: ed28a84bf5bed423a9613c9aefa4dd7b, type: 2}
       propertyPath: m_RootOrder
-      value: 10
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 114878137693043892, guid: ed28a84bf5bed423a9613c9aefa4dd7b,
         type: 2}
