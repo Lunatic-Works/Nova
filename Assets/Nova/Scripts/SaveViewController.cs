@@ -427,7 +427,7 @@ namespace Nova
             for (var i = 0; i < maxSaveEntry; ++i)
             {
                 int saveId = (page - 1) * maxSaveEntry + i + 1;
-                string newIdText = "#" + saveId.ToString();
+                string newIdText = saveId.ToString();
 
                 // Load properties from bookmark
                 string newHeaderText;

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
@@ -11,7 +9,7 @@ namespace Nova
 
         private void Start()
         {
-            _text = GetComponent<Text>();
+            _text = transform.Find("Text").GetComponent<Text>();
         }
 
         public void OnNodeChanged(NodeChangedEventData nodeChangedEventData)
