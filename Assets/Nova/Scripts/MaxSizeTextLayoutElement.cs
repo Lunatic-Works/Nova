@@ -126,7 +126,7 @@ namespace Nova
             LayoutRebuilder.MarkLayoutForRebuild(this.transform as RectTransform);
         }
 
-        protected override void OnValidate()
+        protected new void OnValidate()
         {
             this.SetDirty();
         }

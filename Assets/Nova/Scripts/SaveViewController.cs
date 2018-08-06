@@ -163,7 +163,7 @@ namespace Nova
 
         private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
         {
-            currentNodeName = dialogueChangedEventData.labelName;
+            currentNodeName = dialogueChangedEventData.nodeName;
             currentDialogueText = dialogueChangedEventData.text;
         }
 
