@@ -227,6 +227,7 @@ namespace Nova
             var bookmark = gameState.GetBookmark();
             bookmark.ScreenShot = screenSprite.texture;
             gameState.checkpointManager.SaveBookmark(saveId, bookmark);
+            DeleteCachedThumbnailSprite(saveId);
             Hide();
         }
 
@@ -260,6 +261,7 @@ namespace Nova
         private void _deleteBookmark(int saveId)
         {
             gameState.checkpointManager.DeleteBookmark(saveId);
+            DeleteCachedThumbnailSprite(saveId);
             ShowPage();
         }
 
@@ -384,7 +386,7 @@ namespace Nova
         private void ShowPreviewBookmark(int saveId)
         {
             Bookmark bookmark = gameState.checkpointManager[saveId];
-            ShowPreview(getThumbnailSprite(saveId), string.Format(
+            ShowPreview(GetThumbnailSprite(saveId), string.Format(
                 previewTextFormat,
                 usedSaveSlots[saveId].ModifiedTime.ToString(dateTimeFormat),
                 bookmark.NodeHistory.Last(),
@@ -440,7 +442,7 @@ namespace Nova
                     Bookmark bookmark = gameState.checkpointManager[saveId];
                     newHeaderText = bookmark.NodeHistory.Last();
                     newFooterText = bookmark.CreationTime.ToString(dateTimeFormat);
-                    newThumbnailSprite = getThumbnailSprite(saveId);
+                    newThumbnailSprite = GetThumbnailSprite(saveId);
                     onEditButtonClicked = null;
                     onDeleteButtonClicked = () => DeleteBookmark(saveId);
                 }
@@ -466,15 +468,24 @@ namespace Nova
             }
         }
 
-        private Sprite getThumbnailSprite(int saveId)
+        private Sprite GetThumbnailSprite(int saveId)
         {
-            Assert.IsTrue(usedSaveSlots.ContainsKey(saveId), "Nova: getThumbnailSprite must use a saveId with existing bookmark");
+            Assert.IsTrue(usedSaveSlots.ContainsKey(saveId), "Nova: GetThumbnailSprite must use a saveId with existing bookmark");
             if (!_cachedThumbnailSprite.ContainsKey(saveId))
             {
                 Bookmark bookmark = gameState.checkpointManager[saveId];
                 _cachedThumbnailSprite[saveId] = Utils.Texture2DToSprite(bookmark.ScreenShot);
             }
             return _cachedThumbnailSprite[saveId];
+        }
+
+        private void DeleteCachedThumbnailSprite(int saveId)
+        {
+            if (_cachedThumbnailSprite.ContainsKey(saveId))
+            {
+                Destroy(_cachedThumbnailSprite[saveId]);
+                _cachedThumbnailSprite.Remove(saveId);
+            }
         }
     }
 }
