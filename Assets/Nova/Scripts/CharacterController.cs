@@ -11,7 +11,7 @@ namespace Nova
 
         public string voiceFileFolder;
 
-        public GameState gameState;
+        private GameState gameState;
 
         private AudioSource audioSource;
 
@@ -21,6 +21,7 @@ namespace Nova
         {
             LuaRuntime.Instance.BindObject(characterVariableName, this, "_G");
             audioSource = GetComponent<AudioSource>();
+            gameState = GameState.Instance;
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
             gameState.DialogueWillChange.AddListener(OnDialogueWillChange);
             characterAppearance = transform.Find("Appearance").gameObject;

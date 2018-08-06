@@ -112,8 +112,8 @@ namespace Nova
     /// </summary>
     public class GameState : MonoBehaviour
     {
-        public string scriptPath;
-        public CheckpointManager checkpointManager;
+        [SerializeField] private string scriptPath;
+        private CheckpointManager checkpointManager;
 
         private readonly ScriptLoader scriptLoader = new ScriptLoader();
         private FlowChartTree flowChartTree;
@@ -122,6 +122,41 @@ namespace Nova
         {
             scriptLoader.Init(scriptPath);
             flowChartTree = scriptLoader.GetFlowChartTree();
+            checkpointManager = GetComponent<CheckpointManager>();
+        }
+
+        private static GameState _instance = null;
+
+        /// <summary>
+        /// Get the game state instance attached under current game controller object
+        /// </summary>
+        public static GameState Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    var gameController = Utils.FindGameController();
+                    _instance = gameController.GetComponent<GameState>();
+                    if (_instance == null)
+                    {
+                        Debug.Log("Nova: Attaching game state to game controller.");
+                        _instance = gameController.AddComponent<GameState>();
+                        _instance.scriptPath = "";
+                        Debug.LogWarning("Nova: Default script path is empty string.");
+                    }
+                }
+
+                return _instance;
+            }
+        }
+
+        /// <summary>
+        /// Reset instance when old instance is destroyed
+        /// </summary>
+        private void OnDestroy()
+        {
+            _instance = null;
         }
 
         #region status

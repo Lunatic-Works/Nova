@@ -13,7 +13,6 @@ public class Nova_BackgroundControllerWrap
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("imageFolder", get_imageFolder, set_imageFolder);
-		L.RegVar("gameState", get_gameState, set_gameState);
 		L.RegVar("restorableObjectName", get_restorableObjectName, null);
 		L.EndClass();
 	}
@@ -107,25 +106,6 @@ public class Nova_BackgroundControllerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_gameState(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			Nova.BackgroundController obj = (Nova.BackgroundController)o;
-			Nova.GameState ret = obj.gameState;
-			ToLua.Push(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index gameState on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_restorableObjectName(IntPtr L)
 	{
 		object o = null;
@@ -160,25 +140,6 @@ public class Nova_BackgroundControllerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index imageFolder on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_gameState(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			Nova.BackgroundController obj = (Nova.BackgroundController)o;
-			Nova.GameState arg0 = (Nova.GameState)ToLua.CheckObject<Nova.GameState>(L, 2);
-			obj.gameState = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index gameState on a nil value");
 		}
 	}
 }

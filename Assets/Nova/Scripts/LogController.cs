@@ -7,7 +7,7 @@ namespace Nova
 {
     public class LogController : MonoBehaviour
     {
-        public GameState gameState;
+        private GameState gameState;
         public GameObject LogEntryPrefab;
 
         private const string goBackLogComfirmText = "退回到这句话？";
@@ -23,6 +23,7 @@ namespace Nova
             logPanel = transform.Find("LogPanel").gameObject;
             logContent = logPanel.transform.Find("ScrollView/Viewport/Content").gameObject;
             alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
+            gameState = GameState.Instance;
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
             gameState.BookmarkWillLoad.AddListener(OnBookmarkWillLoad);
         }

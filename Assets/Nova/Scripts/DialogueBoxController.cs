@@ -22,7 +22,7 @@ namespace Nova
 
         private Text nameTextArea;
 
-        public GameState gameState;
+        private GameState gameState;
 
         public bool needAnimation;
 
@@ -43,6 +43,7 @@ namespace Nova
             dialogueTextArea = transform.Find("DialogueBox/Text").gameObject.GetComponent<Text>();
             nameTextArea = transform.Find("NameBox/Text").gameObject.GetComponent<Text>();
 
+            gameState = GameState.Instance;
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
             gameState.BranchOccurs.AddListener(OnBranchOcurrs);
             gameState.BranchSelected.AddListener(OnBranchSelected);

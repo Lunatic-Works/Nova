@@ -11,12 +11,13 @@ namespace Nova
         public string imageFolder;
         private SpriteRenderer _spriteRenderer;
 
-        public GameState gameState;
+        private GameState gameState;
 
         private void Start()
         {
             _spriteRenderer = GetComponent<SpriteRenderer>();
             LuaRuntime.Instance.BindObject("backgroundController", this);
+            gameState = GameState.Instance;
             gameState.AddRestorable(this);
         }
 
