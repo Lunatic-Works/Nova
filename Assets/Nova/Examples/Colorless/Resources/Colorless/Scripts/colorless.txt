@@ -1,7 +1,6 @@
 @<| label 'chapter-1'; is_start(); |>
-<| ergong:Show(); ergong:Say '二宫_01';play_bgm 'day2'; show_background 'bg_1'; |>
+<| ergong:Show(); ergong:Say '二宫_01'; play_bgm 'day2'; show_background 'bg_1'; |>
 二宫会长：真没想到，我们竟然会被暴雨困在了教学楼里。
-
 
 二宫会长少见地皱起了她秀气的眉头。
 
@@ -25,7 +24,6 @@
 <| xiben:Show(); xiben:Say '西本_01'; |>
 西本宝翠：没有人带伞么？
 
-
 西本同学用手指卷着自己的发梢，语气不算太好。
 
 西本宝翠是我的同班同学，但是却拒绝在学生会以外的地方和我交谈。
@@ -39,25 +37,24 @@
 
 西本成为学生会干事的理由是成绩突出，这也是我能坐在这里的原因。
 
-<| muzi:Show(); muzi:Say '牧子_01';|>
+<| muzi:Show(); muzi:Say '牧子_01'; |>
 高天牧子：大家来得太匆忙了啊!
-
 
 牧子摇曳着她柔顺的黑发。
 
-<| muzi:Say '牧子_02';|>
+<| muzi:Say '牧子_02'; |>
 高天牧子：突然通知我们要来，连原因也不说明。我早上买的奶茶都忘记喝了。
 
-<| muzi:Hide(); ergong:Show(); ergong:Say '二宫_02';|>
+<| muzi:Hide(); ergong:Show(); ergong:Say '二宫_02'; |>
 二宫会长：我也不想这样啊，都是浅野说那个文件送到了嘛。
 
-<| ergong:Hide(); qianye:Show(); qianye:Say '浅野_01';|>
+<| ergong:Hide(); qianye:Show(); qianye:Say '浅野_01'; |>
 浅野学长：结果还是因为暴雨延期了，这不是我的错。
 
-<| qianye:Hide(); ergong:Show(); ergong:Say '二宫_03';|>
+<| qianye:Hide(); ergong:Show(); ergong:Say '二宫_03'; |>
 二宫会长：你应该在跟我说之前确认一下情况啊！
 
-<| ergong:Hide(); qianye:Show(); qianye:Say '浅野_02';|>
+<| ergong:Hide(); qianye:Show(); qianye:Say '浅野_02'; |>
 浅野学长：那你也可以在联系学生会干部之前确认一下嘛。
 
 <| qianye:Hide(); |>
@@ -79,7 +76,7 @@
 
 这是学生会日常的一部分。
 
-<| muzi:Show(); play_bgm 'colorlessLove';|>
+<| muzi:Show(); play_bgm 'colorlessLove'; |>
 这时，牧子从书包的侧面抽出了便利店之中常见的包装瓶。
 
 她对着我露出了抱歉似的笑容，然后将奶茶推到了我的面前。
@@ -88,13 +85,13 @@
 
 牧子纤细的手指在教室的白炽灯映衬下，像是象牙打造的艺术品。
 
-<| muzi:Say '牧子_03';|>
+<| muzi:Say '牧子_03'; |>
 高天牧子：买的时候没注意，这个奶茶分量稍微有点多。
 
-<| muzi:Say '牧子_04';|>
+<| muzi:Say '牧子_04'; |>
 高天牧子：竹内君，不介意的话……不如，一起喝吧？
 
-<| muzi:Hide();|>
+<| muzi:Hide(); |>
 高天牧子是和我一届的同级生。
 
 一个月前我们开始交往了。
@@ -117,29 +114,27 @@
 
 竹内：好的。
 
-<| muzi:Show(); muzi:Say '牧子_05';|>
+<| muzi:Show(); muzi:Say '牧子_05'; |>
 高天牧子：还以为竹内君会觉得讨厌呢。
-
 
 高天牧子：牧子露出令人怜惜的微笑，轻轻地拍了拍自己的胸口。
 
 高天牧子：不会。
 
-<| muzi:Say '牧子_06';|>
+<| muzi:Say '牧子_06'; |>
 高天牧子：竹内君一直话很少，还带着很酷的墨镜，我开始还以为很难接近呢。
 
-<| muzi:Say '牧子_07';|>
+<| muzi:Say '牧子_07'; |>
 高天牧子：啊，我不是在说竹内君不好。学习成绩很厉害，而且学生会的工作也做得很棒。
 
-<| muzi:Say '牧子_08';|>
+<| muzi:Say '牧子_08'; |>
 高天牧子：尤其是很温柔，真的很温柔。
 
-<| muzi:Say '牧子_09';|>
+<| muzi:Say '牧子_09'; |>
 高天牧子：对像我这样毫无特点的笨女孩也很体贴……
 
-<| muzi:Say '牧子_10';|>
+<| muzi:Say '牧子_10'; |>
 高天牧子：果然竹内君接受我的告白只是因为同情我吧。
-
 
 牧子说着说着，眼角微微湿润了。
 
@@ -149,13 +144,12 @@
 
 幸好，这时浅野转移了话题。
 
-<| muzi:Hide(); qianye:Show(); qianye:Say '浅野_03';|>
+<| muzi:Hide(); qianye:Show(); qianye:Say '浅野_03'; |>
 浅野学长：啊，对了，储物室有一次性的杯子。奶茶要是凉了，还是慢点喝为好。
-
 
 浅野一边说着，一边对我摇了摇小指。
 
-<| qianye:Hide();|>
+<| qianye:Hide(); |>
 我心领神会。
 
 竹内：我去拿一下杯子。
@@ -164,11 +158,10 @@
 
 我出门的时候依旧可以感觉到有目光追随者我的背影。
 
-<| stop_bgm(); clear_background();|>
-
+<| stop_bgm(); clear_background(); |>
 
 @<|label 'chapter-2'|>
-<| play_bgm 'conspiracy'; show_background 'bg_2';|>
+<| play_bgm 'conspiracy'; show_background 'bg_2'; |>
 竹内：这回又是什么事？
 
 我站在厕所的镜子前，镜中人脸上挂着的墨镜令人压抑。
@@ -179,36 +172,36 @@
 
 失去墨镜的我因为灯光而觉得头晕目眩。
 
-<| qianye:Say '浅野_04';|>
+<| qianye:Say '浅野_04'; |>
 * *：时机到了。
 
 竹内：……
 
-<| qianye:Say '浅野_05';|>
+<| qianye:Say '浅野_05'; |>
 * *：你还没有理解么？这是我好不容易创造的绝好条件！
 
 他的脸变得狰狞。
 
-<| qianye:Say '浅野_06';|>
+<| qianye:Say '浅野_06'; |>
 * *：北条先生等不及了。我们把你送到这里不是让你谈恋爱的。
 
 竹内：我至今也不明白为什么一个父亲要杀死自己的女儿。
 
-<| qianye:Say '浅野_07';|>
+<| qianye:Say '浅野_07'; |>
 * *：因为那是他的私生女，而大选要到了，已经有一个竞选人开始从这方面找麻烦了。
 
 那个人像是无聊似的耸了耸肩。
 
 这是他特有的习惯。
 
-<| qianye:Say '浅野_08';|>
+<| qianye:Say '浅野_08'; |>
 * *：算了，这些政治上的事情说了你这个白痴也听不懂。
 
 在失去了墨镜之后，我的眼睛好不容易适应了光线。
 
 我看到一个玻璃小瓶静静地摆在洗手台边。
 
-<| qianye:Say '浅野_09';|>
+<| qianye:Say '浅野_09'; |>
 * *：加到她的奶茶里，手脚利索点。这种无色无味的毒药说不定比你还贵。
 
 我没有说话，也没有去拿那个小瓶，只是凝视着它。
@@ -219,10 +212,10 @@
 
 厕所里响起的干巴巴的啪嗒声，和哗哗的水声交织在一起。
 
-<| qianye:Say '浅野_10';|>
+<| qianye:Say '浅野_10'; |>
 * *：别忘了北条先生花了多少钱治你的眼睛。
 
-<| qianye:Say '浅野_11';|>
+<| qianye:Say '浅野_11'; |>
 * *：而你的母亲现在又躺在谁的医院里。
 
 我从洗手台上取过小瓶，然后从他手中夺回墨镜。
@@ -231,28 +224,27 @@
 
 竹内：你知道的，我眼睛不太好。
 
-<| qianye:Say '浅野_12';|>
+<| qianye:Say '浅野_12'; |>
 * *：哼，蠢货。
 
 在我离开厕所的时候，那个人依旧对着我的背影骂着。
 
-<| qianye:Say '浅野_13';|>
+<| qianye:Say '浅野_13'; |>
 * *：别搞砸了！小心那个会长，她可能是另一边派来的人！
 
 最后，一切声音都被掩盖在了哗哗的流水声下。
 
-<| stop_bgm(); clear_background();|>
-
+<| stop_bgm(); clear_background(); |>
 
 @<|label 'chapter-3'|>
-<| play_bgm 'theLostThing'; show_background 'bg_3';|>
+<| play_bgm 'theLostThing'; show_background 'bg_3'; |>
 我在走廊看不断落下的雨让自己的头脑冷静下来。
 
 这是我小时候和青梅竹马一起玩时养成的习惯。
 
 回想起来，那段时光或许是我人生里最快乐的日子。
 
-<| xiben:Show();|>
+<| xiben:Show(); |>
 我看了看走廊，果然西本宝翠也在。
 
 我透过墨镜，看着她的头发在风中渐渐变得凌乱。
@@ -269,25 +261,25 @@
 
 宝翠转过头橫了我一眼，然后又厌恶地转过身去。
 
-<| xiben:Say '西本_02';|>
+<| xiben:Say '西本_02'; |>
 西本宝翠：怎么？非要让我看到那个女孩一口一口喂你奶茶，你才高兴么？
 
 竹内：你知道的，牧子不是那种人。
 
-<| xiben:Say '西本_03';|>
+<| xiben:Say '西本_03'; |>
 西本宝翠：是啊，她不是那种人。
 
 西本依旧背对着我，我感觉她要哭了。
 
-<| xiben:Say '西本_04';|>
+<| xiben:Say '西本_04'; |>
 西本宝翠：如果她更坏一点，那就好了
 
 我无言以对。
 
-<| xiben:Say '西本_05';|>
+<| xiben:Say '西本_05'; |>
 西本宝翠：你既然已经消失了那么多年，为什么还要戴着那愚蠢的墨镜回来？
 
-<| xiben:Say '西本_06';|>
+<| xiben:Say '西本_06'; |>
 西本宝翠：你以为天天戴着它我就认不出你来么？转校生？
 
 小时候的宝翠很爱哭，但是长大了的她就不再对外展露自己的情绪。
@@ -300,7 +292,7 @@
 
 她孱弱的身躯在夏季制服里瑟瑟发抖。
 
-<| xiben:Say '西本_07';|>
+<| xiben:Say '西本_07'; |>
 西本宝翠：这就是你想对我说的话么？
 
 我默默地凝视着宝翠。
@@ -315,19 +307,18 @@
 
 竹内：是的，西本同学。
 
-<| xiben:Say '西本_08'; play_sound 'clap';|>
+<| xiben:Say '西本_08'; play_sound 'clap'; |>
 西本宝翠：你混蛋！
 
-<| xiben:Hide();|>
+<| xiben:Hide(); |>
 被甩了一个耳光的我，只能呆呆地看着宝翠跑开。
 
 我的手心还牢牢地攥着那个玻璃小瓶。
 
-<| stop_bgm(); clear_background();|>
-
+<| stop_bgm(); clear_background(); |>
 
 @<|label 'chapter-4'|>
-<| ergong:Show(); ergong:Say '二宫_04'; play_bgm 'redemption'; show_background 'bg_1';|>
+<| ergong:Show(); ergong:Say '二宫_04'; play_bgm 'redemption'; show_background 'bg_1'; |>
 二宫会长：嗯？为什么拿个杯子会花这么长时间？
 
 会长一脸狐疑地问道。
@@ -336,7 +327,7 @@
 
 我推了推我的墨镜，会长勉强接受了这个借口。
 
-<| ergong:Hide();|>
+<| ergong:Hide(); |>
 我将杯子放到桌上，然后慢慢地倒出了奶茶。
 
 我有意倒得很慢。
@@ -349,51 +340,51 @@
 
 发生了什么?
 
-<| xiben:Show(); xiben:Say '西本_09';|>
+<| xiben:Show(); xiben:Say '西本_09'; |>
 西本宝翠：我也要喝。
 
 宝翠不知何时站在了我的旁边，从我怀里抽走了一个杯子。
 
 她弯下腰的时候，头发上的缎带擦过我的鼻翼。
 
-<| xiben:Hide(); muzi:Show(); muzi:Say '牧子_11';|>
+<| xiben:Hide(); muzi:Show(); muzi:Say '牧子_11'; |>
 高天牧子：西本同学……
 
 牧子露出了不知所措的表情，看上去像是受伤的小鹿。
 
-<| muzi:Hide();|>
+<| muzi:Hide(); |>
 宝翠的手一顿，但是她装作没看见，依旧将奶茶彺杯子里倒。
 
-<| ergong:Show();|>
+<| ergong:Show(); |>
 宝翠在这个高中一直不和他人有所接触，她的异状引起了会长的警觉。
 
 会长想必也没有看漏我僵硬的表情。她正来回看着我、宝翠和牧子。
 
 浅野想要说些什么，但是却被会长抢了先机。
 
-<| ergong:Say '二宫_05';|>
+<| ergong:Say '二宫_05'; |>
 二宫会长：没关系，奶茶还够嘛。
 
-<| ergong:Say '二宫_06';|>
+<| ergong:Say '二宫_06'; |>
 二宫会长：说不定西本同学也有些口渴呢。
 
-<| ergong:Hide(); qianye:Show(); qianye:Say '浅野_14';|>
+<| ergong:Hide(); qianye:Show(); qianye:Say '浅野_14'; |>
 浅野学长：但是……竹内和高天不是……
 
-<| qianye:Hide(); ergong:Show(); ergong:Say '二宫_07';|>
+<| qianye:Hide(); ergong:Show(); ergong:Say '二宫_07'; |>
 二宫会长：大家都是朋友，有什么关系嘛……
 
-<| ergong:Hide();|>
+<| ergong:Hide(); |>
 会长一边说着，一边随手将桌上的杯子打乱。
 
 三个一次性杯中都装着乳白色的奶茶，再也分不清你我。
 
 浅野偷偷扫了一眼被我扔到垃圾堆的空玻璃瓶，露出了绝望的表情。
 
-<| ergong:Show(); ergong:Say '二宫_08';|>
+<| ergong:Show(); ergong:Say '二宫_08'; |>
 二宫会长：竹内君，不如你先请吧。大家一起喝，高天同学和西本同学也没意见吧?
 
-<| ergong:Hide();|>
+<| ergong:Hide(); |>
 有意见。
 
 牧子何止有意见，她的眼泪都要涌出来了。
@@ -444,5 +435,5 @@
 
 ……
 
-<| stop_bgm(); clear_background();|>
+<| stop_bgm(); clear_background(); |>
 @<| is_end 'colorless' |>
