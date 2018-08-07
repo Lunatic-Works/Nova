@@ -36,6 +36,14 @@ namespace Nova
             return dict[key] = new TV();
         }
 
+        public static Vector2Int GetContainerSize(this Vector2Int contentSize, float containerAspectRatio)
+        {
+            var contentAspectRatio = 1.0f * contentSize.x / contentSize.y;
+            if (contentAspectRatio > containerAspectRatio)
+                return new Vector2Int(contentSize.x, (int) (contentSize.x / containerAspectRatio));
+            return new Vector2Int((int)(contentSize.y * containerAspectRatio), contentSize.y);
+        }
+
         public static GameObject FindGameController()
         {
             var gameController = GameObject.FindWithTag("GameController");
