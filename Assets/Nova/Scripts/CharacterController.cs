@@ -11,6 +11,12 @@ namespace Nova
 
         public string voiceFileFolder;
 
+        /// TODO read config
+        private bool stopVoiceWhenDialogueWillChange
+        {
+            get { return true; }
+        }
+
         private GameState gameState;
 
         private AudioSource audioSource;
@@ -35,7 +41,7 @@ namespace Nova
         /// </summary>
         private void OnDialogueWillChange()
         {
-            if (audioSource.isPlaying)
+            if (stopVoiceWhenDialogueWillChange && audioSource.isPlaying)
             {
                 audioSource.Stop();
             }
@@ -67,7 +73,7 @@ namespace Nova
         /// <param name="voiceFileName"></param>
         public void Say(string voiceFileName)
         {
-            voiceFileName = voiceFileFolder + voiceFileName;
+            voiceFileName = System.IO.Path.Combine(voiceFileFolder, voiceFileName);
             var audio = AssetsLoader.GetAudioClip(voiceFileName);
             // A character has only one mouth
             if (audioSource.isPlaying)

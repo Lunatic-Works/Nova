@@ -8,6 +8,7 @@ public class Nova_BackgroundControllerWrap
 	{
 		L.BeginClass(typeof(Nova.BackgroundController), typeof(UnityEngine.MonoBehaviour));
 		L.RegFunction("SetImage", SetImage);
+		L.RegFunction("ClearImage", ClearImage);
 		L.RegFunction("GetRestoreData", GetRestoreData);
 		L.RegFunction("Restore", Restore);
 		L.RegFunction("__eq", op_Equality);
@@ -26,6 +27,22 @@ public class Nova_BackgroundControllerWrap
 			Nova.BackgroundController obj = (Nova.BackgroundController)ToLua.CheckObject<Nova.BackgroundController>(L, 1);
 			string arg0 = ToLua.CheckString(L, 2);
 			obj.SetImage(arg0);
+			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ClearImage(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			Nova.BackgroundController obj = (Nova.BackgroundController)ToLua.CheckObject<Nova.BackgroundController>(L, 1);
+			obj.ClearImage();
 			return 0;
 		}
 		catch (Exception e)

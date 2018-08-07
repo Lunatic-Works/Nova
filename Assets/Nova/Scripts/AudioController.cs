@@ -41,7 +41,7 @@ namespace Nova
 
         private AudioClip GetAudioClip(string audioName)
         {
-            audioName = audioPath + audioName;
+            audioName = System.IO.Path.Combine(audioPath, audioName);
             var audio = AssetsLoader.GetAudioClip(audioName);
             Assert.IsNotNull(audio);
             return audio;

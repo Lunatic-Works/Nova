@@ -32,8 +32,14 @@ namespace Nova
         /// <param name="imageName">The name of the image file</param>
         public void SetImage(string imageName)
         {
-            _spriteRenderer.sprite = AssetsLoader.GetSprite(imageFolder + imageName);
+            _spriteRenderer.sprite = AssetsLoader.GetSprite(System.IO.Path.Combine(imageFolder, imageName));
             currentImageName = imageName;
+        }
+
+        public void ClearImage()
+        {
+            _spriteRenderer.sprite = null;
+            currentImageName = null;
         }
 
         #endregion
@@ -62,7 +68,10 @@ namespace Nova
         public void Restore(IRestoreData restoreData)
         {
             var data = restoreData as RestoreData;
-            SetImage(data.currentImageName);
+            if (data.currentImageName != null)
+            {
+                SetImage(data.currentImageName);
+            }
         }
     }
 }

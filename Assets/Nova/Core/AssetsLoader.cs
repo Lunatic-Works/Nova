@@ -21,7 +21,13 @@ namespace Nova
         /// <returns>The specified sprite or null if not found</returns>
         public static Sprite GetSprite(string path)
         {
-            return Resources.Load<Sprite>(path);
+            var ret = Resources.Load<Sprite>(path);
+            if (ret == null)
+            {
+                Debug.LogError(string.Format("Sprite {0} not found", path));
+            }
+
+            return ret;
         }
 
         /// <summary>
@@ -33,7 +39,13 @@ namespace Nova
         /// <returns>The specified AudioClip or null if not found</returns>
         public static AudioClip GetAudioClip(string path)
         {
-            return Resources.Load<AudioClip>(path);
+            var ret = Resources.Load<AudioClip>(path);
+            if (ret == null)
+            {
+                Debug.LogError(string.Format("AudioClip {0} not found", path));
+            }
+
+            return ret;
         }
     }
 }
