@@ -133,4 +133,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioControllerName: bgmController
-  audioPath: Audio/
+  audioPath: Colorless/BGM

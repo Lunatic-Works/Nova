@@ -83,12 +83,13 @@ namespace Nova
             }
         }
 
-        private void Fade(float fromAlpha, float toAplha, float time)
+        private void Fade(float fromAlpha, float toAlpha, float time)
         {
             iTween.ValueTo(gameObject, iTween.Hash(
                 "from", fromAlpha,
-                "to", toAplha,
-                "time", time, "easetype", "linear",
+                "to", toAlpha,
+                "time", time,
+                "easetype", "linear",
                 "onupdate", "SetAlpha"
             ));
         }

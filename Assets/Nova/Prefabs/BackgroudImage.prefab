@@ -68,7 +68,7 @@ MonoBehaviour:
   needFade: 1
   fadeDuration: 0.1
   staticAlpha: 1
-  intermediateAlpha: 0
+  intermediateAlpha: 0.5
 --- !u!212 &212552319352052240
 SpriteRenderer:
   m_ObjectHideFlags: 1
