@@ -2,18 +2,21 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Nova
 {
     public class LogController : MonoBehaviour
     {
-        private GameState gameState;
         public GameObject LogEntryPrefab;
 
         private const string goBackLogComfirmText = "退回到这句话？";
 
-        private GameObject logContent;
+        private GameState gameState;
+
         private GameObject logPanel;
+        private ScrollRect scrollRect;
+        private GameObject logContent;
         private readonly List<GameObject> logEntries = new List<GameObject>();
 
         private AlertController alertController;
@@ -21,7 +24,8 @@ namespace Nova
         private void Awake()
         {
             logPanel = transform.Find("LogPanel").gameObject;
-            logContent = logPanel.transform.Find("ScrollView/Viewport/Content").gameObject;
+            scrollRect = logPanel.transform.Find("ScrollView").GetComponent<ScrollRect>();
+            logContent = scrollRect.transform.Find("Viewport/Content").gameObject;
             alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
             gameState = GameState.Instance;
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
@@ -106,6 +110,7 @@ namespace Nova
         public void Show()
         {
             logPanel.SetActive(true);
+            scrollRect.verticalNormalizedPosition = 0.0f;
         }
 
         /// <summary>

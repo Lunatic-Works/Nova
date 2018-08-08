@@ -1,7 +1,6 @@
 ﻿// TODO
-// Better edit and delete buttons
 // Scale thumbnail by shorter axis
-// Page 0 for auto save, last page for new page
+// Page 0 for quick save, -1 for auto save, last page for new page
 // UI to edit bookmark's description
 // Compress thumbnail
 //
@@ -25,8 +24,6 @@ namespace Nova
 
     public class SaveViewController : MonoBehaviour
     {
-        private GameState gameState;
-        private CheckpointManager checkpointManager;
         public GameObject SaveEntryPrefab;
         public GameObject SaveEntryRowPrefab;
         public int maxRow;
@@ -36,6 +33,9 @@ namespace Nova
         private const string saveBookmarkComfirmText = "覆盖存档{0}？";
         private const string loadBookmarkComfirmText = "读取存档{0}？";
         private const string deleteBookmarkComfirmText = "删除存档{0}？";
+
+        private GameState gameState;
+        private CheckpointManager checkpointManager;
 
         private int maxSaveEntry;
         private int page = 1;

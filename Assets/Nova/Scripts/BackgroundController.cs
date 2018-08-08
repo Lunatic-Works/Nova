@@ -9,8 +9,8 @@ namespace Nova
     public class BackgroundController : MonoBehaviour, IRestorable
     {
         public string imageFolder;
-        private SpriteRenderer _spriteRenderer;
 
+        private SpriteRenderer _spriteRenderer;
         private GameState gameState;
 
         private void Start()

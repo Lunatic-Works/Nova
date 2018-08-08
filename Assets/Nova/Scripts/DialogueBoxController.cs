@@ -18,12 +18,6 @@ namespace Nova
 
     public class DialogueBoxController : MonoBehaviour, IPointerClickHandler
     {
-        private Text dialogueTextArea;
-
-        private Text nameTextArea;
-
-        private GameState gameState;
-
         public bool needAnimation;
 
         public float characterDisplayDuration;
@@ -37,6 +31,12 @@ namespace Nova
         /// The group of the name in the name pattern
         /// </summary>
         public int nameGroup;
+
+        private Text dialogueTextArea;
+
+        private Text nameTextArea;
+
+        private GameState gameState;
 
         private void Start()
         {

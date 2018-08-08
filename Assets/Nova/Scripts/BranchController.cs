@@ -8,10 +8,11 @@ namespace Nova
 {
     public class BranchController : MonoBehaviour, IRestorable
     {
-        private GameState gameState;
         public GameObject BranchButtonPrefab;
         public GameObject blackPanel;
         public bool dimOnBranch;
+
+        private GameState gameState;
 
         private void Start()
         {
