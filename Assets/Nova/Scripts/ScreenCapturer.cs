@@ -25,10 +25,10 @@ namespace Nova
 
             screenCamera.targetTexture = renderTexture;
             screenCamera.Render();
+            screenCamera.targetTexture = null;
             RenderTexture.active = renderTexture;
             texture.ReadPixels(new Rect(Vector2.zero, containerSize), 0, 0, false);
             RenderTexture.active = null;
-            screenCamera.targetTexture = null;
             Destroy(renderTexture);
             texture.Apply();
 
