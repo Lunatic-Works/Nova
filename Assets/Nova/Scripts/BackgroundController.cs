@@ -10,8 +10,9 @@ namespace Nova
     {
         public string imageFolder;
 
-        private SpriteRenderer _spriteRenderer;
         private GameState gameState;
+
+        private SpriteRenderer _spriteRenderer;
 
         private void Start()
         {

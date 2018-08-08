@@ -32,16 +32,17 @@ namespace Nova
         /// </summary>
         public int nameGroup;
 
-        private Text dialogueTextArea;
-
-        private Text nameTextArea;
-
         private GameState gameState;
+
+        private GameObject nameBox;
+        private Text nameTextArea;
+        private Text dialogueTextArea;
 
         private void Start()
         {
-            dialogueTextArea = transform.Find("DialogueBox/Text").gameObject.GetComponent<Text>();
-            nameTextArea = transform.Find("NameBox/Text").gameObject.GetComponent<Text>();
+            nameBox = transform.Find("NameBox").gameObject;
+            nameTextArea = nameBox.transform.Find("Text").GetComponent<Text>();
+            dialogueTextArea = transform.Find("DialogueBox/Text").GetComponent<Text>();
 
             gameState = GameState.Instance;
             gameState.DialogueChanged.AddListener(OnDialogueChanged);
@@ -120,23 +121,31 @@ namespace Nova
                 currentName = m.Groups[nameGroup].Value;
                 dialogueStartIndex = m.Length;
             }
-            else
+            else // No name is found
             {
-                // no name is found
                 currentName = "";
             }
 
             currentDialogue = text.Substring(dialogueStartIndex).Trim();
 
-            // change display
-            nameTextArea.text = currentName;
+            // Change display
+            if (currentName == "")
+            {
+                nameBox.SetActive(false);
+            }
+            else
+            {
+                nameBox.SetActive(true);
+                nameTextArea.text = currentName;
+            }
+
             if (!needAnimation)
             {
                 dialogueTextArea.text = currentDialogue;
                 return;
             }
 
-            // need animantion
+            // Need animantion
             if (isAnimating)
             {
                 StopCharacterAnimation();

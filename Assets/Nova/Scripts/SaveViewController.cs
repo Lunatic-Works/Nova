@@ -131,7 +131,7 @@ namespace Nova
             else
             {
                 // Cannot SetActive(false), otherwise layout will break
-                saveButton.gameObject.GetComponent<CanvasGroup>().alpha = 0.0f;
+                saveButton.GetComponent<CanvasGroup>().alpha = 0.0f;
             }
 
             loadButton.onClick.AddListener(() => ShowLoad());

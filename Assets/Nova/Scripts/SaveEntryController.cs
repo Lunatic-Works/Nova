@@ -72,7 +72,7 @@ namespace Nova
             InitButton(deleteButton, onDeleteButtonClicked);
 
             InitButton(thumbnailButton, onThumbnailButtonClicked, hideButton: false);
-            var thumbnailButtonEnterExit = thumbnailButton.gameObject.GetComponent<PointerEnterExit>();
+            var thumbnailButtonEnterExit = thumbnailButton.GetComponent<PointerEnterExit>();
             thumbnailButtonEnterExit.onPointerEnter.RemoveAllListeners();
             if (onThumbnailButtonEnter != null)
             {

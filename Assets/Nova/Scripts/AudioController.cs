@@ -21,9 +21,9 @@ namespace Nova
         /// </summary>
         public string audioPath;
 
-        private AudioSource audioSource;
-
         private GameState gameState;
+
+        private AudioSource audioSource;
 
         public float volume
         {

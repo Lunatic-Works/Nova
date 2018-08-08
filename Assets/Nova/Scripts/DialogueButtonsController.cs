@@ -16,11 +16,11 @@ namespace Nova
         private Button logButton;
 
         private void Start () {
-            saveButton = transform.Find("Save").gameObject.GetComponent<Button>();
-            loadButton = transform.Find("Load").gameObject.GetComponent<Button>();
-            autoButton = transform.Find("Auto").gameObject.GetComponent<Button>();
-            skipButton = transform.Find("Skip").gameObject.GetComponent<Button>();
-            logButton = transform.Find("Log").gameObject.GetComponent<Button>();
+            saveButton = transform.Find("Save").GetComponent<Button>();
+            loadButton = transform.Find("Load").GetComponent<Button>();
+            autoButton = transform.Find("Auto").GetComponent<Button>();
+            skipButton = transform.Find("Skip").GetComponent<Button>();
+            logButton = transform.Find("Log").GetComponent<Button>();
 
             autoButton.onClick.AddListener(() => { dialogueBoxController.State = DialogueBoxState.Auto; });
             skipButton.onClick.AddListener(() => { dialogueBoxController.State = DialogueBoxState.Skip; });

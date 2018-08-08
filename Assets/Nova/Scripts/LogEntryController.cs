@@ -15,11 +15,11 @@ namespace Nova
 
         private void Awake()
         {
-            text = transform.Find("Text").gameObject.GetComponent<Text>();
+            text = transform.Find("Text").GetComponent<Text>();
             var buttons = transform.Find("Text/Buttons");
-            goBackButton = buttons.Find("GoBackButton").gameObject.GetComponent<Button>();
-            playVoiceButton = buttons.Find("ReplayVoiceButton").gameObject.GetComponent<Button>();
-            addFavoriteButton = buttons.Find("AddFavoriteButton").gameObject.GetComponent<Button>();
+            goBackButton = buttons.Find("GoBackButton").GetComponent<Button>();
+            playVoiceButton = buttons.Find("ReplayVoiceButton").GetComponent<Button>();
+            addFavoriteButton = buttons.Find("AddFavoriteButton").GetComponent<Button>();
         }
 
         private void InitButton(Button button, UnityAction onClickAction)
