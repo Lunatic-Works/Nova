@@ -7,6 +7,7 @@ namespace Nova
         public Texture2D cursorTexture;
         public CursorMode cursorMode = CursorMode.Auto;
         public Vector2 hotSpot = Vector2.zero;
+        public bool autoHideAfterDuration;
         public float hideAfterSeconds = 10.0f;
 
         private void OnEnable()
@@ -31,6 +32,12 @@ namespace Nova
                 // show cursor, reset idle time
                 Cursor.visible = true;
                 lastCursorPosition = currentCursorPosition;
+                idleTime = 0;
+                return;
+            }
+
+            if (!autoHideAfterDuration)
+            {
                 idleTime = 0;
                 return;
             }
