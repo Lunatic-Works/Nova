@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4292405189626576}
   - component: {fileID: 212552319352052240}
+  - component: {fileID: 114544207187356370}
   - component: {fileID: 114245542606432642}
   m_Layer: 0
   m_Name: BackgroudImage
@@ -52,7 +53,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 282f6ec5f05914927bc66139ea979bd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageFolder: Sprites/
+  imageFolder: Colorless/Backgrounds
+--- !u!114 &114544207187356370
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1535484973274616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85619ba28fbf4aed91661d30749646c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  needFade: 1
+  fadeDuration: 0.1
+  staticAlpha: 1
+  intermediateAlpha: 0
 --- !u!212 &212552319352052240
 SpriteRenderer:
   m_ObjectHideFlags: 1

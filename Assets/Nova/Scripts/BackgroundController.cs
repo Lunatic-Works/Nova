@@ -6,17 +6,18 @@ using UnityEngine;
 
 namespace Nova
 {
+    [RequireComponent(typeof(SpriteChangerWithFade))]
     public class BackgroundController : MonoBehaviour, IRestorable
     {
         public string imageFolder;
 
         private GameState gameState;
 
-        private SpriteRenderer _spriteRenderer;
+        private SpriteChangerWithFade _spriteChanger;
 
         private void Start()
         {
-            _spriteRenderer = GetComponent<SpriteRenderer>();
+            _spriteChanger = GetComponent<SpriteChangerWithFade>();
             LuaRuntime.Instance.BindObject("backgroundController", this);
             gameState = GameState.Instance;
             gameState.AddRestorable(this);
@@ -33,13 +34,13 @@ namespace Nova
         /// <param name="imageName">The name of the image file</param>
         public void SetImage(string imageName)
         {
-            _spriteRenderer.sprite = AssetsLoader.GetSprite(System.IO.Path.Combine(imageFolder, imageName));
+            _spriteChanger.sprite = AssetsLoader.GetSprite(System.IO.Path.Combine(imageFolder, imageName));
             currentImageName = imageName;
         }
 
         public void ClearImage()
         {
-            _spriteRenderer.sprite = null;
+            _spriteChanger.sprite = null;
             currentImageName = null;
         }
 
