@@ -38,18 +38,26 @@ namespace Nova
         private Text nameTextArea;
         private Text dialogueTextArea;
 
-        private void Start()
+        private void Awake()
         {
             nameBox = transform.Find("NameBox").gameObject;
             nameTextArea = nameBox.transform.Find("Text").GetComponent<Text>();
             dialogueTextArea = transform.Find("DialogueBox/Text").GetComponent<Text>();
 
-            gameState = GameState.Instance;
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
-            gameState.BranchOccurs.AddListener(OnBranchOcurrs);
-            gameState.BranchSelected.AddListener(OnBranchSelected);
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            gameState.DialogueChanged += OnDialogueChanged;
+            gameState.BranchOccurs += OnBranchOcurrs;
+            gameState.BranchSelected += OnBranchSelected;
         }
-
+        
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
+            gameState.DialogueChanged -= OnDialogueChanged;
+            gameState.BranchOccurs -= OnBranchOcurrs;
+            gameState.BranchSelected -= OnBranchSelected;
+        }
+        
         private string currentName;
         private string currentDialogue;
 
@@ -108,7 +116,7 @@ namespace Nova
         /// The content of the dialogue box needs to be changed
         /// </summary>
         /// <param name="text"></param>
-        private void OnDialogueChanged(DialogueChangedEventData dialogueData)
+        private void OnDialogueChanged(DialogueChangedData dialogueData)
         {
             var text = dialogueData.text;
             Debug.Log(string.Format("<color=green><b>{0}</b></color>", text));
@@ -159,8 +167,8 @@ namespace Nova
         /// <summary>
         /// Make the state normal when branch occurs
         /// </summary>
-        /// <param name="branchOccursEventData"></param>
-        private void OnBranchOcurrs(BranchOccursEventData branchOccursEventData)
+        /// <param name="branchOccursData"></param>
+        private void OnBranchOcurrs(BranchOccursData branchOccursData)
         {
             stateBeforeBranch = State;
         }
@@ -171,8 +179,8 @@ namespace Nova
         /// <summary>
         /// Check if should restore the previous state before the branch happens
         /// </summary>
-        /// <param name="branchSelectedEventData"></param>
-        private void OnBranchSelected(BranchSelectedEventData branchSelectedEventData)
+        /// <param name="branchSelectedData"></param>
+        private void OnBranchSelected(BranchSelectedData branchSelectedData)
         {
             Assert.AreEqual(State, DialogueBoxState.Normal, "DialogueBoxState.Normal != DialogueBox.State");
             switch (stateBeforeBranch)
@@ -390,9 +398,6 @@ namespace Nova
             State = DialogueBoxState.Normal;
         }
 
-        private void OnDestroy()
-        {
-            StopAllCoroutines();
-        }
+        
     }
 }

@@ -7,14 +7,23 @@ namespace Nova
     {
         private Text _text;
 
-        private void Start()
+        private GameState _gameState;
+
+        private void Awake()
         {
             _text = transform.Find("Text").GetComponent<Text>();
+            _gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            _gameState.NodeChanged += OnNodeChanged;
         }
 
-        public void OnNodeChanged(NodeChangedEventData nodeChangedEventData)
+        private void OnDestroy()
         {
-            _text.text = nodeChangedEventData.nodeName;
+            _gameState.NodeChanged -= OnNodeChanged;
+        }
+
+        private void OnNodeChanged(NodeChangedData nodeChangedData)
+        {
+            _text.text = nodeChangedData.nodeName;
         }
     }
 }

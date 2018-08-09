@@ -27,21 +27,27 @@ namespace Nova
             scrollRect = logPanel.transform.Find("ScrollView").GetComponent<ScrollRect>();
             logContent = scrollRect.transform.Find("Viewport/Content").gameObject;
             alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
-            gameState = GameState.Instance;
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
-            gameState.BookmarkWillLoad.AddListener(OnBookmarkWillLoad);
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            gameState.DialogueChanged += OnDialogueChanged;
+            gameState.BookmarkWillLoad += OnBookmarkWillLoad;
         }
 
-        private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
+        private void OnDestroy()
+        {
+            gameState.DialogueChanged -= OnDialogueChanged;
+            gameState.BookmarkWillLoad -= OnBookmarkWillLoad;
+        }
+
+        private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
             var logEntry = Instantiate(LogEntryPrefab);
             logEntry.transform.SetParent(logContent.transform);
             logEntry.transform.localScale = Vector3.one;
 
-            var currentNodeName = dialogueChangedEventData.nodeName;
-            var currentDialogueIndex = dialogueChangedEventData.dialogueIndex;
+            var currentNodeName = dialogueChangedData.nodeName;
+            var currentDialogueIndex = dialogueChangedData.dialogueIndex;
             var logEntryIndex = logEntries.Count;
-            var voices = dialogueChangedEventData.voicesForNextDialogue;
+            var voices = dialogueChangedData.voicesForNextDialogue;
 
             UnityAction onGoBackButtonClicked =
                 () => OnGoBackButtonClicked(currentNodeName, currentDialogueIndex, logEntryIndex);
@@ -56,7 +62,7 @@ namespace Nova
             UnityAction onAddFavoriteButtonClicked = null;
 
             var logEntryController = logEntry.GetComponent<LogEntryController>();
-            logEntryController.Init(dialogueChangedEventData.text, onGoBackButtonClicked,
+            logEntryController.Init(dialogueChangedData.text, onGoBackButtonClicked,
                 onPlayVoiceButtonClicked, onAddFavoriteButtonClicked);
 
             logEntries.Add(logEntry);

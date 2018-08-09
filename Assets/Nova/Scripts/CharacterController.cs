@@ -23,15 +23,22 @@ namespace Nova
 
         private GameObject characterAppearance;
 
-        private void Start()
+        private void Awake()
         {
             LuaRuntime.Instance.BindObject(characterVariableName, this, "_G");
             audioSource = GetComponent<AudioSource>();
-            gameState = GameState.Instance;
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
-            gameState.DialogueWillChange.AddListener(OnDialogueWillChange);
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            gameState.DialogueChanged += OnDialogueChanged;
+            gameState.DialogueWillChange += OnDialogueWillChange;
             characterAppearance = transform.Find("Appearance").gameObject;
             gameState.AddRestorable(this);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.DialogueChanged -= OnDialogueChanged;
+            gameState.DialogueWillChange -= OnDialogueWillChange;
+            gameState.RemoveRestorable(this);
         }
 
         private bool willSaySomething = false;
@@ -50,8 +57,8 @@ namespace Nova
         /// <summary>
         /// Play the voice when the dialogue actually changes
         /// </summary>
-        /// <param name="dialogueChangedEventData"></param>
-        private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
+        /// <param name="dialogueChangedData"></param>
+        private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
             if (willSaySomething)
             {

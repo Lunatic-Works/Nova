@@ -15,7 +15,8 @@ namespace Nova
         private Button skipButton;
         private Button logButton;
 
-        private void Start () {
+        private void Awake()
+        {
             saveButton = transform.Find("Save").GetComponent<Button>();
             loadButton = transform.Find("Load").GetComponent<Button>();
             autoButton = transform.Find("Auto").GetComponent<Button>();

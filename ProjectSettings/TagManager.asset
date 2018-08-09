@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Alert
+  - NovaGameController
   layers:
   - Default
   - TransparentFX
