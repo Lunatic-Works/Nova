@@ -41,7 +41,7 @@ namespace Nova
             var contentAspectRatio = 1.0f * contentSize.x / contentSize.y;
             if (contentAspectRatio > containerAspectRatio)
                 return new Vector2Int(contentSize.x, (int) (contentSize.x / containerAspectRatio));
-            return new Vector2Int((int)(contentSize.y * containerAspectRatio), contentSize.y);
+            return new Vector2Int((int) (contentSize.y * containerAspectRatio), contentSize.y);
         }
 
         public static GameObject FindNovaGameController()
@@ -49,7 +49,9 @@ namespace Nova
             var gameController = GameObject.FindWithTag("NovaGameController");
             if (gameController == null)
             {
-                throw new InvalidAccessException("Nova: Can not find Nova game controller by tag.");
+                throw new InvalidAccessException(
+                    "Nova: Can not find Nova game controller by tag. May be you should put" +
+                    " NovaCreator prefab in your scene");
             }
 
             return gameController;

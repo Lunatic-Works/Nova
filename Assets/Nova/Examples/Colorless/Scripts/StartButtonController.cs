@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using UnityEditor.VersionControl;
+using UnityEngine;
 using UnityEngine.Analytics;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
 namespace Nova.Examples.Colorless.Scripts
@@ -20,6 +22,8 @@ namespace Nova.Examples.Colorless.Scripts
 
         public void OnClick()
         {
+            Assert.IsNotNull(_sceneLoadController, "_sceneLoadController != null");
+            Assert.IsNotNull(_gameState, "_gameState != null");
             _sceneLoadController.DoAfterLoad = _gameState.GameStart;
             SceneManager.LoadScene(GameSceneName);
         }

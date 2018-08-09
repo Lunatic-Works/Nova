@@ -152,6 +152,12 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 114272515042219454, guid: fa85a1f7ee8f24c5a8c2301088bd4291,
+        type: 2}
+      propertyPath: novaGameControllerPrefab
+      value: 
+      objectReference: {fileID: 1491238599924994, guid: f4f3d837d52c042e59059ca036efc46f,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fa85a1f7ee8f24c5a8c2301088bd4291, type: 2}
   m_IsPrefabParent: 0
