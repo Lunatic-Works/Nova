@@ -56,7 +56,6 @@ GameObject:
   - component: {fileID: 222948165404864598}
   - component: {fileID: 114820240682311676}
   - component: {fileID: 114951368350482450}
-  - component: {fileID: 114936702525087996}
   m_Layer: 5
   m_Name: Auto
   m_TagString: Untagged
@@ -283,7 +282,6 @@ GameObject:
   - component: {fileID: 222779633425364756}
   - component: {fileID: 114229371967909180}
   - component: {fileID: 114856461880800322}
-  - component: {fileID: 114433464899980046}
   m_Layer: 5
   m_Name: Skip
   m_TagString: Untagged
@@ -712,18 +710,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114433464899980046
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1959500556734648}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 228fd279dbbda4306b8c6528c8767c74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dialogueBoxController: {fileID: 114358814597933850}
 --- !u!114 &114486548689275498
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -940,18 +926,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &114936702525087996
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1095008613593784}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c1c6de7be4774db083ee0912d013b12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dialogueBoxController: {fileID: 114358814597933850}
 --- !u!114 &114951368350482450
 MonoBehaviour:
   m_ObjectHideFlags: 1

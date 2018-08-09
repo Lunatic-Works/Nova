@@ -6,6 +6,7 @@
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/
+*.patch
 
 # Assets for debug
 */Debug

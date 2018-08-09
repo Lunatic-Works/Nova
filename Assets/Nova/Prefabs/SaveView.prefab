@@ -441,6 +441,21 @@ MonoBehaviour:
   maxRow: 3
   maxCol: 3
   canSave: 1
+  BookmarkSave:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Nova.BookmarkSaveEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  BookmarkLoad:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Nova.BookmarkLoadEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  BookmarkDelete:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Nova.BookmarkDeleteEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
 --- !u!114 &114088346217354248
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1236,8 +1251,8 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: c187cb62a3605eb4180f14289ceb416e, type: 3}
+  m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4

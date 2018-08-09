@@ -22,6 +22,53 @@ namespace Nova
         Load
     }
 
+    public class BookmarkSaveEventData
+    {
+        public BookmarkSaveEventData(int saveId, Bookmark bookmark)
+        {
+            this.saveId = saveId;
+            this.bookmark = bookmark;
+        }
+
+        public int saveId { get; private set; }
+        public Bookmark bookmark { get; private set; }
+    }
+
+    [System.Serializable]
+    public class BookmarkSaveEvent : UnityEvent<BookmarkSaveEventData>
+    {
+    }
+
+    public class BookmarkLoadEventData
+    {
+        public BookmarkLoadEventData(Bookmark bookmark)
+        {
+            this.bookmark = bookmark;
+        }
+
+        public Bookmark bookmark { get; private set; }
+    }
+
+    [System.Serializable]
+    public class BookmarkLoadEvent : UnityEvent<BookmarkLoadEventData>
+    {
+    }
+
+    public class BookmarkDeleteEventData
+    {
+        public BookmarkDeleteEventData(int saveId)
+        {
+            this.saveId = saveId;
+        }
+
+        public int saveId { get; private set; }
+    }
+
+    [System.Serializable]
+    public class BookmarkDeleteEvent : UnityEvent<BookmarkDeleteEventData>
+    {
+    }
+
     public class SaveViewController : MonoBehaviour
     {
         public GameObject SaveEntryPrefab;
@@ -29,6 +76,10 @@ namespace Nova
         public int maxRow;
         public int maxCol;
         public bool canSave;
+
+        public BookmarkSaveEvent BookmarkSave;
+        public BookmarkLoadEvent BookmarkLoad;
+        public BookmarkDeleteEvent BookmarkDelete;
 
         private const string saveBookmarkComfirmText = "覆盖存档{0}？";
         private const string loadBookmarkComfirmText = "读取存档{0}？";
@@ -181,20 +232,19 @@ namespace Nova
 
             savePanel.SetActive(true);
             selectedSaveId = -1;
+            ShowPage();
         }
 
         public void ShowSave()
         {
-            Show();
             saveViewMode = SaveViewMode.Save;
-            ShowPage();
+            Show();
         }
 
         public void ShowLoad()
         {
-            Show();
             saveViewMode = SaveViewMode.Load;
-            ShowPage();
+            Show();
         }
 
         public void Hide()
@@ -232,9 +282,8 @@ namespace Nova
         {
             var bookmark = gameState.GetBookmark();
             bookmark.ScreenShot = screenSprite.texture;
-            checkpointManager.SaveBookmark(saveId, bookmark);
             DeleteCachedThumbnailSprite(saveId);
-            Hide();
+            BookmarkSave.Invoke(new BookmarkSaveEventData(saveId, bookmark));
         }
 
         private void SaveBookmark(int saveId)
@@ -249,10 +298,7 @@ namespace Nova
         private void _loadBookmark(int saveId)
         {
             var bookmark = checkpointManager.LoadBookmark(saveId);
-            Debug.Log(string.Format("Load bookmark, chapter {0}, index {1}",
-                bookmark.NodeHistory.Last(), bookmark.DialogueIndex));
-            gameState.LoadBookmark(bookmark);
-            Hide();
+            BookmarkLoad.Invoke(new BookmarkLoadEventData(bookmark));
         }
 
         private void LoadBookmark(int saveId)
@@ -266,9 +312,8 @@ namespace Nova
 
         private void _deleteBookmark(int saveId)
         {
-            checkpointManager.DeleteBookmark(saveId);
             DeleteCachedThumbnailSprite(saveId);
-            ShowPage();
+            BookmarkDelete.Invoke(new BookmarkDeleteEventData(saveId));
         }
 
         private void DeleteBookmark(int saveId)
@@ -401,7 +446,7 @@ namespace Nova
             ));
         }
 
-        private void ShowPage()
+        public void ShowPage()
         {
             if (usedSaveSlots.Any())
             {
