@@ -1,4 +1,7 @@
 @<| label 'chapter-1'; is_start(); |>
+
+<|interlude:Play()|>
+
 <| ergong:Show(); ergong:Say '二宫_01'; play_bgm 'day2'; show_background 'bg_1'; |>
 二宫会长：真没想到，我们竟然会被暴雨困在了教学楼里。
 
@@ -161,6 +164,8 @@
 <| stop_bgm(); clear_background(); |>
 
 @<|label 'chapter-2'|>
+<|interlude:Play()|>
+
 <| play_bgm 'conspiracy'; show_background 'bg_2'; |>
 竹内：这回又是什么事？
 
@@ -237,6 +242,8 @@
 <| stop_bgm(); clear_background(); |>
 
 @<|label 'chapter-3'|>
+<|interlude:Play()|>
+
 <| play_bgm 'theLostThing'; show_background 'bg_3'; |>
 我在走廊看不断落下的雨让自己的头脑冷静下来。
 
@@ -318,6 +325,8 @@
 <| stop_bgm(); clear_background(); |>
 
 @<|label 'chapter-4'|>
+<|interlude:Play()|>
+
 <| ergong:Show(); ergong:Say '二宫_04'; play_bgm 'redemption'; show_background 'bg_1'; |>
 二宫会长：嗯？为什么拿个杯子会花这么长时间？
 

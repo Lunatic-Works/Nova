@@ -49,7 +49,7 @@ namespace Nova
             gameState.BranchOccurs += OnBranchOcurrs;
             gameState.BranchSelected += OnBranchSelected;
         }
-        
+
         private void OnDestroy()
         {
             StopAllCoroutines();
@@ -57,7 +57,7 @@ namespace Nova
             gameState.BranchOccurs -= OnBranchOcurrs;
             gameState.BranchSelected -= OnBranchSelected;
         }
-        
+
         private string currentName;
         private string currentDialogue;
 
@@ -232,6 +232,8 @@ namespace Nova
         /// <returns></returns>
         private IEnumerator CharacterAnimation()
         {
+            // empty text Area to handle the case when the dialogue is empty
+            dialogueTextArea.text = "";
             for (var index = 1; index <= currentDialogue.Length; ++index)
             {
                 dialogueTextArea.text = currentDialogue.Substring(0, index);
@@ -397,7 +399,5 @@ namespace Nova
 
             State = DialogueBoxState.Normal;
         }
-
-        
     }
 }

@@ -102,7 +102,7 @@ namespace Nova
 
         private IEnumerator ChangeSpriteWithFade(Sprite sp)
         {
-            if (_getSprite != null)
+            if (_getSprite() != null)
             {
                 // Fade out if previous sprite exists
                 Fade(staticAlpha, intermediateAlpha, fadeDuration);
@@ -110,7 +110,14 @@ namespace Nova
             }
 
             _setSprite(sp);
-            Fade(intermediateAlpha, staticAlpha, fadeDuration);
+            if (sp != null)
+            {
+                Fade(intermediateAlpha, staticAlpha, fadeDuration);
+            }
+            else
+            {
+                SetAlpha(staticAlpha);
+            }
         }
     }
 }
