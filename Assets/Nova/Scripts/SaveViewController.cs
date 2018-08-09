@@ -143,10 +143,12 @@ namespace Nova
             {
                 var saveEntryRow = Instantiate(SaveEntryRowPrefab);
                 saveEntryRow.transform.SetParent(saveEntryGrid.transform);
+                saveEntryRow.transform.localScale = Vector3.one;
                 for (var colIdx = 0; colIdx < maxCol; ++colIdx)
                 {
                     var saveEntry = Instantiate(SaveEntryPrefab);
                     saveEntry.transform.SetParent(saveEntryRow.transform);
+                    saveEntry.transform.localScale = Vector3.one;
                     saveEntries.Add(saveEntry);
                 }
             }

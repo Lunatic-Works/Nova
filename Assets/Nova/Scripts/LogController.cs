@@ -35,13 +35,14 @@ namespace Nova
         private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
         {
             var logEntry = Instantiate(LogEntryPrefab);
-            var logEntryController = logEntry.GetComponent<LogEntryController>();
-            var logEntryIndex = logEntries.Count;
+            logEntry.transform.SetParent(logContent.transform);
+            logEntry.transform.localScale = Vector3.one;
+
             var currentNodeName = dialogueChangedEventData.nodeName;
             var currentDialogueIndex = dialogueChangedEventData.dialogueIndex;
+            var logEntryIndex = logEntries.Count;
             var voices = dialogueChangedEventData.voicesForNextDialogue;
 
-            // TODO Add favorite
             UnityAction onGoBackButtonClicked =
                 () => OnGoBackButtonClicked(currentNodeName, currentDialogueIndex, logEntryIndex);
 
@@ -51,12 +52,14 @@ namespace Nova
                 onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(voices);
             }
 
+            // TODO Add favorite
             UnityAction onAddFavoriteButtonClicked = null;
 
+            var logEntryController = logEntry.GetComponent<LogEntryController>();
             logEntryController.Init(dialogueChangedEventData.text, onGoBackButtonClicked,
                 onPlayVoiceButtonClicked, onAddFavoriteButtonClicked);
+
             logEntries.Add(logEntry);
-            logEntry.transform.SetParent(logContent.transform);
         }
 
         public bool hideOnGoBackButtonClicked;
