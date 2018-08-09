@@ -27,6 +27,8 @@ namespace Nova
 
             var alertPanel = Instantiate(AlertPanelPrefab, UICanvas);
             alertPanel.transform.SetAsLastSibling();
+            alertPanel.transform.localScale = Vector3.one;
+
             var alertPanelController = alertPanel.GetComponent<AlertPanelController>();
             alertPanelController.Init(title, bodyContent, onClickConfirm, onClickCancel, ignore);
         }

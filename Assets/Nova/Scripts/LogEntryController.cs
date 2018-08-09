@@ -16,9 +16,9 @@ namespace Nova
         private void Awake()
         {
             text = transform.Find("Text").GetComponent<Text>();
-            var buttons = transform.Find("Text/Buttons");
+            var buttons = text.transform.Find("Buttons");
             goBackButton = buttons.Find("GoBackButton").GetComponent<Button>();
-            playVoiceButton = buttons.Find("ReplayVoiceButton").GetComponent<Button>();
+            playVoiceButton = buttons.Find("PlayVoiceButton").GetComponent<Button>();
             addFavoriteButton = buttons.Find("AddFavoriteButton").GetComponent<Button>();
         }
 

@@ -37,12 +37,13 @@ namespace Nova
             {
                 var childButton = Instantiate(BranchButtonPrefab);
                 childButton.transform.SetParent(transform);
+                childButton.transform.localScale = Vector3.one;
+
                 var text = childButton.GetComponent<Text>();
                 if (text == null)
                 {
                     text = childButton.GetComponentInChildren<Text>();
                 }
-
                 text.text = branchInformation.name;
 
                 childButton.GetComponent<Button>().onClick.AddListener(() => Select(branchInformation.name));
