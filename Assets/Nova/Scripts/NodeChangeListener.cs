@@ -12,7 +12,7 @@ namespace Nova
         private void Awake()
         {
             _text = transform.Find("Text").GetComponent<Text>();
-            _gameState = Utils.FindGameController().GetComponent<GameState>();
+            _gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             _gameState.NodeChanged += OnNodeChanged;
         }
 

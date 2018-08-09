@@ -44,7 +44,7 @@ namespace Nova
             return new Vector2Int((int)(contentSize.y * containerAspectRatio), contentSize.y);
         }
 
-        public static GameObject FindGameController()
+        public static GameObject FindNovaGameController()
         {
             var gameController = GameObject.FindWithTag("NovaGameController");
             if (gameController == null)

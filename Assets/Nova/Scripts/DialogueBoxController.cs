@@ -44,7 +44,7 @@ namespace Nova
             nameTextArea = nameBox.transform.Find("Text").GetComponent<Text>();
             dialogueTextArea = transform.Find("DialogueBox/Text").GetComponent<Text>();
 
-            gameState = Utils.FindGameController().GetComponent<GameState>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             gameState.DialogueChanged += OnDialogueChanged;
             gameState.BranchOccurs += OnBranchOcurrs;
             gameState.BranchSelected += OnBranchSelected;

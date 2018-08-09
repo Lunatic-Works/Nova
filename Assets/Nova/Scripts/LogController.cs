@@ -27,7 +27,7 @@ namespace Nova
             scrollRect = logPanel.transform.Find("ScrollView").GetComponent<ScrollRect>();
             logContent = scrollRect.transform.Find("Viewport/Content").gameObject;
             alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
-            gameState = Utils.FindGameController().GetComponent<GameState>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             gameState.DialogueChanged += OnDialogueChanged;
             gameState.BookmarkWillLoad += OnBookmarkWillLoad;
         }

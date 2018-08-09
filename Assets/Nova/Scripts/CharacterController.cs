@@ -27,7 +27,7 @@ namespace Nova
         {
             LuaRuntime.Instance.BindObject(characterVariableName, this, "_G");
             audioSource = GetComponent<AudioSource>();
-            gameState = Utils.FindGameController().GetComponent<GameState>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             gameState.DialogueChanged += OnDialogueChanged;
             gameState.DialogueWillChange += OnDialogueWillChange;
             characterAppearance = transform.Find("Appearance").gameObject;

@@ -19,7 +19,7 @@ namespace Nova
         {
             _spriteChanger = GetComponent<SpriteChangerWithFade>();
             LuaRuntime.Instance.BindObject("backgroundController", this);
-            gameState = Utils.FindGameController().GetComponent<GameState>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             gameState.AddRestorable(this);
         }
 

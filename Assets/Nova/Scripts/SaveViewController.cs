@@ -154,8 +154,8 @@ namespace Nova
         {
             maxSaveEntry = maxRow * maxCol;
 
-            gameState = Utils.FindGameController().GetComponent<GameState>();
-            checkpointManager = Utils.FindGameController().GetComponent<CheckpointManager>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            checkpointManager = Utils.FindNovaGameController().GetComponent<CheckpointManager>();
 
             savePanel = transform.Find("SavePanel").gameObject;
             backgroundButton = savePanel.transform.Find("Background").GetComponent<Button>();

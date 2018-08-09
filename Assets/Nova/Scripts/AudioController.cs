@@ -33,7 +33,7 @@ namespace Nova
 
         private void Awake()
         {
-            gameState = Utils.FindGameController().GetComponent<GameState>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             audioSource = GetComponent<AudioSource>();
             LuaRuntime.Instance.BindObject(audioControllerName, this);
             gameState.AddRestorable(this);

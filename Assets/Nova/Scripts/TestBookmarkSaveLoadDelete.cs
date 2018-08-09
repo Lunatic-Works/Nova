@@ -12,8 +12,8 @@ namespace Nova
 
         void Start()
         {
-            gameState = Utils.FindGameController().GetComponent<GameState>();
-            checkpointManager = Utils.FindGameController().GetComponent<CheckpointManager>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            checkpointManager = Utils.FindNovaGameController().GetComponent<CheckpointManager>();
 
             saveViewController.BookmarkSave.AddListener(OnBookmarkSave);
             saveViewController.BookmarkLoad.AddListener(OnBookmarkLoad);

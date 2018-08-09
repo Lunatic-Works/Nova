@@ -64,38 +64,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptPath: Colorless/Scripts
-  DialogueWillChange:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-  DialogueChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Nova.DialogueChangedEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  NodeChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Nova.NodeChangedEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  BranchOccurs:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Nova.BranchOccursEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  BranchSelected:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Nova.BranchSelectedEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  CurrentRouteEnded:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Nova.CurrentRouteEndedEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  BookmarkWillLoad:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Nova.BookmarkWillLoadEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null

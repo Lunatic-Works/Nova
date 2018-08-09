@@ -16,7 +16,7 @@ namespace Nova
 
         private void Awake()
         {
-            gameState = Utils.FindGameController().GetComponent<GameState>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             gameState.BranchOccurs += OnBranchHappen;
             gameState.AddRestorable(this);
         }
