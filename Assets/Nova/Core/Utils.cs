@@ -46,10 +46,10 @@ namespace Nova
 
         public static GameObject FindGameController()
         {
-            var gameController = GameObject.FindWithTag("GameController");
+            var gameController = GameObject.FindWithTag("NovaGameController");
             if (gameController == null)
             {
-                throw new InvalidAccessException("Nova: Can not find game controller by tag.");
+                throw new InvalidAccessException("Nova: Can not find Nova game controller by tag.");
             }
 
             return gameController;

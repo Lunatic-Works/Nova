@@ -12,7 +12,7 @@ namespace Nova
 
         void Start()
         {
-            gameState = GameState.Instance;
+            gameState = Utils.FindGameController().GetComponent<GameState>();
             checkpointManager = Utils.FindGameController().GetComponent<CheckpointManager>();
 
             saveViewController.BookmarkSave.AddListener(OnBookmarkSave);

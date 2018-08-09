@@ -27,19 +27,25 @@ namespace Nova
             scrollRect = logPanel.transform.Find("ScrollView").GetComponent<ScrollRect>();
             logContent = scrollRect.transform.Find("Viewport/Content").gameObject;
             alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
-            gameState = GameState.Instance;
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
-            gameState.BookmarkWillLoad.AddListener(OnBookmarkWillLoad);
+            gameState = Utils.FindGameController().GetComponent<GameState>();
+            gameState.DialogueChanged += OnDialogueChanged;
+            gameState.BookmarkWillLoad += OnBookmarkWillLoad;
         }
 
-        private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
+        private void OnDestroy()
+        {
+            gameState.DialogueChanged -= OnDialogueChanged;
+            gameState.BookmarkWillLoad -= OnBookmarkWillLoad;
+        }
+
+        private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
             var logEntry = Instantiate(LogEntryPrefab);
             var logEntryController = logEntry.GetComponent<LogEntryController>();
             var logEntryIndex = logEntries.Count;
-            var currentNodeName = dialogueChangedEventData.nodeName;
-            var currentDialogueIndex = dialogueChangedEventData.dialogueIndex;
-            var voices = dialogueChangedEventData.voicesForNextDialogue;
+            var currentNodeName = dialogueChangedData.nodeName;
+            var currentDialogueIndex = dialogueChangedData.dialogueIndex;
+            var voices = dialogueChangedData.voicesForNextDialogue;
 
             // TODO Add favorite
             UnityAction onGoBackButtonClicked =
@@ -53,7 +59,7 @@ namespace Nova
 
             UnityAction onAddFavoriteButtonClicked = null;
 
-            logEntryController.Init(dialogueChangedEventData.text, onGoBackButtonClicked,
+            logEntryController.Init(dialogueChangedData.text, onGoBackButtonClicked,
                 onPlayVoiceButtonClicked, onAddFavoriteButtonClicked);
             logEntries.Add(logEntry);
             logEntry.transform.SetParent(logContent.transform);

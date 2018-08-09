@@ -14,25 +14,31 @@ namespace Nova
 
         private GameState gameState;
 
-        private void Start()
+        private void Awake()
         {
-            gameState = GameState.Instance;
-            gameState.BranchOccurs.AddListener(OnBranchHappen);
+            gameState = Utils.FindGameController().GetComponent<GameState>();
+            gameState.BranchOccurs += OnBranchHappen;
             gameState.AddRestorable(this);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.BranchOccurs -= OnBranchHappen;
+            gameState.RemoveRestorable(this);
         }
 
         /// <summary>
         /// Show branch buttons when branch happens
         /// </summary>
-        /// <param name="branchOccursEventData"></param>
-        private void OnBranchHappen(BranchOccursEventData branchOccursEventData)
+        /// <param name="branchOccursData"></param>
+        private void OnBranchHappen(BranchOccursData branchOccursData)
         {
             if (dimOnBranch)
             {
                 blackPanel.SetActive(true);
             }
 
-            var branchInformations = branchOccursEventData.branchInformations;
+            var branchInformations = branchOccursData.branchInformations;
             foreach (var branchInformation in branchInformations)
             {
                 var childButton = Instantiate(BranchButtonPrefab);

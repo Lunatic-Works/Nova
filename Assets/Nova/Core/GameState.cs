@@ -10,9 +10,9 @@ namespace Nova
 {
     #region event types and event datas
 
-    public class DialogueChangedEventData
+    public class DialogueChangedData
     {
-        public DialogueChangedEventData(string nodeName, int dialogueIndex, string text,
+        public DialogueChangedData(string nodeName, int dialogueIndex, string text,
             IEnumerable<string> voicesForNextDialogue)
         {
             this.nodeName = nodeName;
@@ -28,14 +28,9 @@ namespace Nova
         public IEnumerable<string> voicesForNextDialogue { get; private set; }
     }
 
-    [System.Serializable]
-    public class DialogueChangedEvent : UnityEvent<DialogueChangedEventData>
+    public class NodeChangedData
     {
-    }
-
-    public class NodeChangedEventData
-    {
-        public NodeChangedEventData(string nodeName, string nodeDescription)
+        public NodeChangedData(string nodeName, string nodeDescription)
         {
             this.nodeName = nodeName;
             this.nodeDescription = nodeDescription;
@@ -45,14 +40,9 @@ namespace Nova
         public string nodeDescription { get; private set; }
     }
 
-    [System.Serializable]
-    public class NodeChangedEvent : UnityEvent<NodeChangedEventData>
+    public class BranchOccursData
     {
-    }
-
-    public class BranchOccursEventData
-    {
-        public BranchOccursEventData(IEnumerable<BranchInformation> branchInformations)
+        public BranchOccursData(IEnumerable<BranchInformation> branchInformations)
         {
             this.branchInformations = branchInformations;
         }
@@ -60,14 +50,9 @@ namespace Nova
         public IEnumerable<BranchInformation> branchInformations { get; private set; }
     }
 
-    [System.Serializable]
-    public class BranchOccursEvent : UnityEvent<BranchOccursEventData>
+    public class BranchSelectedData
     {
-    }
-
-    public class BranchSelectedEventData
-    {
-        public BranchSelectedEventData(BranchInformation selectedBranchInformation)
+        public BranchSelectedData(BranchInformation selectedBranchInformation)
         {
             this.selectedBranchInformation = selectedBranchInformation;
         }
@@ -75,14 +60,9 @@ namespace Nova
         public BranchInformation selectedBranchInformation { get; private set; }
     }
 
-    [System.Serializable]
-    public class BranchSelectedEvent : UnityEvent<BranchSelectedEventData>
+    public class CurrentRouteEndedData
     {
-    }
-
-    public class CurrentRouteEndedEventData
-    {
-        public CurrentRouteEndedEventData(string endName)
+        public CurrentRouteEndedData(string endName)
         {
             this.endName = endName;
         }
@@ -90,17 +70,7 @@ namespace Nova
         public string endName { get; private set; }
     }
 
-    [System.Serializable]
-    public class CurrentRouteEndedEvent : UnityEvent<CurrentRouteEndedEventData>
-    {
-    }
-
     public class BookmarkWillLoadData
-    {
-    }
-
-    [System.Serializable]
-    public class BookmarkWillLoadEvent : UnityEvent<BookmarkWillLoadData>
     {
     }
 
@@ -123,40 +93,6 @@ namespace Nova
             scriptLoader.Init(scriptPath);
             flowChartTree = scriptLoader.GetFlowChartTree();
             checkpointManager = GetComponent<CheckpointManager>();
-        }
-
-        private static GameState _instance = null;
-
-        /// <summary>
-        /// Get the game state instance attached under current game controller object
-        /// </summary>
-        public static GameState Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    var gameController = Utils.FindGameController();
-                    _instance = gameController.GetComponent<GameState>();
-                    if (_instance == null)
-                    {
-                        Debug.Log("Nova: Attaching game state to game controller.");
-                        _instance = gameController.AddComponent<GameState>();
-                        _instance.scriptPath = "";
-                        Debug.LogWarning("Nova: Default script path is empty string.");
-                    }
-                }
-
-                return _instance;
-            }
-        }
-
-        /// <summary>
-        /// Reset instance when old instance is destroyed
-        /// </summary>
-        private void OnDestroy()
-        {
-            _instance = null;
         }
 
         #region status
@@ -205,39 +141,39 @@ namespace Nova
         /// This event will be triggered if whe content of the dialogue will change. It will be triggered before
         /// the lazy execution block of the next dialogue is invoked.
         /// </summary>
-        public UnityEvent DialogueWillChange;
+        public UnityAction DialogueWillChange;
 
         /// <summary>
         /// This event will be triggered if the content of the dialogue has changed. New dialogue text will be
         /// sent to all listeners
         /// </summary>
-        public DialogueChangedEvent DialogueChanged;
+        public UnityAction<DialogueChangedData> DialogueChanged;
 
         /// <summary>
         /// This event will be triggered if the node has changed. The name and discription of the new node will be
         /// sent to all listeners
         /// </summary>
-        public NodeChangedEvent NodeChanged;
+        public UnityAction<NodeChangedData> NodeChanged;
 
         /// <summary>
         /// This event will be triggered if branches occur. The player has to choose which branch to take
         /// </summary>
-        public BranchOccursEvent BranchOccurs;
+        public UnityAction<BranchOccursData> BranchOccurs;
 
         /// <summary>
         /// This event will be triggered if a branch is selected
         /// </summary>
-        public BranchSelectedEvent BranchSelected;
+        public UnityAction<BranchSelectedData> BranchSelected;
 
         /// <summary>
         /// This event will be triggered if the story reaches an end
         /// </summary>
-        public CurrentRouteEndedEvent CurrentRouteEnded;
+        public UnityAction<CurrentRouteEndedData> CurrentRouteEnded;
 
         /// <summary>
         /// A book mark will be loaded
         /// </summary>
-        public BookmarkWillLoadEvent BookmarkWillLoad;
+        public UnityAction<BookmarkWillLoadData> BookmarkWillLoad;
 
         #endregion
 
@@ -276,7 +212,10 @@ namespace Nova
             if (nodeChanged || forceRefreshNode)
             {
                 currentNode = flowChartTree.FindNode(desiredNodeName);
-                NodeChanged.Invoke(new NodeChangedEventData(currentNode.name, currentNode.description));
+                if (NodeChanged != null)
+                {
+                    NodeChanged.Invoke(new NodeChangedData(currentNode.name, currentNode.description));
+                }
             }
 
             // update dialogue
@@ -295,11 +234,19 @@ namespace Nova
                     checkpointManager.SetReached(currentNode.name, currentIndex, GetGameStateStepRestoreEntry());
                 }
 
-                DialogueWillChange.Invoke();
+                if (DialogueWillChange != null)
+                {
+                    DialogueWillChange.Invoke();
+                }
+
                 currentDialogueEntry.ExecuteAction();
-                DialogueChanged.Invoke(
-                    new DialogueChangedEventData(currentNode.name, currentIndex, currentDialogueEntry.text,
-                        new List<string>(voicesOfNextDialogue)));
+                if (DialogueChanged != null)
+                {
+                    DialogueChanged.Invoke(
+                        new DialogueChangedData(currentNode.name, currentIndex, currentDialogueEntry.text,
+                            new List<string>(voicesOfNextDialogue)));
+                }
+
                 voicesOfNextDialogue.Clear();
             }
         }
@@ -444,7 +391,11 @@ namespace Nova
                     }
 
                     isBranching = true;
-                    BranchOccurs.Invoke(new BranchOccursEventData(currentNode.GetAllBranches()));
+                    if (BranchOccurs != null)
+                    {
+                        BranchOccurs.Invoke(new BranchOccursData(currentNode.GetAllBranches()));
+                    }
+
                     break;
                 case FlowChartNodeType.End:
                     if (ended)
@@ -461,7 +412,11 @@ namespace Nova
                         checkpointManager.SetReached(endName);
                     }
 
-                    CurrentRouteEnded.Invoke(new CurrentRouteEndedEventData(endName));
+                    if (CurrentRouteEnded != null)
+                    {
+                        CurrentRouteEnded.Invoke(new CurrentRouteEndedData(endName));
+                    }
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -495,7 +450,11 @@ namespace Nova
                 checkpointManager.SetReached(currentNode.name, branchName);
             }
 
-            BranchSelected.Invoke(new BranchSelectedEventData(selectedBranchInfo));
+            if (BranchSelected != null)
+            {
+                BranchSelected.Invoke(new BranchSelectedData(selectedBranchInfo));
+            }
+
             MoveToNextNode(nextNode);
         }
 
@@ -522,6 +481,15 @@ namespace Nova
             {
                 throw new ArgumentException("Nova: a restorable should have an unique and not null name", ex);
             }
+        }
+
+        /// <summary>
+        /// remove a restorable
+        /// </summary>
+        /// <param name="restorable">the restorable to be removed</param>
+        public void RemoveRestorable(IRestorable restorable)
+        {
+            restorables.Remove(restorable.restorableObjectName);
         }
 
         /// <summary>
@@ -576,7 +544,11 @@ namespace Nova
         /// </summary>
         public void LoadBookmark(Bookmark bookmark)
         {
-            BookmarkWillLoad.Invoke(new BookmarkWillLoadData());
+            if (BookmarkWillLoad != null)
+            {
+                BookmarkWillLoad.Invoke(new BookmarkWillLoadData());
+            }
+
             walkedThroughNodes = bookmark.NodeHistory;
             Assert.IsFalse(walkedThroughNodes.Count == 0);
             MoveBackTo(walkedThroughNodes.Last(), bookmark.DialogueIndex, true, true);

@@ -31,12 +31,17 @@ namespace Nova
             set { audioSource.volume = value; }
         }
 
-        private void Start()
+        private void Awake()
         {
-            gameState = GameState.Instance;
+            gameState = Utils.FindGameController().GetComponent<GameState>();
             audioSource = GetComponent<AudioSource>();
             LuaRuntime.Instance.BindObject(audioControllerName, this);
             gameState.AddRestorable(this);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.RemoveRestorable(this);
         }
 
         private AudioClip GetAudioClip(string audioName)

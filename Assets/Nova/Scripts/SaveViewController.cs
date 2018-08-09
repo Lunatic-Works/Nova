@@ -154,7 +154,7 @@ namespace Nova
         {
             maxSaveEntry = maxRow * maxCol;
 
-            gameState = GameState.Instance;
+            gameState = Utils.FindGameController().GetComponent<GameState>();
             checkpointManager = Utils.FindGameController().GetComponent<CheckpointManager>();
 
             savePanel = transform.Find("SavePanel").gameObject;
@@ -207,19 +207,25 @@ namespace Nova
             previewTextFormat = thumbnailText.text;
 
             alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
+            
+            gameState.DialogueChanged += OnDialogueChanged;
         }
 
         private void Start()
         {
             usedSaveSlots = checkpointManager.SaveSlotsMetadata;
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
             ShowPage();
         }
 
-        private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
+        private void OnDestroy()
         {
-            currentNodeName = dialogueChangedEventData.nodeName;
-            currentDialogueText = dialogueChangedEventData.text;
+            gameState.DialogueChanged -= OnDialogueChanged;
+        }
+
+        private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
+        {
+            currentNodeName = dialogueChangedData.nodeName;
+            currentDialogueText = dialogueChangedData.text;
         }
 
         private void Show()

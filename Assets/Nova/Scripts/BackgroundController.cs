@@ -15,12 +15,17 @@ namespace Nova
 
         private SpriteChangerWithFade _spriteChanger;
 
-        private void Start()
+        private void Awake()
         {
             _spriteChanger = GetComponent<SpriteChangerWithFade>();
             LuaRuntime.Instance.BindObject("backgroundController", this);
-            gameState = GameState.Instance;
+            gameState = Utils.FindGameController().GetComponent<GameState>();
             gameState.AddRestorable(this);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.RemoveRestorable(this);
         }
 
         private string currentImageName;
