@@ -364,6 +364,7 @@ namespace Nova
             using (var fs = File.OpenWrite(_globalSavePath))
                 WriteSave(_globalSave, fs);
 
+            SaveSlotsMetadata.Ensure(saveId).SaveId = saveId;
             SaveSlotsMetadata.Ensure(saveId).ModifiedTime = DateTime.Now;
         }
 
@@ -458,10 +459,10 @@ namespace Nova
             return Math.Max(SaveSlotsMetadata.Keys.Max(), begin);
         }
 
-        public int QueryMinUnusedSaveId(int begin)
+        public int QueryMinUnusedSaveId(int begin, int end)
         {
             int saveId = begin;
-            while (SaveSlotsMetadata.ContainsKey(saveId))
+            while (saveId < end && SaveSlotsMetadata.ContainsKey(saveId))
             {
                 ++saveId;
             }
