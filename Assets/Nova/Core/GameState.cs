@@ -459,6 +459,24 @@ namespace Nova
         }
 
         /// <summary>
+        /// Reset GameState, make it the same as the game not start
+        /// </summary>
+        /// <remarks>
+        /// No event will be triggered when this method is called
+        /// </remarks>
+        public void ResetGameState()
+        {
+            // Reset all
+            walkedThroughNodes = null;
+            currentIndex = 0;
+            currentNode = null;
+            oldIndex = -1;
+            currentDialogueEntry = null;
+            isBranching = false;
+            ended = false;
+        }
+
+        /// <summary>
         /// All restorable objects
         /// </summary>
         private readonly Dictionary<string, IRestorable> restorables = new Dictionary<string, IRestorable>();

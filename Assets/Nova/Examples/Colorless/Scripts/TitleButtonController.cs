@@ -11,16 +11,23 @@ namespace Nova.Examples.Colorless.Scripts
 
         public string titleSceneName;
 
+        private GameState _gameState;
+
         private void Awake()
         {
             _alert = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
             var button = GetComponent<Button>();
             button.onClick.AddListener(OnClick);
+            _gameState = Utils.FindNovaGameController().GetComponent<GameState>();
         }
 
         private void OnClick()
         {
-            _alert.Alert(null, AlertMessage, () => SceneManager.LoadScene(titleSceneName));
+            _alert.Alert(null, AlertMessage, () =>
+            {
+                _gameState.ResetGameState();
+                SceneManager.LoadScene(titleSceneName);
+            });
         }
     }
 }
