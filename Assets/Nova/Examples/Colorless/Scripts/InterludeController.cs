@@ -58,6 +58,7 @@ namespace Nova.Examples.Colorless.Scripts
         /// </summary>
         public void Play()
         {
+            _gameState.ActionAquirePause();
             gameObject.SetActive(true);
             StartCoroutine(PlayCoroutine());
         }
@@ -78,6 +79,7 @@ namespace Nova.Examples.Colorless.Scripts
             _chapterSpriteChanger.sprite = null;
             yield return new WaitForSeconds(fadeDuration);
             gameObject.SetActive(false);
+            _gameState.ActionReleasePause();
         }
     }
 }

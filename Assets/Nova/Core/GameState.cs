@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Nova.Exceptions;
+using NUnit.Framework.Interfaces;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -95,6 +97,11 @@ namespace Nova
             checkpointManager = GetComponent<CheckpointManager>();
         }
 
+        /// <summary>
+        /// Aquiring this lock will make the game state pause and wait for the lock being released
+        /// </summary>
+        private readonly CounterLock actionPauseLock = new CounterLock();
+
         #region status
 
         /// <summary>
@@ -132,6 +139,8 @@ namespace Nova
         /// CurrentRouteEnded has been triggered
         /// </summary>
         private bool ended = false;
+
+        private bool actionIsRunnig = false;
 
         #endregion
 
@@ -178,6 +187,32 @@ namespace Nova
         #endregion
 
         private readonly List<string> voicesOfNextDialogue = new List<string>();
+
+        public void ActionAquirePause()
+        {
+            Assert.IsTrue(actionIsRunnig, "Nova: Action pause lock can only be aquired when action is running.");
+            actionPauseLock.Aquire();
+        }
+
+        public void ActionReleasePause()
+        {
+            Assert.IsTrue(actionIsRunnig, "Nova: Action pause lock can only be released when action is running.");
+            actionPauseLock.Release();
+        }
+
+        /// <summary>
+        /// Check if the pause lock has been locked
+        /// </summary>
+        /// <returns>true if the lock is locked</returns>
+        private bool CheckLock()
+        {
+            if (actionPauseLock.isLocked)
+            {
+                Debug.LogWarning("Nova: Can not change game flow when the GameState is locked.");
+            }
+
+            return actionPauseLock.isLocked;
+        }
 
         /// <summary>
         /// Add a voice clip to be played on the next dialogue
@@ -239,17 +274,31 @@ namespace Nova
                     DialogueWillChange.Invoke();
                 }
 
+                actionIsRunnig = true;
                 currentDialogueEntry.ExecuteAction();
-                if (DialogueChanged != null)
-                {
-                    DialogueChanged.Invoke(
-                        new DialogueChangedData(currentNode.name, currentIndex, currentDialogueEntry.text,
-                            new List<string>(voicesOfNextDialogue)));
-                }
-
-                voicesOfNextDialogue.Clear();
+                StartCoroutine(WaitActionEnd());
             }
         }
+
+        private IEnumerator WaitActionEnd()
+        {
+            while (actionPauseLock.isLocked)
+            {
+                yield return null;
+            }
+
+            // everything makes game state pause ended, change dialogue 
+            if (DialogueChanged != null)
+            {
+                DialogueChanged.Invoke(
+                    new DialogueChangedData(currentNode.name, currentIndex, currentDialogueEntry.text,
+                        new List<string>(voicesOfNextDialogue)));
+            }
+
+            voicesOfNextDialogue.Clear();
+            actionIsRunnig = false;
+        }
+
 
         /// <summary>
         /// Move on to the next node
@@ -271,6 +320,8 @@ namespace Nova
         public void MoveBackTo(string nodeName, int dialogueIndex,
             bool forceRefreshDialogue = false, bool forceRefreshNode = false)
         {
+            if (CheckLock()) return;
+
             // restore history
             var backNodeIndex = walkedThroughNodes.FindLastIndex(x => x == nodeName);
             Assert.IsFalse(backNodeIndex < 0,
@@ -311,6 +362,7 @@ namespace Nova
         /// </summary>
         public void GameStart()
         {
+            if (CheckLock()) return;
             var startNode = flowChartTree.DefaultStartUpNode;
             GameStart(startNode);
         }
@@ -321,6 +373,7 @@ namespace Nova
         /// <param name="startName">the name of the start</param>
         public void Gamestart(string startName)
         {
+            if (CheckLock()) return;
             var startNode = flowChartTree.GetStartUpNode(startName);
             GameStart(startNode);
         }
@@ -332,6 +385,12 @@ namespace Nova
         {
             get
             {
+                // Can not step forward when the state is locked
+                if (actionPauseLock.isLocked)
+                {
+                    return false;
+                }
+
                 if (currentNode == null)
                 {
                     Debug.Log("Nova: Can not call Step before game start.");
@@ -364,6 +423,7 @@ namespace Nova
         /// <returns>true if successfully stepped to the next dialogue or trigger some events</returns>
         public bool Step()
         {
+            if (CheckLock()) return false;
             Assert.IsNotNull(currentNode, "Call Step before the game start");
 
             // if have a next dialogue entry in the current node, directly step to the next
@@ -374,12 +434,15 @@ namespace Nova
                 return true;
             }
 
+            var retval = false;
+
             // Reach the end of a node, do something regards on the flow chart node type
             switch (currentNode.type)
             {
                 case FlowChartNodeType.Normal:
                     // for normal node, just step directly to the next node
                     MoveToNextNode(currentNode.Next);
+                    // successfully move to the next node
                     return true;
                 case FlowChartNodeType.Branching:
                     // A branch occurs, inform branch event listeners
@@ -396,6 +459,8 @@ namespace Nova
                         BranchOccurs.Invoke(new BranchOccursData(currentNode.GetAllBranches()));
                     }
 
+                    // some event triggered
+                    retval = true;
                     break;
                 case FlowChartNodeType.End:
                     if (ended)
@@ -417,12 +482,14 @@ namespace Nova
                         CurrentRouteEnded.Invoke(new CurrentRouteEndedData(endName));
                     }
 
+                    // some event triggered
+                    retval = true;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            return false;
+            return retval;
         }
 
         /// <summary>
@@ -436,6 +503,7 @@ namespace Nova
         /// is not called on branch happens</exception>
         public void SelectBranch(string branchName)
         {
+            if (CheckLock()) return;
             if (!isBranching)
             {
                 throw new InvalidAccessException("Nova: Select branch should only be called when a branch happens");
@@ -466,6 +534,7 @@ namespace Nova
         /// </remarks>
         public void ResetGameState()
         {
+            if (CheckLock()) return;
             // Reset all
             walkedThroughNodes = null;
             currentIndex = 0;
@@ -474,6 +543,7 @@ namespace Nova
             currentDialogueEntry = null;
             isBranching = false;
             ended = false;
+            actionIsRunnig = false;
         }
 
         /// <summary>
@@ -562,6 +632,7 @@ namespace Nova
         /// </summary>
         public void LoadBookmark(Bookmark bookmark)
         {
+            if (CheckLock()) return;
             if (BookmarkWillLoad != null)
             {
                 BookmarkWillLoad.Invoke(new BookmarkWillLoadData());
