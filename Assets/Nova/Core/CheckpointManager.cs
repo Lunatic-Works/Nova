@@ -133,9 +133,9 @@ namespace Nova
 
     public enum BookmarkType
     {
-        AutoSave = 0,
-        QuickSave = 10,
-        NormalSave = 20
+        AutoSave = 101,
+        QuickSave = 201,
+        NormalSave = 301
     }
 
     public enum SaveIdQueryType
@@ -152,11 +152,7 @@ namespace Nova
 
             set
             {
-                Type = BookmarkType.AutoSave;
-                if (value >= (int)BookmarkType.QuickSave)
-                    Type = BookmarkType.QuickSave;
-                if (value >= (int)BookmarkType.NormalSave)
-                    Type = BookmarkType.NormalSave;
+                Type = SaveIdToBookmarkType(value);
                 _saveId = value;
             }
         }
@@ -164,6 +160,19 @@ namespace Nova
         public DateTime ModifiedTime;
 
         private int _saveId;
+
+        public static BookmarkType SaveIdToBookmarkType(int saveId)
+        {
+            if (saveId >= (int)BookmarkType.NormalSave)
+            {
+                return BookmarkType.NormalSave;
+            }
+            if (saveId >= (int)BookmarkType.QuickSave)
+            {
+                return BookmarkType.QuickSave;
+            }
+            return BookmarkType.AutoSave;
+        }
     }
 
     /// <summary>
@@ -438,6 +447,25 @@ namespace Nova
                 return filtered.Aggregate((agg, val) => agg.ModifiedTime < val.ModifiedTime ? agg : val).SaveId;
             else
                 return filtered.Aggregate((agg, val) => agg.ModifiedTime > val.ModifiedTime ? agg : val).SaveId;
+        }
+
+        public int QueryMaxSaveId(int begin)
+        {
+            if (!SaveSlotsMetadata.Any())
+            {
+                return begin;
+            }
+            return Math.Max(SaveSlotsMetadata.Keys.Max(), begin);
+        }
+
+        public int QueryMinUnusedSaveId(int begin)
+        {
+            int saveId = begin;
+            while (SaveSlotsMetadata.ContainsKey(saveId))
+            {
+                ++saveId;
+            }
+            return saveId;
         }
     }
 }

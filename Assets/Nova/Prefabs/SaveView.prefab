@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 224147967277301536}
   - component: {fileID: 114060372357682502}
   - component: {fileID: 114703710863413366}
+  - component: {fileID: 114345549358215676}
   m_Layer: 5
   m_Name: SaveView
   m_TagString: Untagged
@@ -757,6 +758,17 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: '>'
+--- !u!114 &114345549358215676
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1260758879597622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf4d2fa6ea996a44ebd5de795daef195, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114365629881345126
 MonoBehaviour:
   m_ObjectHideFlags: 1

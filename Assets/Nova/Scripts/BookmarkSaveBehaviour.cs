@@ -3,17 +3,17 @@ using UnityEngine.EventSystems;
 
 namespace Nova
 {
-    public class TestBookmarkSaveLoadDelete : MonoBehaviour
+    public class BookmarkSaveBehaviour : MonoBehaviour
     {
-        public SaveViewController saveViewController;
-
         private GameState gameState;
         private CheckpointManager checkpointManager;
+        private SaveViewController saveViewController;
 
         void Start()
         {
             gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             checkpointManager = Utils.FindNovaGameController().GetComponent<CheckpointManager>();
+            saveViewController = GetComponent<SaveViewController>();
 
             saveViewController.BookmarkSave.AddListener(OnBookmarkSave);
             saveViewController.BookmarkLoad.AddListener(OnBookmarkLoad);
