@@ -140,9 +140,32 @@ namespace Nova
         /// </summary>
         private bool ended = false;
 
+        /// <summary>
+        /// True when action is running
+        /// </summary>
         private bool actionIsRunnig = false;
 
         #endregion
+
+        /// <summary>
+        /// Reset GameState, make it the same as the game not start
+        /// </summary>
+        /// <remarks>
+        /// No event will be triggered when this method is called
+        /// </remarks>
+        public void ResetGameState()
+        {
+            if (CheckLock()) return;
+            // Reset all
+            walkedThroughNodes = null;
+            currentIndex = 0;
+            currentNode = null;
+            oldIndex = -1;
+            currentDialogueEntry = null;
+            isBranching = false;
+            ended = false;
+            actionIsRunnig = false;
+        }
 
         #region events
 
@@ -188,12 +211,19 @@ namespace Nova
 
         private readonly List<string> voicesOfNextDialogue = new List<string>();
 
+        /// <summary>
+        /// methods invoked from lazy execution blocks can ask the GameState to pause, i.e. dialogue changes only after
+        /// these method release the GameState
+        /// </summary>
         public void ActionAquirePause()
         {
             Assert.IsTrue(actionIsRunnig, "Nova: Action pause lock can only be aquired when action is running.");
             actionPauseLock.Aquire();
         }
 
+        /// <summary>
+        /// methods that aquire pause of the GameState should Release the GameState when their actions finishes
+        /// </summary>
         public void ActionReleasePause()
         {
             Assert.IsTrue(actionIsRunnig, "Nova: Action pause lock can only be released when action is running.");
@@ -206,11 +236,8 @@ namespace Nova
         /// <returns>true if the lock is locked</returns>
         private bool CheckLock()
         {
-            if (actionPauseLock.isLocked)
-            {
-                Debug.LogWarning("Nova: Can not change game flow when the GameState is locked.");
-            }
-
+            Assert.IsFalse(actionPauseLock.isLocked,
+                "Nova: Can not change game flow when the GameState is paused by methods.");
             return actionPauseLock.isLocked;
         }
 
@@ -317,6 +344,8 @@ namespace Nova
         /// </summary>
         /// <param name="nodeName">the node to move to</param>
         /// <param name="dialogueIndex">the index of the dialogue to move to</param>
+        /// <param name="forceRefreshDialogue">force the DialogueChanged event invoked</param>
+        /// <param name="forceRefreshNode">force the NodeChanged event invoked </param>
         public void MoveBackTo(string nodeName, int dialogueIndex,
             bool forceRefreshDialogue = false, bool forceRefreshNode = false)
         {
@@ -526,25 +555,6 @@ namespace Nova
             MoveToNextNode(nextNode);
         }
 
-        /// <summary>
-        /// Reset GameState, make it the same as the game not start
-        /// </summary>
-        /// <remarks>
-        /// No event will be triggered when this method is called
-        /// </remarks>
-        public void ResetGameState()
-        {
-            if (CheckLock()) return;
-            // Reset all
-            walkedThroughNodes = null;
-            currentIndex = 0;
-            currentNode = null;
-            oldIndex = -1;
-            currentDialogueEntry = null;
-            isBranching = false;
-            ended = false;
-            actionIsRunnig = false;
-        }
 
         /// <summary>
         /// All restorable objects
