@@ -387,7 +387,7 @@ namespace Nova
             );
         }
 
-        public void _autoSaveBookmark(int beginSaveId, string tagText)
+        private void _autoSaveBookmark(int beginSaveId, string tagText)
         {
             var bookmark = gameState.GetBookmark();
             var texture = screenCapturer.GetTexture();
@@ -407,7 +407,7 @@ namespace Nova
             _autoSaveBookmark((int)BookmarkType.AutoSave, pageAutoSaveText);
         }
 
-        public void _quickSaveBookmark()
+        private void _quickSaveBookmark()
         {
             _autoSaveBookmark((int)BookmarkType.QuickSave, pageQuickSaveText);
         }
@@ -417,7 +417,7 @@ namespace Nova
             alertController.Alert(null, quickSaveBookmarkComfirmText, () => _quickSaveBookmark());
         }
 
-        public void _quickLoadBookmark()
+        private void _quickLoadBookmark()
         {
             int saveId = checkpointManager.QuerySaveIdByTime((int)BookmarkType.QuickSave, (int)BookmarkType.NormalSave, SaveIdQueryType.Latest);
             var bookmark = checkpointManager.LoadBookmark(saveId);

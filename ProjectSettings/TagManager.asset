@@ -6,7 +6,6 @@ TagManager:
   tags:
   - Alert
   - NovaGameController
-  - SaveView
   layers:
   - Default
   - TransparentFX

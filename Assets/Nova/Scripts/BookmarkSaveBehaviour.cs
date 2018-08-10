@@ -9,15 +9,22 @@ namespace Nova
         private CheckpointManager checkpointManager;
         private SaveViewController saveViewController;
 
-        void Start()
+        private void Start()
         {
             gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             checkpointManager = Utils.FindNovaGameController().GetComponent<CheckpointManager>();
             saveViewController = GetComponent<SaveViewController>();
 
+            gameState.BranchOccurs += OnBranchOccurs;
+
             saveViewController.BookmarkSave.AddListener(OnBookmarkSave);
             saveViewController.BookmarkLoad.AddListener(OnBookmarkLoad);
             saveViewController.BookmarkDelete.AddListener(OnBookmarkDelete);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.BranchOccurs -= OnBranchOccurs;
         }
 
         private void OnBookmarkSave(BookmarkSaveEventData bookmarkSaveEventData)
@@ -39,6 +46,11 @@ namespace Nova
             Debug.Log("Bookmark delete");
             checkpointManager.DeleteBookmark(bookmarkDeleteEventData.saveId);
             saveViewController.ShowPage();
+        }
+
+        private void OnBranchOccurs(BranchOccursData branchOccursData)
+        {
+            saveViewController.AutoSaveBookmark();
         }
     }
 }

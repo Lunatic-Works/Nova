@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 114345549358215676}
   m_Layer: 5
   m_Name: SaveView
-  m_TagString: SaveView
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -441,7 +441,7 @@ MonoBehaviour:
     type: 2}
   maxRow: 3
   maxCol: 3
-  canSave: 1
+  canSave: 0
   BookmarkSave:
     m_PersistentCalls:
       m_Calls: []
