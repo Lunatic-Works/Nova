@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.IO;
-using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Nova.Examples.Colorless.Scripts
 {
