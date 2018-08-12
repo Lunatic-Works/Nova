@@ -1,6 +1,5 @@
 @<| label 'chapter-1'; is_start(); |>
-
-<|interlude:Play()|>
+<| interlude:Play(); |>
 
 <| ergong:Show(); ergong:Say '二宫_01'; play_bgm 'day2'; show_background 'bg_1'; |>
 二宫会长：真没想到，我们竟然会被暴雨困在了教学楼里。
@@ -9,7 +8,7 @@
 
 秋天的雨似乎让她心情不佳。
 
-<| ergong:Hide() |>
+<| ergong:Hide(); |>
 大家坐在学生会室之中，都选择了沉默。
 
 耳畔只能听见淅淅沥沥的雨声枯燥地重复着。
@@ -35,7 +34,7 @@
 
 不过她若是多笑笑，想必能迷倒不少男生。
 
-<| xiben:Hide() |>
+<| xiben:Hide(); |>
 我是真心这样觉得的。
 
 西本成为学生会干事的理由是成绩突出，这也是我能坐在这里的原因。
@@ -163,8 +162,15 @@
 
 <| stop_bgm(); clear_background(); |>
 
+这是一个测试用的选项。。。
+
+@<| branch {
+    {name = '敲妹妹的门', destination = 'chapter-2'},
+    {name = '去音乐会', destination = 'chapter-2'},
+    {name = '带走伊莉雅', destination = 'chapter-2'}}; |>
+
 @<|label 'chapter-2'|>
-<|interlude:Play()|>
+<| interlude:Play(); |>
 
 <| play_bgm 'conspiracy'; show_background 'bg_2'; |>
 竹内：这回又是什么事？
@@ -242,7 +248,7 @@
 <| stop_bgm(); clear_background(); |>
 
 @<|label 'chapter-3'|>
-<|interlude:Play()|>
+<| interlude:Play(); |>
 
 <| play_bgm 'theLostThing'; show_background 'bg_3'; |>
 我在走廊看不断落下的雨让自己的头脑冷静下来。
@@ -325,7 +331,7 @@
 <| stop_bgm(); clear_background(); |>
 
 @<|label 'chapter-4'|>
-<|interlude:Play()|>
+<| interlude:Play(); |>
 
 <| ergong:Show(); ergong:Say '二宫_04'; play_bgm 'redemption'; show_background 'bg_1'; |>
 二宫会长：嗯？为什么拿个杯子会花这么长时间？
@@ -445,4 +451,4 @@
 ……
 
 <| stop_bgm(); clear_background(); |>
-@<| is_end 'colorless' |>
+@<| is_end 'colorless'; |>
