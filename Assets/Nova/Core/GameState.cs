@@ -330,6 +330,7 @@ namespace Nova
                 yield return null;
             }
 
+            state = State.Normal;
             // everything makes game state pause ended, change dialogue 
             if (DialogueChanged != null)
             {
@@ -339,7 +340,6 @@ namespace Nova
             }
 
             voicesOfNextDialogue.Clear();
-            state = State.Normal;
         }
 
 
