@@ -12,6 +12,7 @@ namespace Nova
         public GameObject AlertPanelPrefab;
 
         // Pass title/bodyContent/ignore = null to hide these objects
+        // When onClickConfirm == onClickCancel == null, cancel button will hide
         public void Alert(string title, string bodyContent,
             UnityAction onClickConfirm = null, UnityAction onClickCancel = null,
             Wrap<bool> ignore = null)

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Nova.Exceptions;
-using NUnit.Framework.Interfaces;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -130,20 +129,39 @@ namespace Nova
         /// </summary>
         private DialogueEntry currentDialogueEntry;
 
+        private enum State
+        {
+            Normal,
+            IsBranching,
+            Ended,
+            ActionRunning
+        }
+
+        private State state = State.Normal;
+
         /// <summary>
         /// BranchOccurs has been triggered, but no branch has been selected
         /// </summary>
-        private bool isBranching = false;
+        private bool isBranching
+        {
+            get { return state == State.IsBranching; }
+        }
 
         /// <summary>
         /// CurrentRouteEnded has been triggered
         /// </summary>
-        private bool ended = false;
+        private bool ended
+        {
+            get { return state == State.Ended; }
+        }
 
         /// <summary>
         /// True when action is running
         /// </summary>
-        private bool actionIsRunnig = false;
+        private bool actionIsRunnig
+        {
+            get { return state == State.ActionRunning; }
+        }
 
         #endregion
 
@@ -155,16 +173,14 @@ namespace Nova
         /// </remarks>
         public void ResetGameState()
         {
-            if (CheckLock()) return;
+            if (CheckActionRunnig()) return;
             // Reset all
             walkedThroughNodes = null;
             currentIndex = 0;
             currentNode = null;
             oldIndex = -1;
             currentDialogueEntry = null;
-            isBranching = false;
-            ended = false;
-            actionIsRunnig = false;
+            state = State.Normal;
         }
 
         #region events
@@ -231,14 +247,14 @@ namespace Nova
         }
 
         /// <summary>
-        /// Check if the pause lock has been locked
+        /// Check if action is running
         /// </summary>
-        /// <returns>true if the lock is locked</returns>
-        private bool CheckLock()
+        /// <returns>true if action is running</returns>
+        private bool CheckActionRunnig()
         {
-            Assert.IsFalse(actionPauseLock.isLocked,
+            Assert.IsFalse(actionIsRunnig,
                 "Nova: Can not change game flow when the GameState is paused by methods.");
-            return actionPauseLock.isLocked;
+            return actionIsRunnig;
         }
 
         /// <summary>
@@ -301,7 +317,7 @@ namespace Nova
                     DialogueWillChange.Invoke();
                 }
 
-                actionIsRunnig = true;
+                state = State.ActionRunning;
                 currentDialogueEntry.ExecuteAction();
                 StartCoroutine(WaitActionEnd());
             }
@@ -314,6 +330,7 @@ namespace Nova
                 yield return null;
             }
 
+            state = State.Normal;
             // everything makes game state pause ended, change dialogue 
             if (DialogueChanged != null)
             {
@@ -323,7 +340,6 @@ namespace Nova
             }
 
             voicesOfNextDialogue.Clear();
-            actionIsRunnig = false;
         }
 
 
@@ -349,18 +365,15 @@ namespace Nova
         public void MoveBackTo(string nodeName, int dialogueIndex,
             bool forceRefreshDialogue = false, bool forceRefreshNode = false)
         {
-            if (CheckLock()) return;
+            if (CheckActionRunnig()) return;
 
             // restore history
             var backNodeIndex = walkedThroughNodes.FindLastIndex(x => x == nodeName);
             Assert.IsFalse(backNodeIndex < 0,
                 string.Format("Nova: move back to node {0} that has not been walked through", nodeName));
 
-            // its impossible to branch when goes backward
-            isBranching = false;
-
-            // its impossible to be ended when goes backward
-            ended = false;
+            // state should be normal when goes backward
+            state = State.Normal;
 
             var nodeHistoryRemoveLength = walkedThroughNodes.Count - backNodeIndex - 1;
             walkedThroughNodes.RemoveRange(backNodeIndex + 1, nodeHistoryRemoveLength);
@@ -381,8 +394,7 @@ namespace Nova
         {
             // clear possible history
             walkedThroughNodes = new List<string>();
-            isBranching = false;
-            ended = false;
+            state = State.Normal;
             MoveToNextNode(startNode);
         }
 
@@ -391,7 +403,7 @@ namespace Nova
         /// </summary>
         public void GameStart()
         {
-            if (CheckLock()) return;
+            if (CheckActionRunnig()) return;
             var startNode = flowChartTree.DefaultStartUpNode;
             GameStart(startNode);
         }
@@ -402,7 +414,7 @@ namespace Nova
         /// <param name="startName">the name of the start</param>
         public void Gamestart(string startName)
         {
-            if (CheckLock()) return;
+            if (CheckActionRunnig()) return;
             var startNode = flowChartTree.GetStartUpNode(startName);
             GameStart(startNode);
         }
@@ -414,35 +426,14 @@ namespace Nova
         {
             get
             {
-                // Can not step forward when the state is locked
-                if (actionPauseLock.isLocked)
-                {
-                    return false;
-                }
-
                 if (currentNode == null)
                 {
                     Debug.Log("Nova: Can not call Step before game start.");
                     return false;
                 }
 
-                // can step forward when the player is at the middle of a node
-                if (currentIndex + 1 < currentNode.DialogueEntryCount)
-                {
-                    return true;
-                }
-
-                switch (currentNode.type)
-                {
-                    case FlowChartNodeType.Normal:
-                        return true;
-                    case FlowChartNodeType.Branching:
-                        return !isBranching;
-                    case FlowChartNodeType.End:
-                        return !ended;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                // can step forward only when the state is normal
+                return state == State.Normal;
             }
         }
 
@@ -452,8 +443,9 @@ namespace Nova
         /// <returns>true if successfully stepped to the next dialogue or trigger some events</returns>
         public bool Step()
         {
-            if (CheckLock()) return false;
             Assert.IsNotNull(currentNode, "Call Step before the game start");
+            if (CheckActionRunnig()) return false;
+            if (state != State.Normal) return false; // can step forward only when state is normal
 
             // if have a next dialogue entry in the current node, directly step to the next
             if (currentIndex + 1 < currentNode.DialogueEntryCount)
@@ -462,8 +454,6 @@ namespace Nova
                 UpdateGameState();
                 return true;
             }
-
-            var retval = false;
 
             // Reach the end of a node, do something regards on the flow chart node type
             switch (currentNode.type)
@@ -475,30 +465,15 @@ namespace Nova
                     return true;
                 case FlowChartNodeType.Branching:
                     // A branch occurs, inform branch event listeners
-                    if (isBranching)
-                    {
-                        // A branching is happening, but the player have not decided which branch to select yet
-                        // Break directly to avoid duplicated invocations of the same branching event
-                        break;
-                    }
-
-                    isBranching = true;
+                    state = State.IsBranching;
                     if (BranchOccurs != null)
                     {
                         BranchOccurs.Invoke(new BranchOccursData(currentNode.GetAllBranches()));
                     }
 
-                    // some event triggered
-                    retval = true;
                     break;
                 case FlowChartNodeType.End:
-                    if (ended)
-                    {
-                        // game end, avoid duplicated calls to CurrentRouteEnded
-                        break;
-                    }
-
-                    ended = true;
+                    state = State.Ended;
                     var endName = flowChartTree.GetEndName(currentNode);
                     if (!checkpointManager.IsReached(endName))
                     {
@@ -511,14 +486,12 @@ namespace Nova
                         CurrentRouteEnded.Invoke(new CurrentRouteEndedData(endName));
                     }
 
-                    // some event triggered
-                    retval = true;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            return retval;
+            return true;
         }
 
         /// <summary>
@@ -532,13 +505,13 @@ namespace Nova
         /// is not called on branch happens</exception>
         public void SelectBranch(string branchName)
         {
-            if (CheckLock()) return;
+            if (CheckActionRunnig()) return;
             if (!isBranching)
             {
                 throw new InvalidAccessException("Nova: Select branch should only be called when a branch happens");
             }
 
-            isBranching = false;
+            state = State.Normal;
             var selectedBranchInfo = currentNode.GetAllBranches().First(x => x.name == branchName);
             var nextNode = currentNode.GetNext(branchName);
             if (!checkpointManager.IsReached(currentNode.name, branchName))
@@ -619,7 +592,7 @@ namespace Nova
                     var restoreData = restoreDatas[restorable.Key];
                     restorable.Value.Restore(restoreData);
                 }
-                catch (KeyNotFoundException ex)
+                catch (KeyNotFoundException)
                 {
                     Debug.LogError(
                         string.Format("Key {0} not found in restorableDatas, check if restorable names of " +
@@ -642,7 +615,7 @@ namespace Nova
         /// </summary>
         public void LoadBookmark(Bookmark bookmark)
         {
-            if (CheckLock()) return;
+            if (CheckActionRunnig()) return;
             if (BookmarkWillLoad != null)
             {
                 BookmarkWillLoad.Invoke(new BookmarkWillLoadData());

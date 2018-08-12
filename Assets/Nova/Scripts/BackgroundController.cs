@@ -79,6 +79,10 @@ namespace Nova
             {
                 SetImage(data.currentImageName);
             }
+            else
+            {
+                ClearImage();
+            }
         }
     }
 }

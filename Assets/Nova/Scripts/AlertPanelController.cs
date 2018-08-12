@@ -45,6 +45,11 @@ namespace Nova
                 _bodyContent.text = bodyContent;
             }
 
+            if (onClickConfirm == null && onClickCancel == null)
+            {
+                _cancelButton.gameObject.SetActive(false);
+            }
+
             if (onClickConfirm != null)
             {
                 _confirmButton.onClick.AddListener(onClickConfirm);

@@ -32,7 +32,6 @@ namespace Nova
             {
                 return info;
             }
-
             return dict[key] = new TV();
         }
 
@@ -53,7 +52,6 @@ namespace Nova
                     "Nova: Can not find Nova game controller by tag. May be you should put" +
                     " NovaCreator prefab in your scene");
             }
-
             return gameController;
         }
     }
