@@ -680,6 +680,23 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 186745585}
   m_Script: {fileID: 11500000, guid: a62cf927628e24326bffdf99556c4ed1, type: 3}
+--- !u!1 &202323507 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1404340703567984, guid: a2da3930c415b6d4cbead0ecdfb099fd,
+    type: 2}
+  m_PrefabInternal: {fileID: 1169794659}
+--- !u!114 &202323509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 202323507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InflateTextKey: bookmark.save.button
 --- !u!224 &219824210 stripped
 RectTransform:
   m_PrefabParentObject: {fileID: 224147967277301536, guid: a2da3930c415b6d4cbead0ecdfb099fd,
@@ -1031,6 +1048,23 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3ea442272877e46ae84c2a32213a9128, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &369786771 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1058400234565340, guid: a2da3930c415b6d4cbead0ecdfb099fd,
+    type: 2}
+  m_PrefabInternal: {fileID: 1169794659}
+--- !u!114 &369786773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 369786771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InflateTextKey: bookmark.load.button
 --- !u!224 &480733998 stripped
 RectTransform:
   m_PrefabParentObject: {fileID: 224026901384816642, guid: 25c55837898d243bd9aae9dc64f493f5,
@@ -1465,6 +1499,23 @@ Transform:
   m_PrefabParentObject: {fileID: 4223318419706732, guid: e708087f7cf8343899832a554e39a531,
     type: 2}
   m_PrefabInternal: {fileID: 736516876}
+--- !u!1 &856959186 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1843069274754796, guid: 25c55837898d243bd9aae9dc64f493f5,
+    type: 2}
+  m_PrefabInternal: {fileID: 186745585}
+--- !u!114 &856959188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 856959186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InflateTextKey: ingame.log.button
 --- !u!1001 &934301089
 Prefab:
   m_ObjectHideFlags: 0
@@ -2100,6 +2151,23 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 1169794659}
   m_Script: {fileID: 11500000, guid: f59ec61cb63f52b4885061e3945f5435, type: 3}
+--- !u!1 &1333717687 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1441163757359176, guid: 25c55837898d243bd9aae9dc64f493f5,
+    type: 2}
+  m_PrefabInternal: {fileID: 186745585}
+--- !u!114 &1333717689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1333717687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InflateTextKey: ingame.save.button
 --- !u!1001 &1506687614
 Prefab:
   m_ObjectHideFlags: 0
@@ -2142,6 +2210,57 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1afd3bb28e69148ba92e05bf594c5bc9, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &1519865036 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1738047415438122, guid: 25c55837898d243bd9aae9dc64f493f5,
+    type: 2}
+  m_PrefabInternal: {fileID: 186745585}
+--- !u!114 &1519865038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1519865036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InflateTextKey: ingame.load.button
+--- !u!1 &1532100453 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1306760637683996, guid: 25c55837898d243bd9aae9dc64f493f5,
+    type: 2}
+  m_PrefabInternal: {fileID: 186745585}
+--- !u!114 &1532100455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1532100453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InflateTextKey: ingame.title.button
+--- !u!1 &1610308438 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1724592595068208, guid: 25c55837898d243bd9aae9dc64f493f5,
+    type: 2}
+  m_PrefabInternal: {fileID: 186745585}
+--- !u!114 &1610308440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1610308438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InflateTextKey: ingame.skip.button
 --- !u!1 &1628752917
 GameObject:
   m_ObjectHideFlags: 0
@@ -2426,6 +2545,23 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ed28a84bf5bed423a9613c9aefa4dd7b, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &2108177569 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1393563891836574, guid: 25c55837898d243bd9aae9dc64f493f5,
+    type: 2}
+  m_PrefabInternal: {fileID: 186745585}
+--- !u!114 &2108177571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2108177569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InflateTextKey: ingame.auto.button
 --- !u!224 &2127728453 stripped
 RectTransform:
   m_PrefabParentObject: {fileID: 224333530190884814, guid: b41742e0d6317446aaf0903bf13917fa,

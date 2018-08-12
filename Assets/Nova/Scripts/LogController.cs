@@ -10,8 +10,6 @@ namespace Nova
     {
         public GameObject LogEntryPrefab;
 
-        private const string goBackLogComfirmText = "退回到这句话？";
-
         private GameState gameState;
 
         private GameObject logPanel;
@@ -93,7 +91,7 @@ namespace Nova
 
         private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
         {
-            alertController.Alert(null, goBackLogComfirmText,
+            alertController.Alert(null, I18n.__("log.back.confirm"),
                 () => _onGoBackButtonClicked(nodeName, dialogueIndex, logEntryIndex));
         }
 

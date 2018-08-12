@@ -7,7 +7,6 @@ namespace Nova.Examples.Colorless.Scripts
     public class TitleButtonController : MonoBehaviour
     {
         private AlertController _alert;
-        public string AlertMessage;
 
         public string titleSceneName;
 
@@ -23,7 +22,7 @@ namespace Nova.Examples.Colorless.Scripts
 
         private void OnClick()
         {
-            _alert.Alert(null, AlertMessage, () =>
+            _alert.Alert(null, I18n.__("ingame.title.confirm"), () =>
             {
                 _gameState.ResetGameState();
                 SceneManager.LoadScene(titleSceneName);

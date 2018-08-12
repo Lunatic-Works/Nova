@@ -81,10 +81,6 @@ namespace Nova
         public BookmarkLoadEvent BookmarkLoad;
         public BookmarkDeleteEvent BookmarkDelete;
 
-        private const string saveBookmarkComfirmText = "覆盖存档{0}？";
-        private const string loadBookmarkComfirmText = "读取存档{0}？";
-        private const string deleteBookmarkComfirmText = "删除存档{0}？";
-
         private GameState gameState;
         private CheckpointManager checkpointManager;
 
@@ -144,7 +140,6 @@ namespace Nova
         private Sprite screenSprite;
 
         private const string dateTimeFormat = "yyyy/MM/dd HH:mm";
-        private string previewTextFormat;
         private string currentNodeName;
         private string currentDialogueText;
 
@@ -205,8 +200,6 @@ namespace Nova
             }
 
             screenCapturer = gameObject.GetComponent<ScreenCapturer>();
-
-            previewTextFormat = thumbnailText.text;
 
             alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
             
@@ -298,7 +291,7 @@ namespace Nova
         {
             alertController.Alert(
                 null,
-                string.Format(saveBookmarkComfirmText, saveId),
+                I18n.__("bookmark.overwrite.confirm", saveId),
                 () => _saveBookmark(saveId)
             );
         }
@@ -313,7 +306,7 @@ namespace Nova
         {
             alertController.Alert(
                 null,
-                string.Format(loadBookmarkComfirmText, saveId),
+                I18n.__("bookmark.load.confirm", saveId),
                 () => _loadBookmark(saveId)
             );
         }
@@ -328,7 +321,7 @@ namespace Nova
         {
             alertController.Alert(
                 null,
-                string.Format(deleteBookmarkComfirmText, saveId),
+                I18n.__("bookmark.delete.confirm", saveId),
                 () => _deleteBookmark(saveId)
             );
         }
@@ -435,8 +428,8 @@ namespace Nova
 
         private void ShowPreviewScreen()
         {
-            ShowPreview(screenSprite, string.Format(
-                previewTextFormat,
+            ShowPreview(screenSprite, I18n.__(
+                "bookmark.summary",
                 DateTime.Now.ToString(dateTimeFormat),
                 currentNodeName,
                 currentDialogueText
@@ -446,8 +439,8 @@ namespace Nova
         private void ShowPreviewBookmark(int saveId)
         {
             Bookmark bookmark = checkpointManager[saveId];
-            ShowPreview(GetThumbnailSprite(saveId), string.Format(
-                previewTextFormat,
+            ShowPreview(GetThumbnailSprite(saveId), I18n.__(
+                "bookmark.summary",
                 usedSaveSlots[saveId].ModifiedTime.ToString(dateTimeFormat),
                 bookmark.NodeHistory.Last(),
                 bookmark.Description

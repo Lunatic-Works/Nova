@@ -214,7 +214,7 @@ namespace Nova
             else
                 ResetGlobalSave();
 
-            var regex = new Regex("sav([0-9]+).nsav");
+            var regex = new Regex(@"sav([0-9]+)\.nsav");
             foreach (var name in Directory.GetFiles(_savePathBase, "sav*.nsav"))
             {
                 var result = regex.Match(name);
