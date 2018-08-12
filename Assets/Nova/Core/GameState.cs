@@ -592,7 +592,7 @@ namespace Nova
                     var restoreData = restoreDatas[restorable.Key];
                     restorable.Value.Restore(restoreData);
                 }
-                catch (KeyNotFoundException ex)
+                catch (KeyNotFoundException)
                 {
                     Debug.LogError(
                         string.Format("Key {0} not found in restorableDatas, check if restorable names of " +
