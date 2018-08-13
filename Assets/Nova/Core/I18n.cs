@@ -158,7 +158,7 @@ namespace Nova
 
         private string EditorPathRoot
         {
-            get { return "Assets/Resources/" + LocalePath; }
+            get { return "Assets/Nova/Resources/" + LocalePath; }
         }
         private DateTime _lastWriteTime;
         private void EditorOnly_SaveTranslation()
