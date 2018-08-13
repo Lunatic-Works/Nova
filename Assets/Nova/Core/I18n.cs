@@ -25,9 +25,24 @@ namespace Nova
     {
         public static readonly I18n Instance = new I18n();
 
-        private TranslationBundle _translationData;
+        /// <summary>
+        /// Translation data with a fallback chain.
+        /// </summary>
+        private List<TranslationBundle> _translationDatas = new List<TranslationBundle>();
 
+        /// <summary>
+        /// Supported locales. The first one is also the default and final fallback for all languages.
+        /// </summary>
         private readonly SystemLanguage[] _locales = { SystemLanguage.Chinese, SystemLanguage.English };
+
+        /// <summary>
+        /// Fallback locale definition. _fallbacks[NotFoundLanguage] = FallbackLanguage
+        /// </summary>
+        private readonly Dictionary<SystemLanguage, SystemLanguage> _fallbacks = new Dictionary<SystemLanguage, SystemLanguage>()
+        {
+            { SystemLanguage.ChineseSimplified, SystemLanguage.Chinese },
+            { SystemLanguage.ChineseTraditional, SystemLanguage.Chinese }
+        };
         private SystemLanguage _currentLocale = Application.systemLanguage;
 
         public SystemLanguage CurrentLocale
@@ -43,42 +58,44 @@ namespace Nova
             Init();
         }
 
+        private void ChainLoadLanguage(SystemLanguage locale)
+        {
+            try
+            {
+                if (_locales.Contains(locale))
+                {
+#if UNITY_EDITOR
+                    var all = File.ReadAllText(EditorPathRoot + locale + ".json");
+                    _translationDatas.Add(JsonConvert.DeserializeObject<TranslationBundle>(all));
+#else
+                    var all = Resources.Load(LocalePath + locale) as TextAsset;
+                    _translationDatas.Add(JsonConvert.DeserializeObject<TranslationBundle>(all.text));
+#endif
+                }
+                else
+                    throw new Exception();
+            }
+            catch
+            {
+                Debug.LogWarning("Nova: Locale [" + _currentLocale + "] not found in supported list");
+#if UNITY_EDITOR
+                _translationDatas.Add(new TranslationBundle());
+                EditorOnly_SaveTranslation();
+#endif
+            }
+            SystemLanguage next;
+            if (_fallbacks.TryGetValue(locale, out next))
+                ChainLoadLanguage(next);
+            else if (_locales[0] != locale)
+                ChainLoadLanguage(_locales[0]);
+        }
+
         private void Init()
         {
+            _translationDatas.Clear();
+            ChainLoadLanguage(CurrentLocale);
 #if UNITY_EDITOR
-            try
-            {
-                if (_locales.Contains(_currentLocale))
-                {
-                    var all = File.ReadAllText(EditorTranslationPath);
-                    _translationData = JsonConvert.DeserializeObject<TranslationBundle>(all);
-                    _lastWriteTime = File.GetLastWriteTime(EditorTranslationPath);
-                }
-                else
-                    throw new Exception();
-            }
-            catch
-            {
-                Debug.LogWarning("Nova: Locale [" + _currentLocale + "] not found in supported list");
-                _translationData = new TranslationBundle();
-                EditorOnly_SaveTranslation();
-            }
-#else
-            try
-            {
-                if (_locales.Contains(_currentLocale))
-                {
-                    var all = Resources.Load(LocalePath + _currentLocale) as TextAsset;
-                    _translationData = JsonConvert.DeserializeObject<TranslationBundle>(all.text);
-                }
-                else
-                    throw new Exception();
-            }
-            catch
-            {
-                Debug.LogWarning("Nova: Locale [" + _currentLocale + "] not found in supported list");
-                _translationData = new TranslationBundle();
-            }
+            _lastWriteTime = File.GetLastWriteTime(EditorTranslationPath);
 #endif
         }
 
@@ -112,41 +129,52 @@ namespace Nova
 #endif
             string translation = key;
             object raw;
-            if (_translationData.TryGetValue(key, out raw))
+            int i = 0, n = _translationDatas.Count;
+            for (i = 0; i < n; i++)
             {
-                if (raw is string)
-                    translation = raw as string;
-                else if (raw is string[])
+                if (_translationDatas[i].TryGetValue(key, out raw))
                 {
-                    var formats = raw as string[];
-                    if (formats.Length == 0)
-                        Debug.LogWarning("Nova: Empty string list for: " + key);
-                    else if (args.Length == 0)
-                        translation = formats[0];
-                    else
+                    if (raw is string)
+                        translation = raw as string;
+                    else if (raw is string[])
                     {
-                        // Assuming the first argument will determine the quantity
-                        object arg1 = args[0];
-                        long quantity = -1;
-                        if (arg1 is int || arg1 is short || arg1 is long)
-                            quantity = (long) arg1;
-                        else if (arg1 is string && !long.TryParse(arg1 as string, out quantity))
-                            quantity = -1;
-                        if (quantity != -1)
-                            translation = formats[Math.Min(quantity, formats.Length - 1)];
+                        var formats = raw as string[];
+                        if (formats.Length == 0)
+                            Debug.LogWarning("Nova: Empty string list for: " + key);
+                        else if (args.Length == 0)
+                            translation = formats[0];
+                        else
+                        {
+                            // Assuming the first argument will determine the quantity
+                            object arg1 = args[0];
+                            long quantity = -1;
+                            if (arg1 is int || arg1 is short || arg1 is long)
+                                quantity = (long)arg1;
+                            else if (arg1 is string && !long.TryParse(arg1 as string, out quantity))
+                                quantity = -1;
+                            if (quantity != -1)
+                                translation = formats[Math.Min(quantity, formats.Length - 1)];
+                        }
                     }
-                }
-                if (args.Length > 0)
-                    translation = string.Format(translation, args);
-            }
-            else
-            {
-                Debug.LogWarning("Nova: Missing translation for: " + key);
-                _translationData.Add(key, key);
+                    if (args.Length > 0)
+                        translation = string.Format(translation, args);
 #if UNITY_EDITOR
-                EditorOnly_SaveTranslation();
+                    if (translation == key)
+                        continue;
 #endif
+                    break;
+                }
+                if (i == 0)
+                    Debug.LogWarning("Nova: Missing translation for: " + key);
             }
+#if UNITY_EDITOR
+            if (translation == key)
+            {
+                // Translation is not found by all means
+                _translationDatas[0].Add(key, key);
+                EditorOnly_SaveTranslation();
+            }
+#endif
             return translation;
         }
 
@@ -164,7 +192,7 @@ namespace Nova
         private void EditorOnly_SaveTranslation()
         {
             Directory.CreateDirectory(EditorPathRoot);
-            File.WriteAllText(EditorTranslationPath, JsonConvert.SerializeObject(_translationData, Formatting.Indented));
+            File.WriteAllText(EditorTranslationPath, JsonConvert.SerializeObject(_translationDatas[0], Formatting.Indented));
             _lastWriteTime = File.GetLastWriteTime(EditorTranslationPath);
         }
 
