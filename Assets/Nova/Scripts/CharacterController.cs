@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using Nova;
 using UnityEngine;
 
 namespace Nova
@@ -11,20 +11,34 @@ namespace Nova
 
         public string voiceFileFolder;
 
-        public GameState gameState;
+        /// TODO read config
+        private bool stopVoiceWhenDialogueWillChange
+        {
+            get { return true; }
+        }
+
+        private GameState gameState;
 
         private AudioSource audioSource;
 
         private GameObject characterAppearance;
 
-        private void Start()
+        private void Awake()
         {
             LuaRuntime.Instance.BindObject(characterVariableName, this, "_G");
             audioSource = GetComponent<AudioSource>();
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
-            gameState.DialogueWillChange.AddListener(OnDialogueWillChange);
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            gameState.DialogueChanged += OnDialogueChanged;
+            gameState.DialogueWillChange += OnDialogueWillChange;
             characterAppearance = transform.Find("Appearance").gameObject;
             gameState.AddRestorable(this);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.DialogueChanged -= OnDialogueChanged;
+            gameState.DialogueWillChange -= OnDialogueWillChange;
+            gameState.RemoveRestorable(this);
         }
 
         private bool willSaySomething = false;
@@ -34,7 +48,7 @@ namespace Nova
         /// </summary>
         private void OnDialogueWillChange()
         {
-            if (audioSource.isPlaying)
+            if (stopVoiceWhenDialogueWillChange && audioSource.isPlaying)
             {
                 audioSource.Stop();
             }
@@ -43,8 +57,8 @@ namespace Nova
         /// <summary>
         /// Play the voice when the dialogue actually changes
         /// </summary>
-        /// <param name="dialogueChangedEventData"></param>
-        private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
+        /// <param name="dialogueChangedData"></param>
+        private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
             if (willSaySomething)
             {
@@ -66,7 +80,7 @@ namespace Nova
         /// <param name="voiceFileName"></param>
         public void Say(string voiceFileName)
         {
-            voiceFileName = voiceFileFolder + voiceFileName;
+            voiceFileName = System.IO.Path.Combine(voiceFileFolder, voiceFileName);
             var audio = AssetsLoader.GetAudioClip(voiceFileName);
             // A character has only one mouth
             if (audioSource.isPlaying)
@@ -108,6 +122,7 @@ namespace Nova
 
         #endregion
 
+        [Serializable]
         private class RestoreData : IRestoreData
         {
             public bool isActive { get; private set; }

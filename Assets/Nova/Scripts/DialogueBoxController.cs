@@ -18,13 +18,7 @@ namespace Nova
 
     public class DialogueBoxController : MonoBehaviour, IPointerClickHandler
     {
-        private Text dialogueTextArea;
-
-        private Text nameTextArea;
-
-        public GameState gameState;
-
-        public bool needAniamtion;
+        public bool needAnimation;
 
         public float characterDisplayDuration;
 
@@ -38,15 +32,44 @@ namespace Nova
         /// </summary>
         public int nameGroup;
 
-        private void Start()
-        {
-            dialogueTextArea = transform.Find("DialogueBox/DialogueText").gameObject.GetComponent<Text>();
-            nameTextArea = transform.Find("DialogueBox/Name/NameText").gameObject.GetComponent<Text>();
+        private GameState gameState;
 
-            gameState.DialogueChanged.AddListener(OnDialogueChange);
-            gameState.BranchOccurs.AddListener(OnBranchOcurrs);
-            gameState.BranchSelected.AddListener(OnBranchSelected);
-            gameState.CurrentRouteEnded.AddListener(OnCurrentRounteEnded);
+        private GameObject nameBox;
+        private Text nameTextArea;
+        private Text dialogueTextArea;
+
+        private void Awake()
+        {
+            nameBox = transform.Find("NameBox").gameObject;
+            nameTextArea = nameBox.transform.Find("Text").GetComponent<Text>();
+            dialogueTextArea = transform.Find("DialogueBox/Text").GetComponent<Text>();
+
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            gameState.DialogueWillChange += OnDialogueWillChange;
+            gameState.DialogueChanged += OnDialogueChanged;
+            gameState.BranchOccurs += OnBranchOcurrs;
+            gameState.BranchSelected += OnBranchSelected;
+            gameState.CurrentRouteEnded += OnCurrentRouteEnded;
+        }
+
+        private void OnCurrentRouteEnded(CurrentRouteEndedData arg0)
+        {
+            State = DialogueBoxState.Normal;
+        }
+
+        private void OnDialogueWillChange()
+        {
+            StopTimer();
+        }
+
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
+            gameState.DialogueWillChange -= OnDialogueWillChange;
+            gameState.DialogueChanged -= OnDialogueChanged;
+            gameState.BranchOccurs -= OnBranchOcurrs;
+            gameState.BranchSelected -= OnBranchSelected;
+            gameState.CurrentRouteEnded -= OnCurrentRouteEnded;
         }
 
         private string currentName;
@@ -76,9 +99,11 @@ namespace Nova
                         break;
                     case DialogueBoxState.Auto:
                         StopAuto();
+                        AutoModeStops.Invoke();
                         break;
                     case DialogueBoxState.Skip:
                         StopSkip();
+                        SkipModeStops.Invoke();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -91,9 +116,11 @@ namespace Nova
                         break;
                     case DialogueBoxState.Auto:
                         BeginAuto();
+                        AutoModeStarts.Invoke();
                         break;
                     case DialogueBoxState.Skip:
                         BeginSkip();
+                        SkipModeStarts.Invoke();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("value", value, null);
@@ -101,42 +128,73 @@ namespace Nova
             }
         }
 
+        public UnityEvent AutoModeStarts;
+        public UnityEvent AutoModeStops;
+        public UnityEvent SkipModeStarts;
+        public UnityEvent SkipModeStops;
+
         private bool isAnimating;
 
         /// <summary>
         /// The content of the dialogue box needs to be changed
         /// </summary>
         /// <param name="text"></param>
-        private void OnDialogueChange(DialogueChangedEventData dialogueData)
+        private void OnDialogueChanged(DialogueChangedData dialogueData)
         {
+            RestartTimer();
             var text = dialogueData.text;
             Debug.Log(string.Format("<color=green><b>{0}</b></color>", text));
 
             // Parse dialogue text
-            var m = Regex.Match(text, namePattern);
-            var dialogueStartIndex = 0;
-            if (m.Success)
+            ParseDialogueText(text);
+
+            // Change display
+            ChangeDisplay();
+
+            // Check current state and set schedule skip
+            SetSchedule();
+        }
+
+        private void SetSchedule()
+        {
+            TryRemoveSchedule();
+            switch (State)
             {
-                currentName = m.Groups[nameGroup].Value;
-                dialogueStartIndex = m.Length;
+                case DialogueBoxState.Normal:
+                    break;
+                case DialogueBoxState.Auto:
+                    TrySchedule(GetAutoScheduledTime());
+                    break;
+                case DialogueBoxState.Skip:
+                    TrySchedule(SkipDelay);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Change display based on current name and current dialogue
+        /// </summary>
+        private void ChangeDisplay()
+        {
+            if (currentName == "")
+            {
+                nameBox.SetActive(false);
             }
             else
             {
-                // no name is found
-                currentName = "";
+                nameBox.SetActive(true);
+                nameTextArea.text = currentName;
             }
 
-            currentDialogue = text.Substring(dialogueStartIndex).Trim();
-
-            // change display
-            nameTextArea.text = currentName;
-            if (!needAniamtion)
+            if (!needAnimation)
             {
                 dialogueTextArea.text = currentDialogue;
                 return;
             }
 
-            // need animantion
+            // Need animantion
             if (isAnimating)
             {
                 StopCharacterAnimation();
@@ -145,13 +203,34 @@ namespace Nova
             StartCharacterAnimation();
         }
 
+        /// <summary>
+        /// Set current name and current dialogue based on dialogue text
+        /// </summary>
+        /// <param name="text">the dialogue text</param>
+        private void ParseDialogueText(string text)
+        {
+            var m = Regex.Match(text, namePattern);
+            var dialogueStartIndex = 0;
+            if (m.Success)
+            {
+                currentName = m.Groups[nameGroup].Value;
+                dialogueStartIndex = m.Length;
+            }
+            else // No name is found
+            {
+                currentName = "";
+            }
+
+            currentDialogue = text.Substring(dialogueStartIndex).Trim();
+        }
+
         private DialogueBoxState stateBeforeBranch;
 
         /// <summary>
         /// Make the state normal when branch occurs
         /// </summary>
-        /// <param name="branchOccursEventData"></param>
-        private void OnBranchOcurrs(BranchOccursEventData branchOccursEventData)
+        /// <param name="branchOccursData"></param>
+        private void OnBranchOcurrs(BranchOccursData branchOccursData)
         {
             stateBeforeBranch = State;
             State = DialogueBoxState.Normal;
@@ -163,8 +242,8 @@ namespace Nova
         /// <summary>
         /// Check if should restore the previous state before the branch happens
         /// </summary>
-        /// <param name="branchSelectedEventData"></param>
-        private void OnBranchSelected(BranchSelectedEventData branchSelectedEventData)
+        /// <param name="branchSelectedData"></param>
+        private void OnBranchSelected(BranchSelectedData branchSelectedData)
         {
             Assert.AreEqual(State, DialogueBoxState.Normal, "DialogueBoxState.Normal != DialogueBox.State");
             switch (stateBeforeBranch)
@@ -180,15 +259,6 @@ namespace Nova
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        /// <summary>
-        /// Stop all posible coroutine when game ends
-        /// </summary>
-        /// <param name="currentRouteEndedEventData"></param>
-        private void OnCurrentRounteEnded(CurrentRouteEndedEventData currentRouteEndedEventData)
-        {
-            State = DialogueBoxState.Normal;
         }
 
         private void StartCharacterAnimation()
@@ -225,6 +295,8 @@ namespace Nova
         /// <returns></returns>
         private IEnumerator CharacterAnimation()
         {
+            // empty text Area to handle the case when the dialogue is empty
+            dialogueTextArea.text = "";
             for (var index = 1; index <= currentDialogue.Length; ++index)
             {
                 dialogueTextArea.text = currentDialogue.Substring(0, index);
@@ -235,11 +307,30 @@ namespace Nova
             isAnimating = false;
         }
 
-        private Coroutine autoCoroutine = null;
+        private Coroutine scheduledStepCoroutine = null;
 
         public float AutoWaitTimePerCharacter;
 
-        public UnityEvent AutoModeStarts;
+
+        private void TrySchedule(float scheduledDelay)
+        {
+            if (dialogueAvaliable)
+            {
+                scheduledStepCoroutine = StartCoroutine(ScheduledStep(scheduledDelay));
+            }
+        }
+
+        private void TryRemoveSchedule()
+        {
+            if (scheduledStepCoroutine == null) return;
+            StopCoroutine(scheduledStepCoroutine);
+            scheduledStepCoroutine = null;
+        }
+
+        private float GetAutoScheduledTime()
+        {
+            return AutoWaitTimePerCharacter * currentDialogue.Length;
+        }
 
         /// <summary>
         /// Start auto
@@ -251,17 +342,9 @@ namespace Nova
         {
             Assert.AreEqual(State, DialogueBoxState.Normal, "DialogueBoxState State != DialogueBoxState.Normal");
             _state = DialogueBoxState.Auto;
-            AutoModeStarts.Invoke();
-            // Make sure no one stop auto mode after immediately recieves an AutoModeStarts event
-            // There is no need to worry about BeginAuto method called again when this event happens, since
-            // This is a private method called by the setter of State
-            if (_state == DialogueBoxState.Auto)
-            {
-                autoCoroutine = StartCoroutine(Auto());
-            }
+            TrySchedule(GetAutoScheduledTime());
         }
 
-        public UnityEvent AutoModeStops;
 
         /// <summary>
         /// Stop Auto
@@ -273,39 +356,12 @@ namespace Nova
         {
             Assert.AreEqual(State, DialogueBoxState.Auto, "DialogueBoxState State != DialogueBoxState.Auto");
             _state = DialogueBoxState.Normal;
-            // The if condition here is to make sure no error will be raised if someone switch the State immediately
-            // after receives AutoModeStarts event
-            if (autoCoroutine != null)
-            {
-                StopCoroutine(autoCoroutine);
-                autoCoroutine = null;
-            }
-
-            AutoModeStops.Invoke();
+            TryRemoveSchedule();
         }
 
-        private IEnumerator Auto()
-        {
-            while (true)
-            {
-                if (currentDialogue == null)
-                {
-                    Debug.LogError("current dialogue not set, Auto mode stop");
-                    _state = DialogueBoxState.Normal;
-                    AutoModeStops.Invoke();
-                    yield break;
-                }
-
-                yield return new WaitForSeconds(currentDialogue.Length * AutoWaitTimePerCharacter);
-                gameState.Step();
-            }
-        }
-
-        private Coroutine skipCoroutine = null;
-        private float SkipDuration;
+        public float SkipDelay;
         private bool shouldNeedAnimation;
 
-        public UnityEvent SkipModeStarts;
 
         /// <summary>
         /// Begin skip
@@ -318,20 +374,11 @@ namespace Nova
             Assert.AreEqual(State, DialogueBoxState.Normal, "DialogueBoxState State != DialogueBoxState.Normal");
             // Stop character animation
             StopCharacterAnimation();
-            shouldNeedAnimation = needAniamtion;
-            needAniamtion = false;
+            shouldNeedAnimation = needAnimation;
+            needAnimation = false;
             _state = DialogueBoxState.Skip;
-            SkipModeStarts.Invoke();
-            // Make sure no one stop skip mode after immediately recieves an SkipModeStarts event
-            // There is no need to worry about BeginSkip method called again when this event happens, since
-            // This is a private method called by the setter of State
-            if (_state == DialogueBoxState.Skip)
-            {
-                skipCoroutine = StartCoroutine(Skip());
-            }
+            TrySchedule(SkipDelay);
         }
-
-        public UnityEvent SkipModeStops;
 
         /// <summary>
         /// Stop skip
@@ -342,34 +389,54 @@ namespace Nova
         private void StopSkip()
         {
             Assert.AreEqual(State, DialogueBoxState.Skip, "DialogueBoxState State != DialogueBoxState.Skip");
-            needAniamtion = shouldNeedAnimation;
+            needAnimation = shouldNeedAnimation;
             _state = DialogueBoxState.Normal;
-            // The if condition here is to make sure no error will be raised if someone switch the State immediately
-            // after receives SkipModeStarts event
-            if (skipCoroutine != null)
-            {
-                StopCoroutine(skipCoroutine);
-                skipCoroutine = null;
-            }
-
-            SkipModeStops.Invoke();
+            TryRemoveSchedule();
         }
 
-        private IEnumerator Skip()
+        private IEnumerator ScheduledStep(float scheduledDelay)
         {
-            while (true)
+            Assert.IsTrue(dialogueAvaliable, "Dialogue should available when a step scheduled for it");
+            while (scheduledDelay > timeAfterDialogueChange)
             {
-                if (currentDialogue == null)
-                {
-                    Debug.LogError("current dialogue not set, Skip mode stop");
-                    _state = DialogueBoxState.Normal;
-                    needAniamtion = shouldNeedAnimation;
-                    SkipModeStops.Invoke();
-                    yield break;
-                }
+                yield return new WaitForSeconds(scheduledDelay - timeAfterDialogueChange);
+            }
 
+            // Pause one frame before step
+            // Give time for rendering and can stop schedule step in time before any unwanted effects occurs
+            yield return null;
+
+            if (gameState.canStepForward)
+            {
                 gameState.Step();
-                yield return new WaitForSeconds(SkipDuration);
+            }
+            else
+            {
+                State = DialogueBoxState.Normal;
+            }
+        }
+
+        private float timeAfterDialogueChange;
+
+        private bool dialogueAvaliable;
+
+        private void StopTimer()
+        {
+            timeAfterDialogueChange = 0;
+            dialogueAvaliable = false;
+        }
+
+        private void RestartTimer()
+        {
+            timeAfterDialogueChange = 0;
+            dialogueAvaliable = true;
+        }
+
+        private void Update()
+        {
+            if (dialogueAvaliable)
+            {
+                timeAfterDialogueChange += Time.deltaTime;
             }
         }
 
@@ -387,11 +454,6 @@ namespace Nova
             }
 
             State = DialogueBoxState.Normal;
-        }
-
-        private void OnDestroy()
-        {
-            StopAllCoroutines();
         }
     }
 }

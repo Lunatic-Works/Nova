@@ -2,38 +2,51 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Nova
 {
     public class LogController : MonoBehaviour
     {
-        public GameState gameState;
-
         public GameObject LogEntryPrefab;
 
-        private GameObject logContent;
+        private GameState gameState;
 
         private GameObject logPanel;
-
+        private ScrollRect scrollRect;
+        private GameObject logContent;
         private readonly List<GameObject> logEntries = new List<GameObject>();
+
+        private AlertController alertController;
 
         private void Awake()
         {
             logPanel = transform.Find("LogPanel").gameObject;
-            logContent = logPanel.transform.Find("ScrollView/Viewport/Content").gameObject;
-            gameState.DialogueChanged.AddListener(OnDialogueChanged);
+            scrollRect = logPanel.transform.Find("ScrollView").GetComponent<ScrollRect>();
+            logContent = scrollRect.transform.Find("Viewport/Content").gameObject;
+            alertController = GameObject.FindWithTag("Alert").GetComponent<AlertController>();
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            gameState.DialogueChanged += OnDialogueChanged;
+            gameState.BookmarkWillLoad += OnBookmarkWillLoad;
         }
 
-        private void OnDialogueChanged(DialogueChangedEventData dialogueChangedEventData)
+        private void OnDestroy()
+        {
+            gameState.DialogueChanged -= OnDialogueChanged;
+            gameState.BookmarkWillLoad -= OnBookmarkWillLoad;
+        }
+
+        private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
             var logEntry = Instantiate(LogEntryPrefab);
-            var logEntryController = logEntry.GetComponent<LogEntryController>();
-            var logEntryIndex = logEntries.Count;
-            var currentNodeName = dialogueChangedEventData.labelName;
-            var currentDialogueIndex = dialogueChangedEventData.dialogueIndex;
-            var voices = dialogueChangedEventData.voicesForNextDialogue;
+            logEntry.transform.SetParent(logContent.transform);
+            logEntry.transform.localScale = Vector3.one;
 
-            // TODO Add favorite
+            var currentNodeName = dialogueChangedData.nodeName;
+            var currentDialogueIndex = dialogueChangedData.dialogueIndex;
+            var logEntryIndex = logEntries.Count;
+            var voices = dialogueChangedData.voicesForNextDialogue;
+
             UnityAction onGoBackButtonClicked =
                 () => OnGoBackButtonClicked(currentNodeName, currentDialogueIndex, logEntryIndex);
 
@@ -43,30 +56,43 @@ namespace Nova
                 onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(voices);
             }
 
+            // TODO Add favorite
             UnityAction onAddFavoriteButtonClicked = null;
 
-            logEntryController.Init(dialogueChangedEventData.text, onGoBackButtonClicked,
+            var logEntryController = logEntry.GetComponent<LogEntryController>();
+            logEntryController.Init(dialogueChangedData.text, onGoBackButtonClicked,
                 onPlayVoiceButtonClicked, onAddFavoriteButtonClicked);
+
             logEntries.Add(logEntry);
-            logEntry.transform.SetParent(logContent.transform);
         }
 
         public bool hideOnGoBackButtonClicked;
 
-        private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
+        private void RemoveLogEntriesRange(int startIndex, int endIndex)
         {
-            for (var i = logEntryIndex; i < logEntries.Count; ++i)
+            for (var i = startIndex; i < endIndex; ++i)
             {
                 Destroy(logEntries[i]);
             }
 
-            logEntries.RemoveRange(logEntryIndex, logEntries.Count - logEntryIndex);
+            logEntries.RemoveRange(startIndex, endIndex - startIndex);
+        }
+
+        private void _onGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
+        {
+            RemoveLogEntriesRange(logEntryIndex, logEntries.Count);
             gameState.MoveBackTo(nodeName, dialogueIndex);
             Debug.Log(string.Format("Remain log entries count: {0}", logEntries.Count));
             if (hideOnGoBackButtonClicked)
             {
                 Hide();
             }
+        }
+
+        private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
+        {
+            alertController.Alert(null, I18n.__("log.back.confirm"),
+                () => _onGoBackButtonClicked(nodeName, dialogueIndex, logEntryIndex));
         }
 
         private void OnPlayVoiceButtonClicked(IEnumerable<string> audioNames)
@@ -79,12 +105,19 @@ namespace Nova
             }
         }
 
+        private void OnBookmarkWillLoad(BookmarkWillLoadData data)
+        {
+            // clear all log entries
+            RemoveLogEntriesRange(0, logEntries.Count);
+        }
+
         /// <summary>
         /// Show log panel
         /// </summary>
         public void Show()
         {
             logPanel.SetActive(true);
+            scrollRect.verticalNormalizedPosition = 0.0f;
         }
 
         /// <summary>

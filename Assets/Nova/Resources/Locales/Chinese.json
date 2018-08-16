@@ -1,0 +1,22 @@
+{
+	"ingame.title.button": "标题",
+	"ingame.log.button": "历史",
+	"ingame.skip.button": "快进",
+	"ingame.auto.button": "自动",
+	"ingame.load.button": "读档",
+	"ingame.save.button": "存档",
+	"bookmark.summary": "日期：{0}\n章节：{1}\n\n{2}",
+	"bookmark.load.button": "读    档",
+	"bookmark.save.button": "存    档",
+	"ingame.title.confirm": "你确定要返回标题画面吗？",
+	"bookmark.load.confirm": "你确定要读取存档{0}吗？",
+	"bookmark.overwrite.confirm": "你确定要覆盖存档{0}吗？",
+	"log.back.confirm": "你确定要回到这一句吗？",
+	"ingame.quicksave.button": "快速存档",
+	"ingame.quickload.button": "快速读档",
+	"bookmark.quicksave.confirm": "你确定要存储快速存档吗？",
+	"bookmark.quickload.nosave": "还没有可读取的快速存档。",
+	"bookmark.quicksave.page": "快速存档",
+	"bookmark.quickload.confirm": "你确定要读取快速存档吗？",
+	"bookmark.autosave.page": "自动存档"
+}

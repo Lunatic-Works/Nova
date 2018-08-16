@@ -1,22 +1,31 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 
 namespace Nova
 {
+    [RequireComponent(typeof(SpriteChangerWithFade))]
     public class BackgroundController : MonoBehaviour, IRestorable
     {
         public string imageFolder;
-        private SpriteRenderer _spriteRenderer;
 
-        public GameState gameState;
+        private GameState gameState;
 
-        private void Start()
+        private SpriteChangerWithFade _spriteChanger;
+
+        private void Awake()
         {
-            _spriteRenderer = GetComponent<SpriteRenderer>();
+            _spriteChanger = GetComponent<SpriteChangerWithFade>();
             LuaRuntime.Instance.BindObject("backgroundController", this);
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             gameState.AddRestorable(this);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.RemoveRestorable(this);
         }
 
         private string currentImageName;
@@ -30,12 +39,19 @@ namespace Nova
         /// <param name="imageName">The name of the image file</param>
         public void SetImage(string imageName)
         {
-            _spriteRenderer.sprite = AssetsLoader.GetSprite(imageFolder + imageName);
+            _spriteChanger.sprite = AssetsLoader.GetSprite(System.IO.Path.Combine(imageFolder, imageName));
             currentImageName = imageName;
+        }
+
+        public void ClearImage()
+        {
+            _spriteChanger.sprite = null;
+            currentImageName = null;
         }
 
         #endregion
 
+        [Serializable]
         private class RestoreData : IRestoreData
         {
             public string currentImageName { get; private set; }
@@ -59,7 +75,14 @@ namespace Nova
         public void Restore(IRestoreData restoreData)
         {
             var data = restoreData as RestoreData;
-            SetImage(data.currentImageName);
+            if (data.currentImageName != null)
+            {
+                SetImage(data.currentImageName);
+            }
+            else
+            {
+                ClearImage();
+            }
         }
     }
 }

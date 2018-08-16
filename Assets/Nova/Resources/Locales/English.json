@@ -1,0 +1,22 @@
+{
+  "ingame.title.button": "Title",
+  "ingame.log.button": "Log",
+  "ingame.skip.button": "Skip",
+  "ingame.auto.button": "Auto",
+  "ingame.load.button": "Load",
+  "ingame.save.button": "Save",
+  "bookmark.summary": "Date：{0}\nChapter：{1}\n\n{2}",
+  "bookmark.load.button": "Load",
+  "bookmark.save.button": "Save",
+  "ingame.title.confirm": "Back to title?",
+  "bookmark.load.confirm": "Load checkpoint {0}?",
+  "bookmark.overwrite.confirm": "Override checkpoint {0}?",
+  "log.back.confirm": "Back to this dialogue?",
+  "ingame.quicksave.button": "Q.Save",
+  "ingame.quickload.button": "Q.Load",
+  "bookmark.quicksave.confirm": "Quick save?",
+  "bookmark.quickload.nosave": "No Q.Save data available.",
+  "bookmark.quicksave.page": "Quick Save",
+  "bookmark.quickload.confirm": "Quick load?",
+  "bookmark.autosave.page": "Auto Save"
+}

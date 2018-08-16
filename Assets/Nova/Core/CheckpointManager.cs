@@ -7,7 +7,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Boo.Lang.Runtime;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -77,18 +76,104 @@ namespace Nova
     [Serializable]
     public class Bookmark
     {
-        public readonly string NodeName;
-        public readonly int DialogueIndex;
-        public long GlobalSaveIdentifier;
+        public const int ScreenShotWidth = 320;
+        public const int ScreenShotHeight = 180;
 
-        public Bookmark(string nodeName, int dialogueIndex)
+        public readonly int DialogueIndex;
+        public readonly List<string> NodeHistory;
+        public long GlobalSaveIdentifier;
+        public readonly DateTime CreationTime = DateTime.Now;
+        public string Description;
+
+        private byte[] _screenShotBytes;
+        [NonSerialized] private Texture2D _screenShotTexture;
+        public Texture2D ScreenShot
         {
-            NodeName = nodeName;
+            get
+            {
+                if (_screenShotBytes == null)
+                {
+                    Assert.IsTrue(_screenShotTexture == null, "Nova: ScreenShot cache is not consistent");
+                    return null;
+                }
+
+                if (_screenShotTexture == null)
+                {
+                    _screenShotTexture = new Texture2D(ScreenShotWidth, ScreenShotHeight, TextureFormat.RGB24, false);
+                    _screenShotTexture.LoadRawTextureData(_screenShotBytes);
+                    _screenShotTexture.Apply();
+                }
+
+                return _screenShotTexture;
+            }
+            set
+            {
+                _screenShotTexture = value;
+                _screenShotBytes = _screenShotTexture.GetRawTextureData();
+            }
+        }
+
+        // NOTE: Do not use default parameter in constructor or it will fail to compile silently...
+
+        /// <summary>
+        /// Create a bookmark based on all reached nodes in current gameplay.
+        /// </summary>
+        /// <param name="nodeHistory">List of all reached nodes, including the current one as the last node.</param>
+        /// <param name="dialogueIndex">Index of the current dialogue.</param>
+        /// <param name="description">Description of this bookmark.</param>
+        public Bookmark(List<string> nodeHistory, int dialogueIndex, string description)
+        {
+            NodeHistory = new List<string>(nodeHistory);
             DialogueIndex = dialogueIndex;
+            Description = description;
         }
     }
 
     #endregion
+
+    public enum BookmarkType
+    {
+        AutoSave = 101,
+        QuickSave = 201,
+        NormalSave = 301
+    }
+
+    public enum SaveIdQueryType
+    {
+        Latest,
+        Earliest
+    }
+
+    public class BookmarkMetadata
+    {
+        public int SaveId
+        {
+            get { return _saveId; }
+
+            set
+            {
+                Type = SaveIdToBookmarkType(value);
+                _saveId = value;
+            }
+        }
+        public BookmarkType Type { get; private set; }
+        public DateTime ModifiedTime;
+
+        private int _saveId;
+
+        public static BookmarkType SaveIdToBookmarkType(int saveId)
+        {
+            if (saveId >= (int)BookmarkType.NormalSave)
+            {
+                return BookmarkType.NormalSave;
+            }
+            if (saveId >= (int)BookmarkType.QuickSave)
+            {
+                return BookmarkType.QuickSave;
+            }
+            return BookmarkType.AutoSave;
+        }
+    }
 
     /// <summary>
     /// Manager component providing ability to manage game progress and save files.
@@ -106,8 +191,8 @@ namespace Nova
 
         private GlobalSave _globalSave;
 
-
-        public HashSet<int> UsedSaveSlots { get; private set; }
+        private Dictionary<int, Bookmark> _cachedSaveSlots;
+        public Dictionary<int, BookmarkMetadata> SaveSlotsMetadata { get; private set; }
 
         /// <summary>
         /// Initalization of members which are unlikely to change in the future
@@ -117,13 +202,14 @@ namespace Nova
             _savePathBase = Application.persistentDataPath + "/Save/";
             _globalSavePath = _savePathBase + "global.nsav";
             _fileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
-            _cryptic = new DESCryptoServiceProvider()
+            _cryptic = new DESCryptoServiceProvider
             {
                 Key = Encoding.ASCII.GetBytes("NovaSave"),
                 IV = Encoding.ASCII.GetBytes("novasave")
             };
             _formatter = new BinaryFormatter();
-            UsedSaveSlots = new HashSet<int>();
+            _cachedSaveSlots = new Dictionary<int, Bookmark>();
+            SaveSlotsMetadata = new Dictionary<int, BookmarkMetadata>();
         }
 
         public void Awake()
@@ -137,7 +223,7 @@ namespace Nova
             else
                 ResetGlobalSave();
 
-            var regex = new Regex("sav([0-9]+).nsav");
+            var regex = new Regex(@"sav([0-9]+)\.nsav");
             foreach (var name in Directory.GetFiles(_savePathBase, "sav*.nsav"))
             {
                 var result = regex.Match(name);
@@ -145,20 +231,15 @@ namespace Nova
                 {
                     int id;
                     if (int.TryParse(result.Groups[1].Value, out id))
-                        UsedSaveSlots.Add(id);
+                        SaveSlotsMetadata.Add(id, new BookmarkMetadata
+                        {
+                            SaveId = id,
+                            ModifiedTime = File.GetLastWriteTime(name)
+                        });
                 }
             }
 
             Debug.Log("CheckpointManager Initialized");
-        }
-
-        private NodeSaveInfo EnsureSavedNode(string nodeName)
-        {
-            NodeSaveInfo info;
-            if (_globalSave.SavedNodes.TryGetValue(nodeName, out info)) return info;
-            info = new NodeSaveInfo();
-            _globalSave.SavedNodes[nodeName] = info;
-            return info;
         }
 
         /// <summary>
@@ -169,7 +250,7 @@ namespace Nova
         /// <param name="entry">Restore entry for the dialogue</param>
         public void SetReached(string nodeName, int dialogueIndex, GameStateStepRestoreEntry entry)
         {
-            EnsureSavedNode(nodeName).DialogueRestoreEntries[dialogueIndex] = entry;
+            _globalSave.SavedNodes.Ensure(nodeName).DialogueRestoreEntries[dialogueIndex] = entry;
         }
 
         /// <summary>
@@ -179,7 +260,7 @@ namespace Nova
         /// <param name="branchName">The name of the branch.</param>
         public void SetReached(string nodeName, string branchName)
         {
-            EnsureSavedNode(nodeName).ReachedBranches.Add(branchName);
+            _globalSave.SavedNodes.Ensure(nodeName).ReachedBranches.Add(branchName);
         }
 
         /// <summary>
@@ -258,16 +339,16 @@ namespace Nova
         private T ReadSave<T>(Stream s)
         {
             var bw = new BinaryReader(s);
-            Assert.IsTrue(_fileHeader.SequenceEqual(bw.ReadBytes(_fileHeader.Length)),
-                "Nova: Invalid save file format");
-            Assert.IsTrue(Version >= bw.ReadInt32(),
-                "Nova: Save file is incompatible with the current version of engine");
+            this.RuntimeAssert(_fileHeader.SequenceEqual(bw.ReadBytes(_fileHeader.Length)),
+                "Invalid save file format");
+            this.RuntimeAssert(Version >= bw.ReadInt32(),
+                "Save file is incompatible with the current version of engine");
             using (var stream = new CryptoStream(s, _cryptic.CreateDecryptor(), CryptoStreamMode.Read))
                 return (T) _formatter.Deserialize(stream);
         }
 
         /// <summary>
-        /// Save a bookmark, and update the global save file too.
+        /// Save a bookmark to disk, and update the global save file too.
         /// Will throw exception if it fails.
         /// </summary>
         /// <param name="saveId">File No. of the bookmark.</param>
@@ -277,15 +358,18 @@ namespace Nova
             using (var fs = File.OpenWrite(ComposeFileName(saveId)))
             {
                 save.GlobalSaveIdentifier = _globalSave.GlobalSaveIdentifier;
-                WriteSave(save, fs);
+                WriteSave(_cachedSaveSlots[saveId] = save, fs);
             }
 
             using (var fs = File.OpenWrite(_globalSavePath))
                 WriteSave(_globalSave, fs);
+
+            SaveSlotsMetadata.Ensure(saveId).SaveId = saveId;
+            SaveSlotsMetadata.Ensure(saveId).ModifiedTime = DateTime.Now;
         }
 
         /// <summary>
-        /// Load a bookmark.
+        /// Load a bookmark from disk. Never uses cache.
         /// Will throw exception if it fails.
         /// </summary>
         /// <param name="saveId">File No. of the bookmark.</param>
@@ -294,10 +378,10 @@ namespace Nova
         {
             using (var fs = File.OpenRead(ComposeFileName(saveId)))
             {
-                Bookmark result = ReadSave<Bookmark>(fs);
-                if (result.GlobalSaveIdentifier != _globalSave.GlobalSaveIdentifier)
-                    throw new RuntimeException("Nova: Save file is incompatible with the global save file");
-                return result;
+                var result = ReadSave<Bookmark>(fs);
+                this.RuntimeAssert(result.GlobalSaveIdentifier == _globalSave.GlobalSaveIdentifier,
+                    "Save file is incompatible with the global save file");
+                return _cachedSaveSlots[saveId] = result;
             }
         }
 
@@ -308,6 +392,81 @@ namespace Nova
         public void DeleteBookmark(int saveId)
         {
             File.Delete(ComposeFileName(saveId));
+            SaveSlotsMetadata.Remove(saveId);
+            _cachedSaveSlots.Remove(saveId);
+        }
+
+        /// <summary>
+        /// Load the contents of all existing bookmark in the given range eagerly.
+        /// </summary>
+        /// <param name="beginSaveId">The beginning of the range, inclusive.</param>
+        /// <param name="endSaveId">The end of the range, exclusive.</param>
+        public void EagerLoadRange(int beginSaveId, int endSaveId)
+        {
+            for (; beginSaveId < endSaveId; beginSaveId++)
+            {
+                if (SaveSlotsMetadata.ContainsKey(beginSaveId))
+                    LoadBookmark(beginSaveId);
+            }
+        }
+
+        /// <summary>
+        /// Load / Save a bookmark by File No.. Will use cached result if exists.
+        /// </summary>
+        /// <param name="saveId">File No. of the bookmark.</param>
+        /// <returns>The cached or loaded bookmark</returns>
+        public Bookmark this[int saveId]
+        {
+            get
+            {
+                if (!SaveSlotsMetadata.ContainsKey(saveId))
+                    return null;
+                if (!_cachedSaveSlots.ContainsKey(saveId))
+                    LoadBookmark(saveId);
+                return _cachedSaveSlots[saveId];
+            }
+
+            set
+            {
+                SaveBookmark(saveId, value);
+            }
+        }
+
+        /// <summary>
+        /// Query the file No. of the latest / earliest bookmark.
+        /// </summary>
+        /// <param name="begin">Beginning file No. of the query range, inclusive.</param>
+        /// <param name="end">Ending file No. of the query range, exclusive.</param>
+        /// <param name="type">Type of this query.</param>
+        /// <returns>File No. to query. If no bookmark is found in range, the return value will be "begin".</returns>
+        public int QuerySaveIdByTime(int begin, int end, SaveIdQueryType type)
+        {
+            var filtered = SaveSlotsMetadata.Values.Where(m => m.SaveId >= begin && m.SaveId < end);
+            if (!filtered.Any())
+                return begin;
+            if (type == SaveIdQueryType.Earliest)
+                return filtered.Aggregate((agg, val) => agg.ModifiedTime < val.ModifiedTime ? agg : val).SaveId;
+            else
+                return filtered.Aggregate((agg, val) => agg.ModifiedTime > val.ModifiedTime ? agg : val).SaveId;
+        }
+
+        public int QueryMaxSaveId(int begin)
+        {
+            if (!SaveSlotsMetadata.Any())
+            {
+                return begin;
+            }
+            return Math.Max(SaveSlotsMetadata.Keys.Max(), begin);
+        }
+
+        public int QueryMinUnusedSaveId(int begin, int end)
+        {
+            int saveId = begin;
+            while (saveId < end && SaveSlotsMetadata.ContainsKey(saveId))
+            {
+                ++saveId;
+            }
+            return saveId;
         }
     }
 }

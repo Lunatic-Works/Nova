@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Nova;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,35 +8,51 @@ namespace Nova
 {
     public class BranchController : MonoBehaviour, IRestorable
     {
-        public Button branchButtomPrefab;
+        public GameObject BranchButtonPrefab;
+        public GameObject blackPanel;
+        public bool dimOnBranch;
 
-        public GameState gameState;
+        private GameState gameState;
 
-        private void Start()
+        private void Awake()
         {
-            gameState.BranchOccurs.AddListener(OnBranchHappen);
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
+            gameState.BranchOccurs += OnBranchHappen;
             gameState.AddRestorable(this);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.BranchOccurs -= OnBranchHappen;
+            gameState.RemoveRestorable(this);
         }
 
         /// <summary>
         /// Show branch buttons when branch happens
         /// </summary>
-        /// <param name="branchOccursEventData"></param>
-        private void OnBranchHappen(BranchOccursEventData branchOccursEventData)
+        /// <param name="branchOccursData"></param>
+        private void OnBranchHappen(BranchOccursData branchOccursData)
         {
-            var branchInformations = branchOccursEventData.branchInformations;
+            if (dimOnBranch)
+            {
+                blackPanel.SetActive(true);
+            }
+
+            var branchInformations = branchOccursData.branchInformations;
             foreach (var branchInformation in branchInformations)
             {
-                var childButtom = Instantiate(branchButtomPrefab);
-                childButtom.transform.SetParent(transform);
-                var text = childButtom.GetComponent<Text>();
+                var childButton = Instantiate(BranchButtonPrefab);
+                childButton.transform.SetParent(transform);
+                childButton.transform.localScale = Vector3.one;
+
+                var text = childButton.GetComponent<Text>();
                 if (text == null)
                 {
-                    text = childButtom.GetComponentInChildren<Text>();
+                    text = childButton.GetComponentInChildren<Text>();
                 }
-
                 text.text = branchInformation.name;
-                childButtom.onClick.AddListener(() => Select(branchInformation.name));
+
+                childButton.GetComponent<Button>().onClick.AddListener(() => Select(branchInformation.name));
             }
         }
 
@@ -47,6 +62,8 @@ namespace Nova
         /// <param name="branchName">the name of the branch to select</param>
         private void Select(string branchName)
         {
+            blackPanel.SetActive(false);
+
             gameState.SelectBranch(branchName);
             RemoveAllSelectButton();
         }
@@ -73,6 +90,8 @@ namespace Nova
 
         public void Restore(IRestoreData restoreData)
         {
+            blackPanel.SetActive(false);
+
             RemoveAllSelectButton();
         }
     }

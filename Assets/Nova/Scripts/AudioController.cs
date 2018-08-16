@@ -1,4 +1,4 @@
-﻿using UnityEditor;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.Assertions;
@@ -21,9 +21,9 @@ namespace Nova
         /// </summary>
         public string audioPath;
 
-        private AudioSource audioSource;
+        private GameState gameState;
 
-        public GameState gameState;
+        private AudioSource audioSource;
 
         public float volume
         {
@@ -31,16 +31,22 @@ namespace Nova
             set { audioSource.volume = value; }
         }
 
-        private void Start()
+        private void Awake()
         {
+            gameState = Utils.FindNovaGameController().GetComponent<GameState>();
             audioSource = GetComponent<AudioSource>();
             LuaRuntime.Instance.BindObject(audioControllerName, this);
             gameState.AddRestorable(this);
         }
 
+        private void OnDestroy()
+        {
+            gameState.RemoveRestorable(this);
+        }
+
         private AudioClip GetAudioClip(string audioName)
         {
-            audioName = audioPath + audioName;
+            audioName = System.IO.Path.Combine(audioPath, audioName);
             var audio = AssetsLoader.GetAudioClip(audioName);
             Assert.IsNotNull(audio);
             return audio;
@@ -86,6 +92,7 @@ namespace Nova
         /// <summary>
         /// Data used to restore the state of the audio controller
         /// </summary>
+        [Serializable]
         private class RestoreData : IRestoreData
         {
             public string audioName { get; private set; }
