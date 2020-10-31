@@ -8,16 +8,19 @@ public class Nova_ScriptLoaderWrap
 	{
 		L.BeginClass(typeof(Nova.ScriptLoader), typeof(System.Object));
 		L.RegFunction("Init", Init);
+		L.RegFunction("ForceInit", ForceInit);
 		L.RegFunction("GetFlowChartTree", GetFlowChartTree);
 		L.RegFunction("RegisterNewNode", RegisterNewNode);
+		L.RegFunction("BeginAddLocaleForNode", BeginAddLocaleForNode);
 		L.RegFunction("RegisterJump", RegisterJump);
 		L.RegFunction("RegisterBranch", RegisterBranch);
 		L.RegFunction("EndRegisterBranch", EndRegisterBranch);
-		L.RegFunction("SetCurrentAsStarUpNode", SetCurrentAsStarUpNode);
+		L.RegFunction("SetCurrentAsStartUpNode", SetCurrentAsStartUpNode);
 		L.RegFunction("SetCurrentAsDefaultStart", SetCurrentAsDefaultStart);
 		L.RegFunction("SetCurrentAsEnd", SetCurrentAsEnd);
 		L.RegFunction("New", _CreateNova_ScriptLoader);
 		L.RegFunction("__tostring", ToLua.op_ToString);
+		L.RegVar("stateLocale", get_stateLocale, set_stateLocale);
 		L.EndClass();
 	}
 
@@ -63,6 +66,23 @@ public class Nova_ScriptLoaderWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ForceInit(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			Nova.ScriptLoader obj = (Nova.ScriptLoader)ToLua.CheckObject<Nova.ScriptLoader>(L, 1);
+			string arg0 = ToLua.CheckString(L, 2);
+			obj.ForceInit(arg0);
+			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetFlowChartTree(IntPtr L)
 	{
 		try
@@ -84,11 +104,27 @@ public class Nova_ScriptLoaderWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 3);
+			ToLua.CheckArgsCount(L, 2);
 			Nova.ScriptLoader obj = (Nova.ScriptLoader)ToLua.CheckObject<Nova.ScriptLoader>(L, 1);
 			string arg0 = ToLua.CheckString(L, 2);
-			string arg1 = ToLua.CheckString(L, 3);
-			obj.RegisterNewNode(arg0, arg1);
+			obj.RegisterNewNode(arg0);
+			return 0;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int BeginAddLocaleForNode(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			Nova.ScriptLoader obj = (Nova.ScriptLoader)ToLua.CheckObject<Nova.ScriptLoader>(L, 1);
+			string arg0 = ToLua.CheckString(L, 2);
+			obj.BeginAddLocaleForNode(arg0);
 			return 0;
 		}
 		catch (Exception e)
@@ -150,14 +186,14 @@ public class Nova_ScriptLoaderWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetCurrentAsStarUpNode(IntPtr L)
+	static int SetCurrentAsStartUpNode(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
 			Nova.ScriptLoader obj = (Nova.ScriptLoader)ToLua.CheckObject<Nova.ScriptLoader>(L, 1);
 			string arg0 = ToLua.CheckString(L, 2);
-			obj.SetCurrentAsStarUpNode(arg0);
+			obj.SetCurrentAsStartUpNode(arg0);
 			return 0;
 		}
 		catch (Exception e)
@@ -197,6 +233,44 @@ public class Nova_ScriptLoaderWrap
 		catch (Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_stateLocale(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			Nova.ScriptLoader obj = (Nova.ScriptLoader)o;
+			UnityEngine.SystemLanguage ret = obj.stateLocale;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index stateLocale on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_stateLocale(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			Nova.ScriptLoader obj = (Nova.ScriptLoader)o;
+			UnityEngine.SystemLanguage arg0 = (UnityEngine.SystemLanguage)ToLua.CheckObject(L, 2, typeof(UnityEngine.SystemLanguage));
+			obj.stateLocale = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index stateLocale on a nil value");
 		}
 	}
 }

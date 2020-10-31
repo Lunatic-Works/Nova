@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine.Assertions;
+﻿using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -7,37 +6,32 @@ namespace Nova
     /// A trivial counting lock
     /// </summary>
     /// <remarks>
-    /// The lock is considered locked only if the number of occupation exceeds the threshold 
+    /// The lock is considered locked only if the number of occupation exceeds the threshold
     /// </remarks>
     public class CounterLock
     {
-        private int _count;
-        private readonly int _threshold;
+        private int count;
+        private readonly int threshold;
 
-        public CounterLock()
-        {
-        }
+        public CounterLock() { }
 
         public CounterLock(int threshold)
         {
-            _threshold = threshold;
+            this.threshold = threshold;
         }
 
         /// <summary>
-        /// Check if the lock has been aquired
+        /// Check if the lock has been acquired
         /// </summary>
-        public bool isLocked
-        {
-            get { return _count > _threshold; }
-        }
+        public bool isLocked => count > threshold;
 
         /// <summary>
-        /// Aquire the lock
+        /// Acquire the lock
         /// </summary>
-        public void Aquire()
+        public void Acquire()
         {
-            Assert.IsTrue(_count < int.MaxValue, "More than Int32.MaxValue calls aquiring lock");
-            _count++;
+            Assert.IsTrue(count < int.MaxValue, "Nova: More than Int32.MaxValue calls acquiring lock.");
+            count++;
         }
 
         /// <summary>
@@ -45,8 +39,8 @@ namespace Nova
         /// </summary>
         public void Release()
         {
-            Assert.IsTrue(_count > 0, "Too many release lock");
-            _count--;
+            Assert.IsTrue(count > 0, "Nova: Too many calls releasing lock.");
+            count--;
         }
     }
 }

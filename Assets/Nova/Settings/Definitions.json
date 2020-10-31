@@ -1,0 +1,103 @@
+{
+    "Language": {
+        "defaultValue": -1
+    },
+    "FontSize": {
+        "min": 30,
+        "defaultValue": 40,
+        "max": 50,
+        "whole": true
+    },
+    "TextSpeed": {
+        "min": 1,
+        "defaultValue": 1.5,
+        "max": 2
+    },
+    "AutoSpeed": {
+        "min": 0,
+        "defaultValue": 1,
+        "max": 2
+    },
+    "SkipSpeed": {
+        "min": 1,
+        "defaultValue": 2,
+        "max": 3
+    },
+    "OnlySkipRead": {
+        "defaultValue": 1
+    },
+    "AbortAnimation": {
+        "defaultValue": 0
+    },
+    "StopVoiceOnDialogueChange": {
+        "defaultValue": 0
+    },
+    "GlobalVolume" : {
+        "min": 0,
+        "defaultValue": 1,
+        "max": 1
+    },
+    "VoiceVolume": {
+        "min": 0,
+        "defaultValue": 1,
+        "max": 1
+    },
+    "ErgongVoice": {
+        "min": 0,
+        "defaultValue": 0.5,
+        "max": 1
+    },
+    "QianyeVoice": {
+        "min": 0,
+        "defaultValue": 0.5,
+        "max": 1
+    },
+    "XibenVoice": {
+        "min": 0,
+        "defaultValue": 0.5,
+        "max": 1
+    },
+    "GaotianVoice": {
+        "min": 0,
+        "defaultValue": 0.5,
+        "max": 1
+    },
+    "BGMVolume": {
+        "min": 0,
+        "defaultValue": 0.5,
+        "max": 1
+    },
+    "SEVolume": {
+        "min": 0,
+        "defaultValue": 0.5,
+        "max": 1
+    },
+    "UIVolume": {
+        "min": 0,
+        "defaultValue": 0.5,
+        "max": 1
+    },
+    "RightButtonAction": {
+        "defaultValue": 0
+    },
+    "ButtonRingSize": {
+        "min": 100,
+        "defaultValue": 200,
+        "max": 300,
+        "whole": true
+    },
+    "DialogueOpacity": {
+        "min": 0.1,
+        "defaultValue": 0.9,
+        "max": 1
+    },
+    "_GameFirstShown": {
+        "defaultValue": 0
+    },
+    "_LogViewFirstShown": {
+        "defaultValue": 0
+    },
+    "_ConfigViewFirstShown": {
+        "defaultValue": 0
+    }
+}

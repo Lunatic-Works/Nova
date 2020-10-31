@@ -1,9 +1,9 @@
-﻿using System;
+﻿using LuaInterface;
+using Nova.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using LuaInterface;
-using Nova.Exceptions;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -12,9 +12,10 @@ namespace Nova
     /// <summary>
     /// The class that load scripts and construct the flowchart tree.
     /// </summary>
+    [ExportCustomType]
     public class ScriptLoader
     {
-        // variable indicates whether the script loader is inited
+        // variable indicates whether the script loader is initialized
         private bool isInited = false;
 
         /// <summary>
@@ -35,11 +36,45 @@ namespace Nova
                 return;
             }
 
+            ForceInit(path);
+
+            isInited = true;
+        }
+
+        private FlowChartTree flowChartTree;
+
+        private FlowChartNode currentNode = null;
+
+        // Current locale of the state machine
+        public SystemLanguage stateLocale;
+
+        private List<LazyBindingEntry> lazyBindingLinks = new List<LazyBindingEntry>();
+
+        public void ForceInit(string path)
+        {
+            flowChartTree = new FlowChartTree();
+            currentNode = null;
+            stateLocale = I18n.DefaultLocale;
+            lazyBindingLinks = new List<LazyBindingEntry>();
+
+            // requires.lua is executed and ScriptDialogueEntryParser.PatternToActionGenerator is filled before calling ParseScript()
             LuaRuntime.Instance.BindObject("scriptLoader", this);
-            var scripts = Resources.LoadAll(path, typeof(TextAsset)).Cast<TextAsset>().ToArray();
-            foreach (var script in scripts)
+
+            foreach (var locale in I18n.SupportedLocales)
             {
-                ParseScript(script.text);
+                stateLocale = locale;
+
+                string localizedPath = path;
+                if (locale != I18n.DefaultLocale)
+                {
+                    localizedPath = I18n.LocalePath + locale + "/" + path;
+                }
+
+                var scripts = Resources.LoadAll(localizedPath, typeof(TextAsset)).Cast<TextAsset>().ToArray();
+                foreach (var script in scripts)
+                {
+                    ParseScript(script.text);
+                }
             }
 
             // Bind all lazy binding entries
@@ -48,21 +83,19 @@ namespace Nova
             // perform sanity check
             flowChartTree.SanityCheck();
 
-            // Construnction finish, freeze the tree status
+            // Construction finish, freeze the tree status
             flowChartTree.Freeze();
-
-            isInited = true;
         }
 
         private void CheckInit()
         {
-            Assert.IsTrue(isInited, "Nova: ScriptLoader methods should be called after Init");
+            Assert.IsTrue(isInited, "Nova: ScriptLoader methods should be called after Init().");
         }
 
         /// <summary>
         /// Get the flow chart tree
         /// </summary>
-        /// <remarks>This method should be called after Init</remarks>
+        /// <remarks>This method should be called after init</remarks>
         /// <returns>The constructed flow chart tree</returns>
         public FlowChartTree GetFlowChartTree()
         {
@@ -70,13 +103,9 @@ namespace Nova
             return flowChartTree;
         }
 
-        private const string FastExecutionStartSymbol = "@<|";
-        private const string FastExecutionEndSymbol = "|>";
-        private const string LazyExcutionStartSymbol = "<|";
-        private const string LazyExcutionEndSymbol = "|>";
-
-        private const string FastExecutionBlockPattern = @"@<\|((?:.|[\r\n])*?)\|>";
-        private const string LazyExecutionBlockPattern = @"^<\|((?:.|[\r\n])*?)\|>";
+        private const string EagerExecutionStartSymbol = "@<|";
+        private const string EagerExecutionBlockPattern = @"@<\|((?:.|[\r\n])*?)\|>";
+        private const string EmptyLinePattern = @"(?:\r?\n\s*){2,}";
 
         /// <summary>
         /// Parse the given script text
@@ -84,44 +113,47 @@ namespace Nova
         /// <param name="text">text of a script</param>
         private void ParseScript(string text)
         {
+            LuaRuntime.Instance.DoString("action_new_file()");
+
             text = text.Trim();
-            // detect the fast execution chunk
-            var fastExecutionStartIndex = text.IndexOf(FastExecutionStartSymbol, StringComparison.Ordinal);
-            if (fastExecutionStartIndex != 0)
+
+            // Detect the eager execution block
+            int eagerExecutionStartIndex = text.IndexOf(EagerExecutionStartSymbol, StringComparison.Ordinal);
+            if (eagerExecutionStartIndex != 0)
             {
-                // The script file does not start with a fast execution chunck
-                Debug.Log("<color=red><b>WARN</b>: The script file does not start with a fast execution block. " +
-                          "All text before the first execution block will be removed</color>");
+                // The script file does not start with a eager execution block
+                Debug.LogWarning("Nova: The script file does not start with a eager execution block. " +
+                                 "All text before the first execution block will be removed.");
             }
 
-            // No fast execution block is found, simply ignore this file
-            if (fastExecutionStartIndex < 0)
+            // No eager execution block is found, simply ignore this file
+            if (eagerExecutionStartIndex < 0)
             {
                 return;
             }
 
-            text = text.Substring(fastExecutionStartIndex);
-            var lastMatchEndIndex = 0;
-            foreach (Match m in Regex.Matches(text, FastExecutionBlockPattern))
+            text = text.Substring(eagerExecutionStartIndex);
+            int lastMatchEndIndex = 0;
+            foreach (Match m in Regex.Matches(text, EagerExecutionBlockPattern))
             {
-                var flowChartNodeText = text.Substring(lastMatchEndIndex, m.Index - lastMatchEndIndex);
-                // This method will not be excuted when the execution enter this loop for the first time,
-                // since the first fast execution block is definitely at the begining of the text.
+                string flowChartNodeText = text.Substring(lastMatchEndIndex, m.Index - lastMatchEndIndex);
+                // This method will not be executed when the execution enter this loop for the first time,
+                // since the first eager execution block is definitely at the beginning of the text.
                 ParseFlowChartNodeText(flowChartNodeText);
                 lastMatchEndIndex = m.Index + m.Length;
 
-                var fastExecutionBlockCode = m.Groups[1].Value;
-                DoFastExecutionBlock(fastExecutionBlockCode);
+                string eagerExecutionBlockCode = m.Groups[1].Value;
+                // Debug.LogFormat("Eager code: <color=blue><b>{0}</b></color>", eagerExecutionBlockCode);
+                DoEagerExecutionBlock(eagerExecutionBlockCode);
             }
 
-            // For some reason, a script file should ends with a fast execution chuck, which needs to refer
+            // For some reason, a script file should ends with a eager execution block, which needs to refer
             // to the next flow chart node
-            // Every thing after the last fast execution chunk will be ignored
-
+            // Every thing after the last eager execution block will be ignored
             if (lastMatchEndIndex < text.Length)
             {
-                Debug.Log("<color=red><b>WARN</b>: A script file should ends with a fast execution chuck, " +
-                          "which needs to refer to the next flow chart node</color>");
+                Debug.LogWarning("Nova: A script file should ends with a eager execution block, " +
+                                 "which needs to refer to the next flow chart node.");
             }
         }
 
@@ -132,21 +164,14 @@ namespace Nova
             public string destination;
         }
 
-        private FlowChartNode currentNode = null;
-
-        private List<LazyBindingEntry> lazyBindingLinks = new List<LazyBindingEntry>();
-
-        private readonly FlowChartTree flowChartTree = new FlowChartTree();
-
-
         /// <summary>
         /// Parse the flow chart node
         /// </summary>
         /// <remarks>
         /// The name of this method might be a little misleading, since this method actually parses the text
-        /// splitted by fast execution blocks, while the node structure are defined by scripts in the fast execution
-        /// block. A new node is created when the 'label' instruction is invoked in the fast execution block, and its
-        /// content ends when either 'branch' or 'jump' instruction is called. Current implementaion (2018/07/16)
+        /// split by eager execution blocks, while the node structure are defined by scripts in the eager execution
+        /// block. A new node is created when the 'label' instruction is invoked in the eager execution block, and its
+        /// content ends when either 'branch' or 'jump' instruction is called. Current implementation (2018/07/16)
         /// constructs flow chart tree with a state machine, i.e. parsed flow chart node text are pushed to
         /// the current node.
         /// </remarks>
@@ -164,40 +189,23 @@ namespace Nova
                 return;
             }
 
-            var emptyLinePattern = @"(?:(?:\r\n|\n)\s*){2,}";
-            var dialogueEntryTexts = Regex.Split(flowChartNodeText, emptyLinePattern);
-            foreach (var text in dialogueEntryTexts)
+            if (currentNode == null)
             {
-                Debug.Log("<color=green>" + text + "</color>");
-                var dialogueEntry = ParseDialogueEntry(text);
-                currentNode.AddDialogueEntry(dialogueEntry);
-            }
-        }
-
-        /// <summary>
-        /// Parse a dialogue entry text
-        /// </summary>
-        /// <remarks>
-        /// A dialogue entry can have one or none lazy execution block. The lazy execution block (if have) should be
-        /// placed at the begining of the dialogue entry text.
-        /// </remarks>
-        /// <param name="dialogueEntryText"></param>
-        /// <returns></returns>
-        private DialogueEntry ParseDialogueEntry(string dialogueEntryText)
-        {
-            dialogueEntryText = dialogueEntryText.Trim();
-            var textStartIndex = 0;
-            var lazyExecutionBlockMatch = Regex.Match(dialogueEntryText, LazyExecutionBlockPattern);
-            LuaFunction action = null;
-            if (lazyExecutionBlockMatch.Success)
-            {
-                var code = lazyExecutionBlockMatch.Groups[1].Value;
-                action = LuaRuntime.Instance.WrapClosure(code);
-                textStartIndex += lazyExecutionBlockMatch.Length;
+                throw new ArgumentException("Nova: Dangling node text " + flowChartNodeText);
             }
 
-            var text = dialogueEntryText.Substring(textStartIndex).Trim();
-            return new DialogueEntry(text, action);
+            string[] dialogueEntryTexts = Regex.Split(flowChartNodeText, EmptyLinePattern);
+
+            if (stateLocale == I18n.DefaultLocale)
+            {
+                var entries = ScriptDialogueEntryParser.ParseDialogueEntries(dialogueEntryTexts);
+                currentNode.SetDialogueEntries(entries);
+            }
+            else
+            {
+                var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(dialogueEntryTexts);
+                currentNode.AddLocaleForDialogueEntries(stateLocale, entries);
+            }
         }
 
         /// <summary>
@@ -208,7 +216,7 @@ namespace Nova
             foreach (var entry in lazyBindingLinks)
             {
                 var node = entry.from;
-                node.AddBranch(entry.branchInfo, flowChartTree.FindNode(entry.destination));
+                node.AddBranch(entry.branchInfo, flowChartTree.GetNode(entry.destination));
             }
 
             // remove unnecessary reference
@@ -216,15 +224,15 @@ namespace Nova
         }
 
         /// <summary>
-        /// Execute code in the fast execution block
+        /// Execute code in the eager execution block
         /// </summary>
-        /// <param name="fastExecutionBlockCode"></param>
-        private void DoFastExecutionBlock(string fastExecutionBlockCode)
+        /// <param name="eagerExecutionBlockCode"></param>
+        private static void DoEagerExecutionBlock(string eagerExecutionBlockCode)
         {
-            LuaRuntime.Instance.DoString(fastExecutionBlockCode);
+            LuaRuntime.Instance.DoString(eagerExecutionBlockCode);
         }
 
-        #region methods called by external scripts
+        #region Methods called by external scripts
 
         /// <summary>
         /// This method is designed to be called externally by scripts.
@@ -234,16 +242,16 @@ namespace Nova
         /// won't be registered as a lazy binding link.
         /// </summary>
         /// <param name="name">the name of the new node</param>
-        /// <param name="description">the description of the new node</param>
-        public void RegisterNewNode(string name, string description)
+        public void RegisterNewNode(string name)
         {
-            var nextNode = new FlowChartNode(name, description);
+            var nextNode = new FlowChartNode(name);
             if (currentNode != null && currentNode.type == FlowChartNodeType.Normal)
             {
-                currentNode.AddBranch(BranchInformation.Defualt, nextNode);
+                currentNode.AddBranch(BranchInformation.Default, nextNode);
             }
 
             currentNode = nextNode;
+
             // The try block here is to make debug info easier to read
             try
             {
@@ -256,8 +264,13 @@ namespace Nova
             catch (ArgumentException)
             {
                 throw new DuplicatedDefinitionException(
-                    string.Format("Nova: Multiple definition of the same label {0}", currentNode.name));
+                    $"Nova: Multiple definition of the same label {currentNode.name}");
             }
+        }
+
+        public void BeginAddLocaleForNode(string name)
+        {
+            currentNode = flowChartTree.GetNode(name);
         }
 
         /// <summary>
@@ -269,22 +282,23 @@ namespace Nova
         {
             if (destination == null)
             {
-                var msg = "Nova: jump_to instruction must have a destination.";
-                msg += " Exception occurs at chunk: " + currentNode.name;
+                string msg = "Nova: jump_to instruction must have a destination.";
+                msg += " Exception occurs at node: " + currentNode.name;
                 throw new ArgumentException(msg);
             }
 
             if (currentNode.type == FlowChartNodeType.Branching)
             {
-                throw new ArgumentException("Nova: Can not apply 'jump_to' to a Branching node");
+                throw new ArgumentException("Nova: Cannot apply jump_to() to a branching node.");
             }
 
             lazyBindingLinks.Add(new LazyBindingEntry
             {
                 from = currentNode,
-                branchInfo = BranchInformation.Defualt,
+                branchInfo = BranchInformation.Default,
                 destination = destination
             });
+
             currentNode = null;
         }
 
@@ -300,8 +314,8 @@ namespace Nova
         {
             if (destination == null)
             {
-                var msg = "Nova: a branch must have a destination.";
-                msg += " Exception occurs at chunk: " + currentNode.name;
+                string msg =
+                    $"Nova: a branch must have a destination. (name = {name}) Exception occurs at node: {currentNode.name}";
                 throw new ArgumentException(msg);
             }
 
@@ -336,11 +350,11 @@ namespace Nova
         /// The name of the start point, which can be differ from that of the node.
         /// If no name is given, use the name of the current node as the start point name.
         /// </param>
-        public void SetCurrentAsStarUpNode(string name)
+        public void SetCurrentAsStartUpNode(string name)
         {
             if (currentNode == null)
             {
-                throw new ArgumentException("Nova: is_start should be called after the definition of a label");
+                throw new ArgumentException("Nova: is_start() should be called after the definition of a label.");
             }
 
             if (name == null)
@@ -362,10 +376,10 @@ namespace Nova
         public void SetCurrentAsDefaultStart(string name)
         {
             // add a start up point
-            SetCurrentAsStarUpNode(name);
+            SetCurrentAsStartUpNode(name);
 
             // Make current node as the default start point
-            flowChartTree.DefaultStartUpNode = currentNode;
+            flowChartTree.defaultStartUpNode = currentNode;
         }
 
         /// <summary>
@@ -385,7 +399,7 @@ namespace Nova
             if (currentNode == null)
             {
                 throw new ArgumentException(
-                    string.Format("Nova: is_end({0}) should be called after the definition of a label", name));
+                    $"Nova: is_end({name}) should be called after the definition of a label.");
             }
 
             // Set the current node type as end

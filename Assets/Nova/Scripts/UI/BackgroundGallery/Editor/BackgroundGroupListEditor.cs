@@ -1,0 +1,213 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEditorInternal;
+using UnityEngine;
+
+namespace Nova.Editor
+{
+    [CustomEditor(typeof(BackgroundGroupList))]
+    public class BackgroundGroupListEditor : SimpleEntryListEditor
+    {
+        private BackgroundGroupList Target => target as BackgroundGroupList;
+
+        protected override SerializedProperty GetEntriesProperty()
+        {
+            return serializedObject.FindProperty("groups");
+        }
+
+        protected override GUIContent GetEntryLabelContent(int i)
+        {
+            return new GUIContent($"Group {i:D2}");
+        }
+
+        protected override GUIContent GetHeaderContent()
+        {
+            return new GUIContent("Background Groups");
+        }
+
+        [MenuItem("Assets/Nova/Create List for All Background Groups", false)]
+        public static void CreateListForAllBackgroundGroups()
+        {
+            var path = EditorUtils.GetSelectedDirectory();
+            var listPaths = AssetDatabase.FindAssets("t:BackgroundGroupList", new[] {path});
+            BackgroundGroupList list;
+            if (listPaths.Length == 0)
+            {
+                list = CreateInstance<BackgroundGroupList>();
+                var pathName = Path.GetFileNameWithoutExtension(path);
+                AssetDatabase.CreateAsset(list, Path.Combine(path, pathName + "_bg_group_list.asset"));
+            }
+            else
+            {
+                list = AssetDatabase.LoadAssetAtPath<BackgroundGroupList>(
+                    AssetDatabase.GUIDToAssetPath(listPaths.First()));
+            }
+
+            list.groups = AssetDatabase.FindAssets("t:BackgroundGroup", new[] {path})
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Select(AssetDatabase.LoadAssetAtPath<BackgroundGroup>)
+                .ToList();
+
+            EditorUtility.SetDirty(list);
+        }
+
+        private class ValidationResultList
+        {
+            public readonly List<int> indices = new List<int>();
+            private ReorderableList invalidGroupsList;
+
+            public void Init(SerializedProperty entries, string name)
+            {
+                invalidGroupsList =
+                    new ReorderableList(indices, typeof(BackgroundGroup), false, false, false, false);
+
+                invalidGroupsList.drawHeaderCallback = rect => { EditorGUI.LabelField(rect, new GUIContent(name)); };
+
+                invalidGroupsList.drawElementCallback = (rect, index, active, focused) =>
+                {
+                    rect.height -= 2;
+                    var center = rect.center;
+                    center.y += 1;
+                    rect.center = center;
+                    EditorGUI.PropertyField(rect,
+                        entries.GetArrayElementAtIndex(indices[index]));
+                };
+
+                invalidGroupsList.elementHeight = 20;
+            }
+
+            public void TryDoLayoutList()
+            {
+                if (!empty)
+                {
+                    invalidGroupsList.DoLayoutList();
+                }
+            }
+
+            public bool empty => indices.Count == 0;
+        }
+
+        private readonly ValidationResultList badReferenceGroupList = new ValidationResultList();
+        private readonly ValidationResultList badSnapshotAspectRatioGroupList = new ValidationResultList();
+        private readonly ValidationResultList emptyGroupList = new ValidationResultList();
+
+        private bool validated = false;
+
+        protected override void Init()
+        {
+            validated = false;
+            badReferenceGroupList.Init(GetEntriesProperty(), "Has Bad Resources Reference");
+            badSnapshotAspectRatioGroupList.Init(GetEntriesProperty(), "Bad Snapshot Aspect Ratio");
+            emptyGroupList.Init(GetEntriesProperty(), "Empty Groups");
+        }
+
+        private static bool GroupResourcesReferenceIsCorrect(BackgroundGroup group)
+        {
+            foreach (var entry in group.entries)
+            {
+                var path = entry.resourcePath;
+                if (Resources.Load<Sprite>(path) == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool GroupSnapshotAspectRatioIsCorrect(BackgroundGroup group)
+        {
+            if (group.entries.Count == 0) return true;
+            var entry = group.entries[0];
+            var path = entry.resourcePath;
+            var sprite = Resources.Load<Sprite>(path);
+            if (sprite == null) return true;
+            var tex = sprite.texture;
+            var size = entry.snapshotScale * new Vector2(tex.width, tex.height);
+            return Math.Abs(BackgroundGroupEditor.SnapshotAspectRatio - size.y / size.x) < 3 * float.Epsilon;
+        }
+
+        private static bool GroupIsEmpty(BackgroundGroup group)
+        {
+            return group.entries.Count == 0;
+        }
+
+        private void ValidateGroups()
+        {
+            validated = true;
+            badReferenceGroupList.indices.Clear();
+            badSnapshotAspectRatioGroupList.indices.Clear();
+            emptyGroupList.indices.Clear();
+            var groups = Target.groups;
+            for (int i = 0; i < groups.Count; i++)
+            {
+                var group = groups[i];
+                if (group == null) continue;
+
+                if (GroupIsEmpty(group))
+                {
+                    emptyGroupList.indices.Add(i);
+                }
+
+                if (!GroupResourcesReferenceIsCorrect(group))
+                {
+                    badReferenceGroupList.indices.Add(i);
+                }
+
+                if (!GroupSnapshotAspectRatioIsCorrect(group))
+                {
+                    badSnapshotAspectRatioGroupList.indices.Add(i);
+                }
+            }
+        }
+
+        private bool noValidationError => badReferenceGroupList.empty && badSnapshotAspectRatioGroupList.empty;
+
+        private void DrawValidationResult()
+        {
+            badReferenceGroupList.TryDoLayoutList();
+            badSnapshotAspectRatioGroupList.TryDoLayoutList();
+            emptyGroupList.TryDoLayoutList();
+        }
+
+        private void GenerateSnapshotForAllGroups()
+        {
+            foreach (var group in Target.groups)
+            {
+                BackgroundGroupEditor.GenerateSnapshot(group);
+            }
+
+            AssetDatabase.Refresh();
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            if (GUILayout.Button(new GUIContent("Validate Groups")))
+            {
+                ValidateGroups();
+            }
+
+            if (!validated)
+            {
+                // draw nothing
+            }
+            else if (noValidationError)
+            {
+                EditorGUILayout.HelpBox("Good, no invalid group found.", MessageType.Info);
+            }
+            else
+            {
+                DrawValidationResult();
+            }
+
+            if (GUILayout.Button("Generate Snapshot for All Groups"))
+            {
+                GenerateSnapshotForAllGroups();
+            }
+        }
+    }
+}

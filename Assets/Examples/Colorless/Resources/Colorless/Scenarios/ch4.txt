@@ -1,0 +1,215 @@
+@<|
+label('ch4', '终章')
+is_start()
+|>
+<|
+anim:trans_fade(cam, function()
+        show(ergong, 'normal', pos_c)
+        show(bg, 'room')
+    end)
+play(bgm, 'prelude')
+box_hide_show()
+auto_voice_on('王二宫', 4)
+auto_voice_on('张浅野', 14)
+auto_voice_on('孙西本', 9)
+auto_voice_on('陈高天', 11)
+set_auto_voice_delay(1)
+|>
+王二宫：：“嗯？为什么拿个杯子会花这么长时间？”
+
+会长一脸狐疑地问道。
+
+李竹内：：“抱歉，那里光线比较暗。”
+
+我推了推我的墨镜。会长勉强接受了这个借口。
+
+<|
+hide(ergong)
+|>
+我将杯子放到桌上，然后慢慢地倒出了奶茶。
+
+我有意倒得很慢。
+
+但是杯子总有装满的一天。
+
+<|
+show(gaotian, 'normal', pos_l)
+|>
+高天看上去很高兴，我对她回以僵硬的笑。
+
+<|
+hide(gaotian)
+show(qianye, 'normal', pos_r)
+|>
+这时，我的余光看到浅野的脸色一僵。
+
+发生了什么？
+
+<|
+hide(qianye)
+show(xiben, 'normal', pos_r)
+|>
+孙西本：：“我也要喝。”
+
+西本不知何时站在了我的旁边，从我怀里抽走了一个杯子。
+
+她弯下腰的时候，头发上的缎带擦过我的鼻翼。
+
+<|
+show(gaotian, 'normal', pos_l)
+|>
+陈高天：：“……西本同学……”
+
+高天露出了不知所措的表情，看上去像是受伤的小鹿。
+
+<|
+hide(gaotian)
+|>
+西本的手一顿，但是她装作没看见，依旧将奶茶往杯子里倒。
+
+<|
+show(ergong, 'normal', pos_l)
+|>
+西本在这个高中一直不和他人有所接触，她的异状引起了会长的警觉。
+
+会长想必也没有看漏我僵硬的表情。她正来回看着我、西本和高天。
+
+浅野想要说些什么，但是却被会长抢了先机。
+
+王二宫：：“没关系，奶茶还够嘛。”
+
+王二宫：：“说不定西本同学也有些口渴呢。”
+
+<|
+hide(xiben)
+show(qianye, 'normal', pos_r)
+|>
+张浅野：：“但、但是……竹内和高天不是……”
+
+王二宫：：“大家都是朋友，有什么关系嘛……”
+
+会长一边说着，一边随手将桌上的杯子打乱。
+
+三个一次性杯中都装着乳白色的奶茶，再也分不清你我。
+
+浅野偷偷扫了一眼被我扔到垃圾堆的空玻璃瓶，露出了绝望的表情。
+
+<|
+hide(qianye)
+|>
+王二宫：：“竹内君，不如你先请吧。大家一起喝，高天同学和西本同学也没意见吧？”
+
+<|
+hide(ergong)
+anim:fade_out(bgm)
+|>
+有意见。
+
+<|
+show(gaotian, 'cry', pos_l)
+|>
+高天何止有意见，她的眼泪都要涌出来了。
+
+但是太过着急的高天却无法顺利地将自己的意思表达出来。
+
+<|
+hide(gaotian)
+show(xiben, 'normal', pos_r)
+|>
+西本呆立着，好像丢了魂。
+
+<|
+hide(xiben)
+show(ergong, 'normal', pos_l)
+|>
+学生会长笑着看着我，她似乎猜到了什么。
+
+<|
+hide(ergong)
+show(qianye, 'normal', pos_r)
+|>
+浅野也看着我。
+
+<|
+anim_persist_begin()
+hide(qianye)
+play(bgm, 'final', 0)
+anim_persist:wait(1.7):volume(bgm, 0.5, 5):wait(1.7)
+|>
+时间好像在这一刻凝固。
+
+外面的雨点也停滞在空中。
+
+<|
+local entry = anim:wait_all(anim_persist)
+entry:vfx(cam, 'mono', {0, 0.9}, 0.5)
+entry:trans2(cam, nil, {'radial_blur', 1}, 0.1, { _Size = 200 }, 0.4)
+|>
+我用颤抖的手摘下了自己的墨镜——
+
+<|
+anim_persist_end()
+|>
+霎时间，世界变成了灰色。
+
+这是一种罕见的疾病，它可以夺走人生的乐趣。
+
+失去色彩的世界会令人绝望。
+
+患上这种病的人，自杀比病死的要多一倍。
+
+<|
+anim:vfx(cam, {'colorless', 2}, {0, 1})
+|>
+但相对地，一些本来无色透明的物质却会展现出奇妙的颜色。
+
+那不是正常人能够理解的色彩。
+
+就像天生的盲人无法理解黑暗一般。
+
+<|
+anim:trans_down(bg, 'black', 0.5)
+sound('flap')
+|>
+我将那杯奶茶一饮而尽——这个颜色我在厕所里就已经见过一次了。
+
+然后，我放下杯子。
+
+周遭的一切事物，耳边的一切声音都无法再束缚住我。
+
+获得自由的我虚弱到无法动弹。
+
+<|
+anim_persist_begin()
+anim_persist:trans_up(bg, 'rain', 0.5
+    ):vfx(cam, {'color', 1}, {0, 1}, 10, { _ColorMul = 3 })
+|>
+我用尽力气将目光转向窗外。
+
+窗外的风景一片灰白，好像是老照片一般模糊。
+
+我凝视着不断落下的雨点。
+
+在我眼中，本应该是无色的雨点也开始闪耀着彩虹的光彩。
+
+…………
+
+<|
+anim:wait_all(anim_persist)
+|>
+……
+
+<|
+anim_persist_end()
+anim:trans_fade(cam, function()
+        show(bg, 'black')
+        vfx(cam, nil)
+        vfx(cam, {nil, 2})
+    end, 2
+    ):trans_fade(bg, 'staff', 2)
+anim:fade_out(bgm, 5)
+set_box('hide')
+stop_auto_skip()
+|>
+<align="center">终</align>
+@<| is_end() |>

@@ -1,0 +1,14 @@
+import os
+
+resources_dir = '../../Assets/Resources'
+out_filename = os.path.join(resources_dir, 'LocalizedResourcePaths.txt')
+
+with open(out_filename, 'w', encoding='utf-8', newline='\n') as f:
+    for root, dirs, files in os.walk(os.path.join(resources_dir, 'Locales')):
+        for file in sorted(files):
+            if file.endswith('.meta'):
+                continue
+            filename = os.path.join(root, os.path.splitext(file)[0])
+            filename = filename.replace('\\', '/')
+            filename = filename.replace(resources_dir + '/', '')
+            f.write(filename + '\n')

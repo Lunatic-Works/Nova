@@ -1,123 +1,154 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
 {
-    /// <summary>
-    /// Change the sprite of component Image or SpriteRenderer with fade effects
-    /// </summary>
     public class SpriteChangerWithFade : MonoBehaviour
     {
-        public bool needFade = true;
         public float fadeDuration = 0.1f;
+        public float fadeInDelay = 0.0f;
 
-        /// <summary>
-        /// target alpha when no change happens
-        /// </summary>
-        public float staticAlpha = 1.0f;
-
-        /// <summary>
-        /// intermediate alpha for during the change
-        /// </summary>
-        public float intermediateAlpha = 0.0f;
-
-        private delegate Sprite GetSprite();
-
-        private delegate void SetSprite(Sprite sprite);
-
-        private GetSprite _getSprite;
-        private SetSprite _setSprite;
-
-        private delegate Color GetColor();
-
-        private delegate void SetColor(Color color);
-
-        private GetColor _getColor;
-        private SetColor _setColor;
+        private SpriteRenderer spriteRenderer;
+        private Image image;
+        private NovaAnimation novaAnimation;
+        private GameObject ghost;
+        private SpriteRenderer ghostSpriteRenderer;
+        private Image ghostImage;
 
         private void Awake()
         {
-            var image = GetComponent<Image>();
-            if (image != null)
-            {
-                _getSprite = () => image.sprite;
-                _setSprite = sp => image.sprite = sp;
-                _getColor = () => image.color;
-                _setColor = c => image.color = c;
-                return;
-            }
-
-            var spriteRenderer = GetComponent<SpriteRenderer>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            image = GetComponent<Image>();
+            this.RuntimeAssert(spriteRenderer != null || image != null, "Missing SpriteRenderer or Image.");
+            novaAnimation = GameObject.FindWithTag("NovaAnimation").transform.Find("PerDialogue")
+                .GetComponent<NovaAnimation>();
+            ghost = new GameObject("SpriteChangerGhost");
+            ghost.transform.SetParent(transform);
+            ghost.SetActive(false);
+            // Show ghost in front of original sprite
+            ghost.transform.localPosition = 0.001f * Vector3.back;
             if (spriteRenderer != null)
             {
-                _getSprite = () => spriteRenderer.sprite;
-                _setSprite = sp => spriteRenderer.sprite = sp;
-                _getColor = () => spriteRenderer.color;
-                _setColor = c => spriteRenderer.color = c;
-                return;
-            }
-
-            Debug.LogError(string.Format(
-                "Nova: ChangeSpriteWithFade should have Image or SpriteRenderer component attached." +
-                " Object name: {0}", gameObject.name));
-        }
-
-        private Coroutine fadingCoroutine;
-
-        /// <summary>
-        /// Assign this property to change the sprite with fade in/out effects
-        /// </summary>
-        public Sprite sprite
-        {
-            get { return _getSprite(); }
-            set
-            {
-                if (!needFade)
-                {
-                    _setSprite(value);
-                    return;
-                }
-
-                StartCoroutine(ChangeSpriteWithFade(value));
-            }
-        }
-
-        private void Fade(float fromAlpha, float toAlpha, float time)
-        {
-            iTween.ValueTo(gameObject, iTween.Hash(
-                "from", fromAlpha,
-                "to", toAlpha,
-                "time", time,
-                "easetype", "linear",
-                "onupdate", "SetAlpha"
-            ));
-        }
-
-        private void SetAlpha(float newAlpha)
-        {
-            var oldColor = _getColor();
-            _setColor(new Color(oldColor.r, oldColor.g, oldColor.b, newAlpha));
-        }
-
-        private IEnumerator ChangeSpriteWithFade(Sprite sp)
-        {
-            if (_getSprite() != null)
-            {
-                // Fade out if previous sprite exists
-                Fade(staticAlpha, intermediateAlpha, fadeDuration);
-                yield return new WaitForSeconds(fadeDuration);
-            }
-
-            _setSprite(sp);
-            if (sp != null)
-            {
-                Fade(intermediateAlpha, staticAlpha, fadeDuration);
+                ghostSpriteRenderer = ghost.AddComponent<SpriteRenderer>();
             }
             else
             {
-                SetAlpha(staticAlpha);
+                ghostImage = ghost.AddComponent<Image>();
+                RectTransform rectTransform = GetComponent<RectTransform>();
+                RectTransform ghostRectTransform = ghost.GetComponent<RectTransform>();
+                ghostRectTransform.sizeDelta = rectTransform.sizeDelta;
             }
+        }
+
+        private void SetSpriteRenderer(Sprite value, bool overlay)
+        {
+            Color color = spriteRenderer.color;
+            var colorTo = new Color(color.r, color.g, color.b, 0.0f);
+
+            bool needFadeInDelay = false;
+            if (spriteRenderer.sprite != null)
+            {
+                needFadeInDelay = true;
+                ghostSpriteRenderer.sprite = spriteRenderer.sprite;
+                ghostSpriteRenderer.color = spriteRenderer.color;
+                ghostSpriteRenderer.material = spriteRenderer.material;
+                ghost.SetActive(true);
+                novaAnimation.Do(new OpacityAnimationProperty(ghostSpriteRenderer, color.a, colorTo.a), fadeDuration)
+                    .Then(new ActionAnimationProperty(() => ghost.SetActive(false)));
+            }
+
+            if (value != null)
+            {
+                spriteRenderer.sprite = value;
+                if (!overlay)
+                {
+                    spriteRenderer.color = colorTo;
+                    if (needFadeInDelay)
+                    {
+                        novaAnimation.Do(null, fadeInDelay)
+                            .Then(new OpacityAnimationProperty(spriteRenderer, colorTo.a, color.a), fadeDuration);
+                    }
+                    else
+                    {
+                        novaAnimation.Do(new OpacityAnimationProperty(spriteRenderer, colorTo.a, color.a),
+                            fadeDuration);
+                    }
+                }
+            }
+            else
+            {
+                spriteRenderer.sprite = null;
+            }
+        }
+
+        private void SetImage(Sprite value, bool overlay)
+        {
+            Color color = image.color;
+            var colorTo = new Color(color.r, color.g, color.b, 0.0f);
+
+            bool needFadeInDelay = false;
+            if (image.sprite != null)
+            {
+                needFadeInDelay = true;
+                ghostImage.sprite = image.sprite;
+                ghostImage.SetNativeSize();
+                ghostImage.color = image.color;
+                ghostImage.material = image.material;
+                ghost.SetActive(true);
+                novaAnimation.Do(new OpacityAnimationProperty(ghostImage, color.a, colorTo.a), fadeDuration)
+                    .Then(new ActionAnimationProperty(() => ghost.SetActive(false)));
+            }
+
+            if (value != null)
+            {
+                image.sprite = value;
+                image.SetNativeSize();
+                if (!overlay)
+                {
+                    image.color = colorTo;
+                    if (needFadeInDelay)
+                    {
+                        novaAnimation.Do(null, fadeInDelay)
+                            .Then(new OpacityAnimationProperty(image, colorTo.a, color.a), fadeDuration);
+                    }
+                    else
+                    {
+                        novaAnimation.Do(new OpacityAnimationProperty(image, colorTo.a, color.a), fadeDuration);
+                    }
+                }
+            }
+            else
+            {
+                image.sprite = null;
+            }
+        }
+
+        public void SetSprite(Sprite value, bool overlay)
+        {
+            if (spriteRenderer != null)
+            {
+                SetSpriteRenderer(value, overlay);
+            }
+            else
+            {
+                SetImage(value, overlay);
+            }
+        }
+
+        public Sprite sprite
+        {
+            get
+            {
+                if (spriteRenderer != null)
+                {
+                    return spriteRenderer.sprite;
+                }
+                else
+                {
+                    return image.sprite;
+                }
+            }
+            set => SetSprite(value, overlay: false);
         }
     }
 }

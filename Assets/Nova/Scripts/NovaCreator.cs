@@ -14,7 +14,7 @@ namespace Nova
             var controllerCount = GameObject.FindGameObjectsWithTag("NovaGameController").Length;
             if (controllerCount > 1)
             {
-                Debug.LogWarning("Nova: Multiple Nova Game Controller found in the scene");
+                Debug.LogWarning("Nova: Multiple Nova Game Controller found in the scene.");
             }
 
             if (controllerCount >= 1)

@@ -1,0 +1,38 @@
+{
+    "Auto": [
+        "A"
+    ],
+    "Skip": [
+        "Ctrl"
+    ],
+    "Save": [
+        "F2"
+    ],
+    "Load": [
+        "F3"
+    ],
+    "QuickSave": [
+        "F9"
+    ],
+    "QuickLoad": [
+        "F10"
+    ],
+    "ToggleDialogue": [
+        "Escape"
+    ],
+    "StepForward": [
+        "Return",
+        "KeypadEnter",
+        "RightArrow",
+        "DownArrow"
+    ],
+    "ShowLog": [
+        "UpArrow"
+    ],
+    "ToggleFullscreen": [
+        "F11"
+    ],
+    "LeaveView": [
+        "Escape"
+    ]
+}

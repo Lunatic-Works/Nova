@@ -1,31 +1,82 @@
-﻿using LuaInterface;
+﻿using System;
+using System.Collections.Generic;
+using LuaInterface;
+using UnityEngine;
 
 namespace Nova
 {
+    public struct LocalizedDialogueEntry
+    {
+        public string displayName;
+        public string dialogue;
+    }
+
     /// <summary>
-    /// A dialogue entry contains the text to display and some actions to execute.
+    /// Dialogue entry without action. Used for serialization.
     /// </summary>
-    /// <remarks>
-    /// DialogueEntry is immutable
-    /// </remarks>
+    [Serializable]
+    public class DialogueDisplayData
+    {
+        public readonly string characterName;
+        public readonly Dictionary<SystemLanguage, string> displayNames;
+        public readonly Dictionary<SystemLanguage, string> dialogues;
+
+        public DialogueDisplayData(string characterName, Dictionary<SystemLanguage, string> displayNames,
+            Dictionary<SystemLanguage, string> dialogues)
+        {
+            this.characterName = characterName;
+            this.displayNames = displayNames;
+            this.dialogues = dialogues;
+        }
+
+        public string FormatNameDialogue()
+        {
+            var name = I18n.__(displayNames);
+            var dialogue = I18n.__(dialogues);
+            if (string.IsNullOrEmpty(name))
+            {
+                return dialogue;
+            }
+            else
+            {
+                return string.Format(I18n.__("format.namedialogue"), name, dialogue);
+            }
+        }
+    }
+
+    /// <summary>
+    /// A dialogue entry contains the character name and the dialogue in each locale, and the action to execute.
+    /// </summary>
     public class DialogueEntry
     {
+        /// <value>Internally used character name.</value>
+        public readonly string characterName;
+
+        /// <value>Displayed character name for each locale.</value>
+        public readonly Dictionary<SystemLanguage, string> displayNames = new Dictionary<SystemLanguage, string>();
+
+        /// <value>Displayed dialogue for each locale.</value>
+        public readonly Dictionary<SystemLanguage, string> dialogues = new Dictionary<SystemLanguage, string>();
+
         /// <value>
-        /// The action to execute when the game processes to this point. The action can contain every thing
-        /// you want, like showing amazing VFX, changing BGM, make the character smile or cry, as long as
+        /// The action to execute when the game processes to this point. The action can contain everything
+        /// you want, like showing amazing VFX, changing BGM, or making the character smile or cry, as long as
         /// you can imagine.
         /// </value>
-        private readonly LuaFunction _action;
+        private readonly LuaFunction action;
 
-        /// <value>
-        /// The text to display. How to display is a problem of UI design
-        /// </value>
-        public string text { get; private set; }
-
-        public DialogueEntry(string text, LuaFunction action = null)
+        public DialogueEntry(string characterName, string displayName, string dialogue, LuaFunction action)
         {
-            _action = action;
-            this.text = text;
+            this.characterName = characterName;
+            displayNames[I18n.DefaultLocale] = displayName;
+            dialogues[I18n.DefaultLocale] = dialogue;
+            this.action = action;
+        }
+
+        public void AddLocale(SystemLanguage locale, LocalizedDialogueEntry entry)
+        {
+            displayNames[locale] = entry.displayName;
+            dialogues[locale] = entry.dialogue;
         }
 
         /// <summary>
@@ -33,10 +84,20 @@ namespace Nova
         /// </summary>
         public void ExecuteAction()
         {
-            if (_action != null)
+            if (action != null)
             {
-                _action.Call();
+                try
+                {
+                    action.Call();
+                }
+                catch (LuaException ex)
+                {
+                    throw new Exceptions.ScriptActionException(
+                        $"Nova: Exception occurred when executing action: {I18n.__(dialogues)}", ex);
+                }
             }
         }
+
+        public DialogueDisplayData displayData => new DialogueDisplayData(characterName, displayNames, dialogues);
     }
 }

@@ -2,39 +2,72 @@
 
 namespace Nova
 {
+    [ExportCustomType]
     public class ScreenCapturer : MonoBehaviour
     {
-        private const float AspectRatio = 1.0f * Bookmark.ScreenShotWidth / Bookmark.ScreenShotHeight;
+        [HideInInspector] public Texture2D gameTexture2D;
 
-        public GameObject screenCameraObject;
-
-        private Camera screenCamera;
-
-        private void Start()
+        private void Awake()
         {
-            // Save the initial screen size. Because when viewport is resized, the screen camera size won't change.
-            screenCamera = screenCameraObject.GetComponent<Camera>();
+            LuaRuntime.Instance.BindObject("screenCapturer", this);
         }
 
-        public Texture2D GetTexture()
+        public static RenderTexture GetGameTexture(bool withUI = true)
         {
-            var screenSize = new Vector2Int(Screen.width, Screen.height);
-            var containerSize = screenSize.GetContainerSize(AspectRatio);
-            var texture = new Texture2D(containerSize.x, containerSize.y, TextureFormat.RGB24, false);
-            var renderTexture = new RenderTexture(containerSize.x, containerSize.y, 0);
+            var screenCamera = withUI ? UICameraHelper.Active : Camera.main;
+            var renderTexture = new RenderTexture(RealScreen.width, RealScreen.height, 24)
+            {
+                name = "ScreenCapturerRenderTexture"
+            };
 
-            screenCamera.targetTexture = renderTexture;
-            screenCamera.Render();
-            screenCamera.targetTexture = null;
+            screenCamera.RenderToTexture(renderTexture);
+
+            return renderTexture;
+        }
+
+        public void SetGameTexture2D()
+        {
+            var screenSize = new Vector2Int(RealScreen.width, RealScreen.height);
+            gameTexture2D = new Texture2D(RealScreen.width, RealScreen.height, TextureFormat.RGB24, false);
+            var renderTexture = GetGameTexture(withUI: false);
+
             RenderTexture.active = renderTexture;
-            texture.ReadPixels(new Rect(Vector2.zero, containerSize), 0, 0, false);
+            gameTexture2D.ReadPixels(new Rect(Vector2.zero, screenSize), 0, 0, false);
             RenderTexture.active = null;
             Destroy(renderTexture);
+            gameTexture2D.Apply();
+        }
+
+        public void DestroyGameTexture2D()
+        {
+            Destroy(gameTexture2D);
+            gameTexture2D = null;
+        }
+
+        public static Texture2D GetBookmarkThumbnailTexture()
+        {
+            var texture = new Texture2D(Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight, TextureFormat.RGB24,
+                false);
+            var fullSizedRenderTexture = RenderTexture.GetTemporary(RealScreen.width, RealScreen.height, 24);
+            var renderTexture = RenderTexture.GetTemporary(Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight, 24);
+
+            UICameraHelper.Active.RenderToTexture(fullSizedRenderTexture);
+
+            Graphics.Blit(fullSizedRenderTexture, renderTexture);
+            RenderTexture.ReleaseTemporary(fullSizedRenderTexture);
+
+            RenderTexture.active = renderTexture;
+            texture.ReadPixels(new Rect(0, 0, Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight), 0, 0, false);
+            RenderTexture.active = null;
+            RenderTexture.ReleaseTemporary(renderTexture);
             texture.Apply();
 
-            TextureScale.Bilinear(texture, Bookmark.ScreenShotWidth, Bookmark.ScreenShotHeight);
-
             return texture;
+        }
+
+        private void OnDestroy()
+        {
+            DestroyGameTexture2D();
         }
     }
 }

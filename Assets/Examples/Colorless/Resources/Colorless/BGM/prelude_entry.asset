@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ad38311eb714f96a1b9f62be871f1e5, type: 3}
+  m_Name: prelude_entry
+  m_EditorClassIdentifier: 
+  id: prelude
+  displayNames:
+  - locale: 40
+    value: "C\u5927\u8C03\u524D\u594F\u66F2"
+  - locale: 10
+    value: Prelude in C Major
+  resourcePath: Colorless\BGM\prelude
+  loopBeginSample: 0
+  loopEndSample: 4167099

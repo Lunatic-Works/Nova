@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
 using UnityEngine;
-using Newtonsoft.Json;
+using UnityEngine.Events;
 
 namespace Nova
 {
     // object can be string or string[]
     //
-    // For the i-th(zero-based) string in the string[],
-    // it will be used as the translation if the first argument provided to __ is == i
+    // For the i-th (zero-based) string in the string[],
+    // it will be used as the translation if the first argument provided to __ is i
     //
     // Example:
     // "ivebeenthere": ["I've never been there", "I've been there once", "I've been there twice", "I've been there {0} times"]
@@ -21,185 +18,168 @@ namespace Nova
     // __("ivebeenthere", 4) == "I've been there 4 times"
     using TranslationBundle = Dictionary<string, object>;
 
-    public class I18n
+    [ExportCustomType]
+    public static class I18n
     {
-        public static readonly I18n Instance = new I18n();
+        public const string LocalePath = "Locales/";
 
-        /// <summary>
-        /// Translation data with a fallback chain.
-        /// </summary>
-        private List<TranslationBundle> _translationDatas = new List<TranslationBundle>();
+        public static readonly SystemLanguage[] SupportedLocales =
+            {SystemLanguage.ChineseSimplified, SystemLanguage.English};
 
-        /// <summary>
-        /// Supported locales. The first one is also the default and final fallback for all languages.
-        /// </summary>
-        private readonly SystemLanguage[] _locales = { SystemLanguage.Chinese, SystemLanguage.English };
+        public static SystemLanguage DefaultLocale => SupportedLocales[0];
 
-        /// <summary>
-        /// Fallback locale definition. _fallbacks[NotFoundLanguage] = FallbackLanguage
-        /// </summary>
-        private readonly Dictionary<SystemLanguage, SystemLanguage> _fallbacks = new Dictionary<SystemLanguage, SystemLanguage>()
+        private static SystemLanguage _currentLocale = Application.systemLanguage;
+
+        public static SystemLanguage CurrentLocale
         {
-            { SystemLanguage.ChineseSimplified, SystemLanguage.Chinese },
-            { SystemLanguage.ChineseTraditional, SystemLanguage.Chinese }
-        };
-        private SystemLanguage _currentLocale = Application.systemLanguage;
-
-        public SystemLanguage CurrentLocale
-        {
-            get { return _currentLocale; }
-            set { _currentLocale = value; Init(); }
-        }
-
-        private const string LocalePath = "Locales/";
-
-        private I18n()
-        {
-            Init();
-        }
-
-        private void ChainLoadLanguage(SystemLanguage locale)
-        {
-            try
+            get => _currentLocale;
+            set
             {
-                if (_locales.Contains(locale))
-                {
+                _currentLocale = value;
+                Init();
+                FallbackLocale();
+                LocaleChanged.Invoke();
+            }
+        }
+
+        private static void FallbackLocale()
+        {
+            if (_currentLocale == SystemLanguage.Chinese || _currentLocale == SystemLanguage.ChineseSimplified ||
+                _currentLocale == SystemLanguage.ChineseTraditional)
+            {
+                _currentLocale = SystemLanguage.ChineseSimplified;
+            }
+            else
+            {
+                _currentLocale = SystemLanguage.English;
+            }
+        }
+
+        public static readonly UnityEvent LocaleChanged = new UnityEvent();
+
+        private static bool Inited = false;
+
+        private static void Init()
+        {
+            if (Inited) return;
+            LoadTranslationBundles();
+            Inited = true;
+        }
+
+        private static readonly Dictionary<SystemLanguage, TranslationBundle> TranslationBundles =
+            new Dictionary<SystemLanguage, TranslationBundle>();
+
+        private static void LoadTranslationBundles()
+        {
+            foreach (var locale in SupportedLocales)
+            {
 #if UNITY_EDITOR
-                    var all = File.ReadAllText(EditorPathRoot + locale + ".json");
-                    _translationDatas.Add(JsonConvert.DeserializeObject<TranslationBundle>(all));
+                var text = File.ReadAllText(EditorPathRoot + locale + ".json");
+                TranslationBundles[locale] = JsonConvert.DeserializeObject<TranslationBundle>(text);
 #else
-                    var all = Resources.Load(LocalePath + locale) as TextAsset;
-                    _translationDatas.Add(JsonConvert.DeserializeObject<TranslationBundle>(all.text));
-#endif
-                }
-                else
-                    throw new Exception();
-            }
-            catch
-            {
-                Debug.LogWarning("Nova: Locale [" + _currentLocale + "] not found in supported list");
-#if UNITY_EDITOR
-                _translationDatas.Add(new TranslationBundle());
-                EditorOnly_SaveTranslation();
+                var textAsset = Resources.Load(LocalePath + locale) as TextAsset;
+                TranslationBundles[locale] = JsonConvert.DeserializeObject<TranslationBundle>(textAsset.text);
 #endif
             }
-            SystemLanguage next;
-            if (_fallbacks.TryGetValue(locale, out next))
-                ChainLoadLanguage(next);
-            else if (_locales[0] != locale)
-                ChainLoadLanguage(_locales[0]);
-        }
-
-        private void Init()
-        {
-            _translationDatas.Clear();
-            ChainLoadLanguage(CurrentLocale);
-#if UNITY_EDITOR
-            _lastWriteTime = File.GetLastWriteTime(EditorTranslationPath);
-#endif
         }
 
         /// <summary>
         /// Get the translation specified by key and optionally deal with the plurals and format arguments. (Shorthand)<para />
-        /// When using in Unity Editor, missing translation will be automatically added to the corrsponding json file.<para />
-        /// Also, translation will be automatically reloaded if the JSON file is changed.
+        /// Translation will be automatically reloaded if the JSON file is changed.
         /// </summary>
+        /// <param name="locale"></param>
         /// <param name="key">Key to specify the translation</param>
         /// <param name="args">Arguments to provide to the translation as a format string.<para />
         /// The first argument will be used to determine the quantity if needed.</param>
         /// <returns>The translated string.</returns>
-        public static string __(string key, params object[] args)
-        {
-            return Instance.Translate(key, args);
-        }
-
-        /// <summary>
-        /// Get the translation specified by key and optionally deal with the plurals and format arguments.<para />
-        /// When using in Unity Editor, missing translation will be automatically added to the corrsponding json file.<para />
-        /// Also, translation will be automatically reloaded if the JSON file is changed.
-        /// </summary>
-        /// <param name="key">Key to specify the translation</param>
-        /// <param name="args">Arguments to provide to the translation as a format string.<para />
-        /// The first argument will be used to determine the quantity if needed.</param>
-        /// <returns>The translated string.</returns>
-        public string Translate(string key, params object[] args)
+        public static string __(SystemLanguage locale, string key, params object[] args)
         {
 #if UNITY_EDITOR
             EditorOnly_GetLatestTranslation();
 #endif
+
+            Init();
+
             string translation = key;
-            object raw;
-            int i = 0, n = _translationDatas.Count;
-            for (i = 0; i < n; i++)
+
+            if (TranslationBundles[locale].TryGetValue(key, out var raw))
             {
-                if (_translationDatas[i].TryGetValue(key, out raw))
+                if (raw is string value)
                 {
-                    if (raw is string)
-                        translation = raw as string;
-                    else if (raw is string[])
+                    translation = value;
+                }
+                else if (raw is string[] formats)
+                {
+                    if (formats.Length == 0)
                     {
-                        var formats = raw as string[];
-                        if (formats.Length == 0)
-                            Debug.LogWarning("Nova: Empty string list for: " + key);
-                        else if (args.Length == 0)
-                            translation = formats[0];
-                        else
+                        Debug.LogWarningFormat("Nova: Empty translation string list for: {0}", key);
+                    }
+                    else if (args.Length == 0)
+                    {
+                        translation = formats[0];
+                    }
+                    else
+                    {
+                        // The first argument will determine the quantity
+                        object arg1 = args[0];
+                        if (arg1 is int i)
                         {
-                            // Assuming the first argument will determine the quantity
-                            object arg1 = args[0];
-                            long quantity = -1;
-                            if (arg1 is int || arg1 is short || arg1 is long)
-                                quantity = (long)arg1;
-                            else if (arg1 is string && !long.TryParse(arg1 as string, out quantity))
-                                quantity = -1;
-                            if (quantity != -1)
-                                translation = formats[Math.Min(quantity, formats.Length - 1)];
+                            translation = formats[Math.Min(i, formats.Length - 1)];
                         }
                     }
-                    if (args.Length > 0)
-                        translation = string.Format(translation, args);
-#if UNITY_EDITOR
-                    if (translation == key)
-                        continue;
-#endif
-                    break;
                 }
-                if (i == 0)
-                    Debug.LogWarning("Nova: Missing translation for: " + key);
+                else
+                {
+                    Debug.LogWarningFormat("Nova: Invalid translation format for: {0}", key);
+                }
+
+                if (args.Length > 0)
+                {
+                    translation = string.Format(translation, args);
+                }
             }
-#if UNITY_EDITOR
-            if (translation == key)
+            else
             {
-                // Translation is not found by all means
-                _translationDatas[0].Add(key, key);
-                EditorOnly_SaveTranslation();
+                Debug.LogWarningFormat("Nova: Missing translation for: {0}", key);
             }
-#endif
+
             return translation;
         }
 
+        public static string __(string key, params object[] args)
+        {
+            return __(CurrentLocale, key, args);
+        }
+
+        // Get localized string with fallback to DefaultLocale
+        public static string __(Dictionary<SystemLanguage, string> dict)
+        {
+            if (dict.ContainsKey(CurrentLocale))
+            {
+                return dict[CurrentLocale];
+            }
+            else
+            {
+                return dict[DefaultLocale];
+            }
+        }
+
 #if UNITY_EDITOR
-        private string EditorTranslationPath
-        {
-            get { return EditorPathRoot + _currentLocale + ".json"; }
-        }
+        private static string EditorPathRoot => "Assets/Nova/Resources/" + LocalePath;
 
-        private string EditorPathRoot
-        {
-            get { return "Assets/Nova/Resources/" + LocalePath; }
-        }
-        private DateTime _lastWriteTime;
-        private void EditorOnly_SaveTranslation()
-        {
-            Directory.CreateDirectory(EditorPathRoot);
-            File.WriteAllText(EditorTranslationPath, JsonConvert.SerializeObject(_translationDatas[0], Formatting.Indented));
-            _lastWriteTime = File.GetLastWriteTime(EditorTranslationPath);
-        }
+        private static string EditorTranslationPath => EditorPathRoot + CurrentLocale + ".json";
 
-        private void EditorOnly_GetLatestTranslation()
+        private static DateTime LastWriteTime;
+
+        private static void EditorOnly_GetLatestTranslation()
         {
-            if (File.GetLastWriteTime(EditorTranslationPath) != _lastWriteTime)
+            var writeTime = File.GetLastWriteTime(EditorTranslationPath);
+            if (writeTime != LastWriteTime)
+            {
+                LastWriteTime = writeTime;
+                Inited = false;
                 Init();
+            }
         }
 #endif
     }

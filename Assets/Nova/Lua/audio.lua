@@ -1,30 +1,58 @@
----
---- Created by L.
---- DateTime: 2018/7/23 12:48 PM
----
-
---- play bgm
---- this function will stop the previous bgm and start the new one
---- this function should have bgmController binded
-function play_bgm(audio_name)
-    __Nova.bgmController:PlayAudio(audio_name)
+function sound(audio_name, volume, pos, use_3d)
+    volume = volume or 1
+    pos = pos or {0, 0, 0}
+    if use_3d then
+        __Nova.soundController:PlayClipAtPoint(audio_name, Vector3(unpack(pos)), volume)
+    else
+        __Nova.soundController:PlayClipNo3D(audio_name, Vector3(unpack(pos)), volume)
+    end
 end
 
---- stop current playing bgm
---- if no bgm is playing, this function will do nothing
---- this function should have bgmController binded
-function stop_bgm()
-    __Nova.bgmController:StopAudio()
+function say(obj, audio_name, delay, override_auto_voice)
+    delay = delay or 0
+    if override_auto_voice == nil then
+        override_auto_voice = true
+    end
+    obj:Say(audio_name, delay)
+    if override_auto_voice then
+        auto_voice_overridden = true
+    end
 end
 
---- play sound
---- this function should have soundController binded
-function play_sound(audio_name, position, volume)
-    if position == nil then
-        position = Vector3(0, 0, 0)
+function play(obj, audio_name, volume)
+    volume = volume or 0.5
+    obj.scriptVolume = volume
+    obj:Play(audio_name)
+
+    if obj == bgm or obj == music then
+        __Nova.bgmUnlockHelper:Unlock(audio_name)
     end
-    if volume == nil then
-        volume = 1
-    end
-    __Nova.soundController:PlayClipAtPoint(audio_name, position, volume)
-end 
+end
+add_preload_pattern('play')
+
+function stop(obj)
+    obj:Stop()
+    schedule_gc()
+end
+
+function volume(obj, value)
+    obj.scriptVolume = value
+end
+
+make_anim_method('volume', function(self, obj, value, duration)
+    duration = duration or 1
+    return self:_then(Nova.VolumeAnimationProperty(obj, value)):_for(duration)
+end)
+
+make_anim_method('fade_in', function(self, obj, audio_name, volume, duration)
+    volume = volume or 0.5
+    local entry = self:action(play, obj, audio_name, 0):volume(obj, volume, duration)
+    entry.head = self
+    return entry
+end)
+
+make_anim_method('fade_out', function(self, obj, duration)
+    local entry = self:volume(obj, 0, duration):action(stop, obj)
+    entry.head = self
+    return entry
+end)

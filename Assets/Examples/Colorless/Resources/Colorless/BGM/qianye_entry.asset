@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ad38311eb714f96a1b9f62be871f1e5, type: 3}
+  m_Name: qianye_entry
+  m_EditorClassIdentifier: 
+  id: qianye
+  displayNames:
+  - locale: 40
+    value: "D\u5C0F\u8C03\u5C0F\u63D0\u7434\u7ADE\u594F\u66F2"
+  - locale: 10
+    value: Violin Partita No.2 in D Minor
+  resourcePath: Colorless\BGM\qianye
+  loopBeginSample: 0
+  loopEndSample: 5471085

@@ -1,8 +1,19 @@
----
---- Created by huisedenanhai.
---- DateTime: 2018/7/18 1:17 AM
----
-
+--- require order is important
 require 'built_in'
-require 'background_controller'
+require 'hook'
+require 'preload'
+
+require 'animation'
+require 'animation_high_level'
+require 'animation_presets'
 require 'audio'
+require 'auto_voice'
+require 'checkpoint_helper'
+require 'dialogue_box'
+require 'garbage_collection'
+require 'graphics'
+require 'input'
+require 'pose'
+require 'shader_info'
+require 'timeline'
+require 'transition'
