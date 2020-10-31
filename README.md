@@ -1,6 +1,6 @@
 # Nova（能叶）
 
-![Nova banner](doc/img/nova_banner)
+![Nova banner](doc/img/nova_banner.png)
 
 基于Unity，对程序员友好的视觉小说（VN）/文字冒险游戏（AVG）框架
 
