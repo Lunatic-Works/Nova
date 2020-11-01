@@ -14,4 +14,8 @@
 
 ## 友情链接
 
-我们的第一部视觉小说作品《青箱》 https://store.steampowered.com/app/1131740
+我们的第一部视觉小说作品《青箱》：[Steam页面](https://store.steampowered.com/app/1131740) [知乎页面](https://www.zhihu.com/question/409724349) [Bangumi页面](https://bgm.tv/subject/311066)
+
+我们的微博：[@LunaticWorks](https://weibo.com/LunaticWorks)
+
+我们的QQ群：876212259，如果以后讨论程序的人多了可能会再开一个程序群
