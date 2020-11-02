@@ -18,7 +18,7 @@
     * `Core/`：核心部分的代码
     * `Editor/`：在Unity Editor中使用的代码
     * `Exceptions/`
-    * `Fonts/`：字体，包括Textmesh Pro使用的font asset和material preset，以及生成font asset时使用的字符集，字符集由`Tools/Resources/generate_charsets.py`生成
+    * `Fonts/`：字体，包括TextMesh Pro使用的font asset和material preset，以及生成font asset时使用的字符集，字符集由`Tools/Resources/generate_charsets.py`生成
     * `Generate/`：生成的代码
     * `Lua/`
     * `Prefabs/`

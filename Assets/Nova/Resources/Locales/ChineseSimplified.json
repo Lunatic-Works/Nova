@@ -52,7 +52,7 @@
   "config.key.QuickLoad": "快速读档",
   "config.key.QuickSave": "快速存档",
   "config.key.Save": "存档",
-  "config.key.ShowLog": "显示历史",
+  "config.key.ShowLog": "文本回顾",
   "config.key.Skip": "快进",
   "config.key.StepForward": "下一句",
   "config.key.ToggleDialogue": "隐藏/显示对话框",
