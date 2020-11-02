@@ -200,7 +200,7 @@ TODO：动画低层接口的文档
             * 转场默认的`layer_id`为1，特效默认的`layer_id`为0
             * 目前不支持同一种特效叠加多次
     * `times`可以是`duration`或`{duration, easing}`
-    * `properties`为shader的参数
+    * `properties`为shader的属性
         * TODO：由于一些历史遗留问题，shader的名称会从Unity风格转换为Lua风格，但是property的名称不会，这里以后要统一
     * `color2`为转场后图片的颜色
         * 如果`obj`是`CameraController`，则`color2`无效
@@ -212,7 +212,7 @@ TODO：动画低层接口的文档
         * 第二类转场前半段和后半段的`times`和`properties`可以分别设置
 * 特效 `vfx(obj, shader_layer, t, properties)`
     * `shader_name`为`nil`或空字符串表示取消特效
-    * `t`对应shader的参数`_T`，范围为0~1，0表示特效不出现，1表示特效完全出现
+    * `t`对应shader的属性`_T`，范围为0~1，0表示特效不出现，1表示特效完全出现
     * `t, properties`可省略，默认`t`为1
 * 特效动画 `anim:vfx(obj, shader_layer, start_target_t, times, properties)`
     * `start_target_t`为`{start_t, target_t}`

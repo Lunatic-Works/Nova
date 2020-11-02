@@ -28,6 +28,7 @@
 * [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎
 * [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个使用web前端的引擎，似乎得到了Xihe Animation的支持
 * [Snowing](https://github.com/Strrationalism/Snowing)：用C++写的硬核引擎
+* [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家自研引擎的碎片化问题，而定义的通用脚本格式
 
 本框架的依赖：
 
