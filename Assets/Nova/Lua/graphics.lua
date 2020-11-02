@@ -14,7 +14,7 @@ function auto_fade_off()
 end
 
 --- usage:
----     show(obj, 'image_name', [{x, y, [scale, z, angle]}, {r, g, b, [a]}])
+---     show(obj, 'image_name', [{x, y, [scale, z, angle]}, {r, g, b, [a]}, fade])
 function show(obj, image_name, coord, color, fade)
     if fade == nil then
         fade = (auto_fade_off_count == 0)

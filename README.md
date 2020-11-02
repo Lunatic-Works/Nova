@@ -12,6 +12,7 @@
 
 * [程序结构](doc/program_structure.md)
 * [目录结构](doc/directory_structure.md)
+* [脚本语言](doc/novascript.md)
 * [Todo list](doc/todo.md)
 
 ## 友情链接
@@ -27,3 +28,8 @@
 * [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎
 * [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个使用web前端的引擎，似乎得到了Xihe Animation的支持
 * [Snowing](https://github.com/Strrationalism/Snowing)：用C++写的硬核引擎
+
+本框架的依赖：
+
+* [tolua#](https://github.com/topameng/tolua)
+* [Json.NET](https://github.com/JamesNK/Newtonsoft.Json)

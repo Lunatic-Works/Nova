@@ -34,14 +34,3 @@ make_anim_method('trans_down', function(self, obj, image_name, duration)
     duration = duration or 1
     return self:trans(obj, image_name, 'fade', duration, { _Mask = 'Masks/wipe_up', _InvertMask = 1 })
 end, add_preload_pattern)
-
-function box_hide_show(duration, pos_name, style_name)
-    duration = duration or 1
-    -- set style and new page beforr animation
-    set_box('hide', style_name, false)
-    if box_pos_presets[pos_name] and box_pos_presets[pos_name][update_mode] == 'append' then
-        new_page()
-    end
-    anim:wait(duration):action(set_box, pos_name, style_name, false)
-    text_delay(duration)
-end

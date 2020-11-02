@@ -33,17 +33,17 @@ function label(name, display_name)
 end
 
 --- jump to the given destination
-function jump_to(destination)
-    __Nova.scriptLoader:RegisterJump(destination)
+function jump_to(dest)
+    __Nova.scriptLoader:RegisterJump(dest)
 end
 
---- a branch needs to have the following structure
+--- a branch needs to have the following structure:
 --- {
----    name = 'the name of this branch',
----    destination = 'the destination node of this branch',
+---    name = 'text for this branch',
+---    dest = 'name of the destination node',
 ---    metadata = {a table that contains some additional information}
 --- }
---- only the metadata field can be omitted
+--- the metadata field can be omitted
 
 --- add branches to the current node
 --- branches should be a list of 'branch'
@@ -59,14 +59,14 @@ end
 --- should be called after the node has been defined
 --- a flowchart tree CAN have multiple entrance points, which means this method can be called several times under
 --- different nodes
---- a start point can have a name. If no name is given, the name of the current node will be used.
---- the name of the start point should be unique among that of all the start points.
+--- a start point can have a name. If no name is given, the name of the current node will be used
+--- the name of the start point should be unique among that of all the start points
 function is_start(name)
     __Nova.scriptLoader:SetCurrentAsStartUpNode(name)
 end
 
 --- set the current node as the default start point
---- a game can have only one default start point. this function CANNOT be called under different nodes.
+--- a game can have only one default start point. This function CANNOT be called under different nodes
 --- the meaning of the parameter name is the same as that of is_start()
 function is_default_start(name)
     __Nova.scriptLoader:SetCurrentAsDefaultStart(name)
@@ -84,7 +84,7 @@ end
 
 --- get GameObject
 --- caching everything might cause memory leak, so this method will do no cache
---- find GameObject by name might be slow. it is user's work to decide whether to cache the result or not
+--- find GameObject by name might be slow. It is the author's work to decide whether to cache the result or not
 function get_go(obj)
     local o
     if type(obj) == 'string' then

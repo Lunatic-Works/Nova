@@ -160,15 +160,15 @@ local function set_mat_properties(mat, base_shader_name, properties)
     end
 end
 
-local function parse_shader_name_layer_id(shader_name_layer_id, default_layer_id)
+local function parse_shader_layer(shader_layer, default_layer_id)
     default_layer_id = default_layer_id or 0
-    if shader_name_layer_id == nil then
+    if shader_layer == nil then
         return nil, default_layer_id
-    elseif type(shader_name_layer_id) == 'string' then
-        return shader_name_layer_id, default_layer_id
+    elseif type(shader_layer) == 'string' then
+        return shader_layer, default_layer_id
     else
-        -- type(shader_name_layer_id) == 'table'
-        return shader_name_layer_id[1], shader_name_layer_id[2]
+        -- type(shader_layer) == 'table'
+        return shader_layer[1], shader_layer[2]
     end
 end
 
@@ -191,8 +191,8 @@ end
 --- usage:
 ---     trans(obj, 'image_name', 'shader_name', [duration, { name = value }, {r, g, b, [a]}])
 ---     trans(cam, func, 'shader_name', [duration, { name = value }, {r, g, b, [a]}])
-make_anim_method('trans', function(self, obj, image_name, shader_name_layer_id, times, properties, color2)
-    local shader_name, layer_id = parse_shader_name_layer_id(shader_name_layer_id, cam_trans_layer_id)
+make_anim_method('trans', function(self, obj, image_name, shader_layer, times, properties, color2)
+    local shader_name, layer_id = parse_shader_layer(shader_layer, cam_trans_layer_id)
     -- mat is not RestorableMaterial
     local mat, base_shader_name = get_mat(obj, shader_name, false)
     local duration, easing = parse_times(times)
@@ -255,8 +255,8 @@ end, add_preload_pattern)
 --- range of _T is (0, 1), _T = 0 shows _MainTex, _T = 1 hides _MainTex
 --- usage:
 ---     trans2(obj, 'image_name', 'shader_name', [duration, { name = value }, duration2, { name = value }, {r, g, b, [a]}])
-make_anim_method('trans2', function(self, obj, image_name, shader_name_layer_id, times, properties, times2, properties2, color2)
-    local shader_name, layer_id = parse_shader_name_layer_id(shader_name_layer_id, cam_trans_layer_id)
+make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, properties, times2, properties2, color2)
+    local shader_name, layer_id = parse_shader_layer(shader_layer, cam_trans_layer_id)
     -- mat is not RestorableMaterial
     local mat, base_shader_name = get_mat(obj, shader_name, false)
     local duration, easing = parse_times(times)
@@ -320,8 +320,8 @@ end, add_preload_pattern)
 --- usage:
 ---     vfx(obj, 'shader_name', [t, { name = value }])
 ---     vfx(obj, {'shader_name'. layer_id}, [t, { name = value }])
-function vfx(obj, shader_name_layer_id, t, properties)
-    local shader_name, layer_id = parse_shader_name_layer_id(shader_name_layer_id)
+function vfx(obj, shader_layer, t, properties)
+    local shader_name, layer_id = parse_shader_layer(shader_layer)
     if shader_name and shader_name ~= '' then
         local mat, base_shader_name = get_mat(obj, shader_name)
         t = t or 1
@@ -350,8 +350,8 @@ end
 --- if target_t = 0, the material will be set to default after the animation
 --- usage:
 ---     vfx(obj, 'shader_name', {start_t, target_t}, duration, [{ name = value }])
-make_anim_method('vfx', function(self, obj, shader_name_layer_id, start_target_t, times, properties)
-    local shader_name, layer_id = parse_shader_name_layer_id(shader_name_layer_id)
+make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times, properties)
+    local shader_name, layer_id = parse_shader_layer(shader_layer)
     local mat, base_shader_name = get_mat(obj, shader_name)
     local start_t, target_t = unpack(start_target_t)
     local duration, easing = parse_times(times)
@@ -388,8 +388,8 @@ end)
 
 --- usage:
 ---     vfx_free(obj, 'shader_name', duration, {{'name', start_value, target_value}, ...}, [{ name = value }])
-make_anim_method('vfx_free', function(self, obj, shader_name_layer_id, times, anim_properties, properties)
-    local shader_name, layer_id = parse_shader_name_layer_id(shader_name_layer_id)
+make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_properties, properties)
+    local shader_name, layer_id = parse_shader_layer(shader_layer)
     local mat, base_shader_name = get_mat(obj, shader_name)
     local duration, easing = parse_times(times)
     properties = properties or {}

@@ -7,7 +7,7 @@
     * `Resources/Colorless/`：这部作品的资源文件，在`Resources`下面建一个`Colorless`文件夹有利于防止资源的名字跟外面冲突
         * `Backgrounds/`：背景图片（如果需要前景等其他图片，可以单独放一个文件夹）
         * `BGM/`：背景音乐
-        * `Scenarios/`：剧本
+        * `Scenarios/`：剧情脚本
         * `Sounds/`：音效
         * `Standings/`：立绘部件，每名角色各有一个文件夹
         * `Voices/`：语音，每名角色各有一个文件夹
