@@ -6,7 +6,7 @@ import re
 
 shader_proto_dir = '../../Assets/Nova/ShaderProtos'
 shader_dir = '../../Assets/Nova/Resources/Shaders'
-timestamps_filename = 'timestamps.json'
+timestamps_filename = 'shader_timestamps.json'
 shader_info_cs_filename = '../../Assets/Nova/Generate/ShaderInfoDatabase.cs'
 shader_info_lua_filename = '../../Assets/Nova/Lua/shader_info.lua'
 

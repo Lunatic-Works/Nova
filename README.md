@@ -10,12 +10,17 @@
 
 文档正在施工中……
 
+* [目录结构](doc/directory_structure.md)
 * [Todo list](doc/todo.md)
 
 ## 友情链接
 
-我们的第一部视觉小说作品《青箱》：[Steam页面](https://store.steampowered.com/app/1131740) [知乎页面](https://www.zhihu.com/question/409724349) [Bangumi页面](https://bgm.tv/subject/311066)
+* 我们的第一部视觉小说作品《青箱》：[Steam页面](https://store.steampowered.com/app/1131740) [知乎页面](https://www.zhihu.com/question/409724349) [Bangumi页面](https://bgm.tv/subject/311066)
+* 我们的微博：[@LunaticWorks](https://weibo.com/LunaticWorks)
+* 我们的QQ群：876212259，如果以后讨论程序的人多了可能会再开一个程序群
 
-我们的微博：[@LunaticWorks](https://weibo.com/LunaticWorks)
-
-我们的QQ群：876212259，如果以后讨论程序的人多了可能会再开一个程序群
+* [Ren'Py](https://github.com/renpy/renpy)：如果你没有编程基础但是想学，或者有Python基础，推荐用这个引擎
+* [AVG.js](https://github.com/avgjs/avg-core)：如果你信仰web前端，推荐用这个引擎
+* [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎
+* [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个使用web前端的引擎，似乎得到了Xihe Animation的支持
+* [Snowing](https://github.com/Strrationalism/Snowing)：用C++写的硬核引擎

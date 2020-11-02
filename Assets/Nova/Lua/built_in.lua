@@ -50,7 +50,7 @@ end
 --- this method can be only called once for each node. i.e. all branches of the node should be added at once
 function branch(branches)
     for i, branch in ipairs(branches) do
-        __Nova.scriptLoader:RegisterBranch(branch.name, branch.destination, branch.metadata)
+        __Nova.scriptLoader:RegisterBranch(branch.name, branch.dest, branch.metadata)
     end
     __Nova.scriptLoader:EndRegisterBranch()
 end
