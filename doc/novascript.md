@@ -69,11 +69,11 @@ Nova提供的Lua文件放在`Assets/Nova/Lua/`文件夹下。目前tolua#提供�
             * 图片文件位置由`SpriteController.imageFolder`设置
     * `coord`是图像的坐标，格式为`{x, y, scale, z, angle}`，元素均为数值
         * 坐标系：画面中心的`x, y, z`为0，向右`x`增大，向上`y`增大，向里`z`增大
-        * `angle`的正值为逆时针，范围为-180~180
+        * `angle`的正值为逆时针，范围为-180\~180
         * `scale, z, angle`可省略，默认为这个Controller之前的值
         * `scale`和`angle`可以改为三个数值的table，表示`x, y, z`分量
         * 为了方便只有2D的演出，我们没有把`z`和`x, y`放在一起
-    * `color`是与图像相乘的颜色，是一个table，包括1~4个数值，范围为0~1
+    * `color`是与图像相乘的颜色，是一个table，包括1\~4个数值，范围为0\~1
         * 1个数值：`r, g, b`均为该值，`a`为1
         * 2个数值：`r, g, b`均为第一个值，`a`为第二个值
         * 3个数值：`r, g, b`为这三个数值，`a`为1
@@ -89,7 +89,7 @@ Nova提供的Lua文件放在`Assets/Nova/Lua/`文件夹下。目前tolua#提供�
 
 * 播放音效 `sound(audio_name, volume, pos, use_3d)`
     * `audio_name`是音效的名称，文件位置由`SoundController.audioFolder`设置
-    * `volume`范围为0~1
+    * `volume`范围为0\~1
         * 实际的音量为脚本中的音量与设置中的音量的乘积
     * `pos`是音效的位置，格式为`{x, y, z}`
         * 音效素材一般不需要做出立体声效果，由引擎实现
@@ -212,7 +212,7 @@ TODO：动画低层接口的文档
         * 第二类转场前半段和后半段的`times`和`properties`可以分别设置
 * 特效 `vfx(obj, shader_layer, t, properties)`
     * `shader_name`为`nil`或空字符串表示取消特效
-    * `t`对应shader的属性`_T`，范围为0~1，0表示特效不出现，1表示特效完全出现
+    * `t`对应shader的属性`_T`，范围为0\~1，0表示特效不出现，1表示特效完全出现
     * `t, properties`可省略，默认`t`为1
 * 特效动画 `anim:vfx(obj, shader_layer, start_target_t, times, properties)`
     * `start_target_t`为`{start_t, target_t}`
