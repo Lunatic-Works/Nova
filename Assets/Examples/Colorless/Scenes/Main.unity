@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 25935805}
   - component: {fileID: 25935806}
   m_Layer: 16
-  m_Name: SpriteMerger
+  m_Name: TextureMerger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

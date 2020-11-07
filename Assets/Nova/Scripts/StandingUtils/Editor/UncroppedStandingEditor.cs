@@ -24,7 +24,7 @@ namespace Nova.Editor
 
             foreach (var spritePath in EditorUtils.PathOfSelectedSprites())
             {
-                var go = new GameObject("Standing Component");
+                var go = new GameObject("StandingComponent");
                 var spriteRenderer = go.AddComponent<SpriteRenderer>();
                 var sprite = spriteRenderer.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
                 var cropper = go.AddComponent<SpriteCropper>();
