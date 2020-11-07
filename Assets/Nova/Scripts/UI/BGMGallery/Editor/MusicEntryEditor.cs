@@ -358,7 +358,7 @@ namespace Nova.Editor
             return AssetDatabase.GetMainAssetTypeAtPath(path) == typeof(AudioClip);
         }
 
-        [MenuItem("Assets/Nova/Create Music Entries for All Audio Clips in Folder", false)]
+        [MenuItem("Assets/Nova/Create Music Entries for All Audio Clips", false)]
         public static void CreateMusicEntryForAllAudioClips()
         {
             var paths = new[] {EditorUtils.GetSelectedDirectory()};
