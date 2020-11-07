@@ -1,19 +1,22 @@
 # Nova（能叶）
 
-![Nova banner](doc/img/nova_banner.png)
+![Nova banner](https://github.com/Lunatic-Works/Nova/wiki/img/nova_banner.png)
 
 基于Unity，对程序员友好的视觉小说（VN）/文字冒险游戏（AVG）框架
 
 本框架支持Unity 2018和2019，Windows/Linux/macOS/Android/iOS平台
 
-## 使用说明
+## 快速上手
+
+1. 将`Assets/Examples/Colorless/`文件夹下的所有东西移动到`Assets/`下
+2. 打开`Assets/Scenes/Main.unity`，体验示例作品
+3. 试着改一改各种素材和配置吧
+
+## 说明文档
 
 文档正在施工中……
 
-* [程序结构](doc/program_structure.md)
-* [目录结构](doc/directory_structure.md)
-* [脚本语言](doc/novascript.md)
-* [Todo list](doc/todo.md)
+https://github.com/Lunatic-Works/Nova/wiki/
 
 ## 友情链接
 
