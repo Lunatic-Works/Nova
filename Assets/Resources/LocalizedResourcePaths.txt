@@ -1,0 +1,5 @@
+Locales/English/Colorless/Backgrounds/staff
+Locales/English/Colorless/Scenarios/ch1
+Locales/English/Colorless/Scenarios/ch2
+Locales/English/Colorless/Scenarios/ch3
+Locales/English/Colorless/Scenarios/ch4

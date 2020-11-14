@@ -20,6 +20,7 @@ auto_voice_on('？？？', 4)
 show(qianye, 'normal', pos_c, 0)
 anim:cam_punch()
 anim:vfx(cam, 'mono', {0, 0.9}, 0.3)
+sound('flap', 0.5)
 |>
 那个人摘下了我的墨镜。
 
@@ -66,8 +67,9 @@ anim:vfx(cam, 'mono', {0, 0.9}, 0.3)
 <|
 anim:cam_punch()
 anim:vfx(cam, 'mono', {0.9, 0}, 0.3)
+sound('flap', 0.5)
 |>
-我从洗手台上取过小瓶，然后从他手中夺回墨镜。
+我取过小瓶，紧接着从他手中夺回墨镜。
 
 李竹内：：“抱歉，刚才没看清楚。”
 
@@ -81,7 +83,7 @@ tint(qianye, 1)
 |>
 在我离开厕所的时候，那个人依旧对着我的背影骂着。
 
-？？？：：“别搞砸了！小心那个会长，她可能是另一边派来的人！”
+？？？：：“别搞砸了！小心那个会长，她可能是另一边派来的人……”
 
 <|
 anim:trans_fade(bg, 'black')
