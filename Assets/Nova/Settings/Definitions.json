@@ -18,12 +18,12 @@
         "defaultValue": 1,
         "max": 2
     },
-    "SkipSpeed": {
+    "FastForwardSpeed": {
         "min": 1,
         "defaultValue": 2,
         "max": 3
     },
-    "OnlySkipRead": {
+    "OnlyFastForwardRead": {
         "defaultValue": 1
     },
     "AbortAnimation": {

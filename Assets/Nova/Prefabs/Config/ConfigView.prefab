@@ -3225,7 +3225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inflateTextKey: config.item.onlyskipread
+  inflateTextKey: config.item.onlyfastforwardread
 --- !u!114 &4302047356483401322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7536,7 +7536,7 @@ PrefabInstance:
     - target: {fileID: 66509085395240754, guid: 99ea0e89a196f4dec99cc167bc3f2968,
         type: 3}
       propertyPath: m_Name
-      value: OnlySkipRead
+      value: OnlyFastForwardRead
       objectReference: {fileID: 0}
     - target: {fileID: 66509085395240909, guid: 99ea0e89a196f4dec99cc167bc3f2968,
         type: 3}
@@ -7646,7 +7646,7 @@ PrefabInstance:
     - target: {fileID: 8936213892256827692, guid: 99ea0e89a196f4dec99cc167bc3f2968,
         type: 3}
       propertyPath: configKeyName
-      value: OnlySkipRead
+      value: OnlyFastForwardRead
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 99ea0e89a196f4dec99cc167bc3f2968, type: 3}

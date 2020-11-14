@@ -71,7 +71,7 @@ namespace Nova
             var sprites = poseArray.Select(imageName =>
                 AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, imageName))).ToList();
             var texture = characterTextureMerger.GetMergedTexture(sprites);
-            if (fade && !gameState.isMovingBack && dialogueBoxController.state != DialogueBoxState.Skip)
+            if (fade && !gameState.isMovingBack && dialogueBoxController.state != DialogueBoxState.FastForward)
             {
                 textureChanger.SetTexture(texture);
             }
@@ -122,7 +122,7 @@ namespace Nova
 
             Sprite sprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageName));
             if (spriteChanger != null && spriteChanger.enabled && fade && !gameState.isMovingBack &&
-                dialogueBoxController.state != DialogueBoxState.Skip)
+                dialogueBoxController.state != DialogueBoxState.FastForward)
             {
                 // If pose is not changing, do not hide body
                 if (currentImageName != null && imageName[0] == currentImageName[0])
@@ -151,7 +151,7 @@ namespace Nova
 
             if (textureChanger != null)
             {
-                if (fade && !gameState.isMovingBack && dialogueBoxController.state != DialogueBoxState.Skip)
+                if (fade && !gameState.isMovingBack && dialogueBoxController.state != DialogueBoxState.FastForward)
                 {
                     textureChanger.SetTexture(null);
                 }
@@ -161,7 +161,7 @@ namespace Nova
                 }
             }
             else if (spriteChanger != null && spriteChanger.enabled && fade && !gameState.isMovingBack &&
-                     dialogueBoxController.state != DialogueBoxState.Skip)
+                     dialogueBoxController.state != DialogueBoxState.FastForward)
             {
                 spriteChanger.sprite = null;
             }

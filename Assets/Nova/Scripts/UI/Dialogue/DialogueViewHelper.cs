@@ -17,9 +17,9 @@ namespace Nova
             controller.state = DialogueBoxState.Auto;
         }
 
-        public void StartSkip()
+        public void StartFastForward()
         {
-            controller.state = DialogueBoxState.Skip;
+            controller.state = DialogueBoxState.FastForward;
         }
 
         public void StartNormal()

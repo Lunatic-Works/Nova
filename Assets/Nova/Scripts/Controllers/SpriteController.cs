@@ -159,7 +159,7 @@ namespace Nova
 
             Sprite newSprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageName));
             if (spriteChanger != null && spriteChanger.enabled && fade && !gameState.isMovingBack &&
-                dialogueBoxController.state != DialogueBoxState.Skip)
+                dialogueBoxController.state != DialogueBoxState.FastForward)
             {
                 spriteChanger.sprite = newSprite;
             }
@@ -179,7 +179,7 @@ namespace Nova
             }
 
             if (spriteChanger != null && spriteChanger.enabled && fade && !gameState.isMovingBack &&
-                dialogueBoxController.state != DialogueBoxState.Skip)
+                dialogueBoxController.state != DialogueBoxState.FastForward)
             {
                 spriteChanger.sprite = defaultSprite;
             }

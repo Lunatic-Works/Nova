@@ -273,7 +273,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 387142925}
-          m_MethodName: StartSkip
+          m_MethodName: StartFastForward
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -284,7 +284,7 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
     activeSprite: {fileID: 21300000, guid: e066518f315c59a4ab73fd08b30f686b, type: 3}
-    actionI18nName: ingame.skip.button
+    actionI18nName: ingame.fastforward.button
   _sectorRadius: 200
   innerRatio: 0.3
   angleOffset: -67.5
@@ -1762,7 +1762,7 @@ MonoBehaviour:
   clickForwardAbility: 1
   abortAnimationAbility: 1
   scriptAbortAnimationAbility: 1
-  onlySkipRead: 1
+  onlyFastForwardRead: 1
   dialogueUpdateMode: 0
   hideDialogueButtons:
   - {fileID: 8792096721231997147}
@@ -1787,16 +1787,16 @@ MonoBehaviour:
   autoModeStops:
     m_PersistentCalls:
       m_Calls: []
-  skipModeStarts:
+  fastForwardModeStarts:
     m_PersistentCalls:
       m_Calls: []
-  skipModeStops:
+  fastForwardModeStops:
     m_PersistentCalls:
       m_Calls: []
   continueAutoAfterBranch: 0
-  continueSkipAfterBranch: 0
+  continueFastForwardAfterBranch: 0
   autoDelay: 0
-  skipDelay: 0
+  fastForwardDelay: 0
   textAnimation: {fileID: 1503052317}
   needAnimation: 1
   readColor: {r: 0, g: 0, b: 0, a: 1}
@@ -1879,7 +1879,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b55bc709342695c4585a171396005580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configKeyName: OnlySkipRead
+  configKeyName: OnlyFastForwardRead
 --- !u!114 &387142936
 MonoBehaviour:
   m_ObjectHideFlags: 0

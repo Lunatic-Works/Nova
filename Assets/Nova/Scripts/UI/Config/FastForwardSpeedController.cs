@@ -3,20 +3,20 @@
 namespace Nova
 {
     /// <summary>
-    /// Toggle ability to skip read only based on the value in ConfigManager
+    /// Control fast forward speed based on the value in ConfigManager
     /// </summary>
     [RequireComponent(typeof(DialogueBoxController))]
-    public class OnlySkipReadController : MonoBehaviour
+    public class FastForwardSpeedController : MonoBehaviour
     {
         public string configKeyName;
 
+        private DialogueBoxController dialogueBoxController;
         private ConfigManager configManager;
-        private DialogueBoxController controller;
 
         private void Awake()
         {
+            dialogueBoxController = GetComponent<DialogueBoxController>();
             configManager = Utils.FindNovaGameController().ConfigManager;
-            controller = GetComponent<DialogueBoxController>();
         }
 
         private void OnEnable()
@@ -32,7 +32,8 @@ namespace Nova
 
         private void UpdateValue()
         {
-            controller.onlySkipRead = configManager.GetInt(configKeyName) > 0;
+            // Convert speed to duration
+            dialogueBoxController.fastForwardDelay = Mathf.Pow(0.1f, configManager.GetFloat(configKeyName));
         }
     }
 }

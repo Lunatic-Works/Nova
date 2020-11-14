@@ -8,6 +8,6 @@
     {
         Normal,
         Auto,
-        Skip
+        FastForward
     }
 }

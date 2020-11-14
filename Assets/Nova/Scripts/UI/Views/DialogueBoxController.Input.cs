@@ -5,16 +5,16 @@ namespace Nova
 {
     public partial class DialogueBoxController
     {
-        private bool _skipHotKeyHolding;
+        private bool _fastForwardHotKeyHolding;
 
-        private bool skipHotKeyHolding
+        private bool fastForwardHotKeyHolding
         {
-            get => _skipHotKeyHolding;
+            get => _fastForwardHotKeyHolding;
             set
             {
-                if (_skipHotKeyHolding == value) return;
-                _skipHotKeyHolding = value;
-                state = value ? DialogueBoxState.Skip : DialogueBoxState.Normal;
+                if (_fastForwardHotKeyHolding == value) return;
+                _fastForwardHotKeyHolding = value;
+                state = value ? DialogueBoxState.FastForward : DialogueBoxState.Normal;
             }
         }
 
@@ -60,7 +60,7 @@ namespace Nova
                 viewManager.GetController<LogController>().Show();
             }
 
-            skipHotKeyHolding = inputMapper.GetKey(AbstractKey.Skip);
+            fastForwardHotKeyHolding = inputMapper.GetKey(AbstractKey.FastForward);
         }
 
         private void HandleShortCutWhenDialogueHidden()
@@ -245,7 +245,7 @@ namespace Nova
                 return;
             }
 
-            // Stop auto/skip on any button or torch
+            // Stop auto/fast forward on any button or torch
             state = DialogueBoxState.Normal;
 
             // Handle hyperlinks on any button or torch
@@ -310,7 +310,7 @@ namespace Nova
         [HideInInspector] public bool clickForwardAbility = true;
         [HideInInspector] public bool abortAnimationAbility = true;
         [HideInInspector] public bool scriptAbortAnimationAbility = true;
-        [HideInInspector] public bool onlySkipRead = true;
+        [HideInInspector] public bool onlyFastForwardRead = true;
 
         public void ClickForward()
         {

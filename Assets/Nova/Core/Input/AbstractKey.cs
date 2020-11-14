@@ -2,14 +2,14 @@ namespace Nova
 {
     public enum AbstractKey
     {
+        StepForward,
         Auto,
-        Skip,
+        FastForward,
         Save,
         Load,
         QuickSave,
         QuickLoad,
         ToggleDialogue,
-        StepForward,
         ShowLog,
         ToggleFullscreen,
         LeaveView,

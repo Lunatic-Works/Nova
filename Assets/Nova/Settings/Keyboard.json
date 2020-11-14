@@ -1,8 +1,14 @@
 {
+    "StepForward": [
+        "Return",
+        "KeypadEnter",
+        "RightArrow",
+        "DownArrow"
+    ],
     "Auto": [
         "A"
     ],
-    "Skip": [
+    "FastForward": [
         "Ctrl"
     ],
     "Save": [
@@ -19,12 +25,6 @@
     ],
     "ToggleDialogue": [
         "Escape"
-    ],
-    "StepForward": [
-        "Return",
-        "KeypadEnter",
-        "RightArrow",
-        "DownArrow"
     ],
     "ShowLog": [
         "UpArrow"

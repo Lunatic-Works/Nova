@@ -10,8 +10,10 @@
 /[Uu]ser[Ss]ettings/
 
 !/[Aa]ssets/**/*.meta
-/[Aa]ssets/Plugins*
 /[Aa]ssets/AssetStoreTools*
+/[Aa]ssets/Plugins*
+
+/[Aa]ssets/Nova/ThirdParty/ToLua/Source/Generate/*
 /[Aa]ssets/Resources/Lua*
 
 # Visual Studio cache directory

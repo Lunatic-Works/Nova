@@ -329,9 +329,9 @@ namespace Nova
                         }
 
                         break;
-                    case DialogueBoxState.Skip:
-                        StopSkip();
-                        skipModeStops.Invoke();
+                    case DialogueBoxState.FastForward:
+                        StopFastForward();
+                        fastForwardModeStops.Invoke();
 
                         uiPP.ClearLayer();
                         if (fastForwardModeIcon != null)
@@ -350,7 +350,7 @@ namespace Nova
                         _state = DialogueBoxState.Normal;
                         break;
                     case DialogueBoxState.Auto:
-                        BeginAuto();
+                        StartAuto();
                         autoModeStarts.Invoke();
 
                         if (autoModeIcon != null)
@@ -359,15 +359,15 @@ namespace Nova
                         }
 
                         break;
-                    case DialogueBoxState.Skip:
-                        if (!isReadDialogue && onlySkipRead && !skipHotKeyHolding)
+                    case DialogueBoxState.FastForward:
+                        if (!isReadDialogue && onlyFastForwardRead && !fastForwardHotKeyHolding)
                         {
-                            Alert.Show(I18n.__("dialogue.noskip"));
+                            Alert.Show(I18n.__("dialogue.noreadtext"));
                             return;
                         }
 
-                        BeginSkip();
-                        skipModeStarts.Invoke();
+                        StartFastForward();
+                        fastForwardModeStarts.Invoke();
 
                         uiPP.PushMaterial(fastForwardPostProcessingMaterial);
                         if (fastForwardModeIcon != null)
@@ -384,8 +384,8 @@ namespace Nova
 
         public UnityEvent autoModeStarts;
         public UnityEvent autoModeStops;
-        public UnityEvent skipModeStarts;
-        public UnityEvent skipModeStops;
+        public UnityEvent fastForwardModeStarts;
+        public UnityEvent fastForwardModeStops;
 
         private static bool IsAnimating => NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
 
@@ -409,7 +409,7 @@ namespace Nova
             currentNodeName = dialogueData.nodeName;
 
             isReadDialogue = dialogueData.hasBeenReached;
-            if (state == DialogueBoxState.Skip && !isReadDialogue && onlySkipRead && !skipHotKeyHolding)
+            if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead && !fastForwardHotKeyHolding)
             {
                 state = DialogueBoxState.Normal;
             }
@@ -426,10 +426,10 @@ namespace Nova
                     throw new ArgumentOutOfRangeException();
             }
 
-            // No animation playing when skip
-            if (state == DialogueBoxState.Skip) NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+            // No animation playing when fast forwarding
+            if (state == DialogueBoxState.FastForward) NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
 
-            // Check current state and set schedule skip
+            // Check current state and set schedule for the next dialogue entry
             SetSchedule();
 
             dialogueTime = GetDialogueTime();
@@ -457,8 +457,8 @@ namespace Nova
                 case DialogueBoxState.Auto:
                     TrySchedule(GetDialogueTimeAuto());
                     break;
-                case DialogueBoxState.Skip:
-                    TrySchedule(skipDelay);
+                case DialogueBoxState.FastForward:
+                    TrySchedule(fastForwardDelay);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -508,7 +508,7 @@ namespace Nova
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName);
 
             if (this.needAnimation && useDefaultTextAnimation && needAnimation && !gameState.isMovingBack &&
-                state != DialogueBoxState.Skip)
+                state != DialogueBoxState.FastForward)
             {
                 var contentBox = entry.contentBox;
                 var contentProxy = entry.contentProxy;
@@ -565,7 +565,7 @@ namespace Nova
         }
 
         public bool continueAutoAfterBranch;
-        public bool continueSkipAfterBranch;
+        public bool continueFastForwardAfterBranch;
 
         /// <summary>
         /// Check if should restore the previous state before the branch happens
@@ -581,8 +581,8 @@ namespace Nova
                 case DialogueBoxState.Auto:
                     state = continueAutoAfterBranch ? DialogueBoxState.Auto : DialogueBoxState.Normal;
                     break;
-                case DialogueBoxState.Skip:
-                    state = continueSkipAfterBranch ? DialogueBoxState.Skip : DialogueBoxState.Normal;
+                case DialogueBoxState.FastForward:
+                    state = continueFastForwardAfterBranch ? DialogueBoxState.FastForward : DialogueBoxState.Normal;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -628,7 +628,7 @@ namespace Nova
         /// <remarks>
         /// This method should be called when the state is normal
         /// </remarks>
-        private void BeginAuto()
+        private void StartAuto()
         {
             Assert.AreEqual(state, DialogueBoxState.Normal, "DialogueBoxState State != DialogueBoxState.Normal");
             _state = DialogueBoxState.Auto;
@@ -649,33 +649,33 @@ namespace Nova
         }
 
         public float autoDelay;
-        public float skipDelay;
+        public float fastForwardDelay;
 
         public NovaAnimation textAnimation;
         public bool needAnimation = true;
 
         /// <summary>
-        /// Begin skip
+        /// Begin fast forward
         /// </summary>
         /// <remarks>
         /// This method should be called when the state is normal
         /// </remarks>
-        private void BeginSkip()
+        private void StartFastForward()
         {
             Assert.AreEqual(state, DialogueBoxState.Normal, "DialogueBoxState State != DialogueBoxState.Normal");
-            _state = DialogueBoxState.Skip;
-            TrySchedule(skipDelay);
+            _state = DialogueBoxState.FastForward;
+            TrySchedule(fastForwardDelay);
         }
 
         /// <summary>
-        /// Stop skip
+        /// Stop fast forward
         /// </summary>
         /// <remarks>
-        /// This method should be called when the state is skip
+        /// This method should be called when the state is fast forward
         /// </remarks>
-        private void StopSkip()
+        private void StopFastForward()
         {
-            Assert.AreEqual(state, DialogueBoxState.Skip, "DialogueBoxState State != DialogueBoxState.Skip");
+            Assert.AreEqual(state, DialogueBoxState.FastForward, "DialogueBoxState State != DialogueBoxState.FastForward");
             _state = DialogueBoxState.Normal;
             TryRemoveSchedule();
         }
@@ -710,7 +710,7 @@ namespace Nova
                 if (NextPageOrStep())
                 {
                     timeAfterDialogueChange = 0;
-                    TrySchedule(state == DialogueBoxState.Auto ? autoDelay : skipDelay);
+                    TrySchedule(state == DialogueBoxState.Auto ? autoDelay : fastForwardDelay);
                 }
             }
             else

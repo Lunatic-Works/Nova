@@ -209,7 +209,7 @@ anim:trans_fade(cam, function()
     ):trans_fade(bg, 'staff', 2)
 anim:fade_out(bgm, 5)
 set_box('hide')
-stop_auto_skip()
+stop_auto_ff()
 |>
 <align="center">终</align>
 @<| is_end() |>

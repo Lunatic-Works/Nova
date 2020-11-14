@@ -1,9 +1,9 @@
-function stop_auto_skip()
+function stop_auto_ff()
     __Nova.dialogueBoxController.state = Nova.DialogueBoxState.Normal
 end
 
-function stop_skip()
-    if __Nova.dialogueBoxController.state == Nova.DialogueBoxState.Skip then
+function stop_ff()
+    if __Nova.dialogueBoxController.state == Nova.DialogueBoxState.FastForward then
         __Nova.dialogueBoxController.state = Nova.DialogueBoxState.Normal
     end
 end
