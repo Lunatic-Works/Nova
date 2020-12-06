@@ -46,6 +46,7 @@ namespace Nova
 
         private MusicEntry currentMusic
         {
+            get => _currentMusic;
             set
             {
                 if (_currentMusic == value)
@@ -73,6 +74,14 @@ namespace Nova
             {
                 _musicList = value;
                 currentMusic = _musicList?.Current()?.entry;
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (currentMusic != null)
+            {
+                ApplyMusicEntry(currentMusic);
             }
         }
 
