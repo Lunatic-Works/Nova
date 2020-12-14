@@ -266,14 +266,13 @@ namespace Nova
                 foreach (string name in Directory.GetFiles(savePathBase, "sav*.nsav*"))
                 {
                     var result = Regex.Match(name, @"sav([0-9]+)\.nsav");
-                    if (result.Groups.Count > 1)
+                    if (result.Groups.Count > 1 && int.TryParse(result.Groups[1].Value, out int id))
                     {
-                        if (int.TryParse(result.Groups[1].Value, out int id))
-                            saveSlotsMetadata.Add(id, new BookmarkMetadata
-                            {
-                                saveID = id,
-                                modifiedTime = File.GetLastWriteTime(name)
-                            });
+                        saveSlotsMetadata.Add(id, new BookmarkMetadata
+                        {
+                            saveID = id,
+                            modifiedTime = File.GetLastWriteTime(name)
+                        });
                     }
                 }
 
@@ -369,6 +368,12 @@ namespace Nova
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
         public GameStateStepRestoreEntry IsReachedForAnyVariables(string nodeName, int dialogueIndex)
         {
+            // If reading global save file fails, globalSave will be null
+            if (globalSave == null)
+            {
+                return null;
+            }
+
             foreach (var dict in globalSave.savedNodesByVariablesHash.Values)
             {
                 if (dict.TryGetValue(nodeName, out NodeSaveInfo info) &&
@@ -526,25 +531,24 @@ namespace Nova
             {
                 this.RuntimeAssert(fileHeader.SequenceEqual(bw.ReadBytes(fileHeader.Length)),
                     "Invalid save file format.");
-                this.RuntimeAssert(Version >= bw.ReadInt32(),
-                    "Save file is incompatible with the current version of engine.");
 
-                using (var compressed = new DeflateStream(s, CompressionMode.Decompress))
-                using (var uncompressed = new MemoryStream())
+                int version = bw.ReadInt32();
+                this.RuntimeAssert(Version >= version,
+                    "Save file is incompatible with the current version of Nova.");
+
+                if (version == 2)
                 {
-                    var position = s.Position;
-                    try
+                    using (var compressed = new DeflateStream(s, CompressionMode.Decompress))
+                    using (var uncompressed = new MemoryStream())
                     {
                         compressed.CopyTo(uncompressed);
                         uncompressed.Position = 0;
                         return (T) formatter.Deserialize(uncompressed);
                     }
-                    catch (IOException)
-                    {
-                        // Version 1 using XorStream
-                        s.Position = position;
-                        return (T) formatter.Deserialize(new XorStream(s, fileHeader));
-                    }
+                }
+                else // version == 1
+                {
+                    return (T) formatter.Deserialize(new XorStream(s, fileHeader));
                 }
             }
         }
