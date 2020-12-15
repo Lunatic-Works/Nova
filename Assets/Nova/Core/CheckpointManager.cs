@@ -368,8 +368,8 @@ namespace Nova
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
         public GameStateStepRestoreEntry IsReachedForAnyVariables(string nodeName, int dialogueIndex)
         {
-            // If reading global save file fails, globalSave will be null
-            if (globalSave == null)
+            // If reading global save file fails, globalSave.savedNodesByVariablesHash will be null
+            if (globalSave?.savedNodesByVariablesHash == null)
             {
                 return null;
             }

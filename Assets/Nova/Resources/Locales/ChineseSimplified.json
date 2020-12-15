@@ -7,7 +7,7 @@
   "bgmgallery.mode.seq": "列表循环",
   "bgmgallery.title": "音乐鉴赏",
   "bookmark.autosave.page": "自动存档",
-  "bookmark.corrupted.title": "（损坏的存档）",
+  "bookmark.corrupted.title": "（存档损坏）",
   "bookmark.date.latest": "最新",
   "bookmark.delete.confirm": "要删除存档{0}吗？",
   "bookmark.load.button": "读    档",
