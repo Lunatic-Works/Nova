@@ -8,9 +8,11 @@
 
 ## 快速上手
 
-1. 将`Assets/Examples/Colorless/`文件夹下的所有东西移动到`Assets/`下
-2. 打开`Assets/Scenes/Main.unity`，体验示例作品
-3. 试着改一改各种素材和配置吧
+1. `git clone`
+2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
+3. 将`Assets/Examples/Colorless/`文件夹下的所有东西移动到`Assets/`下
+4. 打开`Assets/Scenes/Main.unity`，体验示例作品
+5. 试着改一改各种素材和配置吧
 
 ## 说明文档
 
