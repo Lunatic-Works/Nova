@@ -12,7 +12,10 @@
 2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 将`Assets/Examples/Colorless/`文件夹下的所有东西移动到`Assets/`下
 4. 打开`Assets/Scenes/Main.unity`，体验示例作品
-5. 试着改一改各种素材和配置吧
+5. 在开始改脚本之前，先删除英文版的脚本，以免发生冲突
+    * `Assets/Resources/Locales/English/Colorless/Scenarios/`文件夹下是英文版的脚本，可以全部删除
+    * `Assets/Resources/LocalizedResourcePaths.txt`里面是英文版用到的文件，可以全部清空，但是这个文件本身不能删除
+5. 试着改一改脚本吧，脚本放在`Assets/Resources/Colorless/Scenarios/`文件夹下
 
 ## 说明文档
 
