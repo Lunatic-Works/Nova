@@ -8,6 +8,7 @@ end
 
 function auto_voice_off(name)
     v('auto_voice_status_' .. name, 0)
+    v('auto_voice_id_' .. name, 0)
 end
 
 local auto_voice_delay = 0

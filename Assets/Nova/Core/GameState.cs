@@ -393,7 +393,7 @@ namespace Nova
             // everything that makes game state pause has ended, change dialogue
             // TODO: use advancedDialogueHelper to override dialogue
             // The game author should define overriding dialogues for each locale
-            // By the way, we don't need to store all dialogues in save data, 
+            // By the way, we don't need to store all dialogues in save data,
             // just those overriden
             DialogueChanged?.Invoke(new DialogueChangedData(currentNode.name, currentIndex,
                 currentDialogueEntry.displayData, new Dictionary<string, VoiceEntry>(voicesOfNextDialogue),
@@ -452,13 +452,13 @@ namespace Nova
                 // all save data of nodes to be removed are deleted
                 for (var i = backNodeIndex + 1; i < walkedThroughNodes.Count; i++)
                 {
-                    checkpointManager.UnsetReach(walkedThroughNodes[i]);
+                    checkpointManager.UnsetReached(walkedThroughNodes[i]);
                 }
 
                 // all save data of later dialogues are deleted
                 for (var i = dialogueIndex + 1; i < flowChartTree.GetNode(nodeName).dialogueEntryCount; i++)
                 {
-                    checkpointManager.UnsetReach(nodeName, i);
+                    checkpointManager.UnsetReached(nodeName, i);
                 }
             }
 

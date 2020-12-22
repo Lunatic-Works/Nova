@@ -342,7 +342,7 @@ namespace Nova
         }
 
         // DEBUG ONLY METHOD: will destroy all versions regardless of variables
-        public void UnsetReach(string nodeName, int dialogueIndex)
+        public void UnsetReached(string nodeName, int dialogueIndex)
         {
             foreach (var dict in globalSave.savedNodesByVariablesHash.Values)
             {
@@ -352,7 +352,7 @@ namespace Nova
         }
 
         // DEBUG ONLY METHOD: will destroy all versions regardless of variables
-        public void UnsetReach(string nodeName)
+        public void UnsetReached(string nodeName)
         {
             foreach (var dict in globalSave.savedNodesByVariablesHash.Values)
             {
