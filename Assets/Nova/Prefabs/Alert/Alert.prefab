@@ -898,7 +898,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useGhost: 0
   cubic: 1
-  enterSound: {fileID: 8300000, guid: 1a23e7bd6cf53cd428f92d5bf30b349a, type: 3}
+  enterSound: {fileID: 8300000, guid: 9e78e2acebf3edd4d88830bb1c847e4a, type: 3}
   exitSound: {fileID: 0}
   movementDirection: 1
   scalingDirection: 1

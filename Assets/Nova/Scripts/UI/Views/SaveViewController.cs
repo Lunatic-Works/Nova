@@ -680,8 +680,10 @@ namespace Nova
                     bookmark.description
                 ));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // TODO: Do not load a bookmark multiple times when it is corrupted
+                Debug.LogWarning(e);
                 ShowPreview(dummy, I18n.__("bookmark.corrupted.title"));
             }
         }
@@ -773,8 +775,9 @@ namespace Nova
 
                         onThumbnailButtonClicked = () => OnThumbnailButtonClicked(saveID);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Debug.LogWarning(e);
                         newHeaderText = "";
                         newFooterText = I18n.__("bookmark.corrupted.title");
                         newThumbnailSprite = dummy;

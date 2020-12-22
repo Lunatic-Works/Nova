@@ -69,7 +69,7 @@ namespace Nova
         public readonly long globalSaveIdentifier = DateTime.Now.ToBinary();
 
         /// The global flags and status of the game. For example, the unlock status of music or CG
-        /// It is users' job to make sure all values are serializable
+        /// It is the game author's job to make sure all values are serializable
         public readonly Dictionary<string, object> data = new Dictionary<string, object>();
     }
 
@@ -82,6 +82,8 @@ namespace Nova
     {
         public const int ScreenshotWidth = 320;
         public const int ScreenshotHeight = 180;
+
+        private static readonly byte[] JPEGHeader = {0xFF, 0xD8, 0xFF, 0xE0};
 
         public readonly List<string> nodeHistory;
         public readonly int dialogueIndex;
@@ -106,8 +108,16 @@ namespace Nova
                 if (screenshotTexture == null)
                 {
                     screenshotTexture = new Texture2D(ScreenshotWidth, ScreenshotHeight, TextureFormat.RGB24, false);
-                    screenshotTexture.LoadRawTextureData(screenshotBytes);
-                    screenshotTexture.Apply();
+
+                    if (screenshotBytes.Take(JPEGHeader.Length).SequenceEqual(JPEGHeader))
+                    {
+                        screenshotTexture.LoadImage(screenshotBytes);
+                    }
+                    else
+                    {
+                        screenshotTexture.LoadRawTextureData(screenshotBytes);
+                        screenshotTexture.Apply();
+                    }
                 }
 
                 return screenshotTexture;
@@ -115,7 +125,7 @@ namespace Nova
             set
             {
                 screenshotTexture = value;
-                screenshotBytes = screenshotTexture.GetRawTextureData();
+                screenshotBytes = screenshotTexture.EncodeToJPG();
             }
         }
 
@@ -261,30 +271,11 @@ namespace Nova
 
             Directory.CreateDirectory(savePathBase);
 
-            void Next()
-            {
-                foreach (string name in Directory.GetFiles(savePathBase, "sav*.nsav*"))
-                {
-                    var result = Regex.Match(name, @"sav([0-9]+)\.nsav");
-                    if (result.Groups.Count > 1 && int.TryParse(result.Groups[1].Value, out int id))
-                    {
-                        saveSlotsMetadata.Add(id, new BookmarkMetadata
-                        {
-                            saveID = id,
-                            modifiedTime = File.GetLastWriteTime(name)
-                        });
-                    }
-                }
-
-                // Debug.Log("Nova: CheckpointManager initialized.");
-            }
-
             if (File.Exists(globalSavePath))
             {
                 try
                 {
-                    globalSave = SafeLoad<GlobalSave>(globalSavePath);
-                    Next();
+                    globalSave = SafeRead<GlobalSave>(globalSavePath);
                 }
                 catch (Exception ex)
                 {
@@ -292,11 +283,7 @@ namespace Nova
                     Alert.Show(
                         null,
                         I18n.__("bookmark.load.globalfail"),
-                        () =>
-                        {
-                            ResetGlobalSave();
-                            Next();
-                        },
+                        ResetGlobalSave,
                         Utils.Exit
                     );
                 }
@@ -305,6 +292,21 @@ namespace Nova
             {
                 ResetGlobalSave();
             }
+
+            foreach (string name in Directory.GetFiles(savePathBase, "sav*.nsav*"))
+            {
+                var result = Regex.Match(name, @"sav([0-9]+)\.nsav");
+                if (result.Groups.Count > 1 && int.TryParse(result.Groups[1].Value, out int id))
+                {
+                    saveSlotsMetadata.Add(id, new BookmarkMetadata
+                    {
+                        saveID = id,
+                        modifiedTime = File.GetLastWriteTime(name)
+                    });
+                }
+            }
+
+            // Debug.Log("Nova: CheckpointManager initialized.");
         }
 
         /// <summary>
@@ -393,8 +395,7 @@ namespace Nova
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
         public GameStateStepRestoreEntry IsReached(string nodeName, int dialogueIndex, string variablesHash)
         {
-            if (globalSave.savedNodesByVariablesHash.Ensure(variablesHash)
-                .TryGetValue(nodeName, out NodeSaveInfo info))
+            if (globalSave.savedNodesByVariablesHash.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
                 if (info.dialogueRestoreEntries.TryGetValue(dialogueIndex, out GameStateStepRestoreEntry entry))
                     return entry;
             return null;
@@ -409,8 +410,7 @@ namespace Nova
         /// <returns>Whether the branch has been reached.</returns>
         public bool IsReached(string nodeName, string branchName, string variablesHash)
         {
-            if (globalSave.savedNodesByVariablesHash.Ensure(variablesHash)
-                .TryGetValue(nodeName, out NodeSaveInfo info))
+            if (globalSave.savedNodesByVariablesHash.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
                 return info.reachedBranches.Contains(branchName);
             return false;
         }
@@ -440,37 +440,44 @@ namespace Nova
             foreach (var file in saveDir.GetFiles())
                 file.Delete();
 
+            globalSave = new GlobalSave();
             using (var fs = File.OpenWrite(globalSavePath))
-                WriteSave(globalSave = new GlobalSave(), fs);
+                WriteSave(globalSave, fs);
         }
 
-        private T SafeLoad<T>(string path)
+        private T SafeRead<T>(string path)
         {
-            return SafeLoad<T>(path, x => { });
+            return SafeRead<T>(path, x => { });
         }
 
-        private T SafeLoad<T>(string path, Action<T> assertion)
+        private T SafeRead<T>(string path, Action<T> assertion)
         {
             try
             {
-                var newSaveTargetPath = path + ".new";
                 try
                 {
-                    using (var fs = File.OpenRead(newSaveTargetPath))
+                    using (var fs = File.OpenRead(path))
                     {
-                        Debug.Log($"Nova: {newSaveTargetPath} Incomplete save file found, try to load");
                         var result = ReadSave<T>(fs);
                         assertion(result);
                         return result;
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // Debug.Log($"Nova: {path} Proceed to normal loading");
-                    using (var fs = File.OpenRead(path))
+                    Debug.LogWarning($"Nova: {path} is corrupted, details below. Try to recover");
+                    Debug.LogWarning(ex.Message);
+
+                    var oldPath = path + ".old";
+                    using (var fs = File.OpenRead(oldPath))
                     {
                         var result = ReadSave<T>(fs);
                         assertion(result);
+
+                        // Recover only if the old file is good
+                        File.Delete(path); // no exception if not exist
+                        File.Move(oldPath, path); // exception if exists
+
                         return result;
                     }
                 }
@@ -486,20 +493,17 @@ namespace Nova
         {
             try
             {
-                // Debug.Log($"Nova: {path} Save started");
-                var oldSaveTargetPath = path + ".old";
-                var newSaveTargetPath = path + ".new";
-                using (var fs = File.OpenWrite(newSaveTargetPath)) // overwrite if needed
-                    WriteSave(obj, fs);
-                File.Delete(oldSaveTargetPath); // no exception if not exist
+                var oldPath = path + ".old";
                 if (File.Exists(path))
                 {
-                    File.Move(path, oldSaveTargetPath); // exception if exists
+                    File.Delete(oldPath); // no exception if not exist
+                    File.Move(path, oldPath); // exception if exists
                 }
 
-                File.Move(newSaveTargetPath, path);
-                File.Delete(oldSaveTargetPath);
-                // Debug.Log($"Nova: {path} Save ended");
+                using (var fs = File.OpenWrite(path)) // overwrite if needed
+                    WriteSave(obj, fs); // May be interrupted
+
+                File.Delete(oldPath);
             }
             catch (Exception ex)
             {
@@ -577,6 +581,7 @@ namespace Nova
         /// <summary>
         /// Update global save file.
         /// </summary>
+        /// TODO: UpdateGlobalSave() is slow when there are many saved dialogue entries
         public void UpdateGlobalSave()
         {
             if (globalSave != null)
@@ -591,7 +596,7 @@ namespace Nova
         /// <returns>The loaded bookmark.</returns>
         public Bookmark LoadBookmark(int saveID)
         {
-            return ReplaceCache(saveID, SafeLoad<Bookmark>(ComposeFileName(saveID), result =>
+            return ReplaceCache(saveID, SafeRead<Bookmark>(ComposeFileName(saveID), result =>
             {
                 this.RuntimeAssert(result.globalSaveIdentifier == globalSave.globalSaveIdentifier,
                     "Save file is incompatible with the global save file.");
@@ -651,7 +656,7 @@ namespace Nova
         /// <returns>File No. to query. If no bookmark is found in range, the return value will be "begin".</returns>
         public int QuerySaveIDByTime(int begin, int end, SaveIDQueryType type)
         {
-            var filtered = saveSlotsMetadata.Values.Where(m => m.saveID >= begin && m.saveID < end);
+            var filtered = saveSlotsMetadata.Values.Where(m => m.saveID >= begin && m.saveID < end).ToList();
             if (!filtered.Any())
                 return begin;
             if (type == SaveIDQueryType.Earliest)

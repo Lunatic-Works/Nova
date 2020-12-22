@@ -14,6 +14,7 @@ namespace Nova
 
         private void OnEnable()
         {
+            textProxy.Init();
             textProxy.UpdateFont();
             I18n.LocaleChanged.AddListener(textProxy.UpdateFont);
         }

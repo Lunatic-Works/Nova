@@ -155,15 +155,15 @@ namespace Nova
 
                             DontDestroyOnLoad(singleton);
 
-                            Debug.LogFormat("Nova: [Singleton] An instance of {0} " +
-                                            "is needed in the scene, so {1} " +
-                                            "was created with DontDestroyOnLoad.",
-                                typeof(LuaRuntime), singleton);
+                            // Debug.LogFormat("Nova: [Singleton] An instance of {0} " +
+                            //                 "is needed in the scene, so {1} " +
+                            //                 "was created with DontDestroyOnLoad.",
+                            //     typeof(LuaRuntime), singleton);
                         }
                         else
                         {
-                            Debug.LogFormat("Nova: [Singleton] Using instance already created: {0}",
-                                _instance.gameObject.name);
+                            // Debug.LogFormat("Nova: [Singleton] Using instance already created: {0}",
+                            //     _instance.gameObject.name);
                         }
                     }
 
