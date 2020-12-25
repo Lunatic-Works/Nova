@@ -3,13 +3,13 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BGMGalleryVolumeController : MonoBehaviour
+    public class MusicGalleryVolumeController : MonoBehaviour
     {
         private Slider slider;
         private AudioSource audioSource;
         private ConfigManager config;
 
-        public string configKey = "nova.bgm_gallery.volume";
+        public string configKey = "nova.music_gallery.volume";
         public float defaultVolume = 0.5f;
 
         private void LoadConfig()
@@ -22,7 +22,7 @@ namespace Nova
         private void Awake()
         {
             slider = GetComponent<Slider>();
-            audioSource = GetComponentInParent<BGMGalleryMusicPlayer>().audioSource;
+            audioSource = GetComponentInParent<MusicGalleryPlayer>().audioSource;
             config = Utils.FindNovaGameController().ConfigManager;
             slider.onValueChanged.AddListener(OnValueChanged);
         }

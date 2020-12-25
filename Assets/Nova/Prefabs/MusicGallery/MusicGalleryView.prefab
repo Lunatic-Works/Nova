@@ -430,7 +430,7 @@ GameObject:
   - component: {fileID: 3535619004574509351}
   - component: {fileID: 3535619004574509348}
   m_Layer: 5
-  m_Name: BGMGalleryView
+  m_Name: MusicGalleryView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -470,12 +470,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myPanel: {fileID: 3535619005968859448}
   musicPlayer: {fileID: 3535619006079575071}
-  bgmUnlockStatusKey: bgm_unlock
-  bgmList: {fileID: 0}
-  bgmListScrollContent: {fileID: 7321285593639802457}
-  bgmEntryPrefab: {fileID: 114443515121404542, guid: 76560a599646540cd9cc8cbb1de59982,
+  musicUnlockStatusKey: music_unlock_status
+  musicList: {fileID: 0}
+  musicListScrollContent: {fileID: 7321285593639802457}
+  musicEntryPrefab: {fileID: 114443515121404542, guid: 76560a599646540cd9cc8cbb1de59982,
     type: 3}
-  lockedBGMPrefab: {fileID: 1445111611402822, guid: cf717f9eab311426b9ec4cb31e2b695b,
+  lockedMusicPrefab: {fileID: 1445111611402822, guid: cf717f9eab311426b9ec4cb31e2b695b,
     type: 3}
   audioControllersToDisable: []
 --- !u!114 &3535619004574509348
@@ -1111,7 +1111,7 @@ GameObject:
   - component: {fileID: 3535619005968859445}
   - component: {fileID: 3535619005968859444}
   m_Layer: 5
-  m_Name: BGMGalleryPanel
+  m_Name: MusicGalleryPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1491,7 +1491,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92a7c3d5c0e94086b8d6838f7d15594c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configKey: nova.bgm_gallery.volume
+  configKey: nova.music_gallery.volume
   defaultVolume: 0.5
 --- !u!1 &4579907563847574147
 GameObject:
@@ -2277,7 +2277,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: ee5d41bd6e260934eb99caeea48ebe91, type: 3}
   - {fileID: 21300000, guid: 4c1412862d54c254bbfcb667ee1000c7, type: 3}
   - {fileID: 21300000, guid: c0064c5774413db4ba5420b92f1eba5d, type: 3}
-  configKey: nova.bgm_gallery.play_mode
+  configKey: nova.music_gallery.play_mode
 --- !u!1 &8941604857863547288
 GameObject:
   m_ObjectHideFlags: 0
@@ -2522,7 +2522,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1788404525052874, guid: 76560a599646540cd9cc8cbb1de59982, type: 3}
       propertyPath: m_Name
-      value: BGMEntry
+      value: MusicEntry
       objectReference: {fileID: 0}
     - target: {fileID: 224333044980241010, guid: 76560a599646540cd9cc8cbb1de59982,
         type: 3}
@@ -3427,7 +3427,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1445111611402822, guid: cf717f9eab311426b9ec4cb31e2b695b, type: 3}
       propertyPath: m_Name
-      value: LockedBGMEntry
+      value: LockedMusicEntry
       objectReference: {fileID: 0}
     - target: {fileID: 224874500930595788, guid: cf717f9eab311426b9ec4cb31e2b695b,
         type: 3}

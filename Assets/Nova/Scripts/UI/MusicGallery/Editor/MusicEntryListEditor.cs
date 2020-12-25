@@ -40,12 +40,12 @@ namespace Nova.Editor
 
         protected override GUIContent GetEntryLabelContent(int i)
         {
-            return new GUIContent($"BGM {i:D2}");
+            return new GUIContent($"Music {i:D2}");
         }
 
         protected override GUIContent GetHeaderContent()
         {
-            return new GUIContent("BGM Entries");
+            return new GUIContent("Music Entries");
         }
     }
 }

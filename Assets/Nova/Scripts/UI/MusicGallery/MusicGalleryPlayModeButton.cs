@@ -5,13 +5,13 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BGMGalleryPlayModeButton : MonoBehaviour
+    public class MusicGalleryPlayModeButton : MonoBehaviour
     {
         public Image iconImage;
         public List<Sprite> icons;
-        public string configKey = "nova.bgm_gallery.play_mode";
+        public string configKey = "nova.music_gallery.play_mode";
 
-        private BGMGalleryController controller;
+        private MusicGalleryController controller;
         private ConfigManager config;
 
         private MusicListMode GetNextMode()
@@ -24,11 +24,11 @@ namespace Nova
             switch (controller.mode)
             {
                 case MusicListMode.Sequential:
-                    return I18n.__("bgmgallery.mode.seq");
+                    return I18n.__("musicgallery.mode.seq");
                 case MusicListMode.SingleLoop:
-                    return I18n.__("bgmgallery.mode.loop");
+                    return I18n.__("musicgallery.mode.loop");
                 case MusicListMode.Random:
-                    return I18n.__("bgmgallery.mode.rand");
+                    return I18n.__("musicgallery.mode.rand");
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -36,7 +36,7 @@ namespace Nova
 
         private void Awake()
         {
-            controller = GetComponentInParent<BGMGalleryController>();
+            controller = GetComponentInParent<MusicGalleryController>();
             config = Utils.FindNovaGameController().ConfigManager;
         }
 

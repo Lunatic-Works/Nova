@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BGMFrequencyHistogram : MonoBehaviour
+    public class MusicFrequencyHistogram : MonoBehaviour
     {
         [Range(6, 10)] public int sampleResolution = 8;
         public int logSegments = 25;
@@ -36,7 +36,7 @@ namespace Nova
             frequencyBase = Mathf.Pow(frequencySampleCount, 1.0f / logSegments);
             image = GetComponent<Image>();
             image.material = material = new Material(Shader.Find("Nova/UI/Histogram"));
-            audioSource = GetComponentInParent<BGMGalleryMusicPlayer>().audioSource;
+            audioSource = GetComponentInParent<MusicGalleryPlayer>().audioSource;
         }
 
         private float GetInterpolatedFrequency(float index)

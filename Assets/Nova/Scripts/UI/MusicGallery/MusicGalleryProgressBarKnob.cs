@@ -3,13 +3,13 @@ using UnityEngine.EventSystems;
 
 namespace Nova
 {
-    public class BGMGalleryMusicProgressBarKnob : MonoBehaviour, IPointerDownHandler
+    public class MusicGalleryProgressBarKnob : MonoBehaviour, IPointerDownHandler
     {
-        private BGMGalleryMusicProgressBar bar;
+        private MusicGalleryProgressBar bar;
 
         private void Awake()
         {
-            bar = GetComponentInParent<BGMGalleryMusicProgressBar>();
+            bar = GetComponentInParent<MusicGalleryProgressBar>();
         }
 
         public void OnPointerDown(PointerEventData eventData)

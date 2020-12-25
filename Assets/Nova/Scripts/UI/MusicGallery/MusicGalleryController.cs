@@ -6,7 +6,7 @@ using Assert = UnityEngine.Assertions.Assert;
 
 namespace Nova
 {
-    using BGMUnlockInfo = SerializableHashSet<string>;
+    using MusicUnlockInfo = SerializableHashSet<string>;
 
     public enum MusicListMode
     {
@@ -15,25 +15,25 @@ namespace Nova
         Random = 2
     }
 
-    public class BGMGalleryController : ViewControllerBase
+    public class MusicGalleryController : ViewControllerBase
     {
-        private static readonly BGMUnlockInfo DefaultUnlockSet = new BGMUnlockInfo();
+        private static readonly MusicUnlockInfo DefaultUnlockSet = new MusicUnlockInfo();
         private CheckpointManager checkpointManager;
 
-        public BGMGalleryMusicPlayer musicPlayer;
-        public string bgmUnlockStatusKey = "bgm_unlock_status";
-        public MusicEntryList bgmList;
+        public MusicGalleryPlayer musicPlayer;
+        public string musicUnlockStatusKey = "music_unlock_status";
+        public MusicEntryList musicList;
 
-        public Transform bgmListScrollContent;
-        public BGMGalleryEntry bgmEntryPrefab;
-        public GameObject lockedBGMPrefab;
+        public Transform musicListScrollContent;
+        public MusicGalleryEntry musicEntryPrefab;
+        public GameObject lockedMusicPrefab;
         public List<AudioController> audioControllersToDisable;
 
-        // the index of entries in _allBGMs is their index in _unlockedBGMs
-        // indices of those locked BGMs are -1
+        // The indices of entries in allMusics are their indices in unlockedMusics
+        // The indices of locked musics are -1
         private const int LockedIndex = -1;
-        private List<MusicListEntry> allBgMs;
-        private List<MusicListEntry> unlockedBgMs;
+        private List<MusicListEntry> allMusics;
+        private List<MusicListEntry> unlockedMusics;
 
         private MusicListMode _mode = MusicListMode.Sequential;
 
@@ -51,7 +51,7 @@ namespace Nova
         private IMusicList GetMusicList(MusicListEntry currentMusic)
         {
             Assert.IsNotNull(currentMusic);
-            if (unlockedBgMs.Count == 0)
+            if (unlockedMusics.Count == 0)
             {
                 return null;
             }
@@ -59,11 +59,11 @@ namespace Nova
             switch (mode)
             {
                 case MusicListMode.Sequential:
-                    return new SequentialMusicList(unlockedBgMs, currentMusic.index);
+                    return new SequentialMusicList(unlockedMusics, currentMusic.index);
                 case MusicListMode.SingleLoop:
-                    return new SingleLoopMusicList(unlockedBgMs, currentMusic.index);
+                    return new SingleLoopMusicList(unlockedMusics, currentMusic.index);
                 case MusicListMode.Random:
-                    return new RandomMusicList(unlockedBgMs, currentMusic.index);
+                    return new RandomMusicList(unlockedMusics, currentMusic.index);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -95,7 +95,7 @@ namespace Nova
         {
             base.Awake();
             checkpointManager = Utils.FindNovaGameController().CheckpointManager;
-            allBgMs = bgmList.entries
+            allMusics = musicList.entries
                 .Select(entry => new MusicListEntry(LockedIndex, entry))
                 .ToList();
         }
@@ -116,8 +116,8 @@ namespace Nova
 
         private void RefreshContent()
         {
-            UpdateUnlockedBGMs();
-            RefreshBGMListView();
+            UpdateUnlockedMusics();
+            RefreshMusicListView();
             RefreshMusicPlayerList();
         }
 
@@ -132,28 +132,28 @@ namespace Nova
             return entry.index >= 0;
         }
 
-        private void UpdateUnlockedBGMs()
+        private void UpdateUnlockedMusics()
         {
-            var unlockedInfo = checkpointManager.Get(bgmUnlockStatusKey, DefaultUnlockSet);
-            unlockedBgMs = new List<MusicListEntry>();
-            foreach (var bgm in allBgMs)
+            var unlockedInfo = checkpointManager.Get(musicUnlockStatusKey, DefaultUnlockSet);
+            unlockedMusics = new List<MusicListEntry>();
+            foreach (var music in allMusics)
             {
-                if (IsUnlocked(unlockedInfo, bgm.entry))
+                if (IsUnlocked(unlockedInfo, music.entry))
                 {
-                    bgm.index = unlockedBgMs.Count;
-                    unlockedBgMs.Add(bgm);
+                    music.index = unlockedMusics.Count;
+                    unlockedMusics.Add(music);
                 }
                 else
                 {
-                    bgm.index = LockedIndex;
+                    music.index = LockedIndex;
                 }
             }
         }
 
-        private void ClearBGMListView()
+        private void ClearMusicListView()
         {
             var children = new List<GameObject>();
-            foreach (Transform child in bgmListScrollContent)
+            foreach (Transform child in musicListScrollContent)
             {
                 children.Add(child.gameObject);
             }
@@ -169,34 +169,34 @@ namespace Nova
             return unlockInfo.Contains(entry.id);
         }
 
-        private void RefreshBGMListView()
+        private void RefreshMusicListView()
         {
-            ClearBGMListView();
-            foreach (var bgm in allBgMs)
+            ClearMusicListView();
+            foreach (var music in allMusics)
             {
-                if (IsUnlocked(bgm))
+                if (IsUnlocked(music))
                 {
-                    var entry = Instantiate(bgmEntryPrefab, bgmListScrollContent, false);
-                    entry.Init(bgm, Play);
+                    var entry = Instantiate(musicEntryPrefab, musicListScrollContent, false);
+                    entry.Init(music, Play);
                 }
                 else
                 {
-                    Instantiate(lockedBGMPrefab, bgmListScrollContent, false);
+                    Instantiate(lockedMusicPrefab, musicListScrollContent, false);
                 }
             }
         }
 
-        private void UnlockAllBGMs()
+        private void UnlockAllMusics()
         {
-            var unlockHelper = GetComponent<BGMUnlockHelper>();
+            var unlockHelper = GetComponent<MusicUnlockHelper>();
             if (!unlockHelper)
             {
                 return;
             }
 
-            foreach (var bgm in allBgMs)
+            foreach (var music in allMusics)
             {
-                unlockHelper.Unlock(bgm.entry.id);
+                unlockHelper.Unlock(music.entry.id);
             }
 
             RefreshContent();
@@ -207,7 +207,7 @@ namespace Nova
             base.OnActivatedUpdate();
             if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
             {
-                UnlockAllBGMs();
+                UnlockAllMusics();
             }
         }
     }

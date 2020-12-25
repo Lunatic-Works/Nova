@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BGMGalleryMusicProgressBar : MonoBehaviour
+    public class MusicGalleryProgressBar : MonoBehaviour
     {
-        private BGMGalleryMusicPlayer player;
+        private MusicGalleryPlayer player;
         public Text timeLabel;
         private Slider slider;
 
@@ -20,7 +20,7 @@ namespace Nova
 
         private void Awake()
         {
-            player = GetComponentInParent<BGMGalleryMusicPlayer>();
+            player = GetComponentInParent<MusicGalleryPlayer>();
             Assert.IsNotNull(player);
             slider = GetComponent<Slider>();
             slider.onValueChanged.AddListener(OnValueChanged);

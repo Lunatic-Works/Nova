@@ -5,23 +5,23 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    /// use BGMGalleryMusicPlayer.Play and BGMGalleryMusicPlayer.Pause instead of manipulate
+    /// use MusicGalleryPlayer.Play and MusicGalleryPlayer.Pause instead of manipulate
     /// the underlying AudioSource directly
-    /// BGMGalleryMusicPlayer will maintain a IsPlaying status, it will be sync with AudioSource.isPlaying
-    /// If IsPlaying flag is out of sync, the underlying clip has finished playing. The player will play the
-    /// next music in its playing list
-    public class BGMGalleryMusicPlayer : MonoBehaviour
+    /// MusicGalleryPlayer will maintain an isPlaying status, it will be sync with AudioSource.isPlaying
+    /// If isPlaying flag is out of sync, it means the underlying clip has finished playing. The player
+    /// will play the next music in its playing list
+    public class MusicGalleryPlayer : MonoBehaviour
     {
         public AudioSource audioSource;
         public Text titleLabel;
-        public BGMGalleryMusicProgressBar progressBar;
+        public MusicGalleryProgressBar progressBar;
 
         public bool isPlaying { get; private set; }
 
         private void ApplyInvalidMusicEntry()
         {
             audioSource.clip = null;
-            titleLabel.text = I18n.__("bgmgallery.title");
+            titleLabel.text = I18n.__("musicgallery.title");
             progressBar.interactable = false;
         }
 

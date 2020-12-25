@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 114206928784627902}
   - component: {fileID: 114443515121404542}
   m_Layer: 5
-  m_Name: BGMEntry
+  m_Name: MusicEntry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

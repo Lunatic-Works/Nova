@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BGMGalleryEntry : MonoBehaviour
+    public class MusicGalleryEntry : MonoBehaviour
     {
         private Text text;
         private Button button;

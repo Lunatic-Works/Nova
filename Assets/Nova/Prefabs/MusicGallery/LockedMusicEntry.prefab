@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 114433196750853574}
   - component: {fileID: 114118000621819890}
   m_Layer: 5
-  m_Name: LockedBGMEntry
+  m_Name: LockedMusicEntry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
