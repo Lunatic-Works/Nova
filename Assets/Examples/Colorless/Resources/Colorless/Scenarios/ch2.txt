@@ -98,7 +98,7 @@ anim:fade_out(bgs)
 接下来我要去……
 @<|
 branch {
-    { name = '走廊', dest = 'ch3' },
-    { name = '学生会室', dest = 'ch4' }
+    { dest = 'ch3', text = '走廊' },
+    { dest = 'ch4', text = '学生会室' },
 }
 |>

@@ -37,20 +37,32 @@ function jump_to(dest)
     __Nova.scriptLoader:RegisterJump(dest)
 end
 
---- a branch needs to have the following structure:
---- {
----    name = 'text for this branch',
----    dest = 'name of the destination node',
----    metadata = {a table that contains some additional information}
---- }
---- the metadata field can be omitted
-
 --- add branches to the current node
 --- branches should be a list of 'branch'
+--- a branch is a table with the following structure:
+--- {
+---    dest = 'name of the destination node',
+---    text = 'text on the button to select this branch', should not use if mode is jump
+---    mode = 'normal|jump|show|enable', optional, default is normal
+---    cond = a function that returns a bool, should not use if mode is show, optional if mode is jump
+--- }
 --- this method can be only called once for each node. i.e. all branches of the node should be added at once
 function branch(branches)
     for i, branch in ipairs(branches) do
-        __Nova.scriptLoader:RegisterBranch(branch.name, branch.dest, branch.metadata)
+        local mode = Nova.BranchMode.Normal
+        if branch.mode == nil or branch.mode == 'normal' then
+            -- pass
+        elseif branch.mode == 'jump' then
+            mode = Nova.BranchMode.Jump
+        elseif branch.mode == 'show' then
+            mode = Nova.BranchMode.Show
+        elseif branch.mode == 'enable' then
+            mode = Nova.BranchMode.Enable
+        else
+            warn('Unknown branch mode: ' .. tostring(branch.mode) .. ', text: ' .. tostring(text))
+            return
+        end
+        __Nova.scriptLoader:RegisterBranch(tostring(i), branch.dest, branch.text, mode, branch.cond)
     end
     __Nova.scriptLoader:EndRegisterBranch()
 end

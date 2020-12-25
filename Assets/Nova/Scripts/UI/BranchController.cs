@@ -29,25 +29,48 @@ namespace Nova
         /// <param name="branchOccursData"></param>
         private void OnBranchHappen(BranchOccursData branchOccursData)
         {
+            var branchInformations = branchOccursData.branchInformations;
+
+            foreach (var branchInfo in branchInformations)
+            {
+                if (branchInfo.mode == BranchMode.Jump)
+                {
+                    if (branchInfo.condition == null || branchInfo.condition.Invoke<bool>())
+                    {
+                        gameState.SelectBranch(branchInfo.name);
+                        return;
+                    }
+                }
+            }
+
             if (backPanel != null)
             {
                 backPanel.SetActive(true);
             }
 
-            var branchInformations = branchOccursData.branchInformations;
-            foreach (var branchInformation in branchInformations)
+            foreach (var branchInfo in branchInformations)
             {
-                var childButton = Instantiate(branchButtonPrefab, transform);
-
-                var text = childButton.GetComponent<Text>();
-                if (text == null)
+                if (branchInfo.mode == BranchMode.Jump)
                 {
-                    text = childButton.GetComponentInChildren<Text>();
+                    continue;
                 }
 
-                text.text = branchInformation.name;
+                if (branchInfo.mode == BranchMode.Show && !branchInfo.condition.Invoke<bool>())
+                {
+                    continue;
+                }
 
-                childButton.GetComponent<Button>().onClick.AddListener(() => Select(branchInformation.name));
+                var child = Instantiate(branchButtonPrefab, transform);
+
+                var text = child.GetComponentInChildren<Text>();
+                text.text = branchInfo.text;
+
+                var button = child.GetComponentInChildren<Button>();
+                button.onClick.AddListener(() => Select(branchInfo.name));
+                if (branchInfo.mode == BranchMode.Enable)
+                {
+                    button.interactable = branchInfo.condition.Invoke<bool>();
+                }
             }
         }
 

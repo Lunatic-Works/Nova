@@ -162,7 +162,7 @@ namespace Nova
         /// Get next node by branch name
         /// </summary>
         /// <param name="branchName">
-        /// The name of the branch. The name MUST represents one of its branches
+        /// The name of the branch.
         /// </param>
         /// <returns>
         /// The next node at the specified branch.

@@ -1,5 +1,5 @@
 @<|
-label('ch4', 'Chapter 4')
+label('ch4', 'The Last Chapter')
 |>
 Ergong::“Huh? Why does it take so long to get a cup?”
 
@@ -20,7 +20,11 @@ Gaotian looks happy, and I smile back at her stiffly.
 At this moment, my remaining eyes see Qianye's face changed.
 
 What had happened?
+@<||>
 
+@<|
+label('ch4_true', 'The Last Chapter')
+|>
 Xiben::“I want a drink too.”
 
 Unexpectedly, Xiben gets next to me and draws a cup from my arms.
@@ -102,4 +106,12 @@ I stare at the everlasting raindrops.
 In my eyes, the colorless raindrops are shining like rainbows.
 
 <align="center">Fin</align>
+@<||>
+
+@<|
+label('ch4_bad', 'The Last Chapter')
+|>
+Because you didn't get the flag of Xiben, we cannot make up the plot…
+
+BAD END
 @<||>

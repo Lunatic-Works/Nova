@@ -10,6 +10,7 @@ box_hide_show(2)
 play(bgs, 'rain')
 anim:volume(bgs, 0.2, 3)
 auto_voice_on('孙西本', 2)
+v('flag_xiben', 1)
 |>
 我在走廊看着不断落下的雨，让自己的头脑冷静下来。
 

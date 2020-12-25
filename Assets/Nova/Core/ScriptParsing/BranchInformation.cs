@@ -2,6 +2,15 @@
 
 namespace Nova
 {
+    [ExportCustomType]
+    public enum BranchMode
+    {
+        Normal,
+        Jump,
+        Show,
+        Enable
+    }
+
     /// <summary>
     /// The information of branch
     /// </summary>
@@ -10,30 +19,39 @@ namespace Nova
     /// </remarks>
     public class BranchInformation
     {
-        /// <value>
-        /// The name of this branch.
-        /// The name should be unique among all branches that derived from the same flow chart node
-        /// </value>
-        public string name { get; private set; }
-
         /// <summary>
-        /// A branch information can have some other data, like descriptions or lua functions,
-        /// which can be customized by scripts
+        /// The internal name of the branch, auto generated from ScriptLoader.RegisterBranch()
+        /// The name should be unique in a flow chart node
         /// </summary>
-        public readonly LuaTable metadata;
+        public readonly string name;
 
         /// <summary>
-        /// The default branch value, used for Normal flow chart node
+        /// The text on the button to select this branch
+        /// </summary>
+        public readonly string text;
+
+        public readonly BranchMode mode;
+        public readonly LuaFunction condition;
+
+        /// <summary>
+        /// The default branch, used in normal flow chart nodes
         /// </summary>
         /// <remarks>
-        /// Since default value owns the default name, all other branches should not have the name __@default
+        /// Since the default branch owns the default name, all other branches should not have the name 'default'
         /// </remarks>
-        public static readonly BranchInformation Default = new BranchInformation {name = "__@default"};
+        public static readonly BranchInformation Default = new BranchInformation("default");
 
-        public BranchInformation(string name = null, LuaTable metadata = null)
+        public BranchInformation(string name)
         {
             this.name = name;
-            this.metadata = metadata;
+        }
+
+        public BranchInformation(string name, string text, BranchMode mode, LuaFunction condition)
+        {
+            this.name = name;
+            this.text = text;
+            this.mode = mode;
+            this.condition = condition;
         }
 
         /// <summary>

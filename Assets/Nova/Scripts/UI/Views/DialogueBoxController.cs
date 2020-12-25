@@ -221,7 +221,6 @@ namespace Nova
         {
             gameState.DialogueWillChange += OnDialogueWillChange;
             gameState.DialogueChanged += OnDialogueChanged;
-            gameState.BranchOccurs += OnBranchOccurs;
             gameState.BranchSelected += OnBranchSelected;
             gameState.CurrentRouteEnded += OnCurrentRouteEnded;
             gameState.AddRestorable(this);
@@ -232,7 +231,6 @@ namespace Nova
             StopAllCoroutines();
             gameState.DialogueWillChange -= OnDialogueWillChange;
             gameState.DialogueChanged -= OnDialogueChanged;
-            gameState.BranchOccurs -= OnBranchOccurs;
             gameState.BranchSelected -= OnBranchSelected;
             gameState.CurrentRouteEnded -= OnCurrentRouteEnded;
             gameState.RemoveRestorable(this);
@@ -409,7 +407,8 @@ namespace Nova
             currentNodeName = dialogueData.nodeName;
 
             isReadDialogue = dialogueData.hasBeenReached;
-            if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead && !fastForwardHotKeyHolding)
+            if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead &&
+                !fastForwardHotKeyHolding)
             {
                 state = DialogueBoxState.Normal;
             }
@@ -427,7 +426,8 @@ namespace Nova
             }
 
             // No animation playing when fast forwarding
-            if (state == DialogueBoxState.FastForward) NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+            if (state == DialogueBoxState.FastForward)
+                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
 
             // Check current state and set schedule for the next dialogue entry
             SetSchedule();
@@ -552,40 +552,28 @@ namespace Nova
             AppendDialogue(displayData);
         }
 
-        private DialogueBoxState stateBeforeBranch;
-
-        /// <summary>
-        /// Make the state normal when branch occurs
-        /// </summary>
-        /// <param name="branchOccursData"></param>
-        private void OnBranchOccurs(BranchOccursData branchOccursData)
-        {
-            stateBeforeBranch = state;
-            state = DialogueBoxState.Normal;
-        }
-
         public bool continueAutoAfterBranch;
         public bool continueFastForwardAfterBranch;
 
         /// <summary>
-        /// Check if should restore the previous state before the branch happens
+        /// Check if state should be reset to Normal after the branch
         /// </summary>
         /// <param name="branchSelectedData"></param>
         private void OnBranchSelected(BranchSelectedData branchSelectedData)
         {
-            Assert.AreEqual(state, DialogueBoxState.Normal, "DialogueBoxState.Normal != DialogueBox.State");
-            switch (stateBeforeBranch)
+            if (branchSelectedData.selectedBranchInformation.mode == BranchMode.Jump)
             {
-                case DialogueBoxState.Normal:
-                    break;
-                case DialogueBoxState.Auto:
-                    state = continueAutoAfterBranch ? DialogueBoxState.Auto : DialogueBoxState.Normal;
-                    break;
-                case DialogueBoxState.FastForward:
-                    state = continueFastForwardAfterBranch ? DialogueBoxState.FastForward : DialogueBoxState.Normal;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                return;
+            }
+
+            if (!continueAutoAfterBranch && state == DialogueBoxState.Auto)
+            {
+                state = DialogueBoxState.Normal;
+            }
+
+            if (!continueFastForwardAfterBranch && state == DialogueBoxState.FastForward)
+            {
+                state = DialogueBoxState.Normal;
             }
         }
 
@@ -675,7 +663,8 @@ namespace Nova
         /// </remarks>
         private void StopFastForward()
         {
-            Assert.AreEqual(state, DialogueBoxState.FastForward, "DialogueBoxState State != DialogueBoxState.FastForward");
+            Assert.AreEqual(state, DialogueBoxState.FastForward,
+                "DialogueBoxState State != DialogueBoxState.FastForward");
             _state = DialogueBoxState.Normal;
             TryRemoveSchedule();
         }

@@ -1,6 +1,5 @@
 @<|
 label('ch4', '终章')
-is_start()
 |>
 <|
 anim:trans_fade(cam, function()
@@ -44,7 +43,18 @@ show(qianye, 'normal', pos_r)
 这时，我的余光看到浅野的脸色一变。
 
 发生了什么？
+@<|
+branch {
+    { dest = 'ch4_true', mode = 'jump', cond = function()
+        return v('flag_xiben') == 1
+    end },
+    { dest = 'ch4_bad', mode = 'jump' },
+}
+|>
 
+@<|
+label('ch4_true', '终章')
+|>
 <|
 hide(qianye)
 show(xiben, 'normal', pos_r)
@@ -206,4 +216,15 @@ set_box('hide')
 stop_auto_ff()
 |>
 <align="center">终</align>
-@<| is_end() |>
+@<| is_end 'true_end' |>
+
+@<|
+label('ch4_bad', '终章')
+|>
+因为你没有获得西本的flag，剧情编不下去了……
+
+<|
+set_box('center', 'center')
+|>
+BAD END
+@<| is_end 'bad_end' |>

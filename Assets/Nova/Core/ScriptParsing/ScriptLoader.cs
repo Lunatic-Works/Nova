@@ -48,6 +48,13 @@ namespace Nova
         // Current locale of the state machine
         public SystemLanguage stateLocale;
 
+        private class LazyBindingEntry
+        {
+            public FlowChartNode from;
+            public string destination;
+            public BranchInformation branchInfo;
+        }
+
         private List<LazyBindingEntry> lazyBindingLinks = new List<LazyBindingEntry>();
 
         public void ForceInit(string path)
@@ -155,13 +162,6 @@ namespace Nova
                 Debug.LogWarning("Nova: A script file should ends with a eager execution block, " +
                                  "which needs to refer to the next flow chart node.");
             }
-        }
-
-        private class LazyBindingEntry
-        {
-            public FlowChartNode from;
-            public BranchInformation branchInfo;
-            public string destination;
         }
 
         /// <summary>
@@ -295,8 +295,8 @@ namespace Nova
             lazyBindingLinks.Add(new LazyBindingEntry
             {
                 from = currentNode,
-                branchInfo = BranchInformation.Default,
-                destination = destination
+                destination = destination,
+                branchInfo = BranchInformation.Default
             });
 
             currentNode = null;
@@ -307,16 +307,35 @@ namespace Nova
         /// The type of the current node will be switched to Branching.
         /// This method is designed to be called externally by scripts.
         /// </summary>
-        /// <param name="name">the name of this branch</param>
-        /// <param name="destination">the destination of this branch</param>
-        /// <param name="metadata">additional metadata</param>
-        public void RegisterBranch(string name, string destination, LuaTable metadata)
+        /// <param name="name">internal name of the branch, unique in a node</param>
+        /// <param name="destination">name of the destination node</param>
+        /// <param name="text">text on the button to select this branch</param>
+        /// <param name="mode"></param>
+        /// <param name="condition"></param>
+        public void RegisterBranch(string name, string destination, string text, BranchMode mode, LuaFunction condition)
         {
-            if (destination == null)
+            if (string.IsNullOrEmpty(destination))
             {
-                string msg =
-                    $"Nova: a branch must have a destination. (name = {name}) Exception occurs at node: {currentNode.name}";
-                throw new ArgumentException(msg);
+                throw new ArgumentException(
+                    $"Nova: a branch must have a destination. Exception occurs at node: {currentNode.name}, text: {text}");
+            }
+
+            if (mode == BranchMode.Normal && condition != null)
+            {
+                throw new ArgumentException(
+                    $"Nova: branch mode is Normal but condition is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+            }
+
+            if (mode == BranchMode.Jump && text != null)
+            {
+                throw new ArgumentException(
+                    $"Nova: branch mode is Jump but text is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+            }
+
+            if ((mode == BranchMode.Show || mode == BranchMode.Enable) && condition == null)
+            {
+                throw new ArgumentException(
+                    $"Nova: branch mode is Show or Enable but condition is null. Exception occurs at node: {currentNode.name}, destination: {destination}");
             }
 
             currentNode.type = FlowChartNodeType.Branching;
@@ -324,7 +343,7 @@ namespace Nova
             {
                 from = currentNode,
                 destination = destination,
-                branchInfo = new BranchInformation(name, metadata)
+                branchInfo = new BranchInformation(name, text, mode, condition)
             });
         }
 

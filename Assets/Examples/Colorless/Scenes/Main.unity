@@ -4124,7 +4124,7 @@ MonoBehaviour:
   m_CellSize: {x: 360, y: 80}
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 1
-  m_ConstraintCount: 2
+  m_ConstraintCount: 3
 --- !u!114 &1542636873 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1542636873, guid: ed28a84bf5bed423a9613c9aefa4dd7b,
