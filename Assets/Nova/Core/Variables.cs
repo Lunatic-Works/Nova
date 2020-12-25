@@ -6,11 +6,33 @@ using System.Text;
 
 namespace Nova
 {
+    [ExportCustomType]
+    public enum VariableType
+    {
+        Boolean,
+        Number,
+        String
+    }
+
+    [Serializable]
+    [ExportCustomType]
+    public class VariableEntry
+    {
+        public readonly VariableType type;
+        public readonly string value;
+
+        public VariableEntry(VariableType type, string value)
+        {
+            this.type = type;
+            this.value = value;
+        }
+    }
+
     [Serializable]
     [ExportCustomType]
     public class Variables
     {
-        private SortedDictionary<string, string> variables = new SortedDictionary<string, string>();
+        private SortedDictionary<string, VariableEntry> variables = new SortedDictionary<string, VariableEntry>();
 
         private string _hash = "";
         private bool needCalculateHash;
@@ -31,17 +53,18 @@ namespace Nova
 
         [NonSerialized] private HashAlgorithm algorithm = SHA256.Create();
 
-        public string Get(string name)
+        public VariableEntry Get(string name)
         {
-            return variables.TryGetValue(name, out string varValue) ? varValue : null;
+            variables.TryGetValue(name, out var entry);
+            return entry;
         }
 
-        public void Set(string name, string value)
+        public void Set(string name, VariableType type, string value)
         {
-            // Debug.Log(string.Format("Setting variable {0} to {1}", name, value));
-            if (!variables.TryGetValue(name, out string varValue) || varValue != value)
+            variables.TryGetValue(name, out var oldEntry);
+            if (oldEntry == null || oldEntry.type != type || oldEntry.value != value)
             {
-                variables[name] = value;
+                variables[name] = new VariableEntry(type, value);
                 needCalculateHash = true;
             }
         }
@@ -62,7 +85,7 @@ namespace Nova
 
         public void CopyFrom(Variables variables)
         {
-            this.variables = new SortedDictionary<string, string>(variables.variables);
+            this.variables = new SortedDictionary<string, VariableEntry>(variables.variables);
             hash = variables.hash;
         }
 

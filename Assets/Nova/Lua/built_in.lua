@@ -46,6 +46,7 @@ end
 ---    mode = 'normal|jump|show|enable', optional, default is normal
 ---    cond = a function that returns a bool, should not use if mode is show, optional if mode is jump
 --- }
+--- if cond is a string, it will be converted to a function that returns that expression
 --- this method can be only called once for each node. i.e. all branches of the node should be added at once
 function branch(branches)
     for i, branch in ipairs(branches) do
@@ -62,7 +63,13 @@ function branch(branches)
             warn('Unknown branch mode: ' .. tostring(branch.mode) .. ', text: ' .. tostring(text))
             return
         end
-        __Nova.scriptLoader:RegisterBranch(tostring(i), branch.dest, branch.text, mode, branch.cond)
+
+        local cond = branch.cond
+        if type(cond) == 'string' then
+            cond = load('return ' .. cond)
+        end
+
+        __Nova.scriptLoader:RegisterBranch(tostring(i), branch.dest, branch.text, mode, cond)
     end
     __Nova.scriptLoader:EndRegisterBranch()
 end
@@ -143,24 +150,43 @@ function dump(o)
     end
 end
 
-local function try_to_number(x)
-    local x_number = tonumber(x)
-    if x_number then
-        return x_number
+--- inverse of tostring()
+function toboolean(s)
+    if s == 'true' then
+        return true
+    elseif s == 'false' then
+        return false
     else
-        return x
+        return nil
     end
 end
 
 -- access variable at run time (lazy only)
--- value should not be nil
+-- value can be boolean, number, or string
 -- get: v(name)
 -- set: v(name, value)
 function v(name, value)
     if value == nil then
-        return try_to_number(__Nova.variables:Get(name))
+        local entry = __Nova.variables:Get(name)
+        if entry == nil then
+            return nil
+        elseif entry.type == Nova.VariableType.Boolean then
+            return toboolean(entry.value)
+        elseif entry.type == Nova.VariableType.Number then
+            return tonumber(entry.value)
+        else -- entry.type == Nova.VariableType.String
+            return entry.value
+        end
     else
-        __Nova.variables:Set(name, value)
+        if type(value) == 'boolean' then
+            __Nova.variables:Set(name, Nova.VariableType.Boolean, tostring(value))
+        elseif type(value) == 'number' then
+            __Nova.variables:Set(name, Nova.VariableType.Number, tostring(value))
+        elseif type(value) == 'string' then
+            __Nova.variables:Set(name, Nova.VariableType.String, value)
+        else
+            warn('variable can be boolean, number, or string only, but found ' .. tostring(value))
+        end
     end
 end
 

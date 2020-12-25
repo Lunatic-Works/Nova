@@ -4,64 +4,41 @@ label 'test_branch'
 |>
 <|
 set_box()
+v('flag', 0)
 |>
-这是一个分支节点
+测试开始
+@<| jump_to 'begin_loop' |>
+
+@<| label 'begin_loop' |>
+要加一个flag吗
 @<|
 branch {
-    { dest = 'test_branch_1', text = '选项1'},
-    { dest = 'test_branch_2', text = '选项2'},
-    { dest = 'test_branch_3', text = '选项3'},
+    { dest = 'add_flag', text = '加一个flag'},
+    { dest = 'end_loop', text = '不加了'},
 }
 |>
 
-@<|
-label 'test_branch_1'
-|>
+@<| label 'add_flag' |>
 <|
-v('flag', 1)
+v('flag', v('flag') + 1)
+print(v('flag'))
 |>
-选项1
-@<| jump_to 'test_branch_middle' |>
+加了一个flag
+@<| jump_to 'begin_loop' |>
 
-@<|
-label 'test_branch_2'
-|>
-<|
-v('flag', 2)
-|>
-选项2
-@<| jump_to 'test_branch_middle' |>
-
-@<|
-label 'test_branch_3'
-|>
-<|
-v('flag', 3)
-|>
-选项3
-@<| jump_to 'test_branch_middle' |>
-
-@<|
-label 'test_branch_middle'
-|>
-又一个分支节点，如果刚才选3会直接跳到最后
+@<| label 'end_loop' |>
+如果flag > 5会直接跳到最后
 @<|
 branch {
     { dest = 'test_branch_end', text = '普通的选项'},
-    { dest = 'test_branch_end', text = '如果刚才选1才会出现', mode = 'show', cond = function()
-        return v('flag') == 1
+    { dest = 'test_branch_end', text = 'flag > 1才会出现', mode = 'show', cond = function()
+        return v('flag') > 1
     end },
-    { dest = 'test_branch_end', text = '如果刚才选2才能点击', mode = 'enable', cond = function()
-        return v('flag') == 2
-    end },
-    { dest = 'test_branch_end', mode = 'jump', cond = function()
-        return v('flag') == 3
-    end },
+    { dest = 'test_branch_end', text = 'flag < 2才能点击', mode = 'enable', cond = "v('flag') < 2" },
+    { dest = 'test_branch_end', mode = 'jump', cond = "v('flag') > 5" },
 }
 |>
 
-@<|
-label 'test_branch_end'
-|>
+@<| label 'test_branch_end' |>
 测试结束
 @<| is_end 'test_branch' |>
