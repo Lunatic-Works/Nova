@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using UnityEngine;
 
 namespace Nova
 {
@@ -78,9 +79,18 @@ namespace Nova
                 return "";
             }
 
-            return Convert.ToBase64String(algorithm.ComputeHash(Encoding.UTF8.GetBytes(
-                string.Join("\0", from pair in variables select pair.Key + "\0" + pair.Value)
+            string hash = Convert.ToBase64String(algorithm.ComputeHash(Encoding.UTF8.GetBytes(
+                string.Join("\0", from pair in variables select pair.Key + "\0" + pair.Value.type + "\0" + pair.Value.value)
             )));
+
+            // Debug.Log("CalculateHash");
+            // foreach (var pair in variables)
+            // {
+            //     Debug.LogFormat("{0} {1} {2}", pair.Key, pair.Value.type, pair.Value.value);
+            // }
+            // Debug.Log(hash);
+
+            return hash;
         }
 
         public void CopyFrom(Variables variables)
@@ -97,7 +107,7 @@ namespace Nova
 
         public override string ToString()
         {
-            return string.Join(",", variables.Keys.Select(k => k + ":" + variables[k]));
+            return string.Join(",", from pair in variables select pair.Key + ":" + pair.Value.type + ":" + pair.Value.value);
         }
     }
 }
