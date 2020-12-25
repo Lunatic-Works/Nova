@@ -4,19 +4,19 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BackgroundGalleryElement : MonoBehaviour, IPointerClickHandler
+    public class ImageGalleryElement : MonoBehaviour, IPointerClickHandler
     {
         public Image snapshot;
 
-        private BackgroundGroup group;
-        private BackgroundGalleryController controller;
+        private ImageGroup group;
+        private ImageGalleryController controller;
 
         private void Awake()
         {
-            controller = GetComponentInParent<BackgroundGalleryController>();
+            controller = GetComponentInParent<ImageGalleryController>();
         }
 
-        public void SetGroup(BackgroundGroup group)
+        public void SetGroup(ImageGroup group)
         {
             this.group = group;
 

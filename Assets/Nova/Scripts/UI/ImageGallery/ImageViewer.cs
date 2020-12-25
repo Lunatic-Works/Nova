@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BackgroundImageViewer : MonoBehaviour
+    public class ImageViewer : MonoBehaviour
     {
         public Image image;
         public Vector2 defaultImageSize = new Vector2(1920, 1080);
@@ -11,11 +11,11 @@ namespace Nova
         public Text indexLabel;
         public Text scaleLabel;
 
-        private BackgroundGroup group;
+        private ImageGroup group;
         private int index;
         private float scale;
 
-        public void SetBackgroundGroup(BackgroundGroup group)
+        public void SetImageGroup(ImageGroup group)
         {
             this.group = group;
             index = 0;
@@ -25,6 +25,11 @@ namespace Nova
 
         private void Refresh()
         {
+            if (group == null)
+            {
+                return;
+            }
+
             if (index >= group.entries.Count)
             {
                 image.sprite = null;

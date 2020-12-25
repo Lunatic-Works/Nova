@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace Nova.Editor
 {
-    [CustomEditor(typeof(BackgroundGroup))]
-    public class BackgroundGroupEditor : UnityEditor.Editor
+    [CustomEditor(typeof(ImageGroup))]
+    public class ImageGroupEditor : UnityEditor.Editor
     {
         public const int SnapshotWidth = 320;
         public const int SnapshotHeight = 180;
@@ -73,40 +73,40 @@ namespace Nova.Editor
             return prefix;
         }
 
-        private static void CreateBackgroundGroup(string path, IEnumerable<string> backgroundSprites)
+        private static void CreateImageGroup(string path, IEnumerable<string> imageSprites)
         {
-            var groupPath = Path.Combine(path, GetCommonPrefix(backgroundSprites) + "_group.asset");
-            var group = AssetDatabase.LoadAssetAtPath<BackgroundGroup>(groupPath);
+            var groupPath = Path.Combine(path, GetCommonPrefix(imageSprites) + "_group.asset");
+            var group = AssetDatabase.LoadAssetAtPath<ImageGroup>(groupPath);
             if (group == null)
             {
-                group = CreateInstance<BackgroundGroup>();
+                group = CreateInstance<ImageGroup>();
                 AssetDatabase.CreateAsset(group, groupPath);
             }
 
-            group.entries = backgroundSprites.Select(bgPath =>
+            group.entries = imageSprites.Select(imagePath =>
             {
-                var fileName = Path.GetFileNameWithoutExtension(bgPath);
-                return new BackgroundEntry
+                var fileName = Path.GetFileNameWithoutExtension(imagePath);
+                return new ImageEntry
                 {
                     id = fileName,
                     displayNames = new[] {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}},
-                    resourcePath = GetResourcesPath(bgPath),
+                    resourcePath = GetResourcesPath(imagePath),
                 };
             }).ToList();
 
             EditorUtility.SetDirty(group);
         }
 
-        [MenuItem("Assets/Create/Nova/Background Group", false)]
-        public static void CreateBackgroundGroup()
+        [MenuItem("Assets/Create/Nova/Image Group", false)]
+        public static void CreateImageGroup()
         {
             // split path name and file name
             var path = EditorUtils.GetSelectedDirectory();
-            CreateBackgroundGroup(path, EditorUtils.PathOfSelectedSprites());
+            CreateImageGroup(path, EditorUtils.PathOfSelectedSprites());
         }
 
-        [MenuItem("Assets/Create/Nova/Background Group", true)]
-        public static bool CreateBackgroundGroupValidation()
+        [MenuItem("Assets/Create/Nova/Image Group", true)]
+        public static bool CreateImageGroupValidation()
         {
             var path = AssetDatabase.GetAssetPath(Selection.activeObject);
             return AssetDatabase.GetMainAssetTypeAtPath(path) == typeof(Texture2D);
@@ -121,7 +121,7 @@ namespace Nova.Editor
             reorderableList = new ReorderableList(serializedObject, entries,
                 true, true, true, true);
 
-            reorderableList.drawHeaderCallback = rect => { EditorGUI.LabelField(rect, new GUIContent("Backgrounds")); };
+            reorderableList.drawHeaderCallback = rect => { EditorGUI.LabelField(rect, new GUIContent("Images")); };
 
             reorderableList.onAddCallback = list =>
             {
@@ -142,14 +142,14 @@ namespace Nova.Editor
         private Color previewSnapshotFrameColor = Color.red;
         private float previewSnapshotFrameLineWidth = 2.0f;
 
-        private static void CorrectSnapshotScaleY(BackgroundEntry entry, Texture tex, SerializedProperty entryProperty)
+        private static void CorrectSnapshotScaleY(ImageEntry entry, Texture tex, SerializedProperty entryProperty)
         {
             var size = entry.snapshotScale * new Vector2(tex.width, tex.height);
             var fix = Mathf.Abs(SnapshotAspectRatio / (size.y / size.x));
             entryProperty.FindPropertyRelative("snapshotScale.y").floatValue *= fix;
         }
 
-        private static void CorrectSnapshotScaleX(BackgroundEntry entry, Texture tex, SerializedProperty entryProperty)
+        private static void CorrectSnapshotScaleX(ImageEntry entry, Texture tex, SerializedProperty entryProperty)
         {
             var size = entry.snapshotScale * new Vector2(tex.width, tex.height);
             var fix = Mathf.Abs((1.0f / SnapshotAspectRatio) / (size.x / size.y));
@@ -165,12 +165,12 @@ namespace Nova.Editor
             entryProperty.FindPropertyRelative("snapshotScale.y").floatValue = 1.0f;
         }
 
-        private void DrawPreview(string path, BackgroundEntry entry, SerializedProperty entryProperty)
+        private void DrawPreview(string path, ImageEntry entry, SerializedProperty entryProperty)
         {
             var sprite = Resources.Load<Sprite>(path);
             if (sprite == null)
             {
-                EditorGUILayout.HelpBox("Invalid background resource path!", MessageType.Error);
+                EditorGUILayout.HelpBox("Invalid image resource path!", MessageType.Error);
                 return;
             }
 
@@ -198,7 +198,7 @@ namespace Nova.Editor
             }
         }
 
-        private void DrawPreviewSnapshotFrame(BackgroundEntry entry, Rect rect)
+        private void DrawPreviewSnapshotFrame(ImageEntry entry, Rect rect)
         {
             EditorUtils.DrawPreviewCropFrame(rect, new Rect(entry.snapshotOffset, entry.snapshotScale),
                 previewSnapshotFrameColor, previewSnapshotFrameLineWidth);
@@ -261,7 +261,7 @@ namespace Nova.Editor
             return SnapshotTexture.EncodeToPNG();
         }
 
-        private static void GenerateSnapshot(BackgroundEntry entry)
+        private static void GenerateSnapshot(ImageEntry entry)
         {
             if (entry == null) return;
             var sprite = Resources.Load<Sprite>(entry.resourcePath);
@@ -276,9 +276,9 @@ namespace Nova.Editor
             File.WriteAllBytes(snapshotFullPath, data);
         }
 
-        private BackgroundGroup Target => target as BackgroundGroup;
+        private ImageGroup Target => target as ImageGroup;
 
-        public static void GenerateSnapshot(BackgroundGroup group)
+        public static void GenerateSnapshot(ImageGroup group)
         {
             if (group == null || group.entries.Count <= 0) return;
             GenerateSnapshot(group.entries[0]);
@@ -294,7 +294,7 @@ namespace Nova.Editor
                 AssetDatabase.Refresh();
             }
 
-            EditorGUILayout.HelpBox("The first background entry will be selected as the snapshot", MessageType.Info);
+            EditorGUILayout.HelpBox("The first image entry will be selected as the snapshot", MessageType.Info);
 
             reorderableList.DoLayoutList();
             if (reorderableList.index == -1 || reorderableList.index >= Target.entries.Count)

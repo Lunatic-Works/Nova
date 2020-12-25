@@ -58,12 +58,12 @@ namespace Nova.Editor
         public static IEnumerable<string> PathOfSelectedSprites()
         {
             // strange work around with unity
-            foreach (var bg in Selection.GetFiltered<Texture2D>(SelectionMode.Assets))
+            foreach (var tex in Selection.GetFiltered<Texture2D>(SelectionMode.Assets))
             {
                 Sprite sprite = null;
                 try
                 {
-                    sprite = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GetAssetPath(bg));
+                    sprite = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GetAssetPath(tex));
                 }
                 catch
                 {

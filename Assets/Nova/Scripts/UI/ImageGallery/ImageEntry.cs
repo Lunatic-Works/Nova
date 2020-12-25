@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Nova
 {
     [Serializable]
-    public class BackgroundEntry
+    public class ImageEntry
     {
         public string id;
         public LocaleStringPair[] displayNames;

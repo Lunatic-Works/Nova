@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class BackgroundGroup : ScriptableObject
+    public class ImageGroup : ScriptableObject
     {
-        public List<BackgroundEntry> entries;
+        public List<ImageEntry> entries;
 
         public Sprite LoadSnapshot()
         {

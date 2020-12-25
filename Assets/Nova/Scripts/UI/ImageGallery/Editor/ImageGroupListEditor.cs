@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace Nova.Editor
 {
-    [CustomEditor(typeof(BackgroundGroupList))]
-    public class BackgroundGroupListEditor : SimpleEntryListEditor
+    [CustomEditor(typeof(ImageGroupList))]
+    public class ImageGroupListEditor : SimpleEntryListEditor
     {
-        private BackgroundGroupList Target => target as BackgroundGroupList;
+        private ImageGroupList Target => target as ImageGroupList;
 
         protected override SerializedProperty GetEntriesProperty()
         {
@@ -25,30 +25,30 @@ namespace Nova.Editor
 
         protected override GUIContent GetHeaderContent()
         {
-            return new GUIContent("Background Groups");
+            return new GUIContent("Image Groups");
         }
 
-        [MenuItem("Assets/Nova/Create List for All Background Groups", false)]
-        public static void CreateListForAllBackgroundGroups()
+        [MenuItem("Assets/Nova/Create List for All Image Groups", false)]
+        public static void CreateListForAllImageGroups()
         {
             var path = EditorUtils.GetSelectedDirectory();
-            var listPaths = AssetDatabase.FindAssets("t:BackgroundGroupList", new[] {path});
-            BackgroundGroupList list;
+            var listPaths = AssetDatabase.FindAssets("t:ImageGroupList", new[] {path});
+            ImageGroupList list;
             if (listPaths.Length == 0)
             {
-                list = CreateInstance<BackgroundGroupList>();
+                list = CreateInstance<ImageGroupList>();
                 var pathName = Path.GetFileNameWithoutExtension(path);
-                AssetDatabase.CreateAsset(list, Path.Combine(path, pathName + "_bg_group_list.asset"));
+                AssetDatabase.CreateAsset(list, Path.Combine(path, pathName + "_image_group_list.asset"));
             }
             else
             {
-                list = AssetDatabase.LoadAssetAtPath<BackgroundGroupList>(
+                list = AssetDatabase.LoadAssetAtPath<ImageGroupList>(
                     AssetDatabase.GUIDToAssetPath(listPaths.First()));
             }
 
-            list.groups = AssetDatabase.FindAssets("t:BackgroundGroup", new[] {path})
+            list.groups = AssetDatabase.FindAssets("t:ImageGroup", new[] {path})
                 .Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<BackgroundGroup>)
+                .Select(AssetDatabase.LoadAssetAtPath<ImageGroup>)
                 .ToList();
 
             EditorUtility.SetDirty(list);
@@ -62,7 +62,7 @@ namespace Nova.Editor
             public void Init(SerializedProperty entries, string name)
             {
                 invalidGroupsList =
-                    new ReorderableList(indices, typeof(BackgroundGroup), false, false, false, false);
+                    new ReorderableList(indices, typeof(ImageGroup), false, false, false, false);
 
                 invalidGroupsList.drawHeaderCallback = rect => { EditorGUI.LabelField(rect, new GUIContent(name)); };
 
@@ -104,7 +104,7 @@ namespace Nova.Editor
             emptyGroupList.Init(GetEntriesProperty(), "Empty Groups");
         }
 
-        private static bool GroupResourcesReferenceIsCorrect(BackgroundGroup group)
+        private static bool GroupResourcesReferenceIsCorrect(ImageGroup group)
         {
             foreach (var entry in group.entries)
             {
@@ -118,7 +118,7 @@ namespace Nova.Editor
             return true;
         }
 
-        private static bool GroupSnapshotAspectRatioIsCorrect(BackgroundGroup group)
+        private static bool GroupSnapshotAspectRatioIsCorrect(ImageGroup group)
         {
             if (group.entries.Count == 0) return true;
             var entry = group.entries[0];
@@ -127,10 +127,10 @@ namespace Nova.Editor
             if (sprite == null) return true;
             var tex = sprite.texture;
             var size = entry.snapshotScale * new Vector2(tex.width, tex.height);
-            return Math.Abs(BackgroundGroupEditor.SnapshotAspectRatio - size.y / size.x) < 3 * float.Epsilon;
+            return Math.Abs(ImageGroupEditor.SnapshotAspectRatio - size.y / size.x) < 3 * float.Epsilon;
         }
 
-        private static bool GroupIsEmpty(BackgroundGroup group)
+        private static bool GroupIsEmpty(ImageGroup group)
         {
             return group.entries.Count == 0;
         }
@@ -177,7 +177,7 @@ namespace Nova.Editor
         {
             foreach (var group in Target.groups)
             {
-                BackgroundGroupEditor.GenerateSnapshot(group);
+                ImageGroupEditor.GenerateSnapshot(group);
             }
 
             AssetDatabase.Refresh();

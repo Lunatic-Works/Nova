@@ -5014,7 +5014,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1931879755326992, guid: a8d81af0d5879154b9814eeeb6e0293a, type: 3}
       propertyPath: m_Name
-      value: BackgroundGallery
+      value: ImageGallery
       objectReference: {fileID: 0}
     - target: {fileID: 114205822394568380, guid: a8d81af0d5879154b9814eeeb6e0293a,
         type: 3}
@@ -6240,7 +6240,7 @@ PrefabInstance:
     - target: {fileID: 8089046609868017881, guid: 79e0957580781694098a70feb271ad8c,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryView
+      value: ImageGalleryView
       objectReference: {fileID: 0}
     - target: {fileID: 8089046609868017881, guid: 79e0957580781694098a70feb271ad8c,
         type: 3}
@@ -6249,7 +6249,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8089046609868017887, guid: 79e0957580781694098a70feb271ad8c,
         type: 3}
-      propertyPath: backgroundGroupList
+      propertyPath: imageGroupList
       value: 
       objectReference: {fileID: 11400000, guid: 9e784d65e11c9674aa0c5bd1b2ddd99f,
         type: 2}

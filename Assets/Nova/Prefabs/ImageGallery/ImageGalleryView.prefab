@@ -441,7 +441,7 @@ GameObject:
   - component: {fileID: 8089046609475190176}
   - component: {fileID: 8089046609475190177}
   m_Layer: 5
-  m_Name: BackgroundGalleryRow (2)
+  m_Name: ImageGalleryRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1088,7 +1088,7 @@ GameObject:
   - component: {fileID: 8089046609868017880}
   - component: {fileID: 8089046609868017887}
   m_Layer: 5
-  m_Name: BackgroundGalleryView
+  m_Name: ImageGalleryView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1127,7 +1127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myPanel: {fileID: 8089046610246761898}
-  backgroundGroupList: {fileID: 0}
+  imageGroupList: {fileID: 0}
   pageNumberLabel: {fileID: 8089046610794320923}
   imageViewer: {fileID: 8089046608936622307}
 --- !u!1 &8089046610010904452
@@ -1218,7 +1218,7 @@ GameObject:
   - component: {fileID: 8089046610095911548}
   - component: {fileID: 8089046610095911538}
   m_Layer: 5
-  m_Name: BackgroundGalleryRow
+  m_Name: ImageGalleryRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1788,7 +1788,7 @@ GameObject:
   - component: {fileID: 8089046610246761901}
   - component: {fileID: 8089046610246761902}
   m_Layer: 5
-  m_Name: BackgroundGalleryPanel
+  m_Name: ImageGalleryPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1901,7 +1901,7 @@ GameObject:
   - component: {fileID: 8089046610305487361}
   - component: {fileID: 8089046610305487362}
   m_Layer: 5
-  m_Name: BackgroundGalleryRow (1)
+  m_Name: ImageGalleryRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3962,7 +3962,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -4087,7 +4087,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (1)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -4212,7 +4212,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (1)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -4337,7 +4337,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (2)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -4462,7 +4462,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (2)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -4587,7 +4587,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -4712,7 +4712,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -4837,7 +4837,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (3)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -4962,7 +4962,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (3)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -5087,7 +5087,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (1)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -5212,7 +5212,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (3)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}
@@ -5337,7 +5337,7 @@ PrefabInstance:
     - target: {fileID: 8287527120313180354, guid: 81eda3bdf955945f980ac1f58a54c428,
         type: 3}
       propertyPath: m_Name
-      value: BackgroundGalleryElement (2)
+      value: ImageGalleryElement
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81eda3bdf955945f980ac1f58a54c428, type: 3}

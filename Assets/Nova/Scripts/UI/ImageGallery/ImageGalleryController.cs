@@ -3,18 +3,18 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BackgroundGalleryController : ViewControllerBase
+    public class ImageGalleryController : ViewControllerBase
     {
-        public BackgroundGroupList backgroundGroupList;
+        public ImageGroupList imageGroupList;
         public Text pageNumberLabel;
-        public BackgroundImageViewer imageViewer;
+        public ImageViewer imageViewer;
 
-        private BackgroundGalleryElement[] elements;
+        private ImageGalleryElement[] elements;
 
         protected override void Awake()
         {
             base.Awake();
-            elements = GetComponentsInChildren<BackgroundGalleryElement>(true);
+            elements = GetComponentsInChildren<ImageGalleryElement>(true);
         }
 
         private int page = 0;
@@ -30,12 +30,12 @@ namespace Nova
             base.Show(onFinish);
         }
 
-        private int pageCount => (backgroundGroupList.groups.Count + elements.Length - 1) / elements.Length;
+        private int pageCount => (imageGroupList.groups.Count + elements.Length - 1) / elements.Length;
 
         private void Refresh()
         {
             var offset = page * elements.Length;
-            var groups = backgroundGroupList.groups;
+            var groups = imageGroupList.groups;
             for (var i = 0; i < elements.Length; i++)
             {
                 elements[i].SetGroup(offset + i < groups.Count ? groups[offset + i] : null);
@@ -47,7 +47,7 @@ namespace Nova
         public void NextPage()
         {
             page++;
-            if (page * elements.Length >= backgroundGroupList.groups.Count)
+            if (page * elements.Length >= imageGroupList.groups.Count)
             {
                 page--;
             }
@@ -66,9 +66,9 @@ namespace Nova
             Refresh();
         }
 
-        public void DisplayGroup(BackgroundGroup group)
+        public void DisplayGroup(ImageGroup group)
         {
-            imageViewer.SetBackgroundGroup(group);
+            imageViewer.SetImageGroup(group);
             imageViewer.Show();
         }
     }
