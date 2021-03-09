@@ -2,9 +2,10 @@ import re
 from glob import glob
 
 patterns = [
+    '../../Assets/Examples/Colorless/Resources/Colorless/Scenarios/*.txt',
     '../../Assets/Nova/Fonts/Charset3500.txt',
     '../../Assets/Nova/Resources/Locales/*.json',
-    '../../Assets/Examples/Colorless/Resources/Colorless/Scenarios/*.txt',
+    '../../Assets/Resources/Colorless/Scenarios/*.txt',
     '../../Assets/Resources/Locales/*/Colorless/Scenarios/*.txt',
 ]
 out_filename = '../../Assets/Nova/Fonts/Charset.txt'
