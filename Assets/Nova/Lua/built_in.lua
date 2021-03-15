@@ -41,8 +41,9 @@ end
 --- branches should be a list of 'branch'
 --- a branch is a table with the following structure:
 --- {
----    dest = 'name of the destination node',
----    text = 'text on the button to select this branch', should not use if mode is jump
+---    dest = 'name of the destination node'
+---    text = 'text on the button', should not use if mode is jump
+---    image = {'image_name', {x, y, scale}}, should not use if mode is jump
 ---    mode = 'normal|jump|show|enable', optional, default is normal
 ---    cond = a function that returns a bool, should not use if mode is show, optional if mode is jump
 --- }
@@ -50,6 +51,13 @@ end
 --- this method can be only called once for each node. i.e. all branches of the node should be added at once
 function branch(branches)
     for i, branch in ipairs(branches) do
+        local image_info = nil
+        if branch.image ~= nil then
+            local image_name, image_coord = unpack(branch.image)
+            local pos_x, pos_y, scale = unpack(image_coord)
+            image_info = Nova.BranchImageInformation(image_name, pos_x, pos_y, scale)
+        end
+
         local mode = Nova.BranchMode.Normal
         if branch.mode == nil or branch.mode == 'normal' then
             -- pass
@@ -69,7 +77,7 @@ function branch(branches)
             cond = load('return ' .. cond)
         end
 
-        __Nova.scriptLoader:RegisterBranch(tostring(i), branch.dest, branch.text, mode, cond)
+        __Nova.scriptLoader:RegisterBranch(tostring(i), branch.dest, branch.text, image_info, mode, cond)
     end
     __Nova.scriptLoader:EndRegisterBranch()
 end

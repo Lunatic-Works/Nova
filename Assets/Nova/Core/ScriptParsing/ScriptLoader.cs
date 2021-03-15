@@ -310,9 +310,11 @@ namespace Nova
         /// <param name="name">internal name of the branch, unique in a node</param>
         /// <param name="destination">name of the destination node</param>
         /// <param name="text">text on the button to select this branch</param>
+        /// <param name="imageInfo"></param>
         /// <param name="mode"></param>
         /// <param name="condition"></param>
-        public void RegisterBranch(string name, string destination, string text, BranchMode mode, LuaFunction condition)
+        public void RegisterBranch(string name, string destination, string text, BranchImageInformation imageInfo,
+            BranchMode mode, LuaFunction condition)
         {
             if (string.IsNullOrEmpty(destination))
             {
@@ -326,10 +328,10 @@ namespace Nova
                     $"Nova: branch mode is Normal but condition is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
             }
 
-            if (mode == BranchMode.Jump && text != null)
+            if (mode == BranchMode.Jump && (text != null || imageInfo != null))
             {
                 throw new ArgumentException(
-                    $"Nova: branch mode is Jump but text is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+                    $"Nova: branch mode is Jump but text or imageInfo is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
             }
 
             if ((mode == BranchMode.Show || mode == BranchMode.Enable) && condition == null)
@@ -343,7 +345,7 @@ namespace Nova
             {
                 from = currentNode,
                 destination = destination,
-                branchInfo = new BranchInformation(name, text, mode, condition)
+                branchInfo = new BranchInformation(name, text, imageInfo, mode, condition)
             });
         }
 

@@ -1,0 +1,29 @@
+@<|
+label 'test_branch_image'
+is_start()
+|>
+<|
+set_box()
+|>
+测试选项图片
+为了识别选项图片中的透明区域，图片的import settings里要选中read/write enabled
+@<|
+branch {
+    { dest = 'test_branch_image_red', image = {'red_pill', {-500, 0, 0.5}}},
+    { dest = 'test_branch_image_blue', image = {'blue_pill', {500, 0, 0.5}}},
+    { dest = 'test_branch_image_blue', text = '测试不能选的图片', image = {'blue_pill', {500, -300, 0.5}}, mode = 'enable', cond = 'false'},
+    { dest = 'test_branch_image_blue', text = '文字和图片可以一起用'},
+}
+|>
+
+@<| label 'test_branch_image_red' |>
+红的药来了
+@<| jump_to 'test_branch_image_end' |>
+
+@<| label 'test_branch_image_blue' |>
+蓝的药来了
+@<| jump_to 'test_branch_image_end' |>
+
+@<| label 'test_branch_image_end' |>
+测试结束
+@<| is_end 'test_branch_image' |>

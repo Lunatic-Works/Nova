@@ -11,6 +11,23 @@ namespace Nova
         Enable
     }
 
+    [ExportCustomType]
+    public class BranchImageInformation
+    {
+        public readonly string name;
+        public readonly float positionX;
+        public readonly float positionY;
+        public readonly float scale;
+
+        public BranchImageInformation(string name, float positionX, float positionY, float scale)
+        {
+            this.name = name;
+            this.positionX = positionX;
+            this.positionY = positionY;
+            this.scale = scale;
+        }
+    }
+
     /// <summary>
     /// The information of branch
     /// </summary>
@@ -30,6 +47,8 @@ namespace Nova
         /// </summary>
         public readonly string text;
 
+        public readonly BranchImageInformation imageInfo;
+
         public readonly BranchMode mode;
         public readonly LuaFunction condition;
 
@@ -46,10 +65,12 @@ namespace Nova
             this.name = name;
         }
 
-        public BranchInformation(string name, string text, BranchMode mode, LuaFunction condition)
+        public BranchInformation(string name, string text, BranchImageInformation imageInfo, BranchMode mode,
+            LuaFunction condition)
         {
             this.name = name;
             this.text = text;
+            this.imageInfo = imageInfo;
             this.mode = mode;
             this.condition = condition;
         }

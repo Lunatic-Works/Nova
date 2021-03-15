@@ -24,7 +24,7 @@ function play(obj, audio_name, volume)
     obj.scriptVolume = volume
     obj:Play(audio_name)
 
-    if obj == bgm or obj == music then
+    if obj == bgm then
         __Nova.musicUnlockHelper:Unlock(audio_name)
     end
 end
