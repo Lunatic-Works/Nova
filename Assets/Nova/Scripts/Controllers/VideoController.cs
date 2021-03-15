@@ -46,6 +46,8 @@ namespace Nova
             }
 
             videoPlayer.clip = AssetLoader.Load<VideoClip>(System.IO.Path.Combine(videoFolder, videoName));
+            // TODO: how to preload video?
+            videoPlayer.Prepare();
             currentVideoName = videoName;
         }
 
@@ -59,13 +61,6 @@ namespace Nova
 
             videoPlayer.clip = null;
             currentVideoName = null;
-        }
-
-        // Does not use AssetLoader's cache
-        public void Preload(string videoName)
-        {
-            videoPlayer.clip = AssetLoader.Load<VideoClip>(System.IO.Path.Combine(videoFolder, videoName));
-            videoPlayer.Prepare();
         }
 
         #endregion

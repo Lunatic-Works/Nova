@@ -1,6 +1,6 @@
 @<|
 label 'test_video'
--- is_unlocked_start()
+is_unlocked_start()
 |>
 <|
 show(xiben, 'normal', pos_c)

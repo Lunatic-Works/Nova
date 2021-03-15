@@ -1,7 +1,6 @@
 function video(video_name)
     __Nova.videoController:SetVideo(video_name)
 end
-add_preload_pattern_with_obj('video', '__Nova.videoController')
 
 function video_hide()
     __Nova.videoController:ClearVideo()
