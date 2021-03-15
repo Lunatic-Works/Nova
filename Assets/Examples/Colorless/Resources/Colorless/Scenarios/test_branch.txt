@@ -6,7 +6,7 @@ label 'test_branch'
 set_box()
 v('flag', 0)
 |>
-测试开始
+测试选项
 @<| jump_to 'begin_loop' |>
 
 @<| label 'begin_loop' |>

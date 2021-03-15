@@ -1,0 +1,25 @@
+@<|
+label 'test_video'
+-- is_start()
+|>
+<|
+show(xiben, 'normal', pos_c)
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试视频
+
+<|
+video('demo_video')
+anim:video_play()
+|>
+显示视频
+
+<|
+video_hide()
+|>
+隐藏视频
+
+测试结束
+@<| is_end 'test_video' |>

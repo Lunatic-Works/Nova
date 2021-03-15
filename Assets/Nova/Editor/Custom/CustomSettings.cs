@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 public static class CustomSettings
 {
@@ -168,6 +169,8 @@ public static class CustomSettings
         _GT(typeof(RectTransform)),
         // _GT(typeof(Sprite)),
         _GT(typeof(SpriteRenderer)),
+        _GT(typeof(VideoClip)),
+        _GT(typeof(VideoPlayer)),
 
         _GT(typeof(TMPro.TextAlignmentOptions)),
 

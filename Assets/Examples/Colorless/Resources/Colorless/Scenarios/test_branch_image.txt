@@ -1,6 +1,6 @@
 @<|
 label 'test_branch_image'
-is_start()
+-- is_start()
 |>
 <|
 set_box()
