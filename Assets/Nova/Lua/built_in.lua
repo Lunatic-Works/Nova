@@ -33,13 +33,15 @@ function label(name, display_name)
 end
 
 --- jump to the given destination
+--- should be called at the end of the node
 function jump_to(dest)
     __Nova.scriptLoader:RegisterJump(dest)
 end
 
 --- add branches to the current node
---- branches should be a list of 'branch'
---- a branch is a table with the following structure:
+--- should be called at the end of the node
+--- should be called only once for each node, i.e., all branches of the node should be added at once
+--- branches should be a list of 'branch'. A 'branch' is a table with the following structure:
 --- {
 ---    dest = 'name of the destination node'
 ---    text = 'text on the button', should not use if mode is jump
@@ -48,7 +50,6 @@ end
 ---    cond = a function that returns a bool, should not use if mode is show, optional if mode is jump
 --- }
 --- if cond is a string, it will be converted to a function that returns that expression
---- this method can be only called once for each node. i.e. all branches of the node should be added at once
 function branch(branches)
     for i, branch in ipairs(branches) do
         local image_info = nil
@@ -82,35 +83,45 @@ function branch(branches)
     __Nova.scriptLoader:EndRegisterBranch()
 end
 
---- set the current node as a start point of the game
---- should be called after the node has been defined
---- a flowchart tree CAN have multiple entrance points, which means this method can be called several times under
+--- set the current node as a start node
+--- should be called at the end of the node
+--- a game can have multiple start points, which means this function can be called several times under
 --- different nodes
---- a start point can have a name. If no name is given, the name of the current node will be used
---- the name of the start point should be unique among that of all the start points
+--- a name can be assigned to a start point, which can differ from the node name
+--- the name should be unique among all start point names
+--- if no name is given, the name of the current node will be used
 function is_start(name)
-    __Nova.scriptLoader:SetCurrentAsStartUpNode(name)
+    __Nova.scriptLoader:SetCurrentAsStart(name)
+end
+
+--- set the current node as a start point which is unlocked when running the game for the first time
+--- should be called at the end of the node
+--- indicates is_start()
+function is_unlocked_start(name)
+    __Nova.scriptLoader:SetCurrentAsUnlockedStart(name)
 end
 
 --- set the current node as the default start point
---- a game can have only one default start point. This function CANNOT be called under different nodes
---- the meaning of the parameter name is the same as that of is_start()
+--- should be called at the end of the node
+--- a game can have only one default start node, so this function cannot be called under different nodes
+--- indicates is_unlocked_start()
 function is_default_start(name)
     __Nova.scriptLoader:SetCurrentAsDefaultStart(name)
 end
 
---- set the current node as an end
---- an end can have a name, different ends should have different names
---- a node can only have one end name, and an end name can only refer to one node
+--- set the current node as an end node
+--- should be called at the end of the node
+--- a name can be assigned to an end point, which can differ from the node name
+--- the name should be unique among all end point names
 --- if no name is given, the name of the current node will be used
---- all nodes without child node should be marked as an end. If is_end() is not called under such nodes, those nodes
---- will be marked as ends automatically
+--- all nodes without child nodes should be marked as end nodes
+--- if is_end() is not called under those nodes, they will be marked as end nodes automatically
 function is_end(name)
     __Nova.scriptLoader:SetCurrentAsEnd(name)
 end
 
 --- get GameObject
---- caching everything might cause memory leak, so this method will do no cache
+--- caching everything might cause memory leak, so this function will do no cache
 --- find GameObject by name might be slow. It is the author's work to decide whether to cache the result or not
 function get_go(obj)
     local o

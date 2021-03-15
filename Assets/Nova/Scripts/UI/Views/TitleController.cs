@@ -52,12 +52,16 @@ namespace Nova
                     bgmController.Play(bgmName);
                 }
 
-                var reachedChapterCount = gameState.GetAllStartupNodeNames()
-                    .Count(name => checkpointManager.IsReachedForAnyVariables(name, 0) != null);
-                if (reachedChapterCount > 1 && configManager.GetInt(ChapterFirstUnlockedKey) == 0)
+                if (configManager.GetInt(ChapterFirstUnlockedKey) == 0)
                 {
-                    Alert.Show(I18n.__("title.first.selectchapter"));
-                    configManager.SetInt(ChapterFirstUnlockedKey, 1);
+                    var unlockedChapterCount = gameState.GetAllUnlockedStartNodeNames().Length;
+                    var reachedChapterCount = gameState.GetAllStartNodeNames()
+                        .Count(name => checkpointManager.IsReachedForAnyVariables(name, 0) != null);
+                    if (unlockedChapterCount == 1 && reachedChapterCount > 1)
+                    {
+                        Alert.Show(I18n.__("title.first.selectchapter"));
+                        configManager.SetInt(ChapterFirstUnlockedKey, 1);
+                    }
                 }
 
                 onFinish?.Invoke();

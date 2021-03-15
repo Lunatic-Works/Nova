@@ -1,6 +1,6 @@
 @<|
 label 'test_video'
--- is_start()
+-- is_unlocked_start()
 |>
 <|
 show(xiben, 'normal', pos_c)
@@ -22,4 +22,4 @@ video_hide()
 隐藏视频
 
 测试结束
-@<| is_end 'test_video' |>
+@<| is_end() |>

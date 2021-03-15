@@ -10,24 +10,24 @@ using UnityEngine.Assertions;
 namespace Nova
 {
     /// <summary>
-    /// The class that load scripts and construct the flowchart tree.
+    /// The class that loads scripts and constructs the flow chart tree.
     /// </summary>
     [ExportCustomType]
     public class ScriptLoader
     {
-        // variable indicates whether the script loader is initialized
+        // Variable indicating whether the script loader is initialized
         private bool isInited = false;
 
         /// <summary>
         /// Initialize the script loader. This method will load all text asset files in the given folder, parse all the
-        /// scripts and generate the flowchart tree of the story.
+        /// scripts, and construct the flow chart tree.
         /// </summary>
         /// <remarks>
-        /// All scripts will be parsed so this method might take some time to finish.
+        /// All scripts will be parsed, so this method might take some time to finish.
         /// </remarks>
         /// <param name="path">
-        /// The folder that stores all the scripts. All text assets in that folder will be loaded and processed, so
-        /// there should be no text assets other than script files in the given folder.
+        /// The folder containing all the scripts. All text assets in that folder will be loaded and parsed, so
+        /// there should be no text assets other than script files in that folder.
         /// </param>
         public void Init(string path)
         {
@@ -87,10 +87,10 @@ namespace Nova
             // Bind all lazy binding entries
             BindAllLazyBindingEntries();
 
-            // perform sanity check
+            // Perform sanity check
             flowChartTree.SanityCheck();
 
-            // Construction finish, freeze the tree status
+            // Construction finished, freeze the tree status
             flowChartTree.Freeze();
         }
 
@@ -103,7 +103,7 @@ namespace Nova
         /// Get the flow chart tree
         /// </summary>
         /// <remarks>This method should be called after init</remarks>
-        /// <returns>The constructed flow chart tree</returns>
+        /// <returns>The flow chart tree</returns>
         public FlowChartTree GetFlowChartTree()
         {
             CheckInit();
@@ -117,14 +117,14 @@ namespace Nova
         /// <summary>
         /// Parse the given script text
         /// </summary>
-        /// <param name="text">text of a script</param>
+        /// <param name="text">Text of a script</param>
         private void ParseScript(string text)
         {
             LuaRuntime.Instance.DoString("action_new_file()");
 
             text = text.Trim();
 
-            // Detect the eager execution block
+            // Detect eager execution block
             int eagerExecutionStartIndex = text.IndexOf(EagerExecutionStartSymbol, StringComparison.Ordinal);
             if (eagerExecutionStartIndex != 0)
             {
@@ -154,9 +154,8 @@ namespace Nova
                 DoEagerExecutionBlock(eagerExecutionBlockCode);
             }
 
-            // For some reason, a script file should ends with a eager execution block, which needs to refer
-            // to the next flow chart node
-            // Every thing after the last eager execution block will be ignored
+            // A script file should ends with an eager execution block
+            // Everything after the last eager execution block will be ignored
             if (lastMatchEndIndex < text.Length)
             {
                 Debug.LogWarning("Nova: A script file should ends with a eager execution block, " +
@@ -219,7 +218,7 @@ namespace Nova
                 node.AddBranch(entry.branchInfo, flowChartTree.GetNode(entry.destination));
             }
 
-            // remove unnecessary reference
+            // Remove unnecessary reference
             lazyBindingLinks = null;
         }
 
@@ -235,13 +234,13 @@ namespace Nova
         #region Methods called by external scripts
 
         /// <summary>
+        /// Create a new flow chart node register it to the current constructing FlowChartTree.
+        /// If the current node is a normal node, the newly created one is intended to be its
+        /// succeeding node. The link between the new node and the current one will be added immediately, which
+        /// will not be registered as a lazy binding link.
         /// This method is designed to be called externally by scripts.
-        /// A new flow chart node will be created and registered to the current constructing FlowChartTree.
-        /// If current editing node is a normal node, the newly created one is intended to be its
-        /// succeed node. The link between the new node and the current one will be added immediately, which
-        /// won't be registered as a lazy binding link.
         /// </summary>
-        /// <param name="name">the name of the new node</param>
+        /// <param name="name">Name of the new node</param>
         public void RegisterNewNode(string name)
         {
             var nextNode = new FlowChartNode(name);
@@ -274,10 +273,10 @@ namespace Nova
         }
 
         /// <summary>
-        /// Register a lazy binding link and null the current node
+        /// Register a lazy binding link and null the current node.
         /// This method is designed to be called externally by scripts.
         /// </summary>
-        /// <param name="destination">the destination of jump</param>
+        /// <param name="destination">Destination of the jump</param>
         public void RegisterJump(string destination)
         {
             if (destination == null)
@@ -307,9 +306,9 @@ namespace Nova
         /// The type of the current node will be switched to Branching.
         /// This method is designed to be called externally by scripts.
         /// </summary>
-        /// <param name="name">internal name of the branch, unique in a node</param>
-        /// <param name="destination">name of the destination node</param>
-        /// <param name="text">text on the button to select this branch</param>
+        /// <param name="name">Internal name of the branch, unique in a node</param>
+        /// <param name="destination">Name of the destination node</param>
+        /// <param name="text">Text on the button to select this branch</param>
         /// <param name="imageInfo"></param>
         /// <param name="mode"></param>
         /// <param name="condition"></param>
@@ -350,9 +349,8 @@ namespace Nova
         }
 
         /// <summary>
-        /// Stop registering branch to the current node
+        /// Stop registering branches to the current node, and null the current node.
         /// This method is designed to be called externally by scripts.
-        /// Simply null the current node
         /// </summary>
         public void EndRegisterBranch()
         {
@@ -360,22 +358,27 @@ namespace Nova
         }
 
         /// <summary>
-        /// Set the current node as the start up node
-        /// This method is designed to be called externally by scripts
+        /// Set the current node as a start node.
+        /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// A flow chart tree can have multiple entry points. A name can be assigned to a start point,
-        /// if no name is given, the name of the current node will be used
+        /// A flow chart tree can have multiple start points.
+        /// A name can be assigned to a start point, which can differ from the node name.
+        /// The name should be unique among all start point names.
         /// </remarks>
         /// <param name="name">
-        /// The name of the start point, which can be differ from that of the node.
-        /// If no name is given, use the name of the current node as the start point name.
+        /// Name of the start point.
+        /// If no name is given, the name of the current node will be used.
         /// </param>
-        public void SetCurrentAsStartUpNode(string name)
+        /// <exception cref="ArgumentException">
+        /// ArgumentException will be thrown if called without registering the current node.
+        /// </exception>
+        public void SetCurrentAsStart(string name)
         {
             if (currentNode == null)
             {
-                throw new ArgumentException("Nova: is_start() should be called after the definition of a label.");
+                throw new ArgumentException(
+                    $"Nova: SetCurrentAsStart({name}) should be called after registering the current node.");
             }
 
             if (name == null)
@@ -383,47 +386,65 @@ namespace Nova
                 name = currentNode.name;
             }
 
-            flowChartTree.AddStartUp(name, currentNode);
+            flowChartTree.AddStart(name, currentNode);
+        }
+
+        public void SetCurrentAsUnlockedStart(string name)
+        {
+            if (currentNode == null)
+            {
+                throw new ArgumentException(
+                    $"Nova: SetCurrentAsUnlockedStart({name}) should be called after registering the current node.");
+            }
+
+            if (name == null)
+            {
+                name = currentNode.name;
+            }
+
+            SetCurrentAsStart(name);
+            flowChartTree.AddUnlockedStart(name, currentNode);
         }
 
         /// <summary>
-        /// Make the current node as the default start point of the game.
+        /// Set the current node as the default start node.
         /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// This method will first add the current node as a start point, then set it as default.
+        /// This method will first add the current node as a start node, then set it as default.
         /// </remarks>
         /// <param name="name"></param>
         public void SetCurrentAsDefaultStart(string name)
         {
-            // add a start up point
-            SetCurrentAsStartUpNode(name);
-
-            // Make current node as the default start point
-            flowChartTree.defaultStartUpNode = currentNode;
+            SetCurrentAsUnlockedStart(name);
+            flowChartTree.defaultStartNode = currentNode;
         }
 
         /// <summary>
-        /// Set the current node as an end node
+        /// Set the current node as an end node.
         /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// While a flow chart can have multiple endings, each name of endings should be unique among other endings,
-        /// and a node can only have one end name.
+        /// A flow chart tree can have multiple end points.
+        /// A name can be assigned to an end point, which can differ from the node name.
+        /// The name should be unique among all end point names.
         /// </remarks>
-        /// <param name="name">The name of the ending</param>
+        /// <param name="name">
+        /// Name of the end point.
+        /// If no name is given, the name of the current node will be used.
+        /// </param>
         /// <exception cref="ArgumentException">
-        /// ArgumentException will been thrown if is_end is called when the label is not defined.
+        /// ArgumentException will be thrown if called without registering the current node.
         /// </exception>
         public void SetCurrentAsEnd(string name)
         {
             if (currentNode == null)
             {
                 throw new ArgumentException(
-                    $"Nova: is_end({name}) should be called after the definition of a label.");
+                    $"Nova: SetCurrentAsEnd({name}) should be called after registering the current node.");
             }
 
-            // Set the current node type as end
+            // Set the current node type as End
             currentNode.type = FlowChartNodeType.End;
 
             // Add the node as an end
@@ -434,7 +455,7 @@ namespace Nova
 
             flowChartTree.AddEnd(name, currentNode);
 
-            // null the current node, is_end will indicates the end of a label
+            // Null the current node, because SetCurrentAsEnd() indicates the end of a node
             currentNode = null;
         }
 

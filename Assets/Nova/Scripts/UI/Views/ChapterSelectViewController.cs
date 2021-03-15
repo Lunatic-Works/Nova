@@ -14,13 +14,12 @@ namespace Nova
         public LogController logController;
         public bool unlockAllChaptersForDebug;
 
-        // private const string GameFirstShownKey = "_Game" + ConfigViewController.FirstShownKeySuffix;
-
         private GameState gameState;
-
         private CheckpointManager checkpointManager;
 
-        // private ConfigManager configManager;
+        private string[] startNodeNames;
+        private string[] unlockedStartNodeNames;
+
         private Dictionary<string, GameObject> buttons;
 
         protected override void Awake()
@@ -30,7 +29,11 @@ namespace Nova
             var controller = Utils.FindNovaGameController();
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
-            // configManager = controller.ConfigManager;
+
+            // TODO: customize the order of chapters
+            startNodeNames = gameState.GetAllStartNodeNames().OrderBy(x => x).ToArray();
+            unlockedStartNodeNames = gameState.GetAllUnlockedStartNodeNames();
+
             returnButton.onClick.AddListener(Hide);
         }
 
@@ -38,7 +41,7 @@ namespace Nova
         {
             base.Start();
 
-            buttons = gameState.GetAllStartupNodeNames().Select(chapter =>
+            buttons = startNodeNames.Select(chapter =>
             {
                 var chapterButton = Instantiate(chapterButtonPrefab, chapterList.transform);
                 var button = chapterButton.GetComponent<Button>();
@@ -49,10 +52,7 @@ namespace Nova
 
         public override void Show(Action onFinish)
         {
-            var chapterNames = gameState.GetAllStartupNodeNames();
-            var reachedChaptersCount =
-                chapterNames.Count(name => checkpointManager.IsReachedForAnyVariables(name, 0) != null);
-            if (reachedChaptersCount < 2 && !unlockAllChaptersForDebug && !Utils.GetKeyInEditor(KeyCode.LeftShift))
+            if (ReachedChapterCount() < 2 && !Utils.GetKeyInEditor(KeyCode.LeftShift))
             {
                 BeginChapter();
                 return;
@@ -62,23 +62,21 @@ namespace Nova
             base.Show(onFinish);
         }
 
+        private bool IsUnlocked(string name)
+        {
+            return unlockAllChaptersForDebug || unlockedStartNodeNames.Contains(name) ||
+                   checkpointManager.IsReachedForAnyVariables(name, 0) != null;
+        }
+
+        private int ReachedChapterCount()
+        {
+            return startNodeNames.Count(IsUnlocked);
+        }
+
         private void BeginChapter(string chapterName = null)
         {
             viewManager.GetController<TitleController>().SwitchView<DialogueBoxController>(() =>
             {
-                // if (configManager.GetInt(GameFirstShownKey) == 0)
-                // {
-                //     if (Application.isMobilePlatform)
-                //     {
-                //         Alert.Show(I18n.__("ingame.first.hint.touch"), () => { Alert.Show(I18n.__("ingame.first.auto")); });
-                //     }
-                //     else
-                //     {
-                //         Alert.Show(I18n.__("ingame.first.hint.mouse"), () => { Alert.Show(I18n.__("ingame.first.auto")); });
-                //     }
-                //     configManager.SetInt(GameFirstShownKey, 1);
-                // }
-
                 logController.Clear();
 
                 if (chapterName == null)
@@ -96,7 +94,7 @@ namespace Nova
         {
             foreach (var chapter in buttons)
             {
-                if (unlockAllChaptersForDebug || checkpointManager.IsReachedForAnyVariables(chapter.Key, 0) != null)
+                if (IsUnlocked(chapter.Key))
                 {
                     chapter.Value.GetComponent<Button>().enabled = true;
                     chapter.Value.GetComponent<Text>().text = I18nHelper.NodeNames.Get(chapter.Key);

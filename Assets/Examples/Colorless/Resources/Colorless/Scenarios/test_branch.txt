@@ -1,6 +1,6 @@
 @<|
 label 'test_branch'
--- is_start()
+-- is_unlocked_start()
 |>
 <|
 set_box()
@@ -41,4 +41,4 @@ branch {
 
 @<| label 'test_branch_end' |>
 测试结束
-@<| is_end 'test_branch' |>
+@<| is_end() |>

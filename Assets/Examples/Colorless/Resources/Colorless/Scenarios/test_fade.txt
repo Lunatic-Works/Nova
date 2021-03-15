@@ -1,6 +1,6 @@
 @<|
 label 'test_fade'
-is_start()
+-- is_unlocked_start()
 |>
 <|
 show(xiben, 'normal', pos_l)
@@ -27,4 +27,4 @@ anim:trans(cam, function()
 第二个画面出现
 
 测试结束
-@<| is_end 'test_fade' |>
+@<| is_end() |>

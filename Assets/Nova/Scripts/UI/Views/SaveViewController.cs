@@ -682,7 +682,7 @@ namespace Nova
             }
             catch (Exception e)
             {
-                // TODO: Do not load a bookmark multiple times when it is corrupted
+                // TODO: do not load a bookmark multiple times when it is corrupted
                 Debug.LogWarning(e);
                 ShowPreview(dummy, I18n.__("bookmark.corrupted.title"));
             }

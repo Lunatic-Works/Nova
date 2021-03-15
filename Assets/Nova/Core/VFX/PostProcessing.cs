@@ -68,19 +68,19 @@ namespace Nova
             }
         }
 
-        public int layersCount
+        public int layerCount
         {
             get
             {
                 if (asProxyOf != null)
-                    return asProxyOf.layersCount;
+                    return asProxyOf.layerCount;
                 return layers.Count;
             }
             set
             {
                 if (asProxyOf != null)
                 {
-                    asProxyOf.layersCount = value;
+                    asProxyOf.layerCount = value;
                     return;
                 }
 
@@ -101,15 +101,15 @@ namespace Nova
         {
             if (!material)
                 return;
-            if (layersCount <= layerID)
-                layersCount = layerID + 1;
+            if (layerCount <= layerID)
+                layerCount = layerID + 1;
             layers[layerID].Add(material);
         }
 
         public void ClearLayer(int layerID = 0)
         {
-            if (layersCount <= layerID)
-                layersCount = layerID + 1;
+            if (layerCount <= layerID)
+                layerCount = layerID + 1;
             layers[layerID].Clear();
         }
 

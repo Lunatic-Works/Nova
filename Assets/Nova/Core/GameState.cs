@@ -503,12 +503,12 @@ namespace Nova
         }
 
         /// <summary>
-        /// Start the game from the default start up point
+        /// Start the game from the default start point
         /// </summary>
         public void GameStart()
         {
             if (CheckActionRunning()) return;
-            var startNode = flowChartTree.defaultStartUpNode;
+            var startNode = flowChartTree.defaultStartNode;
             GameStart(startNode);
         }
 
@@ -519,13 +519,18 @@ namespace Nova
         public void GameStart(string startName)
         {
             if (CheckActionRunning()) return;
-            var startNode = flowChartTree.GetStartUpNode(startName);
+            var startNode = flowChartTree.GetStartNode(startName);
             GameStart(startNode);
         }
 
-        public string[] GetAllStartupNodeNames()
+        public string[] GetAllStartNodeNames()
         {
-            return flowChartTree.GetAllStartupNodeNames();
+            return flowChartTree.GetAllStartNodeNames();
+        }
+
+        public string[] GetAllUnlockedStartNodeNames()
+        {
+            return flowChartTree.GetAllUnlockedStartNodeNames();
         }
 
         #endregion

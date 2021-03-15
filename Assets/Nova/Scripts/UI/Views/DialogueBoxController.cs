@@ -437,7 +437,7 @@ namespace Nova
 
         private void JumpChapter(int offset)
         {
-            string[] chapters = gameState.GetAllStartupNodeNames();
+            string[] chapters = gameState.GetAllStartNodeNames();
             int targetChapterIndex = Array.IndexOf(chapters, currentNodeName) + offset;
             if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Length)
             {

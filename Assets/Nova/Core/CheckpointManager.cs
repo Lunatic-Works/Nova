@@ -65,7 +65,7 @@ namespace Nova
         public readonly Dictionary<string, Dictionary<string, NodeSaveInfo>> savedNodesByVariablesHash =
             new Dictionary<string, Dictionary<string, NodeSaveInfo>>();
 
-        public readonly SerializableHashSet<string> reachedEndings = new SerializableHashSet<string>();
+        public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
         public readonly long globalSaveIdentifier = DateTime.Now.ToBinary();
 
         /// The global flags and status of the game. For example, the unlock status of music or CG
@@ -335,12 +335,12 @@ namespace Nova
         }
 
         /// <summary>
-        /// Set an ending to "reached" state.
+        /// Set an end point to "reached" state.
         /// </summary>
-        /// <param name="endName">The name of the ending.</param>
+        /// <param name="endName">The name of the end point.</param>
         public void SetReached(string endName)
         {
-            globalSave.reachedEndings.Add(endName);
+            globalSave.reachedEnds.Add(endName);
         }
 
         // DEBUG ONLY METHOD: will destroy all versions regardless of variables
@@ -416,13 +416,13 @@ namespace Nova
         }
 
         /// <summary>
-        /// Check if the ending has been reached.
+        /// Check if the end point has been reached.
         /// </summary>
-        /// <param name="endName">The name of the ending.</param>
-        /// <returns>Whether the ending has been reached.</returns>
+        /// <param name="endName">The name of the end point.</param>
+        /// <returns>Whether the end point has been reached.</returns>
         public bool IsReached(string endName)
         {
-            return globalSave.reachedEndings.Contains(endName);
+            return globalSave.reachedEnds.Contains(endName);
         }
 
         private string ComposeFileName(int saveID)
