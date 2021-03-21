@@ -28,30 +28,29 @@ namespace Nova
 
         public static SystemLanguage DefaultLocale => SupportedLocales[0];
 
-        private static SystemLanguage _currentLocale = Application.systemLanguage;
+        private static SystemLanguage _currentLocale = FallbackLocale(Application.systemLanguage);
 
         public static SystemLanguage CurrentLocale
         {
             get => _currentLocale;
             set
             {
-                _currentLocale = value;
+                _currentLocale = FallbackLocale(value);
                 Init();
-                FallbackLocale();
                 LocaleChanged.Invoke();
             }
         }
 
-        private static void FallbackLocale()
+        private static SystemLanguage FallbackLocale(SystemLanguage locale)
         {
-            if (_currentLocale == SystemLanguage.Chinese || _currentLocale == SystemLanguage.ChineseSimplified ||
-                _currentLocale == SystemLanguage.ChineseTraditional)
+            if (locale == SystemLanguage.Chinese || locale == SystemLanguage.ChineseSimplified ||
+                locale == SystemLanguage.ChineseTraditional)
             {
-                _currentLocale = SystemLanguage.ChineseSimplified;
+                return SystemLanguage.ChineseSimplified;
             }
             else
             {
-                _currentLocale = SystemLanguage.English;
+                return SystemLanguage.English;
             }
         }
 
@@ -97,7 +96,6 @@ namespace Nova
 #if UNITY_EDITOR
             EditorOnly_GetLatestTranslation();
 #endif
-
             Init();
 
             string translation = key;

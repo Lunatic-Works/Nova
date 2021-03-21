@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,19 +24,7 @@ namespace Nova
 
         private void UpdateText()
         {
-            // TODO: sometimes I18n may not have been initialized when the program just starts
-            string str;
-            try
-            {
-                str = I18n.__(inflateTextKey);
-            }
-            catch (KeyNotFoundException e)
-            {
-                Debug.Log(e);
-                Debug.Log($"inflateTextKey {inflateTextKey}");
-                str = inflateTextKey;
-            }
-
+            string str = I18n.__(inflateTextKey);
             if (textProxy != null)
             {
                 textProxy.Init();
