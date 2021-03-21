@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Nova
 {
-    [RequireComponent(typeof(AudioSource))]
     public abstract class CompositeSpriteControllerBase : MonoBehaviour, IRestorable
     {
         public string imageFolder;

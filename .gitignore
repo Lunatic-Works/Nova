@@ -1,20 +1,20 @@
 # https://github.com/github/gitignore/blob/master/Unity.gitignore
 
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ibrary*/
-/[Ll]ogs/
-/[Mm]emoryCaptures/
-/[Oo]bj/
-/[Tt]emp/
-/[Uu]ser[Ss]ettings/
+/Build/
+/Builds/
+/Library*/
+/Logs/
+/MemoryCaptures/
+/Obj/
+/Temp/
+/UserSettings/
 
-!/[Aa]ssets/**/*.meta
-/[Aa]ssets/AssetStoreTools*
-/[Aa]ssets/Plugins*
+!/Assets/**/*.meta
+/Assets/AssetStoreTools*
+/Assets/Plugins*
 
-/[Aa]ssets/Nova/ThirdParty/ToLua/Source/Generate/*
-/[Aa]ssets/Resources/Lua*
+/Assets/Nova/ThirdParty/ToLua/Source/Generate/*
+/Assets/Resources/Lua*
 
 # Visual Studio cache directory
 .vs/
@@ -59,14 +59,14 @@ sysinfo.txt
 crashlytics-build.properties
 
 # Packed Addressables
-/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/Assets/AddressableAssetsData/*/*.bin*
 
 # Temporary auto-generated Android Assets
-/[Aa]ssets/[Ss]treamingAssets/aa.meta
-/[Aa]ssets/[Ss]treamingAssets/aa/*
+/Assets/StreamingAssets/aa.meta
+/Assets/StreamingAssets/aa/*
 
 # VS packages
-/[Pp]ackages/Microsoft*/
+/Packages/Microsoft*/
 packages.config
 
 # NDepend

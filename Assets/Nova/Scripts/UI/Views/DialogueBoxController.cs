@@ -61,7 +61,6 @@ namespace Nova
         }
     }
 
-    [RequireComponent(typeof(ButtonRingTrigger))]
     [RequireComponent(typeof(TextSpeedConfigReader))]
     [ExportCustomType]
     public partial class DialogueBoxController : ViewControllerBase, IPointerDownHandler, IPointerUpHandler,

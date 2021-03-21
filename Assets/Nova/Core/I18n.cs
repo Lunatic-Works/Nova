@@ -36,7 +36,6 @@ namespace Nova
             set
             {
                 _currentLocale = FallbackLocale(value);
-                Init();
                 LocaleChanged.Invoke();
             }
         }
@@ -176,7 +175,6 @@ namespace Nova
             {
                 LastWriteTime = writeTime;
                 Inited = false;
-                Init();
             }
         }
 #endif
