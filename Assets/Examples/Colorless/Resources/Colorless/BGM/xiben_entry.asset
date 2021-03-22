@@ -18,6 +18,6 @@ MonoBehaviour:
     value: "\u964DE\u5927\u8C03\u591C\u66F2"
   - locale: 10
     value: Nocturne in E-flat Major
-  resourcePath: Colorless\BGM\xiben
+  resourcePath: Colorless/BGM/xiben
   loopBeginSample: 0
   loopEndSample: 6099580

@@ -10,6 +10,7 @@ namespace Nova
     {
         private MusicGalleryController controller;
         private CheckpointManager checkpoint;
+        private MusicUnlockInfo unlockInfo;
 
         private void Awake()
         {
@@ -18,14 +19,19 @@ namespace Nova
             LuaRuntime.Instance.BindObject("musicUnlockHelper", this);
         }
 
+        private void Start()
+        {
+            unlockInfo = checkpoint.Get<MusicUnlockInfo>(statusKey) ?? new MusicUnlockInfo();
+        }
+
         private string statusKey => controller.musicUnlockStatusKey;
 
-        public void Unlock(string id)
+        public void Unlock(string path)
         {
-            var s = checkpoint.Get<MusicUnlockInfo>(statusKey) ?? new MusicUnlockInfo();
-            if (s.Contains(id)) return;
-            s.Add(id);
-            checkpoint.Set(statusKey, s);
+            path = Utils.ConvertPathSeparator(path);
+            if (unlockInfo.Contains(path)) return;
+            unlockInfo.Add(path);
+            checkpoint.Set(statusKey, unlockInfo);
         }
     }
 }

@@ -25,7 +25,7 @@ function play(obj, audio_name, volume)
     obj:Play(audio_name)
 
     if obj == bgm then
-        __Nova.musicUnlockHelper:Unlock(audio_name)
+        __Nova.musicUnlockHelper:Unlock(obj.audioFolder .. '/' .. audio_name)
     end
 end
 add_preload_pattern('play')

@@ -18,6 +18,6 @@ MonoBehaviour:
     value: "D\u5C0F\u8C03\u5C0F\u63D0\u7434\u7ADE\u594F\u66F2"
   - locale: 10
     value: Violin Partita No. 2 in D Minor
-  resourcePath: Colorless\BGM\qianye
+  resourcePath: Colorless/BGM/qianye
   loopBeginSample: 0
   loopEndSample: 5471085

@@ -166,7 +166,7 @@ namespace Nova
 
         private static bool IsUnlocked(ICollection<string> unlockInfo, MusicEntry entry)
         {
-            return unlockInfo.Contains(entry.id);
+            return unlockInfo.Contains(Utils.ConvertPathSeparator(entry.resourcePath));
         }
 
         private void RefreshMusicListView()
@@ -196,7 +196,7 @@ namespace Nova
 
             foreach (var music in allMusics)
             {
-                unlockHelper.Unlock(music.entry.id);
+                unlockHelper.Unlock(music.entry.resourcePath);
             }
 
             RefreshContent();

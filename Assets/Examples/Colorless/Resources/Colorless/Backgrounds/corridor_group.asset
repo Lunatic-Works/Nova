@@ -17,6 +17,6 @@ MonoBehaviour:
     displayNames:
     - locale: 40
       value: corridor
-    resourcePath: Colorless\Backgrounds\corridor
+    resourcePath: Colorless/Backgrounds/corridor
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}

@@ -90,8 +90,7 @@ namespace Nova
 
         public static T LoadOrNull<T>(string path) where T : UnityObject
         {
-            // Convert OS-dependent path separator to "/"
-            path = path.Replace("\\", "/");
+            path = Utils.ConvertPathSeparator(path);
             path = TryGetLocalizedPath(path);
             return Resources.Load<T>(path);
         }
@@ -135,8 +134,7 @@ namespace Nova
 
         public static void Preload(AssetCacheType type, string path)
         {
-            // Convert OS-dependent path separator to "/"
-            path = path.Replace("\\", "/");
+            path = Utils.ConvertPathSeparator(path);
 
             // Debug.LogFormat("Preload {0}:{1}", type, path);
             var cache = Current.cachedAssets[type];
@@ -154,8 +152,7 @@ namespace Nova
 
         public static void Unpreload(AssetCacheType type, string path)
         {
-            // Convert OS-dependent path separator to "/"
-            path = path.Replace("\\", "/");
+            path = Utils.ConvertPathSeparator(path);
 
             // Debug.LogFormat("Unpreload {0}:{1}", type, path);
             var cache = Current.cachedAssets[type];

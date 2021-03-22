@@ -18,6 +18,6 @@ MonoBehaviour:
     value: "C\u5927\u8C03\u524D\u594F\u66F2"
   - locale: 10
     value: Prelude in C Major
-  resourcePath: Colorless\BGM\prelude
+  resourcePath: Colorless/BGM/prelude
   loopBeginSample: 0
   loopEndSample: 4167099

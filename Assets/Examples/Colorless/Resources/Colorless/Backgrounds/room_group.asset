@@ -17,6 +17,13 @@ MonoBehaviour:
     displayNames:
     - locale: 40
       value: room
-    resourcePath: Colorless\Backgrounds\room
+    resourcePath: Colorless/Backgrounds/room
+    snapshotOffset: {x: 0, y: 0}
+    snapshotScale: {x: 1, y: 1}
+  - id: toilet
+    displayNames:
+    - locale: 40
+      value: toilet
+    resourcePath: Colorless/Backgrounds/toilet
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}

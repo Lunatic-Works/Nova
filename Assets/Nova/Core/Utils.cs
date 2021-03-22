@@ -397,6 +397,12 @@ namespace Nova
         {
             return GetPath(component.transform) + ":" + component.GetType();
         }
+
+        // Convert OS-dependent path separator to "/"
+        public static string ConvertPathSeparator(string s)
+        {
+            return s.Replace('\\', '/');
+        }
     }
 
     public class XorStream : Stream

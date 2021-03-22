@@ -18,6 +18,6 @@ MonoBehaviour:
     value: "A\u5C0F\u8C03\u534E\u5C14\u5179"
   - locale: 10
     value: Waltz in A Minor
-  resourcePath: Colorless\BGM\gaotian
+  resourcePath: Colorless/BGM/gaotian
   loopBeginSample: 0
   loopEndSample: 2091072

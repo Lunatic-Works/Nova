@@ -20,37 +20,37 @@ namespace Nova.Editor
             return Path.Combine(Application.dataPath, AssetDatabase.GetAssetPath(asset).Substring(7));
         }
 
-        private const string ResourceFolderName = "/Resources/";
+        private const string ResourcesFolderName = "/Resources/";
 
         private static string GetResourcesFolder(string path)
         {
-            // Convert OS-dependent path separator to "/"
-            path = path.Replace("\\", "/");
+            path = Utils.ConvertPathSeparator(path);
 
-            var index = path.IndexOf(ResourceFolderName, StringComparison.Ordinal);
+            var index = path.IndexOf(ResourcesFolderName, StringComparison.Ordinal);
             if (index == -1)
             {
                 throw new ArgumentException();
             }
 
-            return path.Substring(0, index + ResourceFolderName.Length);
+            return path.Substring(0, index + ResourcesFolderName.Length);
         }
 
-        private static string GetResourcesPath(string path)
+        private static string GetResourcePath(string path)
         {
-            // Convert OS-dependent path separator to "/"
-            path = path.Replace("\\", "/");
+            path = Utils.ConvertPathSeparator(path);
 
-            var index = path.IndexOf(ResourceFolderName, StringComparison.Ordinal);
+            var index = path.IndexOf(ResourcesFolderName, StringComparison.Ordinal);
             if (index == -1)
             {
                 throw new ArgumentException();
             }
 
-            var fullResPath = path.Substring(index + ResourceFolderName.Length);
-            var dir = Path.GetDirectoryName(fullResPath);
-            var fileName = Path.GetFileNameWithoutExtension(fullResPath);
-            return Path.Combine(dir, fileName);
+            var resourcePath = path.Substring(index + ResourcesFolderName.Length);
+            var dirName = Path.GetDirectoryName(resourcePath);
+            var fileName = Path.GetFileNameWithoutExtension(resourcePath);
+            resourcePath = Path.Combine(dirName, fileName);
+            resourcePath = Utils.ConvertPathSeparator(resourcePath);
+            return resourcePath;
         }
 
         private static string GetCommonPrefix(IEnumerable<string> paths)
@@ -90,7 +90,7 @@ namespace Nova.Editor
                 {
                     id = fileName,
                     displayNames = new[] {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}},
-                    resourcePath = GetResourcesPath(imagePath),
+                    resourcePath = GetResourcePath(imagePath),
                 };
             }).ToList();
 
