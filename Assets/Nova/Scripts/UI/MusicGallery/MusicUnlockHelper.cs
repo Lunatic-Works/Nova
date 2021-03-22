@@ -8,30 +8,23 @@ namespace Nova
     [ExportCustomType]
     public class MusicUnlockHelper : MonoBehaviour
     {
-        private MusicGalleryController controller;
-        private CheckpointManager checkpoint;
-        private MusicUnlockInfo unlockInfo;
+        private CheckpointManager checkpointManager;
 
         private void Awake()
         {
-            controller = GetComponent<MusicGalleryController>();
-            checkpoint = Utils.FindNovaGameController().CheckpointManager;
+            checkpointManager = Utils.FindNovaGameController().CheckpointManager;
             LuaRuntime.Instance.BindObject("musicUnlockHelper", this);
         }
 
-        private void Start()
-        {
-            unlockInfo = checkpoint.Get<MusicUnlockInfo>(statusKey) ?? new MusicUnlockInfo();
-        }
-
-        private string statusKey => controller.musicUnlockStatusKey;
+        private static string MusicUnlockStatusKey => MusicGalleryController.MusicUnlockStatusKey;
 
         public void Unlock(string path)
         {
             path = Utils.ConvertPathSeparator(path);
+            var unlockInfo = checkpointManager.Get(MusicUnlockStatusKey, new MusicUnlockInfo());
             if (unlockInfo.Contains(path)) return;
             unlockInfo.Add(path);
-            checkpoint.Set(statusKey, unlockInfo);
+            checkpointManager.Set(MusicUnlockStatusKey, unlockInfo);
         }
     }
 }

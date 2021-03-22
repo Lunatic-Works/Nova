@@ -17,21 +17,21 @@ namespace Nova
 
     public class MusicGalleryController : ViewControllerBase
     {
-        private static readonly MusicUnlockInfo DefaultUnlockSet = new MusicUnlockInfo();
-        private CheckpointManager checkpointManager;
+        public const string MusicUnlockStatusKey = "music_unlock_status";
 
         public MusicGalleryPlayer musicPlayer;
-        public string musicUnlockStatusKey = "music_unlock_status";
         public MusicEntryList musicList;
-
         public Transform musicListScrollContent;
         public MusicGalleryEntry musicEntryPrefab;
-        public GameObject lockedMusicPrefab;
+        public GameObject lockedMusicEntryPrefab;
         public List<AudioController> audioControllersToDisable;
 
+        private CheckpointManager checkpointManager;
+
         // The indices of entries in allMusics are their indices in unlockedMusics
-        // The indices of locked musics are -1
+        // The indices of locked entries are -1
         private const int LockedIndex = -1;
+
         private List<MusicListEntry> allMusics;
         private List<MusicListEntry> unlockedMusics;
 
@@ -121,24 +121,23 @@ namespace Nova
             RefreshMusicPlayerList();
         }
 
-        private void RefreshMusicPlayerList()
-        {
-            if (musicPlayer == null || musicPlayer.musicList == null) return;
-            musicPlayer.musicList = GetMusicList(musicPlayer.musicList.Current());
-        }
-
         private static bool IsUnlocked(MusicListEntry entry)
         {
-            return entry.index >= 0;
+            return entry.index != LockedIndex;
+        }
+
+        private static bool IsUnlocked(ICollection<string> unlockInfo, MusicEntry entry)
+        {
+            return unlockInfo.Contains(Utils.ConvertPathSeparator(entry.resourcePath));
         }
 
         private void UpdateUnlockedMusics()
         {
-            var unlockedInfo = checkpointManager.Get(musicUnlockStatusKey, DefaultUnlockSet);
+            var unlockInfo = checkpointManager.Get(MusicUnlockStatusKey, new MusicUnlockInfo());
             unlockedMusics = new List<MusicListEntry>();
             foreach (var music in allMusics)
             {
-                if (IsUnlocked(unlockedInfo, music.entry))
+                if (IsUnlocked(unlockInfo, music.entry))
                 {
                     music.index = unlockedMusics.Count;
                     unlockedMusics.Add(music);
@@ -164,11 +163,6 @@ namespace Nova
             }
         }
 
-        private static bool IsUnlocked(ICollection<string> unlockInfo, MusicEntry entry)
-        {
-            return unlockInfo.Contains(Utils.ConvertPathSeparator(entry.resourcePath));
-        }
-
         private void RefreshMusicListView()
         {
             ClearMusicListView();
@@ -181,24 +175,28 @@ namespace Nova
                 }
                 else
                 {
-                    Instantiate(lockedMusicPrefab, musicListScrollContent, false);
+                    Instantiate(lockedMusicEntryPrefab, musicListScrollContent, false);
                 }
             }
         }
 
+        private void RefreshMusicPlayerList()
+        {
+            if (musicPlayer == null || musicPlayer.musicList == null) return;
+            musicPlayer.musicList = GetMusicList(musicPlayer.musicList.Current());
+        }
+
+        #region For debug
+
         private void UnlockAllMusics()
         {
-            var unlockHelper = GetComponent<MusicUnlockHelper>();
-            if (!unlockHelper)
-            {
-                return;
-            }
-
+            var unlockInfo = checkpointManager.Get(MusicUnlockStatusKey, new MusicUnlockInfo());
             foreach (var music in allMusics)
             {
-                unlockHelper.Unlock(music.entry.resourcePath);
+                unlockInfo.Add(Utils.ConvertPathSeparator(music.entry.resourcePath));
             }
 
+            checkpointManager.Set(MusicUnlockStatusKey, unlockInfo);
             RefreshContent();
         }
 
@@ -210,5 +208,7 @@ namespace Nova
                 UnlockAllMusics();
             }
         }
+
+        #endregion
     }
 }

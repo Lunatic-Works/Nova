@@ -475,7 +475,7 @@ MonoBehaviour:
   musicListScrollContent: {fileID: 7321285593639802457}
   musicEntryPrefab: {fileID: 114443515121404542, guid: 76560a599646540cd9cc8cbb1de59982,
     type: 3}
-  lockedMusicPrefab: {fileID: 1445111611402822, guid: cf717f9eab311426b9ec4cb31e2b695b,
+  lockedMusicEntryPrefab: {fileID: 1445111611402822, guid: cf717f9eab311426b9ec4cb31e2b695b,
     type: 3}
   audioControllersToDisable: []
 --- !u!114 &3535619004574509348
