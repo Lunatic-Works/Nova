@@ -15,6 +15,8 @@ namespace Nova
         public AudioSource audioSource;
         public Text titleLabel;
         public MusicGalleryProgressBar progressBar;
+        public GameObject playButton;
+        public GameObject pauseButton;
 
         public bool isPlaying { get; private set; }
 
@@ -87,6 +89,7 @@ namespace Nova
 
         public void Play()
         {
+            if (audioSource.clip == null) return;
             if (audioSource.isPlaying) return;
             if (needResetMusicOffset)
             {
@@ -96,12 +99,18 @@ namespace Nova
 
             isPlaying = true;
             audioSource.Play();
+
+            playButton.SetActive(false);
+            pauseButton.SetActive(true);
         }
 
         public void Pause()
         {
             isPlaying = false;
             audioSource.Pause();
+
+            playButton.SetActive(true);
+            pauseButton.SetActive(false);
         }
 
         public void Next()
