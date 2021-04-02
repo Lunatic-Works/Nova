@@ -1,60 +1,41 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Nova
 {
-    public class ImageViewer : MonoBehaviour
+    using ImageUnlockInfo = SerializableHashSet<string>;
+
+    public class ImageViewer : MonoBehaviour, IPointerClickHandler
     {
         public Image image;
         public Vector2 defaultImageSize = new Vector2(1920, 1080);
-
-        public Text indexLabel;
-        public Text scaleLabel;
+        public float maxScale = 2.0f;
+        public float scaleStep = 0.1f;
 
         private ImageGroup group;
+        private ImageUnlockInfo unlockInfo;
         private int index;
         private float scale;
 
-        public void SetImageGroup(ImageGroup group)
-        {
-            this.group = group;
-            index = 0;
-            scale = 1.0f;
-            Refresh();
-        }
-
         private void Refresh()
         {
-            if (group == null)
-            {
-                return;
-            }
-
-            if (index >= group.entries.Count)
-            {
-                image.sprite = null;
-                return;
-            }
-
-            var sprite = image.sprite = AssetLoader.Load<Sprite>(group.entries[index].resourcePath);
-            if (sprite != null)
-            {
-                image.rectTransform.sizeDelta = new Vector2(sprite.texture.width, sprite.texture.height);
-            }
-            else
-            {
-                image.rectTransform.sizeDelta = defaultImageSize;
-            }
-
-            image.rectTransform.localScale = new Vector3(scale, scale, 1.0f);
-
-            indexLabel.text = $"{index + 1}/{group.entries.Count}";
-            scaleLabel.text = $"{scale:0.0}x";
+            var sprite = AssetLoader.Load<Sprite>(group.entries[index].resourcePath);
+            image.sprite = sprite;
+            image.rectTransform.sizeDelta = new Vector2(sprite.texture.width, sprite.texture.height);
+            float baseScale = Mathf.Max(defaultImageSize.x / sprite.texture.width,
+                defaultImageSize.y / sprite.texture.height);
+            image.rectTransform.localScale = new Vector3(baseScale * scale, baseScale * scale, 1.0f);
         }
 
-        public void Show()
+        public void Show(ImageGroup group, ImageUnlockInfo unlockInfo)
         {
             gameObject.SetActive(true);
+            this.group = group;
+            this.unlockInfo = unlockInfo;
+            index = ImageGalleryController.GetNextUnlockedImage(group, unlockInfo, -1);
+            scale = 1.0f;
+            Refresh();
         }
 
         public void Hide()
@@ -62,30 +43,47 @@ namespace Nova
             gameObject.SetActive(false);
         }
 
+        public void PreviousImage()
+        {
+            index = ImageGalleryController.GetPreviousUnlockedImage(group, unlockInfo, index);
+            if (index >= 0)
+            {
+                Refresh();
+            }
+            else
+            {
+                Hide();
+            }
+        }
+
+        public void NextImage()
+        {
+            index = ImageGalleryController.GetNextUnlockedImage(group, unlockInfo, index);
+            if (index >= 0)
+            {
+                Refresh();
+            }
+            else
+            {
+                Hide();
+            }
+        }
+
         public void ZoomIn()
         {
-            scale += 0.1f;
+            scale = Mathf.Min(scale + scaleStep, maxScale);
             Refresh();
         }
 
         public void ZoomOut()
         {
-            scale = Mathf.Max(0.1f, scale - 0.1f);
+            scale = Mathf.Max(scale - scaleStep, 1.0f);
             Refresh();
         }
 
-        public void NextImage()
+        public void OnPointerClick(PointerEventData pointerEventData)
         {
-            index++;
-            if (index >= group.entries.Count) index--;
-            Refresh();
-        }
-
-        public void PreviousImage()
-        {
-            index--;
-            if (index < 0) index = 0;
-            Refresh();
+            NextImage();
         }
     }
 }

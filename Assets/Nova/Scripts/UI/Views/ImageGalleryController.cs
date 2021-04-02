@@ -42,7 +42,7 @@ namespace Nova
             leftButton = pagerPanel.Find("LeftButton").GetComponent<Button>();
             rightButton = pagerPanel.Find("RightButton").GetComponent<Button>();
             pageText = pagerPanel.Find("PageText").GetComponent<Text>();
-            imageViewer = GetComponentInChildren<ImageViewer>(true);
+            imageViewer = myPanel.transform.Find("ImageViewer").GetComponent<ImageViewer>();
 
             leftButton.onClick.AddListener(PageLeft);
             rightButton.onClick.AddListener(PageRight);
@@ -93,11 +93,11 @@ namespace Nova
                         int unlockedCount = GetUnlockedImageCount(group, unlockInfo);
                         if (unlockedCount > 0)
                         {
-                            int firstUnlocked = GetFirstUnlockedImage(group, unlockInfo);
+                            int firstUnlocked = GetNextUnlockedImage(group, unlockInfo, -1);
                             entry.snapshot.sprite =
                                 Resources.Load<Sprite>(group.entries[firstUnlocked].snapshotResourcePath);
                             entry.button.interactable = true;
-                            entry.button.onClick.AddListener(() => ShowGroup(group));
+                            entry.button.onClick.AddListener(() => ShowGroup(group, unlockInfo));
 
                             if (group.entries.Count > 1)
                             {
@@ -122,14 +122,27 @@ namespace Nova
             }
         }
 
-        private static int GetUnlockedImageCount(ImageGroup group, ImageUnlockInfo unlockInfo)
+        public static int GetUnlockedImageCount(ImageGroup group, ImageUnlockInfo unlockInfo)
         {
             return group.entries.Count(entry => unlockInfo.Contains(Utils.ConvertPathSeparator(entry.resourcePath)));
         }
 
-        private static int GetFirstUnlockedImage(ImageGroup group, ImageUnlockInfo unlockInfo)
+        public static int GetPreviousUnlockedImage(ImageGroup group, ImageUnlockInfo unlockInfo, int start)
         {
-            for (int i = 0; i < group.entries.Count; ++i)
+            for (int i = start - 1; i >= 0; --i)
+            {
+                if (unlockInfo.Contains(Utils.ConvertPathSeparator(group.entries[i].resourcePath)))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public static int GetNextUnlockedImage(ImageGroup group, ImageUnlockInfo unlockInfo, int start)
+        {
+            for (int i = start + 1; i < group.entries.Count; ++i)
             {
                 if (unlockInfo.Contains(Utils.ConvertPathSeparator(group.entries[i].resourcePath)))
                 {
@@ -160,10 +173,9 @@ namespace Nova
             ShowPage();
         }
 
-        private void ShowGroup(ImageGroup group)
+        private void ShowGroup(ImageGroup group, ImageUnlockInfo unlockInfo)
         {
-            imageViewer.SetImageGroup(group);
-            imageViewer.Show();
+            imageViewer.Show(group, unlockInfo);
         }
 
         #region For debug
