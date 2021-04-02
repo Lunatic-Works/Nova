@@ -86,9 +86,6 @@ namespace Nova
         private Text rightButtonText;
         private Text pageText;
 
-        private OldTVToThumbnailTransition otvTransition;
-        private BasicUIViewTransition basicTransition;
-
         private Color defaultTextColor;
         private Color saveTextColor;
         private Color loadTextColor;
@@ -190,10 +187,6 @@ namespace Nova
             leftButtonText = leftButtonPanel.GetComponentInChildren<Text>();
             rightButtonText = rightButtonPanel.GetComponentInChildren<Text>();
             pageText = pagerPanel.Find("PageText").GetComponent<Text>();
-
-            otvTransition = myPanel.GetComponent<OldTVToThumbnailTransition>();
-            basicTransition = myPanel.GetComponent<BasicUIViewTransition>();
-            this.RuntimeAssert(otvTransition != null && basicTransition != null, "Missing Transition.");
 
             ColorUtility.TryParseHtmlString("#000000FF", out defaultTextColor);
             ColorUtility.TryParseHtmlString("#33CC33FF", out saveTextColor);
@@ -304,16 +297,6 @@ namespace Nova
             }
 
             selectedSaveID = -1;
-            if (viewManager.titlePanel.activeSelf)
-            {
-                basicTransition.enabled = true;
-                otvTransition.enabled = false;
-            }
-            else
-            {
-                basicTransition.enabled = false;
-                otvTransition.enabled = true;
-            }
 
             ShowPage();
             base.Show();
@@ -338,22 +321,6 @@ namespace Nova
         public void ShowLoadFromTitle()
         {
             Show(SaveViewMode.Load, true);
-        }
-
-        public override void Hide(Action onFinish)
-        {
-            if (viewManager.titlePanel.activeSelf)
-            {
-                basicTransition.enabled = true;
-                otvTransition.enabled = false;
-            }
-            else
-            {
-                basicTransition.enabled = false;
-                otvTransition.enabled = true;
-            }
-
-            base.Hide(onFinish);
         }
 
         protected override void OnHideComplete()
