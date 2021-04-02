@@ -24,7 +24,7 @@ function play(obj, audio_name, volume)
     obj.scriptVolume = volume
     obj:Play(audio_name)
 
-    if obj == bgm then
+    if tostring(obj:GetType()) == 'Nova.AudioController' then
         __Nova.musicUnlockHelper:Unlock(obj.audioFolder .. '/' .. audio_name)
     end
 end

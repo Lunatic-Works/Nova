@@ -35,6 +35,10 @@ function show(obj, image_name, coord, color, fade)
             obj:SetImage(image_name, fade)
         end
     end
+
+    if tostring(obj:GetType()) == 'Nova.SpriteController' then
+        __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. image_name)
+    end
 end
 add_preload_pattern('show')
 

@@ -1470,6 +1470,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8089046609868017880}
   - component: {fileID: 8089046609868017887}
+  - component: {fileID: 1613618527168713528}
   m_Layer: 5
   m_Name: ImageGalleryView
   m_TagString: Untagged
@@ -1517,6 +1518,18 @@ MonoBehaviour:
   maxCol: 4
   emptyImage: {fileID: 21300000, guid: 97dc4280387fbc540b5bb26510c088d1, type: 3}
   lockedImage: {fileID: 21300000, guid: 8bd0e8d11d6117d4faef7ad07d3df696, type: 3}
+--- !u!114 &1613618527168713528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8089046609868017881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afde122513f0465c965ecbe372ce53dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8089046610010904452
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 namespace Nova
 {
+    using ImageUnlockInfo = SerializableHashSet<string>;
+
     public class ImageGalleryController : ViewControllerBase
     {
         public const string ImageUnlockStatusKey = "image_unlock_status";
@@ -15,6 +17,8 @@ namespace Nova
         public int maxCol;
         public Sprite emptyImage;
         public Sprite lockedImage;
+
+        private CheckpointManager checkpointManager;
 
         private Button leftButton;
         private Button rightButton;
@@ -30,6 +34,8 @@ namespace Nova
         protected override void Awake()
         {
             base.Awake();
+
+            checkpointManager = Utils.FindNovaGameController().CheckpointManager;
 
             var pagerPanel = myPanel.transform.Find("Snapshots/Footer/Pager");
             leftButton = pagerPanel.Find("LeftButton").GetComponent<Button>();
@@ -71,17 +77,53 @@ namespace Nova
 
             var offset = (page - 1) * entries.Count;
             var groups = imageGroupList.groups;
+            var unlockInfo = checkpointManager.Get(ImageUnlockStatusKey, new ImageUnlockInfo());
             for (var i = 0; i < entries.Count; ++i)
             {
+                var entry = entries[i];
+                entry.button.interactable = false;
+                entry.button.onClick.RemoveAllListeners();
                 if (offset + i < groups.Count)
                 {
-                    entries[i].SetGroup(groups[offset + i]);
+                    var group = groups[offset + i];
+                    if (group.entries.Count > 0)
+                    {
+                        int firstUnlocked = FindFirstUnlockedImage(group, unlockInfo);
+                        if (firstUnlocked >= 0)
+                        {
+                            entry.snapshot.sprite =
+                                Resources.Load<Sprite>(group.entries[firstUnlocked].snapshotResourcePath);
+                            entry.button.interactable = true;
+                            entry.button.onClick.AddListener(() => ShowGroup(group));
+                        }
+                        else
+                        {
+                            entry.snapshot.sprite = lockedImage;
+                        }
+                    }
+                    else
+                    {
+                        entry.snapshot.sprite = emptyImage;
+                    }
                 }
                 else
                 {
-                    entries[i].SetGroup(emptyImage);
+                    entry.snapshot.sprite = emptyImage;
                 }
             }
+        }
+
+        private static int FindFirstUnlockedImage(ImageGroup group, ImageUnlockInfo unlockInfo)
+        {
+            for (int i = 0; i < group.entries.Count; ++i)
+            {
+                if (unlockInfo.Contains(Utils.ConvertPathSeparator(group.entries[i].resourcePath)))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
 
         private void PageLeft()
@@ -104,10 +146,38 @@ namespace Nova
             ShowPage();
         }
 
-        public void DisplayGroup(ImageGroup group)
+        private void ShowGroup(ImageGroup group)
         {
             imageViewer.SetImageGroup(group);
             imageViewer.Show();
         }
+
+        #region For debug
+
+        private void UnlockAllImages()
+        {
+            var unlockInfo = checkpointManager.Get(ImageUnlockStatusKey, new ImageUnlockInfo());
+            foreach (var group in imageGroupList.groups)
+            {
+                foreach (var entry in group.entries)
+                {
+                    unlockInfo.Add(Utils.ConvertPathSeparator(entry.resourcePath));
+                }
+            }
+
+            checkpointManager.Set(ImageUnlockStatusKey, unlockInfo);
+            ShowPage();
+        }
+
+        protected override void OnActivatedUpdate()
+        {
+            base.OnActivatedUpdate();
+            if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
+            {
+                UnlockAllImages();
+            }
+        }
+
+        #endregion
     }
 }

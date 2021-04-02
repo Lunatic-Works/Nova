@@ -13,6 +13,13 @@ MonoBehaviour:
   m_Name: room_group
   m_EditorClassIdentifier: 
   entries:
+  - id: corridor
+    displayNames:
+    - locale: 40
+      value: corridor
+    resourcePath: Colorless/Backgrounds/corridor
+    snapshotOffset: {x: 0, y: 0}
+    snapshotScale: {x: 1, y: 1}
   - id: room
     displayNames:
     - locale: 40
