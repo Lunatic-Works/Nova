@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class ImageGalleryElement : MonoBehaviour, IPointerClickHandler
+    public class ImageGalleryEntry : MonoBehaviour, IPointerClickHandler
     {
         public Image snapshot;
 
@@ -19,21 +19,21 @@ namespace Nova
         public void SetGroup(ImageGroup group)
         {
             this.group = group;
+            snapshot.sprite = group.LoadSnapshot();
+        }
 
-            if (group == null)
-            {
-                snapshot.gameObject.SetActive(false);
-            }
-            else
-            {
-                snapshot.gameObject.SetActive(true);
-                snapshot.sprite = group.LoadSnapshot();
-            }
+        public void SetGroup(Sprite sprite)
+        {
+            group = null;
+            snapshot.sprite = sprite;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            controller.DisplayGroup(group);
+            if (group != null)
+            {
+                controller.DisplayGroup(group);
+            }
         }
     }
 }
