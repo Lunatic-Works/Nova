@@ -7,5 +7,6 @@ namespace Nova
     {
         public Image snapshot;
         public Button button;
+        public Text text;
     }
 }

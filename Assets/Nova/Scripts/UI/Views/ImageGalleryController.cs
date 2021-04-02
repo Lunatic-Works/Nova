@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -83,18 +84,26 @@ namespace Nova
                 var entry = entries[i];
                 entry.button.interactable = false;
                 entry.button.onClick.RemoveAllListeners();
+                entry.text.enabled = false;
                 if (offset + i < groups.Count)
                 {
                     var group = groups[offset + i];
                     if (group.entries.Count > 0)
                     {
-                        int firstUnlocked = FindFirstUnlockedImage(group, unlockInfo);
-                        if (firstUnlocked >= 0)
+                        int unlockedCount = GetUnlockedImageCount(group, unlockInfo);
+                        if (unlockedCount > 0)
                         {
+                            int firstUnlocked = GetFirstUnlockedImage(group, unlockInfo);
                             entry.snapshot.sprite =
                                 Resources.Load<Sprite>(group.entries[firstUnlocked].snapshotResourcePath);
                             entry.button.interactable = true;
                             entry.button.onClick.AddListener(() => ShowGroup(group));
+
+                            if (group.entries.Count > 1)
+                            {
+                                entry.text.enabled = true;
+                                entry.text.text = $"{unlockedCount} / {group.entries.Count}";
+                            }
                         }
                         else
                         {
@@ -113,7 +122,12 @@ namespace Nova
             }
         }
 
-        private static int FindFirstUnlockedImage(ImageGroup group, ImageUnlockInfo unlockInfo)
+        private static int GetUnlockedImageCount(ImageGroup group, ImageUnlockInfo unlockInfo)
+        {
+            return group.entries.Count(entry => unlockInfo.Contains(Utils.ConvertPathSeparator(entry.resourcePath)));
+        }
+
+        private static int GetFirstUnlockedImage(ImageGroup group, ImageUnlockInfo unlockInfo)
         {
             for (int i = 0; i < group.entries.Count; ++i)
             {
