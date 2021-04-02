@@ -78,7 +78,7 @@ namespace Nova
 
         public bool Forward()
         {
-            if (contentBox.pageToDisplay == contentBox.textInfo.pageCount)
+            if (contentBox.pageToDisplay >= contentBox.textInfo.pageCount)
             {
                 return false;
             }
