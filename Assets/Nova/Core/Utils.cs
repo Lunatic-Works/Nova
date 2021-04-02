@@ -102,7 +102,7 @@ namespace Nova
             var gameController = go.GetComponent<GameController>();
             if (gameController == null)
             {
-                throw new InvalidAccessException("Nova: No GameController component in NovaGameController.");
+                throw new InvalidAccessException("Nova: No GameController component in NovaGameController game object.");
             }
 
             return gameController;
