@@ -81,9 +81,12 @@ namespace Nova
             Refresh();
         }
 
-        public void OnPointerClick(PointerEventData pointerEventData)
+        public void OnPointerClick(PointerEventData eventData)
         {
-            NextImage();
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                NextImage();
+            }
         }
     }
 }

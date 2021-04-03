@@ -178,6 +178,18 @@ namespace Nova
             imageViewer.Show(group, unlockInfo);
         }
 
+        protected override void BackHide()
+        {
+            if (imageViewer.gameObject.activeSelf)
+            {
+                imageViewer.Hide();
+            }
+            else
+            {
+                Hide();
+            }
+        }
+
         #region For debug
 
         private void UnlockAllImages()

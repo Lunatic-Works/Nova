@@ -4583,16 +4583,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 922924600}
     m_Modifications:
-    - target: {fileID: 1124277312707465585, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 91.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914054466736184289, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 127.499985
-      objectReference: {fileID: 0}
     - target: {fileID: 3535619004574509351, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: musicList
@@ -4729,46 +4719,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3535619004859047374, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -17
-      objectReference: {fileID: 0}
     - target: {fileID: 3535619006079575071, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 530880088}
-    - target: {fileID: 3535619006091115217, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 18.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3962174862496820371, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 54.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -69.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -56.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049959921000225447, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -40.00003
-      objectReference: {fileID: 0}
-    - target: {fileID: 8733886360927594596, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 164.49998
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
 --- !u!224 &1891790025 stripped
