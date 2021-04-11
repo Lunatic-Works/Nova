@@ -9,6 +9,7 @@
 ## 快速上手
 
 1. `git clone`
+    * `v0.1` branch是公开的最新版本，`master` branch可能会落后一些
 2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 准备打开我们的示例工程
     * 将`Assets/Examples/Colorless/`文件夹下的`Prefabs/, Scenes/, StandingsUncropped/`和对应的`.meta`文件移动到`Assets/`文件夹下

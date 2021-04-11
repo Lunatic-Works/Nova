@@ -1,11 +1,11 @@
 --- require order is important
 require 'built_in'
+
 require 'hook'
 require 'preload'
 
 require 'animation'
 require 'animation_high_level'
-require 'animation_presets'
 require 'audio'
 require 'auto_voice'
 require 'checkpoint_helper'
@@ -18,3 +18,5 @@ require 'shader_info'
 require 'timeline'
 require 'transition'
 require 'video'
+
+require 'animation_presets'

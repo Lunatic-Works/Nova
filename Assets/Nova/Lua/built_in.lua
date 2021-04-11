@@ -49,7 +49,7 @@ end
 ---    mode = 'normal|jump|show|enable', optional, default is normal
 ---    cond = a function that returns a bool, should not use if mode is show, optional if mode is jump
 --- }
---- if cond is a string, it will be converted to a function that returns that expression
+--- if cond is a string, it will be converted to a function returning that expression
 function branch(branches)
     for i, branch in ipairs(branches) do
         local image_info = nil

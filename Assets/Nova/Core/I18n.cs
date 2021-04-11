@@ -95,6 +95,7 @@ namespace Nova
 #if UNITY_EDITOR
             EditorOnly_GetLatestTranslation();
 #endif
+
             Init();
 
             string translation = key;

@@ -81,7 +81,7 @@ namespace Nova
                 var text = child.GetComponentInChildren<Text>();
                 text.text = branchInfo.text;
 
-                var button = child.GetComponent<Button>();
+                var button = child.GetComponentInChildren<Button>();
                 button.onClick.AddListener(() => Select(branchInfo.name));
                 if (branchInfo.mode == BranchMode.Enable)
                 {
