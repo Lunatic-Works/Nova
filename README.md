@@ -4,12 +4,14 @@
 
 基于Unity，对程序员友好的视觉小说（VN）/文字冒险游戏（AVG）框架
 
-本框架支持Unity 2018和2019，Windows/Linux/macOS/Android/iOS平台
+本框架支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台
+
+新功能将会随着我们的下一部作品一起开发，预计的功能包括URP，以及更稳定、更灵活的脚本
 
 ## 快速上手
 
 1. `git clone`
-    * `v0.1` branch是公开的最新版本，`master` branch可能会落后一些
+    * `v0.1` branch是最新的公开版本，`master` branch可能会落后一些
 2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 准备打开我们的示例工程
     * 将`Assets/Examples/Colorless/`文件夹下的`Prefabs/, Scenes/, StandingsUncropped/`和对应的`.meta`文件移动到`Assets/`文件夹下
