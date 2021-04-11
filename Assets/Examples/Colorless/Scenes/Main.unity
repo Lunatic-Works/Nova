@@ -4609,11 +4609,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MusicGalleryView
       objectReference: {fileID: 0}
-    - target: {fileID: 3535619004574509354, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3535619004574509355, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: m_Pivot.x
@@ -4719,11 +4714,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3535619004859047374, guid: 68bda17d3044b4344852e02e4c58e8c4,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -17
+      objectReference: {fileID: 0}
     - target: {fileID: 3535619006079575071, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 530880088}
+    - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -69.3999
+      objectReference: {fileID: 0}
+    - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -56.30005
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
 --- !u!224 &1891790025 stripped
@@ -5455,11 +5465,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SaveView
       objectReference: {fileID: 0}
-    - target: {fileID: 3745355648971507454, guid: cd6a123d28e326f4fbd7c930095cc3e0,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3745355648979271389, guid: cd6a123d28e326f4fbd7c930095cc3e0,
         type: 3}
       propertyPath: m_Pivot.x
@@ -5578,10 +5583,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Alert
       objectReference: {fileID: 0}
-    - target: {fileID: 1855191247817758, guid: 10b8a1561d89a4ad59007d02da0b1f24, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3855522455313760688, guid: 10b8a1561d89a4ad59007d02da0b1f24,
         type: 3}
       propertyPath: m_Pivot.x
@@ -5699,12 +5700,12 @@ PrefabInstance:
     - target: {fileID: 3113775754512027877, guid: 85bfeeaac13b54597b7eff58b793f6d4,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -69.5
+      value: -69.3999
       objectReference: {fileID: 0}
     - target: {fileID: 3113775754512027877, guid: 85bfeeaac13b54597b7eff58b793f6d4,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -56.25
+      value: -56.30005
       objectReference: {fileID: 0}
     - target: {fileID: 3113775755284081194, guid: 85bfeeaac13b54597b7eff58b793f6d4,
         type: 3}
@@ -5815,11 +5816,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ConfigView
-      objectReference: {fileID: 0}
-    - target: {fileID: 3113775755284081197, guid: 85bfeeaac13b54597b7eff58b793f6d4,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85bfeeaac13b54597b7eff58b793f6d4, type: 3}
@@ -6009,20 +6005,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: HelpView
       objectReference: {fileID: 0}
-    - target: {fileID: 5908642565334599335, guid: 673dd4dc9ec3b354399833258b97f5a3,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -69.5
+      value: -69.3999
       objectReference: {fileID: 0}
     - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -56.25
+      value: -56.30005
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
@@ -6102,6 +6093,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 922924600}
     m_Modifications:
+    - target: {fileID: 794920417235669879, guid: 79e0957580781694098a70feb271ad8c,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -69.3999
+      objectReference: {fileID: 0}
     - target: {fileID: 8089046609868017880, guid: 79e0957580781694098a70feb271ad8c,
         type: 3}
       propertyPath: m_Pivot.x
@@ -6370,10 +6366,6 @@ PrefabInstance:
     - target: {fileID: 362885691, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: _sectors.Array.data[6].action.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 390191758, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -55
       objectReference: {fileID: 0}
     - target: {fileID: 1515438340287766, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_Name

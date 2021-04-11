@@ -4,8 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Alert
   - NovaGameController
+  - Alert
+  - NovaAnimation
+  - DialogueView
+  - UICamera
+  - RenderManager
   layers:
   - Default
   - TransparentFX
@@ -15,6 +19,7 @@ TagManager:
   - UI
   - 
   - 
+  - UI3D
   - 
   - 
   - 
@@ -22,9 +27,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - PoseCombiner
+  - Mask
   - 
   - 
   - 

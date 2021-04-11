@@ -43,5 +43,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84b7119a3ddb43818d22576f080dff6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  novaGameControllerPrefab: {fileID: 1737081535048956, guid: f6ffa30e02e8743d4a12478ae1820f65,
+  novaGameControllerPrefab: {fileID: 1737081535048956, guid: 6403a557313524d2ca1380ae544841c9,
     type: 3}
