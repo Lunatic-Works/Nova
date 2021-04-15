@@ -34,15 +34,17 @@ namespace Nova
             controller.ResetCurrentKeyMappingDefault();
         }
 
-        public void Refresh()
+        public InputMappingListEntry Refresh()
         {
             ClearContent();
             var cnt = controller.currentCompoundKeys.Count;
+            InputMappingListEntry ret = null;
             for (var i = 0; i < cnt; i++)
             {
-                var go = Instantiate(entryPrefab, content);
-                go.Init(controller, i);
+                ret = Instantiate(entryPrefab, content);
+                ret.Init(controller, i);
             }
+            return ret;
         }
     }
 }

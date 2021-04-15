@@ -1521,6 +1521,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characters: {fileID: 871599196}
   soundController: {fileID: 1542636873}
+  viewManager: {fileID: 922924601}
 --- !u!4 &671619212
 Transform:
   m_ObjectHideFlags: 0
@@ -4724,6 +4725,16 @@ PrefabInstance:
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 530880088}
+    - target: {fileID: 3535619006091115217, guid: 68bda17d3044b4344852e02e4c58e8c4,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 18.240005
+      objectReference: {fileID: 0}
+    - target: {fileID: 3962174862496820371, guid: 68bda17d3044b4344852e02e4c58e8c4,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 54.72
+      objectReference: {fileID: 0}
     - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: m_AnchoredPosition.x

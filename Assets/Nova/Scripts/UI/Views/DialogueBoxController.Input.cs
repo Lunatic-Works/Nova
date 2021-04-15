@@ -18,7 +18,7 @@ namespace Nova
             }
         }
 
-        private void HandleShortCutInGameView()
+        private void HandleShortcutInGameView()
         {
             if (inputMapper.GetKeyUp(AbstractKey.Auto))
             {
@@ -63,7 +63,7 @@ namespace Nova
             fastForwardHotKeyHolding = inputMapper.GetKey(AbstractKey.FastForward);
         }
 
-        private void HandleShortCutWhenDialogueHidden()
+        private void HandleShortcutWhenDialogueHidden()
         {
             if (inputMapper.GetKeyUp(AbstractKey.ToggleDialogue))
             {
@@ -73,7 +73,7 @@ namespace Nova
 
 #if UNITY_EDITOR
 
-        private void HandleEditorOnlyShortCut()
+        private void HandleEditorOnlyShortcut()
         {
             if (viewManager.currentView == CurrentViewType.Game)
             {
@@ -116,7 +116,7 @@ namespace Nova
 
 #endif
 
-        private void HandleShortCut()
+        private void HandleShortcut()
         {
             if (inputMapper.GetKeyUp(AbstractKey.ToggleFullscreen))
             {
@@ -125,17 +125,17 @@ namespace Nova
 
             if (viewManager.currentView == CurrentViewType.Game)
             {
-                HandleShortCutInGameView();
+                HandleShortcutInGameView();
             }
 
             if (viewManager.currentView == CurrentViewType.DialogueHidden)
             {
-                HandleShortCutWhenDialogueHidden();
+                HandleShortcutWhenDialogueHidden();
             }
 
-            // some editor only short cuts
+            // some editor only shortcuts
 #if UNITY_EDITOR
-            HandleEditorOnlyShortCut();
+            HandleEditorOnlyShortcut();
 #endif
         }
 

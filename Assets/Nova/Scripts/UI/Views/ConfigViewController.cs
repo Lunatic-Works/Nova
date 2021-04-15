@@ -116,5 +116,16 @@ namespace Nova
         }
 
         // No alert for restore and apply
+
+        protected override void OnActivatedUpdate()
+        {
+            // Avoid going back when recoding shortcuts
+            if (inputMappingController.compoundKeyRecorder.gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            base.OnActivatedUpdate();
+        }
     }
 }

@@ -264,7 +264,7 @@ namespace Nova
 
             // All shortcut should use InputMapping. Always call this method in update as validity of each AbstractKeys
             // are defined specifically.
-            HandleShortCut();
+            HandleShortcut();
 
             if (!gameController.disableInput)
             {

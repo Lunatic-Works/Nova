@@ -6,6 +6,7 @@ namespace Nova
     {
         [SerializeField] private GameObject characters;
         [SerializeField] private SoundController soundController;
+        [SerializeField] private ViewManager viewManager;
 
         private GameState gameState;
         private CharacterController[] characterControllers;
@@ -42,6 +43,11 @@ namespace Nova
 
         private void Update()
         {
+            if (viewManager.currentView != CurrentViewType.Game)
+            {
+                return;
+            }
+
             if (Utils.GetKeyDownInEditor(KeyCode.R))
             {
                 if (Utils.GetKeyInEditor(KeyCode.LeftShift))

@@ -29,10 +29,38 @@ namespace Nova
         {
             popupController.Hide();
             inputMapper.SetEnableAll(true);
+
             if (entry != null)
             {
                 entry.FinishModify();
-                entry.RefreshDisplay();
+
+                if (entry.key.isNone)
+                {
+                    controller.DeleteCompoundKey(entry.index);
+                }
+                else
+                {
+                    int duplicatedIndex = -1;
+                    for (int i = 0; i < controller.currentCompoundKeys.Count; ++i)
+                    {
+                        // Assuming there can be at most one duplicated key
+                        if (i != entry.index && controller.currentCompoundKeys[i].Equals(entry.key))
+                        {
+                            duplicatedIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (duplicatedIndex >= 0)
+                    {
+                        controller.DeleteCompoundKey(entry.index);
+                    }
+                    else
+                    {
+                        controller.ResolveDuplicate();
+                        entry.RefreshDisplay();
+                    }
+                }
             }
 
             entry = null;
@@ -79,9 +107,9 @@ namespace Nova
             var compoundKey = entry.key;
             var dirty = false;
 
-            if (CompoundKey.AltIsHolding)
+            if (CompoundKey.CtrlIsHolding)
             {
-                compoundKey.Alt = true;
+                compoundKey.Ctrl = true;
                 dirty = true;
             }
 
@@ -91,15 +119,15 @@ namespace Nova
                 dirty = true;
             }
 
-            if (CompoundKey.ShiftIsHolding)
+            if (CompoundKey.AltIsHolding)
             {
-                compoundKey.Shift = true;
+                compoundKey.Alt = true;
                 dirty = true;
             }
 
-            if (CompoundKey.CtrlIsHolding)
+            if (CompoundKey.ShiftIsHolding)
             {
-                compoundKey.Ctrl = true;
+                compoundKey.Shift = true;
                 dirty = true;
             }
 

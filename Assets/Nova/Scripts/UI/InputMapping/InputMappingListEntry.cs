@@ -10,8 +10,8 @@ namespace Nova
         public Color activeColor;
 
         private InputMappingController controller;
-        private int index;
 
+        public int index { get; private set; }
         public CompoundKey key { get; private set; }
 
         private void Awake()

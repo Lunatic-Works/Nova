@@ -13,20 +13,7 @@ namespace Nova
 
         public AbstractKeyboardData keyboardData { get; private set; }
 
-        private InputMapper _inputMapper;
-
-        private InputMapper inputMapper
-        {
-            get
-            {
-                if (_inputMapper == null)
-                {
-                    _inputMapper = Utils.FindNovaGameController().InputMapper;
-                }
-
-                return _inputMapper;
-            }
-        }
+        private InputMapper inputMapper;
 
         // TODO: not used
         private bool modified = false;
@@ -69,7 +56,13 @@ namespace Nova
         {
             currentCompoundKeys.Add(new CompoundKey());
             MarkDataDirty();
-            inputMappingList.Refresh();
+            var lastEntry = inputMappingList.Refresh();
+            StartModifyCompoundKey(lastEntry);
+        }
+
+        private void Awake()
+        {
+            inputMapper = Utils.FindNovaGameController().InputMapper;
         }
 
         private void Start()
@@ -103,6 +96,7 @@ namespace Nova
         {
             keyboardData[currentSelectedKey] =
                 inputMapper.keyboard.Data[currentSelectedKey].Select(key => new CompoundKey(key)).ToList();
+            ResolveDuplicate();
             inputMappingList.Refresh();
         }
 
@@ -122,6 +116,7 @@ namespace Nova
         public void ResetCurrentKeyMappingDefault()
         {
             keyboardData[currentSelectedKey] = inputMapper.GetDefaultKeyboardData()[currentSelectedKey];
+            ResolveDuplicate();
             MarkDataDirty();
             inputMappingList.Refresh();
         }
@@ -129,6 +124,21 @@ namespace Nova
         public void StartModifyCompoundKey(InputMappingListEntry entry)
         {
             compoundKeyRecorder.BeginRecording(entry);
+        }
+
+        // Remove the compound keys in all abstract keys other than currentSelectedKey
+        // if they are in currentSelectedKey
+        public void ResolveDuplicate()
+        {
+            foreach (var ak in keyboardData.Keys.ToList())
+            {
+                if (ak == currentSelectedKey)
+                {
+                    continue;
+                }
+
+                keyboardData[ak] = keyboardData[ak].Where(key => !currentCompoundKeys.Contains(key)).ToList();
+            }
         }
     }
 }

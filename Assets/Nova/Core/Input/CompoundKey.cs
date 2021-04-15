@@ -378,5 +378,15 @@ namespace Nova
 
             return v;
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is CompoundKey anotherKey && ToString().Equals(anotherKey.ToString());
+        }
+
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
+        }
     }
 }

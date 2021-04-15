@@ -8,5 +8,10 @@ namespace Nova
         {
             set => label.entry = value;
         }
+
+        protected override void OnActivatedUpdate()
+        {
+            // Do nothing
+        }
     }
 }
