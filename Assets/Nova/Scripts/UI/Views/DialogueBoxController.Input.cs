@@ -87,7 +87,7 @@ namespace Nova
                     }
                     catch
                     {
-                        // ignored
+                        // TODO: handle exceptions
                     }
                 }
 
@@ -123,17 +123,26 @@ namespace Nova
                 GameRenderManager.SwitchFullScreen();
             }
 
-            if (viewManager.currentView == CurrentViewType.Game)
+            if (buttonRingTrigger.buttonShowing)
             {
-                HandleShortcutInGameView();
+                if (inputMapper.GetKeyUp(AbstractKey.LeaveView))
+                {
+                    buttonRingTrigger.Hide(false);
+                }
+            }
+            else
+            {
+                if (viewManager.currentView == CurrentViewType.Game)
+                {
+                    HandleShortcutInGameView();
+                }
+
+                if (viewManager.currentView == CurrentViewType.DialogueHidden)
+                {
+                    HandleShortcutWhenDialogueHidden();
+                }
             }
 
-            if (viewManager.currentView == CurrentViewType.DialogueHidden)
-            {
-                HandleShortcutWhenDialogueHidden();
-            }
-
-            // some editor only shortcuts
 #if UNITY_EDITOR
             HandleEditorOnlyShortcut();
 #endif
@@ -289,6 +298,11 @@ namespace Nova
             )
             {
                 // Ignore input when mouse is outside of the game window
+                return;
+            }
+
+            if (buttonRingTrigger.buttonShowing)
+            {
                 return;
             }
 
