@@ -218,9 +218,9 @@ namespace Nova
         {
             NovaAnimation.StopAll();
 
-            var gameController = FindNovaGameControllerObject();
-            gameController.GetComponent<CheckpointManager>().UpdateGlobalSave();
-            gameController.GetComponent<ConfigManager>().Apply();
+            var gameController = FindNovaGameController();
+            gameController.CheckpointManager.UpdateGlobalSave();
+            gameController.ConfigManager.Apply();
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;

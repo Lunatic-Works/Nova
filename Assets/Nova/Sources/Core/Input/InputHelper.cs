@@ -10,7 +10,7 @@ namespace Nova
         private void Awake()
         {
             gameController = Utils.FindNovaGameController();
-            LuaRuntime.Instance.BindObject("InputHelper", this);
+            LuaRuntime.Instance.BindObject("inputHelper", this);
         }
 
         public void DisableInput(bool value)

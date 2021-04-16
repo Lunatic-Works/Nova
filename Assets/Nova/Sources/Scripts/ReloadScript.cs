@@ -14,11 +14,7 @@ namespace Nova
 
         private void Start()
         {
-            var controller = Utils.FindNovaGameController();
-            if (controller != null)
-            {
-                gameState = controller.GameState;
-            }
+            gameState = Utils.FindNovaGameController().GameState;
 
             if (characters != null)
             {

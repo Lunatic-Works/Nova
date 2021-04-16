@@ -1,9 +1,9 @@
 function input_on()
-    __Nova.InputHelper:DisableInput(false)
+    __Nova.inputHelper:DisableInput(false)
 end
 
 function input_off()
-    __Nova.InputHelper:DisableInput(true)
+    __Nova.inputHelper:DisableInput(true)
 end
 
 function click_forward_on()

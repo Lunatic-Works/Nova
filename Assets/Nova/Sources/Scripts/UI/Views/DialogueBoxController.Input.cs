@@ -118,11 +118,6 @@ namespace Nova
 
         private void HandleShortcut()
         {
-            if (inputMapper.GetKeyUp(AbstractKey.ToggleFullscreen))
-            {
-                GameRenderManager.SwitchFullScreen();
-            }
-
             if (buttonRingTrigger.buttonShowing)
             {
                 if (inputMapper.GetKeyUp(AbstractKey.LeaveView))
