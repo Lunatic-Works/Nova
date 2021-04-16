@@ -316,7 +316,7 @@ namespace Nova
         private void UpdateGameState(bool nodeChanged, bool dialogueChanged, bool firstEntryOfNode,
             bool dialogueStepped)
         {
-            // Debug.LogFormat("UpdateGameState begin {0} {1} {2}", _stepNumFromLastCheckpoint, _restrainCheckpoint, _forceCheckpoint);
+            // Debug.LogFormat("UpdateGameState begin {0} {1} {2}", stepNumFromLastCheckpoint, restrainCheckpoint, forceCheckpoint);
 
             if (nodeChanged)
             {
@@ -340,7 +340,7 @@ namespace Nova
                 var gameStateRestoreEntry = checkpointManager.IsReached(currentNode.name, currentIndex, variables.hash);
                 if (gameStateRestoreEntry == null)
                 {
-                    // tell the checkpoint manager a new dialogue entry has been reached
+                    // Tell the checkpoint manager a new dialogue entry has been reached
                     checkpointManager.SetReached(currentNode.name, currentIndex, variables,
                         GetGameStateStepRestoreEntry());
                 }
@@ -362,9 +362,13 @@ namespace Nova
                 if (checkpointRestrained)
                 {
                     restrainCheckpoint--;
+                    if (restrainCheckpoint == 1)
+                    {
+                        Debug.LogWarning($"Nova: restrainCheckpoint reaches 1");
+                    }
                 }
 
-                // As action for this dialogue will be rerun, it's fine to just reset _forceCheckpoint as false
+                // As the action for this dialogue will be re-run, it's fine to just reset forceCheckpoint to false
                 forceCheckpoint = false;
 
                 DialogueWillChange?.Invoke();
@@ -376,7 +380,7 @@ namespace Nova
                 StartCoroutine(WaitActionEnd(gameStateRestoreEntry != null));
             }
 
-            // Debug.LogFormat("UpdateGameState end {0} {1} {2} {3}", _stepNumFromLastCheckpoint, _restrainCheckpoint, _forceCheckpoint, currentDialogueEntry?.text);
+            // Debug.LogFormat("UpdateGameState end {0} {1} {2} {3}", stepNumFromLastCheckpoint, restrainCheckpoint, forceCheckpoint, currentDialogueEntry?.displayData.FormatNameDialogue());
         }
 
         private readonly AdvancedDialogueHelper advancedDialogueHelper = new AdvancedDialogueHelper();
@@ -672,8 +676,8 @@ namespace Nova
         }
 
         /// <summary>
-        /// Not all states can be easily restored, like persistent animations. Store some 'real' checkpoints,
-        /// and other states of the game play can be restored by re-executing the scripts from the last checkpoint.
+        /// Not all states can be easily restored, like persistent animations.
+        /// Store some checkpoints, and other states can be restored by re-executing from the last checkpoint.
         /// At least one checkpoint will be saved every maxStepNumFromLastCheckpoint, except during persistent animations.
         /// </summary>
         public int maxStepNumFromLastCheckpoint = 10;
@@ -681,16 +685,16 @@ namespace Nova
         private int stepNumFromLastCheckpoint;
 
         /// <summary>
-        /// Prevent saving real checkpoints.
-        /// This feature is necessary for the restoration of persistent animations.
-        /// The restraint has higher priority than EnsureCheckpoint().
+        /// Restrain saving checkpoints.
+        /// This feature is necessary for restoring persistent animations.
+        /// This restraint has higher priority than EnsureCheckpoint().
         /// </summary>
         private int restrainCheckpoint;
 
         private bool checkpointRestrained => restrainCheckpoint > 0;
 
         /// <summary>
-        /// Restrain real checkpoints for given steps. Force overwrite the number of restraining steps with authorized set to true.
+        /// Restrain saving checkpoints for given steps. Force overwrite the number of restraining steps when authorized is true.
         /// </summary>
         /// <param name="steps">the steps to restrain checkpoints</param>
         /// <param name="authorized">if the new restraining step num should overwrite the old one</param>
@@ -737,7 +741,7 @@ namespace Nova
                                                      maxStepNumFromLastCheckpoint);
 
         /// <summary>
-        /// Force get current game state checkpoint
+        /// Force to get the current game state as a checkpoint
         /// </summary>
         /// <returns>current game state checkpoint</returns>
         private GameStateStepRestoreCheckpointEntry GetGameStateStepRestoreEntryRaw()
@@ -749,8 +753,7 @@ namespace Nova
             }
 
             lastCheckpointVariablesHash = variables.hash;
-            // Debug.Log($"Nova: Saving checkpoint entry and setting lastCheckpointVariablesHash to {lastCheckpointVariablesHash}");
-            // Debug.Log("<color=aqua>Real checkpoint generated</color>");
+            // Debug.Log($"Nova: Saving checkpoint and setting lastCheckpointVariablesHash = {lastCheckpointVariablesHash}");
             return new GameStateStepRestoreCheckpointEntry(restoreDatas, variables, restrainCheckpoint);
         }
 
@@ -771,7 +774,7 @@ namespace Nova
 
         private void RestoreRaw(GameStateStepRestoreCheckpointEntry restoreDatas)
         {
-            // Debug.Log($"Nova: restoring to varhash = {restoreDatas.Variables.Hash}, is checkpoint entry");
+            // Debug.Log($"Nova: Restoring checkpoint from varhash = {restoreDatas.variables.hash}");
             Assert.IsNotNull(restoreDatas);
 
             stepNumFromLastCheckpoint = 0;
@@ -799,12 +802,12 @@ namespace Nova
         }
 
         /// <summary>
-        /// get the name of node and dialogue index before specified steps
+        /// Get the node name and the dialogue index before specified steps
         /// </summary>
-        /// <param name="steps">the num to step back</param>
-        /// <param name="nodeName">the node at given 'steps' before</param>
-        /// <param name="dialogueIndex">the dialogue index at given 'steps' before</param>
-        /// <returns>true when success, false when step is too large or minus than 0</returns>
+        /// <param name="steps">number to step back</param>
+        /// <param name="nodeName">node name at given steps before</param>
+        /// <param name="dialogueIndex">dialogue index at given steps before</param>
+        /// <returns>true when success, false when step is too large or a minus number</returns>
         public bool SeekBackStep(int steps, out string nodeName, out int dialogueIndex)
         {
             if (steps < 0)
@@ -821,8 +824,8 @@ namespace Nova
                 return true;
             }
 
-            // following part of code won't be frequently executed, since there is always a real checkpoint at the
-            // start of the node, and the steps stored in GameStateStepRestoreEntry would never step across node
+            // The following code won't be frequently executed, since there is always a checkpoint at the
+            // start of the node, and the steps stored in GameStateStepRestoreEntry never steps across node
             // boundary.
 
             steps -= currentIndex;
@@ -845,12 +848,12 @@ namespace Nova
         }
 
         /// <summary>
-        /// Restore all restorables. the lazy execution block at the target entry position will be executed again
+        /// Restore all restorables. The lazy execution block in the target entry will be executed again.
         /// </summary>
         /// <param name="restoreDatas">restore datas</param>
         private void Restore(GameStateStepRestoreEntry restoreDatas)
         {
-            // Debug.LogFormat("Steps from last ckpt: {0}", restoreDatas.StepNumFromLastCheckpoint);
+            // Debug.LogFormat("Steps from last ckpt: {0}", restoreDatas.stepNumFromLastCheckpoint);
 
             if (restoreDatas is GameStateStepRestoreCheckpointEntry checkpointEntry)
             {
@@ -859,12 +862,12 @@ namespace Nova
             }
             else if (restoreDatas is GameStateStepRestoreSimpleEntry simpleEntry)
             {
-                // Debug.Log($"Nova: restoring to varhash = {simpleEntry.LastCheckpointVariablesHash}, is simple entry");
+                // Debug.Log($"Nova: Restoring simple entry from lastCheckpointVariablesHash = {simpleEntry.lastCheckpointVariablesHash}");
 
                 if (!SeekBackStep(simpleEntry.stepNumFromLastCheckpoint, out string storedNode,
                     out int storedDialogueIndex))
                 {
-                    Debug.LogErrorFormat("Nova: Failed to seek back, invalid StepNumFromLastCheckpoint: {0}",
+                    Debug.LogErrorFormat("Nova: Failed to seek back, invalid stepNumFromLastCheckpoint: {0}",
                         simpleEntry.stepNumFromLastCheckpoint);
                 }
 
