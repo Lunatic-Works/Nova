@@ -63,46 +63,48 @@ namespace Nova
                 return;
             }
 
-            // Debug.LogFormat("Fullscreen status changing from {0} (logical {1}) to {2}", Screen.fullScreen, isLogicalFullScreen, to);
-            if (isLogicalFullScreen != to)
+            // Debug.LogFormat("Full screen status changing from {0} (logical {1}) to {2}", Screen.fullScreen, isLogicalFullScreen, to);
+            if (isLogicalFullScreen == to)
             {
-                isLogicalFullScreen = to;
-                if (to)
+                return;
+            }
+
+            isLogicalFullScreen = to;
+            if (to)
+            {
+                configManager.SetInt(LastWindowedWidthKey, Screen.width);
+                configManager.SetInt(LastWindowedHeightKey, Screen.height);
+                Screen.SetResolution(
+                    Screen.currentResolution.width,
+                    Screen.currentResolution.height,
+                    FullScreenMode.FullScreenWindow
+                );
+            }
+            else
+            {
+                var targetW = configManager.GetInt(LastWindowedWidthKey);
+                var targetH = configManager.GetInt(LastWindowedHeightKey);
+                if (targetW == 0 || targetH == 0)
                 {
-                    configManager.SetInt(LastWindowedWidthKey, Screen.width);
-                    configManager.SetInt(LastWindowedHeightKey, Screen.height);
-                    Screen.SetResolution(
-                        Screen.currentResolution.width,
-                        Screen.currentResolution.height,
-                        FullScreenMode.FullScreenWindow
-                    );
+                    if (Screen.resolutions.Length == 0)
+                    {
+                        targetW = 1280;
+                        targetH = 720;
+                    }
+                    else
+                    {
+                        var defaultResolution = Screen.resolutions[Screen.resolutions.Length / 2];
+                        targetW = defaultResolution.width;
+                        targetH = defaultResolution.height;
+                    }
                 }
-                else
+
+                Screen.SetResolution(targetW, targetH, FullScreenMode.Windowed);
+
+                if (configManager.GetInt(ChangeWindowSizeFirstShownKey) == 0)
                 {
-                    var targetW = configManager.GetInt(LastWindowedWidthKey);
-                    var targetH = configManager.GetInt(LastWindowedHeightKey);
-                    if (targetW == 0 || targetH == 0)
-                    {
-                        if (Screen.resolutions.Length == 0)
-                        {
-                            targetW = 1280;
-                            targetH = 720;
-                        }
-                        else
-                        {
-                            var defaultResolution = Screen.resolutions[Screen.resolutions.Length / 2];
-                            targetW = defaultResolution.width;
-                            targetH = defaultResolution.height;
-                        }
-                    }
-
-                    Screen.SetResolution(targetW, targetH, FullScreenMode.Windowed);
-
-                    if (configManager.GetInt(ChangeWindowSizeFirstShownKey) == 0)
-                    {
-                        Alert.Show(I18n.__("config.changewindowsize"));
-                        configManager.SetInt(ChangeWindowSizeFirstShownKey, 1);
-                    }
+                    Alert.Show(I18n.__("config.changewindowsize"));
+                    configManager.SetInt(ChangeWindowSizeFirstShownKey, 1);
                 }
             }
         }
@@ -193,10 +195,6 @@ namespace Nova
                 RealScreen.uiSize = gameRenderTarget.rectTransform.rect.size;
                 shouldUpdateTransitionsAfter--;
             }
-            else if (shouldUpdateTransitionsAfter > 0)
-            {
-                shouldUpdateTransitionsAfter--;
-            }
         }
 
         private void OnPreCull()
@@ -214,7 +212,7 @@ namespace Nova
 
         private void _switchFullScreen()
         {
-            UpdateFullScreenStatus(!isLogicalFullScreen);
+            fullScreenToggle.isOn = !isLogicalFullScreen;
         }
 
         public static string Tag;

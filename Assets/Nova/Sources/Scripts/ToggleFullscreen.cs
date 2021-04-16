@@ -2,7 +2,7 @@
 
 namespace Nova
 {
-    public class ToggleFullscreen : MonoBehaviour
+    public class ToggleFullScreen : MonoBehaviour
     {
         private InputMapper inputMapper;
 
@@ -13,7 +13,7 @@ namespace Nova
 
         private void Update()
         {
-            if (inputMapper.GetKeyUp(AbstractKey.ToggleFullscreen))
+            if (inputMapper.GetKeyUp(AbstractKey.ToggleFullScreen))
             {
                 GameRenderManager.SwitchFullScreen();
             }

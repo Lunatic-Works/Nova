@@ -11,7 +11,7 @@ namespace Nova
         QuickLoad,
         ToggleDialogue,
         ShowLog,
-        ToggleFullscreen,
+        ToggleFullScreen,
         LeaveView,
     }
 }
