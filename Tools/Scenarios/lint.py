@@ -17,7 +17,7 @@ def lint_file(in_filename):
 
     for chapter_name, entries, _, _ in chapters:
         print(chapter_name)
-        anim_persist_tracked = True
+        anim_persist_tracked = False
         for code, chara_name, dialogue, line_num in entries:
             if code and not dialogue:
                 print(f'Line {line_num}: code block with empty dialogue')
@@ -27,35 +27,52 @@ def lint_file(in_filename):
                     if not line:
                         print(f'Line {line_num}: empty line in code block')
 
+                check_anim_persist_override = False
                 check_show = False
                 check_trans = False
-                check_anim_persist_override = False
                 try:
                     for func_name, args, env in walk_functions(code):
+                        arg_names = [get_node_name(x) for x in args]
+
+                        for name in [func_name] + arg_names:
+                            if name == 'anim_persist_begin':
+                                if anim_persist_tracked:
+                                    print(
+                                        f'Line {line_num}: anim_persist_begin() not match'
+                                    )
+                                else:
+                                    anim_persist_tracked = True
+
+                                if env:
+                                    check_anim_persist_override = True
+
+                                if 'anim_persist' in env:
+                                    print(
+                                        f'Line {line_num}: anim_persist_begin() in anim_persist'
+                                    )
+
+                            elif name == 'anim_persist_end':
+                                if anim_persist_tracked:
+                                    anim_persist_tracked = False
+                                else:
+                                    print(
+                                        f'Line {line_num}: anim_persist_end() not match'
+                                    )
+
+                                if env:
+                                    check_anim_persist_override = True
+
+                                if 'anim_persist' in env:
+                                    print(
+                                        f'Line {line_num}: anim_persist_end() in anim_persist'
+                                    )
+
                         if func_name == 'anim':
                             if env:
                                 print(
                                     f'Line {line_num}: anim in anon function')
-                        elif func_name == 'anim_persist_begin':
-                            anim_persist_tracked = True
 
-                            if env:
-                                check_anim_persist_override = True
-                        elif func_name == 'anim_persist_end':
-                            if anim_persist_tracked:
-                                anim_persist_tracked = False
-                            else:
-                                print(
-                                    f'Line {line_num}: anim_persist_end() not match'
-                                )
-
-                            if env:
-                                check_anim_persist_override = True
                         elif func_name == 'anim_persist':
-                            if 'anim_persist' in env:
-                                print(
-                                    f'Line {line_num}: anim_persist in anim_persist'
-                                )
                             if not anim_persist_tracked:
                                 print(
                                     f'Line {line_num}: anim_persist not tracked'
@@ -66,13 +83,18 @@ def lint_file(in_filename):
                                     f'Line {line_num}: anim_persist overridden by anim_persist_begin() or anim_persist_end()'
                                 )
 
-                        if func_name == 'show':
-                            if (not env and args and
-                                    get_node_name(args[0]) != 'extra_text'):
+                            if 'anim_persist' in env:
+                                print(
+                                    f'Line {line_num}: anim_persist in anim_persist'
+                                )
+
+                        elif func_name == 'show':
+                            if (not env and args
+                                    and arg_names[0] != 'extra_text'):
                                 check_show = True
+
                         elif 'trans' in func_name:
-                            if (len(args) >= 2
-                                    and get_node_name(args[0]) == 'cam'
+                            if (len(args) >= 2 and arg_names[0] == 'cam'
                                     and not isinstance(args[1], astnodes.Nil)):
                                 check_trans = True
 

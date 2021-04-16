@@ -156,7 +156,8 @@ def get_node_name(node):
     elif isinstance(node, astnodes.Index):
         return f'{get_node_name(node.value)}.{get_node_name(node.idx)}'
     else:
-        raise ValueError(f'Unknown node: {type(node)}')
+        # raise ValueError(f'Unknown node: {type(node)}')
+        return None
 
 
 def isinstance_any(obj, classes):
