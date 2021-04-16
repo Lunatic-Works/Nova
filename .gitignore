@@ -13,7 +13,7 @@
 /Assets/AssetStoreTools*
 /Assets/Plugins*
 
-/Assets/Nova/ThirdParty/ToLua/Source/Generate/*
+/Assets/Nova/Sources/ThirdParty/ToLua/Source/Generate/*
 /Assets/Resources/Lua*
 
 # Visual Studio cache directory

@@ -11,10 +11,10 @@ using UnityEngine.Video;
 
 public static class CustomSettings
 {
-    public static string saveDir = Application.dataPath + "/Nova/ThirdParty/ToLua/Source/Generate/";
-    public static string toluaBaseType = Application.dataPath + "/Nova/ThirdParty/ToLua/BaseType/";
+    public static string saveDir = Application.dataPath + "/Nova/Sources/ThirdParty/ToLua/Source/Generate/";
+    public static string toluaBaseType = Application.dataPath + "/Nova/Sources/ThirdParty/ToLua/BaseType/";
     public static string baseLuaDir = Application.dataPath + "/Nova/Lua/";
-    public static string injectionFilesPath = Application.dataPath + "/Nova/ThirdParty/ToLua/Injection/";
+    public static string injectionFilesPath = Application.dataPath + "/Nova/Sources/ThirdParty/ToLua/Injection/";
 
     //导出时强制做为静态类的类型(注意customTypeList 还要添加这个类型才能导出)
     //unity 有些类作为sealed class, 其实完全等价于静态类
