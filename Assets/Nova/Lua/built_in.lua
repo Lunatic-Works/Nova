@@ -69,7 +69,7 @@ function branch(branches)
         elseif branch.mode == 'enable' then
             mode = Nova.BranchMode.Enable
         else
-            warn('Unknown branch mode: ' .. tostring(branch.mode) .. ', text: ' .. tostring(text))
+            warn('Unknown branch mode: ' .. tostring(branch.mode) .. ', text: ' .. tostring(branch.text))
             return
         end
 

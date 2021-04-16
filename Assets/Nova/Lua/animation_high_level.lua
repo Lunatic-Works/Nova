@@ -205,8 +205,8 @@ make_anim_method('move', function(self, obj, coord, duration, easing)
     local transform = obj.transform
 
     local entry
-    entry = self:_then(_move {obj, pos, relative}):_with(easing):_for(duration)
-    entry = self:_then(_rotate {obj, angle, relative}):_with(easing):_for(duration)
+    self:_then(_move {obj, pos, relative}):_with(easing):_for(duration)
+    self:_then(_rotate {obj, angle, relative}):_with(easing):_for(duration)
     if camera then
         if relative then
             entry = self:_then(Nova.CameraSizeAnimationProperty(camera, scale, relative)):_with(easing):_for(duration)
