@@ -92,17 +92,17 @@ namespace Nova
             modified = false;
         }
 
+        public void RestoreAll()
+        {
+            RefreshData();
+            inputMappingList.Refresh();
+        }
+
         public void RestoreCurrentKeyMapping()
         {
             keyboardData[currentSelectedKey] =
                 inputMapper.keyboard.Data[currentSelectedKey].Select(key => new CompoundKey(key)).ToList();
             ResolveDuplicate();
-            inputMappingList.Refresh();
-        }
-
-        public void RestoreAll()
-        {
-            RefreshData();
             inputMappingList.Refresh();
         }
 
@@ -115,7 +115,7 @@ namespace Nova
 
         public void ResetCurrentKeyMappingDefault()
         {
-            keyboardData[currentSelectedKey] = inputMapper.GetDefaultKeyboardData()[currentSelectedKey];
+            keyboardData[currentSelectedKey] = inputMapper.GetDefaultCompoundKeys(currentSelectedKey);
             ResolveDuplicate();
             MarkDataDirty();
             inputMappingList.Refresh();

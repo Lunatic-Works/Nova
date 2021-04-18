@@ -49,49 +49,40 @@ namespace Nova
             return defaultKeyboard.Data.GetCopy();
         }
 
+        public List<CompoundKey> GetDefaultCompoundKeys(AbstractKey key)
+        {
+            return defaultKeyboard.Data[key].Select(ck => new CompoundKey(ck)).ToList();
+        }
+
         private IEnumerable<IAbstractKeyDevice> keyDevices
         {
             get { yield return keyboard; }
         }
 
-        private string GetMappingFileOrDefault(string path, TextAsset defaultMapping)
-        {
-            try
-            {
-                return File.ReadAllText(path);
-            }
-            catch (Exception)
-            {
-                if (defaultMapping != null)
-                {
-                    return defaultMapping.text;
-                }
-            }
-
-            return null;
-        }
-
         private void LoadKeyBoard()
         {
+            defaultKeyboard = new AbstractKeyboard();
+            defaultKeyboard.Load(defaultKeyboardMapping.text);
+
             keyboard = new AbstractKeyboard();
             try
             {
                 keyboard.Load(File.ReadAllText(KeyBoardMappingFilePath));
+
+                // Use default values to fill missing keys
+                foreach (AbstractKey ak in Enum.GetValues(typeof(AbstractKey)))
+                {
+                    if (!keyboard.Data.ContainsKey(ak))
+                    {
+                        keyboard.Data[ak] = GetDefaultCompoundKeys(ak);
+                    }
+                }
             }
             catch
             {
                 Debug.LogWarning("Nova: Failed to load input mapping file, use default input mapping.");
-                keyboard.Load(defaultKeyboardMapping.text);
+                keyboard.Data = GetDefaultKeyboardData();
             }
-
-            // load default keyboard
-            defaultKeyboard = new AbstractKeyboard();
-            defaultKeyboard.Load(defaultKeyboardMapping.text);
-        }
-
-        private void Load()
-        {
-            LoadKeyBoard();
         }
 
         private void SaveKeyBoard()
@@ -116,7 +107,7 @@ namespace Nova
 
         private void Awake()
         {
-            Load();
+            LoadKeyBoard();
             foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
                 keyStatus[key] = false;

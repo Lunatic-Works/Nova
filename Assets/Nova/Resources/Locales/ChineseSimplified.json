@@ -52,7 +52,7 @@
   "config.key.ShowLog": "文本回顾",
   "config.key.StepForward": "下一句",
   "config.key.ToggleDialogue": "隐藏/显示对话框",
-  "config.key.ToggleFullscreen": "全屏显示",
+  "config.key.ToggleFullScreen": "全屏显示",
   "config.recorderpopup": "按下新的快捷键",
   "config.resetalerts": "重置操作提示",
   "config.resetdefault": "重置默认设置",
