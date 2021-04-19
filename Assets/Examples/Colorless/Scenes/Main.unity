@@ -3975,12 +3975,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114272515042219454, guid: fa85a1f7ee8f24c5a8c2301088bd4291,
-        type: 3}
-      propertyPath: novaGameControllerPrefab
-      value: 
-      objectReference: {fileID: 1737081535048956, guid: f4f3d837d52c042e59059ca036efc46f,
-        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa85a1f7ee8f24c5a8c2301088bd4291, type: 3}
 --- !u!1 &1429794104
@@ -4575,7 +4569,7 @@ PrefabInstance:
     - target: {fileID: 2914054466736184289, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 128
+      value: 127.999985
       objectReference: {fileID: 0}
     - target: {fileID: 3535619004574509351, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
@@ -4746,7 +4740,7 @@ PrefabInstance:
     - target: {fileID: 8733886360927594596, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 164
+      value: 163.99998
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}

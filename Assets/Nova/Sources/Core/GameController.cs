@@ -63,7 +63,7 @@ namespace Nova
 
         private static T AssertNotNull<T>(T component, string name) where T : MonoBehaviour
         {
-            Assert.IsNotNull(component, $"Nova: Cannot find {name}, ill formed NovaGameController.");
+            Assert.IsNotNull(component, $"Nova: Cannot find {name}, ill-formed NovaGameController.");
             return component;
         }
 
