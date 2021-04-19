@@ -77,7 +77,7 @@ namespace Nova
         {
             if (viewManager.currentView == CurrentViewType.Game)
             {
-                if (Input.GetKeyUp(KeyCode.LeftArrow))
+                if (Utils.GetKeyUpInEditor(KeyCode.LeftArrow))
                 {
                     state = DialogueBoxState.Normal;
                     try
@@ -91,25 +91,19 @@ namespace Nova
                     }
                 }
 
-                if (Input.GetKeyUp(KeyCode.Backspace))
+                if (Utils.GetKeyUpInEditor(KeyCode.Backspace))
                 {
                     JumpChapter(0);
                 }
 
-                if (Input.GetKeyUp(KeyCode.LeftBracket))
+                if (Utils.GetKeyUpInEditor(KeyCode.LeftBracket))
                 {
                     JumpChapter(-1);
                 }
 
-                if (Input.GetKeyUp(KeyCode.RightBracket))
+                if (Utils.GetKeyUpInEditor(KeyCode.RightBracket))
                 {
                     JumpChapter(1);
-                }
-
-                if (Input.GetKeyUp(KeyCode.P))
-                {
-                    useThemedBox = true;
-                    textColor = Color.white;
                 }
             }
         }
