@@ -159,7 +159,7 @@ public static class CustomSettings
         // _GT(typeof(LuaProfiler)),
         // _GT(typeof(QualitySettings)),
         // _GT(typeof(RenderSettings)),
-        // _GT(typeof(RenderTexture)),
+        _GT(typeof(RenderTexture)),
         // _GT(typeof(Resources)),
 
         #region Nova exported types

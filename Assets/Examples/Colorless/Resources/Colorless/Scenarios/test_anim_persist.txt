@@ -23,11 +23,11 @@ anim_persist:move(bg, {5, 0}, 10)
 anim_persist:stop()
 anim_persist:tint(bg, {0, 0, 1}, 10)
 |>
+停止上一段持续动画，开始下一段持续动画
+
 333
 
 444
-
-555
 
 <|
 anim_persist_end()

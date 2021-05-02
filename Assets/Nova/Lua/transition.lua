@@ -201,8 +201,8 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
     local action_begin, action_end
     if tostring(obj:GetType()) == 'Nova.CameraController' then
         action_begin = function()
-            __Nova.screenCapturer:SetGameTexture2D()
-            mat:SetTexture('_SubTex', __Nova.screenCapturer.gameTexture2D)
+            __Nova.screenCapturer:CaptureGameTexture()
+            mat:SetTexture('_SubTex', __Nova.screenCapturer.capturedGameTexture)
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 1)
@@ -216,7 +216,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
 
         action_end = function()
             set_mat(obj, get_default_mat(obj), layer_id)
-            __Nova.screenCapturer:DestroyGameTexture2D()
+            __Nova.screenCapturer:DestroyGameTexture()
         end
     else
         action_begin = function()

@@ -10,9 +10,9 @@ namespace Nova
 
     public enum MusicListMode
     {
-        Sequential = 0,
-        SingleLoop = 1,
-        Random = 2
+        Sequential,
+        SingleLoop,
+        Random
     }
 
     public class MusicGalleryController : ViewControllerBase

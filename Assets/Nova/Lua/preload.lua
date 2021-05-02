@@ -5,6 +5,10 @@ add_preload_pattern_with_obj_for_table = Nova.ScriptDialogueEntryParser.AddPatte
 add_preload_pattern_with_obj_and_res = Nova.ScriptDialogueEntryParser.AddPatternWithObjectAndResource
 
 function preload(obj, resource_name)
+    if obj == nil then
+        warn('preload obj == nil', resource_name)
+    end
+
     if obj == 'Texture' then
         Nova.AssetLoader.Preload(Nova.AssetCacheType.Image, resource_name)
     elseif obj == __Nova.timelineController then
@@ -26,6 +30,10 @@ function preload(obj, resource_name)
 end
 
 function unpreload(obj, resource_name)
+    if obj == nil then
+        warn('unpreload obj == nil', resource_name)
+    end
+
     if obj == 'Texture' then
         Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Image, resource_name)
     elseif obj == __Nova.timelineController then

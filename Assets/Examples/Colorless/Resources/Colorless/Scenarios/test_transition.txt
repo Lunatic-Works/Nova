@@ -18,6 +18,7 @@ anim:trans(cam, function()
     end, 'fade', 1, { _Mask = 'Masks/eye' })
 |>
 第一类转场
+前一幅画面渐变到后一幅画面
 
 <|
 anim:trans2(cam, function()
@@ -27,6 +28,7 @@ anim:trans2(cam, function()
     end, 'broken_tv', 1)
 |>
 第二类转场
+先让前一幅画面消失，再让后一幅画面出现
 
 <|
 anim:vfx(cam, 'color', {0, 1}, 1, { _ColorMul = 0 })
@@ -69,6 +71,38 @@ anim:vfx(cam, 'lens_blur', {0, 1}, 1, { _Size = 4 })
 anim:vfx(cam, 'lens_blur', {1, 0}, 1, { _Size = 4 })
 |>
 摄像机特效结束
+
+<|
+gaotian.layer = cam_mask.maskLayer
+bg2.layer = cam_mask.maskLayer
+show(xiben, 'normal', pos_l)
+show(bg, 'room')
+show(gaotian, 'normal', pos_r)
+show(bg2, 'corridor')
+anim:vfx(cam_mask, 'fade', {0, 0.5}, 1, { _Mask = 'Masks/wipe_left', _Vague = 0.1 })
+|>
+测试遮罩
+先把gaotian和bg2的layer设为cam_mask.maskLayer，再给cam_mask加vfx
+
+<|
+gaotian.layer = 0
+bg2.layer = 0
+cam2.cullingMask = 1
+hide(bg2)
+anim:move(cam2, {-3, 0})
+|>
+也可以让两个摄像机拍同一个图层
+把gaotian和bg2的layer重置为0，并把cam2的cullingMask设为1，就是拍摄layer 0
+
+<|
+anim:vfx(cam_mask, 'fade', {0.5, 0}, 1, { _Mask = 'Masks/wipe_left', _Vague = 0.1 })
+|>
+遮罩结束
+
+<|
+cam2.cullingMask = 2^cam_mask.maskLayer
+|>
+重置cam2的cullingMask
 
 测试结束
 @<| is_end() |>

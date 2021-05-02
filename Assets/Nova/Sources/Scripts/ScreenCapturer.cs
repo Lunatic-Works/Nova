@@ -5,7 +5,7 @@ namespace Nova
     [ExportCustomType]
     public class ScreenCapturer : MonoBehaviour
     {
-        [HideInInspector] public Texture2D gameTexture2D;
+        [HideInInspector] public RenderTexture capturedGameTexture;
 
         private void Awake()
         {
@@ -25,23 +25,15 @@ namespace Nova
             return renderTexture;
         }
 
-        public void SetGameTexture2D()
+        public void CaptureGameTexture()
         {
-            var screenSize = new Vector2Int(RealScreen.width, RealScreen.height);
-            gameTexture2D = new Texture2D(RealScreen.width, RealScreen.height, TextureFormat.RGB24, false);
-            var renderTexture = GetGameTexture(withUI: false);
-
-            RenderTexture.active = renderTexture;
-            gameTexture2D.ReadPixels(new Rect(Vector2.zero, screenSize), 0, 0, false);
-            RenderTexture.active = null;
-            Destroy(renderTexture);
-            gameTexture2D.Apply();
+            capturedGameTexture = GetGameTexture(withUI: false);
         }
 
-        public void DestroyGameTexture2D()
+        public void DestroyGameTexture()
         {
-            Destroy(gameTexture2D);
-            gameTexture2D = null;
+            Destroy(capturedGameTexture);
+            capturedGameTexture = null;
         }
 
         public static Texture2D GetBookmarkThumbnailTexture()
@@ -67,7 +59,7 @@ namespace Nova
 
         private void OnDestroy()
         {
-            DestroyGameTexture2D();
+            DestroyGameTexture();
         }
     }
 }

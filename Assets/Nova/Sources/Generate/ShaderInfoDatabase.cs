@@ -261,6 +261,32 @@ namespace Nova.Generate
                 }
             },
             {
+                "Ripple",
+                new Dictionary<string, ShaderPropertyType>
+                {
+                    {"_Amp", ShaderPropertyType.Float},
+                    {"_Aspect", ShaderPropertyType.Float},
+                    {"_BlurSize", ShaderPropertyType.Float},
+                    {"_RFreq", ShaderPropertyType.Float},
+                    {"_T", ShaderPropertyType.Float},
+                    {"_TFreq", ShaderPropertyType.Float},
+                }
+            },
+            {
+                "Ripple Move",
+                new Dictionary<string, ShaderPropertyType>
+                {
+                    {"_Amp", ShaderPropertyType.Float},
+                    {"_Aspect", ShaderPropertyType.Float},
+                    {"_BlurSize", ShaderPropertyType.Float},
+                    {"_Fade", ShaderPropertyType.Float},
+                    {"_RFreq", ShaderPropertyType.Float},
+                    {"_T", ShaderPropertyType.Float},
+                    {"_TFreq", ShaderPropertyType.Float},
+                    {"_Width", ShaderPropertyType.Float},
+                }
+            },
+            {
                 "Roll",
                 new Dictionary<string, ShaderPropertyType>
                 {
@@ -622,6 +648,32 @@ namespace Nova.Generate
                 {
                     {"_Freq", 10.0f},
                     {"_T", 0.0f},
+                }
+            },
+            {
+                "Ripple",
+                new Dictionary<string, float>
+                {
+                    {"_Amp", 0.01f},
+                    {"_Aspect", 1.77777778f},
+                    {"_BlurSize", 1.0f},
+                    {"_RFreq", 50.0f},
+                    {"_T", 0.0f},
+                    {"_TFreq", 3.0f},
+                }
+            },
+            {
+                "Ripple Move",
+                new Dictionary<string, float>
+                {
+                    {"_Amp", 0.01f},
+                    {"_Aspect", 1.77777778f},
+                    {"_BlurSize", 1.0f},
+                    {"_Fade", 0.1f},
+                    {"_RFreq", 50.0f},
+                    {"_T", 0.0f},
+                    {"_TFreq", 3.0f},
+                    {"_Width", 0.1f},
                 }
             },
             {

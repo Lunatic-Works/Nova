@@ -232,18 +232,23 @@ namespace Nova
 
         public static void DestroyMaterial(Material material, bool destroyInEditor = true)
         {
-            if (material == null) return;
+            DestroyObject(material, destroyInEditor);
+        }
+
+        public static void DestroyObject(UnityEngine.Object obj, bool destroyInEditor = true)
+        {
+            if (obj == null) return;
 #if UNITY_EDITOR
             if (Application.isPlaying)
             {
-                UnityObject.Destroy(material);
+                UnityObject.Destroy(obj);
             }
             else if (destroyInEditor)
             {
-                UnityObject.DestroyImmediate(material);
+                UnityObject.DestroyImmediate(obj);
             }
 #else
-            UnityObject.Destroy(material);
+            UnityObject.Destroy(obj);
 #endif
         }
 

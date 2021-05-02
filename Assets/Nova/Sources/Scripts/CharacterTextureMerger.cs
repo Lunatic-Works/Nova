@@ -51,15 +51,15 @@ namespace Nova
         {
             foreach (var texture in textureCache.Values)
             {
-                Destroy(texture);
+                Utils.DestroyObject(texture);
             }
 
             foreach (var sr in layers)
             {
-                Destroy(sr.gameObject);
+                Utils.DestroyObject(sr.gameObject);
             }
 
-            Destroy(empty);
+            Utils.DestroyObject(empty);
         }
 
         public Texture GetMergedTexture(List<SpriteWithOffset> sprites)
