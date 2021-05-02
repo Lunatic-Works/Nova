@@ -1,0 +1,163 @@
+@<|
+label 'test_basic'
+is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试基本功能
+
+很多页文字
+111
+222
+333
+444
+555
+666
+777
+888
+999
+
+很长的文字
+一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零
+
+英文换行 abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg
+
+<|
+anim:action(function() anim:stop() end)
+|>
+停止动画的奇怪情况
+
+富文本：<color="green">爱是<voffset=1em>一道</voffset><size=200%>光</size>，<b>如<i>此<s>美<u>妙</u></s></i></b></color>
+
+<link="https://github.com/Lunatic-Works/Nova"><style=Link>超链接</style></link>
+
+<|
+show(xiben, 'normal', pos_c)
+say(xiben, '01')
+|>
+孙西本：：“没有人带伞么？”
+
+<|
+move(xiben, pos_l)
+|>
+角色移动
+
+<|
+tint(xiben, {1, 0.5, 0})
+|>
+角色变色
+
+<|
+cubic = Nova.AnimationEntry.CubicEasing(0, 0)
+anim:_do(_rotate { xiben, Vector3(0, 60, 90) }):_for(1
+    ):_and(_scale { xiben, Vector3(0.8, 0.2, 1) }):_for(1
+    ):_then(_rotate { xiben, Vector3(0, 0, 0) }):_for(2
+    ):_and(_scale { xiben, Vector3(0.4, 0.4, 1) }):_for(2
+    ):_then(_move { xiben, Vector3(1, -1, 0) }):_with(cubic):_for(1):_repeat(2
+    ):_then(_action { function() print('action!!!') end }):_repeat(1)
+|>
+动画低层接口
+
+<|
+anim_persist_begin()
+anim_persist:loop(function(entry)
+    return entry:wait(1
+        ):action(show, bg, 'rain'
+        ):wait(1
+        ):action(show, bg, 'room')
+end)
+anim_persist:loop(function(entry)
+    return entry:wait(0.7
+        ):action(tint, bg, {1, 1, 0}
+        ):wait(0.7
+        ):action(tint, bg, {1, 0, 1})
+end)
+|>
+开始播放持续动画
+
+<|
+anim:move(xiben, pos_l):move(xiben, pos_r)
+|>
+角色移动动画
+
+<|
+anim:tint(xiben, {0, 0.5, 1})
+|>
+角色变色动画
+
+<|
+hide(xiben)
+|>
+角色消失
+
+<|
+anim_persist_end()
+tint(bg, 1)
+|>
+停止播放持续动画
+
+<|
+move(bg, {1, 1})
+|>
+背景移动
+
+<|
+anim:move(bg, {1, -1})
+|>
+背景移动动画
+
+<|
+tint(bg, {0.5, 0.5, 1})
+|>
+背景变色
+
+<|
+anim:tint(bg, 1)
+|>
+背景变色动画
+
+<|
+anim:move(bg, {0, 0, 1})
+|>
+恢复背景位置
+
+<|
+move(cam, {-5, -5, 3})
+|>
+摄像机移动
+
+<|
+anim:move(cam, {5, 5, 7})
+|>
+摄像机移动动画
+
+<|
+anim:move(cam, {0, 0, 5})
+|>
+恢复摄像机位置
+
+<|
+play(bgm, 'xiben')
+|>
+播放BGM
+
+<|
+play(bgm, 'xiben')
+|>
+BGM持续
+
+<|
+play(bgm, 'qianye')
+|>
+BGM淡入淡出
+
+<|
+stop(bgm)
+|>
+BGM停止
+
+测试结束
+@<| is_end() |>

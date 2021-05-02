@@ -3,7 +3,7 @@
 namespace Nova
 {
     /// <summary>
-    /// Create and init Nova Game Controller prefab
+    /// Create and init NovaGameController prefab
     /// </summary>
     public class NovaCreator : MonoBehaviour
     {
@@ -14,7 +14,7 @@ namespace Nova
             var controllerCount = GameObject.FindGameObjectsWithTag("NovaGameController").Length;
             if (controllerCount > 1)
             {
-                Debug.LogWarning("Nova: Multiple Nova Game Controller found in the scene.");
+                Debug.LogWarning("Nova: Multiple NovaGameController found in the scene.");
             }
 
             if (controllerCount >= 1)

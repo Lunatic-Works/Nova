@@ -1,0 +1,74 @@
+@<|
+label 'test_transition'
+is_unlocked_start()
+|>
+<|
+show(xiben, 'normal', pos_l)
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试转场
+
+<|
+anim:trans(cam, function()
+        hide(xiben)
+        show(gaotian, 'normal', pos_r)
+        show(bg, 'corridor')
+    end, 'fade', 1, { _Mask = 'Masks/eye' })
+|>
+第一类转场
+
+<|
+anim:trans2(cam, function()
+        hide(gaotian)
+        show(xiben, 'normal', pos_l)
+        show(bg, 'room')
+    end, 'broken_tv', 1)
+|>
+第二类转场
+
+<|
+anim:vfx(cam, 'color', {0, 1}, 1, { _ColorMul = 0 })
+|>
+用两句话完成的转场
+先让画面变黑
+
+<|
+auto_fade_off()
+hide(xiben)
+show(gaotian, 'normal', pos_r)
+show(bg, 'corridor')
+auto_fade_on()
+anim:vfx(cam, 'color', {1, 0}, 1, { _ColorMul = 0 })
+|>
+再让画面出现
+不在trans里的时候，角色的show和hide默认有零点几秒的淡入淡出动画
+现在我们不需要这个动画，就要用auto_fade_off()和auto_fade_on()
+
+<|
+anim:vfx(bg, 'mix_add', {0, 1}, 1, { _Mask = 'Masks/vertical' })
+|>
+给背景加特效
+
+背景特效持续
+
+<|
+anim:vfx(bg, 'mix_add', {1, 0}, 1, { _Mask = 'Masks/vertical' })
+|>
+背景特效结束
+
+<|
+anim:vfx(cam, 'lens_blur', {0, 1}, 1, { _Size = 4 })
+|>
+给摄像机加特效
+
+摄像机特效持续
+
+<|
+anim:vfx(cam, 'lens_blur', {1, 0}, 1, { _Size = 4 })
+|>
+摄像机特效结束
+
+测试结束
+@<| is_end() |>

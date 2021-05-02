@@ -1,8 +1,10 @@
 @<|
 label 'test_branch_image'
--- is_unlocked_start()
+is_unlocked_start()
 |>
 <|
+show(bg, 'room')
+stop(bgm)
 set_box()
 |>
 测试选项图片

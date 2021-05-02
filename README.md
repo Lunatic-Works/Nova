@@ -4,6 +4,8 @@
 
 基于Unity，对程序员友好的视觉小说（VN）/文字冒险游戏（AVG）框架
 
+设计思路和一些特点的介绍：https://zhuanlan.zhihu.com/p/272466277
+
 本框架支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台
 
 新功能将会随着我们的下一部作品一起开发，预计的功能包括URP，以及更稳定、更灵活的脚本
@@ -25,9 +27,7 @@
 
 ## 说明文档
 
-文档正在施工中……
-
-https://github.com/Lunatic-Works/Nova/wiki/
+GitHub Wiki（正在施工中）：https://github.com/Lunatic-Works/Nova/wiki/
 
 ## 友情链接
 

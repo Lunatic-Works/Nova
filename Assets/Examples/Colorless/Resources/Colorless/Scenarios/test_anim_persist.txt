@@ -1,0 +1,38 @@
+@<|
+label 'test_anim_persist'
+is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试持续动画
+
+<|
+anim_persist_begin()
+anim_persist:move(bg, {5, 0}, 10)
+|>
+开始持续动画
+
+111
+
+222
+
+<|
+anim_persist:stop()
+anim_persist:tint(bg, {0, 0, 1}, 10)
+|>
+333
+
+444
+
+555
+
+<|
+anim_persist_end()
+|>
+停止持续动画
+
+测试结束
+@<| is_end() |>

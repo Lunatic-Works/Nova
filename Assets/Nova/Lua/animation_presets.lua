@@ -34,3 +34,22 @@ make_anim_method('trans_down', function(self, obj, image_name, duration)
     duration = duration or 1
     return self:trans(obj, image_name, 'fade', duration, { _Mask = 'Masks/wipe_up', _InvertMask = 1 })
 end, add_preload_pattern)
+
+make_anim_method('nod', function(self, obj, distance, duration)
+    distance = distance or 0.3
+    duration = duration or 0.15
+    local entry = self:move(obj, {0, -distance, RELATIVE}, duration, {0, 0.5}
+        ):move(obj, {0, distance, RELATIVE}, duration, {0.5, 0})
+    entry.head = self
+    return entry
+end)
+
+make_anim_method('shake', function(self, obj, distance, duration)
+    distance = distance or 0.2
+    duration = duration or 0.07
+    local entry = self:move(obj, {-distance, 0, RELATIVE}, duration, {0, 0.5}
+        ):move(obj, {distance * 2, 0, RELATIVE}, duration * 2, 0.5
+        ):move(obj, {-distance, 0, RELATIVE}, duration, {0.5, 0})
+    entry.head = self
+    return entry
+end)

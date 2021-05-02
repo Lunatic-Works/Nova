@@ -8,6 +8,7 @@ namespace Nova
     [Flags]
     public enum AnimationType
     {
+        None = 0,
         PerDialogue = 1,
         Persistent = 2,
         UI = 4,

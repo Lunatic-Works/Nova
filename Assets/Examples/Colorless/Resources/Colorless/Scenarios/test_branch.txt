@@ -1,8 +1,10 @@
 @<|
 label 'test_branch'
--- is_unlocked_start()
+is_unlocked_start()
 |>
 <|
+show(bg, 'room')
+stop(bgm)
 set_box()
 v('flag', 0)
 |>

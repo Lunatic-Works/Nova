@@ -15,7 +15,7 @@ namespace Nova
         /// </summary>
         /// <remarks>
         /// This method should be called before every Nova related work happens. The begining of the Start or Awake
-        /// of the game controller might be a good choice
+        /// of the GameController might be a good choice
         /// </remarks>
         private void Init()
         {

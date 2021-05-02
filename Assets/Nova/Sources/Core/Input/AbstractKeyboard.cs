@@ -1,10 +1,11 @@
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Nova
 {
-    using AbstractKeyboardSerialized = Dictionary<AbstractKey, List<string>>;
+    using AbstractKeyboardSerialized = Dictionary<string, List<string>>;
 
     public class AbstractKeyboard : IAbstractKeyDevice
     {
@@ -28,7 +29,10 @@ namespace Nova
             var data = JsonConvert.DeserializeObject<AbstractKeyboardSerialized>(json);
             foreach (var pair in data)
             {
-                mapping[pair.Key] = pair.Value.Select(CompoundKey.FromString).ToList();
+                if (Enum.TryParse(pair.Key, out AbstractKey ak))
+                {
+                    mapping[ak] = pair.Value.Select(CompoundKey.FromString).ToList();
+                }
             }
         }
 
@@ -37,7 +41,7 @@ namespace Nova
             var data = new AbstractKeyboardSerialized();
             foreach (var pair in mapping)
             {
-                data[pair.Key] = pair.Value.Select(k => k.ToString()).ToList();
+                data[pair.Key.ToString()] = pair.Value.Select(k => k.ToString()).ToList();
             }
 
             return JsonConvert.SerializeObject(data, Formatting.Indented);
