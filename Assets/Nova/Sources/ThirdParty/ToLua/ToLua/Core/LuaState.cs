@@ -119,7 +119,7 @@ namespace LuaInterface
             OpenBaseLibs();
             LuaSetTop(0);
             InitLuaPath();
-            Debugger.Log("Init lua state cost: {0}", Time.realtimeSinceStartup - time);
+            // Debugger.Log("Init lua state cost: {0}", Time.realtimeSinceStartup - time);
         }
 
         void OpenBaseLibs()
@@ -216,7 +216,7 @@ namespace LuaInterface
 #if UNITY_EDITOR
             beStart = true;
 #endif
-            Debugger.Log("LuaState start");
+            // Debugger.Log("LuaState start");
             OpenBaseLuaLibs();
 #if ENABLE_LUA_INJECTION
             Push(LuaDLL.tolua_tag());
@@ -2014,7 +2014,7 @@ namespace LuaInterface
                 missSet.Clear();
 #endif
                 OnDestroy();
-                Debugger.Log("LuaState destroy");
+                // Debugger.Log("LuaState destroy");
             }
 
             if (mainState == this)

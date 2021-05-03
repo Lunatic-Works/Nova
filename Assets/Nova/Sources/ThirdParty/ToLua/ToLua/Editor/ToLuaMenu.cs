@@ -685,7 +685,7 @@ public static class ToLuaMenu
             sb.AppendLineEx("\t\tL.EndPreLoad();");
         }
 
-        sb.AppendLineEx("\t\tDebugger.Log(\"Register lua type cost time: {0}\", Time.realtimeSinceStartup - t);");
+        // sb.AppendLineEx("\t\tDebugger.Log(\"Register lua type cost time: {0}\", Time.realtimeSinceStartup - t);");
         sb.AppendLineEx("\t}");
 
         for (int i = 0; i < dtList.Count; i++)

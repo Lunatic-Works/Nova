@@ -48,3 +48,7 @@ GitHub Wiki（正在施工中）：https://github.com/Lunatic-Works/Nova/wiki/
 
 * [tolua#](https://github.com/topameng/tolua)
 * [Json.NET](https://github.com/JamesNK/Newtonsoft.Json)
+
+国内镜像（随缘更新）：
+
+* https://gitee.com/woctordho/Nova
