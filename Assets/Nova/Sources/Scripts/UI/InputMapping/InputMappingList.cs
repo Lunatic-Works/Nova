@@ -44,6 +44,7 @@ namespace Nova
                 ret = Instantiate(entryPrefab, content);
                 ret.Init(controller, i);
             }
+
             return ret;
         }
     }

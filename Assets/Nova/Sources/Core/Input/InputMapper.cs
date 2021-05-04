@@ -6,16 +6,30 @@ using UnityEngine;
 
 namespace Nova
 {
+    using KeyStatus = Dictionary<AbstractKey, bool>;
+    using AbstractKeyGroups = Dictionary<AbstractKey, AbstractKeyGroup>;
+    using AbstractKeyTags = Dictionary<AbstractKey, bool>;
+
     public class InputMapper : MonoBehaviour
     {
+        public static string InputFilesDirectory => Path.Combine(Application.persistentDataPath, "Input");
+
+        private static string KeyBoardMappingFilePath => Path.Combine(InputFilesDirectory, "keyboard.json");
+
         public TextAsset defaultKeyboardMapping;
 
-        private Dictionary<AbstractKey, bool> keyStatus = new Dictionary<AbstractKey, bool>();
-        private Dictionary<AbstractKey, bool> keyStatusLastFrame = new Dictionary<AbstractKey, bool>();
-        private readonly Dictionary<AbstractKey, bool> keyEnabled = new Dictionary<AbstractKey, bool>();
+        private KeyStatus keyStatus = new KeyStatus();
+        private KeyStatus keyStatusLastFrame = new KeyStatus();
+        private KeyStatus keyEnabled = new KeyStatus();
+        private readonly KeyStatus keyTriggered = new KeyStatus();
 
-        public static string InputFilesDirectory => Path.Combine(Application.persistentDataPath, "Input");
-        private static string KeyBoardMappingFilePath => Path.Combine(InputFilesDirectory, "keyboard.json");
+        public readonly AbstractKeyboard keyboard = new AbstractKeyboard();
+        public readonly AbstractKeyGroups keyGroups = new AbstractKeyGroups();
+        public readonly AbstractKeyTags keyIsEditor = new AbstractKeyTags();
+
+        private readonly AbstractKeyboard defaultKeyboard = new AbstractKeyboard();
+
+        #region Enable
 
         public void SetEnable(AbstractKey key, bool value)
         {
@@ -24,25 +38,35 @@ namespace Nova
 
         public bool IsEnabled(AbstractKey key)
         {
+#if !UNITY_EDITOR
+            if (keyIsEditor[key])
+            {
+                return false;
+            }
+#endif
+
             return keyEnabled[key];
         }
 
-        public void SetEnableAll(bool value)
+        public void SetEnableGroup(AbstractKeyGroup group)
         {
             foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
-                SetEnable(key, value);
+                SetEnable(key, (keyGroups[key] & group) > 0);
             }
         }
 
-        public bool IsEnabledAll()
+        public KeyStatus GetEnabledState()
         {
-            return Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>().All(key => keyEnabled[key]);
+            return keyEnabled.ToDictionary(x => x.Key, x => x.Value);
         }
 
-        public AbstractKeyboard keyboard { get; private set; }
+        public void SetEnabledState(KeyStatus keyEnabled)
+        {
+            this.keyEnabled = keyEnabled;
+        }
 
-        private AbstractKeyboard defaultKeyboard;
+        #endregion
 
         public AbstractKeyboardData GetDefaultKeyboardData()
         {
@@ -59,12 +83,12 @@ namespace Nova
             get { yield return keyboard; }
         }
 
+        #region Save and load
+
         private void LoadKeyBoard()
         {
-            defaultKeyboard = new AbstractKeyboard();
-            defaultKeyboard.Load(defaultKeyboardMapping.text);
+            defaultKeyboard.LoadFull(defaultKeyboardMapping.text, keyGroups, keyIsEditor);
 
-            keyboard = new AbstractKeyboard();
             try
             {
                 keyboard.Load(File.ReadAllText(KeyBoardMappingFilePath));
@@ -87,11 +111,6 @@ namespace Nova
 
         private void SaveKeyBoard()
         {
-            if (keyboard == null)
-            {
-                return;
-            }
-
             File.WriteAllText(KeyBoardMappingFilePath, keyboard.Json());
         }
 
@@ -105,16 +124,19 @@ namespace Nova
             SaveKeyBoard();
         }
 
+        #endregion
+
         private void Awake()
         {
             LoadKeyBoard();
+
             foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
                 keyStatus[key] = false;
                 keyStatusLastFrame[key] = false;
+                keyEnabled[key] = true;
+                keyTriggered[key] = false;
             }
-
-            SetEnableAll(true);
         }
 
         private void OnDestroy()
@@ -122,21 +144,28 @@ namespace Nova
             Save();
         }
 
+        // Trigger at most one time in each frame
         public bool GetKey(AbstractKey key)
         {
             if (!IsEnabled(key)) return false;
+            if (keyTriggered[key]) return false;
+            keyTriggered[key] = true;
             return keyStatus[key];
         }
 
         public bool GetKeyDown(AbstractKey key)
         {
             if (!IsEnabled(key)) return false;
+            if (keyTriggered[key]) return false;
+            keyTriggered[key] = true;
             return !keyStatusLastFrame[key] && keyStatus[key];
         }
 
         public bool GetKeyUp(AbstractKey key)
         {
             if (!IsEnabled(key)) return false;
+            if (keyTriggered[key]) return false;
+            keyTriggered[key] = true;
             return keyStatusLastFrame[key] && !keyStatus[key];
         }
 
@@ -159,6 +188,7 @@ namespace Nova
             foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
                 keyStatus[key] = keyDevices.Any(device => device.GetKey(key));
+                keyTriggered[key] = false;
             }
         }
     }

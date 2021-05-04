@@ -5,13 +5,16 @@ using UnityEngine.EventSystems;
 
 namespace Nova
 {
+    using KeyStatus = Dictionary<AbstractKey, bool>;
+
     public class CompoundKeyRecorder : MonoBehaviour, IPointerClickHandler
     {
+        public RecordPopupController popupController;
+
         private InputMapper inputMapper;
         private InputMappingController controller;
         private readonly HashSet<KeyCode> prefixKeys = new HashSet<KeyCode>(CompoundKey.PrefixKeys);
-
-        public RecordPopupController popupController;
+        private KeyStatus keyEnabled;
 
         private void Awake()
         {
@@ -20,7 +23,8 @@ namespace Nova
 
         private void OnEnable()
         {
-            inputMapper.SetEnableAll(false);
+            keyEnabled = inputMapper.GetEnabledState();
+            inputMapper.SetEnableGroup(AbstractKeyGroup.None);
             popupController.entry = entry;
             popupController.Show();
         }
@@ -28,7 +32,7 @@ namespace Nova
         private void OnDisable()
         {
             popupController.Hide();
-            inputMapper.SetEnableAll(true);
+            inputMapper.SetEnabledState(keyEnabled);
 
             if (entry != null)
             {
@@ -92,7 +96,6 @@ namespace Nova
             if (!AnyKeyPressing) return;
             entry.key.Clear();
             isPressing = true;
-            controller.MarkDataDirty();
             HandlePress();
         }
 

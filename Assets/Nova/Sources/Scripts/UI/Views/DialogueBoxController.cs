@@ -266,7 +266,7 @@ namespace Nova
             // are defined specifically.
             HandleShortcut();
 
-            if (!gameController.disableInput)
+            if (!gameController.inputDisabled)
             {
                 HandleInput();
             }

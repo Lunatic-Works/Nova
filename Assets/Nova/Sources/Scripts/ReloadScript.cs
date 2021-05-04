@@ -9,12 +9,15 @@ namespace Nova
         [SerializeField] private ViewManager viewManager;
 
         private GameState gameState;
+        private InputMapper inputMapper;
         private CharacterController[] characterControllers;
         private string currentNodeInitialVariablesHash;
 
         private void Start()
         {
-            gameState = Utils.FindNovaGameController().GameState;
+            var gameController = Utils.FindNovaGameController();
+            gameState = gameController.GameState;
+            inputMapper = gameController.InputMapper;
 
             if (characters != null)
             {
@@ -32,8 +35,9 @@ namespace Nova
             gameState.NodeChanged -= OnNodeChanged;
         }
 
-        private void OnNodeChanged(NodeChangedData arg0)
+        private void OnNodeChanged(NodeChangedData nodeChangedData)
         {
+            Debug.Log($"ReloadScript OnNodeChanged {nodeChangedData.nodeName} {gameState.variables.hash}");
             currentNodeInitialVariablesHash = gameState.variables.hash;
         }
 
@@ -44,19 +48,17 @@ namespace Nova
                 return;
             }
 
-            if (Utils.GetKeyDownInEditor(KeyCode.R))
+            if (inputMapper.GetKeyUp(AbstractKey.EditorReloadScripts))
             {
-                if (Utils.GetKeyInEditor(KeyCode.LeftShift))
-                {
-                    ReloadScriptOnly();
-                }
-                else
-                {
-                    ReloadAndRefreshNode();
-                }
+                ReloadScripts();
             }
 
-            if (Utils.GetKeyDownInEditor(KeyCode.F))
+            if (inputMapper.GetKeyUp(AbstractKey.EditorRerunNode))
+            {
+                RerunNode();
+            }
+
+            if (inputMapper.GetKeyUp(AbstractKey.EditorRerunAction))
             {
                 RerunAction();
             }
@@ -78,14 +80,24 @@ namespace Nova
             }
         }
 
-        private void ReloadAndRefreshNode()
+        private void ReloadScripts()
+        {
+            if (!gameState) return;
+            NovaAnimation.StopAll();
+            LuaRuntime.Instance.InitRequires();
+            gameState.ReloadScripts();
+        }
+
+        private void RerunNode()
         {
             if (!gameState) return;
             NovaAnimation.StopAll();
             var currentNode = gameState.currentNode;
             var currentIndex = gameState.currentIndex;
             SuppressSound(true);
+            Debug.Log($"MoveBackTo {currentNode.name} {currentNodeInitialVariablesHash}");
             gameState.MoveBackTo(currentNode.name, 0, currentNodeInitialVariablesHash, clearFuture: true);
+            LuaRuntime.Instance.InitRequires();
             gameState.ReloadScripts();
 
             // step back to current index
@@ -98,13 +110,6 @@ namespace Nova
             NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
             SuppressSound(false); // only the last step can play sound
             gameState.Step();
-        }
-
-        private void ReloadScriptOnly()
-        {
-            if (!gameState) return;
-            NovaAnimation.StopAll();
-            gameState.ReloadScripts();
         }
 
         private void RerunAction()

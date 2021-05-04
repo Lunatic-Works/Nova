@@ -6,6 +6,9 @@ using System.Linq;
 namespace Nova
 {
     using AbstractKeyboardSerialized = Dictionary<string, List<string>>;
+    using AbstractKeyboardSerializedFull = Dictionary<string, Dictionary<string, List<string>>>;
+    using AbstractKeyGroups = Dictionary<AbstractKey, AbstractKeyGroup>;
+    using AbstractKeyTags = Dictionary<AbstractKey, bool>;
 
     public class AbstractKeyboard : IAbstractKeyDevice
     {
@@ -32,6 +35,32 @@ namespace Nova
                 if (Enum.TryParse(pair.Key, out AbstractKey ak))
                 {
                     mapping[ak] = pair.Value.Select(CompoundKey.FromString).ToList();
+                }
+            }
+        }
+
+        public void LoadFull(string json, AbstractKeyGroups groups, AbstractKeyTags isEditor)
+        {
+            mapping.Clear();
+            var data = JsonConvert.DeserializeObject<AbstractKeyboardSerializedFull>(json);
+            foreach (var pair in data)
+            {
+                if (Enum.TryParse(pair.Key, out AbstractKey ak))
+                {
+                    mapping[ak] = pair.Value["Keys"].Select(CompoundKey.FromString).ToList();
+
+                    var group = AbstractKeyGroup.None;
+                    foreach (var s in pair.Value["Groups"])
+                    {
+                        if (Enum.TryParse(s, out AbstractKeyGroup _group))
+                        {
+                            group |= _group;
+                        }
+                    }
+
+                    groups[ak] = group;
+
+                    isEditor[ak] = pair.Value["Tags"].Contains("Editor");
                 }
             }
         }

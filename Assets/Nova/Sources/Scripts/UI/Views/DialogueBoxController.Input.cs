@@ -77,7 +77,7 @@ namespace Nova
         {
             if (viewManager.currentView == CurrentViewType.Game)
             {
-                if (Utils.GetKeyUpInEditor(KeyCode.LeftArrow))
+                if (inputMapper.GetKeyUp(AbstractKey.EditorBackward))
                 {
                     state = DialogueBoxState.Normal;
                     try
@@ -91,17 +91,17 @@ namespace Nova
                     }
                 }
 
-                if (Utils.GetKeyUpInEditor(KeyCode.Backspace))
+                if (inputMapper.GetKeyUp(AbstractKey.EditorBeginChapter))
                 {
                     JumpChapter(0);
                 }
 
-                if (Utils.GetKeyUpInEditor(KeyCode.LeftBracket))
+                if (inputMapper.GetKeyUp(AbstractKey.EditorPreviousChapter))
                 {
                     JumpChapter(-1);
                 }
 
-                if (Utils.GetKeyUpInEditor(KeyCode.RightBracket))
+                if (inputMapper.GetKeyUp(AbstractKey.EditorNextChapter))
                 {
                     JumpChapter(1);
                 }
@@ -144,7 +144,7 @@ namespace Nova
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (gameController.disableInput)
+            if (gameController.inputDisabled)
             {
                 // Touch finger
                 if (eventData.pointerId >= 0)
@@ -222,7 +222,7 @@ namespace Nova
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (gameController.disableInput)
+            if (gameController.inputDisabled)
             {
                 // Mouse left button
                 if (eventData.pointerId == -1)

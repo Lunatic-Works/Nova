@@ -1,3 +1,5 @@
+using System;
+
 namespace Nova
 {
     public enum AbstractKey
@@ -13,5 +15,21 @@ namespace Nova
         ShowLog,
         ToggleFullScreen,
         LeaveView,
+        EditorBackward,
+        EditorBeginChapter,
+        EditorPreviousChapter,
+        EditorNextChapter,
+        EditorReloadScripts,
+        EditorRerunNode,
+        EditorRerunAction
+    }
+
+    [Flags]
+    public enum AbstractKeyGroup
+    {
+        None = 0,
+        Game = 1,
+        UI = 2,
+        All = 3
     }
 }

@@ -11,19 +11,15 @@ namespace Nova
         public InputMappingList inputMappingList;
         public CompoundKeyRecorder compoundKeyRecorder;
 
-        public AbstractKeyboardData keyboardData { get; private set; }
-
+        private AbstractKeyboardData keyboardData;
         private InputMapper inputMapper;
 
-        // TODO: not used
-        private bool modified = false;
-
-        public void MarkDataDirty()
-        {
-            modified = true;
-        }
-
-        public static IEnumerable<AbstractKey> MappableKeys => Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>();
+#if UNITY_EDITOR
+        public IEnumerable<AbstractKey> mappableKeys => Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>();
+#else
+        public IEnumerable<AbstractKey> mappableKeys => Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>()
+            .Where(ak => !inputMapper.keyIsEditor[ak]);
+#endif
 
         private AbstractKey _currentSelectedKey;
 
@@ -48,14 +44,12 @@ namespace Nova
         public void DeleteCompoundKey(int index)
         {
             currentCompoundKeys.RemoveAt(index);
-            MarkDataDirty();
             inputMappingList.Refresh();
         }
 
         public void AddCompoundKey()
         {
             currentCompoundKeys.Add(new CompoundKey());
-            MarkDataDirty();
             var lastEntry = inputMappingList.Refresh();
             StartModifyCompoundKey(lastEntry);
         }
@@ -68,7 +62,7 @@ namespace Nova
         private void Start()
         {
             RefreshData();
-            _currentSelectedKey = MappableKeys.First();
+            _currentSelectedKey = mappableKeys.First();
             abstractKeyList.RefreshAll();
             inputMappingList.Refresh();
             compoundKeyRecorder.Init(this);
@@ -82,14 +76,12 @@ namespace Nova
         private void RefreshData()
         {
             keyboardData = inputMapper.keyboard.Data.GetCopy();
-            modified = false;
         }
 
         public void Apply()
         {
             inputMapper.keyboard.Data = keyboardData;
             inputMapper.Save();
-            modified = false;
         }
 
         public void RestoreAll()
@@ -109,7 +101,6 @@ namespace Nova
         public void ResetDefault()
         {
             keyboardData = inputMapper.GetDefaultKeyboardData();
-            MarkDataDirty();
             inputMappingList.Refresh();
         }
 
@@ -117,7 +108,6 @@ namespace Nova
         {
             keyboardData[currentSelectedKey] = inputMapper.GetDefaultCompoundKeys(currentSelectedKey);
             ResolveDuplicate();
-            MarkDataDirty();
             inputMappingList.Refresh();
         }
 
@@ -126,13 +116,18 @@ namespace Nova
             compoundKeyRecorder.BeginRecording(entry);
         }
 
-        // Remove the compound keys in all abstract keys other than currentSelectedKey
-        // if they are in currentSelectedKey
+        // In all abstract keys other than currentSelectedKey that have any same group as currentSelectedKey,
+        // remove any compound key that is in currentSelectedKey
         public void ResolveDuplicate()
         {
             foreach (var ak in keyboardData.Keys.ToList())
             {
                 if (ak == currentSelectedKey)
+                {
+                    continue;
+                }
+
+                if ((inputMapper.keyGroups[ak] & inputMapper.keyGroups[currentSelectedKey]) == 0)
                 {
                     continue;
                 }

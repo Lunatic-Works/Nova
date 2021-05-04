@@ -43,13 +43,6 @@ namespace Nova
             gameState.RestrainCheckpoint(steps, authorized);
         }
 
-        public void EnsureCheckpoint()
-        {
-            Debug.LogWarning(
-                "Deprecated. We should call EnsureCheckpointOnNextDialogue() in the previous dialogue entry.");
-            gameState.EnsureCheckpoint();
-        }
-
         public void EnsureCheckpointOnNextDialogue()
         {
             gameState.EnsureCheckpointOnNextDialogue();

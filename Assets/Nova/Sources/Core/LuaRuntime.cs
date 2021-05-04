@@ -30,8 +30,8 @@ namespace Nova
             lua.Start();
             LuaBinder.Bind(lua);
             lua.AddSearchPath(Application.dataPath + "/Nova/Lua");
-            // do default includes
-            lua.DoString("require 'requires'");
+
+            InitRequires();
 
             // get the lua load string function
             luaLoadString = lua.GetFunction("loadstring");
@@ -51,6 +51,11 @@ namespace Nova
 
         private LuaState lua;
         private LuaFunction luaLoadString;
+
+        public void InitRequires()
+        {
+            lua.DoString("require 'requires'");
+        }
 
         /// <summary>
         /// Make an object visible in lua.

@@ -316,7 +316,7 @@ namespace Nova
         private void UpdateGameState(bool nodeChanged, bool dialogueChanged, bool firstEntryOfNode,
             bool dialogueStepped)
         {
-            // Debug.LogFormat("UpdateGameState begin {0} {1} {2}", stepNumFromLastCheckpoint, restrainCheckpoint, forceCheckpoint);
+            // Debug.Log($"UpdateGameState begin {currentNode.name} {currentIndex} {stepNumFromLastCheckpoint} {restrainCheckpoint} {forceCheckpoint}");
 
             if (nodeChanged)
             {
@@ -324,7 +324,9 @@ namespace Nova
 
                 if (firstEntryOfNode) EnsureCheckpoint(); // always get a checkpoint at the beginning of the node
 
+                Debug.Log($"NodeChanged.Invoke begin {currentNode.name} {currentIndex} {variables.hash}");
                 NodeChanged?.Invoke(new NodeChangedData(currentNode.name));
+                Debug.Log($"NodeChanged.Invoke end {currentNode.name} {currentIndex} {variables.hash}");
             }
 
             if (dialogueChanged)
@@ -341,6 +343,7 @@ namespace Nova
                 if (gameStateRestoreEntry == null)
                 {
                     // Tell the checkpoint manager a new dialogue entry has been reached
+                    // Debug.Log($"UpdateGameState SetReached {currentNode.name} {currentIndex} {variables.hash}");
                     checkpointManager.SetReached(currentNode.name, currentIndex, variables,
                         GetGameStateStepRestoreEntry());
                 }
@@ -368,7 +371,7 @@ namespace Nova
                     }
                 }
 
-                // As the action for this dialogue will be re-run, it's fine to just reset forceCheckpoint to false
+                // As the action in this dialogue entry will rerun, it's fine to just reset forceCheckpoint to false
                 forceCheckpoint = false;
 
                 DialogueWillChange?.Invoke();
@@ -376,11 +379,13 @@ namespace Nova
                 state = State.ActionRunning;
                 lastVariablesHashBeforeAction = variables.hash;
                 currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
+                Debug.Log($"ExecuteAction begin {currentNode.name} {currentIndex} {variables.hash}");
                 currentDialogueEntry.ExecuteAction();
+                Debug.Log($"ExecuteAction end {currentNode.name} {currentIndex} {variables.hash}");
                 StartCoroutine(WaitActionEnd(gameStateRestoreEntry != null));
             }
 
-            // Debug.LogFormat("UpdateGameState end {0} {1} {2} {3}", stepNumFromLastCheckpoint, restrainCheckpoint, forceCheckpoint, currentDialogueEntry?.displayData.FormatNameDialogue());
+            // Debug.Log($"UpdateGameState end {currentNode.name} {currentIndex} {stepNumFromLastCheckpoint} {restrainCheckpoint} {forceCheckpoint} {currentDialogueEntry?.displayData.FormatNameDialogue()}");
         }
 
         private readonly AdvancedDialogueHelper advancedDialogueHelper = new AdvancedDialogueHelper();
@@ -719,6 +724,7 @@ namespace Nova
             var checkpoint = checkpointManager.IsReached(currentNode.name, currentIndex, variables.hash);
             if (!(checkpoint is GameStateStepRestoreCheckpointEntry))
             {
+                // Debug.Log($"EnsureCheckpoint SetReached {currentNode.name} {currentIndex} {variables.hash}");
                 checkpointManager.SetReached(currentNode.name, currentIndex, variables,
                     GetGameStateStepRestoreEntryRaw());
             }

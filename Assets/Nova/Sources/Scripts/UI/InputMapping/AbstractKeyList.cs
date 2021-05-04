@@ -31,7 +31,7 @@ namespace Nova
         public void RefreshAll()
         {
             ClearContent();
-            foreach (var key in InputMappingController.MappableKeys)
+            foreach (var key in controller.mappableKeys)
             {
                 var go = Instantiate(entryPrefab, content);
                 go.Init(controller, AbstractKeyDisplayName(key), key);
