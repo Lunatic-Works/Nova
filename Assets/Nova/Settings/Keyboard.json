@@ -156,20 +156,9 @@
             "Editor"
         ]
     },
-    "EditorRerunNode": {
-        "Keys": [
-            "Shift+R"
-        ],
-        "Groups": [
-            "Game"
-        ],
-        "Tags": [
-            "Editor"
-        ]
-    },
     "EditorRerunAction": {
         "Keys": [
-            "Alt+R"
+            "F"
         ],
         "Groups": [
             "Game"

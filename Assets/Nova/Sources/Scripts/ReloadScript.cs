@@ -37,7 +37,6 @@ namespace Nova
 
         private void OnNodeChanged(NodeChangedData nodeChangedData)
         {
-            Debug.Log($"ReloadScript OnNodeChanged {nodeChangedData.nodeName} {gameState.variables.hash}");
             currentNodeInitialVariablesHash = gameState.variables.hash;
         }
 
@@ -51,11 +50,6 @@ namespace Nova
             if (inputMapper.GetKeyUp(AbstractKey.EditorReloadScripts))
             {
                 ReloadScripts();
-            }
-
-            if (inputMapper.GetKeyUp(AbstractKey.EditorRerunNode))
-            {
-                RerunNode();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.EditorRerunAction))
@@ -82,22 +76,11 @@ namespace Nova
 
         private void ReloadScripts()
         {
-            if (!gameState) return;
-            NovaAnimation.StopAll();
-            LuaRuntime.Instance.InitRequires();
-            gameState.ReloadScripts();
-        }
-
-        private void RerunNode()
-        {
-            if (!gameState) return;
             NovaAnimation.StopAll();
             var currentNode = gameState.currentNode;
             var currentIndex = gameState.currentIndex;
             SuppressSound(true);
-            Debug.Log($"MoveBackTo {currentNode.name} {currentNodeInitialVariablesHash}");
             gameState.MoveBackTo(currentNode.name, 0, currentNodeInitialVariablesHash, clearFuture: true);
-            LuaRuntime.Instance.InitRequires();
             gameState.ReloadScripts();
 
             // step back to current index
@@ -114,7 +97,6 @@ namespace Nova
 
         private void RerunAction()
         {
-            if (!gameState) return;
             gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex).ExecuteAction();
         }
     }

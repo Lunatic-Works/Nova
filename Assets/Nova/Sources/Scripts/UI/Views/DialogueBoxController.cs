@@ -440,9 +440,13 @@ namespace Nova
             int targetChapterIndex = Array.IndexOf(chapters, currentNodeName) + offset;
             if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Length)
             {
-                NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
+                NovaAnimation.StopAll();
                 gameState.ResetGameState();
                 gameState.GameStart(chapters[targetChapterIndex]);
+            }
+            else
+            {
+                Debug.LogWarning($"Nova: No chapter index {targetChapterIndex}");
             }
         }
 

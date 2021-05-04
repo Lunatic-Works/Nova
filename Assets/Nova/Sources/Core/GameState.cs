@@ -105,12 +105,12 @@ namespace Nova
         }
 
         /// <summary>
-        /// dirty force reload, simply reload all scripts, does not take too much in consideration.
-        /// this method is only used for faster iteration during development, like preview changes in scripts without
-        /// restart the game
+        /// Used for faster iterations during the development, like to preview changes in scripts without restarting the game
+        /// Assume we already moved to the first dialogue entry in the current node, and provided initial variables hash
         /// </summary>
         public void ReloadScripts()
         {
+            LuaRuntime.Instance.InitRequires();
             scriptLoader.ForceInit(scriptPath);
             flowChartTree = scriptLoader.GetFlowChartTree();
             UpdateGameState(true, true, false, false);
@@ -324,9 +324,7 @@ namespace Nova
 
                 if (firstEntryOfNode) EnsureCheckpoint(); // always get a checkpoint at the beginning of the node
 
-                Debug.Log($"NodeChanged.Invoke begin {currentNode.name} {currentIndex} {variables.hash}");
                 NodeChanged?.Invoke(new NodeChangedData(currentNode.name));
-                Debug.Log($"NodeChanged.Invoke end {currentNode.name} {currentIndex} {variables.hash}");
             }
 
             if (dialogueChanged)
@@ -379,9 +377,7 @@ namespace Nova
                 state = State.ActionRunning;
                 lastVariablesHashBeforeAction = variables.hash;
                 currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
-                Debug.Log($"ExecuteAction begin {currentNode.name} {currentIndex} {variables.hash}");
                 currentDialogueEntry.ExecuteAction();
-                Debug.Log($"ExecuteAction end {currentNode.name} {currentIndex} {variables.hash}");
                 StartCoroutine(WaitActionEnd(gameStateRestoreEntry != null));
             }
 

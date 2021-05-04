@@ -20,7 +20,6 @@ namespace Nova
         EditorPreviousChapter,
         EditorNextChapter,
         EditorReloadScripts,
-        EditorRerunNode,
         EditorRerunAction
     }
 
