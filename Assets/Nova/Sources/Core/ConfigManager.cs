@@ -18,7 +18,6 @@ namespace Nova
             public string defaultValue;
         }
 
-        // Please attach this script to NovaGameController game object
         public TextAsset defaultSettingsJson;
 
         private Dictionary<string, SettingDefinition> definitions;

@@ -127,7 +127,7 @@ namespace Nova
 
         public string restorableObjectName => luaName;
 
-        public RestorablePriority priority => RestorablePriority.Timeline;
+        public RestorablePriority priority => RestorablePriority.Early;
 
         public IRestoreData GetRestoreData()
         {

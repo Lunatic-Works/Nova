@@ -494,13 +494,6 @@ namespace Nova
 
         private float perCharacterFadeInDuration => textSpeedConfigReader.perCharacterFadeInDuration;
 
-        private static void SetGraphicAlpha(Graphic g, float alpha)
-        {
-            var c = g.color;
-            c.a = alpha;
-            g.color = c;
-        }
-
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
             // ?. bypasses lifetime check of UnityEngine.Object, but it is fine here
@@ -513,15 +506,15 @@ namespace Nova
             if (this.needAnimation && useDefaultTextAnimation && needAnimation && !gameState.isMovingBack &&
                 state != DialogueBoxState.FastForward)
             {
-                var contentBox = entry.contentBox;
                 var contentProxy = entry.contentProxy;
-                var characterCount = contentBox.textInfo.characterCount;
+                var characterCount = contentProxy.textBox.GetTextInfo(contentProxy.text).characterCount;
 
                 // TODO: sometimes textInfo.characterCount returns 0, use text.Length
-                if (characterCount <= 0)
+                if (characterCount <= 0 && contentProxy.text.Length > 0)
                 {
-                    Debug.LogWarningFormat("characterCount <= 0 {0} {1}", contentBox.text.Length, contentBox.text);
-                    characterCount = contentBox.text.Length;
+                    Debug.LogWarning(
+                        $"characterCount mismatch: {characterCount} {contentProxy.text.Length} {contentProxy.text}");
+                    characterCount = contentProxy.text.Length;
                 }
 
                 float textAnimDuration = perCharacterFadeInDuration * characterCount;
@@ -532,7 +525,7 @@ namespace Nova
                 //      PerCharacterFadeInDuration,
                 //      contentBox.textInfo.characterCount, textAnimDuration, contentBox.text);
 
-                textAnimation.Do(new ActionAnimationProperty(() => SetGraphicAlpha(contentBox, 0))) // hide text
+                textAnimation.Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
                     .Then(null).For(textAnimationDelay)
                     .Then(
                         new TextFadeInAnimationProperty(contentProxy, (byte) (255 * nowTextColor.a)),

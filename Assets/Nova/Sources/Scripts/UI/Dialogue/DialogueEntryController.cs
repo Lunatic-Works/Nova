@@ -25,7 +25,7 @@ namespace Nova
         private VerticalLayoutGroup verticalLayoutGroup;
         private LayoutElement textLayoutElement;
 
-        private bool inited = false;
+        private bool inited;
 
         private void InitReferences()
         {
@@ -90,12 +90,7 @@ namespace Nova
         public string content
         {
             get => contentProxy.text;
-            private set
-            {
-                contentProxy.text = value;
-                // Calculate text length
-                contentBox.ForceMeshUpdate();
-            }
+            private set => contentProxy.text = value;
         }
 
         public string characterName

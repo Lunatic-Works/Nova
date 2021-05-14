@@ -30,7 +30,7 @@ namespace Nova
         private void UpdateValue()
         {
             var value = configManager.GetFloat(configKeyName);
-            if (Mathf.Abs(value - slider.value) < float.Epsilon)
+            if (Mathf.Approximately(value, slider.value))
             {
                 // Eliminate infinite recursion
                 return;

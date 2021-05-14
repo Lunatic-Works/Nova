@@ -6,37 +6,20 @@ namespace Nova
     /// Trivial checkpoint management helper for Nova scripts
     /// </summary>
     [ExportCustomType]
-    public class CheckpointHelper
+    public class CheckpointHelper : MonoBehaviour
     {
-        private GameState _gameState;
+        private GameState gameState;
+        private CheckpointManager checkpointManager;
 
-        private GameState gameState
+        private void Awake()
         {
-            get
-            {
-                if (_gameState == null)
-                {
-                    _gameState = Utils.FindNovaGameController().GameState;
-                }
-
-                return _gameState;
-            }
+            var controller = Utils.FindNovaGameController();
+            gameState = controller.GameState;
+            checkpointManager = controller.CheckpointManager;
+            LuaRuntime.Instance.BindObject("checkpointHelper", this);
         }
 
-        private CheckpointManager _checkpointManager;
-
-        private CheckpointManager checkpointManager
-        {
-            get
-            {
-                if (_checkpointManager == null)
-                {
-                    _checkpointManager = Utils.FindNovaGameController().CheckpointManager;
-                }
-
-                return _checkpointManager;
-            }
-        }
+        public int warningStepNumFromLastCheckpoint => gameState.warningStepNumFromLastCheckpoint;
 
         public void RestrainCheckpoint(int steps, bool authorized = false)
         {

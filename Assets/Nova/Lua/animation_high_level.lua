@@ -23,30 +23,22 @@ function WrapAnim:action(func, ...)
     return self:_do(_action { function() func(unpack(args)) end })
 end
 
-local loop_actions = {}
-
---- For GC
-function clear_loop_actions()
-    loop_actions = {}
-end
-
 --- infinite loop at the end of an animation chain
 --- func: WrapEntry -> WrapEntry
 --- if func returns nil, the loop will end
 make_anim_method('loop', function(self, func)
-    local tail
-    local idx = #loop_actions + 1
+    local loop_action, tail
 
-    loop_actions[idx] = function()
+    loop_action = function()
         local res = func(tail)
         if res == nil then
             return
         end
-        tail = res:action(loop_actions[idx])
+        tail = res:action(loop_action)
         tail.entry.evaluateOnStop = false
     end
 
-    tail = func(self):action(loop_actions[idx])
+    tail = func(self):action(loop_action)
     tail.entry.evaluateOnStop = false
     tail.head = self
     return tail

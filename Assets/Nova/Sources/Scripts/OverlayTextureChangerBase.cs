@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
@@ -90,7 +89,7 @@ namespace Nova
             SetTexture(to, 0f);
         }
 
-        public static List<Vector2> GetTextureOffsetsAlignedOnAnchor(out Vector2 boundingSize,
+        private static List<Vector2> GetTextureOffsetsAlignedOnAnchor(out Vector2 boundingSize,
             out Vector2 boundingAnchor, Texture[] textures, Vector2[] pivots = null)
         {
             var anchorDistances = new Vector4();
@@ -109,10 +108,10 @@ namespace Nova
                     pivot = pivots[i];
                 }
 
-                anchorDistances.x = Math.Max(pivot.x, anchorDistances.x);
-                anchorDistances.y = Math.Max(pivot.y, anchorDistances.y);
-                anchorDistances.z = Math.Max(w - pivot.x, anchorDistances.z);
-                anchorDistances.w = Math.Max(h - pivot.y, anchorDistances.w);
+                anchorDistances.x = Mathf.Max(pivot.x, anchorDistances.x);
+                anchorDistances.y = Mathf.Max(pivot.y, anchorDistances.y);
+                anchorDistances.z = Mathf.Max(w - pivot.x, anchorDistances.z);
+                anchorDistances.w = Mathf.Max(h - pivot.y, anchorDistances.w);
             }
 
             boundingSize = new Vector2(anchorDistances.x + anchorDistances.z, anchorDistances.y + anchorDistances.w);

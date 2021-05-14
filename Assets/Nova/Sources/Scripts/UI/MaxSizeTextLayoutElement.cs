@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -47,7 +46,7 @@ namespace Nova
             get => _maxHeight;
             set
             {
-                if (Math.Abs(_maxHeight - value) < 1e-2) return;
+                if (Mathf.Approximately(_maxHeight, value)) return;
                 _maxHeight = value;
                 SetDirty();
             }
@@ -58,7 +57,7 @@ namespace Nova
             get => _maxWidth;
             set
             {
-                if (Math.Abs(_maxWidth - value) < 1e-2) return;
+                if (Mathf.Approximately(_maxWidth, value)) return;
                 _maxWidth = value;
                 SetDirty();
             }

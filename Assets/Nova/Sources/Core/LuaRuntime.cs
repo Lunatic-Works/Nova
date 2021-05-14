@@ -8,7 +8,9 @@ namespace Nova
     /// </summary>
     public class LuaRuntime : MonoBehaviour
     {
-        private bool isInited = false;
+        private LuaState lua;
+        private LuaFunction luaLoadString;
+        private bool inited;
 
         /// <summary>
         /// Inititialize the lua runtime environment
@@ -19,7 +21,7 @@ namespace Nova
         /// </remarks>
         private void Init()
         {
-            if (isInited)
+            if (inited)
             {
                 return;
             }
@@ -41,20 +43,17 @@ namespace Nova
                 luaLoadString = lua.GetFunction("load");
             }
 
-            isInited = true;
+            inited = true;
         }
-
-        private void CheckInit()
-        {
-            this.RuntimeAssert(isInited, "LuaRuntime methods should be called after Init().");
-        }
-
-        private LuaState lua;
-        private LuaFunction luaLoadString;
 
         public void InitRequires()
         {
             lua.DoString("require 'requires'");
+        }
+
+        private void CheckInit()
+        {
+            this.RuntimeAssert(inited, "LuaRuntime methods should be called after Init().");
         }
 
         /// <summary>
@@ -141,7 +140,7 @@ namespace Nova
                 {
                     if (_instance == null)
                     {
-                        _instance = (LuaRuntime) FindObjectOfType(typeof(LuaRuntime));
+                        _instance = (LuaRuntime)FindObjectOfType(typeof(LuaRuntime));
 
                         if (FindObjectsOfType(typeof(LuaRuntime)).Length > 1)
                         {

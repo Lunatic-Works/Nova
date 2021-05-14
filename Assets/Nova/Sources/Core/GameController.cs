@@ -10,9 +10,9 @@ namespace Nova
     {
         public GameState GameState { get; private set; }
         public CheckpointManager CheckpointManager { get; private set; }
-        public FancyCursor FancyCursor { get; private set; }
         public ConfigManager ConfigManager { get; private set; }
         public InputMapper InputMapper { get; private set; }
+        public FancyCursor FancyCursor { get; private set; }
         public NovaAnimation PersistAnimation { get; private set; }
         public NovaAnimation PerDialogueAnimation { get; private set; }
 
@@ -20,9 +20,9 @@ namespace Nova
         {
             GameState = FindComponent<GameState>();
             CheckpointManager = FindComponent<CheckpointManager>();
-            FancyCursor = FindComponent<FancyCursor>();
             ConfigManager = FindComponent<ConfigManager>();
             InputMapper = FindComponent<InputMapper>();
+            FancyCursor = FindComponent<FancyCursor>();
             PerDialogueAnimation = FindComponent<NovaAnimation>("NovaAnimation/PerDialogue");
             PersistAnimation = FindComponent<NovaAnimation>("NovaAnimation/Persistent");
         }

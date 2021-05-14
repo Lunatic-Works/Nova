@@ -663,7 +663,7 @@ namespace Nova
             }
             catch (ArgumentException ex)
             {
-                throw new ArgumentException("Nova: a restorable should have an unique and not null name", ex);
+                throw new ArgumentException("Nova: a restorable should have an unique and non-null name", ex);
             }
         }
 
@@ -682,6 +682,8 @@ namespace Nova
         /// At least one checkpoint will be saved every maxStepNumFromLastCheckpoint, except during persistent animations.
         /// </summary>
         public int maxStepNumFromLastCheckpoint = 10;
+
+        public readonly int warningStepNumFromLastCheckpoint = 100;
 
         private int stepNumFromLastCheckpoint;
 
@@ -720,7 +722,6 @@ namespace Nova
             var checkpoint = checkpointManager.IsReached(currentNode.name, currentIndex, variables.hash);
             if (!(checkpoint is GameStateStepRestoreCheckpointEntry))
             {
-                // Debug.Log($"EnsureCheckpoint SetReached {currentNode.name} {currentIndex} {variables.hash}");
                 checkpointManager.SetReached(currentNode.name, currentIndex, variables,
                     GetGameStateStepRestoreEntryRaw());
             }
@@ -785,7 +786,8 @@ namespace Nova
 
             variables.CopyFrom(restoreDatas.variables);
 
-            foreach (var restorable in from entry in restorables
+            foreach (var restorable in
+                from entry in restorables
                 orderby (entry.Value as IPrioritizedRestorable)?.priority ?? RestorablePriority.Normal descending
                 select entry)
             {

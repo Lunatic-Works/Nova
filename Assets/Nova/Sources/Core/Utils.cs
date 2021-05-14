@@ -71,11 +71,11 @@ namespace Nova
             float contentAspectRatio = 1.0f * contentSize.x / contentSize.y;
             if (contentAspectRatio > containerAspectRatio)
             {
-                return new Vector2Int(contentSize.x, (int) (contentSize.x / containerAspectRatio));
+                return new Vector2Int(contentSize.x, (int)(contentSize.x / containerAspectRatio));
             }
             else
             {
-                return new Vector2Int((int) (contentSize.y * containerAspectRatio), contentSize.y);
+                return new Vector2Int((int)(contentSize.y * containerAspectRatio), contentSize.y);
             }
         }
 
@@ -442,7 +442,7 @@ namespace Nova
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            int position = (int) (Position % xorCodes.Length);
+            int position = (int)(Position % xorCodes.Length);
             int ret = realStream.Read(buffer, offset, count);
             for (int i = 0; i < count; i++)
             {
@@ -465,10 +465,10 @@ namespace Nova
         public override void Write(byte[] buffer, int offset, int count)
         {
             byte[] buf = new byte[count];
-            int position = (int) (Position % xorCodes.Length);
+            int position = (int)(Position % xorCodes.Length);
             for (int i = 0; i < count; i++)
             {
-                buf[i] = (byte) (buffer[i + offset] ^ xorCodes[(position + i) % xorCodes.Length]);
+                buf[i] = (byte)(buffer[i + offset] ^ xorCodes[(position + i) % xorCodes.Length]);
             }
 
             realStream.Write(buf, 0, count);

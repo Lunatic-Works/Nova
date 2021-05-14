@@ -14,7 +14,8 @@ namespace Nova
             return c >= 0x4e00 && c <= 0x9fff;
         }
 
-        private TMP_Text textBox;
+        public TMP_Text textBox;
+
         private bool inited;
         private bool needRefreshLineBreak;
         private bool needRefreshFade;
@@ -97,7 +98,7 @@ namespace Nova
             get => textBox.fontSize;
             set
             {
-                if (textBox.fontSize == value) return;
+                if (Mathf.Approximately(textBox.fontSize, value)) return;
                 textBox.fontSize = value;
                 needRefreshLineBreak = true;
             }
@@ -181,7 +182,7 @@ namespace Nova
             textBox.text = text;
         }
 
-        private void SetTextAlpha(byte a)
+        public void SetTextAlpha(byte a)
         {
             Color32 color = textBox.color;
             color.a = a;

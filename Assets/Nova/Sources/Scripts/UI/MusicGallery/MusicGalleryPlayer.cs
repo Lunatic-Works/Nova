@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -148,8 +147,7 @@ namespace Nova
             Assert.IsTrue(isPlaying);
             // out of sync also happens when the application lost focus
             // check the time to ensure the clip has finished playing
-            if (Math.Abs(audioSource.time) < float.Epsilon ||
-                Math.Abs(audioSource.time - audioSource.clip.length) < float.Epsilon)
+            if (audioSource.time < float.Epsilon || Mathf.Approximately(audioSource.time, audioSource.clip.length))
             {
                 Step();
             }

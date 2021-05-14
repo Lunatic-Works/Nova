@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nova.Exceptions;
+using System;
 using System.Collections.Generic;
 using LuaInterface;
 using UnityEngine;
@@ -59,9 +60,7 @@ namespace Nova
         public readonly Dictionary<SystemLanguage, string> dialogues = new Dictionary<SystemLanguage, string>();
 
         /// <value>
-        /// The action to execute when the game processes to this point. The action can contain everything
-        /// you want, like showing amazing VFX, changing BGM, or making the character smile or cry, as long as
-        /// you can imagine.
+        /// The action to execute when the game processes to this point.
         /// </value>
         private readonly LuaFunction action;
 
@@ -92,7 +91,7 @@ namespace Nova
                 }
                 catch (LuaException ex)
                 {
-                    throw new Exceptions.ScriptActionException(
+                    throw new ScriptActionException(
                         $"Nova: Exception occurred when executing action: {I18n.__(dialogues)}", ex);
                 }
             }

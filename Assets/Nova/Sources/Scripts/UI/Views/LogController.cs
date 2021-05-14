@@ -200,7 +200,7 @@ namespace Nova
         {
             base.OnActivatedUpdate();
 
-            if (Input.mouseScrollDelta.y < 0 && Math.Abs(scrollRect.verticalScrollbar.value) < 1e-6)
+            if (Input.mouseScrollDelta.y < 0 && Mathf.Approximately(scrollRect.verticalScrollbar.value, 0f))
             {
                 Hide();
             }

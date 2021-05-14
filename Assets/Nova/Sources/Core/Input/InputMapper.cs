@@ -21,7 +21,8 @@ namespace Nova
         private KeyStatus keyStatus = new KeyStatus();
         private KeyStatus keyStatusLastFrame = new KeyStatus();
         private KeyStatus keyEnabled = new KeyStatus();
-        private readonly KeyStatus keyTriggered = new KeyStatus();
+        private readonly KeyStatus keyDownWhenEnabled = new KeyStatus();
+        private readonly KeyStatus keyDownToBeCleared = new KeyStatus();
 
         public readonly AbstractKeyboard keyboard = new AbstractKeyboard();
         public readonly AbstractKeyGroups keyGroups = new AbstractKeyGroups();
@@ -34,6 +35,8 @@ namespace Nova
         public void SetEnable(AbstractKey key, bool value)
         {
             keyEnabled[key] = value;
+            keyDownWhenEnabled[key] = false;
+            keyDownToBeCleared[key] = false;
         }
 
         public bool IsEnabled(AbstractKey key)
@@ -135,7 +138,8 @@ namespace Nova
                 keyStatus[key] = false;
                 keyStatusLastFrame[key] = false;
                 keyEnabled[key] = true;
-                keyTriggered[key] = false;
+                keyDownWhenEnabled[key] = false;
+                keyDownToBeCleared[key] = false;
             }
         }
 
@@ -144,28 +148,22 @@ namespace Nova
             Save();
         }
 
-        // Trigger at most one time in each frame
         public bool GetKey(AbstractKey key)
         {
             if (!IsEnabled(key)) return false;
-            if (keyTriggered[key]) return false;
-            keyTriggered[key] = true;
             return keyStatus[key];
         }
 
         public bool GetKeyDown(AbstractKey key)
         {
             if (!IsEnabled(key)) return false;
-            if (keyTriggered[key]) return false;
-            keyTriggered[key] = true;
             return !keyStatusLastFrame[key] && keyStatus[key];
         }
 
         public bool GetKeyUp(AbstractKey key)
         {
             if (!IsEnabled(key)) return false;
-            if (keyTriggered[key]) return false;
-            keyTriggered[key] = true;
+            if (!keyDownWhenEnabled[key]) return false;
             return keyStatusLastFrame[key] && !keyStatus[key];
         }
 
@@ -188,7 +186,22 @@ namespace Nova
             foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
                 keyStatus[key] = keyDevices.Any(device => device.GetKey(key));
-                keyTriggered[key] = false;
+
+                if (keyDownToBeCleared[key])
+                {
+                    keyDownToBeCleared[key] = false;
+                    keyDownWhenEnabled[key] = false;
+                }
+
+                if (GetKeyDown(key))
+                {
+                    keyDownWhenEnabled[key] = true;
+                }
+
+                if (GetKeyUp(key))
+                {
+                    keyDownToBeCleared[key] = true;
+                }
             }
         }
     }

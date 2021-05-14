@@ -226,6 +226,21 @@ namespace Nova
             DestroyEntry(this);
         }
 
+        // Remove without evaluating
+        public void Remove()
+        {
+            if (isStopped) return;
+
+            status = AnimationEntryStatus.Stopped;
+
+            foreach (Transform child in Utils.GetChildren(transform))
+            {
+                child.GetComponent<AnimationEntry>().Remove();
+            }
+
+            DestroyEntry(this);
+        }
+
         #endregion
 
         private void Terminate()

@@ -16,7 +16,7 @@ namespace Nova
     public class ScriptLoader
     {
         // Variable indicating whether the script loader is initialized
-        private bool isInited = false;
+        private bool inited;
 
         /// <summary>
         /// Initialize the script loader. This method will load all text asset files in the given folder, parse all the
@@ -31,14 +31,14 @@ namespace Nova
         /// </param>
         public void Init(string path)
         {
-            if (isInited)
+            if (inited)
             {
                 return;
             }
 
             ForceInit(path);
 
-            isInited = true;
+            inited = true;
         }
 
         private FlowChartTree flowChartTree;
@@ -80,7 +80,14 @@ namespace Nova
                 var scripts = Resources.LoadAll(localizedPath, typeof(TextAsset)).Cast<TextAsset>().ToArray();
                 foreach (var script in scripts)
                 {
-                    ParseScript(script.text);
+                    try
+                    {
+                        ParseScript(script.text);
+                    }
+                    catch (ScriptParseException exception)
+                    {
+                        throw new ScriptParseException($"Failed to parse {script.name}", exception);
+                    }
                 }
             }
 
@@ -96,7 +103,7 @@ namespace Nova
 
         private void CheckInit()
         {
-            Assert.IsTrue(isInited, "Nova: ScriptLoader methods should be called after Init().");
+            Assert.IsTrue(inited, "Nova: ScriptLoader methods should be called after Init().");
         }
 
         /// <summary>

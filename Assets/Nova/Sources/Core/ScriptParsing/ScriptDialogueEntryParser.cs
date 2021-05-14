@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nova.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -211,7 +212,7 @@ namespace Nova
                     action = LuaRuntime.Instance.WrapClosure(combinedCode);
                     if (action == null)
                     {
-                        throw new Exceptions.ScriptParseException(
+                        throw new ScriptParseException(
                             $"Syntax error while parsing lazy execution block:\nText: {text}\nCode: {combinedCode}");
                     }
                 }

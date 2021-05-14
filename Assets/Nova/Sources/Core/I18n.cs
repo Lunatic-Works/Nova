@@ -55,7 +55,7 @@ namespace Nova
 
         public static readonly UnityEvent LocaleChanged = new UnityEvent();
 
-        private static bool Inited = false;
+        private static bool Inited;
 
         private static void Init()
         {

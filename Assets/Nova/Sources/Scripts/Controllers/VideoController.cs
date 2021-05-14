@@ -5,7 +5,7 @@ using UnityEngine.Video;
 namespace Nova
 {
     [ExportCustomType]
-    public class VideoController : MonoBehaviour, IPrioritizedRestorable
+    public class VideoController : MonoBehaviour, IRestorable
     {
         public string luaName;
         public string videoFolder;
@@ -77,8 +77,6 @@ namespace Nova
         }
 
         public string restorableObjectName => luaName;
-
-        public RestorablePriority priority => RestorablePriority.Normal;
 
         public IRestoreData GetRestoreData()
         {

@@ -8,7 +8,7 @@
     public enum RestorablePriority
     {
         Normal = 0,
-        Timeline = 1,
+        Early = 1,
         Preload = 2
     }
 }
