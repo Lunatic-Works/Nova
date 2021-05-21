@@ -1,0 +1,53 @@
+@<|
+label 'test_global_variable'
+is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+-- 为了防止玩家每次读档到最后一条对话时都加一周目，在第一条对话时把全局变量round_count加1，然后保存到局部变量里
+-- 在这一周目里，无论玩家怎么读档/回跳，局部变量round_count都是这一周目开始时的全局变量round_count + 1
+-- 如果读档到其他周目，局部变量round_count也不会超过全局变量round_count
+-- 最开始时gv('round_count')会返回nil，这时用or 0把它换成0
+v('round_count', (gv('round_count') or 0) + 1)
+|>
+测试全局变量
+
+111
+
+222
+
+<|
+gv('count', (gv('count') or 0) + 1)
+print(gv('count'))
+|>
+Console中会输出这句话进行了多少次
+每次读档/回跳到这里时都会加一次
+
+333
+
+444
+@<|
+branch {
+    { dest = 'test_global_variable_next', text = '普通的选项'},
+    { dest = 'test_global_variable_next', text = '二周目才会出现', mode = 'show', cond = "v('round_count') >= 2" },
+}
+|>
+
+@<| label 'test_global_variable_next' |>
+555
+
+666
+
+<|
+-- 如果局部变量round_count比全局变量大，就表示一个新的周目结束了，把它保存到全局变量里
+if v('round_count') > (gv('round_count') or 0) then
+    gv('round_count', v('round_count'))
+end
+print(gv('round_count'))
+|>
+Console中会输出进行了多少周目
+
+测试结束
+@<| is_end() |>

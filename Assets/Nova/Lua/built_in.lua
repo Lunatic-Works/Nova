@@ -204,7 +204,32 @@ function v(name, value)
         elseif type(value) == 'string' then
             __Nova.variables:Set(name, Nova.VariableType.String, value)
         else
-            warn('variable can be boolean, number, or string only, but found ' .. tostring(value))
+            warn('variable can only be boolean, number, or string, but found ' .. tostring(value))
+        end
+    end
+end
+
+function gv(name, value)
+    if value == nil then
+        local entry = __Nova.checkpointHelper:GetGlobalVariable(name)
+        if entry == nil then
+            return nil
+        elseif entry.type == Nova.VariableType.Boolean then
+            return toboolean(entry.value)
+        elseif entry.type == Nova.VariableType.Number then
+            return tonumber(entry.value)
+        else -- entry.type == Nova.VariableType.String
+            return entry.value
+        end
+    else
+        if type(value) == 'boolean' then
+            __Nova.checkpointHelper:SetGlobalVariable(name, Nova.VariableType.Boolean, tostring(value))
+        elseif type(value) == 'number' then
+            __Nova.checkpointHelper:SetGlobalVariable(name, Nova.VariableType.Number, tostring(value))
+        elseif type(value) == 'string' then
+            __Nova.checkpointHelper:SetGlobalVariable(name, Nova.VariableType.String, value)
+        else
+            warn('variable can only be boolean, number, or string, but found ' .. tostring(value))
         end
     end
 end
