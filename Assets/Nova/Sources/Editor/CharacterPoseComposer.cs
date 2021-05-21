@@ -55,7 +55,7 @@ namespace Nova.Editor
         {
             root = new GameObject("PoseComposerDummy")
             {
-                hideFlags = HideFlags.HideAndDontSave
+                hideFlags = HideFlags.DontSave
             };
             root.SetActive(true);
             merger = root.AddComponent<CharacterTextureMerger>();

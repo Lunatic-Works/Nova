@@ -21,10 +21,10 @@ namespace Nova.Editor
             if (gameObject == null)
             {
                 gameObject = EditorUtility.CreateGameObjectWithHideFlags(
-                    AudioPreviewerName, HideFlags.HideAndDontSave, typeof(AudioLooperOld)
+                    AudioPreviewerName, HideFlags.DontSave, typeof(AudioLooperOld)
                 );
                 var gameObject2 = EditorUtility.CreateGameObjectWithHideFlags(
-                    AudioPreviewerName + "2", HideFlags.HideAndDontSave, typeof(AudioSource)
+                    AudioPreviewerName + "2", HideFlags.DontSave, typeof(AudioSource)
                 );
                 gameObject2.transform.SetParent(gameObject.transform);
             }
