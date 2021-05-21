@@ -174,8 +174,6 @@ namespace Nova
         /// </summary>
         private bool actionIsRunning => state == State.ActionRunning;
 
-        #endregion
-
         /// <summary>
         /// Reset GameState, make it the same as the game not start
         /// </summary>
@@ -197,9 +195,11 @@ namespace Nova
             // Restore scene
             if (checkpointManager.clearSceneRestoreEntry != null)
             {
-                RestoreRaw(checkpointManager.clearSceneRestoreEntry);
+                RestoreCheckpoint(checkpointManager.clearSceneRestoreEntry);
             }
         }
+
+        #endregion
 
         #region Events
 
@@ -343,11 +343,11 @@ namespace Nova
                     // Tell the checkpoint manager a new dialogue entry has been reached
                     // Debug.Log($"UpdateGameState SetReached {currentNode.name} {currentIndex} {variables.hash}");
                     checkpointManager.SetReached(currentNode.name, currentIndex, variables,
-                        GetGameStateStepRestoreEntry());
+                        GetRestoreEntry());
                 }
 
                 // Change states after creating or restoring from checkpoint
-                if (shouldSaveRealCheckpoint)
+                if (shouldSaveCheckpoint)
                 {
                     stepNumFromLastCheckpoint = 0;
                 }
@@ -491,7 +491,7 @@ namespace Nova
             // Save a clean state of game scene
             if (checkpointManager.clearSceneRestoreEntry == null)
             {
-                checkpointManager.clearSceneRestoreEntry = GetGameStateStepRestoreEntryRaw();
+                checkpointManager.clearSceneRestoreEntry = GetCheckpoint();
             }
         }
 
@@ -640,7 +640,7 @@ namespace Nova
             MoveToNextNode(nextNode);
         }
 
-        #region Manage restorables
+        #region Restoration
 
         /// <summary>
         /// All restorable objects
@@ -720,10 +720,10 @@ namespace Nova
             if (checkpointRestrained) return;
             stepNumFromLastCheckpoint = 0;
             var checkpoint = checkpointManager.IsReached(currentNode.name, currentIndex, variables.hash);
-            if (!(checkpoint is GameStateStepRestoreCheckpointEntry))
+            if (!(checkpoint is GameStateCheckpoint))
             {
                 checkpointManager.SetReached(currentNode.name, currentIndex, variables,
-                    GetGameStateStepRestoreEntryRaw());
+                    GetCheckpoint());
             }
         }
 
@@ -734,12 +734,10 @@ namespace Nova
 
         public void EnsureCheckpointOnNextDialogue()
         {
-            // Debug.Log("EnsureCheckpointOnNextDialogue");
-
             forceCheckpoint = true;
         }
 
-        private bool shouldSaveRealCheckpoint => forceCheckpoint ||
+        private bool shouldSaveCheckpoint => forceCheckpoint ||
                                                  (!checkpointRestrained && stepNumFromLastCheckpoint >=
                                                      maxStepNumFromLastCheckpoint);
 
@@ -747,7 +745,7 @@ namespace Nova
         /// Force to get the current game state as a checkpoint
         /// </summary>
         /// <returns>current game state checkpoint</returns>
-        private GameStateStepRestoreCheckpointEntry GetGameStateStepRestoreEntryRaw()
+        private GameStateCheckpoint GetCheckpoint()
         {
             var restoreDatas = new Dictionary<string, IRestoreData>();
             foreach (var restorable in restorables)
@@ -756,28 +754,26 @@ namespace Nova
             }
 
             lastCheckpointVariablesHash = variables.hash;
-            // Debug.Log($"Nova: Saving checkpoint and setting lastCheckpointVariablesHash = {lastCheckpointVariablesHash}");
-            return new GameStateStepRestoreCheckpointEntry(restoreDatas, variables, restrainCheckpoint);
+            return new GameStateCheckpoint(restoreDatas, variables, restrainCheckpoint);
         }
 
         /// <summary>
         /// Get all restore data from registered restorables
         /// </summary>
         /// <returns>a game state step restore entry that contains all restore datas for the current dialogue</returns>
-        private GameStateStepRestoreEntry GetGameStateStepRestoreEntry()
+        private GameStateRestoreEntry GetRestoreEntry()
         {
-            if (shouldSaveRealCheckpoint)
+            if (shouldSaveCheckpoint)
             {
-                return GetGameStateStepRestoreEntryRaw();
+                return GetCheckpoint();
             }
 
-            return new GameStateStepRestoreSimpleEntry(stepNumFromLastCheckpoint, restrainCheckpoint,
+            return new GameStateSimpleEntry(stepNumFromLastCheckpoint, restrainCheckpoint,
                 lastCheckpointVariablesHash);
         }
 
-        private void RestoreRaw(GameStateStepRestoreCheckpointEntry restoreDatas)
+        private void RestoreCheckpoint(GameStateCheckpoint restoreDatas)
         {
-            // Debug.Log($"Nova: Restoring checkpoint from varhash = {restoreDatas.variables.hash}");
             Assert.IsNotNull(restoreDatas);
 
             stepNumFromLastCheckpoint = 0;
@@ -829,7 +825,7 @@ namespace Nova
             }
 
             // The following code won't be frequently executed, since there is always a checkpoint at the
-            // start of the node, and the steps stored in GameStateStepRestoreEntry never steps across node
+            // start of the node, and the steps stored in GameStateRestoreEntry never steps across node
             // boundary.
 
             steps -= currentIndex;
@@ -854,20 +850,16 @@ namespace Nova
         /// <summary>
         /// Restore all restorables. The lazy execution block in the target entry will be executed again.
         /// </summary>
-        /// <param name="restoreDatas">restore datas</param>
-        private void Restore(GameStateStepRestoreEntry restoreDatas)
+        /// <param name="restoreData">restore data</param>
+        private void Restore(GameStateRestoreEntry restoreData)
         {
-            // Debug.LogFormat("Steps from last ckpt: {0}", restoreDatas.stepNumFromLastCheckpoint);
-
-            if (restoreDatas is GameStateStepRestoreCheckpointEntry checkpointEntry)
+            if (restoreData is GameStateCheckpoint checkpointEntry)
             {
-                RestoreRaw(checkpointEntry);
+                RestoreCheckpoint(checkpointEntry);
                 UpdateGameState(true, true, false, false);
             }
-            else if (restoreDatas is GameStateStepRestoreSimpleEntry simpleEntry)
+            else if (restoreData is GameStateSimpleEntry simpleEntry)
             {
-                // Debug.Log($"Nova: Restoring simple entry from lastCheckpointVariablesHash = {simpleEntry.lastCheckpointVariablesHash}");
-
                 if (!SeekBackStep(simpleEntry.stepNumFromLastCheckpoint, out string storedNode,
                     out int storedDialogueIndex))
                 {
@@ -891,7 +883,7 @@ namespace Nova
             }
             else
             {
-                throw new ArgumentException($"Nova: {restoreDatas} is not supported.");
+                throw new ArgumentException($"Nova: {restoreData} is not supported.");
             }
         }
 

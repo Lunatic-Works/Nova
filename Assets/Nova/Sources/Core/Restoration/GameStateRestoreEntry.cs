@@ -9,12 +9,12 @@ namespace Nova
     /// </summary>
     /// <remarks>
     /// Due to the design of the Nova script syntax, the status of objects at each step can only be known at runtime.
-    /// To implement back step functionality, the game state object should know all the GameStateStepRestoreEntry at
+    /// To implement back step functionality, the game state object should know all the GameStateRestoreEntry at
     /// each step to perform a back step. To make the back step functionality still work after loading from
-    /// a checkpoint, the CheckpointManager should store all the GameStateStepRestoreEntry for walked passed dialogues.
+    /// a checkpoint, the CheckpointManager should store all the GameStateRestoreEntry for walked passed dialogues.
     /// </remarks>
     [Serializable]
-    public abstract class GameStateStepRestoreEntry
+    public abstract class GameStateRestoreEntry
     {
         /// <summary>
         /// this value is guaranteed to be non-negative.
@@ -28,7 +28,7 @@ namespace Nova
         /// </summary>
         public readonly int restrainCheckpointNum;
 
-        protected GameStateStepRestoreEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum)
+        protected GameStateRestoreEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum)
         {
             this.stepNumFromLastCheckpoint = stepNumFromLastCheckpoint;
             this.restrainCheckpointNum = restrainCheckpointNum;
@@ -36,13 +36,13 @@ namespace Nova
     }
 
     [Serializable]
-    public class GameStateStepRestoreCheckpointEntry : GameStateStepRestoreEntry
+    public class GameStateCheckpoint : GameStateRestoreEntry
     {
         private readonly Dictionary<string, IRestoreData> restoreDatas;
 
         public readonly Variables variables;
 
-        public GameStateStepRestoreCheckpointEntry(Dictionary<string, IRestoreData> restoreDatas, Variables variables,
+        public GameStateCheckpoint(Dictionary<string, IRestoreData> restoreDatas, Variables variables,
             int restrainCheckpointNum)
             : base(0, restrainCheckpointNum)
         {
@@ -55,11 +55,11 @@ namespace Nova
     }
 
     [Serializable]
-    public class GameStateStepRestoreSimpleEntry : GameStateStepRestoreEntry
+    public class GameStateSimpleEntry : GameStateRestoreEntry
     {
         public readonly string lastCheckpointVariablesHash;
 
-        public GameStateStepRestoreSimpleEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum,
+        public GameStateSimpleEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum,
             string lastCheckpointVariablesHash)
             : base(stepNumFromLastCheckpoint, restrainCheckpointNum)
         {

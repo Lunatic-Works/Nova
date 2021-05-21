@@ -15,7 +15,7 @@ function say(obj, audio_name, delay, override_auto_voice)
     end
     obj:Say(audio_name, delay)
     if override_auto_voice then
-        auto_voice_overridden = true
+        auto_voice_skip()
     end
 end
 

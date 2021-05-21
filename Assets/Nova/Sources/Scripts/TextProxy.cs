@@ -14,7 +14,7 @@ namespace Nova
             return c >= 0x4e00 && c <= 0x9fff;
         }
 
-        public TMP_Text textBox;
+        [HideInInspector] public TMP_Text textBox;
 
         private bool inited;
         private bool needRefreshLineBreak;

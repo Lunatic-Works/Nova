@@ -2293,10 +2293,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 871599196}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: acd55bfa7ef7c39489eedaa27f8bebb9, type: 3}
+  m_Script: {fileID: 11500000, guid: d7666a094a8862245a246b20ba3b3f44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  luaGlobalName: auto_voice_config
+  luaName: autoVoice
   autoVoiceConfigs:
   - characterName: "\u738B\u4E8C\u5BAB"
     characterController: {fileID: 537562888}
@@ -2313,6 +2313,7 @@ MonoBehaviour:
   - characterName: "\uFF1F\uFF1F\uFF1F"
     characterController: {fileID: 1839185672}
     prefix: 
+  padWidth: 2
 --- !u!4 &880587543 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5683051339407815765, guid: 496f273ceaa70f846a7fc9cc4d92372f,

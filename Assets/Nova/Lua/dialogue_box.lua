@@ -53,7 +53,7 @@ function box_alignment(mode)
 end
 
 function box_text_color(color)
-    if color and color ~= '' then
+    if color then
         __Nova.dialogueBoxController.textColorHasSet = true
         __Nova.dialogueBoxController.textColor = parse_color(color)
     else

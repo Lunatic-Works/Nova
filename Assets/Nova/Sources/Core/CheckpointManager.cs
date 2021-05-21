@@ -46,12 +46,12 @@ namespace Nova
     [Serializable]
     public class NodeSaveInfo
     {
-        public readonly Dictionary<int, GameStateStepRestoreEntry> dialogueRestoreEntries;
+        public readonly Dictionary<int, GameStateRestoreEntry> dialogueRestoreEntries;
         public readonly SerializableHashSet<string> reachedBranches;
 
         public NodeSaveInfo()
         {
-            dialogueRestoreEntries = new Dictionary<int, GameStateStepRestoreEntry>();
+            dialogueRestoreEntries = new Dictionary<int, GameStateRestoreEntry>();
             reachedBranches = new SerializableHashSet<string>();
         }
     }
@@ -224,7 +224,7 @@ namespace Nova
         public string saveFolder = "";
         public Dictionary<int, BookmarkMetadata> saveSlotsMetadata { get; private set; }
 
-        [HideInInspector] public GameStateStepRestoreCheckpointEntry clearSceneRestoreEntry;
+        [HideInInspector] public GameStateCheckpoint clearSceneRestoreEntry;
 
         /// <summary>
         /// Initialization of members which are unlikely to change in the future
@@ -316,7 +316,7 @@ namespace Nova
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <param name="variables">Current variables.</param>
         /// <param name="entry">Restore entry for the dialogue</param>
-        public void SetReached(string nodeName, int dialogueIndex, Variables variables, GameStateStepRestoreEntry entry)
+        public void SetReached(string nodeName, int dialogueIndex, Variables variables, GameStateRestoreEntry entry)
         {
             globalSave.savedNodesByVariablesHash.Ensure(variables.hash).Ensure(nodeName)
                 .dialogueRestoreEntries[dialogueIndex] = entry;
@@ -368,7 +368,7 @@ namespace Nova
         /// <param name="nodeName">The name of FlowChartNode containing the dialogue.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateStepRestoreEntry IsReachedForAnyVariables(string nodeName, int dialogueIndex)
+        public GameStateRestoreEntry IsReachedForAnyVariables(string nodeName, int dialogueIndex)
         {
             // If reading global save file fails, globalSave.savedNodesByVariablesHash will be null
             if (globalSave?.savedNodesByVariablesHash == null)
@@ -379,7 +379,7 @@ namespace Nova
             foreach (var dict in globalSave.savedNodesByVariablesHash.Values)
             {
                 if (dict.TryGetValue(nodeName, out NodeSaveInfo info) &&
-                    info.dialogueRestoreEntries.TryGetValue(dialogueIndex, out GameStateStepRestoreEntry entry))
+                    info.dialogueRestoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
                     return entry;
             }
 
@@ -393,10 +393,10 @@ namespace Nova
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <param name="variablesHash">Hash of current variables.</param>
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateStepRestoreEntry IsReached(string nodeName, int dialogueIndex, string variablesHash)
+        public GameStateRestoreEntry IsReached(string nodeName, int dialogueIndex, string variablesHash)
         {
             if (globalSave.savedNodesByVariablesHash.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
-                if (info.dialogueRestoreEntries.TryGetValue(dialogueIndex, out GameStateStepRestoreEntry entry))
+                if (info.dialogueRestoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
                     return entry;
             return null;
         }

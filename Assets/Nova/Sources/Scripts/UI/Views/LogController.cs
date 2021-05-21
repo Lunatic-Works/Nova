@@ -88,7 +88,7 @@ namespace Nova
         private void AddEntry(InitParams initParams)
         {
             if (checkpointManager.IsReached(initParams.currentNodeName, initParams.currentDialogueIndex,
-                initParams.variablesHashBeforeChange) is GameStateStepRestoreCheckpointEntry)
+                initParams.variablesHashBeforeChange) is GameStateCheckpoint)
             {
                 lastCheckpointLogParamsRef = initParams;
             }
@@ -261,7 +261,7 @@ namespace Nova
 
                 var lastParams = curr.logParams[0];
                 var entry = checkpointManager.IsReached(lastParams.currentNodeName, lastParams.currentDialogueIndex,
-                    lastParams.variablesHashBeforeChange) as GameStateStepRestoreCheckpointEntry;
+                    lastParams.variablesHashBeforeChange) as GameStateCheckpoint;
                 this.RuntimeAssert(entry != null,
                     "the earliest log in each restore data must be pointing at another checkpoint");
                 curr = entry[restorableObjectName] as LogControllerRestoreData;

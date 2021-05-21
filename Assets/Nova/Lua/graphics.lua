@@ -19,10 +19,10 @@ function show(obj, image_name, coord, color, fade)
     if fade == nil then
         fade = (auto_fade_off_count == 0)
     end
-    if coord and coord ~= '' then
+    if coord then
         move(obj, coord)
     end
-    if color and color ~= '' then
+    if color then
         tint(obj, color)
     end
     if type(image_name) == 'table' then

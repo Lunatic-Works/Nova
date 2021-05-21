@@ -29,7 +29,7 @@ namespace Nova
             }
         }
 
-        public void OnDestroy()
+        private void OnDestroy()
         {
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
