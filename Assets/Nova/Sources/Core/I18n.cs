@@ -35,7 +35,13 @@ namespace Nova
             get => _currentLocale;
             set
             {
-                _currentLocale = FallbackLocale(value);
+                value = FallbackLocale(value);
+                if (value == _currentLocale)
+                {
+                    return;
+                }
+
+                _currentLocale = value;
                 LocaleChanged.Invoke();
             }
         }

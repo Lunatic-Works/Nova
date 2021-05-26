@@ -738,8 +738,8 @@ namespace Nova
         }
 
         private bool shouldSaveCheckpoint => forceCheckpoint ||
-                                                 (!checkpointRestrained && stepNumFromLastCheckpoint >=
-                                                     maxStepNumFromLastCheckpoint);
+                                             (!checkpointRestrained && stepNumFromLastCheckpoint >=
+                                                 maxStepNumFromLastCheckpoint);
 
         /// <summary>
         /// Force to get the current game state as a checkpoint
@@ -794,9 +794,9 @@ namespace Nova
                 }
                 catch (KeyNotFoundException)
                 {
-                    Debug.LogErrorFormat("Nova: Key {0} not found in restoreDatas. Check if the restorable name " +
-                                         "has changed. If that is true, try clear all checkpoint " +
-                                         "files, or undo the change of the restorable name.", restorable.Key);
+                    Debug.LogWarningFormat("Nova: Key {0} not found in restoreDatas. Check if the restorable name " +
+                                           "has changed. If that is true, try clear all checkpoint " +
+                                           "files, or undo the change of the restorable name.", restorable.Key);
                 }
             }
         }

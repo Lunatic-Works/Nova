@@ -151,6 +151,7 @@ namespace Nova
             set
             {
                 _backgroundColor = value;
+                Init();
                 basicBackgroundImage.color = new Color(_backgroundColor.r, _backgroundColor.g, _backgroundColor.b,
                     _backgroundColor.a * _configOpacity);
                 backgroundCanvasGroup.alpha = _backgroundColor.a * _configOpacity;
@@ -169,9 +170,14 @@ namespace Nova
             }
         }
 
-        protected override void Awake()
+        private bool inited;
+
+        private void Init()
         {
-            base.Awake();
+            if (inited)
+            {
+                return;
+            }
 
             gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
@@ -201,6 +207,14 @@ namespace Nova
             dialogueBoxShown.SetActive(true);
 
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
+
+            inited = true;
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            Init();
         }
 
         public override void Hide(Action onFinish)

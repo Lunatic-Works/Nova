@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Nova
 {
@@ -7,17 +8,13 @@ namespace Nova
     {
         public List<ConfigTabButton> tabs;
 
-        private void Start()
+        private void Awake()
         {
             this.RuntimeAssert(tabs.Count > 0, "Empty Config Tab List");
             for (var i = 0; i < tabs.Count; i++)
             {
-                var tab = tabs[i];
-                if (tab.isActiveAndEnabled)
-                {
-                    var index = i;
-                    tab.button.onClick.AddListener(() => SetActiveTab(index));
-                }
+                var index = i;
+                tabs[i].GetComponent<Button>().onClick.AddListener(() => SetActiveTab(index));
             }
 
             SetActiveTab(0);

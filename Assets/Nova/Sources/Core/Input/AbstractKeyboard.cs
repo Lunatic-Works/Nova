@@ -12,13 +12,25 @@ namespace Nova
 
     public class AbstractKeyboard : IAbstractKeyDevice
     {
-        private AbstractKeyboardData mapping =
-            new AbstractKeyboardData();
+        private AbstractKeyboardData mapping;
 
         public AbstractKeyboardData Data
         {
             get => mapping;
             set => mapping = value;
+        }
+
+        private bool inited;
+
+        public void Init()
+        {
+            if (inited)
+            {
+                return;
+            }
+
+            mapping = new AbstractKeyboardData();
+            inited = true;
         }
 
         public bool GetKey(AbstractKey key)

@@ -221,6 +221,7 @@ namespace Nova
             var gameController = FindNovaGameController();
             gameController.CheckpointManager.UpdateGlobalSave();
             gameController.ConfigManager.Apply();
+            gameController.InputMapper.Save();
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;

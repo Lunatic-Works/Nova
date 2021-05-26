@@ -38,6 +38,7 @@ namespace Nova
             set
             {
                 _scriptVolume = value;
+                Init();
                 audioSource.volume = _scriptVolume * _configVolume;
             }
         }
@@ -50,12 +51,20 @@ namespace Nova
             set
             {
                 _configVolume = value;
+                Init();
                 audioSource.volume = _scriptVolume * _configVolume;
             }
         }
 
-        private void Awake()
+        private bool inited;
+
+        private void Init()
         {
+            if (inited)
+            {
+                return;
+            }
+
             gameState = Utils.FindNovaGameController().GameState;
 
             if (musicEntryList != null)
@@ -72,6 +81,13 @@ namespace Nova
                 LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
                 gameState.AddRestorable(this);
             }
+
+            inited = true;
+        }
+
+        private void Awake()
+        {
+            Init();
         }
 
         private void OnDestroy()

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
@@ -87,10 +88,8 @@ namespace Nova
                 configManager.ResetToDefault();
                 inputMappingController.ResetDefault();
                 configManager.Apply();
-                // error will occur if reset default button is clicked before the InputMappingController starts
-                // as the InputMappingController will reload data from current InputMapping, which will not get
-                // updated unless the apply method get called.
                 inputMappingController.Apply();
+                I18n.CurrentLocale = Application.systemLanguage;
             });
         }
 

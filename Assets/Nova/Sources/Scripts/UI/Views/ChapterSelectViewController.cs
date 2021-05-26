@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,7 +32,8 @@ namespace Nova
             checkpointManager = controller.CheckpointManager;
 
             // TODO: customize the order of chapters
-            startNodeNames = gameState.GetAllStartNodeNames().OrderBy(x => x).ToArray();
+            startNodeNames = gameState.GetAllStartNodeNames().OrderBy(x => Regex.Replace(x, @"\d+", m => m.Value.PadLeft(2, '0'))).ToArray();
+
             unlockedStartNodeNames = gameState.GetAllUnlockedStartNodeNames();
 
             returnButton.onClick.AddListener(Hide);

@@ -25,13 +25,16 @@ namespace Nova
             this.RuntimeAssert(localeTogglePairs.Length > 0, "Empty language toggle list");
             foreach (var pair in localeTogglePairs)
             {
-                pair.toggle.isOn = pair.locale == I18n.CurrentLocale;
-            }
-
-            foreach (var pair in localeTogglePairs)
-            {
                 pair.toggle.onValueChanged.AddListener(value => SetLocale(value, pair.locale));
             }
+
+            OnLocaleChanged();
+            I18n.LocaleChanged.AddListener(OnLocaleChanged);
+        }
+
+        private void OnDestroy()
+        {
+            I18n.LocaleChanged.RemoveListener(OnLocaleChanged);
         }
 
         private void SetLocale(bool value, SystemLanguage locale)
@@ -39,6 +42,14 @@ namespace Nova
             if (!value) return;
             I18n.CurrentLocale = locale;
             configManager.SetInt(configKeyName, (int) locale);
+        }
+
+        private void OnLocaleChanged()
+        {
+            foreach (var pair in localeTogglePairs)
+            {
+                pair.toggle.SetIsOnWithoutNotify(pair.locale == I18n.CurrentLocale);
+            }
         }
     }
 }

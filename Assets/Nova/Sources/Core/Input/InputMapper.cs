@@ -14,7 +14,7 @@ namespace Nova
     {
         public static string InputFilesDirectory => Path.Combine(Application.persistentDataPath, "Input");
 
-        private static string KeyBoardMappingFilePath => Path.Combine(InputFilesDirectory, "keyboard.json");
+        private static string KeyboardMappingFilePath => Path.Combine(InputFilesDirectory, "keyboard.json");
 
         public TextAsset defaultKeyboardMapping;
 
@@ -88,13 +88,15 @@ namespace Nova
 
         #region Save and load
 
-        private void LoadKeyBoard()
+        private void LoadKeyboard()
         {
+            defaultKeyboard.Init();
             defaultKeyboard.LoadFull(defaultKeyboardMapping.text, keyGroups, keyIsEditor);
 
+            keyboard.Init();
             try
             {
-                keyboard.Load(File.ReadAllText(KeyBoardMappingFilePath));
+                keyboard.Load(File.ReadAllText(KeyboardMappingFilePath));
 
                 // Use default values to fill missing keys
                 foreach (AbstractKey ak in Enum.GetValues(typeof(AbstractKey)))
@@ -112,26 +114,38 @@ namespace Nova
             }
         }
 
-        private void SaveKeyBoard()
+        private void SaveKeyboard()
         {
-            File.WriteAllText(KeyBoardMappingFilePath, keyboard.Json());
+            File.WriteAllText(KeyboardMappingFilePath, keyboard.Json());
         }
 
         public void Save()
         {
+            if (!inited)
+            {
+                return;
+            }
+
             if (!Directory.Exists(InputFilesDirectory))
             {
                 Directory.CreateDirectory(InputFilesDirectory);
             }
 
-            SaveKeyBoard();
+            SaveKeyboard();
         }
 
         #endregion
 
-        private void Awake()
+        private bool inited;
+
+        public void Init()
         {
-            LoadKeyBoard();
+            if (inited)
+            {
+                return;
+            }
+
+            LoadKeyboard();
 
             foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
@@ -141,6 +155,13 @@ namespace Nova
                 keyDownWhenEnabled[key] = false;
                 keyDownToBeCleared[key] = false;
             }
+
+            inited = true;
+        }
+
+        private void Awake()
+        {
+            Init();
         }
 
         private void OnDestroy()

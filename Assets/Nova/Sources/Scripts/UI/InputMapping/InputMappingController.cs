@@ -12,7 +12,23 @@ namespace Nova
         public CompoundKeyRecorder compoundKeyRecorder;
 
         private AbstractKeyboardData keyboardData;
-        private InputMapper inputMapper;
+
+        private InputMapper _inputMapper;
+
+        private InputMapper inputMapper
+        {
+            get
+            {
+                if (_inputMapper == null)
+                {
+                    _inputMapper = Utils.FindNovaGameController().InputMapper;
+                    _inputMapper.Init();
+                    RefreshData();
+                }
+
+                return _inputMapper;
+            }
+        }
 
 #if UNITY_EDITOR
         public IEnumerable<AbstractKey> mappableKeys => Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>();
@@ -52,11 +68,6 @@ namespace Nova
             currentCompoundKeys.Add(new CompoundKey());
             var lastEntry = inputMappingList.Refresh();
             StartModifyCompoundKey(lastEntry);
-        }
-
-        private void Awake()
-        {
-            inputMapper = Utils.FindNovaGameController().InputMapper;
         }
 
         private void Start()

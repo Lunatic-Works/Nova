@@ -90,7 +90,12 @@ namespace Nova
         public string content
         {
             get => contentProxy.text;
-            private set => contentProxy.text = value;
+            private set
+            {
+                contentProxy.text = value;
+                // Update text length
+                contentBox.ForceMeshUpdate();
+            }
         }
 
         public string characterName
