@@ -7,14 +7,14 @@ namespace Nova
     {
         private Slider slider;
         private AudioSource audioSource;
-        private ConfigManager config;
+        private ConfigManager configManager;
 
         public string configKey = "nova.music_gallery.volume";
         public float defaultVolume = 0.5f;
 
         private void LoadConfig()
         {
-            var v = config.GetFloat(configKey, defaultVolume);
+            var v = configManager.GetFloat(configKey, defaultVolume);
             audioSource.volume = v;
             slider.value = v;
         }
@@ -23,7 +23,7 @@ namespace Nova
         {
             slider = GetComponent<Slider>();
             audioSource = GetComponentInParent<MusicGalleryPlayer>().audioSource;
-            config = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaGameController().ConfigManager;
             slider.onValueChanged.AddListener(OnValueChanged);
         }
 
@@ -34,8 +34,8 @@ namespace Nova
 
         private void OnDisable()
         {
-            config.SetFloat(configKey, Mathf.Clamp01(slider.value));
-            config.Apply();
+            configManager.SetFloat(configKey, Mathf.Clamp01(slider.value));
+            configManager.Apply();
         }
 
         private void OnValueChanged(float value)

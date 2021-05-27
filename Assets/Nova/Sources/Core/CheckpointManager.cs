@@ -38,7 +38,7 @@ namespace Nova
 
     #endregion
 
-    #region Save types
+    #region Classes
 
     /// <summary>
     /// Containing progress and snapshots of reached FlowChartNode.
@@ -155,8 +155,6 @@ namespace Nova
         }
     }
 
-    #endregion
-
     public enum BookmarkType
     {
         AutoSave = 101,
@@ -205,8 +203,10 @@ namespace Nova
         }
     }
 
+    #endregion
+
     /// <summary>
-    /// Manager component providing ability to manage game progress and save files.
+    /// Manager component providing ability to manage the game progress and save files.
     /// </summary>
     public class CheckpointManager : MonoBehaviour
     {
@@ -238,31 +238,6 @@ namespace Nova
             formatter = new BinaryFormatter();
             cachedSaveSlots = new Dictionary<int, Bookmark>();
             saveSlotsMetadata = new Dictionary<int, BookmarkMetadata>();
-        }
-
-        private Bookmark ReplaceCache(int saveID, Bookmark newBookmark)
-        {
-            if (cachedSaveSlots.ContainsKey(saveID))
-            {
-                var old = cachedSaveSlots[saveID];
-                if (old == newBookmark)
-                {
-                    return newBookmark;
-                }
-
-                Destroy(old.screenshot);
-            }
-
-            if (newBookmark == null)
-            {
-                cachedSaveSlots.Remove(saveID);
-            }
-            else
-            {
-                cachedSaveSlots[saveID] = newBookmark;
-            }
-
-            return newBookmark;
         }
 
         private void Start()
@@ -308,6 +283,18 @@ namespace Nova
 
             // Debug.Log("Nova: CheckpointManager initialized.");
         }
+
+        private void OnDestroy()
+        {
+            UpdateGlobalSave();
+
+            foreach (var bookmark in cachedSaveSlots.Values)
+            {
+                bookmark.TryDestroyTexture();
+            }
+        }
+
+        #region Global save
 
         /// <summary>
         /// Set a dialogue to "reached" state and save the restore entry for the dialogue.
@@ -363,7 +350,7 @@ namespace Nova
         }
 
         /// <summary>
-        /// Check if the dialogue has been reached in any combination of variables.
+        /// Check if the dialogue has been reached with any combination of variables.
         /// </summary>
         /// <param name="nodeName">The name of FlowChartNode containing the dialogue.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
@@ -425,14 +412,18 @@ namespace Nova
             return globalSave.reachedEnds.Contains(endName);
         }
 
-        private string ComposeFileName(int saveID)
+        /// <summary>
+        /// Update the global save file.
+        /// </summary>
+        /// TODO: UpdateGlobalSave() is slow when there are many saved dialogue entries
+        public void UpdateGlobalSave()
         {
-            return Path.Combine(savePathBase, $"sav{saveID:D3}.nsav");
+            SafeWrite(globalSave, globalSavePath);
         }
 
         /// <summary>
         /// Reset the global save file to clear all progress.
-        /// Note that all the other save files will be invalid.
+        /// Note that all bookmarks will be invalid.
         /// </summary>
         public void ResetGlobalSave()
         {
@@ -444,6 +435,10 @@ namespace Nova
             using (var fs = File.OpenWrite(globalSavePath))
                 WriteSave(globalSave, fs);
         }
+
+        #endregion
+
+        #region Read and write
 
         private T SafeRead<T>(string path)
         {
@@ -512,23 +507,6 @@ namespace Nova
             }
         }
 
-        private void WriteSave<T>(T obj, Stream s)
-        {
-            using (var bw = new BinaryWriter(s))
-            {
-                bw.Write(fileHeader);
-                bw.Write(Version);
-
-                using (var compressed = new DeflateStream(s, CompressionMode.Compress))
-                using (var uncompressed = new MemoryStream())
-                {
-                    formatter.Serialize(uncompressed, obj);
-                    uncompressed.Position = 0;
-                    uncompressed.CopyTo(compressed);
-                }
-            }
-        }
-
         private T ReadSave<T>(Stream s)
         {
             using (var bw = new BinaryReader(s))
@@ -557,11 +535,62 @@ namespace Nova
             }
         }
 
+        private void WriteSave<T>(T obj, Stream s)
+        {
+            using (var bw = new BinaryWriter(s))
+            {
+                bw.Write(fileHeader);
+                bw.Write(Version);
+
+                using (var compressed = new DeflateStream(s, CompressionMode.Compress))
+                using (var uncompressed = new MemoryStream())
+                {
+                    formatter.Serialize(uncompressed, obj);
+                    uncompressed.Position = 0;
+                    uncompressed.CopyTo(compressed);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Bookmarks
+
+        private string ComposeFileName(int saveID)
+        {
+            return Path.Combine(savePathBase, $"sav{saveID:D3}.nsav");
+        }
+
+        private Bookmark ReplaceCache(int saveID, Bookmark newBookmark)
+        {
+            if (cachedSaveSlots.ContainsKey(saveID))
+            {
+                var old = cachedSaveSlots[saveID];
+                if (old == newBookmark)
+                {
+                    return newBookmark;
+                }
+
+                Destroy(old.screenshot);
+            }
+
+            if (newBookmark == null)
+            {
+                cachedSaveSlots.Remove(saveID);
+            }
+            else
+            {
+                cachedSaveSlots[saveID] = newBookmark;
+            }
+
+            return newBookmark;
+        }
+
         /// <summary>
-        /// Save a bookmark to disk, and update the global save file too.
+        /// Save a bookmark to disk, and update the global save file.
         /// Will throw exception if it fails.
         /// </summary>
-        /// <param name="saveID">File No. of the bookmark.</param>
+        /// <param name="saveID">ID of the bookmark.</param>
         /// <param name="save">The bookmark to save.</param>
         public void SaveBookmark(int saveID, Bookmark save)
         {
@@ -579,20 +608,10 @@ namespace Nova
         }
 
         /// <summary>
-        /// Update global save file.
-        /// </summary>
-        /// TODO: UpdateGlobalSave() is slow when there are many saved dialogue entries
-        public void UpdateGlobalSave()
-        {
-            if (globalSave != null)
-                SafeWrite(globalSave, globalSavePath);
-        }
-
-        /// <summary>
         /// Load a bookmark from disk. Never uses cache.
         /// Will throw exception if it fails.
         /// </summary>
-        /// <param name="saveID">File No. of the bookmark.</param>
+        /// <param name="saveID">ID of the bookmark.</param>
         /// <returns>The loaded bookmark.</returns>
         public Bookmark LoadBookmark(int saveID)
         {
@@ -606,7 +625,7 @@ namespace Nova
         /// <summary>
         /// Delete a specified bookmark.
         /// </summary>
-        /// <param name="saveID">File No. of the bookmark.</param>
+        /// <param name="saveID">ID of the bookmark.</param>
         public void DeleteBookmark(int saveID)
         {
             File.Delete(ComposeFileName(saveID));
@@ -629,9 +648,9 @@ namespace Nova
         }
 
         /// <summary>
-        /// Load / Save a bookmark by File No.. Will use cached result if exists.
+        /// Load / Save a bookmark by ID. Will use cached result if exists.
         /// </summary>
-        /// <param name="saveID">File No. of the bookmark.</param>
+        /// <param name="saveID">ID of the bookmark.</param>
         /// <returns>The cached or loaded bookmark</returns>
         public Bookmark this[int saveID]
         {
@@ -648,12 +667,12 @@ namespace Nova
         }
 
         /// <summary>
-        /// Query the file No. of the latest / earliest bookmark.
+        /// Query the ID of the latest / earliest bookmark.
         /// </summary>
-        /// <param name="begin">Beginning file No. of the query range, inclusive.</param>
-        /// <param name="end">Ending file No. of the query range, exclusive.</param>
+        /// <param name="begin">Beginning ID of the query range, inclusive.</param>
+        /// <param name="end">Ending ID of the query range, exclusive.</param>
         /// <param name="type">Type of this query.</param>
-        /// <returns>File No. to query. If no bookmark is found in range, the return value will be "begin".</returns>
+        /// <returns>The ID to query. If no bookmark is found in range, the return value will be "begin".</returns>
         public int QuerySaveIDByTime(int begin, int end, SaveIDQueryType type)
         {
             var filtered = saveSlotsMetadata.Values.Where(m => m.saveID >= begin && m.saveID < end).ToList();
@@ -685,6 +704,10 @@ namespace Nova
 
             return saveID;
         }
+
+        #endregion
+
+        #region Auxiliary data
 
         /// <summary>
         /// Get the stored global flag
@@ -735,12 +758,6 @@ namespace Nova
             globalSave.data[key] = value;
         }
 
-        private void OnDestroy()
-        {
-            foreach (var bookmark in cachedSaveSlots.Values)
-            {
-                bookmark.TryDestroyTexture();
-            }
-        }
+        #endregion
     }
 }

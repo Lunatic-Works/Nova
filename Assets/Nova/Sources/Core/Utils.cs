@@ -201,6 +201,14 @@ namespace Nova
             return angle < float.Epsilon ? 0.0f : Quaternion.Angle(a, value) / angle;
         }
 
+        public static void SaveAll()
+        {
+            var gameController = FindNovaGameController();
+            gameController.CheckpointManager.UpdateGlobalSave();
+            gameController.ConfigManager.Apply();
+            gameController.InputMapper.Save();
+        }
+
         public static void ExitWithConfirm()
         {
             Alert.Show(
@@ -218,16 +226,13 @@ namespace Nova
         {
             NovaAnimation.StopAll();
 
-            var gameController = FindNovaGameController();
-            gameController.CheckpointManager.UpdateGlobalSave();
-            gameController.ConfigManager.Apply();
-            gameController.InputMapper.Save();
-
 #if UNITY_EDITOR
+            SaveAll();
             UnityEditor.EditorApplication.isPlaying = false;
 #else
             ForceQuit = true;
             Application.Quit();
+            // All components write to disk in OnDestroy
 #endif
         }
 
