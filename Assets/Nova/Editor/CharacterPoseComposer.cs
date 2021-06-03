@@ -12,9 +12,8 @@ namespace Nova.Editor
     {
         private class Pose
         {
-            public string poseName;
-            public string posePath;
-            public SpriteWithOffset sprite => AssetDatabase.LoadAssetAtPath<SpriteWithOffset>(posePath);
+            public string name;
+            public SpriteWithOffset sprite;
         }
 
         [MenuItem("Nova/Preview Character Pose")]
@@ -25,66 +24,49 @@ namespace Nova.Editor
         }
 
         private string imageFolder;
-        public int referenceSize = 2048;
-        public int pixelsPerUnit = 100;
+        private int referenceSize = 2048;
+        private int pixelsPerUnit = 100;
 
-        private ReorderableList reorderableList;
         private readonly List<Pose> poses = new List<Pose>();
+        private ReorderableList reorderableList;
+        private bool dirty;
+
         private GameObject root;
         private CharacterTextureMerger merger;
-        private Texture current;
-        private float previewHeight = 500f;
-        private bool dirty;
-        private RectInt captureBox = new RectInt(100, 100, 500, 500);
-        private string captureDest = "Faces/001.png";
+        private Texture texture;
+        private float previewHeight = 600f;
 
-        private void OnSelectionChange()
-        {
-            var go = Selection.activeGameObject;
-            if (go != null)
-            {
-                var cc = go.GetComponent<CompositeSpriteControllerBase>();
-                if (cc != null)
-                {
-                    imageFolder = cc.imageFolder;
-                }
-            }
-        }
+        private RectInt captureBox = new RectInt(100, 100, 500, 500);
+        private string captureDest;
 
         private void OnEnable()
         {
+            imageFolder = EditorUtils.GetSelectedDirectory();
+
             root = new GameObject("PoseComposerDummy")
             {
                 hideFlags = HideFlags.DontSave
             };
-            root.SetActive(true);
             merger = root.AddComponent<CharacterTextureMerger>();
             merger.runInEditMode = true;
             merger.referenceSize = referenceSize;
             merger.pixelsPerUnit = pixelsPerUnit;
 
             reorderableList = new ReorderableList(poses, typeof(Pose), true, true, true, true);
-
             reorderableList.drawHeaderCallback += DrawHeader;
             reorderableList.drawElementCallback += DrawElement;
-
-            reorderableList.onReorderCallback += ReorderItem;
-
             reorderableList.onAddCallback += AddItem;
             reorderableList.onRemoveCallback += RemoveItem;
-
-            OnSelectionChange();
+            reorderableList.onReorderCallback += ReorderItem;
         }
 
         private void OnDisable()
         {
             reorderableList.drawHeaderCallback -= DrawHeader;
             reorderableList.drawElementCallback -= DrawElement;
-
-            reorderableList.onReorderCallback -= ReorderItem;
-
             reorderableList.onAddCallback -= AddItem;
             reorderableList.onRemoveCallback -= RemoveItem;
+            reorderableList.onReorderCallback -= ReorderItem;
 
             DestroyImmediate(root);
         }
@@ -94,49 +76,35 @@ namespace Nova.Editor
             GUI.Label(rect, "Pose Layers");
         }
 
-        private static IEnumerable<string> SubDirectories(string baseDirectory)
-        {
-            var subDirs = Directory.GetDirectories(baseDirectory);
-            if (subDirs.Length == 0)
-            {
-                yield return baseDirectory;
-            }
-            else
-            {
-                foreach (var path in subDirs)
-                {
-                    foreach (var subPath in SubDirectories(path))
-                    {
-                        yield return subPath;
-                    }
-                }
-            }
-        }
-
         private void DrawElement(Rect rect, int index, bool active, bool focused)
         {
             Pose item = poses[index];
 
             if (EditorGUI.DropdownButton(
                 new Rect(rect.x + rect.width / 3, rect.y, rect.width * 2 / 3, rect.height),
-                new GUIContent(item.poseName ?? "Pose"),
+                new GUIContent(item.name ?? "Pose"),
                 FocusType.Passive
             ))
             {
                 var menu = new GenericMenu();
 
-                string basePath = Path.Combine("Assets/Resources", imageFolder);
-                var entries = AssetDatabase.FindAssets("t:Sprite", new[] {basePath})
+                var entries = AssetDatabase.FindAssets("t:Sprite", new[] {imageFolder})
                     .Select(AssetDatabase.GUIDToAssetPath)
                     .ToList();
 
                 foreach (var path in entries)
                 {
-                    var pose = Path.GetFileName(path);
-                    menu.AddItem(new GUIContent(pose), false, () =>
+                    var poseName = Path.GetFileNameWithoutExtension(path);
+                    var sprite = AssetDatabase.LoadAssetAtPath<SpriteWithOffset>(Path.ChangeExtension(path, "asset"));
+                    if (sprite == null)
                     {
-                        item.poseName = pose;
-                        item.posePath = path;
+                        return;
+                    }
+
+                    menu.AddItem(new GUIContent(poseName), false, () =>
+                    {
+                        item.name = poseName;
+                        item.sprite = sprite;
                         dirty = true;
                     });
                 }
@@ -151,23 +119,25 @@ namespace Nova.Editor
             dirty = true;
         }
 
-        private void ReorderItem(ReorderableList list)
-        {
-            dirty = true;
-        }
-
         private void RemoveItem(ReorderableList list)
         {
             poses.RemoveAt(list.index);
             dirty = true;
         }
 
-        private string PosePathToLuaAssetPath(string posePath)
+        private void ReorderItem(ReorderableList list)
         {
-            var relative = posePath.Substring(posePath.LastIndexOf(imageFolder, StringComparison.Ordinal) +
-                                              imageFolder.Length + 1);
-            var extensionStripped = Path.ChangeExtension(relative, "");
-            return extensionStripped.Substring(0, extensionStripped.Length - 1);
+            dirty = true;
+        }
+
+        private string PosesToLuaTable(IEnumerable<Pose> poses)
+        {
+            var luaTable = poses
+                .Where(p => !string.IsNullOrEmpty(p.name))
+                .Select(p => "'" + p.name + "'")
+                .Aggregate((r, s) => r + ", " + s);
+            luaTable = "{" + luaTable + "}";
+            return luaTable;
         }
 
         private void OnGUI()
@@ -177,104 +147,98 @@ namespace Nova.Editor
             referenceSize = EditorGUILayout.IntField("Reference Size", referenceSize);
             pixelsPerUnit = EditorGUILayout.IntField("Pixels Per Unit", pixelsPerUnit);
 
-            if (!string.IsNullOrEmpty(imageFolder))
+            reorderableList.DoLayoutList();
+
+            if (dirty)
             {
-                reorderableList.DoLayoutList();
-                GUILayout.Label("Composed Pose Lua", EditorStyles.boldLabel);
-                var luaList = poses
-                    .Where(p => p.posePath != null && p.posePath.Contains(imageFolder))
-                    .Select(p => "'" + PosePathToLuaAssetPath(p.posePath) + "'")
-                    .DefaultIfEmpty()
-                    .Aggregate((r, s) => r + ", " + s);
-                luaList = "{" + luaList + "}";
-                EditorGUILayout.SelectableLabel(luaList);
-                if (GUILayout.Button("Copy"))
-                {
-                    EditorGUIUtility.systemCopyBuffer = luaList;
-                }
-
-                GUILayout.Label("Pose Preview", EditorStyles.boldLabel);
-                previewHeight = EditorGUILayout.Slider("Preview Size", previewHeight, 200f, 1000f);
-                if (dirty)
-                {
-                    dirty = false;
-                    current = merger.GetMergedTexture(poses.Where(p => p.sprite != null).Select(p => p.sprite)
-                        .ToList());
-                }
-
-                if (current != null)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("Capture Box");
-                    captureBox = EditorGUILayout.RectIntField(captureBox);
-                    GUILayout.EndHorizontal();
-                    GUILayout.BeginHorizontal();
-                    captureDest = EditorGUILayout.TextField("Capture Destination", captureDest);
-                    if (GUILayout.Button("Capture"))
-                    {
-                        Texture2D tex = new Texture2D(captureBox.width, captureBox.height, TextureFormat.ARGB32, false);
-                        RenderTexture.active = current as RenderTexture;
-                        tex.ReadPixels(new Rect(captureBox.x, captureBox.y, captureBox.width, captureBox.height), 0, 0);
-                        RenderTexture.active = null;
-                        tex.Apply();
-
-                        var dest = Path.Combine("Assets/Resources", captureDest);
-                        File.WriteAllBytes(dest, tex.EncodeToPNG());
-                        EditorUtility.DisplayDialog("Finished", "The captured png is saved at " + dest, "Good");
-                    }
-
-                    GUILayout.EndHorizontal();
-                }
-
-                if (current != null)
-                {
-                    var scale = previewHeight / current.height;
-                    var previewRect = EditorGUILayout.GetControlRect(
-                        false, previewHeight, GUILayout.Width(scale * current.width)
-                    );
-                    EditorGUI.DrawPreviewTexture(previewRect, current);
-
-                    EditorGUI.DrawRect(
-                        new Rect(
-                            previewRect.x + captureBox.x * scale,
-                            previewRect.y + captureBox.y * scale,
-                            1,
-                            captureBox.height * scale
-                        ),
-                        Color.red
-                    );
-
-                    EditorGUI.DrawRect(
-                        new Rect(
-                            previewRect.x + captureBox.xMax * scale,
-                            previewRect.y + captureBox.y * scale,
-                            1,
-                            captureBox.height * scale
-                        ),
-                        Color.red
-                    );
-
-                    EditorGUI.DrawRect(
-                        new Rect(
-                            previewRect.x + captureBox.x * scale,
-                            previewRect.y + captureBox.y * scale,
-                            captureBox.width * scale,
-                            1
-                        ),
-                        Color.red
-                    );
-
-                    EditorGUI.DrawRect(
-                        new Rect(
-                            previewRect.x + captureBox.x * scale,
-                            previewRect.y + captureBox.yMax * scale,
-                            captureBox.width * scale,
-                            1
-                        ),
-                        Color.red
-                    );
-                }
+                dirty = false;
+                var sprites = poses.Where(p => !string.IsNullOrEmpty(p.name)).Select(p => p.sprite).ToList();
+                texture = sprites.Count == 0 ? null : merger.GetMergedTexture(sprites);
             }
+
+            if (texture == null)
+            {
+                return;
+            }
+
+            GUILayout.Label("Composed Pose Lua Table", EditorStyles.boldLabel);
+            var luaTable = PosesToLuaTable(poses);
+            EditorGUILayout.SelectableLabel(luaTable);
+            if (GUILayout.Button("Copy"))
+            {
+                EditorGUIUtility.systemCopyBuffer = luaTable;
+            }
+
+            GUILayout.Label("Pose Preview", EditorStyles.boldLabel);
+            previewHeight = EditorGUILayout.Slider("Preview Size", previewHeight, 200f, 1000f);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Capture Box");
+            captureBox = EditorGUILayout.RectIntField(captureBox);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            captureDest = EditorGUILayout.TextField("Capture Destination", captureDest);
+
+            if (GUILayout.Button("Capture"))
+            {
+                Texture2D tex = new Texture2D(captureBox.width, captureBox.height, TextureFormat.ARGB32, false);
+                RenderTexture.active = texture as RenderTexture;
+                tex.ReadPixels(new Rect(captureBox.x, captureBox.y, captureBox.width, captureBox.height), 0, 0);
+                RenderTexture.active = null;
+                tex.Apply();
+
+                File.WriteAllBytes(captureDest, tex.EncodeToPNG());
+                EditorUtility.DisplayDialog("Finished", $"The captured png is saved at {captureDest}", "OK");
+            }
+
+            GUILayout.EndHorizontal();
+
+            var scale = previewHeight / texture.height;
+            var previewRect = EditorGUILayout.GetControlRect(
+                false, previewHeight, GUILayout.Width(scale * texture.width)
+            );
+            EditorGUI.DrawPreviewTexture(previewRect, texture);
+
+            EditorGUI.DrawRect(
+                new Rect(
+                    previewRect.x + captureBox.x * scale,
+                    previewRect.y + captureBox.y * scale,
+                    1,
+                    captureBox.height * scale
+                ),
+                Color.red
+            );
+
+            EditorGUI.DrawRect(
+                new Rect(
+                    previewRect.x + captureBox.xMax * scale,
+                    previewRect.y + captureBox.y * scale,
+                    1,
+                    captureBox.height * scale
+                ),
+                Color.red
+            );
+
+            EditorGUI.DrawRect(
+                new Rect(
+                    previewRect.x + captureBox.x * scale,
+                    previewRect.y + captureBox.y * scale,
+                    captureBox.width * scale,
+                    1
+                ),
+                Color.red
+            );
+
+            EditorGUI.DrawRect(
+                new Rect(
+                    previewRect.x + captureBox.x * scale,
+                    previewRect.y + captureBox.yMax * scale,
+                    captureBox.width * scale,
+                    1
+                ),
+                Color.red
+            );
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Nova
 {
     public class CharacterTextureMerger : MonoBehaviour
     {
-        public int layer;
+        public int layer = 16;
         public int referenceSize = 2048;
         public int pixelsPerUnit = 100;
 
