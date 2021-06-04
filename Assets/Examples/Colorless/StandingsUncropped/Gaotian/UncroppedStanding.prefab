@@ -95,10 +95,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 103
-    y: 392
-    width: 68
-    height: 40
+    x: 418
+    y: 1578
+    width: 256
+    height: 144
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &754947705784957024
@@ -196,10 +196,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 23
+    x: 98
     y: 0
-    width: 176
-    height: 480
+    width: 688
+    height: 1908
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &949566254105636885
@@ -297,10 +297,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 103
-    y: 406
-    width: 68
-    height: 32
+    x: 418
+    y: 1634
+    width: 256
+    height: 100
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &1192477423818816810
@@ -398,10 +398,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 103
-    y: 406
-    width: 68
-    height: 32
+    x: 418
+    y: 1634
+    width: 260
+    height: 108
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &3148422339271769018
@@ -499,10 +499,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 108
-    y: 427
-    width: 68
-    height: 16
+    x: 438
+    y: 1714
+    width: 252
+    height: 48
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &3419862376633197859
@@ -600,10 +600,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 109
-    y: 425
-    width: 68
-    height: 24
+    x: 442
+    y: 1706
+    width: 256
+    height: 76
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &3907559962014704604
@@ -701,10 +701,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 125
-    y: 383
-    width: 16
-    height: 16
+    x: 506
+    y: 1538
+    width: 48
+    height: 44
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &4370520639677289245
@@ -802,10 +802,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 107
-    y: 409
-    width: 60
-    height: 20
+    x: 434
+    y: 1642
+    width: 220
+    height: 60
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &4696883961899173099
@@ -903,10 +903,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 53
-    y: 311
-    width: 136
-    height: 200
+    x: 221
+    y: 1250
+    width: 524
+    height: 784
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &4766406248975107718
@@ -1004,10 +1004,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 122
-    y: 384
-    width: 20
-    height: 16
+    x: 497
+    y: 1542
+    width: 68
+    height: 40
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &5083233861719292964
@@ -1074,7 +1074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fab45c64e6cc48b1a2649c3fca1d0274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outputDirectory: Resources/Colorless/Standings/Gaotian
+  outputDirectory: Assets/Resources/Colorless/Standings/Gaotian
 --- !u!1 &5568436396923237593
 GameObject:
   m_ObjectHideFlags: 0
@@ -1170,10 +1170,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 107
-    y: 408
-    width: 60
-    height: 24
+    x: 434
+    y: 1638
+    width: 224
+    height: 76
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &5676024303247080229
@@ -1271,10 +1271,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 74
-    y: 373
-    width: 104
-    height: 108
+    x: 302
+    y: 1502
+    width: 396
+    height: 404
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &6357683670520098839
@@ -1372,10 +1372,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 123
-    y: 384
-    width: 20
-    height: 16
+    x: 498
+    y: 1542
+    width: 64
+    height: 44
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &6495307592061109132
@@ -1473,10 +1473,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 126
-    y: 384
-    width: 16
-    height: 12
+    x: 510
+    y: 1542
+    width: 48
+    height: 32
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &6499807646563194334
@@ -1574,10 +1574,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 104
-    y: 422
-    width: 72
-    height: 20
+    x: 422
+    y: 1697
+    width: 268
+    height: 60
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &6530398176675129834
@@ -1675,10 +1675,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 122
-    y: 381
-    width: 24
-    height: 20
+    x: 494
+    y: 1530
+    width: 76
+    height: 60
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &7823007880053718748
@@ -1776,10 +1776,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 104
-    y: 425
-    width: 72
-    height: 20
+    x: 425
+    y: 1709
+    width: 276
+    height: 60
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &8012557252931437825
@@ -1877,10 +1877,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 103
-    y: 406
-    width: 68
-    height: 32
+    x: 418
+    y: 1634
+    width: 256
+    height: 100
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &8641014377530498445
@@ -1978,10 +1978,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 123
-    y: 380
-    width: 20
-    height: 20
+    x: 498
+    y: 1526
+    width: 64
+    height: 64
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &8731725463478078913
@@ -2079,10 +2079,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 103
-    y: 407
-    width: 68
-    height: 28
+    x: 418
+    y: 1634
+    width: 256
+    height: 88
   autoCropPadding: 2
   autoCropAlpha: 0.01
 --- !u!1 &9142275092401061221
@@ -2180,9 +2180,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 109
-    y: 399
-    width: 8
-    height: 12
+    x: 442
+    y: 1605
+    width: 20
+    height: 28
   autoCropPadding: 2
   autoCropAlpha: 0.01

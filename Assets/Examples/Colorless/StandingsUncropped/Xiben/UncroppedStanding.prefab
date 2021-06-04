@@ -601,7 +601,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cropRect:
     x: 370
-    y: 1884
+    y: 1883
     width: 272
     height: 28
   autoCropPadding: 2
@@ -1782,7 +1782,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fab45c64e6cc48b1a2649c3fca1d0274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outputDirectory: Resources/Colorless/Standings/Xiben
+  outputDirectory: Assets/Resources/Colorless/Standings/Xiben
 --- !u!1 &6466059111950205907
 GameObject:
   m_ObjectHideFlags: 0

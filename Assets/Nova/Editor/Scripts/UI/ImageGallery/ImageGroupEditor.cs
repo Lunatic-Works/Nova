@@ -102,7 +102,7 @@ namespace Nova.Editor
         {
             // split path name and file name
             var path = EditorUtils.GetSelectedDirectory();
-            CreateImageGroup(path, EditorUtils.PathOfSelectedSprites());
+            CreateImageGroup(path, EditorUtils.GetSelectedSpritePaths());
         }
 
         [MenuItem("Assets/Create/Nova/Image Group", true)]

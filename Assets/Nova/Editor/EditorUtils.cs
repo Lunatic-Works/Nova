@@ -8,11 +8,11 @@ namespace Nova.Editor
     public static class EditorUtils
     {
         // https://gist.github.com/allanolivei/9260107
-        public static string GetSelectedDirectory(string fallback = "Assets")
+        public static string GetSelectedDirectory()
         {
-            var path = fallback;
+            var path = "";
 
-            foreach (var obj in Selection.GetFiltered(typeof(Object), SelectionMode.Assets))
+            foreach (var obj in Selection.GetFiltered<Object>(SelectionMode.Assets))
             {
                 path = AssetDatabase.GetAssetPath(obj);
                 if (string.IsNullOrEmpty(path) || !File.Exists(path)) continue;
@@ -23,21 +23,11 @@ namespace Nova.Editor
             return path;
         }
 
-        public static IEnumerable<string> PathOfSelectedSprites()
+        public static IEnumerable<string> GetSelectedSpritePaths()
         {
-            // strange work around with Unity
             foreach (var tex in Selection.GetFiltered<Texture2D>(SelectionMode.Assets))
             {
-                Sprite sprite = null;
-                try
-                {
-                    sprite = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GetAssetPath(tex));
-                }
-                catch
-                {
-                    // ignored
-                }
-
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GetAssetPath(tex));
                 if (sprite != null)
                 {
                     yield return AssetDatabase.GetAssetPath(sprite);
@@ -76,10 +66,17 @@ namespace Nova.Editor
             DrawFrame(new Rect(offset, size), color, lineWidth);
         }
 
-        public static void DrawPreviewCaptureFrame(Rect preview, Rect capture, float scale, Color color,
+        public static void DrawPreviewCaptureFrame(Rect preview, Rect capture, float scale, bool inverseY, Color color,
             float lineWidth = 1.0f)
         {
-            DrawFrame(new Rect(preview.min + scale * capture.min, scale * capture.size), color, lineWidth);
+            var offset = preview.min + scale * capture.min;
+            if (inverseY)
+            {
+                offset.y = preview.yMax - scale * capture.yMax;
+            }
+
+            var size = scale * capture.size;
+            DrawFrame(new Rect(offset, size), color, lineWidth);
         }
     }
 }

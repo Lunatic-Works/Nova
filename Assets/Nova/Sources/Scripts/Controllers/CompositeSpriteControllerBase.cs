@@ -7,7 +7,7 @@ namespace Nova
     public abstract class CompositeSpriteControllerBase : MonoBehaviour, IRestorable
     {
         public string imageFolder;
-        public CharacterTextureMerger characterTextureMerger;
+        public SpriteMerger characterTextureMerger;
 
         public string currentImageName { get; protected set; }
 

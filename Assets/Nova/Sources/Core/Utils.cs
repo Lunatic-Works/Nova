@@ -260,7 +260,7 @@ namespace Nova
             DestroyObject(material, destroyInEditor);
         }
 
-        public static void DestroyObject(UnityEngine.Object obj, bool destroyInEditor = true)
+        public static void DestroyObject(UnityObject obj, bool destroyInEditor = true)
         {
             if (obj == null) return;
 #if UNITY_EDITOR

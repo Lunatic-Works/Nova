@@ -2085,7 +2085,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fab45c64e6cc48b1a2649c3fca1d0274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outputDirectory: Resources/Colorless/Standings/Ergong
+  outputDirectory: Assets/Resources/Colorless/Standings/Ergong
 --- !u!1 &8663148578743467218
 GameObject:
   m_ObjectHideFlags: 0
@@ -2282,7 +2282,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cropRect:
-    x: 283
+    x: 282
     y: 1830
     width: 228
     height: 60

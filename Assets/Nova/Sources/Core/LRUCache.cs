@@ -68,7 +68,7 @@ namespace Nova
             var cachedObject = node.value as UnityObject;
             if (cachedObject != null)
             {
-                UnityObject.Destroy(cachedObject);
+                Utils.DestroyObject(cachedObject);
             }
         }
 

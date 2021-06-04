@@ -7,8 +7,8 @@ namespace Nova.Editor
     [CustomEditor(typeof(SpriteCropper))]
     public class SpriteCropperEditor : UnityEditor.Editor
     {
-        private bool showCaptureBox;
-        private RectInt captureBox = new RectInt(100, 100, 400, 400);
+        private bool useCaptureBox;
+        private RectInt captureBox = new RectInt(0, 0, 400, 400);
 
         public override void OnInspectorGUI()
         {
@@ -16,127 +16,141 @@ namespace Nova.Editor
             var cropper = target as SpriteCropper;
             var texture = cropper.sprite.texture;
 
+            useCaptureBox = GUILayout.Toggle(useCaptureBox, "Use Capture Box");
+            if (useCaptureBox)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Capture Box");
+                captureBox = EditorGUILayout.RectIntField(captureBox);
+                GUILayout.EndHorizontal();
+            }
+
             if (GUILayout.Button("Auto Crop"))
             {
-                AutoCrop(cropper);
+                if (useCaptureBox)
+                {
+                    AutoCrop(cropper, captureBox);
+                }
+                else
+                {
+                    AutoCrop(cropper);
+                }
             }
 
-            showCaptureBox = GUILayout.Toggle(showCaptureBox, "Show Capture Box");
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Capture Box");
-            captureBox = EditorGUILayout.RectIntField(captureBox);
-            GUILayout.EndHorizontal();
-
-            var scale = EditorGUIUtility.currentViewWidth / texture.width;
-            var previewRect = EditorGUILayout.GetControlRect(false, scale * texture.height);
+            var scale = EditorGUIUtility.currentViewWidth / texture.width * 0.5f;
+            var previewRect =
+                EditorGUILayout.GetControlRect(false, scale * texture.height, GUILayout.Width(scale * texture.width));
             EditorGUI.DrawTextureTransparent(previewRect, texture);
 
-            if (showCaptureBox)
+            if (useCaptureBox)
             {
-                EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, Color.red);
+                EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, false, Color.red);
             }
 
-            var cropRectInt = cropper.cropRect;
-            var cropRect = new Rect(
-                (float)cropRectInt.x / texture.width,
-                (float)cropRectInt.y / texture.height,
-                (float)cropRectInt.width / texture.width,
-                (float)cropRectInt.height / texture.height
-            );
-            EditorUtils.DrawPreviewCropFrame(previewRect, cropRect, Color.yellow);
+            EditorUtils.DrawPreviewCaptureFrame(previewRect, cropper.cropRect.ToRect(), scale, true, Color.yellow);
         }
 
-        private static int RoundToFour(int v)
+        private static int RoundUpToFour(int x)
         {
-            return ((v + 3) >> 2) << 2;
+            return ((x + 3) / 4) * 4;
         }
 
-        public static void AutoCrop(SpriteCropper cropper)
+        private static void RoundWithBorders(ref int x1, ref int x2, int left, int right)
+        {
+            x2 = x1 + RoundUpToFour(x2 - x1);
+
+            if (x1 < left)
+            {
+                if (left + x2 - x1 <= right)
+                {
+                    x2 = left + x2 - x1;
+                }
+                else
+                {
+                    x2 = right;
+                }
+
+                x1 = left;
+            }
+
+            if (x2 > right)
+            {
+                if (right - x2 + x1 >= left)
+                {
+                    x1 = right - x2 + x1;
+                }
+                else
+                {
+                    x1 = left;
+                }
+
+                x2 = right;
+            }
+        }
+
+        public static void AutoCrop(SpriteCropper cropper, RectInt captureBox)
         {
             var texture = cropper.sprite.texture;
-            var width = texture.width;
-            var height = texture.height;
             var colors = texture.GetPixels();
-            // scan from bottom to top
-            int minX = width - 1, maxX = 0;
-            int minY = -1, maxY = -1;
-            for (var i = 0; i < height; i++)
+
+            int left = Math.Max(0, captureBox.xMin);
+            int right = Math.Min(texture.width, captureBox.xMax);
+            int bottom = Math.Max(0, texture.height - captureBox.yMax);
+            int top = Math.Min(texture.height, texture.height - captureBox.yMin);
+
+            bool hasPixel = false;
+            int minX = int.MaxValue;
+            int maxX = int.MinValue;
+            int minY = int.MaxValue;
+            int maxY = int.MinValue;
+            for (var i = bottom; i < top; ++i)
             {
-                var hasPixel = false;
-                for (var j = 0; j < width; j++)
+                bool hasPixelInRow = false;
+                for (var j = left; j < right; ++j)
                 {
-                    var color = colors[width * i + j];
+                    var color = colors[texture.width * i + j];
                     if (color.a > cropper.autoCropAlpha)
                     {
-                        hasPixel = true;
+                        hasPixelInRow = true;
                         minX = Math.Min(minX, j);
                         maxX = Math.Max(maxX, j);
                     }
                 }
 
-                if (hasPixel && minY == -1)
+                if (hasPixelInRow)
                 {
-                    minY = i;
+                    hasPixel = true;
+                    minY = Math.Min(minY, i);
+                    maxY = Math.Max(maxY, i);
                 }
             }
 
-            // scan from top to bottom
-            for (var i = height - 1; i >= 0; i--)
+            if (hasPixel)
             {
-                var hasPixel = false;
-                for (var j = 0; j < width; j++)
-                {
-                    var color = colors[width * i + j];
-                    if (color.a > cropper.autoCropAlpha)
-                    {
-                        hasPixel = true;
-                    }
-                }
+                int padding = cropper.autoCropPadding;
+                int x1 = Math.Max(left, minX - padding);
+                int x2 = Math.Min(right, maxX + padding + 1);
+                int y1 = Math.Max(bottom, minY - padding);
+                int y2 = Math.Min(top, maxY + padding + 1);
 
-                if (hasPixel && maxY == -1)
-                {
-                    maxY = i;
-                }
-            }
+                RoundWithBorders(ref x1, ref x2, left, right);
+                RoundWithBorders(ref y1, ref y2, bottom, top);
 
-            if (minY == -1 || maxY == -1)
-            {
-                // empty image
-                cropper.cropRect = new RectInt(0, 0, 1, 1);
+                cropper.cropRect = new RectInt(x1, y1, x2 - x1, y2 - y1);
             }
             else
             {
-                var padding = cropper.autoCropPadding;
-                var x1 = Math.Max(0, minX - padding);
-                var y1 = Math.Max(0, minY - padding);
-                var x2 = Math.Min(maxX + padding, width - 1);
-                var y2 = Math.Min(maxY + padding, height - 1);
-
-                // try to round to 4
-                var cw = RoundToFour(x2 - x1 + 1);
-                var ch = RoundToFour(y2 - y1 + 1);
-
-                if (x1 + cw > width)
-                {
-                    x1 = width - cw;
-                }
-
-                if (y1 + ch > height)
-                {
-                    y1 = height - ch;
-                }
-
-                x2 = x1 + cw - 1;
-                y2 = y1 + ch - 1;
-
-                // restrain in range
-                x1 = Math.Max(0, x1);
-                y1 = Math.Max(0, y1);
-
-                cropper.cropRect = new RectInt(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
+                // Empty image
+                cropper.cropRect = new RectInt(0, 0, 4, 4);
             }
 
             EditorUtility.SetDirty(cropper);
+        }
+
+        public static void AutoCrop(SpriteCropper cropper)
+        {
+            var texture = cropper.sprite.texture;
+            AutoCrop(cropper, new RectInt(0, 0, texture.width, texture.height));
         }
     }
 }

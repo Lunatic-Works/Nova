@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class CharacterTextureMerger : MonoBehaviour
+    public class SpriteMerger : MonoBehaviour
     {
         public int layer = 16;
-        public int referenceSize = 2048;
-        public int pixelsPerUnit = 100;
+        public Vector2Int referenceSize = new Vector2Int(2048, 4096);
+        public float pixelsPerUnit = 100.0f;
 
         private LRUCache<string, RenderTexture> textureCache;
         private Camera mergeCamera;
@@ -70,53 +70,68 @@ namespace Nova
             }
 
             var key = sprites.Aggregate("", (r, s) => r + s.GetInstanceID() + ":");
-            if (!textureCache.TryGetValue(key, out var result))
+            if (textureCache.ContainsKey(key))
             {
-                EnsureLayers(sprites.Count);
-                for (var i = 0; i < layers.Count; i++)
-                {
-                    if (i < sprites.Count)
-                    {
-                        var s = sprites[i].sprite;
-                        var offset = sprites[i].offset;
-                        layers[i].sprite = s;
-                        layers[i].transform.localPosition = offset;
-                        layers[i].gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        layers[i].gameObject.SetActive(false);
-                        layers[i].sprite = null;
-                    }
-                }
+                return textureCache[key];
+            }
 
-                // Now we only have standings with 1:2 aspect ratio
-                // TODO: set renderTexture's aspect ratio
-                RenderTexture renderTexture;
-                if (textureCache.Count == textureCache.MaxSize)
+            EnsureLayers(sprites.Count);
+            for (var i = 0; i < layers.Count; i++)
+            {
+                if (i < sprites.Count)
                 {
-                    renderTexture = textureCache.PopLeastUsed();
+                    layers[i].sprite = sprites[i].sprite;
+                    layers[i].transform.localPosition = sprites[i].offset;
+                    layers[i].gameObject.SetActive(true);
                 }
                 else
                 {
-                    renderTexture = new RenderTexture(referenceSize / 2, referenceSize, 0)
-                    {
-                        name = "CharacterMergerRenderTexture",
-                    };
-                }
-
-                mergeCamera.orthographicSize = (float) referenceSize / pixelsPerUnit / 2;
-                mergeCamera.RenderToTexture(renderTexture);
-
-                for (int i = 0; i < sprites.Count; i++)
-                {
                     layers[i].gameObject.SetActive(false);
+                    layers[i].sprite = null;
                 }
-
-                result = textureCache[key] = renderTexture;
             }
 
-            return result;
+            RenderTexture texture;
+            if (textureCache.Count == textureCache.MaxSize)
+            {
+                texture = textureCache.PopLeastUsed();
+            }
+            else
+            {
+                texture = new RenderTexture(referenceSize.x, referenceSize.y, 0)
+                {
+                    name = "SpriteMergerRenderTexture"
+                };
+            }
+
+            mergeCamera.orthographicSize = (float)Mathf.Max(referenceSize.x, referenceSize.y) / pixelsPerUnit / 2;
+            mergeCamera.RenderToTexture(texture);
+            textureCache[key] = texture;
+
+            for (int i = 0; i < sprites.Count; i++)
+            {
+                layers[i].gameObject.SetActive(false);
+                layers[i].sprite = null;
+            }
+
+            return texture;
+        }
+
+        public Texture GetMergedTexture(List<Sprite> sprites)
+        {
+            return GetMergedTexture(sprites.Select(sprite =>
+                {
+                    var so = ScriptableObject.CreateInstance<SpriteWithOffset>();
+                    so.sprite = sprite;
+                    so.offset = Vector3.zero;
+                    return so;
+                })
+                .ToList());
+        }
+
+        public void ClearCache()
+        {
+            textureCache.Clear();
         }
     }
 }

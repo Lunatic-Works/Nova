@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 25935805}
   - component: {fileID: 25935806}
   m_Layer: 16
-  m_Name: TextureMerger
+  m_Name: SpriteMerger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   layer: 16
-  referenceSize: 2048
+  referenceSize: {x: 2048, y: 4096}
   pixelsPerUnit: 85
 --- !u!1001 &39029815
 PrefabInstance:

@@ -120,7 +120,7 @@ namespace Nova.Editor
                     audioClip.GetData(sampleData, 0);
 
                     downSampleTo = audioClip.frequency / 60;
-                    downSampledData = new float[(int) Math.Ceiling(1.0f * audioClip.samples / downSampleTo)];
+                    downSampledData = new float[(int)Math.Ceiling(1.0f * audioClip.samples / downSampleTo)];
                     for (int i = 0; i < sampleData.Length; i += downSampleTo)
                     {
                         float ssum = 0;
@@ -130,7 +130,7 @@ namespace Nova.Editor
                             ssum += sampleData[j] * sampleData[j];
                         }
 
-                        float rms = (float) Math.Sqrt(ssum / (j - i));
+                        float rms = (float)Math.Sqrt(ssum / (j - i));
                         downSampledData[i / downSampleTo] = rms;
                     }
 
@@ -170,8 +170,8 @@ namespace Nova.Editor
                         DrawCurve(
                             r,
                             t => t < 0.5
-                                ? previewBeginSample + (int) (t / 0.5 * previewBeforeSample)
-                                : musicEntry.loopBeginSample + (int) ((t - 0.5) / 0.5 * previewBeforeSample)
+                                ? previewBeginSample + (int)(t / 0.5 * previewBeforeSample)
+                                : musicEntry.loopBeginSample + (int)((t - 0.5) / 0.5 * previewBeforeSample)
                         );
                         EditorGUI.DrawRect(
                             new Rect(
@@ -208,7 +208,7 @@ namespace Nova.Editor
                         Rect r = AudioCurveRendering.BeginCurveFrame(GUILayoutUtility.GetRect(1, 10000, 100, 100));
                         DrawCurve(
                             r,
-                            t => previewBeginSample + (int) (t / 0.5 * previewBeforeSample)
+                            t => previewBeginSample + (int)(t / 0.5 * previewBeforeSample)
                         );
                         EditorGUI.DrawRect(
                             new Rect(
@@ -361,14 +361,14 @@ namespace Nova.Editor
         [MenuItem("Assets/Nova/Create Music Entries for All Audio Clips", false)]
         public static void CreateMusicEntryForAllAudioClips()
         {
-            var paths = new[] {EditorUtils.GetSelectedDirectory()};
-            var guids = AssetDatabase.FindAssets("t:AudioClip", paths);
-            var assets = guids.Select((guid, index) => AssetDatabase.GUIDToAssetPath(guid));
-            foreach (var asset in assets)
+            var dir = EditorUtils.GetSelectedDirectory();
+            var paths = AssetDatabase.FindAssets("t:AudioClip", new[] {dir})
+                .Select(AssetDatabase.GUIDToAssetPath);
+            foreach (var path in paths)
             {
-                if (!asset.Contains("_head") && !asset.Contains("_loop"))
+                if (!path.Contains("_head") && !path.Contains("_loop"))
                 {
-                    CreateMusicEntry(asset);
+                    CreateMusicEntry(path);
                 }
             }
         }
