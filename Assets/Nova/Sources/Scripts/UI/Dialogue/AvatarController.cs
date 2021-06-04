@@ -8,8 +8,7 @@ namespace Nova
     public class AvatarController : CompositeSpriteControllerBase
     {
         public string luaGlobalName;
-        public float transitionDuration = 0.2f;
-        public int visibleTextPushDistance = 100;
+        public int visibleTextPushDistance = 200;
 
         private Dictionary<string, string> boundDialogueNameToImageName;
         private string pendingBindImageName; // null: no bind, "": bind to empty

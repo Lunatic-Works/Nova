@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Nova
 {
-    [Serializable]
     public enum AnimationEntryStatus
     {
         Paused,

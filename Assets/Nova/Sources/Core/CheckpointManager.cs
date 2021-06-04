@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,32 +11,6 @@ using UnityEngine.Assertions;
 
 namespace Nova
 {
-    #region Serialization utils
-
-    /// <summary>
-    /// Implementation of Serializable HashSet.
-    /// The original HashSet is not serializable.
-    /// </summary>
-    /// <typeparam name="T">Type of value in HashSet</typeparam>
-    [Serializable]
-    public class SerializableHashSet<T> : HashSet<T>
-    {
-        public SerializableHashSet() { }
-
-        protected SerializableHashSet(SerializationInfo info, StreamingContext context)
-        {
-            foreach (var val in (List<T>) info.GetValue("values", typeof(List<T>)))
-                Add(val);
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("values", this.ToList());
-        }
-    }
-
-    #endregion
-
     #region Classes
 
     /// <summary>
@@ -268,15 +241,15 @@ namespace Nova
                 ResetGlobalSave();
             }
 
-            foreach (string name in Directory.GetFiles(savePathBase, "sav*.nsav*"))
+            foreach (string filename in Directory.GetFiles(savePathBase, "sav*.nsav*"))
             {
-                var result = Regex.Match(name, @"sav([0-9]+)\.nsav");
+                var result = Regex.Match(filename, @"sav([0-9]+)\.nsav");
                 if (result.Groups.Count > 1 && int.TryParse(result.Groups[1].Value, out int id))
                 {
                     saveSlotsMetadata.Add(id, new BookmarkMetadata
                     {
                         saveID = id,
-                        modifiedTime = File.GetLastWriteTime(name)
+                        modifiedTime = File.GetLastWriteTime(filename)
                     });
                 }
             }
@@ -442,7 +415,7 @@ namespace Nova
 
         private T SafeRead<T>(string path)
         {
-            return SafeRead<T>(path, x => { });
+            return SafeRead<T>(path, _ => { });
         }
 
         private T SafeRead<T>(string path, Action<T> assertion)
@@ -477,10 +450,10 @@ namespace Nova
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Debug.LogError($"Nova: Error loading {path}, details below");
-                throw ex; // Nested exception cannot display full message here
+                throw; // Nested exception cannot display full message here
             }
         }
 
@@ -503,7 +476,7 @@ namespace Nova
             catch (Exception ex)
             {
                 Alert.Show(I18n.__("bookmark.save.fail"), ex.Message);
-                throw ex;
+                throw;
             }
         }
 
