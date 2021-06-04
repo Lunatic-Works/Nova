@@ -20,7 +20,7 @@ namespace Nova
         public AutoVoiceConfig[] autoVoiceConfigs;
 
         /// <summary>
-        /// Length of the voice filename after padding zeros to the left.
+        /// Length of the voice file name after padding zeros to the left.
         /// </summary>
         public int padWidth;
 

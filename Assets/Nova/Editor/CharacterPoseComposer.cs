@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,9 +33,8 @@ namespace Nova.Editor
         private GameObject root;
         private CharacterTextureMerger merger;
         private Texture texture;
-        private float previewHeight = 600f;
 
-        private RectInt captureBox = new RectInt(100, 100, 500, 500);
+        private RectInt captureBox = new RectInt(100, 100, 400, 400);
         private string captureDest;
 
         private void OnEnable()
@@ -130,7 +128,7 @@ namespace Nova.Editor
             dirty = true;
         }
 
-        private string PosesToLuaTable(IEnumerable<Pose> poses)
+        private static string PosesToLuaTable(IEnumerable<Pose> poses)
         {
             var luaTable = poses
                 .Where(p => !string.IsNullOrEmpty(p.name))
@@ -170,7 +168,6 @@ namespace Nova.Editor
             }
 
             GUILayout.Label("Pose Preview", EditorStyles.boldLabel);
-            previewHeight = EditorGUILayout.Slider("Preview Size", previewHeight, 200f, 1000f);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Capture Box");
@@ -196,51 +193,12 @@ namespace Nova.Editor
 
             GUILayout.EndHorizontal();
 
-            var scale = previewHeight / texture.height;
-            var previewRect = EditorGUILayout.GetControlRect(
-                false, previewHeight, GUILayout.Width(scale * texture.width)
-            );
+            var previewRect =
+                EditorGUILayout.GetControlRect(false, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            previewRect.size = Utils.GetContentSize(previewRect.size, (float)texture.width / texture.height);
+            var scale = previewRect.width / texture.width;
             EditorGUI.DrawPreviewTexture(previewRect, texture);
-
-            EditorGUI.DrawRect(
-                new Rect(
-                    previewRect.x + captureBox.x * scale,
-                    previewRect.y + captureBox.y * scale,
-                    1,
-                    captureBox.height * scale
-                ),
-                Color.red
-            );
-
-            EditorGUI.DrawRect(
-                new Rect(
-                    previewRect.x + captureBox.xMax * scale,
-                    previewRect.y + captureBox.y * scale,
-                    1,
-                    captureBox.height * scale
-                ),
-                Color.red
-            );
-
-            EditorGUI.DrawRect(
-                new Rect(
-                    previewRect.x + captureBox.x * scale,
-                    previewRect.y + captureBox.y * scale,
-                    captureBox.width * scale,
-                    1
-                ),
-                Color.red
-            );
-
-            EditorGUI.DrawRect(
-                new Rect(
-                    previewRect.x + captureBox.x * scale,
-                    previewRect.y + captureBox.yMax * scale,
-                    captureBox.width * scale,
-                    1
-                ),
-                Color.red
-            );
+            EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, Color.red);
         }
     }
 }

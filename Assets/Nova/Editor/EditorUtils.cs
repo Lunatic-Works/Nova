@@ -23,6 +23,28 @@ namespace Nova.Editor
             return path;
         }
 
+        public static IEnumerable<string> PathOfSelectedSprites()
+        {
+            // strange work around with Unity
+            foreach (var tex in Selection.GetFiltered<Texture2D>(SelectionMode.Assets))
+            {
+                Sprite sprite = null;
+                try
+                {
+                    sprite = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GetAssetPath(tex));
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                if (sprite != null)
+                {
+                    yield return AssetDatabase.GetAssetPath(sprite);
+                }
+            }
+        }
+
         public static void DrawFrame(Rect rect, Color color, float lineWidth = 1.0f)
         {
             var offset = rect.min;
@@ -46,35 +68,18 @@ namespace Nova.Editor
             ), color);
         }
 
-        public static void DrawPreviewCropFrame(Rect previewRect, Rect crop, Color color, float lineWidth = 1.0f)
+        public static void DrawPreviewCropFrame(Rect preview, Rect crop, Color color, float lineWidth = 1.0f)
         {
-            var offset = previewRect.min + previewRect.size *
-                new Vector2(crop.x, 1.0f - crop.y);
-            var size = previewRect.size * crop.size;
+            var offset = preview.min + preview.size * new Vector2(crop.x, 1.0f - crop.y);
+            var size = preview.size * crop.size;
             size.y = -size.y;
             DrawFrame(new Rect(offset, size), color, lineWidth);
         }
 
-        public static IEnumerable<string> PathOfSelectedSprites()
+        public static void DrawPreviewCaptureFrame(Rect preview, Rect capture, float scale, Color color,
+            float lineWidth = 1.0f)
         {
-            // strange work around with unity
-            foreach (var tex in Selection.GetFiltered<Texture2D>(SelectionMode.Assets))
-            {
-                Sprite sprite = null;
-                try
-                {
-                    sprite = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GetAssetPath(tex));
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                if (sprite != null)
-                {
-                    yield return AssetDatabase.GetAssetPath(sprite);
-                }
-            }
+            DrawFrame(new Rect(preview.min + scale * capture.min, scale * capture.size), color, lineWidth);
         }
     }
 }

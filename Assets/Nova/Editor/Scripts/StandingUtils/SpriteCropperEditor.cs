@@ -7,38 +7,43 @@ namespace Nova.Editor
     [CustomEditor(typeof(SpriteCropper))]
     public class SpriteCropperEditor : UnityEditor.Editor
     {
-        private bool showPreview = true;
-
-        private static void DrawPreview(SpriteCropper cropper)
-        {
-            var sprite = cropper.sprite;
-            var height = EditorGUIUtility.currentViewWidth / sprite.texture.width * sprite.texture.height;
-            var rect = EditorGUILayout.GetControlRect(false, height);
-            EditorGUI.DrawTextureTransparent(rect, sprite.texture);
-            var cropRectInt = cropper.cropRect;
-            var cropRect = new Rect(
-                (float) cropRectInt.x / sprite.texture.width,
-                (float) cropRectInt.y / sprite.texture.height,
-                (float) cropRectInt.width / sprite.texture.width,
-                (float) cropRectInt.height / sprite.texture.height
-            );
-            EditorUtils.DrawPreviewCropFrame(rect, cropRect, Color.red);
-        }
+        private bool showCaptureBox;
+        private RectInt captureBox = new RectInt(100, 100, 400, 400);
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             var cropper = target as SpriteCropper;
+            var texture = cropper.sprite.texture;
+
             if (GUILayout.Button("Auto Crop"))
             {
                 AutoCrop(cropper);
             }
 
-            showPreview = GUILayout.Toggle(showPreview, "ShowPreview");
-            if (showPreview)
+            showCaptureBox = GUILayout.Toggle(showCaptureBox, "Show Capture Box");
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Capture Box");
+            captureBox = EditorGUILayout.RectIntField(captureBox);
+            GUILayout.EndHorizontal();
+
+            var scale = EditorGUIUtility.currentViewWidth / texture.width;
+            var previewRect = EditorGUILayout.GetControlRect(false, scale * texture.height);
+            EditorGUI.DrawTextureTransparent(previewRect, texture);
+
+            if (showCaptureBox)
             {
-                DrawPreview(cropper);
+                EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, Color.red);
             }
+
+            var cropRectInt = cropper.cropRect;
+            var cropRect = new Rect(
+                (float)cropRectInt.x / texture.width,
+                (float)cropRectInt.y / texture.height,
+                (float)cropRectInt.width / texture.width,
+                (float)cropRectInt.height / texture.height
+            );
+            EditorUtils.DrawPreviewCropFrame(previewRect, cropRect, Color.yellow);
         }
 
         private static int RoundToFour(int v)
@@ -48,8 +53,7 @@ namespace Nova.Editor
 
         public static void AutoCrop(SpriteCropper cropper)
         {
-            var sprite = cropper.sprite;
-            var texture = sprite.texture;
+            var texture = cropper.sprite.texture;
             var width = texture.width;
             var height = texture.height;
             var colors = texture.GetPixels();

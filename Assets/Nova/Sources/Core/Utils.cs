@@ -66,16 +66,34 @@ namespace Nova
             return dict[key];
         }
 
-        public static Vector2Int GetContainerSize(this Vector2Int contentSize, float containerAspectRatio)
+        public static Rect ToRect(this RectInt rectInt)
         {
-            float contentAspectRatio = 1.0f * contentSize.x / contentSize.y;
+            return new Rect(rectInt.min, rectInt.size);
+        }
+
+        public static Vector2 GetContainerSize(Vector2 contentSize, float containerAspectRatio)
+        {
+            float contentAspectRatio = contentSize.x / contentSize.y;
             if (contentAspectRatio > containerAspectRatio)
             {
-                return new Vector2Int(contentSize.x, (int)(contentSize.x / containerAspectRatio));
+                return new Vector2(contentSize.x, contentSize.x / containerAspectRatio);
             }
             else
             {
-                return new Vector2Int((int)(contentSize.y * containerAspectRatio), contentSize.y);
+                return new Vector2(contentSize.y * containerAspectRatio, contentSize.y);
+            }
+        }
+
+        public static Vector2 GetContentSize(Vector2 containerSize, float contentAspectRatio)
+        {
+            float containerAspectRatio = containerSize.x / containerSize.y;
+            if (contentAspectRatio > containerAspectRatio)
+            {
+                return new Vector2(containerSize.x, containerSize.x / contentAspectRatio);
+            }
+            else
+            {
+                return new Vector2(containerSize.y * contentAspectRatio, containerSize.y);
             }
         }
 
@@ -102,7 +120,8 @@ namespace Nova
             var gameController = go.GetComponent<GameController>();
             if (gameController == null)
             {
-                throw new InvalidAccessException("Nova: No GameController component in NovaGameController game object.");
+                throw new InvalidAccessException(
+                    "Nova: No GameController component in NovaGameController game object.");
             }
 
             return gameController;

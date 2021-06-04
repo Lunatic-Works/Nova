@@ -162,12 +162,12 @@ namespace Nova
 
         public static BookmarkType SaveIDToBookmarkType(int saveID)
         {
-            if (saveID >= (int) BookmarkType.NormalSave)
+            if (saveID >= (int)BookmarkType.NormalSave)
             {
                 return BookmarkType.NormalSave;
             }
 
-            if (saveID >= (int) BookmarkType.QuickSave)
+            if (saveID >= (int)BookmarkType.QuickSave)
             {
                 return BookmarkType.QuickSave;
             }
@@ -241,15 +241,15 @@ namespace Nova
                 ResetGlobalSave();
             }
 
-            foreach (string filename in Directory.GetFiles(savePathBase, "sav*.nsav*"))
+            foreach (string fileName in Directory.GetFiles(savePathBase, "sav*.nsav*"))
             {
-                var result = Regex.Match(filename, @"sav([0-9]+)\.nsav");
+                var result = Regex.Match(fileName, @"sav([0-9]+)\.nsav");
                 if (result.Groups.Count > 1 && int.TryParse(result.Groups[1].Value, out int id))
                 {
                     saveSlotsMetadata.Add(id, new BookmarkMetadata
                     {
                         saveID = id,
-                        modifiedTime = File.GetLastWriteTime(filename)
+                        modifiedTime = File.GetLastWriteTime(fileName)
                     });
                 }
             }
@@ -498,12 +498,12 @@ namespace Nova
                     {
                         compressed.CopyTo(uncompressed);
                         uncompressed.Position = 0;
-                        return (T) formatter.Deserialize(uncompressed);
+                        return (T)formatter.Deserialize(uncompressed);
                     }
                 }
                 else // version == 1
                 {
-                    return (T) formatter.Deserialize(new XorStream(s, fileHeader));
+                    return (T)formatter.Deserialize(new XorStream(s, fileHeader));
                 }
             }
         }
@@ -708,7 +708,7 @@ namespace Nova
 
             try
             {
-                return (T) Convert.ChangeType(value, typeof(T));
+                return (T)Convert.ChangeType(value, typeof(T));
             }
             catch (InvalidCastException)
             {

@@ -13,7 +13,7 @@ namespace Nova.Editor
     {
         public const int SnapshotWidth = 320;
         public const int SnapshotHeight = 180;
-        public const float SnapshotAspectRatio = (float) SnapshotHeight / SnapshotWidth;
+        public const float SnapshotAspectRatio = (float)SnapshotHeight / SnapshotWidth;
 
         private static string GetAssetFullPath(UnityEngine.Object asset)
         {
@@ -140,7 +140,7 @@ namespace Nova.Editor
 
         private bool previewDrawSnapshotFrame = true;
         private Color previewSnapshotFrameColor = Color.red;
-        private float previewSnapshotFrameLineWidth = 2.0f;
+        private float previewSnapshotFrameLineWidth = 1.0f;
 
         private static void CorrectSnapshotScaleY(ImageEntry entry, Texture tex, SerializedProperty entryProperty)
         {
