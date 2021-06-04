@@ -188,8 +188,10 @@ namespace Nova.Editor
                 RenderTexture.active = null;
                 tex.Apply();
 
-                File.WriteAllBytes(captureDest, tex.EncodeToPNG());
-                EditorUtility.DisplayDialog("Finished", $"The captured png is saved at {captureDest}", "OK");
+                var absoluteCaptureDest = Path.Combine(Path.GetDirectoryName(Application.dataPath), captureDest);
+                Directory.CreateDirectory(Path.GetDirectoryName(absoluteCaptureDest));
+                File.WriteAllBytes(absoluteCaptureDest, tex.EncodeToPNG());
+                EditorUtility.DisplayDialog("Finished", $"The captured png is saved at {absoluteCaptureDest}", "OK");
             }
 
             GUILayout.EndHorizontal();

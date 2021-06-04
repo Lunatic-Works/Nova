@@ -17,7 +17,7 @@ namespace Nova.Editor
 
         private static string GetAssetFullPath(UnityEngine.Object asset)
         {
-            return Path.Combine(Application.dataPath, AssetDatabase.GetAssetPath(asset).Substring(7));
+            return Path.Combine(Path.GetDirectoryName(Application.dataPath), AssetDatabase.GetAssetPath(asset));
         }
 
         private const string ResourcesFolderName = "/Resources/";
@@ -273,6 +273,7 @@ namespace Nova.Editor
             var assetFullPath = GetAssetFullPath(sprite);
             var snapshotFullPath =
                 Path.Combine(GetResourcesFolder(assetFullPath), entry.snapshotResourcePath + ".png");
+            Directory.CreateDirectory(Path.GetDirectoryName(snapshotFullPath));
             File.WriteAllBytes(snapshotFullPath, data);
         }
 

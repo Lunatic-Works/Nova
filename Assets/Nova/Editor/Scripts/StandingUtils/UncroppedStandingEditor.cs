@@ -91,7 +91,9 @@ namespace Nova.Editor
             cropped.SetPixels(pixels);
             cropped.Apply();
             var bytes = cropped.EncodeToPNG();
-            File.WriteAllBytes(Path.Combine(standing.absoluteOutputDirectory, cropper.sprite.name + ".png"), bytes);
+            var absoluteOutputFileName = Path.Combine(standing.absoluteOutputDirectory, cropper.sprite.name + ".png");
+            Directory.CreateDirectory(Path.GetDirectoryName(absoluteOutputFileName));
+            File.WriteAllBytes(absoluteOutputFileName, bytes);
         }
 
         private static void GenerateMetaData(UncroppedStanding standing)
