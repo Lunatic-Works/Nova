@@ -134,7 +134,7 @@ namespace Nova
             float time;
             if (playableDirector != null)
             {
-                time = (float) playableDirector.time;
+                time = (float)playableDirector.time;
             }
             else
             {

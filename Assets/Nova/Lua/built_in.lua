@@ -53,7 +53,7 @@ end
 function branch(branches)
     for i, branch in ipairs(branches) do
         local image_info = nil
-        if branch.image ~= nil then
+        if branch.image then
             local image_name, image_coord = unpack(branch.image)
             local pos_x, pos_y, scale = unpack(image_coord)
             image_info = Nova.BranchImageInformation(image_name, pos_x, pos_y, scale)

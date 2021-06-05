@@ -511,8 +511,7 @@ namespace Nova
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
             Color nowTextColor = textColorHasSet ? textColor : isReadDialogue ? readColor : unreadColor;
-            // ?. bypasses lifetime check of UnityEngine.Object, but it is fine here
-            dialogueText.textLeftExtraPadding = avatarController?.textPaddingOrZero ?? 0;
+            dialogueText.textLeftExtraPadding = avatarController.textPaddingOrZero;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName);
 
             if (this.needAnimation && useDefaultTextAnimation && needAnimation && !gameState.isMovingBack &&

@@ -29,7 +29,7 @@ namespace Nova
             for (int i = 0; i < seq.Length; i++)
             {
                 var item = seq[i];
-                float beginning, ending;
+                float beginning;
                 switch (item.offsetBasedOn)
                 {
                     case TransitionSequenceOffsetBase.GlobalBeginning:
@@ -48,7 +48,7 @@ namespace Nova
                 }
 
                 beginning += item.offset;
-                ending = beginning + (isEnter ? item.transition.enterDuration : item.transition.exitDuration);
+                var ending = beginning + (isEnter ? item.transition.enterDuration : item.transition.exitDuration);
                 if (ending >= globalEnding)
                 {
                     maxIdx = i;

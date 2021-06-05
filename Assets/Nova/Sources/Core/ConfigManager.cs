@@ -34,9 +34,13 @@ namespace Nova
                 JsonConvert.DeserializeObject<Dictionary<string, SettingDefinition>>(defaultSettingsJson.text);
         }
 
+        private void OnDestroy()
+        {
+            Apply();
+        }
+
         public void Apply()
         {
-            // write to player prefs
             foreach (var entry in tmpStrCache)
             {
                 PlayerPrefs.SetString(entry.Key, entry.Value);
@@ -54,7 +58,6 @@ namespace Nova
 
             ClearCache();
 
-            // save player prefs
             PlayerPrefs.Save();
         }
 
@@ -211,7 +214,7 @@ namespace Nova
             }
         }
 
-        public string[] GetAllTrackedKeys()
+        public IEnumerable<string> GetAllTrackedKeys()
         {
             return GetString(TrackedKeysKey).Split(new[] {','}, System.StringSplitOptions.RemoveEmptyEntries);
         }

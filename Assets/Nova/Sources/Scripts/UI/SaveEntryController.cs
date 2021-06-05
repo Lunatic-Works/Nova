@@ -9,6 +9,7 @@ namespace Nova
     {
         private Text idText;
         private NovaTextOutline idTextOutline;
+
         // private Text headerText;
         private Text dateText;
         private GameObject latest;

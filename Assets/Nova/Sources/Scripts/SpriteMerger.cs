@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -104,7 +105,7 @@ namespace Nova
                 };
             }
 
-            mergeCamera.orthographicSize = (float)Mathf.Max(referenceSize.x, referenceSize.y) / pixelsPerUnit / 2;
+            mergeCamera.orthographicSize = (float)Math.Max(referenceSize.x, referenceSize.y) / pixelsPerUnit / 2;
             mergeCamera.RenderToTexture(texture);
             textureCache[key] = texture;
 
@@ -116,7 +117,7 @@ namespace Nova
             return texture;
         }
 
-        public Texture GetMergedTexture(List<Sprite> sprites)
+        public Texture GetMergedTexture(IEnumerable<Sprite> sprites)
         {
             return GetMergedTexture(sprites.Select(sprite =>
                 {

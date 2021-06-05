@@ -23,7 +23,7 @@ namespace Nova
             LuaRuntime.Instance.BindObject("checkpointHelper", this);
         }
 
-        public int warningStepNumFromLastCheckpoint => gameState.warningStepNumFromLastCheckpoint;
+        public static int WarningStepNumFromLastCheckpoint => GameState.WarningStepNumFromLastCheckpoint;
 
         public void RestrainCheckpoint(int steps, bool authorized = false)
         {

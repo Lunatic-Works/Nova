@@ -125,7 +125,7 @@ namespace Nova
             if (aspectRatio < desiredAspectRatio)
             {
                 RealScreen.fHeight = Screen.width / desiredAspectRatio;
-                RealScreen.height = (int) RealScreen.fHeight;
+                RealScreen.height = (int)RealScreen.fHeight;
                 RealScreen.fWidth = RealScreen.width = Screen.width;
 
                 var delta = 1 - aspectRatio / RealScreen.aspectRatio;
@@ -136,7 +136,7 @@ namespace Nova
             else
             {
                 RealScreen.fWidth = Screen.height * desiredAspectRatio;
-                RealScreen.width = (int) RealScreen.fWidth;
+                RealScreen.width = (int)RealScreen.fWidth;
                 RealScreen.fHeight = RealScreen.height = Screen.height;
 
                 var delta = 1 - RealScreen.aspectRatio / aspectRatio;

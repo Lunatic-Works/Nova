@@ -28,7 +28,7 @@ namespace Nova
 
         protected override float currentValue
         {
-            get => (float) timeline.playableDirector.time;
+            get => (float)timeline.playableDirector.time;
             set
             {
                 timeline.playableDirector.time = value;
@@ -37,6 +37,6 @@ namespace Nova
         }
 
         protected override float CombineDelta(float a, float b) =>
-            Mathf.Clamp(a + b, 0f, (float) timeline.playableDirector.duration);
+            Mathf.Clamp(a + b, 0f, (float)timeline.playableDirector.duration);
     }
 }

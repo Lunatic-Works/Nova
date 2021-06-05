@@ -33,7 +33,7 @@ end
 
 --- get material from the MaterialPoolComponent attached to the GameObject
 local function get_mat(obj, shader_name, restorable)
-    if shader_name == nil or shader_name == '' then
+    if shader_name == nil then
         return nil
     end
 
@@ -322,7 +322,7 @@ end, add_preload_pattern)
 ---     vfx(obj, {'shader_name'. layer_id}, [t, { name = value }])
 function vfx(obj, shader_layer, t, properties)
     local shader_name, layer_id = parse_shader_layer(shader_layer)
-    if shader_name and shader_name ~= '' then
+    if shader_name then
         local mat, base_shader_name = get_mat(obj, shader_name)
         t = t or 1
         properties = properties or {}

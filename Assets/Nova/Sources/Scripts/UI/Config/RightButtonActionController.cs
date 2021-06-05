@@ -40,7 +40,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            dialogueBoxController.rightButtonAction = (RightButtonAction) configManager.GetInt(configKeyName);
+            dialogueBoxController.rightButtonAction = (RightButtonAction)configManager.GetInt(configKeyName);
         }
     }
 }

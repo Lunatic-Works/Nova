@@ -48,7 +48,7 @@ namespace Nova
             if (headClip != null)
             {
                 headAudioSource.Play();
-                double timeLeft = (double) headClip.samples / headClip.frequency;
+                double timeLeft = (double)headClip.samples / headClip.frequency;
                 audioSource.PlayScheduled(AudioSettings.dspTime + timeLeft);
             }
             else
@@ -84,7 +84,7 @@ namespace Nova
             {
                 AudioClip headClip = headAudioSource.clip;
                 headAudioSource.UnPause();
-                double timeLeft = (double) (headClip.samples - headAudioSource.timeSamples) / headClip.frequency;
+                double timeLeft = (double)(headClip.samples - headAudioSource.timeSamples) / headClip.frequency;
                 audioSource.PlayScheduled(AudioSettings.dspTime + timeLeft);
             }
             else

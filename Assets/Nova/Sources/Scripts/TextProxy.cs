@@ -227,7 +227,7 @@ namespace Nova
 
             // handle fading character
             var tint = Mathf.Clamp01(characterCount * fadeValue - fadingCharacterIndex);
-            var alpha = (byte) (targetAlpha * tint);
+            var alpha = (byte)(targetAlpha * tint);
             ApplyAlphaToCharAtIndex(fadingCharacterIndex, alpha);
 
             // handle hidden characters

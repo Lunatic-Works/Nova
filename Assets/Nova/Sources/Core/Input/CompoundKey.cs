@@ -371,7 +371,7 @@ namespace Nova
                         v.Shift = true;
                         break;
                     default:
-                        v.Key = (KeyCode) Enum.Parse(typeof(KeyCode), key);
+                        v.Key = (KeyCode)Enum.Parse(typeof(KeyCode), key);
                         break;
                 }
             }

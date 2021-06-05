@@ -15,11 +15,11 @@ namespace Nova
             var localeInt = configManager.GetInt(configKeyName);
             if (localeInt < 0)
             {
-                configManager.SetInt(configKeyName, (int) I18n.CurrentLocale);
+                configManager.SetInt(configKeyName, (int)I18n.CurrentLocale);
             }
             else
             {
-                I18n.CurrentLocale = (SystemLanguage) localeInt;
+                I18n.CurrentLocale = (SystemLanguage)localeInt;
             }
 
             this.RuntimeAssert(localeTogglePairs.Length > 0, "Empty language toggle list");
@@ -41,7 +41,7 @@ namespace Nova
         {
             if (!value) return;
             I18n.CurrentLocale = locale;
-            configManager.SetInt(configKeyName, (int) locale);
+            configManager.SetInt(configKeyName, (int)locale);
         }
 
         private void OnLocaleChanged()

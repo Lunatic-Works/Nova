@@ -2,7 +2,7 @@ anim_persist_begun = false
 
 function anim_persist_begin()
     anim_persist:stop()
-    __Nova.checkpointHelper:RestrainCheckpoint(__Nova.checkpointHelper.warningStepNumFromLastCheckpoint, true)
+    __Nova.checkpointHelper:RestrainCheckpoint(Nova.CheckpointHelper.WarningStepNumFromLastCheckpoint, true)
     anim_persist_begun = true
 end
 

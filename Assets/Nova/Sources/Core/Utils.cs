@@ -412,7 +412,7 @@ namespace Nova
         }
 
         // Avoid mutating the enumerable in the loop
-        public static List<Transform> GetChildren(Transform transform)
+        public static IEnumerable<Transform> GetChildren(Transform transform)
         {
             return transform.Cast<Transform>().ToList();
         }

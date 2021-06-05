@@ -34,6 +34,6 @@ namespace Nova
     public static class RealInput
     {
         // TODO: may not be needed in newer unity engine
-        public static Vector3 mousePosition => Input.mousePosition - (Vector3) RealScreen.offset;
+        public static Vector3 mousePosition => Input.mousePosition - (Vector3)RealScreen.offset;
     }
 }

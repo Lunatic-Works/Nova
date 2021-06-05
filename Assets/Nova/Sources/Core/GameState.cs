@@ -683,7 +683,7 @@ namespace Nova
         /// </summary>
         public int maxStepNumFromLastCheckpoint = 10;
 
-        public readonly int warningStepNumFromLastCheckpoint = 100;
+        public const int WarningStepNumFromLastCheckpoint = 100;
 
         private int stepNumFromLastCheckpoint;
 

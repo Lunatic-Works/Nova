@@ -16,7 +16,7 @@ namespace Nova
 
         private MusicListMode GetNextMode()
         {
-            return (MusicListMode) (((int) controller.mode + 1) % 3);
+            return (MusicListMode)(((int)controller.mode + 1) % 3);
         }
 
         private string GetDescription()
@@ -45,13 +45,13 @@ namespace Nova
             set
             {
                 controller.mode = value;
-                iconImage.sprite = icons[(int) value];
+                iconImage.sprite = icons[(int)value];
             }
         }
 
         private void LoadConfig()
         {
-            mode = (MusicListMode) config.GetInt(configKey, (int) controller.mode);
+            mode = (MusicListMode)config.GetInt(configKey, (int)controller.mode);
         }
 
         private void OnEnable()
@@ -61,7 +61,7 @@ namespace Nova
 
         private void OnDisable()
         {
-            config.SetInt(configKey, (int) controller.mode);
+            config.SetInt(configKey, (int)controller.mode);
         }
 
         public void OnClick()

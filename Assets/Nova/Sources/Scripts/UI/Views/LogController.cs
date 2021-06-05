@@ -97,8 +97,7 @@ namespace Nova
                 .GetComponent<LogEntryController>();
 
             UnityAction<int> onGoBackButtonClicked = logEntryIndex => OnGoBackButtonClicked(initParams.currentNodeName,
-                initParams.currentDialogueIndex,
-                logEntryIndex, initParams.variablesHashBeforeChange);
+                initParams.currentDialogueIndex, logEntryIndex, initParams.variablesHashBeforeChange);
 
             UnityAction onPlayVoiceButtonClicked = null;
             if (initParams.voices.Any())

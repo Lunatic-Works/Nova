@@ -40,7 +40,7 @@ namespace Nova.Editor
 
         private void OnEnable()
         {
-            root = new GameObject("CharacterPoseComposerDummy")
+            root = new GameObject("CharacterPoseComposer")
             {
                 hideFlags = HideFlags.DontSave
             };

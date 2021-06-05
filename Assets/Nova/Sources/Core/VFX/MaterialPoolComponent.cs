@@ -33,18 +33,16 @@ namespace Nova
             defaultMaterial = null;
         }
 
-        private readonly MaterialFactory _factory = new MaterialFactory();
-
-        public MaterialFactory factory => _factory;
+        public MaterialFactory factory { get; } = new MaterialFactory();
 
         public Material Get(string shaderName)
         {
-            return _factory.Get(shaderName);
+            return factory.Get(shaderName);
         }
 
         public RestorableMaterial GetRestorableMaterial(string shaderName)
         {
-            return _factory.GetRestorableMaterial(shaderName);
+            return factory.GetRestorableMaterial(shaderName);
         }
 
         public static MaterialPoolComponent Ensure(GameObject gameObject)

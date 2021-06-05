@@ -212,13 +212,13 @@ make_anim_method('move', function(self, obj, coord, duration, easing)
 end)
 
 function get_color(obj)
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(Nova.CharacterController))
+    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.CharacterController)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
     if renderer then
         local color = renderer.color
         return color.r, color.g, color.b, color.a
     end
 
-    warn('Cannot find CharacterController or SpriteRenderer or Image for ' .. tostring(obj))
+    warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. tostring(obj))
     return nil
 end
 
@@ -245,13 +245,13 @@ end
 --- usage:
 ---     tint(obj, {r, g, b, [a]})
 function tint(obj, color)
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(Nova.CharacterController))
+    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.CharacterController)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
     if renderer then
         renderer.color = parse_color(color)
         return
     end
 
-    warn('Cannot find CharacterController or SpriteRenderer or Image for ' .. tostring(obj))
+    warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. tostring(obj))
 end
 
 --- usage:
@@ -260,7 +260,7 @@ make_anim_method('tint', function(self, obj, color, duration, easing)
     local character = obj:GetComponent(typeof(Nova.CharacterController))
     local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
     if character == nil and renderer == nil then
-        warn('Cannot find CharacterController or SpriteRenderer or Image for ' .. tostring(obj))
+        warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. tostring(obj))
         return self
     end
 

@@ -7,7 +7,6 @@ namespace Nova.Editor
 {
     public static class EditorUtils
     {
-        // https://gist.github.com/allanolivei/9260107
         public static string GetSelectedDirectory()
         {
             var path = "";

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -316,16 +317,10 @@ namespace Nova
             // Debug.LogFormat("Called: {0}", voices.Count);
 
             StopVoiceAll();
-            var bias = float.PositiveInfinity;
+            float bias = 0.0f;
             if (unbiasedDelay)
             {
-                foreach (var v in voices.Values)
-                {
-                    if (v.voiceDelay < bias)
-                    {
-                        bias = v.voiceDelay;
-                    }
-                }
+                bias = voices.Values.Select(v => v.voiceDelay).Min();
             }
 
             foreach (var voice in voices)

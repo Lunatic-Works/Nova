@@ -131,7 +131,7 @@ namespace Nova
             preCalculatedAnchorPos = GetAnchorPosToCanvas();
             selectedSectorIndex = -1;
             actionNameText.text = "";
-            actionNameText.fontSize = (int) (_sectorRadius / 6);
+            actionNameText.fontSize = (int)(_sectorRadius / 6);
         }
 
         private bool suppressNextAction = true;

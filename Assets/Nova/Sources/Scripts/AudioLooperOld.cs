@@ -41,7 +41,7 @@ namespace Nova
 
         public bool isPlaying => enabled;
 
-        public static double CurrentMillis => (double) DateTime.Now.Ticks / TimeSpan.TicksPerSecond;
+        public static double CurrentMillis => (double)DateTime.Now.Ticks / TimeSpan.TicksPerSecond;
 
         private void Awake()
         {
