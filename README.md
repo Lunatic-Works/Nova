@@ -42,7 +42,7 @@ GitHub Wiki（正在施工中）：https://github.com/Lunatic-Works/Nova/wiki/
 * [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个使用web前端的引擎，似乎得到了Xihe Animation的支持
 * [Snowing](https://github.com/Strrationalism/Snowing)：用C++写的硬核引擎
 * [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家自研引擎的碎片化问题，而定义的通用脚本格式
-* [EtherAPI](https://github.com/VoidmatrixHeathcliff/EtherEngine)：基于Lua和SDL的跨平台游戏接口
+* [EtherEngine](https://github.com/VoidmatrixHeathcliff/EtherEngine)：基于Lua和SDL的跨平台游戏接口
 * [Luna Engine](https://github.com/JX-Master/Luna-Engine-0.6)：这个引擎不是我们做的，不过看起来很有意思
 
 本框架的依赖：
