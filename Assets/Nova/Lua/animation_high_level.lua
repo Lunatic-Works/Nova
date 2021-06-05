@@ -227,7 +227,7 @@ function parse_color(color)
         return Color(color, color, color, 1)
     else -- type(color) == 'table'
         if #color == 1 then
-            warn('table is not needed: {' .. color[1] .. '}')
+            warn('Table is not needed: {' .. color[1] .. '}')
             return Color(color[1], color[1], color[1], 1)
         elseif #color == 2 then
             return Color(color[1], color[1], color[1], color[2])
@@ -236,7 +236,7 @@ function parse_color(color)
         elseif #color == 4 then
             return Color(color[1], color[2], color[3], color[4])
         else
-            warn('parse color failed: ' .. dump(color))
+            warn('Parse color failed: ' .. dump(color))
             return Color.white
         end
     end

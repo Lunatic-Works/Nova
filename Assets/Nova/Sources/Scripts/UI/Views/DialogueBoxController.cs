@@ -104,7 +104,7 @@ namespace Nova
                     leftPadding = value ? themedEntryLeftPadding : 0,
                     rightPadding = value ? themedEntryRightPadding : 0,
                     nameTextSpacing = value ? themedEntryNameTextSpacing : 0,
-                    preferredHeight = value ? (float?) themedEntryPreferredHeight : null
+                    preferredHeight = value ? (float?)themedEntryPreferredHeight : null
                 };
 
                 var scrollRectTransform = dialogueTextScrollRect.transform as RectTransform;
@@ -510,11 +510,9 @@ namespace Nova
 
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
-            // ?. bypasses lifetime check of UnityEngine.Object, but it is fine here
-            avatarController?.SetDialogueName(displayData.characterName);
-
             Color nowTextColor = textColorHasSet ? textColor : isReadDialogue ? readColor : unreadColor;
-            dialogueText.textLeftExtraPadding = avatarController?.avatarWidth ?? 0;
+            // ?. bypasses lifetime check of UnityEngine.Object, but it is fine here
+            dialogueText.textLeftExtraPadding = avatarController?.textPaddingOrZero ?? 0;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName);
 
             if (this.needAnimation && useDefaultTextAnimation && needAnimation && !gameState.isMovingBack &&
@@ -542,7 +540,7 @@ namespace Nova
                 textAnimation.Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
                     .Then(null).For(textAnimationDelay)
                     .Then(
-                        new TextFadeInAnimationProperty(contentProxy, (byte) (255 * nowTextColor.a)),
+                        new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
                         textAnimDuration
                     ).And(
                         new VerticalScrollRectAnimationProperty(dialogueTextScrollRect, 0f),
@@ -862,7 +860,7 @@ namespace Nova
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
             return new DialogueBoxRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas,
-                clickForwardAbility, scriptAbortAnimationAbility, (int) textAlignment, useThemedBox, textColorHasSet,
+                clickForwardAbility, scriptAbortAnimationAbility, (int)textAlignment, useThemedBox, textColorHasSet,
                 textColor, materialName, closeButtonShown, dialogueFinishIconEnabled);
         }
 
@@ -876,7 +874,7 @@ namespace Nova
             clickForwardAbility = data.clickForwardAbility;
             scriptAbortAnimationAbility = data.scriptAbortAnimationAbility;
 
-            textAlignment = (TextAlignmentOptions) data.textAlignment;
+            textAlignment = (TextAlignmentOptions)data.textAlignment;
             useThemedBox = data.useThemedBox;
             textColorHasSet = data.textColorHasSet;
             textColor = data.textColor;

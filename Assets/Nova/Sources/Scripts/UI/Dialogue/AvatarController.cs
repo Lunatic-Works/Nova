@@ -1,25 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
 {
+    [Serializable]
+    public class AvatarConfig
+    {
+        public string characterName;
+        public CharacterController characterController;
+        public string prefix;
+    }
+
     [ExportCustomType]
     public class AvatarController : CompositeSpriteControllerBase
     {
         public string luaGlobalName;
-        public int visibleTextPushDistance = 200;
+        public AvatarConfig[] avatarConfigs;
+        public int textPadding = 200;
 
-        private Dictionary<string, string> boundDialogueNameToImageName;
-        private string pendingBindImageName; // null: no bind, "": bind to empty
+        public int textPaddingOrZero => string.IsNullOrEmpty(currentImageName) ? 0 : textPadding;
 
-        public int avatarWidth => string.IsNullOrEmpty(currentImageName) ? 0 : visibleTextPushDistance;
+        private readonly Dictionary<string, AvatarConfig> nameToConfig = new Dictionary<string, AvatarConfig>();
+
+        private string characterName;
+        private Dictionary<string, string> characterToImageName = new Dictionary<string, string>();
 
         protected override void Awake()
         {
             base.Awake();
-            boundDialogueNameToImageName = new Dictionary<string, string>();
-            pendingBindImageName = null;
+
+            foreach (var config in avatarConfigs)
+            {
+                nameToConfig[config.characterName] = config;
+            }
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -36,70 +51,93 @@ namespace Nova
             }
         }
 
-        public void SetDialogueName(string name)
+        public void SetCharacterName(string name)
         {
-            if (pendingBindImageName != null)
+            characterName = name;
+        }
+
+        private bool CheckCharacterName(string imageName)
+        {
+            if (string.IsNullOrEmpty(characterName))
             {
-                boundDialogueNameToImageName[name] = pendingBindImageName;
-                pendingBindImageName = null;
+                Debug.LogWarning($"Nova: Set avatar {imageName} with empty characterName");
+                return false;
+            }
+
+            if (!nameToConfig.ContainsKey(characterName))
+            {
+                Debug.LogWarning($"Nova: Set avatar {imageName} with unknown characterName {characterName}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public CharacterController GetCharacterController()
+        {
+            if (nameToConfig.ContainsKey(characterName))
+            {
+                return nameToConfig[characterName].characterController;
             }
             else
             {
-                boundDialogueNameToImageName.TryGetValue(name, out string imageName);
-                if (currentImageName == imageName)
-                {
-                    return;
-                }
-
-                if (!string.IsNullOrEmpty(imageName))
-                {
-                    string[] parts = StringToPoseArray(imageName);
-                    if (parts.Length == 1)
-                    {
-                        base.SetImage(imageName);
-                    }
-                    else
-                    {
-                        base.SetPose(parts, true);
-                    }
-                }
-                else
-                {
-                    base.ClearImage();
-                }
+                Debug.LogWarning($"Nova: GetCharacterController with unknown characterName {characterName}");
+                return null;
             }
         }
 
-        protected override void SetPose(string[] poseArray, bool fade)
+        public void SetPoseDelayed(LuaInterface.LuaTable pose)
         {
-            base.SetPose(poseArray, fade);
-            pendingBindImageName = PoseArrayToString(poseArray);
+            if (!CheckCharacterName("pose"))
+            {
+                return;
+            }
+
+            var prefix = nameToConfig[characterName].prefix;
+            var poseStr = PoseArrayToString(pose.ToArray().Cast<string>().Select(x => prefix + x).ToArray());
+            characterToImageName[characterName] = poseStr;
         }
 
-        /// <summary>
-        /// Bind current (i.e. next dialogue) dialogue name to have the target image as avatar
-        /// </summary>
-        public override void SetImage(string to, bool fade = true)
+        public void SetImageDelayed(string imageName)
         {
-            base.SetImage(to, fade);
-            pendingBindImageName = to;
+            if (!CheckCharacterName(imageName))
+            {
+                return;
+            }
+
+            characterToImageName[characterName] = nameToConfig[characterName].prefix + imageName;
         }
 
-        /// <summary>
-        /// Clear avatar of current (i.e. next dialogue) dialogue name
-        /// </summary>
-        public override void ClearImage(bool fade = true)
+        public void ClearImageDelayed()
         {
-            base.ClearImage(fade);
-            pendingBindImageName = "";
+            if (!CheckCharacterName(""))
+            {
+                return;
+            }
+
+            characterToImageName.Remove(characterName);
         }
 
-        /// <summary>
-        /// Clear all bindings, but does not hide current displayed avatar
-        /// </summary>
+        public void UpdateImage(bool fade = true)
+        {
+            if (string.IsNullOrEmpty(characterName) || !nameToConfig.ContainsKey(characterName))
+            {
+                return;
+            }
+
+            if (characterToImageName.ContainsKey(characterName))
+            {
+                SetImageOrPose(characterToImageName[characterName], fade);
+            }
+            else
+            {
+                ClearImage(fade);
+            }
+        }
+
         public void ResetAll()
         {
-            boundDialogueNameToImageName.Clear();
+            characterToImageName.Clear();
         }
 
         private Color _color = Color.white;
@@ -110,31 +148,38 @@ namespace Nova
             set => SetColor(_color = value);
         }
 
-        public override string restorableObjectName => luaGlobalName;
-
         [Serializable]
         private class AvatarRestoreData : CompositeSpriteControllerBaseRestoreData
         {
-            public readonly Dictionary<string, string> boundDialogueNameToImageName;
+            // No need to save characterName, because it will be set in the action of the dialogue entry
+            public readonly Dictionary<string, string> characterToImageName;
 
             public AvatarRestoreData(CompositeSpriteControllerBaseRestoreData baseData,
-                Dictionary<string, string> boundDialogueNameToImageName) : base(baseData)
+                Dictionary<string, string> characterToImageName) : base(baseData)
             {
-                this.boundDialogueNameToImageName = boundDialogueNameToImageName;
+                this.characterToImageName = characterToImageName;
             }
         }
+
+        public override string restorableObjectName => luaGlobalName;
 
         public override IRestoreData GetRestoreData()
         {
             return new AvatarRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
-                boundDialogueNameToImageName);
+                characterToImageName);
         }
 
         public override void Restore(IRestoreData restoreData)
         {
+            // Avoid updating image when restoring base by setting currentImageName = baseData.currentImageName
+            var baseData = restoreData as CompositeSpriteControllerBaseRestoreData;
+            var currentImageNameOld = currentImageName;
+            currentImageName = baseData.currentImageName;
+            base.Restore(baseData);
+            currentImageName = currentImageNameOld;
+
             var data = restoreData as AvatarRestoreData;
-            boundDialogueNameToImageName = data.boundDialogueNameToImageName;
-            base.Restore(restoreData);
+            characterToImageName = data.characterToImageName;
         }
     }
 }

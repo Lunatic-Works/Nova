@@ -111,7 +111,6 @@ namespace Nova
             for (int i = 0; i < sprites.Count; i++)
             {
                 layers[i].gameObject.SetActive(false);
-                layers[i].sprite = null;
             }
 
             return texture;

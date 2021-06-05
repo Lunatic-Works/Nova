@@ -6455,6 +6455,22 @@ PrefabInstance:
       propertyPath: _sectors.Array.data[6].action.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+      propertyPath: avatarConfigs.Array.data[0].characterController
+      value: 
+      objectReference: {fileID: 537562888}
+    - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+      propertyPath: avatarConfigs.Array.data[1].characterController
+      value: 
+      objectReference: {fileID: 1839185672}
+    - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+      propertyPath: avatarConfigs.Array.data[2].characterController
+      value: 
+      objectReference: {fileID: 1964594893}
+    - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+      propertyPath: avatarConfigs.Array.data[3].characterController
+      value: 
+      objectReference: {fileID: 1992234137}
     - target: {fileID: 1515438340287766, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_Name
       value: DialogueView

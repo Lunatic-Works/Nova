@@ -6,7 +6,7 @@ add_preload_pattern_with_obj_and_res = Nova.ScriptDialogueEntryParser.AddPattern
 
 function preload(obj, resource_name)
     if obj == nil then
-        warn('preload obj == nil', resource_name)
+        warn('Preload obj == nil', resource_name)
     end
 
     if obj == 'Texture' then
@@ -31,7 +31,7 @@ end
 
 function unpreload(obj, resource_name)
     if obj == nil then
-        warn('unpreload obj == nil', resource_name)
+        warn('Unpreload obj == nil', resource_name)
     end
 
     if obj == 'Texture' then

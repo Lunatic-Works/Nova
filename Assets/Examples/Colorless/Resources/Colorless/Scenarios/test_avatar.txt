@@ -1,0 +1,45 @@
+@<|
+label 'test_avatar'
+is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试头像
+
+<|
+show(avatar, 'normal')
+|>
+王二宫：：第一个人的头像
+
+没有人说话的时候就没有头像
+
+王二宫：：出现刚才的头像
+
+李竹内：：没有头像
+
+王二宫：：还是刚才的头像
+
+<|
+show(avatar, 'normal')
+|>
+陈高天：：第二个人的头像
+
+<|
+show(avatar, 'cry')
+|>
+陈高天：：换一个表情
+
+<|
+hide(avatar)
+|>
+陈高天：：头像消失
+
+王二宫：：仍然是刚才的头像
+
+陈高天：：仍然没有头像
+
+测试结束
+@<| is_end() |>

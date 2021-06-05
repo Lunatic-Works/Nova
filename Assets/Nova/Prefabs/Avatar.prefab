@@ -89,7 +89,20 @@ MonoBehaviour:
   imageFolder: Colorless/Faces
   characterTextureMerger: {fileID: 5655490266559290119}
   luaGlobalName: avatar
-  visibleTextPushDistance: 200
+  avatarConfigs:
+  - characterName: "\u738B\u4E8C\u5BAB"
+    characterController: {fileID: 0}
+    prefix: Ergong/
+  - characterName: "\u5F20\u6D45\u91CE"
+    characterController: {fileID: 0}
+    prefix: Qianye/
+  - characterName: "\u5B59\u897F\u672C"
+    characterController: {fileID: 0}
+    prefix: Xiben/
+  - characterName: "\u9648\u9AD8\u5929"
+    characterController: {fileID: 0}
+    prefix: Gaotian/
+  textPadding: 200
 --- !u!114 &5655490265707447723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -113,7 +126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5655490266559290116}
   - component: {fileID: 5655490266559290119}
-  m_Layer: 16
+  m_Layer: 5
   m_Name: SpriteMerger
   m_TagString: Untagged
   m_Icon: {fileID: 0}

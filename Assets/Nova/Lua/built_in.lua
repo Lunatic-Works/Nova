@@ -147,7 +147,7 @@ function remove_entry(t, entry)
         end
     end
     if idx == 0 then
-        warn('entry not found')
+        warn('Entry not found')
         return
     end
     table.remove(t, idx)
@@ -204,7 +204,7 @@ function v(name, value)
         elseif type(value) == 'string' then
             __Nova.variables:Set(name, Nova.VariableType.String, value)
         else
-            warn('variable can only be boolean, number, or string, but found ' .. tostring(value))
+            warn('Variable can only be boolean, number, or string, but found ' .. tostring(value))
         end
     end
 end
@@ -229,7 +229,7 @@ function gv(name, value)
         elseif type(value) == 'string' then
             __Nova.checkpointHelper:SetGlobalVariable(name, Nova.VariableType.String, value)
         else
-            warn('variable can only be boolean, number, or string, but found ' .. tostring(value))
+            warn('Variable can only be boolean, number, or string, but found ' .. tostring(value))
         end
     end
 end

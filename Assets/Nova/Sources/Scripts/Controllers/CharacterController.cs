@@ -186,6 +186,13 @@ namespace Nova
             }
         }
 
+        private void SayImmediatelyWithDelay(AudioClip clip, float delay)
+        {
+            StopVoice();
+            audioSource.clip = clip;
+            audioSource.PlayDelayed(delay);
+        }
+
         #endregion
 
         #region Color
@@ -255,12 +262,7 @@ namespace Nova
 
         #endregion
 
-        private void SayImmediatelyWithDelay(AudioClip clip, float delay)
-        {
-            StopVoice();
-            audioSource.clip = clip;
-            audioSource.PlayDelayed(delay);
-        }
+        #region Restoration
 
         [Serializable]
         private class CharacterRestoreData : CompositeSpriteControllerBaseRestoreData
@@ -286,18 +288,20 @@ namespace Nova
 
         public override void Restore(IRestoreData restoreData)
         {
+            base.Restore(restoreData);
             var data = restoreData as CharacterRestoreData;
             environmentColor = data.environmentColor;
             layer = data.layer;
-            base.Restore(data);
         }
+
+        #endregion
 
         #region Static fields and methods
 
         private static readonly Dictionary<string, CharacterController> Characters =
             new Dictionary<string, CharacterController>();
 
-        private static void RegisterCharacter(string name, CharacterController character)
+        private static void AddCharacter(string name, CharacterController character)
         {
             Characters.Add(name, character);
         }
@@ -374,7 +378,7 @@ namespace Nova
 
         private void OnEnable()
         {
-            RegisterCharacter(luaGlobalName, this);
+            AddCharacter(luaGlobalName, this);
         }
 
         private void OnDisable()

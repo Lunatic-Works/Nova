@@ -31,8 +31,6 @@ namespace Nova
 
         public abstract Color color { get; set; }
 
-        public abstract string restorableObjectName { get; }
-
         protected void SetColor(Color color)
         {
             if (textureChanger != null)
@@ -80,6 +78,30 @@ namespace Nova
             }
 
             currentImageName = poseName;
+        }
+
+        protected void SetImageOrPose(string imageName, bool fade = true)
+        {
+            if (imageName == currentImageName)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(imageName))
+            {
+                ClearImage(fade);
+                return;
+            }
+
+            string[] parts = StringToPoseArray(imageName);
+            if (parts.Length == 1)
+            {
+                SetImage(imageName, fade);
+            }
+            else
+            {
+                SetPose(parts, fade);
+            }
         }
 
         #endregion
@@ -174,6 +196,8 @@ namespace Nova
 
         #endregion
 
+        #region Restoration
+
         [Serializable]
         protected class CompositeSpriteControllerBaseRestoreData : IRestoreData
         {
@@ -202,6 +226,8 @@ namespace Nova
                 renderQueue = baseData.renderQueue;
             }
         }
+
+        public abstract string restorableObjectName { get; }
 
         public virtual IRestoreData GetRestoreData()
         {
@@ -245,27 +271,9 @@ namespace Nova
 
             RenderQueueOverrider.Ensure(gameObject).renderQueue = data.renderQueue;
 
-            if (data.currentImageName == currentImageName)
-            {
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(data.currentImageName))
-            {
-                string[] parts = StringToPoseArray(data.currentImageName);
-                if (parts.Length == 1)
-                {
-                    SetImage(data.currentImageName, fade: false);
-                }
-                else
-                {
-                    SetPose(parts, fade: false);
-                }
-            }
-            else
-            {
-                ClearImage(fade: false);
-            }
+            SetImageOrPose(data.currentImageName, false);
         }
+
+        #endregion
     }
 }
