@@ -1,8 +1,8 @@
-add_action_before_lazy_block(function(chara_name)
-    avatar:SetCharacterName(chara_name)
+add_action_before_lazy_block(function(name)
+    avatar:SetCharacterName(name)
 end)
 
-add_action_after_lazy_block(function(chara_name)
+add_action_after_lazy_block(function()
     avatar:UpdateImage()
 end)
 

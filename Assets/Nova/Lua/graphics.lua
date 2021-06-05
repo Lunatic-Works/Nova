@@ -27,11 +27,6 @@ function show(obj, image_name, coord, color, fade)
         tint(obj, color)
     end
 
-    if obj == avatar then
-        avatar_show(image_name)
-        return
-    end
-
     if type(image_name) == 'table' then
         obj:SetPose(image_name, fade)
     else
@@ -57,11 +52,6 @@ add_preload_pattern('show_no_fade')
 function hide(obj, fade)
     if fade == nil then
         fade = (auto_fade_off_count == 0)
-    end
-
-    if obj == avatar then
-        avatar_hide()
-        return
     end
 
     obj:ClearImage(fade)

@@ -22,7 +22,7 @@ function auto_voice_skip()
     auto_voice_overridden = true
 end
 
-function auto_voice_action(name)
+add_action_after_lazy_block(function(name)
     if auto_voice_overridden then
         auto_voice_overridden = false
         return
@@ -38,5 +38,4 @@ function auto_voice_action(name)
     say(chara, audio_name, auto_voice_delay, false)
     __Nova.autoVoice:IncrementIndex(name)
     auto_voice_delay = 0
-end
-add_action_after_lazy_block(auto_voice_action)
+end)

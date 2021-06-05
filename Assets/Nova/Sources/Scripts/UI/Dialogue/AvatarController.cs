@@ -120,18 +120,14 @@ namespace Nova
 
         public void UpdateImage(bool fade = true)
         {
-            if (string.IsNullOrEmpty(characterName) || !nameToConfig.ContainsKey(characterName))
+            if (string.IsNullOrEmpty(characterName) || !nameToConfig.ContainsKey(characterName) ||
+                !characterToImageName.ContainsKey(characterName))
             {
-                return;
-            }
-
-            if (characterToImageName.ContainsKey(characterName))
-            {
-                SetImageOrPose(characterToImageName[characterName], fade);
+                ClearImage(fade);
             }
             else
             {
-                ClearImage(fade);
+                SetImageOrPose(characterToImageName[characterName], fade);
             }
         }
 

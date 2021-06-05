@@ -10,7 +10,7 @@ set_box()
 测试头像
 
 <|
-show(avatar, 'normal')
+avatar_show('normal')
 |>
 王二宫：：第一个人的头像
 
@@ -23,17 +23,17 @@ show(avatar, 'normal')
 王二宫：：还是刚才的头像
 
 <|
-show(avatar, 'normal')
+avatar_show('normal')
 |>
 陈高天：：第二个人的头像
 
 <|
-show(avatar, 'cry')
+avatar_show('cry')
 |>
 陈高天：：换一个表情
 
 <|
-hide(avatar)
+avatar_hide()
 |>
 陈高天：：头像消失
 
