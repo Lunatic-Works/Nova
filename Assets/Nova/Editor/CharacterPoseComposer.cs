@@ -177,6 +177,8 @@ namespace Nova.Editor
             {
                 imageFolder = EditorUtils.GetSelectedDirectory();
                 uncropped = imageFolder.ToLower().Contains("uncrop");
+                layers.Clear();
+                dirty = true;
             }
 
             uncropped = GUILayout.Toggle(uncropped, "Uncropped");

@@ -94,6 +94,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 294
     y: 1766
@@ -195,6 +200,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 306
     y: 1766
@@ -296,6 +306,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 285
     y: 1810
@@ -397,6 +412,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 295
     y: 1766
@@ -498,6 +518,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 418
     y: 1662
@@ -599,6 +624,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 426
     y: 1654
@@ -700,6 +730,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 418
     y: 1658
@@ -801,6 +836,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 278
     y: 1818
@@ -902,6 +942,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 306
     y: 1762
@@ -1003,6 +1048,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 422
     y: 1654
@@ -1104,6 +1154,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 298
     y: 1766
@@ -1205,6 +1260,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 291
     y: 1824
@@ -1306,6 +1366,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 202
     y: 1262
@@ -1407,6 +1472,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 414
     y: 1642
@@ -1508,6 +1578,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 78
     y: 0
@@ -1609,6 +1684,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 298
     y: 1814
@@ -1710,6 +1790,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 282
     y: 1818
@@ -1811,6 +1896,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 282
     y: 1826
@@ -1912,6 +2002,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 294
     y: 1766
@@ -2013,6 +2108,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 418
     y: 1666
@@ -2180,6 +2280,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 294
     y: 1766
@@ -2281,6 +2386,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57cfdee052744ced8c24c8c4255c7eba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boundRect:
+    x: 0
+    y: 0
+    width: 1100
+    height: 2400
   cropRect:
     x: 282
     y: 1830

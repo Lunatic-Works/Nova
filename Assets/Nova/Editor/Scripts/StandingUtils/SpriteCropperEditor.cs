@@ -7,46 +7,22 @@ namespace Nova.Editor
     [CustomEditor(typeof(SpriteCropper))]
     public class SpriteCropperEditor : UnityEditor.Editor
     {
-        private bool useCaptureBox;
-        private RectInt captureBox = new RectInt(0, 0, 400, 400);
-
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             var cropper = target as SpriteCropper;
             var texture = cropper.sprite.texture;
 
-            useCaptureBox = GUILayout.Toggle(useCaptureBox, "Use Capture Box");
-            if (useCaptureBox)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Capture Box");
-                captureBox = EditorGUILayout.RectIntField(captureBox);
-                GUILayout.EndHorizontal();
-            }
-
             if (GUILayout.Button("Auto Crop"))
             {
-                if (useCaptureBox)
-                {
-                    AutoCrop(cropper, captureBox);
-                }
-                else
-                {
-                    AutoCrop(cropper);
-                }
+                AutoCrop(cropper);
             }
 
             var scale = EditorGUIUtility.currentViewWidth / texture.width * 0.5f;
             var previewRect =
                 EditorGUILayout.GetControlRect(false, scale * texture.height, GUILayout.Width(scale * texture.width));
             EditorGUI.DrawTextureTransparent(previewRect, texture);
-
-            if (useCaptureBox)
-            {
-                EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, false, Color.red);
-            }
-
+            EditorUtils.DrawPreviewCaptureFrame(previewRect, cropper.boundRect.ToRect(), scale, true, Color.red);
             EditorUtils.DrawPreviewCaptureFrame(previewRect, cropper.cropRect.ToRect(), scale, true, Color.yellow);
         }
 
@@ -55,7 +31,7 @@ namespace Nova.Editor
             return ((x + 3) / 4) * 4;
         }
 
-        private static void RoundWithBorders(ref int x1, ref int x2, int left, int right)
+        private static void RoundWithBounds(ref int x1, ref int x2, int left, int right)
         {
             x2 = x1 + RoundUpToFour(x2 - x1);
 
@@ -88,15 +64,16 @@ namespace Nova.Editor
             }
         }
 
-        public static void AutoCrop(SpriteCropper cropper, RectInt captureBox)
+        public static void AutoCrop(SpriteCropper cropper)
         {
             var texture = cropper.sprite.texture;
             var colors = texture.GetPixels();
 
-            int left = Math.Max(0, captureBox.xMin);
-            int right = Math.Min(texture.width, captureBox.xMax);
-            int bottom = Math.Max(0, texture.height - captureBox.yMax);
-            int top = Math.Min(texture.height, texture.height - captureBox.yMin);
+            var boundRect = cropper.boundRect;
+            int left = Math.Max(0, boundRect.xMin);
+            int right = Math.Min(texture.width, boundRect.xMax);
+            int bottom = Math.Max(0, boundRect.yMin);
+            int top = Math.Min(texture.height, boundRect.yMax);
 
             bool hasPixel = false;
             int minX = int.MaxValue;
@@ -133,24 +110,19 @@ namespace Nova.Editor
                 int y1 = Math.Max(bottom, minY - padding);
                 int y2 = Math.Min(top, maxY + padding + 1);
 
-                RoundWithBorders(ref x1, ref x2, left, right);
-                RoundWithBorders(ref y1, ref y2, bottom, top);
+                RoundWithBounds(ref x1, ref x2, left, right);
+                RoundWithBounds(ref y1, ref y2, bottom, top);
 
                 cropper.cropRect = new RectInt(x1, y1, x2 - x1, y2 - y1);
             }
             else
             {
                 // Empty image
-                cropper.cropRect = new RectInt(0, 0, 4, 4);
+                var center = Vector2Int.RoundToInt(boundRect.center);
+                cropper.cropRect = new RectInt(center.x - 2, center.y - 2, 4, 4);
             }
 
             EditorUtility.SetDirty(cropper);
-        }
-
-        public static void AutoCrop(SpriteCropper cropper)
-        {
-            var texture = cropper.sprite.texture;
-            AutoCrop(cropper, new RectInt(0, 0, texture.width, texture.height));
         }
     }
 }

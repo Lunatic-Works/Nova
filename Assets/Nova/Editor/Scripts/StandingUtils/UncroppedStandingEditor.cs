@@ -25,12 +25,15 @@ namespace Nova.Editor
             foreach (var spritePath in EditorUtils.GetSelectedSpritePaths())
             {
                 var go = new GameObject("StandingComponent");
-                var spriteRenderer = go.AddComponent<SpriteRenderer>();
-                var sprite = spriteRenderer.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
-                var cropper = go.AddComponent<SpriteCropper>();
-                cropper.cropRect = new RectInt(0, 0, sprite.texture.width, sprite.texture.height);
                 go.transform.SetParent(parent.transform);
                 ResetTransform(go.transform);
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+                var spriteRenderer = go.AddComponent<SpriteRenderer>();
+                spriteRenderer.sprite = sprite;
+                var texture = sprite.texture;
+                var cropper = go.AddComponent<SpriteCropper>();
+                cropper.boundRect = new RectInt(0, 0, texture.width, texture.height);
+                cropper.cropRect = new RectInt(0, 0, texture.width, texture.height);
             }
 
             var currentDir = EditorUtils.GetSelectedDirectory();
@@ -68,15 +71,21 @@ namespace Nova.Editor
             {
                 foreach (var cropper in standing.GetComponentsInChildren<SpriteCropper>())
                 {
+                    var texture = cropper.sprite.texture;
                     if (useCaptureBox)
                     {
-                        SpriteCropperEditor.AutoCrop(cropper, captureBox);
+                        cropper.boundRect.xMin = captureBox.xMin;
+                        cropper.boundRect.yMin = texture.height - captureBox.yMax;
+                        cropper.boundRect.size = captureBox.size;
                     }
                     else
                     {
-                        Debug.Log($"test1 {cropper.sprite}");
-                        SpriteCropperEditor.AutoCrop(cropper);
+                        cropper.boundRect.min = Vector2Int.zero;
+                        cropper.boundRect.width = texture.width;
+                        cropper.boundRect.height = texture.height;
                     }
+
+                    SpriteCropperEditor.AutoCrop(cropper);
                 }
             }
 
@@ -103,12 +112,14 @@ namespace Nova.Editor
 
         private static void WriteCropResult(UncroppedStanding standing, SpriteCropper cropper)
         {
-            var uncropped = cropper.sprite.texture;
             var cropRect = cropper.cropRect;
             var cropped = new Texture2D(cropRect.width, cropRect.height, TextureFormat.RGBA32, false);
-            var pixels = uncropped.GetPixels(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+
+            var texture = cropper.sprite.texture;
+            var pixels = texture.GetPixels(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
             cropped.SetPixels(pixels);
             cropped.Apply();
+
             var bytes = cropped.EncodeToPNG();
             var absoluteOutputFileName = Path.Combine(standing.absoluteOutputDirectory, cropper.sprite.name + ".png");
             Directory.CreateDirectory(Path.GetDirectoryName(absoluteOutputFileName));
@@ -125,15 +136,10 @@ namespace Nova.Editor
 
         private static void GenerateMetaData(UncroppedStanding standing, SpriteCropper cropper)
         {
-            var cropRect = cropper.cropRect;
-            var uncropped = cropper.sprite.texture;
-            var cropped =
-                AssetDatabase.LoadAssetAtPath<Sprite>(Path.Combine(standing.outputDirectory,
-                    cropper.sprite.name + ".png"));
             var meta = CreateInstance<SpriteWithOffset>();
-            meta.offset = (cropRect.center - new Vector2(uncropped.width, uncropped.height) / 2.0f) /
-                          cropper.sprite.pixelsPerUnit;
-            meta.sprite = cropped;
+            meta.offset = (cropper.cropRect.center - cropper.boundRect.center) / cropper.sprite.pixelsPerUnit;
+            var path = Path.Combine(standing.outputDirectory, cropper.sprite.name + ".png");
+            meta.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
             AssetDatabase.CreateAsset(meta, Path.Combine(standing.outputDirectory, cropper.sprite.name + ".asset"));
         }
     }
