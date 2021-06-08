@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Nova
 {
     public class LanguageController : MonoBehaviour
     {
         public string configKeyName;
-        public LocaleTogglePair[] localeTogglePairs;
+        public List<LocaleTogglePair> localeTogglePairs;
 
         private ConfigManager configManager;
 
@@ -22,7 +23,7 @@ namespace Nova
                 I18n.CurrentLocale = (SystemLanguage)localeInt;
             }
 
-            this.RuntimeAssert(localeTogglePairs.Length > 0, "Empty language toggle list");
+            this.RuntimeAssert(localeTogglePairs.Count > 0, "Empty language toggle list");
             foreach (var pair in localeTogglePairs)
             {
                 pair.toggle.onValueChanged.AddListener(value => SetLocale(value, pair.locale));

@@ -80,7 +80,7 @@ namespace Nova
         private ScrollRect dialogueTextScrollRect;
         private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
         private DialogueTextController dialogueText;
-        public Button[] hideDialogueButtons;
+        public List<Button> hideDialogueButtons;
 
         private ButtonRingTrigger buttonRingTrigger;
         private LogController logController;
@@ -300,7 +300,7 @@ namespace Nova
         public Material fastForwardPostProcessingMaterial;
         public GameObject fastForwardModeIcon;
         public GameObject autoModeIcon;
-        public GameObject[] dialogueFinishIcons;
+        public List<GameObject> dialogueFinishIcons;
 
         private AndGate dialogueBoxShown;
         private AndGate dialogueFinished;
@@ -441,9 +441,9 @@ namespace Nova
 
         private void JumpChapter(int offset)
         {
-            string[] chapters = gameState.GetAllStartNodeNames();
-            int targetChapterIndex = Array.IndexOf(chapters, currentNodeName) + offset;
-            if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Length)
+            var chapters = gameState.GetAllStartNodeNames();
+            int targetChapterIndex = chapters.IndexOf(currentNodeName) + offset;
+            if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Count)
             {
                 NovaAnimation.StopAll();
                 gameState.ResetGameState();

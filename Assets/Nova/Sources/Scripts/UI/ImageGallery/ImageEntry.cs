@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace Nova
     public class ImageEntry
     {
         public string id;
-        public LocaleStringPair[] displayNames;
+        public List<LocaleStringPair> displayNames;
         public string resourcePath;
         public Vector2 snapshotOffset = Vector2.zero;
         public Vector2 snapshotScale = Vector2.one;

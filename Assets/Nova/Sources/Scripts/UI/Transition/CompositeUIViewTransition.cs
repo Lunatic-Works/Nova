@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Nova
 {
     public class CompositeUIViewTransition : UIViewTransitionBase
     {
-        public TransitionSequenceItem[] forwardChildTransitions;
-        public TransitionSequenceItem[] backwardChildTransitions;
+        public List<TransitionSequenceItem> forwardChildTransitions;
+        public List<TransitionSequenceItem> backwardChildTransitions;
 
         private float forwardEnding, backwardEnding;
         private int forwardEndingIdx, backwardEndingIdx;
@@ -26,7 +27,7 @@ namespace Nova
             var seq = isEnter ? forwardChildTransitions : backwardChildTransitions;
             float globalEnding = 0, lastBeginning = 0, lastEnding = 0;
             int maxIdx = 0;
-            for (int i = 0; i < seq.Length; i++)
+            for (int i = 0; i < seq.Count; i++)
             {
                 var item = seq[i];
                 float beginning;
@@ -75,7 +76,7 @@ namespace Nova
         private void RunSequence(bool isEnter, Action onAnimationFinish)
         {
             var seq = isEnter ? forwardChildTransitions : backwardChildTransitions;
-            for (int i = 0; i < seq.Length; i++)
+            for (int i = 0; i < seq.Count; i++)
             {
                 var item = seq[i];
                 if (isEnter)

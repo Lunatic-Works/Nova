@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Nova
 {
@@ -10,7 +12,7 @@ namespace Nova
 
         private GameState gameState;
         private InputMapper inputMapper;
-        private CharacterController[] characterControllers;
+        private List<CharacterController> characterControllers;
         private ulong currentNodeInitialVariablesHash;
 
         private void Start()
@@ -21,7 +23,7 @@ namespace Nova
 
             if (characters != null)
             {
-                characterControllers = characters.GetComponentsInChildren<CharacterController>();
+                characterControllers = characters.GetComponentsInChildren<CharacterController>().ToList();
             }
 
             if (!Application.isEditor) return;

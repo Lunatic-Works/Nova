@@ -18,8 +18,8 @@ namespace Nova
         private GameState gameState;
         private CheckpointManager checkpointManager;
 
-        private string[] startNodeNames;
-        private string[] unlockedStartNodeNames;
+        private List<string> startNodeNames;
+        private List<string> unlockedStartNodeNames;
 
         private Dictionary<string, GameObject> buttons;
 
@@ -32,8 +32,7 @@ namespace Nova
             checkpointManager = controller.CheckpointManager;
 
             // TODO: customize the order of chapters
-            startNodeNames = gameState.GetAllStartNodeNames().OrderBy(x => Regex.Replace(x, @"\d+", m => m.Value.PadLeft(2, '0'))).ToArray();
-
+            startNodeNames = gameState.GetAllStartNodeNames().OrderBy(x => Regex.Replace(x, @"\d+", m => m.Value.PadLeft(2, '0'))).ToList();
             unlockedStartNodeNames = gameState.GetAllUnlockedStartNodeNames();
 
             returnButton.onClick.AddListener(Hide);

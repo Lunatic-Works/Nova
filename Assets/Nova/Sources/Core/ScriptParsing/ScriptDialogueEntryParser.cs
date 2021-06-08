@@ -157,7 +157,7 @@ namespace Nova
             dict[index] = (old ?? "") + actions;
         }
 
-        public static DialogueEntry[] ParseDialogueEntries(string[] dialogueEntryTexts)
+        public static List<DialogueEntry> ParseDialogueEntries(string[] dialogueEntryTexts)
         {
             var indexToCode = new string[dialogueEntryTexts.Length];
             var indexToText = new string[dialogueEntryTexts.Length];
@@ -182,7 +182,7 @@ namespace Nova
                 }
             }
 
-            var results = new DialogueEntry[dialogueEntryTexts.Length];
+            var results = new List<DialogueEntry>();
             for (int i = 0; i < dialogueEntryTexts.Length; ++i)
             {
                 string code = indexToCode[i];
@@ -218,15 +218,15 @@ namespace Nova
                 }
 
                 // TODO: there may be some grammar to set different internal and displayed character names
-                results[i] = new DialogueEntry(characterName, characterName, dialogue, action);
+                results.Add(new DialogueEntry(characterName, characterName, dialogue, action));
             }
 
             return results;
         }
 
-        public static LocalizedDialogueEntry[] ParseLocalizedDialogueEntries(string[] dialogueEntryTexts)
+        public static List<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(string[] dialogueEntryTexts)
         {
-            var results = new LocalizedDialogueEntry[dialogueEntryTexts.Length];
+            var results = new List<LocalizedDialogueEntry>();
             for (int i = 0; i < dialogueEntryTexts.Length; ++i)
             {
                 var text = dialogueEntryTexts[i];
@@ -243,7 +243,7 @@ namespace Nova
                     dialogue = text;
                 }
 
-                results[i] = new LocalizedDialogueEntry {displayName = characterName, dialogue = dialogue};
+                results.Add(new LocalizedDialogueEntry {displayName = characterName, dialogue = dialogue});
             }
 
             return results;

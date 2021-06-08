@@ -77,7 +77,7 @@ namespace Nova
                     localizedPath = I18n.LocalePath + locale + "/" + path;
                 }
 
-                var scripts = Resources.LoadAll(localizedPath, typeof(TextAsset)).Cast<TextAsset>().ToArray();
+                var scripts = Resources.LoadAll(localizedPath, typeof(TextAsset)).Cast<TextAsset>();
                 foreach (var script in scripts)
                 {
                     try
@@ -200,7 +200,7 @@ namespace Nova
                 throw new ArgumentException("Nova: Dangling node text " + flowChartNodeText);
             }
 
-            string[] dialogueEntryTexts = Regex.Split(flowChartNodeText, EmptyLinePattern);
+            var dialogueEntryTexts = Regex.Split(flowChartNodeText, EmptyLinePattern);
 
             if (stateLocale == I18n.DefaultLocale)
             {

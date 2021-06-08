@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
@@ -6,7 +7,7 @@ namespace Nova
     [RequireComponent(typeof(Text))]
     public class I18nFontSize : MonoBehaviour
     {
-        public LocaleFloatPair[] multipliers;
+        public List<LocaleFloatPair> multipliers;
 
         private Text text;
         private int fontSize;

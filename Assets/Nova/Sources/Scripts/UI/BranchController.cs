@@ -14,13 +14,13 @@ namespace Nova
         private void Awake()
         {
             gameState = Utils.FindNovaGameController().GameState;
-            gameState.BranchOccurs += OnBranchHappen;
+            gameState.BranchOccurs += OnBranchOccurs;
             gameState.AddRestorable(this);
         }
 
         private void OnDestroy()
         {
-            gameState.BranchOccurs -= OnBranchHappen;
+            gameState.BranchOccurs -= OnBranchOccurs;
             gameState.RemoveRestorable(this);
         }
 
@@ -28,7 +28,7 @@ namespace Nova
         /// Show branch buttons when branch happens
         /// </summary>
         /// <param name="branchOccursData"></param>
-        private void OnBranchHappen(BranchOccursData branchOccursData)
+        private void OnBranchOccurs(BranchOccursData branchOccursData)
         {
             var branchInformations = branchOccursData.branchInformations;
 
@@ -101,8 +101,8 @@ namespace Nova
                 backPanel.SetActive(false);
             }
 
-            gameState.SelectBranch(branchName);
             RemoveAllSelectButton();
+            gameState.SelectBranch(branchName);
         }
 
         private void RemoveAllSelectButton()

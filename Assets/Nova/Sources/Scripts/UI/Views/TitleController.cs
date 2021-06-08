@@ -54,7 +54,7 @@ namespace Nova
 
                 if (configManager.GetInt(ChapterFirstUnlockedKey) == 0)
                 {
-                    var unlockedChapterCount = gameState.GetAllUnlockedStartNodeNames().Length;
+                    var unlockedChapterCount = gameState.GetAllUnlockedStartNodeNames().Count;
                     var reachedChapterCount = gameState.GetAllStartNodeNames()
                         .Count(name => checkpointManager.IsReachedForAnyVariables(name, 0) != null);
                     if (unlockedChapterCount == 1 && reachedChapterCount > 1)

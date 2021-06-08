@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Nova.Exceptions;
+﻿using Nova.Exceptions;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -71,20 +71,20 @@ namespace Nova
         /// <value>
         /// Dialogue entries in this node
         /// </value>
-        private DialogueEntry[] dialogueEntries;
+        private List<DialogueEntry> dialogueEntries = new List<DialogueEntry>();
 
-        public int dialogueEntryCount => dialogueEntries.Length;
+        public int dialogueEntryCount => dialogueEntries.Count;
 
-        public void SetDialogueEntries(DialogueEntry[] entries)
+        public void SetDialogueEntries(List<DialogueEntry> entries)
         {
             dialogueEntries = entries;
         }
 
-        public void AddLocaleForDialogueEntries(SystemLanguage locale, LocalizedDialogueEntry[] entries)
+        public void AddLocaleForDialogueEntries(SystemLanguage locale, List<LocalizedDialogueEntry> entries)
         {
-            Assert.IsTrue(entries.Length == dialogueEntries.Length, "Nova: Localized dialogue entry length differs.");
+            Assert.IsTrue(entries.Count == dialogueEntries.Count, "Nova: Localized dialogue entry count differs.");
 
-            for (int i = 0; i < entries.Length; ++i)
+            for (int i = 0; i < entries.Count; ++i)
             {
                 dialogueEntries[i].AddLocale(locale, entries[i]);
             }

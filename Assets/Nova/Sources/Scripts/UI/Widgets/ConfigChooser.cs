@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +28,7 @@ namespace Nova
         public GameObject togglePrefab;
 
         private ToggleGroup toggleGroup;
-        private Toggle[] toggles;
+        private List<Toggle> toggles;
         private ConfigManager configManager;
 
         private void Awake()
@@ -50,7 +51,7 @@ namespace Nova
                     var toggle = toggleGO.GetComponentInChildren<Toggle>();
                     toggle.group = toggleGroup;
                     return toggle;
-                }).ToArray();
+                }).ToList();
                 toggleGroup.SetAllTogglesOff();
             }
         }
@@ -58,7 +59,7 @@ namespace Nova
         private void UpdateValue()
         {
             var value = configManager.GetInt(configKeyName);
-            if (toggles.Length > value && value >= 0 && toggles[value].isOn)
+            if (toggles.Count > value && value >= 0 && toggles[value].isOn)
             {
                 // Eliminate infinite recursion
                 return;
@@ -69,7 +70,7 @@ namespace Nova
 
         private void OnValueChange(bool _)
         {
-            for (int i = 0; i < toggles.Length; i++)
+            for (int i = 0; i < toggles.Count; i++)
             {
                 if (toggles[i].isOn)
                 {

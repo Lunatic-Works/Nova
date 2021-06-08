@@ -17,7 +17,7 @@ namespace Nova
     public class AvatarController : CompositeSpriteControllerBase
     {
         public string luaGlobalName;
-        public AvatarConfig[] avatarConfigs;
+        public List<AvatarConfig> avatarConfigs;
         public int textPadding = 200;
 
         public int textPaddingOrZero => string.IsNullOrEmpty(currentImageName) ? 0 : textPadding;

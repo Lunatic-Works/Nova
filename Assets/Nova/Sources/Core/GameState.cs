@@ -329,7 +329,7 @@ namespace Nova
 
             if (dialogueChanged)
             {
-                this.RuntimeAssert(currentIndex >= 0 && currentIndex < currentNode.dialogueEntryCount,
+                this.RuntimeAssert(currentIndex >= 0 && (currentNode.dialogueEntryCount == 0 || currentIndex < currentNode.dialogueEntryCount),
                     "Dialogue index out of range.");
 
                 if (!firstEntryOfNode && dialogueStepped)
@@ -374,11 +374,18 @@ namespace Nova
 
                 DialogueWillChange?.Invoke();
 
-                state = State.ActionRunning;
-                lastVariablesHashBeforeAction = variables.hash;
-                currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
-                currentDialogueEntry.ExecuteAction();
-                StartCoroutine(WaitActionEnd(gameStateRestoreEntry != null));
+                if (currentNode.dialogueEntryCount > 0)
+                {
+                    state = State.ActionRunning;
+                    lastVariablesHashBeforeAction = variables.hash;
+                    currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
+                    currentDialogueEntry.ExecuteAction();
+                    StartCoroutine(WaitActionEnd(gameStateRestoreEntry != null));
+                }
+                else
+                {
+                    StepAtEndOfNode();
+                }
             }
 
             // Debug.Log($"UpdateGameState end {currentNode.name} {currentIndex} {stepNumFromLastCheckpoint} {restrainCheckpoint} {forceCheckpoint} {currentDialogueEntry?.displayData.FormatNameDialogue()}");
@@ -528,12 +535,12 @@ namespace Nova
             GameStart(startNode);
         }
 
-        public string[] GetAllStartNodeNames()
+        public List<string> GetAllStartNodeNames()
         {
             return flowChartTree.GetAllStartNodeNames();
         }
 
-        public string[] GetAllUnlockedStartNodeNames()
+        public List<string> GetAllUnlockedStartNodeNames()
         {
             return flowChartTree.GetAllUnlockedStartNodeNames();
         }
@@ -576,37 +583,34 @@ namespace Nova
                 return true;
             }
 
-            // Reach the end of a node, do something regards on the flow chart node type
+            StepAtEndOfNode();
+            return true;
+        }
+
+        private void StepAtEndOfNode()
+        {
             switch (currentNode.type)
             {
                 case FlowChartNodeType.Normal:
-                    // for normal node, just step directly to the next node
                     MoveToNextNode(currentNode.next);
-                    // successfully move to the next node
-                    return true;
+                    break;
                 case FlowChartNodeType.Branching:
-                    // A branch occurs, inform branch event listeners
                     state = State.IsBranching;
                     BranchOccurs?.Invoke(new BranchOccursData(currentNode.GetAllBranches()));
-
                     break;
                 case FlowChartNodeType.End:
                     state = State.Ended;
                     var endName = flowChartTree.GetEndName(currentNode);
                     if (!checkpointManager.IsReached(endName))
                     {
-                        // mark the end as reached
                         checkpointManager.SetReached(endName);
                     }
 
                     CurrentRouteEnded?.Invoke(new CurrentRouteEndedData(endName));
-
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            return true;
         }
 
         /// <summary>

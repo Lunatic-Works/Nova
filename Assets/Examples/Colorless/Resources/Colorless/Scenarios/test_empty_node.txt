@@ -1,0 +1,32 @@
+@<|
+label 'test_empty_node'
+is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试空节点
+@<|
+jump_to 'test_empty_node_1'
+|>
+
+@<| label 'test_empty_node_1' |>
+@<| jump_to 'test_empty_node_2' |>
+
+@<| label 'test_empty_node_2' |>
+222
+@<| jump_to 'test_empty_node_3' |>
+
+@<| label 'test_empty_node_3' |>
+@<|
+branch {
+    { dest = 'test_empty_node_end', text = '结束'},
+    { dest = 'test_empty_node_3', text = '不结束' },
+}
+|>
+
+@<| label 'test_empty_node_end' |>
+测试结束
+@<| is_end() |>

@@ -88,14 +88,14 @@ namespace Nova
         /// <summary>
         /// Returns names of all start nodes.
         /// </summary>
-        public string[] GetAllStartNodeNames()
+        public List<string> GetAllStartNodeNames()
         {
-            return startNodes.Keys.ToArray();
+            return startNodes.Keys.ToList();
         }
 
-        public string[] GetAllUnlockedStartNodeNames()
+        public List<string> GetAllUnlockedStartNodeNames()
         {
-            return unlockedStartNodes.Keys.ToArray();
+            return unlockedStartNodes.Keys.ToList();
         }
 
         /// <summary>

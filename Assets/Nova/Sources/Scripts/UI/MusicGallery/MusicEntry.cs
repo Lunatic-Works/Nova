@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
@@ -5,7 +6,7 @@ namespace Nova
     public class MusicEntry : ScriptableObject
     {
         public string id;
-        public LocaleStringPair[] displayNames;
+        public List<LocaleStringPair> displayNames;
         public string resourcePath;
         public int loopBeginSample;
         public int loopEndSample;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,13 +11,13 @@ namespace Nova
         public GameObject myPanel;
         public ViewManager viewManager { get; private set; }
 
-        protected UIViewTransitionBase[] transitions;
+        protected List<UIViewTransitionBase> transitions;
         protected InputMapper inputMapper;
 
         protected virtual void Awake()
         {
             this.RuntimeAssert(myPanel != null, "MyPanel is not set.");
-            transitions = myPanel.GetComponents<UIViewTransitionBase>();
+            transitions = myPanel.GetComponents<UIViewTransitionBase>().ToList();
             viewManager = GetComponentInParent<ViewManager>();
             this.RuntimeAssert(viewManager != null, "Missing ViewManager in ancestors.");
             viewManager.SetController(this);

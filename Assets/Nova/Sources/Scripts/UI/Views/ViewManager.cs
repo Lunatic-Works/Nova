@@ -24,39 +24,41 @@ namespace Nova
         public RawImage transitionGhost;
         public GameObject transitionInputBlocker;
         public AudioSource uiAudioSource;
-        public NovaAnimation[] additionalAnimationsToBePausedWhenSwitchingView;
-        public AudioController[] audiosToBePausedWhenSwitchingView;
 
-        private IEnumerable<NovaAnimation> animationsToBePausedWhenSwitchingView =>
-            GetAnimationsToBePausedWhenSwitchingView();
+        // Pause some animations and audios when switching the view
+        public List<NovaAnimation> animationsToPause;
+        public List<AudioController> audiosToPause;
 
         private GameController gameController;
 
-        private IEnumerable<NovaAnimation> GetAnimationsToBePausedWhenSwitchingView()
+        // animationsToPause + gameController.PerDialogueAnimation + gameController.PersistAnimation
+        private IEnumerable<NovaAnimation> allAnimationsToPause => GetAllAnimationsToPause();
+
+        private IEnumerable<NovaAnimation> GetAllAnimationsToPause()
         {
-            var additionalHasPerDialogue = false;
-            var additionalHasPersist = false;
-            foreach (var anim in additionalAnimationsToBePausedWhenSwitchingView)
+            var hasPerDialogue = false;
+            var hasPersist = false;
+            foreach (var anim in animationsToPause)
             {
                 if (anim == gameController.PerDialogueAnimation)
                 {
-                    additionalHasPerDialogue = true;
+                    hasPerDialogue = true;
                 }
 
                 if (anim == gameController.PersistAnimation)
                 {
-                    additionalHasPersist = true;
+                    hasPersist = true;
                 }
 
                 yield return anim;
             }
 
-            if (!additionalHasPersist)
+            if (!hasPersist)
             {
                 yield return gameController.PersistAnimation;
             }
 
-            if (!additionalHasPerDialogue)
+            if (!hasPerDialogue)
             {
                 yield return gameController.PerDialogueAnimation;
             }
@@ -100,16 +102,19 @@ namespace Nova
             var newView = isInTransition ? CurrentViewType.InTransition : QueryCurrentView();
             transitionInputBlocker.SetActive(isInTransition);
             if (currentView == newView)
+            {
                 return;
+            }
+
             if (newView == CurrentViewType.Game && currentView != CurrentViewType.Game)
             {
                 // Resume all animations
-                foreach (var anim in animationsToBePausedWhenSwitchingView)
+                foreach (var anim in allAnimationsToPause)
                 {
                     anim.Play();
                 }
 
-                foreach (var ac in audiosToBePausedWhenSwitchingView)
+                foreach (var ac in audiosToPause)
                 {
                     ac.UnPause();
                 }
@@ -117,12 +122,12 @@ namespace Nova
             else if (currentView == CurrentViewType.Game && newView != CurrentViewType.Game)
             {
                 // Pause all animations
-                foreach (var anim in animationsToBePausedWhenSwitchingView)
+                foreach (var anim in allAnimationsToPause)
                 {
                     anim.Pause();
                 }
 
-                foreach (var ac in audiosToBePausedWhenSwitchingView)
+                foreach (var ac in audiosToPause)
                 {
                     ac.Pause();
                 }
@@ -141,7 +146,7 @@ namespace Nova
 
         public void StopAllAnimations()
         {
-            foreach (var anim in animationsToBePausedWhenSwitchingView)
+            foreach (var anim in allAnimationsToPause)
             {
                 anim.Stop();
             }

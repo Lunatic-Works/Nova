@@ -17,7 +17,7 @@ namespace Nova
     public class AutoVoice : MonoBehaviour, IRestorable
     {
         public string luaName;
-        public AutoVoiceConfig[] autoVoiceConfigs;
+        public List<AutoVoiceConfig> autoVoiceConfigs;
 
         /// <summary>
         /// Length of the voice file name after padding zeros to the left.

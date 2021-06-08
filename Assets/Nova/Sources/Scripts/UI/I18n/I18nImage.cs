@@ -1,12 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
 {
     public class I18nImage : MonoBehaviour
     {
-        public LocaleSpritePair[] sprites;
-        public LocaleFloatPair[] multipliers;
+        public List<LocaleSpritePair> sprites;
+        public List<LocaleFloatPair> multipliers;
 
         private Image image;
         private Sprite defaultSprite;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -16,16 +17,16 @@ namespace Nova
     {
         public SystemLanguage locale;
         public TMP_FontAsset fontAsset;
-        public FontMaterialConfig[] materials;
+        public List<FontMaterialConfig> materials;
     }
 
     public class I18nFontConfig : MonoBehaviour
     {
         private static I18nFontConfig Current;
 
-        public static LocalizedFontConfig[] Config => Current.config;
+        public static List<LocalizedFontConfig> Config => Current.config;
 
-        public LocalizedFontConfig[] config;
+        public List<LocalizedFontConfig> config;
 
         private void Awake()
         {

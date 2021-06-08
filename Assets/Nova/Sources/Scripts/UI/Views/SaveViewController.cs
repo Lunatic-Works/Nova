@@ -352,9 +352,8 @@ namespace Nova
                 {
                     if (saveViewBookmarkType == BookmarkType.QuickSave)
                     {
-                        // Auto save is disabled
-                        // saveViewBookmarkType = BookmarkType.AutoSave;
-                        // page = 1;
+                        saveViewBookmarkType = BookmarkType.AutoSave;
+                        page = 1;
                     }
                     else if (saveViewBookmarkType == BookmarkType.NormalSave)
                     {
@@ -703,11 +702,9 @@ namespace Nova
                 pageText.text = $"{page} / {maxPage}";
             }
 
-            // Auto save is disabled
-            // leftButton.interactable = (page > 1 || (saveViewMode == SaveViewMode.Load && saveViewBookmarkType != BookmarkType.AutoSave));
             leftButton.interactable = (page > 1 ||
                                        (saveViewMode == SaveViewMode.Load &&
-                                        saveViewBookmarkType == BookmarkType.NormalSave));
+                                        saveViewBookmarkType != BookmarkType.AutoSave));
             rightButton.interactable = (page < maxPage || saveViewBookmarkType != BookmarkType.NormalSave);
             leftButtonText.color = (leftButton.interactable ? defaultTextColor : disabledTextColor);
             rightButtonText.color = (rightButton.interactable ? defaultTextColor : disabledTextColor);

@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +11,7 @@ namespace Nova
     public class FontSizeController : MonoBehaviour
     {
         public string configKeyName;
-        public LocaleFloatPair[] multipliers;
+        public List<LocaleFloatPair> multipliers;
 
         private Text text;
         private TMP_Text textPro;

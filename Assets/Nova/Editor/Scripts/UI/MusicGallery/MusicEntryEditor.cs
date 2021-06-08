@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -294,7 +295,7 @@ namespace Nova.Editor
             }
 
             entry.id = fileName;
-            entry.displayNames = new[] {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}};
+            entry.displayNames = new List<LocaleStringPair> {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}};
             entry.resourcePath = Utils.ConvertPathSeparator(loadPath);
 
             // get loopBeginSample and loopEndSample from audio clips
