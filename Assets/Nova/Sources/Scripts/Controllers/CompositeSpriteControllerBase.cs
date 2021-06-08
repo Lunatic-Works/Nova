@@ -57,7 +57,7 @@ namespace Nova
             return s.Split(':');
         }
 
-        protected virtual void SetPose(string[] poseArray, bool fade)
+        protected void SetPose(string[] poseArray, bool fade)
         {
             string poseName = PoseArrayToString(poseArray);
             if (poseName == currentImageName)
@@ -131,7 +131,7 @@ namespace Nova
             SetPose(pose.ToArray().Cast<string>().ToArray(), fade);
         }
 
-        public virtual void SetImage(string imageName, bool fade = true)
+        public void SetImage(string imageName, bool fade = true)
         {
             this.RuntimeAssert(characterTextureMerger == null && textureChanger == null,
                 "Do not use SetImage() when CharacterTextureMerger or OverlayTextureChanger exists.");
@@ -163,7 +163,7 @@ namespace Nova
             currentImageName = imageName;
         }
 
-        public virtual void ClearImage(bool fade = true)
+        public void ClearImage(bool fade = true)
         {
             if (string.IsNullOrEmpty(currentImageName))
             {

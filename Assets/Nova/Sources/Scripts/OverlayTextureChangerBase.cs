@@ -90,10 +90,10 @@ namespace Nova
         }
 
         private static List<Vector2> GetTextureOffsetsAlignedOnAnchor(out Vector2 boundingSize,
-            out Vector2 boundingAnchor, Texture[] textures, Vector2[] pivots = null)
+            out Vector2 boundingAnchor, IReadOnlyList<Texture> textures, IReadOnlyList<Vector2> pivots = null)
         {
             var anchorDistances = new Vector4();
-            for (int i = 0; i < textures.Length; i++)
+            for (int i = 0; i < textures.Count; i++)
             {
                 var t = textures[i];
                 if (t == null)
@@ -117,7 +117,7 @@ namespace Nova
             boundingSize = new Vector2(anchorDistances.x + anchorDistances.z, anchorDistances.y + anchorDistances.w);
             boundingAnchor = new Vector2(anchorDistances.x, anchorDistances.y);
             var result = new List<Vector2>();
-            for (int i = 0; i < textures.Length; i++)
+            for (int i = 0; i < textures.Count; i++)
             {
                 var t = textures[i];
                 if (t == null)

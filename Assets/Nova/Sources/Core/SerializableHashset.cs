@@ -18,7 +18,9 @@ namespace Nova
         protected SerializableHashSet(SerializationInfo info, StreamingContext context)
         {
             foreach (var val in (List<T>)info.GetValue("values", typeof(List<T>)))
+            {
                 Add(val);
+            }
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

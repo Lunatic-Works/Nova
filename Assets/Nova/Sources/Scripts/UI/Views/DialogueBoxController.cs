@@ -386,7 +386,7 @@ namespace Nova
 
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(value), value, null);
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }

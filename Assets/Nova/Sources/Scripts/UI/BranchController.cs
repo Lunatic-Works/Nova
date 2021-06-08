@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
@@ -30,7 +31,7 @@ namespace Nova
         /// <param name="branchOccursData"></param>
         private void OnBranchOccurs(BranchOccursData branchOccursData)
         {
-            var branchInformations = branchOccursData.branchInformations;
+            var branchInformations = branchOccursData.branchInformations.ToList();
 
             foreach (var branchInfo in branchInformations)
             {

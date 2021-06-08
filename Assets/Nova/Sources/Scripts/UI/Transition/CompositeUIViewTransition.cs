@@ -43,9 +43,10 @@ namespace Nova
                         beginning = lastBeginning;
                         break;
                     case TransitionSequenceOffsetBase.LastItemEnding:
-                    default:
                         beginning = lastEnding;
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
 
                 beginning += item.offset;

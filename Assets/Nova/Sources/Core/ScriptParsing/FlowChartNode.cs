@@ -80,7 +80,7 @@ namespace Nova
             dialogueEntries = entries;
         }
 
-        public void AddLocaleForDialogueEntries(SystemLanguage locale, List<LocalizedDialogueEntry> entries)
+        public void AddLocaleForDialogueEntries(SystemLanguage locale, IReadOnlyList<LocalizedDialogueEntry> entries)
         {
             Assert.IsTrue(entries.Count == dialogueEntries.Count, "Nova: Localized dialogue entry count differs.");
 

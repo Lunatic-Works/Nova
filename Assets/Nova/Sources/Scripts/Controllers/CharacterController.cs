@@ -312,7 +312,7 @@ namespace Nova
             Characters.Remove(name);
         }
 
-        public static void ReplayVoice(Dictionary<string, VoiceEntry> voices, bool unbiasedDelay = true)
+        public static void ReplayVoice(IReadOnlyDictionary<string, VoiceEntry> voices, bool unbiasedDelay = true)
         {
             // Debug.LogFormat("Called: {0}", voices.Count);
 

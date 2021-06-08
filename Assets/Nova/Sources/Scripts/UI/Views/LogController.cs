@@ -173,7 +173,7 @@ namespace Nova
             }
         }
 
-        private static void OnPlayVoiceButtonClicked(Dictionary<string, VoiceEntry> voiceEntries)
+        private static void OnPlayVoiceButtonClicked(IReadOnlyDictionary<string, VoiceEntry> voiceEntries)
         {
             CharacterController.ReplayVoice(voiceEntries);
         }

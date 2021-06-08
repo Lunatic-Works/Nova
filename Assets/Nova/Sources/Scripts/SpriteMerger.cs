@@ -63,7 +63,7 @@ namespace Nova
             Utils.DestroyObject(empty);
         }
 
-        public Texture GetMergedTexture(List<SpriteWithOffset> sprites)
+        public Texture GetMergedTexture(IReadOnlyList<SpriteWithOffset> sprites)
         {
             if (sprites.Count == 0)
             {

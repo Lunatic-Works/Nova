@@ -263,12 +263,12 @@ namespace Nova
                 if (saveViewMode == SaveViewMode.Save)
                 {
                     // Locate to the first unused slot
-                    saveID = checkpointManager.QueryMinUnusedSaveID((int) BookmarkType.NormalSave, int.MaxValue);
+                    saveID = checkpointManager.QueryMinUnusedSaveID((int)BookmarkType.NormalSave, int.MaxValue);
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
                     // Locate to the latest slot
-                    saveID = checkpointManager.QuerySaveIDByTime((int) BookmarkType.NormalSave, int.MaxValue,
+                    saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue,
                         SaveIDQueryType.Latest);
                 }
 
@@ -482,12 +482,12 @@ namespace Nova
 
         public void AutoSaveBookmark()
         {
-            _autoSaveBookmark((int) BookmarkType.AutoSave, I18n.__("bookmark.autosave.page"));
+            _autoSaveBookmark((int)BookmarkType.AutoSave, I18n.__("bookmark.autosave.page"));
         }
 
         private void _quickSaveBookmark()
         {
-            _autoSaveBookmark((int) BookmarkType.QuickSave, I18n.__("bookmark.quicksave.page"));
+            _autoSaveBookmark((int)BookmarkType.QuickSave, I18n.__("bookmark.quicksave.page"));
             Alert.Show(I18n.__("bookmark.quicksave.complete"));
         }
 
@@ -504,8 +504,8 @@ namespace Nova
 
         private void _quickLoadBookmark()
         {
-            int saveID = checkpointManager.QuerySaveIDByTime((int) BookmarkType.QuickSave,
-                (int) BookmarkType.NormalSave, SaveIDQueryType.Latest);
+            int saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.QuickSave,
+                (int)BookmarkType.NormalSave, SaveIDQueryType.Latest);
             var bookmark = checkpointManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
             bookmarkLoad.Invoke(new BookmarkLoadEventData(bookmark));
@@ -515,7 +515,7 @@ namespace Nova
         public void QuickLoadBookmark()
         {
             if (checkpointManager.saveSlotsMetadata.Values.Any(m =>
-                m.saveID >= (int) BookmarkType.QuickSave && m.saveID < (int) BookmarkType.QuickSave + maxSaveEntry))
+                m.saveID >= (int)BookmarkType.QuickSave && m.saveID < (int)BookmarkType.QuickSave + maxSaveEntry))
             {
                 Alert.Show(
                     null,
@@ -664,7 +664,7 @@ namespace Nova
             keepSelectedSaveIDOnce = false;
             if (saveViewBookmarkType == BookmarkType.NormalSave)
             {
-                int maxSaveID = checkpointManager.QueryMaxSaveID((int) BookmarkType.NormalSave);
+                int maxSaveID = checkpointManager.QueryMaxSaveID((int)BookmarkType.NormalSave);
                 if (checkpointManager.saveSlotsMetadata.ContainsKey(maxSaveID))
                 {
                     maxPage = SaveIDToPage(maxSaveID);
@@ -710,12 +710,12 @@ namespace Nova
             rightButtonText.color = (rightButton.interactable ? defaultTextColor : disabledTextColor);
 
             int latestSaveID =
-                checkpointManager.QuerySaveIDByTime((int) BookmarkType.NormalSave, int.MaxValue,
+                checkpointManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue,
                     SaveIDQueryType.Latest);
 
             for (int i = 0; i < maxSaveEntry; ++i)
             {
-                int saveID = (page - 1) * maxSaveEntry + i + (int) saveViewBookmarkType;
+                int saveID = (page - 1) * maxSaveEntry + i + (int)saveViewBookmarkType;
                 string newIDText = SaveIDToDisplayID(saveID).ToString();
 
                 // Load properties from bookmark
@@ -802,17 +802,17 @@ namespace Nova
 
         private int SaveIDToPage(int saveID)
         {
-            return (saveID - (int) BookmarkMetadata.SaveIDToBookmarkType(saveID) + maxSaveEntry) / maxSaveEntry;
+            return (saveID - (int)BookmarkMetadata.SaveIDToBookmarkType(saveID) + maxSaveEntry) / maxSaveEntry;
         }
 
         private static int SaveIDToDisplayID(int saveID)
         {
-            return saveID - (int) BookmarkMetadata.SaveIDToBookmarkType(saveID) + 1;
+            return saveID - (int)BookmarkMetadata.SaveIDToBookmarkType(saveID) + 1;
         }
 
         private SaveEntryController SaveIDToSaveEntryController(int saveID)
         {
-            int i = (saveID - (int) BookmarkMetadata.SaveIDToBookmarkType(saveID)) % maxSaveEntry;
+            int i = (saveID - (int)BookmarkMetadata.SaveIDToBookmarkType(saveID)) % maxSaveEntry;
             if (i >= 0)
             {
                 return saveEntryControllers[i];

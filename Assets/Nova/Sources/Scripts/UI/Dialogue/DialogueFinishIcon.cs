@@ -27,7 +27,7 @@ namespace Nova
             // Don't do MSAA here. It's hard to check whether the driver supports it.
             cubeCamera.targetTexture = renderTarget = new RenderTexture((int)rect.height, (int)rect.height, 0)
             {
-                name = "DialogueFinishIconRenderTexture",
+                name = "DialogueFinishIconRenderTexture"
             };
             img.texture = renderTarget;
         }

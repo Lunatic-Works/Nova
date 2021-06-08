@@ -55,7 +55,7 @@ namespace Nova.Editor
 
         private static string GetCommonPrefix(IEnumerable<string> paths)
         {
-            var fileNames = paths.Select(Path.GetFileNameWithoutExtension);
+            var fileNames = paths.Select(Path.GetFileNameWithoutExtension).ToList();
             var prefix = new string(
                 fileNames.First()
                     .Substring(0, fileNames.Min(s => s.Length))
@@ -73,9 +73,10 @@ namespace Nova.Editor
             return prefix;
         }
 
-        private static void CreateImageGroup(string path, IEnumerable<string> imageSprites)
+        private static void CreateImageGroup(string path, IEnumerable<string> imagePaths)
         {
-            var groupPath = Path.Combine(path, GetCommonPrefix(imageSprites) + "_group.asset");
+            var imagePathList = imagePaths.ToList();
+            var groupPath = Path.Combine(path, GetCommonPrefix(imagePathList) + "_group.asset");
             var group = AssetDatabase.LoadAssetAtPath<ImageGroup>(groupPath);
             if (group == null)
             {
@@ -83,14 +84,15 @@ namespace Nova.Editor
                 AssetDatabase.CreateAsset(group, groupPath);
             }
 
-            group.entries = imageSprites.Select(imagePath =>
+            group.entries = imagePathList.Select(imagePath =>
             {
                 var fileName = Path.GetFileNameWithoutExtension(imagePath);
                 return new ImageEntry
                 {
                     id = fileName,
-                    displayNames = new List<LocaleStringPair> {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}},
-                    resourcePath = GetResourcePath(imagePath),
+                    displayNames = new List<LocaleStringPair>
+                        {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}},
+                    resourcePath = GetResourcePath(imagePath)
                 };
             }).ToList();
 

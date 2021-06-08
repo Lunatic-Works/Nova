@@ -163,7 +163,11 @@ namespace Nova.Editor
                     int previewBeforeSample = previewSecondsBefore * audioClip.frequency;
                     int previewBeginSample = musicEntry.loopEndSample - previewBeforeSample;
 
-                    int pos1 = audioLooper.currentAudioSource?.timeSamples ?? 0;
+                    int pos1 = 0;
+                    if (audioLooper.currentAudioSource != null)
+                    {
+                        pos1 = audioLooper.currentAudioSource.timeSamples;
+                    }
 
                     if (sampleData != null)
                     {
@@ -295,7 +299,8 @@ namespace Nova.Editor
             }
 
             entry.id = fileName;
-            entry.displayNames = new List<LocaleStringPair> {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}};
+            entry.displayNames = new List<LocaleStringPair>
+                {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}};
             entry.resourcePath = Utils.ConvertPathSeparator(loadPath);
 
             // get loopBeginSample and loopEndSample from audio clips

@@ -68,7 +68,7 @@ namespace Nova
 
         public bool GetEnabled(string name)
         {
-            return nameToEnabled.ContainsKey(name) ? nameToEnabled[name] : false;
+            return nameToEnabled.ContainsKey(name) && nameToEnabled[name];
         }
 
         public void SetEnabled(string name, bool value)

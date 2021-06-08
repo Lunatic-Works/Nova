@@ -150,19 +150,19 @@ namespace Nova
             // if (unpreloadActions != "") Debug.LogFormat("<color=blue>{0}</color>", unpreloadActions);
         }
 
-        private static void CombineActions(Dictionary<int, string> dict, int index, string actions)
+        private static void CombineActions(IDictionary<int, string> dict, int index, string actions)
         {
             if (string.IsNullOrEmpty(actions)) return;
             dict.TryGetValue(index, out string old);
             dict[index] = (old ?? "") + actions;
         }
 
-        public static List<DialogueEntry> ParseDialogueEntries(string[] dialogueEntryTexts)
+        public static List<DialogueEntry> ParseDialogueEntries(IReadOnlyList<string> dialogueEntryTexts)
         {
-            var indexToCode = new string[dialogueEntryTexts.Length];
-            var indexToText = new string[dialogueEntryTexts.Length];
+            var indexToCode = new string[dialogueEntryTexts.Count];
+            var indexToText = new string[dialogueEntryTexts.Count];
             var indexToAdditionalActions = new Dictionary<int, string>();
-            for (int i = 0; i < dialogueEntryTexts.Length; ++i)
+            for (int i = 0; i < dialogueEntryTexts.Count; ++i)
             {
                 ParseText(dialogueEntryTexts[i], out string code, out string text);
                 indexToCode[i] = code;
@@ -183,7 +183,7 @@ namespace Nova
             }
 
             var results = new List<DialogueEntry>();
-            for (int i = 0; i < dialogueEntryTexts.Length; ++i)
+            for (int i = 0; i < dialogueEntryTexts.Count; ++i)
             {
                 string code = indexToCode[i];
                 string text = indexToText[i];
@@ -224,12 +224,11 @@ namespace Nova
             return results;
         }
 
-        public static List<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(string[] dialogueEntryTexts)
+        public static List<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(IReadOnlyList<string> dialogueEntryTexts)
         {
             var results = new List<LocalizedDialogueEntry>();
-            for (int i = 0; i < dialogueEntryTexts.Length; ++i)
+            foreach (var text in dialogueEntryTexts)
             {
-                var text = dialogueEntryTexts[i];
                 var m = Regex.Match(text, @"(.*?)(?:：：|::)(.*)");
                 string characterName, dialogue;
                 if (m.Success)

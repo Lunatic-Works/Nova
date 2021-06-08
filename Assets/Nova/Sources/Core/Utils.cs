@@ -346,17 +346,20 @@ namespace Nova
             return callback =>
             {
                 var callbackCalled = new bool[actions.Length];
-                Func<int, Action> setAndCheckIfAllCalled = i => () =>
-                {
-                    callbackCalled[i] = true;
-                    if (callbackCalled.All(x => x))
+
+                Action SetAndCheckIfAllCalled(int i) =>
+                    () =>
                     {
-                        callback();
-                    }
-                };
+                        callbackCalled[i] = true;
+                        if (callbackCalled.All(x => x))
+                        {
+                            callback();
+                        }
+                    };
+
                 for (int i = 0; i < actions.Length; i++)
                 {
-                    actions[i](setAndCheckIfAllCalled(i));
+                    actions[i](SetAndCheckIfAllCalled(i));
                 }
             };
         }

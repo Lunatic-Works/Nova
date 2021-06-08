@@ -329,7 +329,9 @@ namespace Nova
 
             if (dialogueChanged)
             {
-                this.RuntimeAssert(currentIndex >= 0 && (currentNode.dialogueEntryCount == 0 || currentIndex < currentNode.dialogueEntryCount),
+                this.RuntimeAssert(
+                    currentIndex >= 0 && (currentNode.dialogueEntryCount == 0 ||
+                                          currentIndex < currentNode.dialogueEntryCount),
                     "Dialogue index out of range.");
 
                 if (!firstEntryOfNode && dialogueStepped)
@@ -365,7 +367,7 @@ namespace Nova
                     restrainCheckpoint--;
                     if (restrainCheckpoint == 1)
                     {
-                        Debug.LogWarning($"Nova: restrainCheckpoint reaches 1");
+                        Debug.LogWarning("Nova: restrainCheckpoint reaches 1");
                     }
                 }
 
@@ -537,12 +539,12 @@ namespace Nova
 
         public List<string> GetAllStartNodeNames()
         {
-            return flowChartTree.GetAllStartNodeNames();
+            return flowChartTree.GetAllStartNodeNames().ToList();
         }
 
         public List<string> GetAllUnlockedStartNodeNames()
         {
-            return flowChartTree.GetAllUnlockedStartNodeNames();
+            return flowChartTree.GetAllUnlockedStartNodeNames().ToList();
         }
 
         #endregion

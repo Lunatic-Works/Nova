@@ -12,7 +12,6 @@ namespace Nova
         private void ClearContent()
         {
             var children = content.Cast<Transform>().ToList();
-
             foreach (var child in children)
             {
                 Destroy(child.gameObject);

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Nova
+﻿namespace Nova
 {
     [ExportCustomType]
     public class VolumeAnimationProperty : FloatBaseAnimationProperty

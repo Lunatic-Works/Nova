@@ -131,7 +131,7 @@ namespace Nova
         // remove any compound key that is in currentSelectedKey
         public void ResolveDuplicate()
         {
-            foreach (var ak in keyboardData.Keys.ToList())
+            foreach (var ak in keyboardData.Keys)
             {
                 if (ak == currentSelectedKey)
                 {
