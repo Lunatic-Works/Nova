@@ -4,8 +4,8 @@ namespace Nova
 {
     using MusicUnlockInfo = SerializableHashSet<string>;
 
-    [RequireComponent(typeof(MusicGalleryController))]
     [ExportCustomType]
+    [RequireComponent(typeof(MusicGalleryController))]
     public class MusicUnlockHelper : MonoBehaviour
     {
         private CheckpointManager checkpointManager;

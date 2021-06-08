@@ -53,10 +53,12 @@ namespace Nova
             }
         }
 
-        public ColorAnimationProperty(CharacterColor characterColor, Color targetValue) : base(targetValue)
+        protected override Color CombineDelta(Color a, Color b)
         {
-            this.characterColor = characterColor;
+            throw new System.NotImplementedException();
         }
+
+        protected override Color Lerp(Color a, Color b, float t) => Color.LerpUnclamped(a, b, t);
 
         public ColorAnimationProperty(CharacterColor characterColor, Color startValue, Color targetValue) : base(
             startValue, targetValue)
@@ -64,9 +66,9 @@ namespace Nova
             this.characterColor = characterColor;
         }
 
-        public ColorAnimationProperty(SpriteRenderer spriteRenderer, Color targetValue) : base(targetValue)
+        public ColorAnimationProperty(CharacterColor characterColor, Color targetValue) : base(targetValue)
         {
-            this.spriteRenderer = spriteRenderer;
+            this.characterColor = characterColor;
         }
 
         public ColorAnimationProperty(SpriteRenderer spriteRenderer, Color startValue, Color targetValue) : base(
@@ -75,9 +77,9 @@ namespace Nova
             this.spriteRenderer = spriteRenderer;
         }
 
-        public ColorAnimationProperty(Image image, Color targetValue) : base(targetValue)
+        public ColorAnimationProperty(SpriteRenderer spriteRenderer, Color targetValue) : base(targetValue)
         {
-            this.image = image;
+            this.spriteRenderer = spriteRenderer;
         }
 
         public ColorAnimationProperty(Image image, Color startValue, Color targetValue) : base(startValue, targetValue)
@@ -85,9 +87,9 @@ namespace Nova
             this.image = image;
         }
 
-        public ColorAnimationProperty(DialogueBoxColor dialogueBoxColor, Color targetValue) : base(targetValue)
+        public ColorAnimationProperty(Image image, Color targetValue) : base(targetValue)
         {
-            this.dialogueBoxColor = dialogueBoxColor;
+            this.image = image;
         }
 
         public ColorAnimationProperty(DialogueBoxColor dialogueBoxColor, Color startValue, Color targetValue) : base(
@@ -96,15 +98,9 @@ namespace Nova
             this.dialogueBoxColor = dialogueBoxColor;
         }
 
-        public override string id => "Color";
-
-        protected override Color CombineDelta(Color a, Color b)
+        public ColorAnimationProperty(DialogueBoxColor dialogueBoxColor, Color targetValue) : base(targetValue)
         {
-            throw new System.NotImplementedException();
+            this.dialogueBoxColor = dialogueBoxColor;
         }
-
-        protected override Color Lerp(Color a, Color b, float t) => Color.LerpUnclamped(a, b, t);
-
-        protected override float InverseLerp(Color a, Color b, Color curr) => Utils.InverseLerp(a, b, curr);
     }
 }

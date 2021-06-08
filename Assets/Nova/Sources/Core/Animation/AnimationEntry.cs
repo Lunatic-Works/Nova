@@ -342,8 +342,7 @@ namespace Nova
 
         public void DebugPrint(int level)
         {
-            Debug.LogFormat(new string('+', level) + "{0} {1} {2} {3}", GetInstanceID(),
-                property == null ? "Null ID" : property.id, duration, status);
+            Debug.Log($"{new string('+', level)}{property} {duration} {status}");
             foreach (Transform child in transform)
             {
                 var entry = child.GetComponent<AnimationEntry>();

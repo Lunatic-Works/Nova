@@ -5,18 +5,18 @@ namespace Nova
     [ExportCustomType]
     public class SoundController : MonoBehaviour
     {
-        private static SoundController _Current;
+        private static SoundController _current;
 
         public static SoundController Current
         {
             get
             {
-                if (_Current == null)
+                if (_current == null)
                 {
-                    _Current = GameObject.FindWithTag("SoundController").GetComponent<SoundController>();
+                    _current = GameObject.FindWithTag("SoundController").GetComponent<SoundController>();
                 }
 
-                return _Current;
+                return _current;
             }
         }
 

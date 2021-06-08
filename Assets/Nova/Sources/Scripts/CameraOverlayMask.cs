@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace Nova
 {
-    [RequireComponent(typeof(Camera))]
     [ExportCustomType]
+    [RequireComponent(typeof(Camera))]
     public class CameraOverlayMask : MonoBehaviour, IRestorable
     {
         private static readonly int SubTexID = Shader.PropertyToID("_SubTex");

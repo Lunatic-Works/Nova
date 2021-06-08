@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Nova
 {
+    [ExportCustomType]
     [Flags]
     public enum AnimationType
     {

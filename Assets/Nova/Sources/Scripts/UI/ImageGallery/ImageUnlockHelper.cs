@@ -4,8 +4,8 @@ namespace Nova
 {
     using ImageUnlockInfo = SerializableHashSet<string>;
 
-    [RequireComponent(typeof(ImageGalleryController))]
     [ExportCustomType]
+    [RequireComponent(typeof(ImageGalleryController))]
     public class ImageUnlockHelper : MonoBehaviour
     {
         private CheckpointManager checkpointManager;

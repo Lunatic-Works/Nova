@@ -83,7 +83,7 @@ namespace Nova
                     try
                     {
                         gameState.SeekBackStep(1, out var nodeName, out var dialogueIndex);
-                        gameState.MoveBackTo(nodeName, dialogueIndex, "");
+                        gameState.MoveBackTo(nodeName, dialogueIndex, 0UL);
                     }
                     catch
                     {

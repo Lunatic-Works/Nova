@@ -48,7 +48,7 @@ namespace Nova
                 }
 
                 beginning += item.offset;
-                var ending = beginning + (isEnter ? item.transition.enterDuration : item.transition.exitDuration);
+                float ending = beginning + (isEnter ? item.transition.enterDuration : item.transition.exitDuration);
                 if (ending >= globalEnding)
                 {
                     maxIdx = i;

@@ -31,6 +31,7 @@ namespace Nova.Editor
             return ((x + 3) / 4) * 4;
         }
 
+        // Try to round up x2 - x1 to a multiplier of 4, while ensuring x1 >= left, x2 <= right
         private static void RoundWithBounds(ref int x1, ref int x2, int left, int right)
         {
             x2 = x1 + RoundUpToFour(x2 - x1);

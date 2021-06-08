@@ -3,14 +3,14 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class OpacityAnimationProperty : IAnimationProperty
+    public class OpacityAnimationProperty : FloatBaseAnimationProperty
     {
         private readonly SpriteRenderer spriteRenderer;
         private readonly Image image;
         private readonly CanvasGroup canvasGroup;
         private readonly RawImage rawImage;
 
-        private float opacity
+        protected override float currentValue
         {
             get
             {
@@ -58,47 +58,28 @@ namespace Nova
             }
         }
 
-        // TODO: lazy startValue
-        private readonly float startValue, targetValue;
-
-        public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float startValue, float targetValue)
+        public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float startValue, float targetValue) : base(startValue, targetValue)
         {
             this.spriteRenderer = spriteRenderer;
-            this.startValue = startValue;
-            this.targetValue = targetValue;
         }
 
-        public OpacityAnimationProperty(Image image, float startValue, float targetValue)
+        public OpacityAnimationProperty(Image image, float startValue, float targetValue) : base(startValue, targetValue)
         {
             this.image = image;
-            this.startValue = startValue;
-            this.targetValue = targetValue;
         }
 
-        public OpacityAnimationProperty(CanvasGroup canvasGroup, float startValue, float targetValue)
+        public OpacityAnimationProperty(CanvasGroup canvasGroup, float startValue, float targetValue) : base(startValue, targetValue)
         {
             this.canvasGroup = canvasGroup;
-            this.startValue = startValue;
-            this.targetValue = targetValue;
             // For UI animation, apply startValue when this is constructed
-            value = 0;
+            value = 0.0f;
         }
 
-        public OpacityAnimationProperty(RawImage rawImage, float startValue, float targetValue)
+        public OpacityAnimationProperty(RawImage rawImage, float startValue, float targetValue) : base(startValue, targetValue)
         {
             this.rawImage = rawImage;
-            this.startValue = startValue;
-            this.targetValue = targetValue;
             // For UI animation, apply startValue when this is constructed
-            value = 0;
-        }
-
-        public string id => "Opacity";
-
-        public float value
-        {
-            get => Mathf.InverseLerp(startValue, targetValue, opacity);
-            set => opacity = Mathf.LerpUnclamped(startValue, targetValue, value);
+            value = 0.0f;
         }
     }
 }

@@ -16,8 +16,6 @@ namespace Nova
             this.action = action;
         }
 
-        public string id => "Action";
-
         public float value
         {
             get => 0.0f;

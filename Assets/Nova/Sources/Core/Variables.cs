@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Nova
 {
@@ -14,8 +12,8 @@ namespace Nova
         String
     }
 
-    [Serializable]
     [ExportCustomType]
+    [Serializable]
     public class VariableEntry
     {
         public readonly VariableType type;
@@ -28,20 +26,25 @@ namespace Nova
         }
     }
 
-    [Serializable]
     [ExportCustomType]
+    [Serializable]
     public class Variables
     {
         private SortedDictionary<string, VariableEntry> variables = new SortedDictionary<string, VariableEntry>();
 
-        private string _hash = "";
-        private bool needCalculateHash;
+        [NonSerialized] private ulong _hash;
+        [NonSerialized] private bool needCalculateHash = true;
 
-        public string hash
+        public ulong hash
         {
             get
             {
-                if (needCalculateHash) _hash = CalculateHash();
+                if (needCalculateHash)
+                {
+                    _hash = CalculateHash();
+                    needCalculateHash = false;
+                }
+
                 return _hash;
             }
             private set
@@ -50,8 +53,6 @@ namespace Nova
                 needCalculateHash = false;
             }
         }
-
-        [NonSerialized] private HashAlgorithm algorithm = SHA256.Create();
 
         public VariableEntry Get(string name)
         {
@@ -69,27 +70,28 @@ namespace Nova
             }
         }
 
-        private string CalculateHash()
+        private ulong CalculateHash()
         {
-            needCalculateHash = false;
-
-            if (variables.Count == 0)
+            var x = 0UL;
+            foreach (var pair in variables)
             {
-                return "";
+                foreach (var c in pair.Key)
+                {
+                    x += c;
+                    x *= 3074457345618258799UL;
+                }
+
+                x += (ulong)pair.Value.type;
+                x *= 3074457345618258799UL;
+
+                foreach (var c in pair.Value.value)
+                {
+                    x += c;
+                    x *= 3074457345618258799UL;
+                }
             }
 
-            string hash = Convert.ToBase64String(algorithm.ComputeHash(Encoding.UTF8.GetBytes(
-                string.Join("\0", from pair in variables select pair.Key + "\0" + pair.Value.type + "\0" + pair.Value.value)
-            )));
-
-            // Debug.Log("CalculateHash");
-            // foreach (var pair in variables)
-            // {
-            //     Debug.LogFormat("{0} {1} {2}", pair.Key, pair.Value.type, pair.Value.value);
-            // }
-            // Debug.Log(hash);
-
-            return hash;
+            return x;
         }
 
         public void CopyFrom(Variables variables)
@@ -101,12 +103,13 @@ namespace Nova
         public void Reset()
         {
             variables.Clear();
-            hash = "";
+            hash = 0UL;
         }
 
         public override string ToString()
         {
-            return string.Join(",", from pair in variables select pair.Key + ":" + pair.Value.type + ":" + pair.Value.value);
+            return string.Join(",",
+                from pair in variables select pair.Key + ":" + pair.Value.type + "=" + pair.Value.value);
         }
     }
 }

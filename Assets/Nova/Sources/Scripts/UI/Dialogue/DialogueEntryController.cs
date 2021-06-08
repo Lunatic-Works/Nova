@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public struct DialogueEntryLayoutSetting
+    public class DialogueEntryLayoutSetting
     {
         internal int leftPadding;
         internal int rightPadding;

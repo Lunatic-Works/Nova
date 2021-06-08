@@ -6,7 +6,6 @@ using UnityObject = UnityEngine.Object;
 
 namespace Nova
 {
-    [Serializable]
     [ExportCustomType]
     public enum AssetCacheType
     {

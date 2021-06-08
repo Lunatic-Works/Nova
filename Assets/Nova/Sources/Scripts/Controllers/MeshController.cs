@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace Nova
 {
-    [RequireComponent(typeof(MeshRenderer))]
     [ExportCustomType]
+    [RequireComponent(typeof(MeshRenderer))]
     public class MeshController : MonoBehaviour, IRestorable
     {
         public string luaGlobalName;

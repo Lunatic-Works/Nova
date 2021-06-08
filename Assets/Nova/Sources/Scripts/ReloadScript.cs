@@ -11,7 +11,7 @@ namespace Nova
         private GameState gameState;
         private InputMapper inputMapper;
         private CharacterController[] characterControllers;
-        private string currentNodeInitialVariablesHash;
+        private ulong currentNodeInitialVariablesHash;
 
         private void Start()
         {
@@ -26,7 +26,7 @@ namespace Nova
 
             if (!Application.isEditor) return;
 
-            currentNodeInitialVariablesHash = "";
+            currentNodeInitialVariablesHash = 0UL;
             gameState.NodeChanged += OnNodeChanged;
         }
 

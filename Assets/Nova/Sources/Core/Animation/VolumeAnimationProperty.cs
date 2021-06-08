@@ -34,6 +34,12 @@ namespace Nova
             }
         }
 
+        public VolumeAnimationProperty(UnifiedAudioSource audioSource, float startValue, float targetValue) : base(
+            startValue, targetValue)
+        {
+            this.audioSource = audioSource;
+        }
+
         public VolumeAnimationProperty(UnifiedAudioSource audioSource, float targetValue) : base(targetValue)
         {
             this.audioSource = audioSource;
@@ -45,10 +51,10 @@ namespace Nova
             this.audioSource = audioSource;
         }
 
-        public VolumeAnimationProperty(UnifiedAudioSource audioSource, float startValue, float targetValue) : base(
+        public VolumeAnimationProperty(AudioController audioController, float startValue, float targetValue) : base(
             startValue, targetValue)
         {
-            this.audioSource = audioSource;
+            this.audioController = audioController;
         }
 
         public VolumeAnimationProperty(AudioController audioController, float targetValue) : base(targetValue)
@@ -61,15 +67,5 @@ namespace Nova
         {
             this.audioController = audioController;
         }
-
-        public VolumeAnimationProperty(AudioController audioController, float startValue, float targetValue) : base(
-            startValue, targetValue)
-        {
-            this.audioController = audioController;
-        }
-
-        public override string id => "Audio Volume";
-
-        protected override float CombineDelta(float a, float b) => Mathf.Clamp(a + b, 0f, 1f);
     }
 }

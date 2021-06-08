@@ -61,12 +61,10 @@ namespace Nova
         }
     }
 
-    [RequireComponent(typeof(TextSpeedConfigReader))]
     [ExportCustomType]
     public partial class DialogueBoxController : ViewControllerBase, IPointerDownHandler, IPointerUpHandler,
         IDialogueBoxController, IRestorable
     {
-        [Serializable]
         [ExportCustomType]
         public enum DialogueUpdateMode
         {

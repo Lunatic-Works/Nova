@@ -10,10 +10,8 @@ namespace Nova
             this.text = text;
             this.targetAlpha = targetAlpha;
             // avoid undesired flash on the first frame
-            value = 0;
+            value = 0.0f;
         }
-
-        public string id => "Text Fade In";
 
         private float _value;
 

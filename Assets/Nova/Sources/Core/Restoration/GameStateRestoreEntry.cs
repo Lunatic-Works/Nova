@@ -57,10 +57,10 @@ namespace Nova
     [Serializable]
     public class GameStateSimpleEntry : GameStateRestoreEntry
     {
-        public readonly string lastCheckpointVariablesHash;
+        public readonly ulong lastCheckpointVariablesHash;
 
         public GameStateSimpleEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum,
-            string lastCheckpointVariablesHash)
+            ulong lastCheckpointVariablesHash)
             : base(stepNumFromLastCheckpoint, restrainCheckpointNum)
         {
             this.lastCheckpointVariablesHash = lastCheckpointVariablesHash;

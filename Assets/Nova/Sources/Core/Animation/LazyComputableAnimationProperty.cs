@@ -20,7 +20,6 @@
         protected abstract T currentValue { get; set; }
         protected abstract T CombineDelta(T a, D b);
         protected abstract T Lerp(T a, T b, float t);
-        protected abstract float InverseLerp(T a, T b, T curr);
 
         private void EnsureValuesInitialized()
         {
@@ -65,6 +64,12 @@
             }
         }
 
+        protected LazyComputableAnimationProperty(T startValue, T targetValue)
+        {
+            this.startValue = startValue;
+            this.targetValue = targetValue;
+        }
+
         protected LazyComputableAnimationProperty(T targetValue)
         {
             this.targetValue = targetValue;
@@ -75,18 +80,16 @@
             this.deltaValue = deltaValue;
         }
 
-        protected LazyComputableAnimationProperty(T startValue, T targetValue)
-        {
-            this.startValue = startValue;
-            this.targetValue = targetValue;
-        }
+        private float _value;
 
         public float value
         {
-            get => InverseLerp(startValue, targetValue, currentValue);
-            set => currentValue = Lerp(startValue, targetValue, value);
+            get => _value;
+            set
+            {
+                _value = value;
+                currentValue = Lerp(startValue, targetValue, value);
+            }
         }
-
-        public abstract string id { get; }
     }
 }

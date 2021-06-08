@@ -146,8 +146,8 @@ namespace Nova
         /// </summary>
         public readonly Variables variables = new Variables();
 
-        private string lastCheckpointVariablesHash;
-        private string lastVariablesHashBeforeAction;
+        private ulong lastCheckpointVariablesHash;
+        private ulong lastVariablesHashBeforeAction;
 
         private enum State
         {
@@ -437,7 +437,7 @@ namespace Nova
         /// <param name="dialogueIndex">the index of the dialogue to move to</param>
         /// <param name="variablesHash">hash of variables of the target</param>
         /// <param name="clearFuture">clear saved checkpoints in the future</param>
-        public void MoveBackTo(string nodeName, int dialogueIndex, string variablesHash, bool clearFuture = false)
+        public void MoveBackTo(string nodeName, int dialogueIndex, ulong variablesHash, bool clearFuture = false)
         {
             if (CheckActionRunning()) return;
 

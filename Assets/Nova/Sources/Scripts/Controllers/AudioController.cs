@@ -7,8 +7,8 @@ namespace Nova
     /// <summary>
     /// This class is used for controlling audio source from external scripts
     /// </summary>
-    [RequireComponent(typeof(AudioSource))]
     [ExportCustomType]
+    [RequireComponent(typeof(AudioSource))]
     public class AudioController : MonoBehaviour, IRestorable
     {
         public Slider slider;

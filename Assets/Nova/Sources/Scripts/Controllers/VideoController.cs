@@ -5,6 +5,7 @@ using UnityEngine.Video;
 namespace Nova
 {
     [ExportCustomType]
+    [RequireComponent(typeof(VideoPlayer))]
     public class VideoController : MonoBehaviour, IRestorable
     {
         public string luaName;

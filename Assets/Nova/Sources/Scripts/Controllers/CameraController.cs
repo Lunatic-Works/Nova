@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Nova
 {
     // a lazy proxy to deal with timeline camera switching
-    [RequireComponent(typeof(Camera))]
     [ExportCustomType]
+    [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour, IRestorable
     {
         public string luaGlobalName;

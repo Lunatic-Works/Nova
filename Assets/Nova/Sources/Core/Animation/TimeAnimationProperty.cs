@@ -7,6 +7,25 @@ namespace Nova
     {
         private readonly TimelineController timeline;
 
+        protected override float currentValue
+        {
+            get => (float) timeline.playableDirector.time;
+            set
+            {
+                timeline.playableDirector.time = value;
+                timeline.playableDirector.Evaluate();
+            }
+        }
+
+        protected override float CombineDelta(float a, float b) =>
+            Mathf.Clamp(a + b, 0.0f, (float) timeline.playableDirector.duration);
+
+        public TimeAnimationProperty(TimelineController timeline, float startValue, float targetValue) : base(
+            startValue, targetValue)
+        {
+            this.timeline = timeline;
+        }
+
         public TimeAnimationProperty(TimelineController timeline, float targetValue) : base(targetValue)
         {
             this.timeline = timeline;
@@ -17,26 +36,5 @@ namespace Nova
         {
             this.timeline = timeline;
         }
-
-        public TimeAnimationProperty(TimelineController timeline, float startValue, float targetValue) : base(
-            startValue, targetValue)
-        {
-            this.timeline = timeline;
-        }
-
-        public override string id => "Time";
-
-        protected override float currentValue
-        {
-            get => (float)timeline.playableDirector.time;
-            set
-            {
-                timeline.playableDirector.time = value;
-                timeline.playableDirector.Evaluate();
-            }
-        }
-
-        protected override float CombineDelta(float a, float b) =>
-            Mathf.Clamp(a + b, 0f, (float)timeline.playableDirector.duration);
     }
 }

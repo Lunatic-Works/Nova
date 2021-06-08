@@ -20,7 +20,7 @@ namespace Nova
             this.targetPosition = targetPosition;
             startScale = targetScale = Vector2.one;
             // For UI animation, apply startValue when this is constructed
-            value = 0;
+            value = 0.0f;
         }
 
         public RectTransformAnimationProperty(RectTransform target,
@@ -33,12 +33,10 @@ namespace Nova
             startScale = startSize.InverseScale(baseSize);
             targetScale = targetSize.InverseScale(baseSize);
             // For UI animation, apply startValue when this is constructed
-            value = 0;
+            value = 0.0f;
         }
 
-        public string id => "Rect Transform";
-
-        private float _value = 0;
+        private float _value = 0.0f;
 
         public float value
         {
@@ -46,11 +44,11 @@ namespace Nova
             set
             {
                 _value = value;
-                Vector3 pos = Vector2.LerpUnclamped(startPosition, targetPosition, _value);
+                Vector3 pos = Vector2.LerpUnclamped(startPosition, targetPosition, value);
                 pos.z = target.position.z;
                 target.position = pos;
-                Vector3 scale = Vector2.LerpUnclamped(startScale, targetScale, _value);
-                scale.z = 1;
+                Vector3 scale = Vector2.LerpUnclamped(startScale, targetScale, value);
+                scale.z = 1.0f;
                 target.localScale = scale;
             }
         }

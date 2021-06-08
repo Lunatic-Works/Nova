@@ -24,7 +24,7 @@ namespace Nova
 
         private ScrollRect scrollRect;
         private GameObject logContent;
-        private string previousVariablesHash;
+        private ulong previousVariablesHash;
         private readonly List<LogEntryController> logEntries = new List<LogEntryController>();
         private readonly List<InitParams> logParams = new List<InitParams>();
         private InitParams lastCheckpointLogParamsRef;
@@ -49,7 +49,7 @@ namespace Nova
 
             closeButton.onClick.AddListener(Hide);
 
-            previousVariablesHash = "";
+            previousVariablesHash = 0UL;
 
             lastCheckpointLogParamsRef = null;
         }
@@ -143,7 +143,7 @@ namespace Nova
             RemoveLogEntriesRange(0, logEntries.Count);
         }
 
-        private void _onGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex, string variablesHash)
+        private void _onGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex, ulong variablesHash)
         {
             gameState.MoveBackTo(nodeName, dialogueIndex, variablesHash);
             // Debug.LogFormat("Remain log entries count: {0}", logEntries.Count);
@@ -155,7 +155,7 @@ namespace Nova
 
         private int lastClickedLogIndex = -1;
 
-        private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex, string variablesHash)
+        private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex, ulong variablesHash)
         {
             if (logEntryIndex == lastClickedLogIndex)
             {
@@ -211,7 +211,7 @@ namespace Nova
             public DialogueDisplayData displayData;
             public string currentNodeName;
             public int currentDialogueIndex;
-            public string variablesHashBeforeChange;
+            public ulong variablesHashBeforeChange;
             public Dictionary<string, VoiceEntry> voices;
             public int logEntryIndex;
         }

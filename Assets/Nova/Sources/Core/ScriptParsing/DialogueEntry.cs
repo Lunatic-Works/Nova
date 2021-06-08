@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    public struct LocalizedDialogueEntry
+    public class LocalizedDialogueEntry
     {
         public string displayName;
         public string dialogue;
