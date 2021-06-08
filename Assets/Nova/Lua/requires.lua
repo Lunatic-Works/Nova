@@ -5,6 +5,7 @@ require 'hook'
 require 'preload'
 
 require 'advanced_dialogue_helper'
+require 'alert'
 require 'animation'
 require 'animation_high_level'
 require 'audio'

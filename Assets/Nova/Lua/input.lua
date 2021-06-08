@@ -7,17 +7,17 @@ function input_off()
 end
 
 function click_forward_on()
-    __Nova.dialogueBoxController.clickForwardAbility = true
+    __Nova.dialogueBoxController.canClickForward = true
 end
 
 function click_forward_off()
-    __Nova.dialogueBoxController.clickForwardAbility = false
+    __Nova.dialogueBoxController.canClickForward = false
 end
 
 function click_abort_anim_on()
-    __Nova.dialogueBoxController.scriptAbortAnimationAbility = true
+    __Nova.dialogueBoxController.scriptCanAbortAnimation = true
 end
 
 function click_abort_anim_off()
-    __Nova.dialogueBoxController.scriptAbortAnimationAbility = false
+    __Nova.dialogueBoxController.scriptCanAbortAnimation = false
 end

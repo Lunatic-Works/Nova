@@ -1,0 +1,30 @@
+@<|
+label 'test_alert'
+is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试警告
+
+<|
+anim:wait(1):action(force_step)
+|>
+这句话过一秒钟就会进入下一句话
+
+这是下一句话
+
+<|
+alert('警告警告警告')
+|>
+这是警告框
+
+<|
+notify('通知通知通知')
+|>
+这是通知框
+
+测试结束
+@<| is_end() |>

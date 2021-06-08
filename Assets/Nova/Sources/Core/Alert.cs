@@ -21,6 +21,7 @@ namespace Nova
     /// <summary>
     /// A delegate for alert function to be used across the engine core and the game.
     /// </summary>
+    [ExportCustomType]
     public class Alert : MonoBehaviour
     {
         public const string AlertKeyPrefix = ConfigManager.TrackedKeyPrefix + "Alert";

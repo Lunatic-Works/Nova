@@ -396,15 +396,6 @@ namespace Nova
         public UnityEvent fastForwardModeStarts;
         public UnityEvent fastForwardModeStops;
 
-        private static bool IsAnimating => NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
-
-        private bool textAnimationIsPlaying => textAnimation.isPlaying;
-
-        private void StopTextAnimation()
-        {
-            textAnimation.Stop();
-        }
-
         private string currentNodeName;
 
         /// <summary>
@@ -438,7 +429,9 @@ namespace Nova
 
             // No animation playing when fast forwarding
             if (state == DialogueBoxState.FastForward)
+            {
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+            }
 
             // Check current state and set schedule for the next dialogue entry
             SetSchedule();
@@ -644,7 +637,7 @@ namespace Nova
         public float autoDelay;
         public float fastForwardDelay;
 
-        public NovaAnimation textAnimation;
+        [SerializeField] private NovaAnimation textAnimation;
         public bool needAnimation = true;
 
         /// <summary>
@@ -684,6 +677,12 @@ namespace Nova
             }
 
             return true;
+        }
+
+        public void ForceStep()
+        {
+            NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+            gameState.Step();
         }
 
         private IEnumerator ScheduledStep(float scheduledDelay)
@@ -822,8 +821,8 @@ namespace Nova
             public readonly Vector4Data backgroundColor;
             public readonly DialogueUpdateMode dialogueUpdateMode;
             public readonly List<DialogueDisplayData> displayDatas;
-            public readonly bool clickForwardAbility;
-            public readonly bool scriptAbortAnimationAbility;
+            public readonly bool canClickForward;
+            public readonly bool scriptCanAbortAnimation;
             public readonly int textAlignment;
             public readonly bool useThemedBox;
             public readonly bool textColorHasSet;
@@ -833,16 +832,16 @@ namespace Nova
             public readonly bool dialogueFinishIconEnabled;
 
             public DialogueBoxRestoreData(RectTransform rect, Color backgroundColor,
-                DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, bool clickForwardAbility,
-                bool scriptAbortAnimationAbility, int textAlignment, bool useThemedBox, bool textColorHasSet,
+                DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, bool canClickForward,
+                bool scriptCanAbortAnimation, int textAlignment, bool useThemedBox, bool textColorHasSet,
                 Color textColor, string materialName, bool closeButtonShown, bool dialogueFinishIconEnabled)
             {
                 rectTransformRestoreData = new RectTransformRestoreData(rect);
                 this.backgroundColor = backgroundColor;
                 this.dialogueUpdateMode = dialogueUpdateMode;
                 this.displayDatas = displayDatas;
-                this.clickForwardAbility = clickForwardAbility;
-                this.scriptAbortAnimationAbility = scriptAbortAnimationAbility;
+                this.canClickForward = canClickForward;
+                this.scriptCanAbortAnimation = scriptCanAbortAnimation;
                 this.textAlignment = textAlignment;
                 this.useThemedBox = useThemedBox;
                 this.textColorHasSet = textColorHasSet;
@@ -857,7 +856,7 @@ namespace Nova
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
             return new DialogueBoxRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas,
-                clickForwardAbility, scriptAbortAnimationAbility, (int)textAlignment, useThemedBox, textColorHasSet,
+                canClickForward, scriptCanAbortAnimation, (int)textAlignment, useThemedBox, textColorHasSet,
                 textColor, materialName, closeButtonShown, dialogueFinishIconEnabled);
         }
 
@@ -868,8 +867,8 @@ namespace Nova
             backgroundColor = data.backgroundColor;
 
             dialogueUpdateMode = data.dialogueUpdateMode;
-            clickForwardAbility = data.clickForwardAbility;
-            scriptAbortAnimationAbility = data.scriptAbortAnimationAbility;
+            canClickForward = data.canClickForward;
+            scriptCanAbortAnimation = data.scriptCanAbortAnimation;
 
             textAlignment = (TextAlignmentOptions)data.textAlignment;
             useThemedBox = data.useThemedBox;

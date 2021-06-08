@@ -8,6 +8,10 @@ function stop_ff()
     end
 end
 
+function force_step()
+    __Nova.dialogueBoxController:ForceStep()
+end
+
 function box_update_mode(mode)
     if mode == 'append' then
         mode = Nova.DialogueBoxController.DialogueUpdateMode.Append

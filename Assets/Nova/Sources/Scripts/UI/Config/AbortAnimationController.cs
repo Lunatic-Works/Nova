@@ -32,7 +32,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            controller.abortAnimationAbility = configManager.GetInt(configKeyName) > 0;
+            controller.canAbortAnimation = configManager.GetInt(configKeyName) > 0;
         }
     }
 }

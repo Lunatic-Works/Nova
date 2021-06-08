@@ -310,38 +310,41 @@ namespace Nova
             }
         }
 
-        [HideInInspector] public bool clickForwardAbility = true;
-        [HideInInspector] public bool abortAnimationAbility = true;
-        [HideInInspector] public bool scriptAbortAnimationAbility = true;
+        [HideInInspector] public bool canClickForward = true;
+        [HideInInspector] public bool canAbortAnimation = true;
+        [HideInInspector] public bool scriptCanAbortAnimation = true;
         [HideInInspector] public bool onlyFastForwardRead = true;
 
         public void ClickForward()
         {
-            if (!clickForwardAbility)
+            if (!canClickForward)
             {
                 return;
             }
 
             state = DialogueBoxState.Normal;
 
-            if (!IsAnimating && !textAnimationIsPlaying)
+            bool isAnimating = NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
+            bool textIsAnimating = textAnimation.isPlaying;
+
+            if (!isAnimating && !textIsAnimating)
             {
                 NextPageOrStep();
                 return;
             }
 
-            // When user clicks, text animation should stop, independent of AbortAnimationAbility
-            if (textAnimationIsPlaying)
+            // When user clicks, text animation should stop, independent of canAbortAnimation
+            if (textIsAnimating)
             {
-                StopTextAnimation();
+                textAnimation.Stop();
             }
 
-            if (!abortAnimationAbility || !scriptAbortAnimationAbility)
+            if (!canAbortAnimation || !scriptCanAbortAnimation)
             {
                 return;
             }
 
-            if (IsAnimating)
+            if (isAnimating)
             {
                 NovaAnimation.StopAll(AnimationType.PerDialogue);
 
