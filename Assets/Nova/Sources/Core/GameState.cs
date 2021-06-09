@@ -96,7 +96,7 @@ namespace Nova
             catch (Exception ex)
             {
                 Debug.LogError(ex);
-                Utils.Exit();
+                Utils.Quit();
             }
 
             checkpointManager = GetComponent<CheckpointManager>();
@@ -539,12 +539,12 @@ namespace Nova
 
         public List<string> GetAllStartNodeNames()
         {
-            return flowChartTree.GetAllStartNodeNames().ToList();
+            return flowChartTree.GetAllStartNodeNames();
         }
 
         public List<string> GetAllUnlockedStartNodeNames()
         {
-            return flowChartTree.GetAllUnlockedStartNodeNames().ToList();
+            return flowChartTree.GetAllUnlockedStartNodeNames();
         }
 
         #endregion

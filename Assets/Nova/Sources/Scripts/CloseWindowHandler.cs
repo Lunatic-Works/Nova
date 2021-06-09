@@ -14,7 +14,7 @@ namespace Nova
                 return true;
             }
 
-            Utils.ExitWithConfirm();
+            Utils.QuitWithConfirm();
             return Utils.ForceQuit;
         }
 

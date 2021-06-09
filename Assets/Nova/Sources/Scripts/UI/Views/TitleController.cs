@@ -27,7 +27,7 @@ namespace Nova
             checkpointManager = controller.CheckpointManager;
 
             exitButton.onClick.AddListener(() =>
-                Hide(Utils.Exit)
+                Hide(Utils.Quit)
             );
         }
 

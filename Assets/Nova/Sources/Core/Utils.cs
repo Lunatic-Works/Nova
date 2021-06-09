@@ -228,20 +228,20 @@ namespace Nova
             gameController.InputMapper.Save();
         }
 
-        public static void ExitWithConfirm()
+        public static void QuitWithConfirm()
         {
             Alert.Show(
                 null,
                 I18n.__("ingame.exit.confirm"),
-                Exit,
+                Quit,
                 null,
-                "ExitConfirm"
+                "QuitConfirm"
             );
         }
 
         public static bool ForceQuit = false;
 
-        public static void Exit()
+        public static void Quit()
         {
             NovaAnimation.StopAll();
 

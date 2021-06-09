@@ -24,7 +24,7 @@ namespace Nova
             base.Awake();
 
             returnTitleButton.onClick.AddListener(ReturnTitle);
-            exitGameButton.onClick.AddListener(Utils.ExitWithConfirm);
+            exitGameButton.onClick.AddListener(Utils.QuitWithConfirm);
 
             configManager = Utils.FindNovaGameController().ConfigManager;
 

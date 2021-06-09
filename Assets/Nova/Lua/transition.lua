@@ -149,6 +149,7 @@ local function set_mat_properties(mat, base_shader_name, properties)
                 mat:SetTexturePath(name, value)
             else
                 local tex
+                -- we cannot set value = nil in table, so we use ''
                 if value and value ~= '' then
                     tex = Nova.AssetLoader.LoadTexture(value)
                 end

@@ -35,7 +35,7 @@ namespace Nova
             if (alertFunction == null)
             {
                 Debug.LogError("Nova: AlertFunction not set on Alert component.");
-                Utils.Exit();
+                Utils.Quit();
             }
 
             _alert = alertFunction;
@@ -49,7 +49,7 @@ namespace Nova
                     Debug.LogError("Nova: Alert() should not be called in Awake().");
                 else
                     Debug.LogError("Nova: Missing Alert component in initial scene.");
-                Utils.Exit();
+                Utils.Quit();
             }
         }
 

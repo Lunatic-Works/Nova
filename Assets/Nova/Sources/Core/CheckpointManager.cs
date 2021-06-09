@@ -232,7 +232,7 @@ namespace Nova
                         null,
                         I18n.__("bookmark.load.globalfail"),
                         ResetGlobalSave,
-                        Utils.Exit
+                        Utils.Quit
                     );
                 }
             }
@@ -457,6 +457,8 @@ namespace Nova
             }
         }
 
+        private bool alertOnSafeWriteFail = true;
+
         private void SafeWrite<T>(T obj, string path)
         {
             try
@@ -475,7 +477,12 @@ namespace Nova
             }
             catch (Exception ex)
             {
-                Alert.Show(I18n.__("bookmark.save.fail"), ex.Message);
+                // If there is some problem with Alert.Show, we need to avoid infinite recursion
+                if (alertOnSafeWriteFail)
+                {
+                    alertOnSafeWriteFail = false;
+                    Alert.Show(I18n.__("bookmark.save.fail"), ex.Message);
+                }
                 throw;
             }
         }
