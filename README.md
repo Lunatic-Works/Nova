@@ -15,7 +15,7 @@
 1. `git clone`
 2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 准备打开我们的示例工程
-    * 将`Assets/Examples/Colorless/`文件夹下的`Prefabs/, Scenes/, StandingsUncropped/`和对应的`.meta`文件移动到`Assets/`文件夹下
+    * 将`Assets/Examples/Colorless/`文件夹下的`Scenes/, StandingsUncropped/`和对应的`.meta`文件移动到`Assets/`文件夹下
     * 将`Assets/Examples/Colorless/Resources/`文件夹下的`Colorless/, Locales/`和对应的`.meta`文件移动到`Assets/Resources/`文件夹下
     * 如果操作正确，移动的过程中不会覆盖任何文件，`Assets/Examples/`文件夹下也不会剩下任何文件（除了空文件夹和对应的`.meta`文件）
 4. 打开`Assets/Scenes/Main.unity`，体验示例作品
