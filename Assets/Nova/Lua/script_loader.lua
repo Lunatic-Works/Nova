@@ -68,7 +68,7 @@ function branch(branches)
 
         local cond = branch.cond
         if type(cond) == 'string' then
-            cond = load('return ' .. cond)
+            cond = loadstring('return ' .. cond)
         end
 
         __Nova.scriptLoader:RegisterBranch(tostring(i), branch.dest, branch.text, image_info, mode, cond)
