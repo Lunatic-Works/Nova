@@ -95,10 +95,16 @@ namespace Nova
             lua.DoFile(name);
         }
 
-        public void DoString(string code)
+        public void DoString(string chunk)
         {
             CheckInit();
-            lua.DoString(code);
+            lua.DoString(chunk);
+        }
+
+        public T DoString<T>(string chunk)
+        {
+            CheckInit();
+            return lua.DoString<T>(chunk);
         }
 
         /// <summary>

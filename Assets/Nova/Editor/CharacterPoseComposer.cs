@@ -220,8 +220,7 @@ namespace Nova.Editor
                         merger.pixelsPerUnit = pixelsPerUnit;
                     }
 
-                    merger.ClearCache();
-                    texture = merger.GetMergedTexture(sprites);
+                    texture = merger.GetMergedTexture(name, sprites);
                 }
             }
 

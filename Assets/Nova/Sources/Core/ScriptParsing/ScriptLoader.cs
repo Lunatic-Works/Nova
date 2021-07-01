@@ -55,7 +55,15 @@ namespace Nova
             public BranchInformation branchInfo;
         }
 
-        private List<LazyBindingEntry> lazyBindingLinks = new List<LazyBindingEntry>();
+        private List<LazyBindingEntry> lazyBindingLinks;
+
+        private HashSet<string> onlyIncludedNames;
+
+        private void InitOnlyIncludedNames()
+        {
+            onlyIncludedNames = new HashSet<string>(LuaRuntime.Instance
+                .DoString<LuaTable>("return only_included_scenario_names").ToArray().Cast<string>());
+        }
 
         public void ForceInit(string path)
         {
@@ -66,6 +74,7 @@ namespace Nova
 
             // requires.lua is executed and ScriptDialogueEntryParser.PatternToActionGenerator is filled before calling ParseScript()
             LuaRuntime.Instance.BindObject("scriptLoader", this);
+            InitOnlyIncludedNames();
 
             foreach (var locale in I18n.SupportedLocales)
             {
@@ -80,6 +89,11 @@ namespace Nova
                 var scripts = Resources.LoadAll(localizedPath, typeof(TextAsset)).Cast<TextAsset>();
                 foreach (var script in scripts)
                 {
+                    if (onlyIncludedNames.Count > 0 && !onlyIncludedNames.Contains(script.name))
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         ParseScript(script.text);

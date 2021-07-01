@@ -1,3 +1,5 @@
+only_included_scenario_names = {}
+
 local last_display_name
 
 function action_new_file()

@@ -7,8 +7,8 @@ namespace Nova
     {
         private const string SHADER = "Nova/VFX/Character Change With Fade";
         private const string TIME = "_T";
+        
         private static readonly int TimeID = Shader.PropertyToID(TIME);
-
         private static readonly int ColorID = Shader.PropertyToID("_Color");
         private static readonly int SubColorID = Shader.PropertyToID("_SubColor");
         private static readonly int OffsetsID = Shader.PropertyToID("_Offsets");
@@ -84,7 +84,7 @@ namespace Nova
             SetTexture(to, fadeDuration);
         }
 
-        public void InstantSet(Texture to)
+        public void SetTextureNoFade(Texture to)
         {
             SetTexture(to, 0f);
         }

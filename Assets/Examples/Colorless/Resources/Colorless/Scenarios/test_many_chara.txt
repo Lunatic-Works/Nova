@@ -1,0 +1,38 @@
+@<|
+label 'test_many_chara'
+is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试很多角色
+
+<|
+show(ergong, 'normal', {-6, 0, 0.4})
+|>
+111
+
+<|
+show(qianye, 'normal', {-2, 0, 0.4})
+|>
+222
+
+<|
+show(xiben, 'normal', {2, 0, 0.4})
+|>
+333
+
+<|
+show(gaotian, 'normal', {6, 0, 0.4})
+|>
+444
+
+<|
+show(gaotian, 'cry')
+|>
+555
+
+测试结束
+@<| is_end() |>
