@@ -80,6 +80,7 @@
   "config.title.display": "Display",
   "config.title.shortcuts": "Shortcuts",
   "config.title.volume": "Volume",
+  "dialogue.hint.clickstopchoreo": "“Click to stop animation” can be enabled in settings",
   "dialogue.noreadtext": "No more text read",
   "format.namedialogue": "{0}: {1}",
   "help.close": "Close",

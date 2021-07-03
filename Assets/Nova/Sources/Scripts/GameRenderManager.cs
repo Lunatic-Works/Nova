@@ -22,7 +22,8 @@ namespace Nova
         private static readonly int Global1920ScaleID = Shader.PropertyToID("_GScale");
         private bool isLogicalFullScreen;
 
-        private const string ChangeWindowSizeFirstShownKey = "_ConfigView" + ConfigViewController.FirstShownKeySuffix;
+        private const string ChangeWindowSizeFirstShownKey =
+            ConfigViewController.FirstShownKeyPrefix + "ChangeWindowSize";
 
         public Color marginColor;
         public float desiredAspectRatio;

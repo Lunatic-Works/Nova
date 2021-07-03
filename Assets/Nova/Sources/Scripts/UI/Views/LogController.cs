@@ -16,7 +16,7 @@ namespace Nova
         public Button closeButton;
         public bool hideOnGoBackButtonClicked;
 
-        private const string LogViewFirstShownKey = "_LogView" + ConfigViewController.FirstShownKeySuffix;
+        private const string LogViewFirstShownKey = ConfigViewController.FirstShownKeyPrefix + "LogView";
 
         private GameState gameState;
         private CheckpointManager checkpointManager;

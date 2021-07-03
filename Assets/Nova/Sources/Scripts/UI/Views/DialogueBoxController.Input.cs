@@ -5,6 +5,9 @@ namespace Nova
 {
     public partial class DialogueBoxController
     {
+        private const string AbortAnimationFirstShownKey = ConfigViewController.FirstShownKeyPrefix + "AbortAnimation";
+        private const int HintAbortAnimationClicks = 10;
+
         private bool _fastForwardHotKeyHolding;
 
         private bool fastForwardHotKeyHolding
@@ -339,8 +342,24 @@ namespace Nova
                 textAnimation.Stop();
             }
 
-            if (!canAbortAnimation || !scriptCanAbortAnimation)
+            if (!scriptCanAbortAnimation)
             {
+                return;
+            }
+
+            if (!canAbortAnimation)
+            {
+                int clicks = configManager.GetInt(AbortAnimationFirstShownKey);
+                if (clicks < HintAbortAnimationClicks)
+                {
+                    configManager.SetInt(AbortAnimationFirstShownKey, clicks + 1);
+                }
+                else if (clicks == HintAbortAnimationClicks)
+                {
+                    Alert.Show(I18n.__("dialogue.hint.clickstopchoreo"));
+                    configManager.SetInt(AbortAnimationFirstShownKey, clicks + 1);
+                }
+
                 return;
             }
 

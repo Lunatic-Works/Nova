@@ -7,7 +7,7 @@ namespace Nova
         public Button returnButton;
         public Button returnButton2;
 
-        private const string GameFirstShownKey = "_Game" + ConfigViewController.FirstShownKeySuffix;
+        private const string GameFirstShownKey = ConfigViewController.FirstShownKeyPrefix + "Game";
 
         private ConfigManager configManager;
 

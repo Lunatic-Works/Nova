@@ -6,7 +6,7 @@ namespace Nova
 {
     public class ConfigViewController : ViewControllerBase
     {
-        public const string FirstShownKeySuffix = "FirstShown";
+        public const string FirstShownKeyPrefix = ConfigManager.TrackedKeyPrefix + "FirstShown";
 
         public Button resetDefaultButton;
         public Button resetAlertsButton;
@@ -102,7 +102,7 @@ namespace Nova
                     configManager.SetInt(key, 1);
                 }
 
-                if (key.EndsWith(FirstShownKeySuffix))
+                if (key.StartsWith(FirstShownKeyPrefix))
                 {
                     configManager.SetInt(key, 0);
                 }

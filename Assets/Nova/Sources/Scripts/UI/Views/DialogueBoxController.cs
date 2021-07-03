@@ -76,6 +76,8 @@ namespace Nova
 
         private GameState gameState;
         private GameController gameController;
+        private ConfigManager configManager;
+
         private TextSpeedConfigReader textSpeedConfigReader;
         private ScrollRect dialogueTextScrollRect;
         private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
@@ -179,6 +181,8 @@ namespace Nova
 
             gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
+            configManager = gameController.ConfigManager;
+
             textSpeedConfigReader = GetComponent<TextSpeedConfigReader>();
             dialogueTextScrollRect = GetComponentInChildren<ScrollRect>(true);
             dialogueText = GetComponentInChildren<DialogueTextController>(true);

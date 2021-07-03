@@ -11,7 +11,7 @@ namespace Nova
         public string bgmName;
         public float bgmVolume = 0.5f;
 
-        private const string ChapterFirstUnlockedKey = "_ChapterFirstUnlocked";
+        private const string SelectChapterFirstShownKey = ConfigViewController.FirstShownKeyPrefix + "SelectChapter";
 
         private GameState gameState;
         private ConfigManager configManager;
@@ -52,7 +52,7 @@ namespace Nova
                     bgmController.Play(bgmName);
                 }
 
-                if (configManager.GetInt(ChapterFirstUnlockedKey) == 0)
+                if (configManager.GetInt(SelectChapterFirstShownKey) == 0)
                 {
                     var unlockedChapterCount = gameState.GetAllUnlockedStartNodeNames().Count;
                     var reachedChapterCount = gameState.GetAllStartNodeNames()
@@ -60,7 +60,7 @@ namespace Nova
                     if (unlockedChapterCount == 1 && reachedChapterCount > 1)
                     {
                         Alert.Show(I18n.__("title.first.selectchapter"));
-                        configManager.SetInt(ChapterFirstUnlockedKey, 1);
+                        configManager.SetInt(SelectChapterFirstShownKey, 1);
                     }
                 }
 

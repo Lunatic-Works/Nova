@@ -80,6 +80,7 @@
   "config.title.display": "显示",
   "config.title.shortcuts": "快捷键",
   "config.title.volume": "音量",
+  "dialogue.hint.clickstopchoreo": "系统设置可以选择\n点击终止动画",
   "dialogue.noreadtext": "没有已读文本",
   "format.namedialogue": "{0}：{1}",
   "help.close": "关      闭",
