@@ -45,10 +45,10 @@ namespace Nova
 
             buttons = startNodeNames.Select(chapter =>
             {
-                var chapterButton = Instantiate(chapterButtonPrefab, chapterList.transform);
-                var button = chapterButton.GetComponent<Button>();
+                var go = Instantiate(chapterButtonPrefab, chapterList.transform);
+                var button = go.GetComponent<Button>();
                 button.onClick.AddListener(() => Hide(() => BeginChapter(chapter)));
-                return new KeyValuePair<string, GameObject>(chapter, chapterButton);
+                return new KeyValuePair<string, GameObject>(chapter, go);
             }).ToDictionary(p => p.Key, p => p.Value);
         }
 

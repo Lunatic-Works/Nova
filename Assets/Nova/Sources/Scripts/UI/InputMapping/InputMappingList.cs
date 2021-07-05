@@ -37,14 +37,14 @@ namespace Nova
         {
             ClearContent();
             var cnt = controller.currentCompoundKeys.Count;
-            InputMappingListEntry ret = null;
+            InputMappingListEntry entry = null;
             for (var i = 0; i < cnt; i++)
             {
-                ret = Instantiate(entryPrefab, content);
-                ret.Init(controller, i);
+                entry = Instantiate(entryPrefab, content);
+                entry.Init(controller, i);
             }
 
-            return ret;
+            return entry;
         }
     }
 }

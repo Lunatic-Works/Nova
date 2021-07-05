@@ -46,9 +46,9 @@ namespace Nova
                     var attrs = configEnum.GetMember(name)[0]
                         .GetCustomAttributes(typeof(EnumDisplayNameAttribute), false);
                     var displayName = attrs.Length > 0 ? (attrs[0] as EnumDisplayNameAttribute).displayName : name;
-                    var toggleGO = Instantiate(togglePrefab, transform);
-                    toggleGO.GetComponentInChildren<Text>().text = displayName;
-                    var toggle = toggleGO.GetComponentInChildren<Toggle>();
+                    var go = Instantiate(togglePrefab, transform);
+                    go.GetComponentInChildren<Text>().text = displayName;
+                    var toggle = go.GetComponentInChildren<Toggle>();
                     toggle.group = toggleGroup;
                     return toggle;
                 }).ToList();

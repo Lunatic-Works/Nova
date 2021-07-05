@@ -93,8 +93,7 @@ namespace Nova
                 lastCheckpointLogParamsRef = initParams;
             }
 
-            var logEntry = Instantiate(logEntryPrefab, logContent.transform)
-                .GetComponent<LogEntryController>();
+            var logEntry = Instantiate(logEntryPrefab, logContent.transform);
 
             UnityAction<int> onGoBackButtonClicked = logEntryIndex => OnGoBackButtonClicked(initParams.currentNodeName,
                 initParams.currentDialogueIndex, logEntryIndex, initParams.variablesHashBeforeChange);

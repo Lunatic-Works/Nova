@@ -32,9 +32,9 @@ namespace Nova
             ClearContent();
             foreach (var key in controller.mappableKeys)
             {
-                var go = Instantiate(entryPrefab, content);
-                go.Init(controller, AbstractKeyDisplayName(key), key);
-                entries.Add(go);
+                var entry = Instantiate(entryPrefab, content);
+                entry.Init(controller, AbstractKeyDisplayName(key), key);
+                entries.Add(entry);
             }
         }
 
