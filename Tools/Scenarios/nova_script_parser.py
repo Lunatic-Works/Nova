@@ -173,8 +173,7 @@ def walk_functions_block(nodes, env):
             yield get_node_name(node.func), node.args, env
             for _node in node.args:
                 if isinstance(_node, astnodes.AnonymousFunction):
-                    for x in walk_functions_block(_node.body.body, env):
-                        yield x
+                    yield walk_functions_block(_node.body.body, env)
         elif isinstance(node, astnodes.Invoke):
             while isinstance(node, astnodes.Invoke):
                 invoke_stack.append(node)
@@ -195,9 +194,8 @@ def walk_functions_block(nodes, env):
 
                 for _node in args:
                     if isinstance(_node, astnodes.AnonymousFunction):
-                        for x in walk_functions_block(_node.body.body,
-                                                      env + (source, )):
-                            yield x
+                        yield walk_functions_block(_node.body.body,
+                                                   env + (source, ))
         elif isinstance(node, astnodes.Assign):
             nodes.extend(reversed(node.values))
         elif isinstance_any(node, [
@@ -216,8 +214,7 @@ def walk_functions_block(nodes, env):
 def walk_functions(code):
     tree = ast.parse(code)
     try:
-        for x in walk_functions_block(tree.body.body, ()):
-            yield x
+        yield walk_functions_block(tree.body.body, ())
     except Exception as e:
         print(e)
         print(code)
@@ -236,8 +233,7 @@ def parse_table(node):
         return None
     elif isinstance(node, astnodes.UMinusOp):
         return -parse_table(node.operand)
-    elif (isinstance(node, astnodes.UnaryOp)
-          or isinstance(node, astnodes.BinaryOp)):
+    elif isinstance(node, (astnodes.UnaryOp, astnodes.BinaryOp)):
         return 'expr'
     else:
         raise ValueError(f'Unknown node: {type(node)}')

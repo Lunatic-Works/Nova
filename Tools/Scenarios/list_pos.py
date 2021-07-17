@@ -56,7 +56,7 @@ def typed_sign(x):
 
 
 def typed_item(x):
-    if isinstance(x, int) or isinstance(x, float):
+    if isinstance(x, (int, float)):
         return 0, typed_sign(x), abs(x)
     elif isinstance(x, str):
         return 1, x
