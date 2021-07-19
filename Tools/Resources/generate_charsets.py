@@ -5,6 +5,7 @@ from glob import glob
 
 patterns = [
     '../../Assets/Examples/Colorless/Resources/Colorless/Scenarios/*.txt',
+    '../../Assets/Examples/Colorless/Resources/Locales/*/Colorless/Scenarios/*.txt',
     '../../Assets/Nova/Fonts/Charset3500.txt',
     '../../Assets/Nova/Resources/Locales/*.json',
     '../../Assets/Resources/Colorless/Scenarios/*.txt',

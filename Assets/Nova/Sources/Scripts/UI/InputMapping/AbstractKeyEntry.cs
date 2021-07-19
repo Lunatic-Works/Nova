@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,12 +12,13 @@ namespace Nova
         public Color defaultColor;
 
         private InputMappingController controller;
+        private AbstractKey key;
 
-        public AbstractKey key { get; private set; }
+        private bool selected => controller != null && key == controller.currentSelectedKey;
 
-        private void Awake()
+        private void UpdateText()
         {
-            RefreshColor();
+            label.text = I18n.__($"config.key.{Enum.GetName(typeof(AbstractKey), key)}");
         }
 
         public void RefreshColor()
@@ -24,14 +26,24 @@ namespace Nova
             background.color = selected ? selectedColor : defaultColor;
         }
 
-        public bool selected => controller != null && key == controller.currentSelectedKey;
-
-        public void Init(InputMappingController controller, string text, AbstractKey key)
+        public void Init(InputMappingController controller, AbstractKey key)
         {
             this.controller = controller;
-            label.text = text;
             this.key = key;
+            UpdateText();
             RefreshColor();
+        }
+
+        private void OnEnable()
+        {
+            UpdateText();
+            RefreshColor();
+            I18n.LocaleChanged.AddListener(UpdateText);
+        }
+
+        private void OnDisable()
+        {
+            I18n.LocaleChanged.RemoveListener(UpdateText);
         }
 
         public void SelectCurrentKey()
