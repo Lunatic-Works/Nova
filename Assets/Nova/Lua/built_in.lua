@@ -1,3 +1,20 @@
+--- Disable implicit global variable declaration
+--- See https://www.lua.org/pil/14.2.html
+local declared_names = {}
+
+setmetatable(_G, {
+    __index = function(t, n)
+        if not declared_names[n] then
+            warn('Attempt to read undeclared global variable: ' .. n)
+        end
+        return rawget(t, n)
+    end,
+    __newindex = function(t, n, v)
+        declared_names[n] = true
+        rawset(t, n, v)
+    end,
+})
+
 __Nova = {}
 
 --- show warning without halting the game
