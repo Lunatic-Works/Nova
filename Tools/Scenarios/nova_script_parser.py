@@ -173,7 +173,7 @@ def walk_functions_block(nodes, env):
             yield get_node_name(node.func), node.args, env
             for _node in node.args:
                 if isinstance(_node, astnodes.AnonymousFunction):
-                    yield walk_functions_block(_node.body.body, env)
+                    yield from walk_functions_block(_node.body.body, env)
         elif isinstance(node, astnodes.Invoke):
             while isinstance(node, astnodes.Invoke):
                 invoke_stack.append(node)
@@ -194,8 +194,8 @@ def walk_functions_block(nodes, env):
 
                 for _node in args:
                     if isinstance(_node, astnodes.AnonymousFunction):
-                        yield walk_functions_block(_node.body.body,
-                                                   env + (source, ))
+                        yield from walk_functions_block(
+                            _node.body.body, env + (source, ))
         elif isinstance(node, astnodes.Assign):
             nodes.extend(reversed(node.values))
         elif isinstance_any(node, [
@@ -214,7 +214,7 @@ def walk_functions_block(nodes, env):
 def walk_functions(code):
     tree = ast.parse(code)
     try:
-        yield walk_functions_block(tree.body.body, ())
+        yield from walk_functions_block(tree.body.body, ())
     except Exception as e:
         print(e)
         print(code)
