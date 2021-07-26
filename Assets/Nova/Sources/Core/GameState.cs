@@ -320,7 +320,7 @@ namespace Nova
 
             if (nodeChanged)
             {
-                // Debug.Log($"Nova: node changed to {currentNode.name}");
+                // Debug.Log($"Nova: Node changed to {currentNode.name}");
 
                 if (firstEntryOfNode) EnsureCheckpoint(); // always get a checkpoint at the beginning of the node
 
@@ -456,7 +456,7 @@ namespace Nova
             // restore history
             var backNodeIndex = walkedThroughNodes.FindLastIndex(x => x == nodeName);
             Assert.IsFalse(backNodeIndex < 0,
-                $"Nova: move back to node {nodeName} that has not been walked through.");
+                $"Nova: Move back to node {nodeName} that has not been walked through.");
 
             // state should be normal when goes backward
             state = State.Normal;
@@ -669,7 +669,7 @@ namespace Nova
             }
             catch (ArgumentException ex)
             {
-                throw new ArgumentException("Nova: a restorable should have an unique and non-null name", ex);
+                throw new ArgumentException("Nova: A restorable should have an unique and non-null name", ex);
             }
         }
 

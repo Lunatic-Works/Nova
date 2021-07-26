@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -93,6 +94,11 @@ namespace Nova
                     {
                         continue;
                     }
+
+#if UNITY_EDITOR
+                    var scriptPath = AssetDatabase.GetAssetPath(script);
+                    Debug.Log($"Nova: Parse script {scriptPath}");
+#endif
 
                     try
                     {
@@ -339,25 +345,25 @@ namespace Nova
             if (string.IsNullOrEmpty(destination))
             {
                 throw new ArgumentException(
-                    $"Nova: a branch must have a destination. Exception occurs at node: {currentNode.name}, text: {text}");
+                    $"Nova: A branch must have a destination. Exception occurs at node: {currentNode.name}, text: {text}");
             }
 
             if (mode == BranchMode.Normal && condition != null)
             {
                 throw new ArgumentException(
-                    $"Nova: branch mode is Normal but condition is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+                    $"Nova: Branch mode is Normal but condition is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
             }
 
             if (mode == BranchMode.Jump && (text != null || imageInfo != null))
             {
                 throw new ArgumentException(
-                    $"Nova: branch mode is Jump but text or imageInfo is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+                    $"Nova: Branch mode is Jump but text or imageInfo is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
             }
 
             if ((mode == BranchMode.Show || mode == BranchMode.Enable) && condition == null)
             {
                 throw new ArgumentException(
-                    $"Nova: branch mode is Show or Enable but condition is null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+                    $"Nova: Branch mode is Show or Enable but condition is null. Exception occurs at node: {currentNode.name}, destination: {destination}");
             }
 
             currentNode.type = FlowChartNodeType.Branching;
