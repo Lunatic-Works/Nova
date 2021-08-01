@@ -5,15 +5,15 @@ namespace Nova
 {
     public abstract class OverlayTextureChangerBase : MonoBehaviour
     {
-        private const string SHADER = "Nova/VFX/Character Change With Fade";
+        private const string SHADER = "Nova/VFX/Change Texture With Fade";
         private const string TIME = "_T";
-        
-        private static readonly int TimeID = Shader.PropertyToID(TIME);
-        private static readonly int ColorID = Shader.PropertyToID("_Color");
-        private static readonly int SubColorID = Shader.PropertyToID("_SubColor");
-        private static readonly int OffsetsID = Shader.PropertyToID("_Offsets");
+
         private static readonly int PrimaryTextureID = Shader.PropertyToID("_PrimaryTex");
         private static readonly int SubTextureID = Shader.PropertyToID("_SubTex");
+        private static readonly int OffsetsID = Shader.PropertyToID("_Offsets");
+        private static readonly int ColorID = Shader.PropertyToID("_Color");
+        private static readonly int SubColorID = Shader.PropertyToID("_SubColor");
+        private static readonly int TimeID = Shader.PropertyToID(TIME);
 
         public float fadeDuration = 0.1f;
 

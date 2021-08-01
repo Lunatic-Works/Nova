@@ -669,7 +669,7 @@ namespace Nova
             }
             catch (ArgumentException ex)
             {
-                throw new ArgumentException("Nova: A restorable should have an unique and non-null name", ex);
+                throw new ArgumentException("Nova: A restorable should have an unique and non-null name.", ex);
             }
         }
 

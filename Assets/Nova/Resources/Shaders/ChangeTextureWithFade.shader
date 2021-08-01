@@ -1,13 +1,13 @@
 // This file is generated. Do not edit it manually. Please edit .shaderproto files.
 
-Shader "Nova/VFX/Character Change With Fade"
+Shader "Nova/VFX/Change Texture With Fade"
 {
     Properties
     {
         [HideInInspector] _MainTex ("Dummy Texture Providing Size", 2D) = "black" {}
         [NoScaleOffset] _PrimaryTex ("Primary Texture", 2D) = "black" {}
-        _Offsets ("Offsets (MainX, MainY, SecX, SecY)", Vector) = (0, 0, 0, 0)
         [NoScaleOffset] _SubTex ("Secondary Texture", 2D) = "black" {}
+        _Offsets ("Offsets (MainX, MainY, SecX, SecY)", Vector) = (0, 0, 0, 0)
         _Color ("Primary Texture Color", Color) = (1, 1, 1, 1)
         _SubColor ("Secondary Texture Color", Color) = (1, 1, 1, 1)
         _T ("Time", Range(0.0, 1.0)) = 0.0

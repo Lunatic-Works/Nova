@@ -52,7 +52,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Character Change With Fade",
+                "Change Texture With Fade",
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_Color", ShaderPropertyType.Color},
@@ -461,7 +461,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Character Change With Fade",
+                "Change Texture With Fade",
                 new Dictionary<string, float>
                 {
                     {"_T", 0.0f},
@@ -808,7 +808,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Character Change With Fade",
+                "Change Texture With Fade",
                 new Dictionary<string, Color>
                 {
                     {"_Color", Color.white},
@@ -866,7 +866,7 @@ namespace Nova.Generate
             new Dictionary<string, Dictionary<string, Vector4>>
         {
             {
-                "Character Change With Fade",
+                "Change Texture With Fade",
                 new Dictionary<string, Vector4>
                 {
                     {"_Offsets", Vector4.zero},

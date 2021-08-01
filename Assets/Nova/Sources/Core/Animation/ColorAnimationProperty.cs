@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
@@ -55,7 +56,7 @@ namespace Nova
 
         protected override Color CombineDelta(Color a, Color b)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         protected override Color Lerp(Color a, Color b, float t) => Color.LerpUnclamped(a, b, t);

@@ -26,7 +26,7 @@ shader_type_data = {
         _Roll = 'Float',
         _T = 'Float',
     },
-    ['Character Change With Fade'] = {
+    ['Change Texture With Fade'] = {
         _Color = 'Color',
         _Offsets = 'Vector',
         _PrimaryTex = '2D',
@@ -269,7 +269,7 @@ shader_float_data = {
         _Roll = 0.07,
         _T = 0,
     },
-    ['Character Change With Fade'] = {
+    ['Change Texture With Fade'] = {
         _T = 0,
     },
     ['Color Correction'] = {
@@ -466,7 +466,7 @@ shader_color_data = {
     ['Barrel'] = {
         _BackColor = Color.black,
     },
-    ['Character Change With Fade'] = {
+    ['Change Texture With Fade'] = {
         _Color = Color.white,
         _SubColor = Color.white,
     },
@@ -494,7 +494,7 @@ shader_color_data = {
 }
 
 shader_vector_data = {
-    ['Character Change With Fade'] = {
+    ['Change Texture With Fade'] = {
         _Offsets = Vector4.zero,
     },
 }

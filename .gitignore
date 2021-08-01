@@ -15,6 +15,7 @@
 
 /Assets/Nova/Sources/ThirdParty/ToLua/Source/Generate/*
 /Assets/Resources/Lua*
+/Tools/Resources/shader_timestamps.json
 
 # Visual Studio cache directory
 .vs/

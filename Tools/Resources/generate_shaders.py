@@ -80,7 +80,7 @@ Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
                 '',
                 '1.0',
             )
-        elif filename.startswith('Character'):
+        elif filename == 'ChangeTextureWithFade.shaderproto':
             write_shader(
                 filename,
                 text,

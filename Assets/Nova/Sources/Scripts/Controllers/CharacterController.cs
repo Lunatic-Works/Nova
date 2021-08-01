@@ -68,8 +68,8 @@ namespace Nova
         }
     }
 
-    [RequireComponent(typeof(AudioSource))]
     [ExportCustomType]
+    [RequireComponent(typeof(AudioSource))]
     public class CharacterController : CompositeSpriteControllerBase
     {
         public string luaGlobalName;

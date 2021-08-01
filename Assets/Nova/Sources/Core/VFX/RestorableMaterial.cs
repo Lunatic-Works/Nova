@@ -105,7 +105,7 @@ namespace Nova
                     data.textureNames.Add(name, tn);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
