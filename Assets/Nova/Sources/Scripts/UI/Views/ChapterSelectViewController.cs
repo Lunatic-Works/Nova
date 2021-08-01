@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +16,7 @@ namespace Nova
 
         private GameState gameState;
         private CheckpointManager checkpointManager;
+        private NameSorter nameSorter;
 
         private List<string> startNodeNames;
         private List<string> unlockedStartNodeNames;
@@ -30,10 +30,14 @@ namespace Nova
             var controller = Utils.FindNovaGameController();
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
+            nameSorter = GetComponent<NameSorter>();
 
-            // TODO: customize the order of chapters
-            startNodeNames = gameState.GetAllStartNodeNames()
-                .OrderBy(x => Regex.Replace(x, @"\d+", m => m.Value.PadLeft(2, '0'))).ToList();
+            startNodeNames = gameState.GetAllStartNodeNames();
+            if (nameSorter && nameSorter.matchers.Count > 0)
+            {
+                startNodeNames = nameSorter.Sort(startNodeNames).ToList();
+            }
+
             unlockedStartNodeNames = gameState.GetAllUnlockedStartNodeNames();
 
             returnButton.onClick.AddListener(Hide);
