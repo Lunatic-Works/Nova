@@ -121,23 +121,32 @@ namespace Nova
         /// <summary>
         /// Names of the nodes that have been walked through, including the current node
         /// </summary>
+        /// <remarks>
+        /// Modified by MoveToNextNode() and MoveBackTo()
+        /// </remarks>
         private List<string> walkedThroughNodes = new List<string>();
 
         /// <summary>
         /// The current flow chart node
         /// </summary>
+        /// <remarks>
+        /// Modified by MoveToNextNode() and MoveBackTo()
+        /// </remarks>
         public FlowChartNode currentNode { get; private set; }
 
         /// <summary>
         /// The index of the current dialogue entry in the current node
         /// </summary>
+        /// <remarks>
+        /// Modified by MoveToNextNode(), MoveBackTo() and Step()
+        /// </remarks>
         public int currentIndex { get; private set; }
 
         /// <summary>
         /// The current dialogueEntry
         /// </summary>
         /// <remarks>
-        /// Only set by ResetGameState() and UpdateGameState()
+        /// Modified by UpdateGameState()
         /// </remarks>
         private DialogueEntry currentDialogueEntry;
 
@@ -361,16 +370,16 @@ namespace Nova
                 {
                     this.RuntimeAssert(stepNumFromLastCheckpoint == gameStateRestoreEntry.stepNumFromLastCheckpoint,
                         $"StepNumFromLastCheckpoint mismatch: {stepNumFromLastCheckpoint} {gameStateRestoreEntry.stepNumFromLastCheckpoint}");
-                    this.RuntimeAssert(restrainCheckpoint == gameStateRestoreEntry.restrainCheckpointNum,
-                        $"RestrainCheckpointNum mismatch: {restrainCheckpoint} {gameStateRestoreEntry.restrainCheckpointNum}");
+                    this.RuntimeAssert(restrainCheckpointNum == gameStateRestoreEntry.restrainCheckpointNum,
+                        $"RestrainCheckpointNum mismatch: {restrainCheckpointNum} {gameStateRestoreEntry.restrainCheckpointNum}");
                 }
 
                 if (checkpointRestrained)
                 {
-                    restrainCheckpoint--;
-                    if (restrainCheckpoint == 1)
+                    restrainCheckpointNum--;
+                    if (restrainCheckpointNum == 1)
                     {
-                        Debug.LogWarning("Nova: restrainCheckpoint reaches 1");
+                        Debug.LogWarning("Nova: restrainCheckpointNum reaches 1");
                     }
                 }
 
@@ -593,7 +602,7 @@ namespace Nova
             // if have a next dialogue entry in the current node, directly step to the next
             if (currentIndex + 1 < currentNode.dialogueEntryCount)
             {
-                currentIndex += 1;
+                ++currentIndex;
                 UpdateGameState(false, true, false, true);
                 return true;
             }
@@ -704,6 +713,9 @@ namespace Nova
 
         public const int WarningStepNumFromLastCheckpoint = 100;
 
+        /// <remarks>
+        /// Modified by UpdateGameState(), EnsureCheckpoint() and RestoreCheckpoint()
+        /// </remarks>
         private int stepNumFromLastCheckpoint;
 
         /// <summary>
@@ -711,9 +723,12 @@ namespace Nova
         /// This feature is necessary for restoring persistent animations.
         /// This restraint has higher priority than EnsureCheckpoint().
         /// </summary>
-        private int restrainCheckpoint;
+        /// <remarks>
+        /// Modified by UpdateGameState(), RestrainCheckpoint() and RestoreCheckpoint()
+        /// </remarks>
+        private int restrainCheckpointNum;
 
-        private bool checkpointRestrained => restrainCheckpoint > 0;
+        private bool checkpointRestrained => restrainCheckpointNum > 0;
 
         /// <summary>
         /// Restrain saving checkpoints for given steps. Force overwrite the number of restraining steps when overridden is true.
@@ -723,10 +738,10 @@ namespace Nova
         public void RestrainCheckpoint(int steps, bool overridden = false)
         {
             // check overwrite
-            if (!overridden && restrainCheckpoint >= steps) return;
+            if (!overridden && restrainCheckpointNum >= steps) return;
             // non-negative
             if (steps < 0) steps = 0;
-            restrainCheckpoint = steps;
+            restrainCheckpointNum = steps;
         }
 
         /// <summary>
@@ -749,6 +764,9 @@ namespace Nova
         /// <summary>
         /// Used to force save a checkpoint before a persistent animation begins.
         /// </summary>
+        /// <remarks>
+        /// Modified by UpdateGameState(), EnsureCheckpointOnNextDialogue() and RestoreCheckpoint()
+        /// </remarks>
         private bool forceCheckpoint = false;
 
         public void EnsureCheckpointOnNextDialogue()
@@ -772,7 +790,7 @@ namespace Nova
                 restoreDatas[restorable.Key] = restorable.Value.GetRestoreData();
             }
 
-            return new GameStateCheckpoint(restoreDatas, variables, restrainCheckpoint);
+            return new GameStateCheckpoint(restoreDatas, variables, restrainCheckpointNum);
         }
 
         /// <summary>
@@ -788,7 +806,7 @@ namespace Nova
                 return GetCheckpoint();
             }
 
-            return new GameStateSimpleEntry(stepNumFromLastCheckpoint, restrainCheckpoint,
+            return new GameStateSimpleEntry(stepNumFromLastCheckpoint, restrainCheckpointNum,
                 lastCheckpointVariablesHash);
         }
 
@@ -797,7 +815,7 @@ namespace Nova
             Assert.IsNotNull(restoreDatas);
 
             stepNumFromLastCheckpoint = 0;
-            restrainCheckpoint = restoreDatas.restrainCheckpointNum;
+            restrainCheckpointNum = restoreDatas.restrainCheckpointNum;
             forceCheckpoint = false;
 
             variables.CopyFrom(restoreDatas.variables);
@@ -937,6 +955,6 @@ namespace Nova
         #endregion
 
         private string debugState =>
-            $"{currentNode.name} {currentIndex} {variables.hash} {lastCheckpointVariablesHash} | {stepNumFromLastCheckpoint} {restrainCheckpoint} {forceCheckpoint} {shouldSaveCheckpoint}";
+            $"{currentNode.name} {currentIndex} {variables.hash} {lastCheckpointVariablesHash} | {stepNumFromLastCheckpoint} {restrainCheckpointNum} {forceCheckpoint} {shouldSaveCheckpoint}";
     }
 }
