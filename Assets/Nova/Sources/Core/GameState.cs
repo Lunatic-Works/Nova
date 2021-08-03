@@ -339,7 +339,7 @@ namespace Nova
                     stepNumFromLastCheckpoint++;
                 }
 
-                var gameStateRestoreEntry = checkpointManager.IsReached(currentNode.name, currentIndex, variables.hash);
+                var gameStateRestoreEntry = checkpointManager.GetReached(currentNode.name, currentIndex, variables.hash);
                 if (gameStateRestoreEntry == null)
                 {
                     // Tell the checkpoint manager a new dialogue entry has been reached
@@ -482,12 +482,12 @@ namespace Nova
             currentIndex = dialogueIndex;
 
             // restore status
-            var entry = checkpointManager.IsReached(nodeName, dialogueIndex, variablesHash);
+            var entry = checkpointManager.GetReached(nodeName, dialogueIndex, variablesHash);
             if (entry == null)
             {
                 Debug.LogWarning(
                     $"Nova: Unable to find node with varhash = {variablesHash}, falling back to any variable.");
-                entry = checkpointManager.IsReachedForAnyVariables(nodeName, dialogueIndex);
+                entry = checkpointManager.GetReachedForAnyVariables(nodeName, dialogueIndex);
             }
 
             Restore(entry);
@@ -725,7 +725,7 @@ namespace Nova
 
             if (checkpointRestrained) return;
             stepNumFromLastCheckpoint = 0;
-            var checkpoint = checkpointManager.IsReached(currentNode.name, currentIndex, variables.hash);
+            var checkpoint = checkpointManager.GetReached(currentNode.name, currentIndex, variables.hash);
             if (!(checkpoint is GameStateCheckpoint))
             {
                 checkpointManager.SetReached(currentNode.name, currentIndex, variables,

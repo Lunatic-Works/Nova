@@ -328,7 +328,7 @@ namespace Nova
         /// <param name="nodeName">The name of FlowChartNode containing the dialogue.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateRestoreEntry IsReachedForAnyVariables(string nodeName, int dialogueIndex)
+        public GameStateRestoreEntry GetReachedForAnyVariables(string nodeName, int dialogueIndex)
         {
             // If reading global save file fails, globalSave.savedNodesByVariablesHash will be null
             if (globalSave?.savedNodesByVariablesHash == null)
@@ -353,7 +353,7 @@ namespace Nova
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <param name="variablesHash">Hash of current variables.</param>
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateRestoreEntry IsReached(string nodeName, int dialogueIndex, ulong variablesHash)
+        public GameStateRestoreEntry GetReached(string nodeName, int dialogueIndex, ulong variablesHash)
         {
             if (globalSave.savedNodesByVariablesHash.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
                 if (info.dialogueRestoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
