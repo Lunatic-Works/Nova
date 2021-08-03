@@ -412,7 +412,7 @@ namespace Nova
 
             currentNodeName = dialogueData.nodeName;
 
-            isReadDialogue = dialogueData.hasBeenReached;
+            isReadDialogue = dialogueData.hasBeenReachedForAnyVariables;
             if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead &&
                 !fastForwardHotKeyHolding)
             {

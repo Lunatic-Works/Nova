@@ -149,59 +149,58 @@ namespace LuaInterface
             try
             {
                 int n = LuaDLL.lua_gettop(L);
+                var sb = new StringBuilder();
 
-                using (CString.Block())
-                {
-                    CString sb = CString.Alloc(256);
 #if UNITY_EDITOR
-                    int line = LuaDLL.tolua_where(L, 1);
-                    string filename = LuaDLL.lua_tostring(L, -1);
-                    LuaDLL.lua_settop(L, n);
-                    int offset = filename[0] == '@' ? 1 : 0;
+                int line = LuaDLL.tolua_where(L, 1);
+                string filename = LuaDLL.lua_tostring(L, -1);
+                LuaDLL.lua_settop(L, n);
 
-                    if (!filename.Contains("."))
+                if (filename.EndsWith(".lua"))
+                {
+                    sb.Append($"[{filename}:{line}]:");
+                }
+#endif
+
+                for (int i = 1; i <= n; i++)
+                {
+                    if (i > 1) sb.Append("    ");
+
+                    if (LuaDLL.lua_isstring(L, i) == 1)
                     {
-                        sb.Append('[').Append(filename, offset, filename.Length - offset).Append(".lua:").Append(line).Append("]:");
+                        sb.Append(LuaDLL.lua_tostring(L, i));
+                    }
+                    else if (LuaDLL.lua_isnil(L, i))
+                    {
+                        sb.Append("nil");
+                    }
+                    else if (LuaDLL.lua_isboolean(L, i))
+                    {
+                        sb.Append(LuaDLL.lua_toboolean(L, i) ? "true" : "false");
                     }
                     else
                     {
-                        sb.Append('[').Append(filename, offset, filename.Length - offset).Append(':').Append(line).Append("]:");
-                    }
-#endif
-
-                    for (int i = 1; i <= n; i++)
-                    {
-                        if (i > 1) sb.Append("    ");
-
-                        if (LuaDLL.lua_isstring(L, i) == 1)
-                        {
-                            sb.Append(LuaDLL.lua_tostring(L, i));
-                        }
-                        else if (LuaDLL.lua_isnil(L, i))
+                        IntPtr p = LuaDLL.lua_topointer(L, i);
+                        if (p == IntPtr.Zero)
                         {
                             sb.Append("nil");
                         }
-                        else if (LuaDLL.lua_isboolean(L, i))
-                        {
-                            sb.Append(LuaDLL.lua_toboolean(L, i) ? "true" : "false");
-                        }
                         else
                         {
-                            IntPtr p = LuaDLL.lua_topointer(L, i);
-
-                            if (p == IntPtr.Zero)
-                            {
-                                sb.Append("nil");
-                            }
-                            else
-                            {
-                                sb.Append(LuaDLL.luaL_typename(L, i)).Append(":0x").Append(p.ToString("X"));
-                            }
+                            sb.Append(LuaDLL.luaL_typename(L, i)).Append(":0x").Append(p.ToString("X"));
                         }
                     }
 
-                    Debugger.Log(sb.ToString());            //203行与_line一致
+#if UNITY_EDITOR
+                    if (!filename.EndsWith(".lua"))
+                    {
+                        sb.Append($"\nline: {line}\n------\n{filename}\n------");
+                    }
+#endif
+
+                    Debugger.Log(sb.ToString());
                 }
+
                 return 0;
             }
             catch (Exception e)

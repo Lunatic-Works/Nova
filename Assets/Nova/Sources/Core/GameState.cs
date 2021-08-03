@@ -18,15 +18,17 @@ namespace Nova
         public readonly DialogueDisplayData displayData;
         public readonly Dictionary<string, VoiceEntry> voicesForNextDialogue;
         public readonly bool hasBeenReached;
+        public readonly bool hasBeenReachedForAnyVariables;
 
         public DialogueChangedData(string nodeName, int dialogueIndex, DialogueDisplayData displayData,
-            Dictionary<string, VoiceEntry> voicesForNextDialogue, bool hasBeenReached)
+            Dictionary<string, VoiceEntry> voicesForNextDialogue, bool hasBeenReached, bool hasBeenReachedForAnyVariables)
         {
             this.nodeName = nodeName;
             this.dialogueIndex = dialogueIndex;
             this.displayData = displayData;
             this.voicesForNextDialogue = voicesForNextDialogue;
             this.hasBeenReached = hasBeenReached;
+            this.hasBeenReachedForAnyVariables = hasBeenReachedForAnyVariables;
         }
     }
 
@@ -350,9 +352,9 @@ namespace Nova
                     stepNumFromLastCheckpoint++;
                 }
 
-                var gameStateRestoreEntry =
-                    checkpointManager.GetReached(currentNode.name, currentIndex, variables.hash);
-                if (gameStateRestoreEntry == null)
+                var entry = checkpointManager.GetReached(currentNode.name, currentIndex, variables.hash);
+                var entryAny = checkpointManager.GetReachedForAnyVariables(currentNode.name, currentIndex);
+                if (entry == null)
                 {
                     // Tell the checkpoint manager a new dialogue entry has been reached
                     // Debug.Log($"UpdateGameState SetReached {debugState}");
@@ -366,12 +368,12 @@ namespace Nova
                     stepNumFromLastCheckpoint = 0;
                 }
 
-                if (gameStateRestoreEntry != null)
+                if (entry != null)
                 {
-                    this.RuntimeAssert(stepNumFromLastCheckpoint == gameStateRestoreEntry.stepNumFromLastCheckpoint,
-                        $"StepNumFromLastCheckpoint mismatch: {stepNumFromLastCheckpoint} {gameStateRestoreEntry.stepNumFromLastCheckpoint}");
-                    this.RuntimeAssert(restrainCheckpointNum == gameStateRestoreEntry.restrainCheckpointNum,
-                        $"RestrainCheckpointNum mismatch: {restrainCheckpointNum} {gameStateRestoreEntry.restrainCheckpointNum}");
+                    this.RuntimeAssert(stepNumFromLastCheckpoint == entry.stepNumFromLastCheckpoint,
+                        $"stepNumFromLastCheckpoint mismatch: {stepNumFromLastCheckpoint} {entry.stepNumFromLastCheckpoint}");
+                    this.RuntimeAssert(restrainCheckpointNum == entry.restrainCheckpointNum,
+                        $"restrainCheckpointNum mismatch: {restrainCheckpointNum} {entry.restrainCheckpointNum}");
                 }
 
                 if (checkpointRestrained)
@@ -394,7 +396,7 @@ namespace Nova
                     variablesHashBeforeAction = variables.hash;
                     currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
                     currentDialogueEntry.ExecuteAction();
-                    StartCoroutine(WaitActionEnd(gameStateRestoreEntry != null));
+                    StartCoroutine(WaitActionEnd(entry != null, entryAny != null));
                 }
                 else
                 {
@@ -407,7 +409,7 @@ namespace Nova
 
         private readonly AdvancedDialogueHelper advancedDialogueHelper = new AdvancedDialogueHelper();
 
-        private IEnumerator WaitActionEnd(bool hasBeenReached)
+        private IEnumerator WaitActionEnd(bool hasBeenReached, bool hasBeenReachedForAnyVariables)
         {
             while (actionPauseLock.isLocked)
             {
@@ -420,10 +422,10 @@ namespace Nova
             // TODO: use advancedDialogueHelper to override dialogue
             // The game author should define overriding dialogues for each locale
             // By the way, we don't need to store all dialogues in save data,
-            // just those overriden
+            // just those overridden
             DialogueChanged?.Invoke(new DialogueChangedData(currentNode.name, currentIndex,
                 currentDialogueEntry.displayData, new Dictionary<string, VoiceEntry>(voicesOfNextDialogue),
-                hasBeenReached));
+                hasBeenReached, hasBeenReachedForAnyVariables));
 
             voicesOfNextDialogue.Clear();
 
@@ -506,7 +508,7 @@ namespace Nova
             if (entry == null)
             {
                 Debug.LogWarning(
-                    $"Nova: Unable to find node with varhash = {variablesHash}, falling back to any variable.");
+                    $"Nova: Unable to find node with variablesHash {variablesHash}, falling back to any variables.");
                 entry = checkpointManager.GetReachedForAnyVariables(nodeName, dialogueIndex);
             }
 
