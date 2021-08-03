@@ -25,9 +25,9 @@ namespace Nova
 
         public static int WarningStepNumFromLastCheckpoint => GameState.WarningStepNumFromLastCheckpoint;
 
-        public void RestrainCheckpoint(int steps, bool authorized = false)
+        public void RestrainCheckpoint(int steps, bool overridden = false)
         {
-            gameState.RestrainCheckpoint(steps, authorized);
+            gameState.RestrainCheckpoint(steps, overridden);
         }
 
         public void EnsureCheckpointOnNextDialogue()

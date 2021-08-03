@@ -97,7 +97,7 @@ namespace Nova
         public void CopyFrom(Variables variables)
         {
             this.variables = new SortedDictionary<string, VariableEntry>(variables.variables);
-            hash = variables.hash;
+            needCalculateHash = true;
         }
 
         public void Reset()

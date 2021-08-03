@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -63,6 +64,8 @@ namespace Nova
             ulong lastCheckpointVariablesHash)
             : base(stepNumFromLastCheckpoint, restrainCheckpointNum)
         {
+            Assert.IsTrue(stepNumFromLastCheckpoint > 0,
+                $"Nova: Invalid stepNumFromLastCheckpoint for GameStateSimpleEntry: {stepNumFromLastCheckpoint}");
             this.lastCheckpointVariablesHash = lastCheckpointVariablesHash;
         }
     }

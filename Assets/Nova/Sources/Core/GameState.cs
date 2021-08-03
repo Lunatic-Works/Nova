@@ -119,9 +119,9 @@ namespace Nova
         #region States
 
         /// <summary>
-        /// Nodes that has been walked through
+        /// Names of the nodes that have been walked through, including the current node
         /// </summary>
-        private List<string> walkedThroughNodes;
+        private List<string> walkedThroughNodes = new List<string>();
 
         /// <summary>
         /// The current flow chart node
@@ -142,12 +142,12 @@ namespace Nova
         private DialogueEntry currentDialogueEntry;
 
         /// <summary>
-        /// Current state of variables
+        /// The current state of variables
         /// </summary>
         public readonly Variables variables = new Variables();
 
         private ulong lastCheckpointVariablesHash;
-        private ulong lastVariablesHashBeforeAction;
+        private ulong variablesHashBeforeAction;
 
         private enum State
         {
@@ -170,12 +170,12 @@ namespace Nova
         private bool ended => state == State.Ended;
 
         /// <summary>
-        /// True when action is running
+        /// True when any action is running
         /// </summary>
         private bool actionIsRunning => state == State.ActionRunning;
 
         /// <summary>
-        /// Reset GameState, make it the same as the game not start
+        /// Reset GameState, make it the same as the game is not started
         /// </summary>
         /// <remarks>
         /// No event will be triggered when this method is called
@@ -184,12 +184,14 @@ namespace Nova
         {
             if (CheckActionRunning()) return;
 
-            // Reset all
-            walkedThroughNodes = null;
+            // Reset all states
+            walkedThroughNodes.Clear();
             currentNode = null;
             currentIndex = 0;
             currentDialogueEntry = null;
             variables.Reset();
+            lastCheckpointVariablesHash = 0UL;
+            variablesHashBeforeAction = 0UL;
             state = State.Normal;
 
             // Restore scene
@@ -204,25 +206,25 @@ namespace Nova
         #region Events
 
         /// <summary>
-        /// This event will be triggered if whe content of the dialogue will change. It will be triggered before
+        /// This event will be triggered if the content of the dialogue will change. It will be triggered before
         /// the lazy execution block of the next dialogue is invoked.
         /// </summary>
         public event UnityAction DialogueWillChange;
 
         /// <summary>
-        /// This event will be triggered if the content of the dialogue has changed. New dialogue text will be
-        /// sent to all listeners
+        /// This event will be triggered if the content of the dialogue has changed. The new dialogue text will be
+        /// sent to all listeners.
         /// </summary>
         public event UnityAction<DialogueChangedData> DialogueChanged;
 
         /// <summary>
-        /// This event will be triggered if the node has changed. The name and description of the new node will be
-        /// sent to all listeners
+        /// This event will be triggered if the node has changed. The name and the description of the new node will be
+        /// sent to all listeners.
         /// </summary>
         public event UnityAction<NodeChangedData> NodeChanged;
 
         /// <summary>
-        /// This event will be triggered if branches occur. The player has to choose which branch to take
+        /// This event will be triggered if branches occur. The player has to choose which branch to take.
         /// </summary>
         public event UnityAction<BranchOccursData> BranchOccurs;
 
@@ -316,7 +318,7 @@ namespace Nova
         private void UpdateGameState(bool nodeChanged, bool dialogueChanged, bool firstEntryOfNode,
             bool dialogueStepped)
         {
-            // Debug.Log($"UpdateGameState begin {currentNode.name} {currentIndex} {stepNumFromLastCheckpoint} {restrainCheckpoint} {forceCheckpoint}");
+            // Debug.Log($"UpdateGameState begin {debugState}");
 
             if (nodeChanged)
             {
@@ -339,18 +341,19 @@ namespace Nova
                     stepNumFromLastCheckpoint++;
                 }
 
-                var gameStateRestoreEntry = checkpointManager.GetReached(currentNode.name, currentIndex, variables.hash);
+                var gameStateRestoreEntry =
+                    checkpointManager.GetReached(currentNode.name, currentIndex, variables.hash);
                 if (gameStateRestoreEntry == null)
                 {
                     // Tell the checkpoint manager a new dialogue entry has been reached
-                    // Debug.Log($"UpdateGameState SetReached {currentNode.name} {currentIndex} {variables.hash}");
-                    checkpointManager.SetReached(currentNode.name, currentIndex, variables,
-                        GetRestoreEntry());
+                    // Debug.Log($"UpdateGameState SetReached {debugState}");
+                    checkpointManager.SetReached(currentNode.name, currentIndex, variables, GetRestoreEntry());
                 }
 
                 // Change states after creating or restoring from checkpoint
                 if (shouldSaveCheckpoint)
                 {
+                    lastCheckpointVariablesHash = variables.hash;
                     stepNumFromLastCheckpoint = 0;
                 }
 
@@ -379,7 +382,7 @@ namespace Nova
                 if (currentNode.dialogueEntryCount > 0)
                 {
                     state = State.ActionRunning;
-                    lastVariablesHashBeforeAction = variables.hash;
+                    variablesHashBeforeAction = variables.hash;
                     currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
                     currentDialogueEntry.ExecuteAction();
                     StartCoroutine(WaitActionEnd(gameStateRestoreEntry != null));
@@ -390,7 +393,7 @@ namespace Nova
                 }
             }
 
-            // Debug.Log($"UpdateGameState end {currentNode.name} {currentIndex} {stepNumFromLastCheckpoint} {restrainCheckpoint} {forceCheckpoint} {currentDialogueEntry?.displayData.FormatNameDialogue()}");
+            // Debug.Log($"UpdateGameState end {debugState} {currentDialogueEntry?.displayData.FormatNameDialogue()}");
         }
 
         private readonly AdvancedDialogueHelper advancedDialogueHelper = new AdvancedDialogueHelper();
@@ -448,6 +451,8 @@ namespace Nova
         /// <param name="clearFuture">clear saved checkpoints in the future</param>
         public void MoveBackTo(string nodeName, int dialogueIndex, ulong variablesHash, bool clearFuture = false)
         {
+            // Debug.Log($"MoveBackTo begin {nodeName} {dialogueIndex} {variablesHash}");
+
             if (CheckActionRunning()) return;
 
             // animation should stop
@@ -476,8 +481,7 @@ namespace Nova
                 }
             }
 
-            var nodeHistoryRemoveLength = walkedThroughNodes.Count - backNodeIndex - 1;
-            walkedThroughNodes.RemoveRange(backNodeIndex + 1, nodeHistoryRemoveLength);
+            walkedThroughNodes.RemoveRange(backNodeIndex + 1, walkedThroughNodes.Count - (backNodeIndex + 1));
             currentNode = flowChartTree.GetNode(walkedThroughNodes.Last());
             currentIndex = dialogueIndex;
 
@@ -491,6 +495,8 @@ namespace Nova
             }
 
             Restore(entry);
+
+            // Debug.Log($"MoveBackTo end {nodeName} {dialogueIndex} {variablesHash}");
         }
 
         #region Game start
@@ -511,7 +517,7 @@ namespace Nova
         private void GameStart(FlowChartNode startNode)
         {
             // clear possible history
-            walkedThroughNodes = new List<string>();
+            walkedThroughNodes.Clear();
             state = State.Normal;
             MoveToNextNode(startNode);
         }
@@ -703,14 +709,14 @@ namespace Nova
         private bool checkpointRestrained => restrainCheckpoint > 0;
 
         /// <summary>
-        /// Restrain saving checkpoints for given steps. Force overwrite the number of restraining steps when authorized is true.
+        /// Restrain saving checkpoints for given steps. Force overwrite the number of restraining steps when overridden is true.
         /// </summary>
         /// <param name="steps">the steps to restrain checkpoints</param>
-        /// <param name="authorized">if the new restraining step num should overwrite the old one</param>
-        public void RestrainCheckpoint(int steps, bool authorized = false)
+        /// <param name="overridden">if the new restraining step num should overwrite the old one</param>
+        public void RestrainCheckpoint(int steps, bool overridden = false)
         {
             // check overwrite
-            if (!authorized && restrainCheckpoint >= steps) return;
+            if (!overridden && restrainCheckpoint >= steps) return;
             // non-negative
             if (steps < 0) steps = 0;
             restrainCheckpoint = steps;
@@ -721,7 +727,7 @@ namespace Nova
         /// </summary>
         public void EnsureCheckpoint()
         {
-            // Debug.Log("EnsureCheckpoint");
+            // Debug.Log($"EnsureCheckpoint {debugState}");
 
             if (checkpointRestrained) return;
             stepNumFromLastCheckpoint = 0;
@@ -759,7 +765,6 @@ namespace Nova
                 restoreDatas[restorable.Key] = restorable.Value.GetRestoreData();
             }
 
-            lastCheckpointVariablesHash = variables.hash;
             return new GameStateCheckpoint(restoreDatas, variables, restrainCheckpoint);
         }
 
@@ -769,6 +774,8 @@ namespace Nova
         /// <returns>a game state step restore entry that contains all restore datas for the current dialogue</returns>
         private GameStateRestoreEntry GetRestoreEntry()
         {
+            // Debug.Log($"GetRestoreEntry {debugState}");
+
             if (shouldSaveCheckpoint)
             {
                 return GetCheckpoint();
@@ -903,7 +910,7 @@ namespace Nova
         public Bookmark GetBookmark()
         {
             return new Bookmark(walkedThroughNodes, currentIndex, I18n.__(currentDialogueEntry.dialogues),
-                lastVariablesHashBeforeAction);
+                variablesHashBeforeAction);
         }
 
         /// <summary>
@@ -921,5 +928,8 @@ namespace Nova
         }
 
         #endregion
+
+        private string debugState =>
+            $"{currentNode.name} {currentIndex} {variables.hash} {lastCheckpointVariablesHash} | {stepNumFromLastCheckpoint} {restrainCheckpoint} {forceCheckpoint} {shouldSaveCheckpoint}";
     }
 }
