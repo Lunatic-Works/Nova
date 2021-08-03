@@ -134,7 +134,8 @@ namespace Nova
         public void SetImage(string imageName, bool fade = true)
         {
             this.RuntimeAssert(characterTextureMerger == null && textureChanger == null,
-                "Do not use SetImage() when CharacterTextureMerger or OverlayTextureChanger exists.");
+                "Do not use SetImage() when CharacterTextureMerger or OverlayTextureChanger exists. " +
+                $"If you want to use SetPose(), check imageName: {imageName}");
 
             if (imageName == currentImageName)
             {
