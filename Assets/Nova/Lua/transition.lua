@@ -31,7 +31,7 @@ local function get_full_shader_name(shader_name, pp)
     return full_shader_name, base_shader_name
 end
 
---- get material from the MaterialPoolComponent attached to the GameObject
+--- get material from the MaterialPool attached to the GameObject
 local function get_mat(obj, shader_name, restorable)
     if shader_name == nil then
         return nil
@@ -50,7 +50,7 @@ local function get_mat(obj, shader_name, restorable)
 
     local full_shader_name, base_shader_name = get_full_shader_name(shader_name, pp)
 
-    local pool = Nova.MaterialPoolComponent.Ensure(get_go(obj))
+    local pool = Nova.MaterialPool.Ensure(get_go(obj))
     local mat
     if restorable then
         mat = pool:GetRestorableMaterial(full_shader_name)
@@ -67,7 +67,7 @@ local function get_mat(obj, shader_name, restorable)
 end
 
 local function get_default_mat(obj)
-    return Nova.MaterialPoolComponent.Ensure(get_go(obj)).defaultMaterial
+    return Nova.MaterialPool.Ensure(get_go(obj)).defaultMaterial
 end
 
 local function set_mat(obj, mat, layer_id)

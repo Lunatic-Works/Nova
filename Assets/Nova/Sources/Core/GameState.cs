@@ -460,8 +460,10 @@ namespace Nova
 
             // restore history
             var backNodeIndex = walkedThroughNodes.FindLastIndex(x => x == nodeName);
-            Assert.IsFalse(backNodeIndex < 0,
-                $"Nova: Move back to node {nodeName} that has not been walked through.");
+            if (backNodeIndex < 0)
+            {
+                Debug.LogWarning($"Nova: Move back to node {nodeName} that has not been walked through.");
+            }
 
             // state should be normal when goes backward
             state = State.Normal;
@@ -482,7 +484,12 @@ namespace Nova
             }
 
             walkedThroughNodes.RemoveRange(backNodeIndex + 1, walkedThroughNodes.Count - (backNodeIndex + 1));
-            currentNode = flowChartTree.GetNode(walkedThroughNodes.Last());
+            if (backNodeIndex < 0)
+            {
+                walkedThroughNodes.Add(nodeName);
+            }
+
+            currentNode = flowChartTree.GetNode(nodeName);
             currentIndex = dialogueIndex;
 
             // restore status
@@ -923,7 +930,7 @@ namespace Nova
             BookmarkWillLoad?.Invoke(new BookmarkWillLoadData());
 
             walkedThroughNodes = bookmark.nodeHistory;
-            Assert.IsFalse(walkedThroughNodes.Count == 0);
+            Assert.IsTrue(walkedThroughNodes.Count > 0);
             MoveBackTo(walkedThroughNodes.Last(), bookmark.dialogueIndex, bookmark.variablesHash);
         }
 

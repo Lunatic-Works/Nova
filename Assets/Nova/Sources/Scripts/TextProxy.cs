@@ -184,9 +184,7 @@ namespace Nova
 
         public void SetTextAlpha(byte a)
         {
-            Color32 color = textBox.color;
-            color.a = a;
-            textBox.color = color;
+            textBox.color = Utils.SetAlpha32(textBox.color, a);
         }
 
         private void ApplyAlphaToCharAtIndex(int index, byte alpha)

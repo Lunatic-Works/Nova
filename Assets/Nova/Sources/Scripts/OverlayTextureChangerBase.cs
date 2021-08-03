@@ -31,7 +31,7 @@ namespace Nova
         {
             ResetSize(float.NaN, float.NaN, Vector2.zero);
 
-            var pool = MaterialPoolComponent.Ensure(gameObject);
+            var pool = MaterialPool.Ensure(gameObject);
             material = pool.Get(SHADER);
             pool.defaultMaterial = material;
 

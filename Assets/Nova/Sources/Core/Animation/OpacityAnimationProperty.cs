@@ -35,15 +35,11 @@ namespace Nova
             {
                 if (spriteRenderer != null)
                 {
-                    Color c = spriteRenderer.color;
-                    c.a = value;
-                    spriteRenderer.color = c;
+                    spriteRenderer.color = Utils.SetAlpha(spriteRenderer.color, value);
                 }
                 else if (image != null)
                 {
-                    Color c = image.color;
-                    c.a = value;
-                    image.color = c;
+                    image.color = Utils.SetAlpha(image.color, value);
                 }
                 else if (canvasGroup != null)
                 {
@@ -51,31 +47,33 @@ namespace Nova
                 }
                 else
                 {
-                    Color c = rawImage.color;
-                    c.a = value;
-                    rawImage.color = c;
+                    rawImage.color = Utils.SetAlpha(rawImage.color, value);
                 }
             }
         }
 
-        public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float startValue, float targetValue) : base(startValue, targetValue)
+        public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float startValue, float targetValue) : base(
+            startValue, targetValue)
         {
             this.spriteRenderer = spriteRenderer;
         }
 
-        public OpacityAnimationProperty(Image image, float startValue, float targetValue) : base(startValue, targetValue)
+        public OpacityAnimationProperty(Image image, float startValue, float targetValue) : base(startValue,
+            targetValue)
         {
             this.image = image;
         }
 
-        public OpacityAnimationProperty(CanvasGroup canvasGroup, float startValue, float targetValue) : base(startValue, targetValue)
+        public OpacityAnimationProperty(CanvasGroup canvasGroup, float startValue, float targetValue) : base(startValue,
+            targetValue)
         {
             this.canvasGroup = canvasGroup;
             // For UI animation, apply startValue when this is constructed
             value = 0.0f;
         }
 
-        public OpacityAnimationProperty(RawImage rawImage, float startValue, float targetValue) : base(startValue, targetValue)
+        public OpacityAnimationProperty(RawImage rawImage, float startValue, float targetValue) : base(startValue,
+            targetValue)
         {
             this.rawImage = rawImage;
             // For UI animation, apply startValue when this is constructed

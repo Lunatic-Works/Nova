@@ -220,6 +220,18 @@ namespace Nova
             return angle < float.Epsilon ? 0.0f : Quaternion.Angle(a, value) / angle;
         }
 
+        public static Color SetAlpha(Color color, float a)
+        {
+            color.a = a;
+            return color;
+        }
+
+        public static Color32 SetAlpha32(Color32 color, byte a)
+        {
+            color.a = a;
+            return color;
+        }
+
         public static void SaveAll()
         {
             var gameController = FindNovaGameController();

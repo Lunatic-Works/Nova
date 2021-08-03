@@ -42,9 +42,7 @@ namespace Nova
             }
             else
             {
-                var c = image.color;
-                c.a = configManager.GetFloat(configKeyName);
-                image.color = c;
+                image.color = Utils.SetAlpha(image.color, configManager.GetFloat(configKeyName));
             }
         }
     }

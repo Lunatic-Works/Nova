@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Nova
 {
     [ExportCustomType]
-    public class MaterialPoolComponent : MonoBehaviour
+    public class MaterialPool : MonoBehaviour
     {
         // Keep Renderer's default material, used when turning off VFX on the Renderer
         // DefaultMaterial is null for CameraController
@@ -45,12 +45,12 @@ namespace Nova
             return factory.GetRestorableMaterial(shaderName);
         }
 
-        public static MaterialPoolComponent Ensure(GameObject gameObject)
+        public static MaterialPool Ensure(GameObject gameObject)
         {
-            var pool = gameObject.GetComponent<MaterialPoolComponent>();
+            var pool = gameObject.GetComponent<MaterialPool>();
             if (pool == null)
             {
-                pool = gameObject.AddComponent<MaterialPoolComponent>();
+                pool = gameObject.AddComponent<MaterialPool>();
             }
 
             return pool;

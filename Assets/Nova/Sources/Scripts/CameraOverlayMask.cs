@@ -134,7 +134,7 @@ namespace Nova
             // BlitMaterial must be RestorableMaterial or null
             if (data.materialRestoreData != null)
             {
-                MaterialFactory factory = MaterialPoolComponent.Ensure(gameObject).factory;
+                MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
                 blitMaterial = RestorableMaterial.RestoreMaterialFromData(data.materialRestoreData, factory);
             }
             else

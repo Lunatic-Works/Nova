@@ -14,16 +14,13 @@ namespace Nova
         private void Awake()
         {
             img = GetComponent<Image>();
-            var c = img.color;
-            c.a = 0;
-            img.color = c;
+            img.color = Utils.SetAlpha(img.color, 0);
             t = 0;
         }
 
         private void Update()
         {
             t += Time.deltaTime;
-            Color newColor = img.color;
             if (t > duration * 2)
             {
                 t -= duration * 2;
@@ -31,14 +28,12 @@ namespace Nova
 
             if (t < duration)
             {
-                newColor.a = t / duration;
+                img.color = Utils.SetAlpha(img.color, t / duration);
             }
             else
             {
-                newColor.a = 2 - t / duration;
+                img.color = Utils.SetAlpha(img.color, 2 - t / duration);
             }
-
-            img.color = newColor;
         }
     }
 }

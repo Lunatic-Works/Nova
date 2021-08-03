@@ -77,13 +77,8 @@ namespace Nova
         {
             foreach (var locale in SupportedLocales)
             {
-#if UNITY_EDITOR
-                var text = File.ReadAllText(EditorPathRoot + locale + ".json");
-                TranslationBundles[locale] = JsonConvert.DeserializeObject<TranslationBundle>(text);
-#else
                 var textAsset = Resources.Load(LocalePath + locale) as TextAsset;
                 TranslationBundles[locale] = JsonConvert.DeserializeObject<TranslationBundle>(textAsset.text);
-#endif
             }
         }
 
@@ -169,9 +164,7 @@ namespace Nova
         }
 
 #if UNITY_EDITOR
-        private static string EditorPathRoot => "Assets/Nova/Resources/" + LocalePath;
-
-        private static string EditorTranslationPath => EditorPathRoot + CurrentLocale + ".json";
+        private static string EditorTranslationPath => "Assets/Nova/Resources/" + LocalePath + CurrentLocale + ".json";
 
         private static DateTime LastWriteTime;
 

@@ -262,13 +262,13 @@ namespace Nova
                 // Material must be RestorableMaterial or DefaultMaterial
                 if (data.materialRestoreData != null)
                 {
-                    MaterialFactory factory = MaterialPoolComponent.Ensure(gameObject).factory;
+                    MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
                     spriteRenderer.material =
                         RestorableMaterial.RestoreMaterialFromData(data.materialRestoreData, factory);
                 }
                 else
                 {
-                    spriteRenderer.material = MaterialPoolComponent.Ensure(gameObject).defaultMaterial;
+                    spriteRenderer.material = MaterialPool.Ensure(gameObject).defaultMaterial;
                 }
             }
 

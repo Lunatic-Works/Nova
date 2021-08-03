@@ -231,7 +231,7 @@ namespace Nova
             var data = restoreData as PostProcessingRestoreData;
 
             // Materials must be RestorableMaterial
-            MaterialFactory factory = MaterialPoolComponent.Ensure(gameObject).factory;
+            MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
             layers.Clear();
             foreach (var layerData in data.layersData)
             {
