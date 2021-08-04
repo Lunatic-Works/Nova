@@ -12,7 +12,7 @@
 
 ## 快速上手
 
-1. `git clone`
+1. `git clone`，为了节约时间可以加上`--depth 1`
 2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 准备打开我们的示例工程
     * 将`Assets/Examples/Colorless/`文件夹下的`Scenes/, StandingsUncropped/`和对应的`.meta`文件移动到`Assets/`文件夹下
@@ -21,7 +21,7 @@
 4. 打开`Assets/Scenes/Main.unity`，体验示例作品
 5. 在开始改脚本之前，先删除英文版的脚本，以免发生冲突
     * `Assets/Resources/Locales/English/Colorless/Scenarios/`文件夹下是英文版的脚本，可以全部删除
-    * `Assets/Resources/LocalizedResourcePaths.txt`里面是英文版用到的文件，可以全部清空，但是这个文件本身不能删除
+    * `Assets/Resources/LocalizedResourcePaths.txt`记录英文版用到的文件，可以删除
 5. 试着改一改脚本吧，脚本放在`Assets/Resources/Colorless/Scenarios/`文件夹下
 
 ## 说明文档
@@ -30,7 +30,7 @@ GitHub Wiki（正在施工中）：https://github.com/Lunatic-Works/Nova/wiki/
 
 ## 友情链接
 
-* 我们的第一部视觉小说作品《青箱》：[Steam页面](https://store.steampowered.com/app/1131740) [知乎页面](https://www.zhihu.com/question/409724349) [Bangumi页面](https://bgm.tv/subject/311066)
+* 我们的第一部视觉小说作品《青箱》：[Steam](https://store.steampowered.com/app/1131740) [知乎](https://www.zhihu.com/question/409724349) [Bangumi](https://bgm.tv/subject/311066) [VNDB](https://vndb.org/v26506)
 * 我们的微博：[@LunaticWorks](https://weibo.com/LunaticWorks)
 * 我们的QQ群：876212259，如果以后讨论程序的人多了可能会再开一个程序群
 

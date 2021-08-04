@@ -42,8 +42,11 @@ namespace Nova
         {
             Current = this;
 
-            var text = Resources.Load<TextAsset>("LocalizedResourcePaths").text;
-            LocalizedResourcePaths.UnionWith(text.Split('\n'));
+            var text = Resources.Load<TextAsset>("LocalizedResourcePaths");
+            if (text)
+            {
+                LocalizedResourcePaths.UnionWith(text.text.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries));
+            }
 
             cachedAssets = new Dictionary<AssetCacheType, LRUCache<string, CachedAssetEntry>>
             {
