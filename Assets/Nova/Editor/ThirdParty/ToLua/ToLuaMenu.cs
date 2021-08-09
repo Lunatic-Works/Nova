@@ -913,7 +913,7 @@ public static class ToLuaMenu
     }
 
     [MenuItem("Lua/Clear Wrap Files", false, 6)]
-    public static void ClearLuaWraps()
+    static void ClearLuaWraps()
     {
         string[] files = Directory.GetFiles(CustomSettings.saveDir, "*.cs", SearchOption.TopDirectoryOnly);
 

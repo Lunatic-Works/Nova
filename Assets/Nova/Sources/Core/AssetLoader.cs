@@ -148,7 +148,7 @@ namespace Nova
             {
                 // Debug.LogFormat("Add cache {0}:{1}", type, path);
                 var localizedPath = TryGetLocalizedPath(path);
-                cache[path] = new CachedAssetEntry {count = 1, request = Resources.LoadAsync(localizedPath)};
+                cache[path] = new CachedAssetEntry { count = 1, request = Resources.LoadAsync(localizedPath) };
             }
         }
 
@@ -232,7 +232,7 @@ namespace Nova
                     var count = pathAndCount.Value;
                     var localizedPath = TryGetLocalizedPath(path);
                     var request = Resources.LoadAsync(localizedPath);
-                    cache[path] = new CachedAssetEntry {count = count, request = request};
+                    cache[path] = new CachedAssetEntry { count = count, request = request };
                 }
             }
         }
