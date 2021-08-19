@@ -97,12 +97,12 @@ namespace Nova
         {
             foreach (string key in configManager.GetAllTrackedKeys())
             {
-                if (key.StartsWith(Alert.AlertKeyPrefix))
+                if (key.StartsWith(Alert.AlertKeyPrefix, StringComparison.Ordinal))
                 {
                     configManager.SetInt(key, 1);
                 }
 
-                if (key.StartsWith(FirstShownKeyPrefix))
+                if (key.StartsWith(FirstShownKeyPrefix, StringComparison.Ordinal))
                 {
                     configManager.SetInt(key, 0);
                 }

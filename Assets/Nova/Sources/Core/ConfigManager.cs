@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -104,7 +105,7 @@ namespace Nova
                 return def.defaultValue;
             }
 
-            if (key.StartsWith(Alert.AlertKeyPrefix))
+            if (key.StartsWith(Alert.AlertKeyPrefix, StringComparison.Ordinal))
             {
                 return "1";
             }
@@ -150,7 +151,7 @@ namespace Nova
 
         private void TryTrack(string key)
         {
-            if (key.StartsWith(TrackedKeyPrefix))
+            if (key.StartsWith(TrackedKeyPrefix, StringComparison.Ordinal))
             {
                 var alertKeys = new HashSet<string>(GetString(TrackedKeysKey)
                     .Split(new[] {','}, System.StringSplitOptions.RemoveEmptyEntries)) {key};

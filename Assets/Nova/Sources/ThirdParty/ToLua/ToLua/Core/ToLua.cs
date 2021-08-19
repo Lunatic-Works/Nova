@@ -156,7 +156,7 @@ namespace LuaInterface
                 string filename = LuaDLL.lua_tostring(L, -1);
                 LuaDLL.lua_settop(L, n);
 
-                if (filename.EndsWith(".lua"))
+                if (filename.StartsWith("@") || filename.EndsWith(".lua"))
                 {
                     sb.Append($"[{filename}:{line}]:");
                 }
@@ -190,16 +190,16 @@ namespace LuaInterface
                             sb.Append(LuaDLL.luaL_typename(L, i)).Append(":0x").Append(p.ToString("X"));
                         }
                     }
+                }
+
+                Debugger.Log(sb.ToString());
 
 #if UNITY_EDITOR
-                    if (!filename.EndsWith(".lua"))
-                    {
-                        sb.Append($"\nline: {line}\n------\n{filename}\n------");
-                    }
-#endif
-
-                    Debugger.Log(sb.ToString());
+                if (!(filename.StartsWith("@") || filename.EndsWith(".lua")))
+                {
+                    sb.Append($"\nline: {line}\n------\n{filename}\n------");
                 }
+#endif
 
                 return 0;
             }

@@ -19,7 +19,7 @@ __Nova = {}
 
 --- show warning without halting the game
 function warn(s)
-    print('<color=red>' .. s .. '</color>')
+    print('<color=red>' .. s .. '</color>\n' .. debug.traceback())
 end
 
 --- get GameObject
