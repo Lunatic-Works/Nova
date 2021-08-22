@@ -19,12 +19,12 @@ namespace Nova
     [Serializable]
     public class NodeSaveInfo
     {
-        public readonly Dictionary<int, GameStateRestoreEntry> dialogueRestoreEntries;
+        public readonly Dictionary<int, GameStateRestoreEntry> restoreEntries;
         public readonly SerializableHashSet<string> reachedBranches;
 
         public NodeSaveInfo()
         {
-            dialogueRestoreEntries = new Dictionary<int, GameStateRestoreEntry>();
+            restoreEntries = new Dictionary<int, GameStateRestoreEntry>();
             reachedBranches = new SerializableHashSet<string>();
         }
     }
@@ -35,7 +35,7 @@ namespace Nova
     [Serializable]
     public class GlobalSave
     {
-        public readonly Dictionary<ulong, Dictionary<string, NodeSaveInfo>> savedNodesByVariablesHash =
+        public readonly Dictionary<ulong, Dictionary<string, NodeSaveInfo>> savedNodes =
             new Dictionary<ulong, Dictionary<string, NodeSaveInfo>>();
 
         public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
@@ -278,8 +278,7 @@ namespace Nova
         /// <param name="entry">Restore entry for the dialogue</param>
         public void SetReached(string nodeName, int dialogueIndex, Variables variables, GameStateRestoreEntry entry)
         {
-            globalSave.savedNodesByVariablesHash.Ensure(variables.hash).Ensure(nodeName)
-                .dialogueRestoreEntries[dialogueIndex] = entry;
+            globalSave.savedNodes.Ensure(variables.hash).Ensure(nodeName).restoreEntries[dialogueIndex] = entry;
         }
 
         /// <summary>
@@ -290,8 +289,7 @@ namespace Nova
         /// <param name="variables">Current variables.</param>
         public void SetReached(string nodeName, string branchName, Variables variables)
         {
-            globalSave.savedNodesByVariablesHash.Ensure(variables.hash).Ensure(nodeName).reachedBranches
-                .Add(branchName);
+            globalSave.savedNodes.Ensure(variables.hash).Ensure(nodeName).reachedBranches.Add(branchName);
         }
 
         /// <summary>
@@ -306,17 +304,17 @@ namespace Nova
         // DEBUG ONLY METHOD: will destroy all versions regardless of variables
         public void UnsetReached(string nodeName, int dialogueIndex)
         {
-            foreach (var dict in globalSave.savedNodesByVariablesHash.Values)
+            foreach (var dict in globalSave.savedNodes.Values)
             {
                 if (dict.TryGetValue(nodeName, out NodeSaveInfo nodeInfo))
-                    nodeInfo.dialogueRestoreEntries.Remove(dialogueIndex);
+                    nodeInfo.restoreEntries.Remove(dialogueIndex);
             }
         }
 
         // DEBUG ONLY METHOD: will destroy all versions regardless of variables
         public void UnsetReached(string nodeName)
         {
-            foreach (var dict in globalSave.savedNodesByVariablesHash.Values)
+            foreach (var dict in globalSave.savedNodes.Values)
             {
                 dict.Remove(nodeName);
             }
@@ -330,16 +328,16 @@ namespace Nova
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
         public GameStateRestoreEntry GetReachedForAnyVariables(string nodeName, int dialogueIndex)
         {
-            // If reading global save file fails, globalSave.savedNodesByVariablesHash will be null
-            if (globalSave?.savedNodesByVariablesHash == null)
+            // If reading global save file fails, globalSave.savedNodes will be null
+            if (globalSave?.savedNodes == null)
             {
                 return null;
             }
 
-            foreach (var dict in globalSave.savedNodesByVariablesHash.Values)
+            foreach (var dict in globalSave.savedNodes.Values)
             {
                 if (dict.TryGetValue(nodeName, out NodeSaveInfo info) &&
-                    info.dialogueRestoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
+                    info.restoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
                     return entry;
             }
 
@@ -355,8 +353,8 @@ namespace Nova
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
         public GameStateRestoreEntry GetReached(string nodeName, int dialogueIndex, ulong variablesHash)
         {
-            if (globalSave.savedNodesByVariablesHash.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
-                if (info.dialogueRestoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
+            if (globalSave.savedNodes.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
+                if (info.restoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
                     return entry;
             return null;
         }
@@ -370,7 +368,7 @@ namespace Nova
         /// <returns>Whether the branch has been reached.</returns>
         public bool IsReached(string nodeName, string branchName, ulong variablesHash)
         {
-            if (globalSave.savedNodesByVariablesHash.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
+            if (globalSave.savedNodes.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
                 return info.reachedBranches.Contains(branchName);
             return false;
         }
