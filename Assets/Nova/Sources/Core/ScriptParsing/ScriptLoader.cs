@@ -42,18 +42,25 @@ namespace Nova
             inited = true;
         }
 
-        private FlowChartTree flowChartTree;
+        private readonly FlowChartTree flowChartTree = new FlowChartTree();
 
-        private FlowChartNode currentNode = null;
+        private FlowChartNode currentNode;
 
         // Current locale of the state machine
         public SystemLanguage stateLocale;
 
         private class LazyBindingEntry
         {
-            public FlowChartNode from;
-            public string destination;
-            public BranchInformation branchInfo;
+            public readonly FlowChartNode from;
+            public readonly string destination;
+            public readonly BranchInformation branchInfo;
+
+            public LazyBindingEntry(FlowChartNode from, string destination, BranchInformation branchInfo)
+            {
+                this.from = from;
+                this.destination = destination;
+                this.branchInfo = branchInfo;
+            }
         }
 
         private List<LazyBindingEntry> lazyBindingLinks;
@@ -68,7 +75,6 @@ namespace Nova
 
         public void ForceInit(string path)
         {
-            flowChartTree = new FlowChartTree();
             currentNode = null;
             stateLocale = I18n.DefaultLocale;
             lazyBindingLinks = new List<LazyBindingEntry>();
@@ -318,12 +324,7 @@ namespace Nova
                 throw new ArgumentException("Nova: Cannot apply jump_to() to a branching node.");
             }
 
-            lazyBindingLinks.Add(new LazyBindingEntry
-            {
-                from = currentNode,
-                destination = destination,
-                branchInfo = BranchInformation.Default
-            });
+            lazyBindingLinks.Add(new LazyBindingEntry(currentNode, destination, BranchInformation.Default));
 
             currentNode = null;
         }
@@ -367,12 +368,18 @@ namespace Nova
             }
 
             currentNode.type = FlowChartNodeType.Branching;
-            lazyBindingLinks.Add(new LazyBindingEntry
+            lazyBindingLinks.Add(new LazyBindingEntry(currentNode, destination, new BranchInformation(name, text, imageInfo, mode, condition)));
+        }
+
+        public void AddLocaleForBranch(string name, string destination, string text)
+        {
+            var branchInfo = lazyBindingLinks.Find(x => x.from.name == currentNode.name && x.destination == destination && x.branchInfo.name == name)?.branchInfo;
+            if (branchInfo == null)
             {
-                from = currentNode,
-                destination = destination,
-                branchInfo = new BranchInformation(name, text, imageInfo, mode, condition)
-            });
+                throw new ArgumentException($"Nova: branchInfo not found. from: {currentNode.name}, destination: {destination}, branchInfo: {name}");
+            }
+
+            branchInfo.AddLocale(stateLocale, text);
         }
 
         /// <summary>

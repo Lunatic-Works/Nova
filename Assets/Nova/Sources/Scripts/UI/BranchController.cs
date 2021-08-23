@@ -6,7 +6,7 @@ namespace Nova
 {
     public class BranchController : MonoBehaviour, IRestorable
     {
-        public GameObject branchButtonPrefab;
+        public BranchButtonController branchButtonPrefab;
         public GameObject backPanel;
         public string imageFolder;
 
@@ -62,32 +62,9 @@ namespace Nova
                     continue;
                 }
 
-                var child = Instantiate(branchButtonPrefab, transform);
-
-                if (branchInfo.imageInfo != null)
-                {
-                    var layoutElement = child.AddComponent<LayoutElement>();
-                    layoutElement.ignoreLayout = true;
-                    var image = child.GetComponent<Image>();
-                    image.type = Image.Type.Simple;
-                    image.alphaHitTestMinimumThreshold = 0.5f;
-                    var imageInfo = branchInfo.imageInfo;
-                    // TODO: preload
-                    image.sprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageInfo.name));
-                    image.SetNativeSize();
-                    child.transform.localPosition = new Vector3(imageInfo.positionX, imageInfo.positionY, 0f);
-                    child.transform.localScale = new Vector3(imageInfo.scale, imageInfo.scale, 1f);
-                }
-
-                var text = child.GetComponentInChildren<Text>();
-                text.text = branchInfo.text;
-
-                var button = child.GetComponentInChildren<Button>();
-                button.onClick.AddListener(() => Select(branchInfo.name));
-                if (branchInfo.mode == BranchMode.Enable)
-                {
-                    button.interactable = branchInfo.condition.Invoke<bool>();
-                }
+                var button = Instantiate(branchButtonPrefab, transform);
+                button.Init(branchInfo.texts, branchInfo.imageInfo, imageFolder, () => Select(branchInfo.name),
+                    interactable: branchInfo.mode != BranchMode.Enable || branchInfo.condition.Invoke<bool>());
             }
         }
 

@@ -1,4 +1,6 @@
 ﻿using LuaInterface;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Nova
 {
@@ -42,13 +44,8 @@ namespace Nova
         /// </summary>
         public readonly string name;
 
-        /// <summary>
-        /// The text on the button to select this branch
-        /// </summary>
-        public readonly string text;
-
+        public readonly Dictionary<SystemLanguage, string> texts;
         public readonly BranchImageInformation imageInfo;
-
         public readonly BranchMode mode;
         public readonly LuaFunction condition;
 
@@ -69,10 +66,16 @@ namespace Nova
             LuaFunction condition)
         {
             this.name = name;
-            this.text = text;
+            var texts = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text };
+            this.texts = texts;
             this.imageInfo = imageInfo;
             this.mode = mode;
             this.condition = condition;
+        }
+
+        public void AddLocale(SystemLanguage locale, string text)
+        {
+            texts[locale] = text;
         }
 
         /// <summary>

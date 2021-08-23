@@ -64,4 +64,9 @@ As I leave the toilet, the man is still cursing at my back.
 In the end, all sounds are masked under the rushing water.
 
 Next, I'm going to…
-@<||>
+@<|
+branch {
+    { dest = 'ch3', text = 'Hallway' },
+    { dest = 'ch4', text = 'Student council room' },
+}
+|>

@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 222871363948932442}
   - component: {fileID: 114881617801617298}
   - component: {fileID: 114312941846281828}
+  - component: {fileID: 8702215254368758180}
   m_Layer: 5
   m_Name: BranchButton
   m_TagString: Untagged
@@ -197,3 +198,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8702215254368758180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283954230108114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c99cc004980f645854e3f55a0700a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 114410797073233340}
+  image: {fileID: 114881617801617298}
+  button: {fileID: 114312941846281828}

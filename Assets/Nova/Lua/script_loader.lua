@@ -47,6 +47,8 @@ end
 --- if cond is a string, it will be converted to a function returning that expression
 function branch(branches)
     for i, branch in ipairs(branches) do
+        local name = tostring(i)
+
         local image_info = nil
         if branch.image then
             local image_name, image_coord = unpack(branch.image)
@@ -73,7 +75,11 @@ function branch(branches)
             cond = loadstring('return ' .. cond)
         end
 
-        __Nova.scriptLoader:RegisterBranch(tostring(i), branch.dest, branch.text, image_info, mode, cond)
+        if __Nova.scriptLoader.stateLocale == Nova.I18n.DefaultLocale then
+            __Nova.scriptLoader:RegisterBranch(name, branch.dest, branch.text, image_info, mode, cond)
+        else
+            __Nova.scriptLoader:AddLocaleForBranch(name, branch.dest, branch.text)
+        end
     end
     __Nova.scriptLoader:EndRegisterBranch()
 end
