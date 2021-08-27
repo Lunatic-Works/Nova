@@ -192,14 +192,14 @@ namespace LuaInterface
                     }
                 }
 
-                Debugger.Log(sb.ToString());
-
 #if UNITY_EDITOR
                 if (!(filename.StartsWith("@") || filename.EndsWith(".lua")))
                 {
                     sb.Append($"\nline: {line}\n------\n{filename}\n------");
                 }
 #endif
+
+                Debugger.Log(sb.ToString());
 
                 return 0;
             }

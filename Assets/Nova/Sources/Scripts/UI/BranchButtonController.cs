@@ -12,11 +12,14 @@ namespace Nova
         public Button button;
 
         private Dictionary<SystemLanguage, string> displayTexts;
+        private BranchImageInformation imageInfo;
+        private string imageFolder;
 
         public void Init(Dictionary<SystemLanguage, string> displayTexts, BranchImageInformation imageInfo, string imageFolder, UnityAction onClick, bool interactable)
         {
             this.displayTexts = displayTexts;
-            UpdateText();
+            this.imageInfo = imageInfo;
+            this.imageFolder = imageFolder;
 
             if (imageInfo != null)
             {
@@ -25,12 +28,12 @@ namespace Nova
 
                 image.type = Image.Type.Simple;
                 image.alphaHitTestMinimumThreshold = 0.5f;
-                // TODO: preload
-                image.sprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageInfo.name));
-                image.SetNativeSize();
+
                 transform.localPosition = new Vector3(imageInfo.positionX, imageInfo.positionY, 0f);
                 transform.localScale = new Vector3(imageInfo.scale, imageInfo.scale, 1f);
             }
+
+            UpdateText();
 
             button.onClick.AddListener(onClick);
             button.interactable = interactable;
@@ -45,6 +48,13 @@ namespace Nova
             else
             {
                 text.text = I18n.__(displayTexts);
+            }
+
+            if (imageInfo != null)
+            {
+                // TODO: preload
+                image.sprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageInfo.name));
+                image.SetNativeSize();
             }
         }
 
