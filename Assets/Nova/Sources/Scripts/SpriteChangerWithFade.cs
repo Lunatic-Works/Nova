@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
 {
+    [Obsolete]
     public class SpriteChangerWithFade : MonoBehaviour
     {
         public float fadeDuration = 0.1f;

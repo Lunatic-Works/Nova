@@ -27,19 +27,20 @@ function show(obj, image_name, coord, color, fade)
         tint(obj, color)
     end
 
-    if type(image_name) == 'table' then
-        obj:SetPose(image_name, fade)
-    else
-        local pose = get_pose(obj, image_name)
-        if pose then
-            obj:SetPose(pose, fade)
-        else
-            obj:SetImage(image_name, fade)
-        end
-    end
-
     if tostring(obj:GetType()) == 'Nova.SpriteController' then
+        obj:SetImage(image_name, fade)
         __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. image_name)
+    else
+        if type(image_name) == 'table' then
+            obj:SetPose(image_name, fade)
+        else
+            local pose = get_pose(obj, image_name)
+            if pose then
+                obj:SetPose(pose, fade)
+            else
+                warn('Unknown pose ' .. image_name .. ' for character ' .. obj.luaGlobalName)
+            end
+        end
     end
 end
 add_preload_pattern('show')

@@ -127,7 +127,7 @@ namespace Nova
             }
             else
             {
-                SetImageOrPose(characterToImageName[characterName], fade);
+                SetPose(characterToImageName[characterName], fade);
             }
         }
 

@@ -36,6 +36,15 @@ namespace Nova
             }
         }
 
+        public void Unfreeze()
+        {
+            isFrozen = false;
+            foreach (var node in nodes.Values)
+            {
+                node.Unfreeze();
+            }
+        }
+
         private void CheckFreeze()
         {
             Assert.IsFalse(isFrozen, "Nova: Cannot modify a flow chart tree when it is frozen.");
@@ -44,14 +53,25 @@ namespace Nova
         /// <summary>
         /// Add a node to the flow chart tree
         /// </summary>
-        /// <param name="node">
-        /// Node to be added. No checking will be performed on the node name.
-        /// </param>
+        /// <param name="node">The node to add</param>
+        /// <exception cref="ArgumentException">
+        /// ArgumentException will be thrown if the name is null or empty.
+        /// </exception>
         public void AddNode(FlowChartNode node)
         {
             CheckFreeze();
-            var name = node.name;
-            nodes.Add(name, node);
+
+            if (string.IsNullOrEmpty(node.name))
+            {
+                throw new ArgumentException("Nova: Node name is null or empty");
+            }
+
+            if (nodes.ContainsKey(node.name))
+            {
+                Debug.LogWarning($"Nova: Overwrite node: {node.name}");
+            }
+
+            nodes[node.name] = node;
         }
 
         /// <summary>
@@ -108,34 +128,35 @@ namespace Nova
         /// </remarks>
         /// <param name="name">Name of the start point</param>
         /// <param name="node">The node to add</param>
-        /// <exception cref="DuplicatedDefinitionException">
-        /// DuplicatedDefinitionException will be thrown if the same start point name has been defined.
-        /// </exception>
         /// <exception cref="ArgumentException">
-        /// ArgumentException will be thrown if the node is not in the tree.
+        /// ArgumentException will be thrown if the name is null or empty, or the node is not in the tree.
         /// </exception>
         public void AddStart(string name, FlowChartNode node)
         {
             CheckFreeze();
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Nova: Start name is null or empty");
+            }
 
             if (!HasNode(node))
             {
                 throw new ArgumentException("Nova: Only node in the tree can be set as a start node.");
             }
 
-            var existingStartNode = GetStartNode(name);
-            if (existingStartNode != null && !existingStartNode.Equals(node))
+            if (startNodes.ContainsKey(name))
             {
-                throw new DuplicatedDefinitionException(
-                    $"Nova: Duplicated definition of the same start name: {name}");
+                Debug.LogWarning($"Nova: Overwrite start point: {name}");
             }
 
-            startNodes.Add(name, node);
+            startNodes[name] = node;
         }
 
         public void AddUnlockedStart(string name, FlowChartNode node)
         {
-            unlockedStartNodes.Add(name, node);
+            CheckFreeze();
+            unlockedStartNodes[name] = node;
         }
 
         /// <summary>
@@ -213,14 +234,19 @@ namespace Nova
         /// <param name="name">Name of the end point</param>
         /// <param name="node">The node to add</param>
         /// <exception cref="DuplicatedDefinitionException">
-        /// DuplicatedDefinitionException will be thrown if the same end point name has been defined.
+        /// DuplicatedDefinitionException will be thrown if assigning two different end names to the same node.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// ArgumentException will be thrown if the node is not in the tree.
+        /// ArgumentException will be thrown if the name is null or empty, or the node is not in the tree.
         /// </exception>
         public void AddEnd(string name, FlowChartNode node)
         {
             CheckFreeze();
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Nova: End name is null or empty");
+            }
 
             if (!HasNode(node))
             {
@@ -234,12 +260,11 @@ namespace Nova
                 if (endNodes.ContainsValue(name))
                 {
                     // But the name has been used
-                    throw new DuplicatedDefinitionException(
-                        $"Nova: Duplicated definition of the same end name: {name}");
+                    Debug.LogWarning($"Nova: Overwrite end point: {name}");
                 }
 
                 // The name is unique, add the node as en and
-                endNodes.Add(node, name);
+                endNodes[node] = name;
                 return;
             }
 
@@ -248,7 +273,7 @@ namespace Nova
             {
                 // But the name of the end point is different
                 throw new DuplicatedDefinitionException(
-                    $"Nova: Assigning two different end name: {existingNodeName} and {name} to the same node.");
+                    $"Nova: Assigning two different end names: {existingNodeName} and {name} to the same node.");
             }
         }
 

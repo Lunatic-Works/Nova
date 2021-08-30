@@ -4,25 +4,21 @@ using UnityEngine;
 
 namespace Nova
 {
+    [RequireComponent(typeof(OverlayTextureChangerBase))]
     public abstract class CompositeSpriteControllerBase : MonoBehaviour, IRestorable
     {
         public string imageFolder;
         public SpriteMerger characterTextureMerger;
 
         public string currentImageName { get; protected set; }
-
         public OverlayTextureChangerBase textureChanger { get; protected set; }
 
         protected GameState gameState;
-        private SpriteRenderer spriteRenderer;
-        private SpriteChangerWithFade spriteChanger;
         private DialogueBoxController dialogueBoxController;
 
         protected virtual void Awake()
         {
             gameState = Utils.FindNovaGameController().GameState;
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            spriteChanger = GetComponent<SpriteChangerWithFade>();
             textureChanger = GetComponent<OverlayTextureChangerBase>();
             dialogueBoxController = GameObject.FindWithTag("DialogueView").GetComponent<DialogueBoxController>();
         }
@@ -33,14 +29,7 @@ namespace Nova
 
         protected void SetColor(Color color)
         {
-            if (textureChanger != null)
-            {
-                textureChanger.color = color;
-            }
-            else if (spriteRenderer != null)
-            {
-                spriteRenderer.color = color;
-            }
+            textureChanger.color = color;
         }
 
         #endregion
@@ -80,7 +69,7 @@ namespace Nova
             currentImageName = poseName;
         }
 
-        protected void SetImageOrPose(string imageName, bool fade = true)
+        protected void SetPose(string imageName, bool fade)
         {
             if (imageName == currentImageName)
             {
@@ -94,14 +83,7 @@ namespace Nova
             }
 
             string[] parts = StringToPoseArray(imageName);
-            if (parts.Length == 1)
-            {
-                SetImage(imageName, fade);
-            }
-            else
-            {
-                SetPose(parts, fade);
-            }
+            SetPose(parts, fade);
         }
 
         #endregion
@@ -131,39 +113,6 @@ namespace Nova
             SetPose(pose.ToArray().Cast<string>().ToArray(), fade);
         }
 
-        public void SetImage(string imageName, bool fade = true)
-        {
-            this.RuntimeAssert(characterTextureMerger == null && textureChanger == null,
-                "Do not use SetImage() when CharacterTextureMerger or OverlayTextureChanger exists. " +
-                $"If you want to use SetPose(), check imageName: {imageName}");
-
-            if (imageName == currentImageName)
-            {
-                return;
-            }
-
-            Sprite sprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageName));
-            if (spriteChanger != null && spriteChanger.enabled && fade && !gameState.isMovingBack &&
-                dialogueBoxController.state != DialogueBoxState.FastForward)
-            {
-                // If pose is not changing, do not hide body
-                if (currentImageName != null && imageName[0] == currentImageName[0])
-                {
-                    spriteChanger.SetSprite(sprite, overlay: true);
-                }
-                else
-                {
-                    spriteChanger.sprite = sprite;
-                }
-            }
-            else
-            {
-                spriteRenderer.sprite = sprite;
-            }
-
-            currentImageName = imageName;
-        }
-
         public void ClearImage(bool fade = true)
         {
             if (string.IsNullOrEmpty(currentImageName))
@@ -171,25 +120,13 @@ namespace Nova
                 return;
             }
 
-            if (textureChanger != null)
+            if (fade && !gameState.isMovingBack && dialogueBoxController.state != DialogueBoxState.FastForward)
             {
-                if (fade && !gameState.isMovingBack && dialogueBoxController.state != DialogueBoxState.FastForward)
-                {
-                    textureChanger.SetTexture(null);
-                }
-                else
-                {
-                    textureChanger.SetTextureNoFade(null);
-                }
-            }
-            else if (spriteChanger != null && spriteChanger.enabled && fade && !gameState.isMovingBack &&
-                     dialogueBoxController.state != DialogueBoxState.FastForward)
-            {
-                spriteChanger.sprite = null;
+                textureChanger.SetTexture(null);
             }
             else
             {
-                spriteRenderer.sprite = null;
+                textureChanger.SetTextureNoFade(null);
             }
 
             currentImageName = null;
@@ -207,16 +144,14 @@ namespace Nova
             public readonly string currentImageName;
             public readonly TransformRestoreData transformRestoreData;
             public readonly Vector4Data color;
-            public readonly MaterialRestoreData materialRestoreData;
             public readonly int renderQueue;
 
             public CompositeSpriteControllerBaseRestoreData(string currentImageName, Transform transform, Color color,
-                MaterialRestoreData materialRestoreData, int renderQueue)
+                int renderQueue)
             {
                 this.currentImageName = currentImageName;
                 transformRestoreData = new TransformRestoreData(transform);
                 this.color = color;
-                this.materialRestoreData = materialRestoreData;
                 this.renderQueue = renderQueue;
             }
 
@@ -225,7 +160,6 @@ namespace Nova
                 currentImageName = baseData.currentImageName;
                 transformRestoreData = baseData.transformRestoreData;
                 color = baseData.color;
-                materialRestoreData = baseData.materialRestoreData;
                 renderQueue = baseData.renderQueue;
             }
         }
@@ -234,21 +168,8 @@ namespace Nova
 
         public virtual IRestoreData GetRestoreData()
         {
-            // Material must be RestorableMaterial or DefaultMaterial
-            MaterialRestoreData materialRestoreData;
-            if (spriteRenderer != null && spriteRenderer.sharedMaterial is RestorableMaterial)
-            {
-                materialRestoreData = RestorableMaterial.GetRestoreData(spriteRenderer.sharedMaterial);
-            }
-            else
-            {
-                materialRestoreData = null;
-            }
-
             int renderQueue = RenderQueueOverrider.Ensure(gameObject).renderQueue;
-
-            return new CompositeSpriteControllerBaseRestoreData(currentImageName, transform, color, materialRestoreData,
-                renderQueue);
+            return new CompositeSpriteControllerBaseRestoreData(currentImageName, transform, color, renderQueue);
         }
 
         public virtual void Restore(IRestoreData restoreData)
@@ -256,25 +177,8 @@ namespace Nova
             var data = restoreData as CompositeSpriteControllerBaseRestoreData;
             data.transformRestoreData.Restore(transform);
             color = data.color;
-
-            if (spriteRenderer != null)
-            {
-                // Material must be RestorableMaterial or DefaultMaterial
-                if (data.materialRestoreData != null)
-                {
-                    MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
-                    spriteRenderer.material =
-                        RestorableMaterial.RestoreMaterialFromData(data.materialRestoreData, factory);
-                }
-                else
-                {
-                    spriteRenderer.material = MaterialPool.Ensure(gameObject).defaultMaterial;
-                }
-            }
-
             RenderQueueOverrider.Ensure(gameObject).renderQueue = data.renderQueue;
-
-            SetImageOrPose(data.currentImageName, false);
+            SetPose(data.currentImageName, false);
         }
 
         #endregion

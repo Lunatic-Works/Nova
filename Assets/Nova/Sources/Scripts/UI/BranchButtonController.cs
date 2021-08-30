@@ -15,7 +15,8 @@ namespace Nova
         private BranchImageInformation imageInfo;
         private string imageFolder;
 
-        public void Init(Dictionary<SystemLanguage, string> displayTexts, BranchImageInformation imageInfo, string imageFolder, UnityAction onClick, bool interactable)
+        public void Init(Dictionary<SystemLanguage, string> displayTexts, BranchImageInformation imageInfo,
+            string imageFolder, UnityAction onClick, bool interactable)
         {
             this.displayTexts = displayTexts;
             this.imageInfo = imageInfo;

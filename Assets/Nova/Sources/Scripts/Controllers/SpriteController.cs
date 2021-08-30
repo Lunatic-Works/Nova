@@ -15,7 +15,6 @@ namespace Nova
         private GameState gameState;
         private SpriteRenderer spriteRenderer;
         private Image image;
-        private SpriteChangerWithFade spriteChanger;
         private Sprite defaultSprite;
         private DialogueBoxController dialogueBoxController;
 
@@ -125,7 +124,6 @@ namespace Nova
             }
 
             this.RuntimeAssert(spriteRenderer != null || image != null, "Missing SpriteRenderer or Image.");
-            spriteChanger = GetComponent<SpriteChangerWithFade>();
             defaultSprite = sprite;
             dialogueBoxController = GameObject.FindWithTag("DialogueView").GetComponent<DialogueBoxController>();
 
@@ -158,16 +156,7 @@ namespace Nova
             }
 
             Sprite newSprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageName));
-            if (spriteChanger != null && spriteChanger.enabled && fade && !gameState.isMovingBack &&
-                dialogueBoxController.state != DialogueBoxState.FastForward)
-            {
-                spriteChanger.sprite = newSprite;
-            }
-            else
-            {
-                sprite = newSprite;
-            }
-
+            sprite = newSprite;
             currentImageName = imageName;
         }
 
@@ -178,16 +167,7 @@ namespace Nova
                 return;
             }
 
-            if (spriteChanger != null && spriteChanger.enabled && fade && !gameState.isMovingBack &&
-                dialogueBoxController.state != DialogueBoxState.FastForward)
-            {
-                spriteChanger.sprite = defaultSprite;
-            }
-            else
-            {
-                sprite = defaultSprite;
-            }
-
+            sprite = defaultSprite;
             currentImageName = null;
         }
 

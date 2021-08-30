@@ -83,6 +83,8 @@ namespace Nova
             LuaRuntime.Instance.BindObject("scriptLoader", this);
             InitOnlyIncludedNames();
 
+            flowChartTree.Unfreeze();
+
             foreach (var locale in I18n.SupportedLocales)
             {
                 stateLocale = locale;
@@ -284,20 +286,7 @@ namespace Nova
 
             currentNode = nextNode;
 
-            // The try block here is to make debug info easier to read
-            try
-            {
-                flowChartTree.AddNode(currentNode);
-            }
-            catch (ArgumentNullException)
-            {
-                throw new ArgumentException("Nova: A label must have a name");
-            }
-            catch (ArgumentException)
-            {
-                throw new DuplicatedDefinitionException(
-                    $"Nova: Multiple definition of the same label {currentNode.name}");
-            }
+            flowChartTree.AddNode(currentNode);
         }
 
         public void BeginAddLocaleForNode(string name)
@@ -314,9 +303,8 @@ namespace Nova
         {
             if (destination == null)
             {
-                string msg = "Nova: jump_to instruction must have a destination.";
-                msg += " Exception occurs at node: " + currentNode.name;
-                throw new ArgumentException(msg);
+                throw new ArgumentException(
+                    $"Nova: jump_to instruction must have a destination. Exception occurs at node: {currentNode.name}");
             }
 
             if (currentNode.type == FlowChartNodeType.Branching)

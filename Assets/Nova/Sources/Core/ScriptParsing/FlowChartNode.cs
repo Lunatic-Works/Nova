@@ -42,6 +42,11 @@ namespace Nova
             isFrozen = true;
         }
 
+        public void Unfreeze()
+        {
+            isFrozen = false;
+        }
+
         private void CheckFreeze()
         {
             Assert.IsFalse(isFrozen, "Nova: Cannot modify a flow chart node when it is frozen.");
@@ -77,13 +82,14 @@ namespace Nova
 
         public void SetDialogueEntries(List<DialogueEntry> entries)
         {
+            CheckFreeze();
             dialogueEntries = entries;
         }
 
         public void AddLocaleForDialogueEntries(SystemLanguage locale, IReadOnlyList<LocalizedDialogueEntry> entries)
         {
             Assert.IsTrue(entries.Count == dialogueEntries.Count, "Nova: Localized dialogue entry count differs.");
-
+            CheckFreeze();
             for (int i = 0; i < entries.Count; ++i)
             {
                 dialogueEntries[i].AddLocale(locale, entries[i]);
