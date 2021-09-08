@@ -35,6 +35,30 @@ make_anim_method('trans_down', function(self, obj, image_name, duration)
     return self:trans(obj, image_name, 'fade', duration, { _Mask = 'Masks/wipe_up', _InvertMask = 1 })
 end, add_preload_pattern)
 
+make_anim_method('trans_fade_in', function(self, obj, image_name, coord, color, duration, mask)
+    duration = duration or 1
+    mask = mask or 'Masks/wipe_up'
+    local entry = self:action(function()
+            vfx(obj, 'fade', 1, { _SubTex = '' })
+            show_no_fade(obj, image_name, coord, color)
+        end
+        ):vfx(obj, 'fade', {1, 0}, duration, { _SubTex = '', _Mask = mask })
+    entry.head = self
+    return entry
+end, add_preload_pattern)
+
+make_anim_method('trans_fade_out', function(self, obj, duration, mask)
+    duration = duration or 1
+    mask = mask or 'Masks/wipe_up'
+    local entry = self:vfx(obj, 'fade', {0, 1}, duration, { _SubTex = '', _Mask = mask, _InvertMask = 1 }
+        ):action(function()
+            hide_no_fade(obj)
+            vfx(obj, nil)
+        end)
+    entry.head = self
+    return entry
+end)
+
 make_anim_method('nod', function(self, obj, distance, duration)
     distance = distance or 0.3
     duration = duration or 0.15
