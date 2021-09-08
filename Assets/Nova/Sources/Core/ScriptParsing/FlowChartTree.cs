@@ -193,8 +193,8 @@ namespace Nova
         /// Otherwise, return null.
         /// When setting the value, this property will check if the default start node has already been set.
         /// </remarks>
-        /// <exception cref="ArgumentException">
-        /// ArgumentException will be thrown if two different nodes want to be the default start node.
+        /// <exception cref="DuplicatedDefinitionException">
+        /// DuplicatedDefinitionException will be thrown if assigning two different nodes to be the default start node.
         /// </exception>
         public FlowChartNode defaultStartNode
         {
@@ -218,7 +218,8 @@ namespace Nova
 
                 if (!_defaultStartNode.Equals(value))
                 {
-                    throw new ArgumentException("Nova: Only one node can be the default start point.");
+                    throw new DuplicatedDefinitionException(
+                        $"Nova: Assigning two different default start points: {_defaultStartNode.name} and {value.name}");
                 }
             }
         }
@@ -273,7 +274,7 @@ namespace Nova
             {
                 // But the name of the end point is different
                 throw new DuplicatedDefinitionException(
-                    $"Nova: Assigning two different end names: {existingNodeName} and {name} to the same node.");
+                    $"Nova: Assigning two different end names to the same node: {existingNodeName} and {name}");
             }
         }
 

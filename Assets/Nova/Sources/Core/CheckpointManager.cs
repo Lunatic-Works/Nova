@@ -431,7 +431,7 @@ namespace Nova
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"Nova: {path} is corrupted, details below. Try to recover");
+                    Debug.LogWarning($"Nova: {path} is corrupted, details below. Try to recover...");
                     Debug.LogWarning(ex.Message);
 
                     var oldPath = path + ".old";

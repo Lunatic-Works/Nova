@@ -371,9 +371,9 @@ namespace Nova
                 if (entry != null)
                 {
                     this.RuntimeAssert(stepNumFromLastCheckpoint == entry.stepNumFromLastCheckpoint,
-                        $"stepNumFromLastCheckpoint mismatch: {stepNumFromLastCheckpoint} {entry.stepNumFromLastCheckpoint}");
+                        $"stepNumFromLastCheckpoint mismatch: {stepNumFromLastCheckpoint} {entry.stepNumFromLastCheckpoint}. Try to clear save data.");
                     this.RuntimeAssert(restrainCheckpointNum == entry.restrainCheckpointNum,
-                        $"restrainCheckpointNum mismatch: {restrainCheckpointNum} {entry.restrainCheckpointNum}");
+                        $"restrainCheckpointNum mismatch: {restrainCheckpointNum} {entry.restrainCheckpointNum}. Try to clear save data.");
                 }
 
                 if (checkpointRestrained)
