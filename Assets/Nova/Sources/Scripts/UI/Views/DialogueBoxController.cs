@@ -72,76 +72,99 @@ namespace Nova
             Append
         }
 
-        public DialogueUpdateMode dialogueUpdateMode;
+        [HideInInspector] public DialogueUpdateMode dialogueUpdateMode;
 
-        private GameState gameState;
         private GameController gameController;
+        private GameState gameState;
         private ConfigManager configManager;
 
         private TextSpeedConfigReader textSpeedConfigReader;
         private ScrollRect dialogueTextScrollRect;
-        private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
         private DialogueTextController dialogueText;
-        public List<Button> hideDialogueButtons;
+        private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
 
         private ButtonRingTrigger buttonRingTrigger;
         private LogController logController;
-        public AvatarController avatarController;
-
-        public int themedEntryLeftPadding;
-        public int themedEntryRightPadding;
-        public float themedEntryNameTextSpacing;
-        public float themedEntryPreferredHeight;
+        [SerializeField] private AvatarController avatarController;
 
         // TODO: there are a lot of magic numbers for the current UI
-        public bool useThemedBox
+        [ExportCustomType]
+        public enum Theme
         {
-            get => backgroundGO.activeSelf;
+            Default,
+            Basic
+        }
+
+        private bool themeInited;
+        private Theme _theme;
+
+        public Theme theme
+        {
+            get => _theme;
             set
             {
-                dialogueText.layoutSetting = new DialogueEntryLayoutSetting
+                if (themeInited && _theme == value)
                 {
-                    leftPadding = value ? themedEntryLeftPadding : 0,
-                    rightPadding = value ? themedEntryRightPadding : 0,
-                    nameTextSpacing = value ? themedEntryNameTextSpacing : 0,
-                    preferredHeight = value ? (float?)themedEntryPreferredHeight : null
-                };
+                    return;
+                }
+
+                themeInited = true;
+                _theme = value;
+                Init();
+
+                defaultBackgroundGO.SetActive(value == Theme.Default);
+                basicBackgroundGO.SetActive(value == Theme.Basic);
 
                 var scrollRectTransform = dialogueTextScrollRect.transform as RectTransform;
 
-                backgroundGO.SetActive(value);
-                basicBackgroundGO.SetActive(!value);
-                if (value)
+                switch (value)
                 {
-                    scrollRectTransform.offsetMin = new Vector2(0, 0);
-                    scrollRectTransform.offsetMax = new Vector2(0, 0);
-                    dialogueTextVerticalLayoutGroup.padding = new RectOffset(60, 120, 42, 0);
-                }
-                else
-                {
-                    if (scrollRectTransform.rect.height > 360f)
-                    {
-                        scrollRectTransform.offsetMin = new Vector2(60, 60);
-                        scrollRectTransform.offsetMax = new Vector2(-120, -42);
-                        dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 120);
-                    }
-                    else
-                    {
-                        scrollRectTransform.offsetMin = new Vector2(60, 0);
-                        scrollRectTransform.offsetMax = new Vector2(-120, -42);
-                        dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 0);
-                    }
+                    case Theme.Default:
+                        dialogueText.layoutSetting = new DialogueEntryLayoutSetting
+                        {
+                            leftPadding = 150,
+                            rightPadding = 0,
+                            nameTextSpacing = 16f,
+                            preferredHeight = 150f
+                        };
+
+                        scrollRectTransform.offsetMin = new Vector2(0f, 0f);
+                        scrollRectTransform.offsetMax = new Vector2(0f, 0f);
+                        dialogueTextVerticalLayoutGroup.padding = new RectOffset(60, 120, 42, 0);
+
+                        break;
+                    case Theme.Basic:
+                        dialogueText.layoutSetting = DialogueEntryLayoutSetting.Default;
+
+                        if (scrollRectTransform.rect.height > 360f)
+                        {
+                            scrollRectTransform.offsetMin = new Vector2(60f, 60f);
+                            scrollRectTransform.offsetMax = new Vector2(-120f, -42f);
+                            dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 120);
+                        }
+                        else
+                        {
+                            scrollRectTransform.offsetMin = new Vector2(60f, 0f);
+                            scrollRectTransform.offsetMax = new Vector2(-120f, -42f);
+                            dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 0);
+                        }
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
 
         public RectTransform rect { get; private set; }
 
-        public GameObject basicBackgroundGO;
-        public GameObject backgroundGO;
+        [SerializeField] private GameObject defaultBackgroundGO;
+        [SerializeField] private GameObject basicBackgroundGO;
 
-        public Image basicBackgroundImage { get; private set; }
-        public CanvasGroup backgroundCanvasGroup { get; private set; }
+        [SerializeField] private List<Image> backgroundImages;
+        private List<CanvasGroup> backgroundCanvasGroups = new List<CanvasGroup>();
+        [SerializeField] private List<Button> hideDialogueButtons;
+        [SerializeField] private List<GameObject> dialogueFinishIcons;
 
         private Color _backgroundColor;
 
@@ -152,9 +175,16 @@ namespace Nova
             {
                 _backgroundColor = value;
                 Init();
-                basicBackgroundImage.color = new Color(_backgroundColor.r, _backgroundColor.g, _backgroundColor.b,
-                    _backgroundColor.a * _configOpacity);
-                backgroundCanvasGroup.alpha = _backgroundColor.a * _configOpacity;
+
+                foreach (var image in backgroundImages)
+                {
+                    image.color = new Color(_backgroundColor.r, _backgroundColor.g, _backgroundColor.b, 1f);
+                }
+
+                foreach (var cg in backgroundCanvasGroups)
+                {
+                    cg.alpha = _backgroundColor.a * configOpacity;
+                }
             }
         }
 
@@ -166,7 +196,12 @@ namespace Nova
             set
             {
                 _configOpacity = value;
-                backgroundColor = backgroundColor;
+                Init();
+
+                foreach (var cg in backgroundCanvasGroups)
+                {
+                    cg.alpha = backgroundColor.a * _configOpacity;
+                }
             }
         }
 
@@ -191,22 +226,29 @@ namespace Nova
             buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
             logController = transform.parent.GetComponentInChildren<LogController>();
 
-            Transform dialoguePanel = transform.Find("DialoguePanel");
-            rect = dialoguePanel.GetComponent<RectTransform>();
-            basicBackgroundImage = basicBackgroundGO.GetComponent<Image>();
-            backgroundCanvasGroup = backgroundGO.GetComponent<CanvasGroup>();
+            rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
-            uiPP = UICameraHelper.Active.GetComponent<PostProcessing>();
+            foreach (var image in backgroundImages)
+            {
+                backgroundCanvasGroups.Add(image.GetComponent<CanvasGroup>());
+            }
 
             foreach (var btn in hideDialogueButtons)
+            {
                 btn.onClick.AddListener(Hide);
+            }
+
             dialogueFinished = new AndGate(to =>
             {
                 foreach (var icon in dialogueFinishIcons)
+                {
                     icon.SetActive(to);
+                }
             });
             dialogueBoxShown = new AndGate(dialogueFinished);
             dialogueBoxShown.SetActive(true);
+
+            uiPP = UICameraHelper.Active.GetComponent<PostProcessing>();
 
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
 
@@ -219,17 +261,17 @@ namespace Nova
             Init();
         }
 
+        public override void Show(Action onFinish)
+        {
+            base.Show(onFinish);
+            dialogueBoxShown.SetActive(true);
+        }
+
         public override void Hide(Action onFinish)
         {
             state = DialogueBoxState.Normal;
             base.Hide(onFinish);
             dialogueBoxShown.SetActive(false);
-        }
-
-        public override void Show(Action onFinish)
-        {
-            base.Show(onFinish);
-            dialogueBoxShown.SetActive(true);
         }
 
         private void OnEnable()
@@ -270,7 +312,7 @@ namespace Nova
             {
                 timeAfterDialogueChange += Time.deltaTime;
 
-                if (dialogueFinishIconEnabled &&
+                if (dialogueFinishIconShown &&
                     state == DialogueBoxState.Normal && viewManager.currentView != CurrentViewType.InTransition &&
                     timeAfterDialogueChange > dialogueTime)
                 {
@@ -301,13 +343,12 @@ namespace Nova
             }
         }
 
-        public Material fastForwardPostProcessingMaterial;
-        public GameObject fastForwardModeIcon;
         public GameObject autoModeIcon;
-        public List<GameObject> dialogueFinishIcons;
+        public GameObject fastForwardModeIcon;
+        public Material fastForwardPostProcessingMaterial;
 
-        private AndGate dialogueBoxShown;
         private AndGate dialogueFinished;
+        private AndGate dialogueBoxShown;
         private PostProcessing uiPP;
 
         private bool isReadDialogue = false;
@@ -483,12 +524,12 @@ namespace Nova
         }
 
         private bool useDefaultTextAnimation = true;
-        private float textAnimationDelay = 0;
+        private float textAnimationDelay = 0f;
 
         private void ResetTextAnimationConfig()
         {
             useDefaultTextAnimation = true;
-            textAnimationDelay = 0;
+            textAnimationDelay = 0f;
         }
 
         public void PreventDefaultTextAnimation()
@@ -498,7 +539,7 @@ namespace Nova
 
         public void SetTextAnimationDelay(float secs)
         {
-            textAnimationDelay = Mathf.Max(secs, 0);
+            textAnimationDelay = Mathf.Max(secs, 0f);
         }
 
         private float perCharacterFadeInDuration => textSpeedConfigReader.perCharacterFadeInDuration;
@@ -638,11 +679,11 @@ namespace Nova
             TryRemoveSchedule();
         }
 
-        public float autoDelay;
-        public float fastForwardDelay;
+        [HideInInspector] public float autoDelay;
+        [HideInInspector] public float fastForwardDelay;
 
         [SerializeField] private NovaAnimation textAnimation;
-        public bool needAnimation = true;
+        [HideInInspector] public bool needAnimation = true;
 
         /// <summary>
         /// Begin fast forward
@@ -673,8 +714,7 @@ namespace Nova
 
         private bool NextPageOrStep()
         {
-            if (!useThemedBox || dialogueText.dialogueEntryControllers.Count != 1 ||
-                !dialogueText.dialogueEntryControllers[0].Forward())
+            if (dialogueText.dialogueEntryControllers.Count != 1 || !dialogueText.dialogueEntryControllers[0].Forward())
             {
                 gameState.Step();
                 return false;
@@ -706,7 +746,7 @@ namespace Nova
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 if (NextPageOrStep())
                 {
-                    timeAfterDialogueChange = 0;
+                    timeAfterDialogueChange = 0f;
                     TrySchedule(state == DialogueBoxState.Auto ? autoDelay : fastForwardDelay);
                 }
             }
@@ -724,13 +764,13 @@ namespace Nova
 
         private void StopTimer()
         {
-            timeAfterDialogueChange = 0;
+            timeAfterDialogueChange = 0f;
             dialogueAvailable = false;
         }
 
         private void RestartTimer()
         {
-            timeAfterDialogueChange = 0;
+            timeAfterDialogueChange = 0f;
             dialogueAvailable = true;
         }
 
@@ -790,27 +830,26 @@ namespace Nova
 
         #region Show/Hide close button and dialogue finish icon
 
-        private bool closeButtonShown = true;
+        private bool _closeButtonShown = true;
 
-        public void ShowCloseButton()
+        public bool closeButtonShown
         {
-            closeButtonShown = true;
-            foreach (var btn in hideDialogueButtons)
+            get => _closeButtonShown;
+            set
             {
-                btn.gameObject.SetActive(true);
+                if (_closeButtonShown == value)
+                {
+                    return;
+                }
+
+                foreach (var btn in hideDialogueButtons)
+                {
+                    btn.gameObject.SetActive(value);
+                }
             }
         }
 
-        public void HideCloseButton()
-        {
-            closeButtonShown = false;
-            foreach (var btn in hideDialogueButtons)
-            {
-                btn.gameObject.SetActive(false);
-            }
-        }
-
-        public bool dialogueFinishIconEnabled = true;
+        [HideInInspector] public bool dialogueFinishIconShown = true;
 
         #endregion
 
@@ -828,17 +867,17 @@ namespace Nova
             public readonly bool canClickForward;
             public readonly bool scriptCanAbortAnimation;
             public readonly int textAlignment;
-            public readonly bool useThemedBox;
+            public readonly Theme theme;
             public readonly bool textColorHasSet;
             public readonly Vector4Data textColor;
             public readonly string materialName;
             public readonly bool closeButtonShown;
-            public readonly bool dialogueFinishIconEnabled;
+            public readonly bool dialogueFinishIconShown;
 
             public DialogueBoxRestoreData(RectTransform rect, Color backgroundColor,
                 DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, bool canClickForward,
-                bool scriptCanAbortAnimation, int textAlignment, bool useThemedBox, bool textColorHasSet,
-                Color textColor, string materialName, bool closeButtonShown, bool dialogueFinishIconEnabled)
+                bool scriptCanAbortAnimation, int textAlignment, Theme theme, bool textColorHasSet,
+                Color textColor, string materialName, bool closeButtonShown, bool dialogueFinishIconShown)
             {
                 rectTransformRestoreData = new RectTransformRestoreData(rect);
                 this.backgroundColor = backgroundColor;
@@ -847,12 +886,12 @@ namespace Nova
                 this.canClickForward = canClickForward;
                 this.scriptCanAbortAnimation = scriptCanAbortAnimation;
                 this.textAlignment = textAlignment;
-                this.useThemedBox = useThemedBox;
+                this.theme = theme;
                 this.textColorHasSet = textColorHasSet;
                 this.textColor = textColor;
                 this.materialName = materialName;
                 this.closeButtonShown = closeButtonShown;
-                this.dialogueFinishIconEnabled = dialogueFinishIconEnabled;
+                this.dialogueFinishIconShown = dialogueFinishIconShown;
             }
         }
 
@@ -860,8 +899,8 @@ namespace Nova
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
             return new DialogueBoxRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas,
-                canClickForward, scriptCanAbortAnimation, (int)textAlignment, useThemedBox, textColorHasSet,
-                textColor, materialName, closeButtonShown, dialogueFinishIconEnabled);
+                canClickForward, scriptCanAbortAnimation, (int)textAlignment, theme, textColorHasSet,
+                textColor, materialName, closeButtonShown, dialogueFinishIconShown);
         }
 
         public void Restore(IRestoreData restoreData)
@@ -875,7 +914,7 @@ namespace Nova
             scriptCanAbortAnimation = data.scriptCanAbortAnimation;
 
             textAlignment = (TextAlignmentOptions)data.textAlignment;
-            useThemedBox = data.useThemedBox;
+            theme = data.theme;
             textColorHasSet = data.textColorHasSet;
             textColor = data.textColor;
             materialName = data.materialName;
@@ -886,16 +925,8 @@ namespace Nova
                 AppendDialogue(displayData, needAnimation: false);
             }
 
-            if (data.closeButtonShown)
-            {
-                ShowCloseButton();
-            }
-            else
-            {
-                HideCloseButton();
-            }
-
-            dialogueFinishIconEnabled = data.dialogueFinishIconEnabled;
+            closeButtonShown = data.closeButtonShown;
+            dialogueFinishIconShown = data.dialogueFinishIconShown;
         }
 
         #endregion

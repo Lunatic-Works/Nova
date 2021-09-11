@@ -10,16 +10,16 @@ namespace Nova
     {
         public string configKeyName;
 
-        private Image image;
+        private CanvasGroup canvasGroup;
         private DialogueBoxController dialogueBoxController;
         private ConfigManager configManager;
 
         private void Awake()
         {
-            image = GetComponent<Image>();
+            canvasGroup = GetComponent<CanvasGroup>();
             dialogueBoxController = GetComponent<DialogueBoxController>();
-            this.RuntimeAssert(image != null || dialogueBoxController != null,
-                "Missing Image or DialogueBoxController.");
+            this.RuntimeAssert(canvasGroup != null || dialogueBoxController != null,
+                "Missing CanvasGroup or DialogueBoxController.");
             configManager = Utils.FindNovaGameController().ConfigManager;
         }
 
@@ -42,7 +42,7 @@ namespace Nova
             }
             else
             {
-                image.color = Utils.SetAlpha(image.color, configManager.GetFloat(configKeyName));
+                canvasGroup.alpha = configManager.GetFloat(configKeyName);
             }
         }
     }

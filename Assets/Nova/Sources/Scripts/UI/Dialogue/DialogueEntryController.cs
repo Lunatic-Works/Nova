@@ -9,7 +9,7 @@ namespace Nova
         internal int leftPadding;
         internal int rightPadding;
         internal float nameTextSpacing;
-        internal float? preferredHeight;
+        internal float preferredHeight = -1f;
 
         internal static readonly DialogueEntryLayoutSetting Default = new DialogueEntryLayoutSetting();
     }
@@ -140,7 +140,7 @@ namespace Nova
                 padding.left = _layoutSetting.leftPadding + textLeftExtraPadding;
                 padding.right = _layoutSetting.rightPadding;
                 verticalLayoutGroup.spacing = _layoutSetting.nameTextSpacing;
-                textLayoutElement.preferredHeight = _layoutSetting.preferredHeight ?? -1f;
+                textLayoutElement.preferredHeight = _layoutSetting.preferredHeight;
             }
         }
 

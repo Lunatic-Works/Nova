@@ -14,14 +14,6 @@ function force_step()
 end
 
 function box_update_mode(mode)
-    if mode == 'append' then
-        mode = Nova.DialogueBoxController.DialogueUpdateMode.Append
-    elseif mode == 'overwrite' then
-        mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite
-    else
-        warn('Unknown dialogue update mode: ' .. tostring(mode))
-        return
-    end
     __Nova.dialogueBoxController.dialogueUpdateMode = mode
 end
 
@@ -39,8 +31,8 @@ function box_tint(color)
     __Nova.dialogueBoxController.backgroundColor = parse_color(color)
 end
 
-function box_themed(themed)
-    __Nova.dialogueBoxController.useThemedBox = themed
+function box_theme(theme)
+    __Nova.dialogueBoxController.theme = theme
 end
 
 function box_alignment(mode)
@@ -77,37 +69,37 @@ end
 
 box_pos_presets = {
     bottom = {
-        update_mode = 'overwrite',
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.05, 0.35},
     },
     top = {
-        update_mode = 'overwrite',
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.65, 0.95},
     },
     center = {
-        update_mode = 'overwrite',
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.35, 0.65},
     },
     left = {
-        update_mode = 'append',
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
         offset = {0, 0, 0, 0},
         anchor = {0, 0.5, 0, 1},
     },
     right = {
-        update_mode = 'append',
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
         offset = {0, 0, 0, 0},
         anchor = {0.5, 1, 0, 1},
     },
     full = {
-        update_mode = 'append',
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
         offset = {0, 0, 0, 0},
         anchor = {0.05, 0.95, 0, 1},
     },
     hide = {
-        update_mode = 'overwrite',
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 2.05, 2.35},
     },
@@ -119,38 +111,42 @@ box_style_presets = {
         alignment = 'left',
         text_color = 0,
         text_material = '',
-        themed = true
+        theme = Nova.DialogueBoxController.Theme.Default,
     },
     center = {
         tint = 1,
         alignment = 'center',
         text_color = 0,
         text_material = '',
-        themed = true
+        theme = Nova.DialogueBoxController.Theme.Default,
     },
     dark = {
         tint = {0, 0.5},
         alignment = 'left',
         text_color = 1,
         text_material = 'outline',
+        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     dark_center = {
         tint = {0, 0.5},
         alignment = 'center',
         text_color = 1,
         text_material = 'outline',
+        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     transparent = {
         tint = {0, 0},
         alignment = 'left',
         text_color = 1,
         text_material = 'outline',
+        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     subtitle = {
         tint = {0, 0},
         alignment = 'center',
         text_color = 1,
         text_material = 'outline',
+        theme = Nova.DialogueBoxController.Theme.Basic,
     },
 }
 
@@ -173,7 +169,7 @@ function set_box(pos_name, style_name, auto_new_page)
         return
     end
 
-    if auto_new_page and pos['update_mode'] == 'append' then
+    if auto_new_page and pos['update_mode'] == Nova.DialogueBoxController.DialogueUpdateMode.Append then
         new_page()
     end
 
@@ -185,7 +181,7 @@ function set_box(pos_name, style_name, auto_new_page)
     box_alignment(style['alignment'])
     box_text_color(style['text_color'])
     box_text_material(style['text_material'])
-    box_themed(style['themed'] or false)
+    box_theme(style['theme'])
 end
 
 function new_page()
@@ -200,7 +196,7 @@ function box_hide_show(duration, pos_name, style_name)
     duration = duration or 1
     -- set style and new page before animation
     set_box('hide', style_name, false)
-    if box_pos_presets[pos_name] and box_pos_presets[pos_name]['update_mode'] == 'append' then
+    if box_pos_presets[pos_name] and box_pos_presets[pos_name]['update_mode'] == Nova.DialogueBoxController.DialogueUpdateMode.Append then
         new_page()
     end
     anim:wait(duration):action(set_box, pos_name, style_name, false)
@@ -208,17 +204,17 @@ function box_hide_show(duration, pos_name, style_name)
 end
 
 function box_close_button_on()
-    __Nova.dialogueBoxController:ShowCloseButton()
+    __Nova.dialogueBoxController.closeButtonShown = true
 end
 
 function box_close_button_off()
-    __Nova.dialogueBoxController:HideCloseButton()
+    __Nova.dialogueBoxController.closeButtonShown = false
 end
 
 function box_finish_icon_on()
-    __Nova.dialogueBoxController.dialogueFinishIconEnabled = true
+    __Nova.dialogueBoxController.dialogueFinishIconShown = true
 end
 
 function box_finish_icon_off()
-    __Nova.dialogueBoxController.dialogueFinishIconEnabled = false
+    __Nova.dialogueBoxController.dialogueFinishIconShown = false
 end

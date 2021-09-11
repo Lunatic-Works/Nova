@@ -1,3 +1,4 @@
+
 @<|
 label 'test_basic'
 is_unlocked_start()
@@ -9,7 +10,7 @@ set_box()
 |>
 测试基本功能
 
-很多页文字
+很多行文字
 111
 222
 333
@@ -24,6 +25,32 @@ set_box()
 一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零
 
 英文换行 abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg
+
+<|
+set_box('full', 'dark')
+|>
+全屏文本
+
+很多行文字
+111
+222
+333
+444
+555
+666
+777
+888
+999
+
+很长的文字
+一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零
+
+英文换行 abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg
+
+<|
+set_box()
+|>
+取消全屏文本
 
 <|
 anim:action(function() anim:stop() end)
@@ -43,12 +70,12 @@ say(xiben, '01')
 <|
 move(xiben, pos_l)
 |>
-角色移动
+角色瞬间移动
 
 <|
 tint(xiben, {1, 0.5, 0})
 |>
-角色变色
+角色瞬间变色
 
 <|
 cubic = Nova.AnimationEntry.CubicEasing(0, 0)
@@ -102,7 +129,7 @@ tint(bg, 1)
 <|
 move(bg, {1, 1})
 |>
-背景移动
+背景瞬间移动
 
 <|
 anim:move(bg, {1, -1})
@@ -127,7 +154,7 @@ anim:move(bg, {0, 0, 1})
 <|
 move(cam, {-5, -5, 3})
 |>
-摄像机移动
+摄像机瞬间移动
 
 <|
 anim:move(cam, {5, 5, 7})
