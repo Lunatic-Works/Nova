@@ -1,13 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Nova
 {
-    /// <summary>
-    /// Control auto mode speed based on the value in ConfigManager
-    /// </summary>
-    public class AutoSpeedController : MonoBehaviour
+    public class TextSpeedController : MonoBehaviour
     {
-        public string configKeyName;
+        public string configKeyName = "TextSpeed";
 
         private DialogueBoxController dialogueBoxController;
         private ConfigTextPreviewController configTextPreviewController;
@@ -38,14 +35,14 @@ namespace Nova
         private void UpdateValue()
         {
             // Convert speed to duration
-            float val = 10f * Mathf.Pow(0.2f, configManager.GetFloat(configKeyName));
+            float val = Mathf.Max(2f * Mathf.Pow(0.1f, configManager.GetFloat(configKeyName)) - 0.02f, 0.001f);
             if (dialogueBoxController != null)
             {
-                dialogueBoxController.autoDelay = val;
+                dialogueBoxController.perCharacterFadeInDuration = val;
             }
             else
             {
-                configTextPreviewController.autoDelay = val;
+                configTextPreviewController.perCharacterFadeInDuration = val;
             }
         }
     }

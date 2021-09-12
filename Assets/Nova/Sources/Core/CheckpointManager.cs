@@ -481,6 +481,7 @@ namespace Nova
                     alertOnSafeWriteFail = false;
                     Alert.Show(I18n.__("bookmark.save.fail"), ex.Message);
                 }
+
                 throw;
             }
         }

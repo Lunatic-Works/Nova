@@ -31,7 +31,7 @@ namespace Nova
         private static readonly Vector2[] Dir2Vector =
             {Vector2.zero, Vector2.up, Vector2.right, Vector2.down, Vector2.left};
 
-        private static readonly float[] Dir2Scale = {0, -1, 1};
+        private static readonly float[] Dir2Scale = {0f, -1f, 1f};
 
         public UIViewMovementDirection movementDirection = UIViewMovementDirection.None;
         public UIViewScalingDirection scalingDirection = UIViewScalingDirection.None;
@@ -51,25 +51,25 @@ namespace Nova
             base.OnBeforeEnter();
             if (!useGhost && fade)
             {
-                cg.alpha = 0;
+                cg.alpha = 0f;
             }
         }
 
         protected override void OnEnter(Action onAnimationFinish)
         {
-            AnimationEntry current = GetBaseAnimationEntry();
+            var current = GetBaseAnimationEntry();
             bool hasAnimation = false;
             if (fade)
             {
-                current = current.Then(GetOpacityAnimationProperty(0, 1), duration);
+                current = current.Then(GetOpacityAnimationProperty(0f, 1f), duration);
                 hasAnimation = true;
             }
 
             if (movementDirection != UIViewMovementDirection.None || scalingDirection != UIViewScalingDirection.None)
             {
-                var delta = size0.InverseScale(RealScreen.uiSize) * (UICameraHelper.Active.orthographicSize * 2);
+                var delta = size0.InverseScale(RealScreen.uiSize) * (UICameraHelper.Active.orthographicSize * 2f);
                 delta.Scale(Dir2Vector[(int)movementDirection] * movementPercentage);
-                var size = size0 * (1 + Dir2Scale[(int)scalingDirection] * scalingPercentage);
+                var size = size0 * (1f + Dir2Scale[(int)scalingDirection] * scalingPercentage);
                 var prop = new RectTransformAnimationProperty(rt, pos0 - delta, pos0, size.CloneScale(scale0),
                     size0.CloneScale(scale0));
                 current = hasAnimation ? current.And(prop, duration) : current.Then(prop, duration);
@@ -80,31 +80,33 @@ namespace Nova
             if (rotationDirection != UIViewRotationDirection.None)
             {
                 var prop = new RotationAnimationProperty(rt, Vector3.zero);
-                float angle = 360 * rotationPercentage * (int)rotationDirection;
-                rt.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+                float angle = 360f * rotationPercentage * (int)rotationDirection;
+                rt.rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
                 current = hasAnimation ? current.And(prop, duration) : current.Then(prop, duration);
                 current.With(enterFunction);
             }
 
             if (onAnimationFinish != null)
+            {
                 current.Then(new ActionAnimationProperty(onAnimationFinish));
+            }
         }
 
         protected override void OnExit(Action onAnimationFinish)
         {
-            AnimationEntry current = GetBaseAnimationEntry();
+            var current = GetBaseAnimationEntry();
             bool hasAnimation = false;
             if (fade)
             {
-                current = current.Then(GetOpacityAnimationProperty(1, 0), duration);
+                current = current.Then(GetOpacityAnimationProperty(1f, 0f), duration);
                 hasAnimation = true;
             }
 
             if (movementDirection != UIViewMovementDirection.None || scalingDirection != UIViewScalingDirection.None)
             {
-                var delta = size0.InverseScale(RealScreen.uiSize) * (UICameraHelper.Active.orthographicSize * 2);
+                var delta = size0.InverseScale(RealScreen.uiSize) * (UICameraHelper.Active.orthographicSize * 2f);
                 delta.Scale(Dir2Vector[(int)movementDirection] * movementPercentage);
-                var size = size0 * (1 + Dir2Scale[(int)scalingDirection] * scalingPercentage);
+                var size = size0 * (1f + Dir2Scale[(int)scalingDirection] * scalingPercentage);
                 var prop = new RectTransformAnimationProperty(rt, pos0, pos0 - delta, size0.CloneScale(scale0),
                     size.CloneScale(scale0));
                 current = hasAnimation ? current.And(prop, duration) : current.Then(prop, duration);
@@ -114,8 +116,8 @@ namespace Nova
 
             if (rotationDirection != UIViewRotationDirection.None)
             {
-                float angle = 360 * rotationPercentage * (int)rotationDirection;
-                var prop = new RotationAnimationProperty(rt, new Vector3(0, 0, angle));
+                float angle = 360f * rotationPercentage * (int)rotationDirection;
+                var prop = new RotationAnimationProperty(rt, new Vector3(0f, 0f, angle));
                 rt.rotation = Quaternion.identity;
                 current = hasAnimation ? current.And(prop, duration) : current.Then(prop, duration);
                 current.With(exitFunction);

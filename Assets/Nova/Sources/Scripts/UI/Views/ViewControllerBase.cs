@@ -19,7 +19,7 @@ namespace Nova
             this.RuntimeAssert(myPanel != null, "MyPanel is not set.");
             transitions = myPanel.GetComponents<UIViewTransitionBase>().ToList();
             viewManager = GetComponentInParent<ViewManager>();
-            this.RuntimeAssert(viewManager != null, "Missing ViewManager in ancestors.");
+            this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");
             viewManager.SetController(this);
             inputMapper = Utils.FindNovaGameController().InputMapper;
         }

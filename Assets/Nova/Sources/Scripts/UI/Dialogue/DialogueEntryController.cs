@@ -152,7 +152,7 @@ namespace Nova
             set
             {
                 _textLeftExtraPadding = value;
-                verticalLayoutGroup.padding.left = _layoutSetting.leftPadding + textLeftExtraPadding;
+                verticalLayoutGroup.padding.left = layoutSetting.leftPadding + _textLeftExtraPadding;
             }
         }
 

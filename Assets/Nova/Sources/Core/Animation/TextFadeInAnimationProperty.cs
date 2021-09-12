@@ -9,8 +9,8 @@ namespace Nova
         {
             this.text = text;
             this.targetAlpha = targetAlpha;
-            // avoid undesired flash on the first frame
-            value = 0.0f;
+            // Avoid undesired flash on the first frame
+            value = 0f;
         }
 
         private float _value;

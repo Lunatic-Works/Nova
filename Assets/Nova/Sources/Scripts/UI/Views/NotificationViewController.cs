@@ -9,20 +9,16 @@ namespace Nova
     {
         public GameObject notificationPrefab;
         public float notificationTimePerChar = 0.1f;
-        public float notificationTimeOffset = 1.0f;
-        public float notificationDropSpeed = 500.0f;
+        public float notificationTimeOffset = 1f;
+        public float notificationDropSpeed = 500f;
 
         private float placeholdingDeadItemCountPercentage
         {
-            get =>
-                (layoutGroupBasePos.y - layoutGroupTransform.position.y) * RealScreen.uiSize.y /
-                UICameraHelper.Active.orthographicSize / 2;
-
+            get => (layoutGroupBasePos.y - layoutGroupTransform.position.y) * (RealScreen.uiSize.y / UICameraHelper.Active.orthographicSize * 0.5f);
             set
             {
                 Vector3 newPos = layoutGroupTransform.position;
-                newPos.y = layoutGroupBasePos.y -
-                           value / RealScreen.uiSize.y * UICameraHelper.Active.orthographicSize * 2;
+                newPos.y = layoutGroupBasePos.y - value / (RealScreen.uiSize.y / UICameraHelper.Active.orthographicSize * 0.5f);
                 layoutGroupTransform.position = newPos;
             }
         }
@@ -68,7 +64,10 @@ namespace Nova
         public void Notify(AlertParameters param)
         {
             if (!param.lite)
+            {
                 return;
+            }
+
             var notification = Instantiate(notificationPrefab, myPanel.transform);
             notification.SetActive(true);
             notification.GetComponentInChildren<Text>().text = param.bodyContent;
@@ -80,14 +79,13 @@ namespace Nova
 
         protected override void Update()
         {
-            var delta = placeholdingDeadItemCountPercentage;
-            if (delta < 0)
+            if (placeholdingDeadItemCountPercentage < float.Epsilon)
             {
-                placeholdingDeadItemCountPercentage = 0;
+                placeholdingDeadItemCountPercentage = 0f;
             }
-            else if (delta > float.Epsilon)
+            else
             {
-                placeholdingDeadItemCountPercentage = delta - Time.deltaTime * notificationDropSpeed;
+                placeholdingDeadItemCountPercentage -= Time.deltaTime * notificationDropSpeed;
             }
         }
     }

@@ -78,10 +78,9 @@ namespace Nova
         private GameState gameState;
         private ConfigManager configManager;
 
-        private TextSpeedConfigReader textSpeedConfigReader;
         private ScrollRect dialogueTextScrollRect;
         private DialogueTextController dialogueText;
-        private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
+        private RectTransform dialogueTextRect;
 
         private ButtonRingTrigger buttonRingTrigger;
         private LogController logController;
@@ -120,6 +119,8 @@ namespace Nova
                 switch (value)
                 {
                     case Theme.Default:
+                        scrollRectTransform.offsetMin = new Vector2(60f, 0f);
+                        scrollRectTransform.offsetMax = new Vector2(-120f, -40f);
                         dialogueText.layoutSetting = new DialogueEntryLayoutSetting
                         {
                             leftPadding = 150,
@@ -127,28 +128,11 @@ namespace Nova
                             nameTextSpacing = 16f,
                             preferredHeight = 150f
                         };
-
-                        scrollRectTransform.offsetMin = new Vector2(0f, 0f);
-                        scrollRectTransform.offsetMax = new Vector2(0f, 0f);
-                        dialogueTextVerticalLayoutGroup.padding = new RectOffset(60, 120, 42, 0);
-
                         break;
                     case Theme.Basic:
+                        scrollRectTransform.offsetMin = new Vector2(60f, 120f);
+                        scrollRectTransform.offsetMax = new Vector2(-120f, -40f);
                         dialogueText.layoutSetting = DialogueEntryLayoutSetting.Default;
-
-                        if (scrollRectTransform.rect.height > 360f)
-                        {
-                            scrollRectTransform.offsetMin = new Vector2(60f, 60f);
-                            scrollRectTransform.offsetMax = new Vector2(-120f, -42f);
-                            dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 120);
-                        }
-                        else
-                        {
-                            scrollRectTransform.offsetMin = new Vector2(60f, 0f);
-                            scrollRectTransform.offsetMax = new Vector2(-120f, -42f);
-                            dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 0);
-                        }
-
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -218,10 +202,9 @@ namespace Nova
             gameState = gameController.GameState;
             configManager = gameController.ConfigManager;
 
-            textSpeedConfigReader = GetComponent<TextSpeedConfigReader>();
-            dialogueTextScrollRect = GetComponentInChildren<ScrollRect>(true);
-            dialogueText = GetComponentInChildren<DialogueTextController>(true);
-            dialogueTextVerticalLayoutGroup = dialogueText.GetComponent<VerticalLayoutGroup>();
+            dialogueTextScrollRect = GetComponentInChildren<ScrollRect>();
+            dialogueText = GetComponentInChildren<DialogueTextController>();
+            dialogueTextRect = dialogueText.transform as RectTransform;
 
             buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
             logController = transform.parent.GetComponentInChildren<LogController>();
@@ -306,6 +289,9 @@ namespace Nova
             dialogueFinished.SetActive(false);
         }
 
+        // Avoid refreshing text proxy when changing size in animation
+        [HideInInspector] public bool canRefreshTextProxy = true;
+
         protected override void Update()
         {
             if (viewManager.currentView == CurrentViewType.Game && dialogueAvailable)
@@ -330,7 +316,7 @@ namespace Nova
             }
 
             // Refresh text when size changes
-            if (rect.hasChanged)
+            if (canRefreshTextProxy && rect.hasChanged)
             {
                 // Debug.Log("Dialogue box size changed");
 
@@ -521,20 +507,21 @@ namespace Nova
         public void NewPage()
         {
             dialogueText.Clear();
+            dialogueTextScrollRect.verticalNormalizedPosition = 0f;
         }
 
-        private bool useDefaultTextAnimation = true;
-        private float textAnimationDelay = 0f;
+        [SerializeField] private NovaAnimation textAnimation;
+        [HideInInspector] public bool needAnimation = true;
+
+        private float textAnimationDelay;
+        private float textDurationOverride = -1f;
+        private bool textScrollOverriden;
 
         private void ResetTextAnimationConfig()
         {
-            useDefaultTextAnimation = true;
             textAnimationDelay = 0f;
-        }
-
-        public void PreventDefaultTextAnimation()
-        {
-            useDefaultTextAnimation = false;
+            textDurationOverride = -1f;
+            textScrollOverriden = false;
         }
 
         public void SetTextAnimationDelay(float secs)
@@ -542,7 +529,30 @@ namespace Nova
             textAnimationDelay = Mathf.Max(secs, 0f);
         }
 
-        private float perCharacterFadeInDuration => textSpeedConfigReader.perCharacterFadeInDuration;
+        public void OverrideTextDuration(float secs)
+        {
+            textDurationOverride = Mathf.Max(secs, 0f);
+        }
+
+        public void OverrideTextScroll()
+        {
+            textScrollOverriden = true;
+        }
+
+        // ScrollRect.verticalNormalizedPosition cannot be out of [0, 1]
+        public void SetTextScroll(float value)
+        {
+            var position = dialogueTextRect.localPosition;
+            dialogueTextRect.localPosition = new Vector3(position.x, value, position.z);
+        }
+
+        public RectTransformAnimationProperty GetTextScrollAnimationProperty(float start, float target)
+        {
+            var x = dialogueTextRect.localPosition.x;
+            return new RectTransformAnimationProperty(dialogueTextRect, new Vector2(x, start), new Vector2(x, target));
+        }
+
+        [HideInInspector] public float perCharacterFadeInDuration;
 
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
@@ -550,42 +560,57 @@ namespace Nova
             dialogueText.textLeftExtraPadding = avatarController.textPaddingOrZero;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName);
 
-            if (this.needAnimation && useDefaultTextAnimation && needAnimation && !gameState.isMovingBack &&
-                state != DialogueBoxState.FastForward)
+            if (this.needAnimation && needAnimation && !gameState.isMovingBack && state != DialogueBoxState.FastForward)
             {
                 var contentProxy = entry.contentProxy;
-                var characterCount = contentProxy.textBox.GetTextInfo(contentProxy.text).characterCount;
 
-                // TODO: sometimes textInfo.characterCount returns 0, use text.Length
-                if (characterCount <= 0 && contentProxy.text.Length > 0)
+                float textDuration;
+                if (textDurationOverride >= 0f)
                 {
-                    Debug.LogWarning(
-                        $"characterCount mismatch: {characterCount} {contentProxy.text.Length} {contentProxy.text}");
-                    characterCount = contentProxy.text.Length;
+                    textDuration = textDurationOverride;
+                }
+                else
+                {
+                    var characterCount = contentProxy.textBox.GetTextInfo(contentProxy.text).characterCount;
+
+                    // TODO: sometimes textInfo.characterCount returns 0, use text.Length
+                    if (characterCount <= 0 && contentProxy.text.Length > 0)
+                    {
+                        Debug.LogWarning(
+                            $"characterCount mismatch: {characterCount} {contentProxy.text.Length} {contentProxy.text}");
+                        characterCount = contentProxy.text.Length;
+                    }
+
+                    textDuration = perCharacterFadeInDuration * characterCount;
+
+                    // TMP has many strange behaviour, if the character animation looks strange, uncomment following
+                    // lines to debug
+                    // Debug.LogFormat("pc duration: {0}, char cnt: {1}, total duration: {2}, text: {3}",
+                    //      PerCharacterFadeInDuration,
+                    //      contentBox.textInfo.characterCount, textDuration, contentBox.text);
                 }
 
-                float textAnimDuration = perCharacterFadeInDuration * characterCount;
-
-                // TMP has many strange behaviour, if the character animation looks strange, uncomment following
-                // lines to debug
-                // Debug.LogFormat("pc duration: {0}, char cnt: {1}, total duration: {2}, text: {3}",
-                //      PerCharacterFadeInDuration,
-                //      contentBox.textInfo.characterCount, textAnimDuration, contentBox.text);
-
-                textAnimation.Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
+                var animEntry = textAnimation.Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
                     .Then(null).For(textAnimationDelay)
                     .Then(
                         new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
-                        textAnimDuration
-                    ).And(
+                        textDuration
+                    );
+                if (!textScrollOverriden)
+                {
+                    animEntry.And(
                         new VerticalScrollRectAnimationProperty(dialogueTextScrollRect, 0f),
-                        textAnimDuration,
+                        textDuration,
                         AnimationEntry.CubicEasing(0f, 1f)
                     );
+                }
             }
             else
             {
-                dialogueTextScrollRect.verticalNormalizedPosition = 0f;
+                if (!textScrollOverriden)
+                {
+                    dialogueTextScrollRect.verticalNormalizedPosition = 0f;
+                }
             }
         }
 
@@ -594,6 +619,9 @@ namespace Nova
             NewPage();
             AppendDialogue(displayData);
         }
+
+        [HideInInspector] public float autoDelay;
+        [HideInInspector] public float fastForwardDelay;
 
         public bool continueAutoAfterBranch;
         public bool continueFastForwardAfterBranch;
@@ -678,12 +706,6 @@ namespace Nova
             _state = DialogueBoxState.Normal;
             TryRemoveSchedule();
         }
-
-        [HideInInspector] public float autoDelay;
-        [HideInInspector] public float fastForwardDelay;
-
-        [SerializeField] private NovaAnimation textAnimation;
-        [HideInInspector] public bool needAnimation = true;
 
         /// <summary>
         /// Begin fast forward

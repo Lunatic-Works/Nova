@@ -1,0 +1,75 @@
+@<|
+label 'test_box_anim'
+is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试对话框动画
+
+姓名：：111
+
+222
+
+<|
+set_box('full', 'dark') -- dialogue_box.lua的box_style_presets中的dark设置了theme为Basic
+                        -- 而DialogueBoxController.cs的theme中的Basic设置了dialogueText.layoutSetting = DialogueEntryLayoutSetting.Default
+                        -- 其中的preferredHeight为-1，这时每条对话的高度没有限制
+                        -- 否则theme为Default时，preferredHeight为150，这时每条对话的高度限制为2行
+__Nova.dialogueBoxController.canRefreshTextProxy = false -- 在自定义的对话框动画之前要写这一句
+                                                         -- 否则对话框的位置/大小每改变一下，都要刷新文字排版，就会发生闪烁
+box_anchor({0.05, 0.95, -1, 0}) -- 把对话框移到屏幕的下边缘之外
+                                -- anchor的四个数为对话框的左右下上四条边缘在屏幕中的相对位置，屏幕从左到右是0到1，从下到上是0到1
+                                -- 所以对话框的下边缘anchor为-1，上边缘为0，就是对话框在屏幕的下边缘之外
+anim:box_anchor({0.05, 0.95, 0, 1}, 3, {1, 0} -- 把对话框移到屏幕内
+                                              -- 这段动画结束后，对话框的下边缘anchor为0，上边缘为1
+                                              -- 动画时间为3秒
+                                              -- easing为{1, 0}，表示开始时不用加速（速度为1倍），结束时减速到零
+    ):action(function()
+        __Nova.dialogueBoxController.canRefreshTextProxy = true -- 在自定义的对话框动画之后要写这一句
+    end)
+box_tint({0, 0}) -- 把对话框背景设为黑色（RGB乘上0），完全透明（alpha乘上0）
+anim:box_tint({0, 0.5}, 0.5 -- 对话框淡入，背景变为半透明（alpha乘上0.5），动画时间为0.5秒
+    ):_and():wait(10        -- 等待10秒，就是文字滚动动画结束
+    ):box_tint({0, 0}, 0.5) -- 对话框淡出，背景变为完全透明（alpha乘上0），动画时间为0.5秒
+text_delay(1)    -- 1秒后文字开始出现
+text_duration(8) -- 文字的打字机动画为8秒，一般比文字滚动动画要快
+text_scroll(0)   -- 初始时文字在对话框中的位置为0，这个位置可以在UI/DialogueView/DialoguePanel/DialogueTextScrollView/Viewport/DialogueText的Pos Y看出
+anim:wait(2                           -- 文字滚动动画之前等待2秒，就是对话框移到屏幕内的动画差不多结束的时候
+    ):text_scroll(0, 1300, 8, {0, 1}) -- 文字滚动动画，初始位置为0，最终位置为1300（使得文字在对话框的上边缘之外），时间为8秒，开始时从零加速，结束时不用减速
+|>
+0000000000
+1111111111
+2222222222
+3333333333
+4444444444
+5555555555
+6666666666
+7777777777
+8888888888
+9999999999
+<b></b>
+0000000000
+1111111111
+2222222222
+3333333333
+4444444444
+5555555555
+6666666666
+7777777777
+8888888888
+9999999999
+
+<|
+set_box()
+|>
+恢复对话框
+
+姓名：：111
+
+222
+
+测试结束
+@<| is_end() |>

@@ -69,7 +69,7 @@ namespace Nova
         {
             this.canvasGroup = canvasGroup;
             // For UI animation, apply startValue when this is constructed
-            value = 0.0f;
+            value = 0f;
         }
 
         public OpacityAnimationProperty(RawImage rawImage, float startValue, float targetValue) : base(startValue,
@@ -77,7 +77,7 @@ namespace Nova
         {
             this.rawImage = rawImage;
             // For UI animation, apply startValue when this is constructed
-            value = 0.0f;
+            value = 0f;
         }
     }
 }

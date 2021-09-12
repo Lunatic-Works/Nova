@@ -18,7 +18,7 @@ namespace Nova
         }
 
         protected override float CombineDelta(float a, float b) =>
-            Mathf.Clamp(a + b, 0.0f, (float)timeline.playableDirector.duration);
+            Mathf.Clamp(a + b, 0f, (float)timeline.playableDirector.duration);
 
         public TimeAnimationProperty(TimelineController timeline, float startValue, float targetValue) : base(
             startValue, targetValue)

@@ -6,11 +6,13 @@ namespace Nova
 {
     public class ConfigTextPreviewController : MonoBehaviour
     {
-        public DialogueTextController textPreview;
-        public NovaAnimation textPreviewAnimation;
-        public TextSpeedConfigReader textSpeed;
-        private float currentTextPreviewTimeLeft = 0;
-        public float autoDelay;
+        [SerializeField] private DialogueTextController dialogueText;
+        [SerializeField] private NovaAnimation textAnimation;
+
+        [HideInInspector] public float perCharacterFadeInDuration;
+        [HideInInspector] public float autoDelay;
+
+        private float currentTextPreviewTimeLeft;
 
         private static readonly string[] TextPreviewKeys =
             {"config.textpreview.1", "config.textpreview.2", "config.textpreview.3"};
@@ -28,10 +30,10 @@ namespace Nova
 
         private void ResetTextPreview()
         {
-            if (textPreviewAnimation == null) return;
-            textPreviewAnimation.Stop();
-            textPreview.Clear();
-            var entry = textPreview.AddEntry(
+            if (textAnimation == null) return;
+            textAnimation.Stop();
+            dialogueText.Clear();
+            var entry = dialogueText.AddEntry(
                 GetPreviewDisplayData(),
                 TextAlignmentOptions.TopLeft,
                 Color.black,
@@ -40,11 +42,11 @@ namespace Nova
             );
             var contentBox = entry.contentBox;
             var contentProxy = entry.contentProxy;
-            var textAnimDuration = contentBox.textInfo.characterCount * textSpeed.perCharacterFadeInDuration;
-            currentTextPreviewTimeLeft = textAnimDuration + autoDelay;
-            textPreviewAnimation.Do(
+            var textDuration = perCharacterFadeInDuration * contentBox.textInfo.characterCount;
+            currentTextPreviewTimeLeft = textDuration + autoDelay;
+            textAnimation.Do(
                 new TextFadeInAnimationProperty(contentProxy, 255),
-                textAnimDuration
+                textDuration
             );
             textPreviewIndex = (textPreviewIndex + 1) % TextPreviewKeys.Length;
         }
@@ -52,7 +54,7 @@ namespace Nova
         private void UpdateTextPreview()
         {
             currentTextPreviewTimeLeft -= Time.deltaTime;
-            if (currentTextPreviewTimeLeft < 0)
+            if (currentTextPreviewTimeLeft < 0f)
             {
                 ResetTextPreview();
             }

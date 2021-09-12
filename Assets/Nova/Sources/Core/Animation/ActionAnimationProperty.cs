@@ -18,7 +18,7 @@ namespace Nova
 
         public float value
         {
-            get => 0.0f;
+            get => 0f;
             set => action?.Invoke();
         }
     }
