@@ -63,7 +63,7 @@ namespace Nova
 
     [ExportCustomType]
     public partial class DialogueBoxController : ViewControllerBase, IPointerDownHandler, IPointerUpHandler,
-        IDialogueBoxController, IRestorable
+        IRestorable
     {
         [ExportCustomType]
         public enum DialogueUpdateMode
