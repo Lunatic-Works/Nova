@@ -88,7 +88,7 @@ namespace Nova
             }
         }
 
-        public void ResetTransitionTarget()
+        public virtual void ResetTransitionTarget()
         {
             pos0 = rt.position;
             size0 = rt.rect.size;

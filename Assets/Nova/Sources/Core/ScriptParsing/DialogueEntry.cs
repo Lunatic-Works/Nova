@@ -64,15 +64,23 @@ namespace Nova
         /// <value>
         /// The action to execute when the game processes to this point.
         /// </value>
-        private readonly LuaFunction action;
+        private readonly Dictionary<DialogueActionStage, LuaFunction> actions;
 
-        public DialogueEntry(string characterName, string displayName, string dialogue, LuaFunction action)
+        public DialogueEntry(string characterName, string displayName, string dialogue,
+            Dictionary<DialogueActionStage, LuaFunction> actions)
         {
             var displayNames = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = displayName };
             var dialogues = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = dialogue };
-            displayData = new DialogueDisplayData(characterName, displayNames, dialogues);
-            this.action = action;
+            this.displayData = new DialogueDisplayData(characterName, displayNames, dialogues);
+            this.actions = actions;
         }
+
+        public DialogueEntry(string characterName, string displayName, string dialogue, LuaFunction action)
+            : this(characterName, displayName, dialogue, new Dictionary<DialogueActionStage, LuaFunction>
+            {
+                [DialogueActionStage.Default] = action
+            })
+        { }
 
         public void AddLocale(SystemLanguage locale, LocalizedDialogueEntry entry)
         {
@@ -83,10 +91,16 @@ namespace Nova
         /// <summary>
         /// Execute the action stored in this dialogue entry.
         /// </summary>
-        public void ExecuteAction()
+        public void ExecuteAction(DialogueActionStage stage, bool isRestore)
         {
-            if (action != null)
+            if (actions.TryGetValue(stage, out var action))
             {
+                LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext
+                {
+                    mode = ExecutionMode.Lazy,
+                    stage = stage,
+                    isRestore = isRestore
+                });
                 try
                 {
                     action.Call();
@@ -97,6 +111,23 @@ namespace Nova
                         $"Nova: Exception occurred when executing action: {I18n.__(dialogues)}", ex);
                 }
             }
+        }
+
+        private const string ActionCoroutineName = "__Nova.action_coroutine";
+
+        public static string WrapCoroutine(string code)
+        {
+            return $@"
+{ActionCoroutineName} = coroutine.start(function()
+    __Nova.coroutineHelper:AcquireGameStateLock()
+    {code}
+    __Nova.coroutineHelper:ReleaseGameStateLock()
+end)";
+        }
+
+        public static void StopActionCoroutine()
+        {
+            LuaRuntime.Instance.DoString($"coroutine.stop({ActionCoroutineName})");
         }
     }
 }

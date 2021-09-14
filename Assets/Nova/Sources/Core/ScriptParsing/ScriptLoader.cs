@@ -1,9 +1,8 @@
 ﻿using LuaInterface;
-using Nova.Exceptions;
+using Nova.Script;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -81,6 +80,11 @@ namespace Nova
 
             // requires.lua is executed and ScriptDialogueEntryParser.PatternToActionGenerator is filled before calling ParseScript()
             LuaRuntime.Instance.BindObject("scriptLoader", this);
+            LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext
+            {
+                mode = ExecutionMode.Eager,
+                stage = DialogueActionStage.Default
+            });
             InitOnlyIncludedNames();
 
             flowChartTree.Unfreeze();
@@ -112,9 +116,9 @@ namespace Nova
                     {
                         ParseScript(script.text);
                     }
-                    catch (ScriptParseException exception)
+                    catch (ParseException parseException)
                     {
-                        throw new ScriptParseException($"Failed to parse {script.name}", exception);
+                        throw new ParseException($"Failed to parse {script.name}", parseException);
                     }
                 }
             }
@@ -135,7 +139,7 @@ namespace Nova
         }
 
         /// <summary>
-        /// Get the flow chart tree
+        /// Get the flow chart tree.
         /// </summary>
         /// <remarks>This method should be called after init</remarks>
         /// <returns>The flow chart tree</returns>
@@ -145,99 +149,107 @@ namespace Nova
             return flowChartTree;
         }
 
-        private const string EagerExecutionStartSymbol = "@<|";
-        private const string EagerExecutionBlockPattern = @"@<\|((?:.|[\r\n])*?)\|>";
-        private const string EmptyLinePattern = @"(?:\r?\n\s*){2,}";
+        public class Chunk
+        {
+            public readonly List<ParsedBlock> blocks = new List<ParsedBlock>();
+        }
 
         /// <summary>
-        /// Parse the given script text
+        /// Split blocks at separator and eager execution blocks. All chunks in the result contain
+        /// at least one ParsedBlock.
+        /// </summary>
+        private static List<Chunk> DivideBlocksToChunks(IReadOnlyList<ParsedBlock> blocks)
+        {
+            var res = new List<Chunk>();
+            var chunk = new Chunk();
+
+            void FlushChunk()
+            {
+                if (chunk.blocks.Count != 0)
+                {
+                    res.Add(chunk);
+                    chunk = new Chunk();
+                }
+            }
+
+            foreach (var block in blocks)
+            {
+                if (block.type == BlockType.Separator)
+                {
+                    FlushChunk();
+                }
+                else if (block.type == BlockType.EagerExecution)
+                {
+                    FlushChunk();
+                    var item = new Chunk();
+                    item.blocks.Add(block);
+                    res.Add(item);
+                }
+                else
+                {
+                    chunk.blocks.Add(block);
+                }
+            }
+
+            FlushChunk();
+
+            return res;
+        }
+
+        /// <summary>
+        /// Parse the given script text.
         /// </summary>
         /// <param name="text">Text of a script</param>
         private void ParseScript(string text)
         {
             LuaRuntime.Instance.DoString("action_new_file()");
 
-            text = text.Trim();
+            var blocks = Parser.Parse(text).blocks;
 
-            // Detect eager execution block
-            int eagerExecutionStartIndex = text.IndexOf(EagerExecutionStartSymbol, StringComparison.Ordinal);
-            if (eagerExecutionStartIndex != 0)
-            {
-                // The script file does not start with a eager execution block
-                Debug.LogWarning("Nova: The script file does not start with a eager execution block. " +
-                                 "All text before the first execution block will be removed.");
-            }
-
-            // No eager execution block is found, simply ignore this file
-            if (eagerExecutionStartIndex < 0)
+            if (blocks.Count == 0)
             {
                 return;
             }
 
-            text = text.Substring(eagerExecutionStartIndex);
-            int lastMatchEndIndex = 0;
-            foreach (Match m in Regex.Matches(text, EagerExecutionBlockPattern))
-            {
-                string flowChartNodeText = text.Substring(lastMatchEndIndex, m.Index - lastMatchEndIndex);
-                // This method will not be executed when the execution enter this loop for the first time,
-                // since the first eager execution block is definitely at the beginning of the text.
-                ParseFlowChartNodeText(flowChartNodeText);
-                lastMatchEndIndex = m.Index + m.Length;
+            var chunks = DivideBlocksToChunks(blocks);
 
-                string eagerExecutionBlockCode = m.Groups[1].Value;
-                // Debug.LogFormat("Eager code: <color=blue><b>{0}</b></color>", eagerExecutionBlockCode);
-                DoEagerExecutionBlock(eagerExecutionBlockCode);
-            }
+            var nodeChunks = new List<Chunk>();
 
-            // A script file should ends with an eager execution block
-            // Everything after the last eager execution block will be ignored
-            if (lastMatchEndIndex < text.Length)
+            foreach (var chunk in chunks)
             {
-                Debug.LogWarning("Nova: A script file should ends with a eager execution block, " +
-                                 "which needs to refer to the next flow chart node.");
+                var firstBlock = chunk.blocks[0];
+                if (firstBlock.type == BlockType.EagerExecution)
+                {
+                    if (nodeChunks.Count > 0)
+                    {
+                        AddDialogueChunks(nodeChunks);
+                        nodeChunks = new List<Chunk>();
+                    }
+
+                    DoEagerExecutionBlock(firstBlock.content);
+                }
+                else
+                {
+                    nodeChunks.Add(chunk);
+                }
             }
         }
 
-        /// <summary>
-        /// Parse the flow chart node
-        /// </summary>
-        /// <remarks>
-        /// The name of this method might be a little misleading, since this method actually parses the text
-        /// split by eager execution blocks, while the node structure are defined by scripts in the eager execution
-        /// block. A new node is created when the 'label' instruction is invoked in the eager execution block, and its
-        /// content ends when either 'branch' or 'jump' instruction is called. Current implementation (2018/07/16)
-        /// constructs flow chart tree with a state machine, i.e. parsed flow chart node text are pushed to
-        /// the current node.
-        /// </remarks>
-        /// <param name="flowChartNodeText"></param>
-        private void ParseFlowChartNodeText(string flowChartNodeText)
+        private void AddDialogueChunks(IReadOnlyList<Chunk> chunks)
         {
-            if (flowChartNodeText == null)
-            {
-                return;
-            }
-
-            flowChartNodeText = flowChartNodeText.Trim();
-            if (string.IsNullOrEmpty(flowChartNodeText))
-            {
-                return;
-            }
-
             if (currentNode == null)
             {
-                throw new ArgumentException("Nova: Dangling node text: " + flowChartNodeText);
+                throw new ArgumentException("Nova: Dangling node text");
             }
-
-            var dialogueEntryTexts = Regex.Split(flowChartNodeText, EmptyLinePattern);
 
             if (stateLocale == I18n.DefaultLocale)
             {
-                var entries = ScriptDialogueEntryParser.ParseDialogueEntries(dialogueEntryTexts);
+                var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks);
                 currentNode.SetDialogueEntries(entries);
             }
             else
             {
-                var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(dialogueEntryTexts);
+                var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
                 currentNode.AddLocaleForDialogueEntries(stateLocale, entries);
             }
         }
@@ -356,15 +368,19 @@ namespace Nova
             }
 
             currentNode.type = FlowChartNodeType.Branching;
-            lazyBindingLinks.Add(new LazyBindingEntry(currentNode, destination, new BranchInformation(name, text, imageInfo, mode, condition)));
+            lazyBindingLinks.Add(new LazyBindingEntry(currentNode, destination,
+                new BranchInformation(name, text, imageInfo, mode, condition)));
         }
 
         public void AddLocaleForBranch(string name, string destination, string text)
         {
-            var branchInfo = lazyBindingLinks.Find(x => x.from.name == currentNode.name && x.destination == destination && x.branchInfo.name == name)?.branchInfo;
+            var branchInfo = lazyBindingLinks.Find(x =>
+                    x.from.name == currentNode.name && x.destination == destination && x.branchInfo.name == name)
+                ?.branchInfo;
             if (branchInfo == null)
             {
-                throw new ArgumentException($"Nova: branchInfo not found. from: {currentNode.name}, destination: {destination}, branchInfo: {name}");
+                throw new ArgumentException(
+                    $"Nova: branchInfo not found. from: {currentNode.name}, destination: {destination}, branchInfo: {name}");
             }
 
             branchInfo.AddLocale(stateLocale, text);

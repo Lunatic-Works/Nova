@@ -99,7 +99,8 @@ namespace Nova
 
         private void RerunAction()
         {
-            gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex).ExecuteAction();
+            gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex)
+                .ExecuteAction(DialogueActionStage.Default, false);
         }
     }
 }

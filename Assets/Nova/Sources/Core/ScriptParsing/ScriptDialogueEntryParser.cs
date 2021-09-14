@@ -1,10 +1,10 @@
-﻿using Nova.Exceptions;
+﻿using LuaInterface;
+using Nova.Script;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using LuaInterface;
 
 namespace Nova
 {
@@ -12,7 +12,6 @@ namespace Nova
     public static class ScriptDialogueEntryParser
     {
         private const int PreloadDialogueSteps = 5;
-        private const string LazyExecutionBlockPattern = @"^<\|((?:.|[\r\n])*?)\|>\r?\n";
         private const string LuaCommentPattern = @"--.*";
         private const string NameDialoguePattern = @"(.*?)(?:：：|::)(.*)";
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
@@ -102,46 +101,6 @@ namespace Nova
             };
         }
 
-        /// <summary>
-        /// Parse a dialogue entry text
-        /// </summary>
-        /// <remarks>
-        /// A dialogue entry can have one or none lazy execution block. The lazy execution block (if exists) should be
-        /// placed above the dialogue entry text.
-        /// </remarks>
-        /// <param name="dialogueEntryText"></param>
-        /// <param name="code"></param>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        private static void ParseText(string dialogueEntryText, out string code, out string text)
-        {
-            int textStartIndex = 0;
-            var lazyExecutionBlockMatch = Regex.Match(dialogueEntryText, LazyExecutionBlockPattern);
-            if (lazyExecutionBlockMatch.Success)
-            {
-                code = lazyExecutionBlockMatch.Groups[1].Value;
-                code = code.Trim();
-                if (string.IsNullOrEmpty(code))
-                {
-                    code = null;
-                }
-                else
-                {
-                    code += '\n';
-                    // Debug.Log($"code: <color=blue>{code}</color>");
-                }
-
-                textStartIndex += lazyExecutionBlockMatch.Length;
-            }
-            else
-            {
-                code = null;
-            }
-
-            text = dialogueEntryText.Substring(textStartIndex);
-            // Debug.Log($"text: <color=green>{text}</color>");
-        }
-
         private static void GenerateActions(string code, out StringBuilder preloadActions,
             out StringBuilder unpreloadActions, out StringBuilder forceCheckpointActions)
         {
@@ -195,21 +154,21 @@ namespace Nova
             // if (forceCheckpointActions.Length > 0) Debug.Log($"forceCheckpointActions: <color=magenta>{forceCheckpointActions.ToString()}</color>");
         }
 
-        private static void AppendActions(IList<StringBuilder> indexToCode, int index, StringBuilder actions)
+        private static void AppendActions(IList<StringBuilder> codeBuilders, int index, StringBuilder actions)
         {
             if (actions == null || actions.Length == 0)
             {
                 return;
             }
 
-            var old = indexToCode[index];
+            var old = codeBuilders[index];
             if (old == null || old.Length == 0)
             {
-                indexToCode[index] = actions;
+                codeBuilders[index] = actions;
             }
             else
             {
-                indexToCode[index] = old.Append(actions);
+                codeBuilders[index] = old.Append(actions);
             }
         }
 
@@ -228,78 +187,203 @@ namespace Nova
             }
         }
 
-        public static List<DialogueEntry> ParseDialogueEntries(IReadOnlyList<string> dialogueEntryTexts)
+        /// <remarks>
+        /// There can be multiple dialogue texts in the same chunk. They are concatenated into one, separated with newlines.
+        /// </remarks>
+        private static string GetText(ScriptLoader.Chunk chunk)
         {
-            var indexToCode = new StringBuilder[dialogueEntryTexts.Count];
-            var indexToText = new string[dialogueEntryTexts.Count];
-            for (int i = 0; i < dialogueEntryTexts.Count; ++i)
+            var sb = new StringBuilder();
+            var first = true;
+            foreach (var block in chunk.blocks)
             {
-                ParseText(dialogueEntryTexts[i], out string code, out string text);
-                indexToText[i] = text;
-
-                if (!string.IsNullOrEmpty(code))
+                if (block.type == BlockType.Text)
                 {
-                    indexToCode[i] = new StringBuilder(code);
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        sb.Append('\n');
+                    }
 
-                    GenerateActions(code, out StringBuilder preloadActions,
-                        out StringBuilder unpreloadActions, out StringBuilder forceCheckpointActions);
-                    AppendActions(indexToCode, Math.Max(i - PreloadDialogueSteps, 0), preloadActions);
-                    AppendActions(indexToCode, i, unpreloadActions);
+                    sb.Append(block.content);
+                }
+            }
 
-                    // The first entry of a node must have a real checkpoint, so no need to force there
+            var text = sb.ToString();
+            // Debug.Log($"text: <color=green>{text}</color>");
+            return text;
+        }
+
+        private static string GetStageName(DialogueActionStage stage)
+        {
+            switch (stage)
+            {
+                case DialogueActionStage.BeforeCheckpoint:
+                    return "before_checkpoint";
+                case DialogueActionStage.Default:
+                    return "";
+                case DialogueActionStage.AfterDialogue:
+                    return "after_dialogue";
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private static string GetCode(ScriptLoader.Chunk chunk, DialogueActionStage stage)
+        {
+            var sb = new StringBuilder();
+            var stageName = GetStageName(stage);
+            const string stageKey = "stage";
+            foreach (var block in chunk.blocks)
+            {
+                if (block.type == BlockType.LazyExecution)
+                {
+                    if (!block.attributes.TryGetValue(stageKey, out var stageValue))
+                    {
+                        stageValue = "";
+                    }
+
+                    if (!stageValue.Equals(stageName))
+                    {
+                        continue;
+                    }
+
+                    sb.Append(block.content);
+                    sb.Append("\n");
+                }
+            }
+
+            var code = sb.ToString().Trim();
+            if (code == "")
+            {
+                code = null;
+            }
+
+            // if (code != null) Debug.Log($"code: <color=blue>{code}</color>");
+            return code;
+        }
+
+        private static void PatchDefaultActionCode(IReadOnlyDictionary<DialogueActionStage, string[]> codes,
+            IReadOnlyList<string> characterNames)
+        {
+            var codeBuilders = new StringBuilder[characterNames.Count];
+            for (var i = 0; i < characterNames.Count; ++i)
+            {
+                foreach (DialogueActionStage stage in Enum.GetValues(typeof(DialogueActionStage)))
+                {
+                    var code = codes[stage][i];
+                    if (string.IsNullOrEmpty(code))
+                    {
+                        continue;
+                    }
+
+                    var codeBuilder = new StringBuilder(code);
+                    codeBuilder.Append('\n');
+                    codeBuilders[i] = codeBuilder;
+
+                    GenerateActions(code, out StringBuilder preloadActions, out StringBuilder unpreloadActions,
+                        out StringBuilder forceCheckpointActions);
+                    AppendActions(codeBuilders, Math.Max(i - PreloadDialogueSteps, 0), preloadActions);
+                    AppendActions(codeBuilders, i, unpreloadActions);
+
+                    // The first entry of a node must have a checkpoint, so no need to force here
                     if (i > 0)
                     {
-                        AppendActions(indexToCode, i - 1, forceCheckpointActions);
+                        AppendActions(codeBuilders, i - 1, forceCheckpointActions);
                     }
                 }
             }
 
-            var combinedCode = new StringBuilder();
-            var results = new List<DialogueEntry>();
-            for (int i = 0; i < dialogueEntryTexts.Count; ++i)
+            var patchBuilder = new StringBuilder();
+            for (var i = 0; i < characterNames.Count; ++i)
             {
-                string text = indexToText[i];
-                ParseNameDialogue(text, out string characterName, out string dialogue);
+                var characterName = characterNames[i];
 
-                combinedCode.Clear();
-                combinedCode.AppendFormat(ActionBeforeLazyBlock, characterName);
-                var code = indexToCode[i];
-                if (code != null)
+                patchBuilder.Clear();
+                patchBuilder.AppendFormat(ActionBeforeLazyBlock, characterName);
+                var codeBuilder = codeBuilders[i];
+                if (codeBuilder != null)
                 {
-                    combinedCode.Append(code);
+                    patchBuilder.Append(codeBuilder);
                 }
 
-                combinedCode.AppendFormat(ActionAfterLazyBlock, characterName);
-                string combinedCodeStr = combinedCode.ToString();
+                patchBuilder.AppendFormat(ActionAfterLazyBlock, characterName);
 
-                LuaFunction action = null;
-                if (!string.IsNullOrEmpty(combinedCodeStr))
+                var patchedCode = patchBuilder.ToString();
+                // Debug.Log($"patchBuilder: <color=orange>{patchedCode}</color>");
+                codes[DialogueActionStage.Default][i] = patchedCode;
+            }
+        }
+
+        public static List<DialogueEntry> ParseDialogueEntries(IReadOnlyList<ScriptLoader.Chunk> chunks)
+        {
+            var codes = new Dictionary<DialogueActionStage, string[]>();
+            foreach (DialogueActionStage stage in Enum.GetValues(typeof(DialogueActionStage)))
+            {
+                codes[stage] = new string[chunks.Count];
+            }
+
+            var characterNames = new string[chunks.Count];
+            var dialogues = new string[chunks.Count];
+            for (var i = 0; i < chunks.Count; ++i)
+            {
+                foreach (DialogueActionStage stage in Enum.GetValues(typeof(DialogueActionStage)))
                 {
-                    action = LuaRuntime.Instance.WrapClosure(combinedCodeStr);
-                    if (action == null)
+                    codes[stage][i] = GetCode(chunks[i], stage);
+                }
+
+                var text = GetText(chunks[i]);
+                ParseNameDialogue(text, out characterNames[i], out dialogues[i]);
+            }
+
+            PatchDefaultActionCode(codes, characterNames);
+
+            var results = new List<DialogueEntry>();
+            for (var i = 0; i < chunks.Count; ++i)
+            {
+                var characterName = characterNames[i];
+                var dialogue = dialogues[i];
+
+                var actions = new Dictionary<DialogueActionStage, LuaFunction>();
+                foreach (DialogueActionStage stage in Enum.GetValues(typeof(DialogueActionStage)))
+                {
+                    var code = codes[stage][i];
+                    if (string.IsNullOrEmpty(code))
                     {
-                        throw new ScriptParseException(
-                            $"Syntax error while parsing lazy execution block:\nText: {text}\nCode: {combinedCodeStr}");
+                        continue;
                     }
 
-                    // Debug.Log($"combinedCodeStr: <color=magenta>{combinedCodeStr}</color>");
+                    code = DialogueEntry.WrapCoroutine(code);
+                    var action = LuaRuntime.Instance.WrapClosure(code);
+                    if (action == null)
+                    {
+                        throw new ParseException(
+                            "Syntax error while parsing lazy execution block\n" +
+                            $"characterName: {characterName}, dialogue: {dialogue}\n" +
+                            $"stage: {stage}, code: {code}");
+                    }
+
+                    actions.Add(stage, action);
                 }
 
                 // TODO: there may be some grammar to set different internal and displayed character names
-                results.Add(new DialogueEntry(characterName, characterName, dialogue, action));
+                results.Add(new DialogueEntry(characterName, characterName, dialogue, actions));
             }
 
             return results;
         }
 
         public static List<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(
-            IReadOnlyList<string> dialogueEntryTexts)
+            IReadOnlyList<ScriptLoader.Chunk> chunks)
         {
             var results = new List<LocalizedDialogueEntry>();
-            foreach (var text in dialogueEntryTexts)
+            foreach (var chunk in chunks)
             {
-                ParseNameDialogue(text, out string characterName, out string dialogue);
-                results.Add(new LocalizedDialogueEntry {displayName = characterName, dialogue = dialogue});
+                var text = GetText(chunk);
+                ParseNameDialogue(text, out var characterName, out var dialogue);
+                results.Add(new LocalizedDialogueEntry { displayName = characterName, dialogue = dialogue });
             }
 
             return results;

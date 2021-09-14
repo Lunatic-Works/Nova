@@ -79,13 +79,14 @@ namespace Nova
 
         protected override void Update()
         {
-            if (placeholdingDeadItemCountPercentage < float.Epsilon)
+            var delta = placeholdingDeadItemCountPercentage;
+            if (delta < float.Epsilon)
             {
                 placeholdingDeadItemCountPercentage = 0f;
             }
             else
             {
-                placeholdingDeadItemCountPercentage -= Time.deltaTime * notificationDropSpeed;
+                placeholdingDeadItemCountPercentage = delta - Time.deltaTime * notificationDropSpeed;
             }
         }
     }

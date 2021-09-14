@@ -1,4 +1,6 @@
-﻿using UnityEngine.Assertions;
+﻿using System.Collections;
+using System.Threading.Tasks;
+using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -41,6 +43,19 @@ namespace Nova
         {
             Assert.IsTrue(count > 0, "Nova: Too many calls releasing lock.");
             count--;
+        }
+
+        public void Reset()
+        {
+            count = threshold;
+        }
+
+        public IEnumerator WaitCoroutine()
+        {
+            while (isLocked)
+            {
+                yield return null;
+            }
         }
     }
 }

@@ -31,6 +31,11 @@ namespace Nova
             lua = new LuaState();
             lua.Start();
             LuaBinder.Bind(lua);
+
+            // enable coroutine
+            var looper = gameObject.AddComponent<LuaLooper>();
+            looper.luaState = lua;
+
             lua.AddSearchPath(Application.dataPath + "/Nova/Lua");
 
             InitRequires();
@@ -72,6 +77,11 @@ namespace Nova
             var table = lua.GetTable(tableName);
             table[name] = obj;
             table.Dispose();
+        }
+
+        public void UpdateExecutionContext(ExecutionContext executionContext)
+        {
+            BindObject("executionContext", executionContext);
         }
 
         /// <summary>

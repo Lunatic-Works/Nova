@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
@@ -14,34 +14,26 @@ namespace Nova
         private void Awake()
         {
             gameState = Utils.FindNovaGameController().GameState;
-            gameState.BranchOccurs += OnBranchOccurs;
+            gameState.SelectionOccurs += RaiseSelectionsCallback;
             gameState.AddRestorable(this);
         }
 
         private void OnDestroy()
         {
-            gameState.BranchOccurs -= OnBranchOccurs;
+            gameState.SelectionOccurs -= RaiseSelectionsCallback;
             gameState.RemoveRestorable(this);
         }
 
-        /// <summary>
-        /// Show branch buttons when branch happens
-        /// </summary>
-        /// <param name="branchOccursData"></param>
-        private void OnBranchOccurs(BranchOccursData branchOccursData)
+        private void RaiseSelectionsCallback(SelectionOccursData data)
         {
-            var branchInformations = branchOccursData.branchInformations.ToList();
+            RaiseSelections(data.selections);
+        }
 
-            foreach (var branchInfo in branchInformations)
+        public void RaiseSelections(IReadOnlyList<SelectionOccursData.Selection> selections)
+        {
+            if (selections.Count == 0)
             {
-                if (branchInfo.mode == BranchMode.Jump)
-                {
-                    if (branchInfo.condition == null || branchInfo.condition.Invoke<bool>())
-                    {
-                        gameState.SelectBranch(branchInfo.name);
-                        return;
-                    }
-                }
+                return;
             }
 
             if (backPanel != null)
@@ -49,29 +41,16 @@ namespace Nova
                 backPanel.SetActive(true);
             }
 
-            foreach (var branchInfo in branchInformations)
+            for (var i = 0; i < selections.Count; i++)
             {
-                if (branchInfo.mode == BranchMode.Jump)
-                {
-                    continue;
-                }
-
-                if (branchInfo.mode == BranchMode.Show && !branchInfo.condition.Invoke<bool>())
-                {
-                    continue;
-                }
-
+                var selection = selections[i];
+                var index = i;
                 var button = Instantiate(branchButtonPrefab, transform);
-                button.Init(branchInfo.texts, branchInfo.imageInfo, imageFolder, () => Select(branchInfo.name),
-                    interactable: branchInfo.mode != BranchMode.Enable || branchInfo.condition.Invoke<bool>());
+                button.Init(selection.texts, selection.imageInfo, imageFolder, () => Select(index), selection.active);
             }
         }
 
-        /// <summary>
-        /// Select a branch with the given name
-        /// </summary>
-        /// <param name="branchName">the name of the branch to select</param>
-        private void Select(string branchName)
+        private void Select(int index)
         {
             if (backPanel != null)
             {
@@ -79,7 +58,7 @@ namespace Nova
             }
 
             RemoveAllSelectButton();
-            gameState.SelectBranch(branchName);
+            gameState.SignalFence(index);
         }
 
         private void RemoveAllSelectButton()

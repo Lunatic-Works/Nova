@@ -261,7 +261,6 @@ namespace Nova
         {
             gameState.DialogueWillChange += OnDialogueWillChange;
             gameState.DialogueChanged += OnDialogueChanged;
-            gameState.BranchSelected += OnBranchSelected;
             gameState.CurrentRouteEnded += OnCurrentRouteEnded;
             gameState.AddRestorable(this);
         }
@@ -271,7 +270,6 @@ namespace Nova
             StopAllCoroutines();
             gameState.DialogueWillChange -= OnDialogueWillChange;
             gameState.DialogueChanged -= OnDialogueChanged;
-            gameState.BranchSelected -= OnBranchSelected;
             gameState.CurrentRouteEnded -= OnCurrentRouteEnded;
             gameState.RemoveRestorable(this);
         }
@@ -623,31 +621,6 @@ namespace Nova
         [HideInInspector] public float autoDelay;
         [HideInInspector] public float fastForwardDelay;
 
-        public bool continueAutoAfterBranch;
-        public bool continueFastForwardAfterBranch;
-
-        /// <summary>
-        /// Check if state should be reset to Normal after the branch
-        /// </summary>
-        /// <param name="branchSelectedData"></param>
-        private void OnBranchSelected(BranchSelectedData branchSelectedData)
-        {
-            if (branchSelectedData.selectedBranchInformation.mode == BranchMode.Jump)
-            {
-                return;
-            }
-
-            if (!continueAutoAfterBranch && state == DialogueBoxState.Auto)
-            {
-                state = DialogueBoxState.Normal;
-            }
-
-            if (!continueFastForwardAfterBranch && state == DialogueBoxState.FastForward)
-            {
-                state = DialogueBoxState.Normal;
-            }
-        }
-
         private Coroutine scheduledStepCoroutine = null;
 
         private void TrySchedule(float scheduledDelay)
@@ -743,12 +716,6 @@ namespace Nova
             }
 
             return true;
-        }
-
-        public void ForceStep()
-        {
-            NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-            gameState.Step();
         }
 
         private IEnumerator ScheduledStep(float scheduledDelay)
