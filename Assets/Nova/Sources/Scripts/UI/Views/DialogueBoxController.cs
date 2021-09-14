@@ -549,7 +549,7 @@ namespace Nova
         public RectTransformAnimationProperty GetTextScrollAnimationProperty(float start, float target)
         {
             var x = dialogueTextRect.localPosition.x;
-            return new RectTransformAnimationProperty(dialogueTextRect, new Vector2(x, start), new Vector2(x, target));
+            return new RectTransformAnimationProperty(dialogueTextRect, new Vector2(x, start), new Vector2(x, target), true);
         }
 
         [HideInInspector] public float perCharacterFadeInDuration;

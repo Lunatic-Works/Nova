@@ -90,7 +90,7 @@ namespace Nova
 
         public void ResetTransitionTarget()
         {
-            pos0 = rt.localPosition;
+            pos0 = rt.position;
             size0 = rt.rect.size;
             scale0 = rt.localScale;
             inited = true;
@@ -98,7 +98,7 @@ namespace Nova
 
         public void SetToTransitionTarget()
         {
-            rt.localPosition = pos0;
+            rt.position = pos0;
             Vector3 scale = size0.InverseScale(rt.rect.size);
             scale.x *= scale0.x;
             scale.y *= scale0.y;
