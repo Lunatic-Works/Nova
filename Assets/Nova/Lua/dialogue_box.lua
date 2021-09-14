@@ -230,22 +230,6 @@ function box_hide_show(duration, pos_name, style_name)
     text_delay(duration)
 end
 
-function box_close_button_on()
-    __Nova.dialogueBoxController.closeButtonShown = true
-end
-
-function box_close_button_off()
-    __Nova.dialogueBoxController.closeButtonShown = false
-end
-
-function box_finish_icon_on()
-    __Nova.dialogueBoxController.dialogueFinishIconShown = true
-end
-
-function box_finish_icon_off()
-    __Nova.dialogueBoxController.dialogueFinishIconShown = false
-end
-
 function text_scroll(value)
     __Nova.dialogueBoxController:OverrideTextScroll()
     __Nova.dialogueBoxController:SetTextScroll(value)

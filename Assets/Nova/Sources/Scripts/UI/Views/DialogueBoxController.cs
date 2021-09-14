@@ -718,6 +718,12 @@ namespace Nova
             return true;
         }
 
+        public void ForceStep()
+        {
+            NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+            gameState.Step();
+        }
+
         private IEnumerator ScheduledStep(float scheduledDelay)
         {
             this.RuntimeAssert(dialogueAvailable, "Dialogue should be available when scheduling a step for it.");

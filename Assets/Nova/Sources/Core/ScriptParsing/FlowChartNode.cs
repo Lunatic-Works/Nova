@@ -99,7 +99,7 @@ namespace Nova
         /// <summary>
         /// Get the dialogue entry at the given index
         /// </summary>
-        /// <param name="index">the index of the element to be fetched</param>
+        /// <param name="index">The index of the element to be fetched</param>
         /// <returns>The dialogue entry at the given index</returns>
         public DialogueEntry GetDialogueEntryAt(int index)
         {
@@ -111,11 +111,8 @@ namespace Nova
         #region Branches
 
         /// <summary>
-        /// the number of dialogue entries in this node
+        /// Branches in this node
         /// </summary>
-        /// <value>
-        /// branches from current node
-        /// </value>
         private readonly Dictionary<BranchInformation, FlowChartNode> branches =
             new Dictionary<BranchInformation, FlowChartNode>();
 

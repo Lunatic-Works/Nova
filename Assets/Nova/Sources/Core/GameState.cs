@@ -376,8 +376,15 @@ namespace Nova
                     currentIndex >= 0 && (currentNode.dialogueEntryCount == 0 ||
                                           currentIndex < currentNode.dialogueEntryCount),
                     "Dialogue index out of range.");
-                currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
-                ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, isCheckpoint, onFinish));
+                if (currentNode.dialogueEntryCount > 0)
+                {
+                    currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
+                    ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, isCheckpoint, onFinish));
+                }
+                else
+                {
+                    StepAtEndOfNode(onFinish);
+                }
             }
             else
             {
@@ -428,7 +435,7 @@ namespace Nova
 
             if (advancedDialogueHelper.GetFallThrough())
             {
-                Step(_ => onFinish());
+                Step(_ => onFinish?.Invoke());
                 yield break;
             }
 
@@ -436,7 +443,7 @@ namespace Nova
             if (pendingJumpTarget != null)
             {
                 var node = flowChartTree.GetNode(pendingJumpTarget);
-                this.RuntimeAssert(node != null, "Node " + pendingJumpTarget + " does not exist!");
+                this.RuntimeAssert(node != null, $"Node {pendingJumpTarget} does not exist!");
                 MoveToNextNode(node, onFinish);
                 yield break;
             }
@@ -564,7 +571,7 @@ namespace Nova
             Action onFinish = null)
         {
             // Debug.Log($"MoveBackTo begin {nodeName} {dialogueIndex} {variablesHash}");
-            
+
             CancelAction();
 
             // Animation should stop
@@ -703,7 +710,7 @@ namespace Nova
         /// <remarks>
         /// This method runs asynchronously. The callback will run when the step finishes
         /// </remarks>
-        /// <param name="onFinish">(canStepForward) => {}</param>
+        /// <param name="onFinish">(canStepForward) => { ... }</param>
         /// <returns>True if successfully stepped to the next dialogue or trigger some events</returns>
         public void Step(Action<bool> onFinish)
         {
@@ -720,31 +727,34 @@ namespace Nova
             {
                 ++currentIndex;
                 UpdateGameState(false, true, false, true, false, successCallback);
-                return;
             }
+            else
+            {
+                StepAtEndOfNode(successCallback);
+            }
+        }
 
-            // Reach the end of a node, and do something depending on the flow chart node type
+        private void StepAtEndOfNode(Action onFinish)
+        {
             switch (currentNode.type)
             {
                 case FlowChartNodeType.Normal:
-                    // For a normal node, just step directly to the next node
-                    MoveToNextNode(currentNode.next, successCallback);
-                    return;
+                    MoveToNextNode(currentNode.next, onFinish);
+                    break;
                 case FlowChartNodeType.Branching:
-                    ExecuteAction(DoBranch(currentNode.GetAllBranches(), successCallback));
-                    return;
+                    ExecuteAction(DoBranch(currentNode.GetAllBranches(), onFinish));
+                    break;
                 case FlowChartNodeType.End:
                     state = State.Ended;
                     var endName = flowChartTree.GetEndName(currentNode);
                     if (!checkpointManager.IsReached(endName))
                     {
-                        // Mark the end as reached
                         checkpointManager.SetReached(endName);
                     }
 
                     CurrentRouteEnded?.Invoke(new CurrentRouteEndedData(endName));
-                    successCallback();
-                    return;
+                    onFinish?.Invoke();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
