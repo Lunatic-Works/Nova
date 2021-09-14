@@ -206,8 +206,8 @@ namespace Nova
 
         public void Stop()
         {
-            // Without this, if property is ActionAnimationProperty(() => this.Stop()), it will cause a following stack trace:
-            // Update -> WakeUpChildren -> Terminate(a) -> set Property.value -> Stop(b)
+            // Without this, if property is ActionAnimationProperty(() => Stop()), it will cause a following stack trace:
+            // Update -> WakeUpChildren -> Terminate (a) -> set Property.value -> Stop (b)
             // Both a and b will DestroyEntry
             // And there will be duplicate this in factory...
             if (isStopped) return;

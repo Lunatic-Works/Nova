@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using LuaInterface;
 
@@ -11,7 +12,8 @@ namespace Nova
     public static class ScriptDialogueEntryParser
     {
         private const int PreloadDialogueSteps = 5;
-        private const string LazyExecutionBlockPattern = @"^<\|((?:.|[\r\n])*?)\|>\r?\n?";
+        private const string LazyExecutionBlockPattern = @"^<\|((?:.|[\r\n])*?)\|>\r?\n";
+        private const string NameDialoguePattern = @"(.*?)(?:：：|::)(.*)";
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
 
@@ -29,7 +31,7 @@ namespace Nova
         {
             PatternToActionGenerator[triggeringFuncName] = new ActionGenerators
             {
-                forceCheckpoint = _ => $"{yieldingFuncName}()"
+                forceCheckpoint = _ => $"{yieldingFuncName}()\n"
             };
         }
 
@@ -40,8 +42,8 @@ namespace Nova
             string pattern = $@"(^|[ \(:]){funcName}(\(| *,) *(?<obj>[^ ,]+) *, *'(?<res>[^']+)'";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
-                preload = groups => $"preload({groups["obj"].Value}, '{groups["res"].Value}')",
-                unpreload = groups => $"unpreload({groups["obj"].Value}, '{groups["res"].Value}')"
+                preload = groups => $"preload({groups["obj"].Value}, '{groups["res"].Value}')\n",
+                unpreload = groups => $"unpreload({groups["obj"].Value}, '{groups["res"].Value}')\n"
             };
         }
 
@@ -51,8 +53,8 @@ namespace Nova
             string pattern = $@"(^|[ \(:]){funcName}(\(| *,) *'(?<res>[^']+)'";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
-                preload = groups => $"preload({objName}, '{groups["res"].Value}')",
-                unpreload = groups => $"unpreload({objName}, '{groups["res"].Value}')"
+                preload = groups => $"preload({objName}, '{groups["res"].Value}')\n",
+                unpreload = groups => $"unpreload({objName}, '{groups["res"].Value}')\n"
             };
         }
 
@@ -63,11 +65,11 @@ namespace Nova
             string pattern = $@"(^|[ \(:]){funcName}(\(| *,) *(?<obj>[^ ,]+) *, *\{{(?<res>[^\}}]+)\}}";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
-                preload = groups => string.Join("\n",
-                    groups["res"].Value.Split(',').Select(res => $"preload({groups["obj"].Value}, {res})")
+                preload = groups => string.Concat(
+                    groups["res"].Value.Split(',').Select(res => $"preload({groups["obj"].Value}, {res})\n")
                 ),
-                unpreload = groups => string.Join("\n",
-                    groups["res"].Value.Split(',').Select(res => $"unpreload({groups["obj"].Value}, {res})")
+                unpreload = groups => string.Concat(
+                    groups["res"].Value.Split(',').Select(res => $"unpreload({groups["obj"].Value}, {res})\n")
                 )
             };
         }
@@ -79,11 +81,11 @@ namespace Nova
             string pattern = $@"(^|[ \(:]){funcName}(\(| *,) *\{{(?<res>[^\}}]+)\}}";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
-                preload = groups => string.Join("\n",
-                    groups["res"].Value.Split(',').Select(res => $"preload({objName}, {res})")
+                preload = groups => string.Concat(
+                    groups["res"].Value.Split(',').Select(res => $"preload({objName}, {res})\n")
                 ),
-                unpreload = groups => string.Join("\n",
-                    groups["res"].Value.Split(',').Select(res => $"unpreload({objName}, {res})")
+                unpreload = groups => string.Concat(
+                    groups["res"].Value.Split(',').Select(res => $"unpreload({objName}, {res})\n")
                 )
             };
         }
@@ -94,8 +96,8 @@ namespace Nova
             string pattern = $@"(^|[ \(:]){funcName}(\(| *,)";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
-                preload = groups => $"preload({objName}, '{resource}')",
-                unpreload = groups => $"unpreload({objName}, '{resource}')"
+                preload = groups => $"preload({objName}, '{resource}')\n",
+                unpreload = groups => $"unpreload({objName}, '{resource}')\n"
             };
         }
 
@@ -117,7 +119,17 @@ namespace Nova
             if (lazyExecutionBlockMatch.Success)
             {
                 code = lazyExecutionBlockMatch.Groups[1].Value;
-                // Debug.LogFormat("Lazy code: <color=blue>{0}</color>", code);
+                code = code.Trim();
+                if (string.IsNullOrEmpty(code))
+                {
+                    code = null;
+                }
+                else
+                {
+                    code += '\n';
+                    // Debug.Log($"code: <color=blue>{code}</color>");
+                }
+
                 textStartIndex += lazyExecutionBlockMatch.Length;
             }
             else
@@ -126,95 +138,148 @@ namespace Nova
             }
 
             text = dialogueEntryText.Substring(textStartIndex);
-            // Debug.LogFormat("Text: <color=green>{0}</color>", text);
+            // Debug.Log($"text: <color=green>{text}</color>");
         }
 
-        private static void GenerateAdditionalActions(string code, out string preloadActions,
-            out string unpreloadActions, out string forceCheckpointActions)
+        private static void GenerateAdditionalActions(string code, out StringBuilder preloadActions,
+            out StringBuilder unpreloadActions, out StringBuilder forceCheckpointActions)
         {
-            preloadActions = "";
-            unpreloadActions = "";
-            forceCheckpointActions = "";
+            preloadActions = null;
+            unpreloadActions = null;
+            forceCheckpointActions = null;
+
             foreach (var pair in PatternToActionGenerator)
             {
                 var matches = Regex.Matches(code, pair.Key, RegexOptions.ExplicitCapture | RegexOptions.Multiline);
                 foreach (Match match in matches)
                 {
-                    preloadActions += pair.Value.preload?.Invoke(match.Groups) ?? "" + "\n";
-                    unpreloadActions += pair.Value.unpreload?.Invoke(match.Groups) ?? "" + "\n";
-                    forceCheckpointActions += pair.Value.forceCheckpoint?.Invoke(match.Groups) ?? "" + "\n";
+                    var generators = pair.Value;
+
+                    if (generators.preload != null)
+                    {
+                        if (preloadActions == null)
+                        {
+                            preloadActions = new StringBuilder();
+                        }
+
+                        preloadActions.Append(generators.preload.Invoke(match.Groups));
+                    }
+
+                    if (generators.unpreload != null)
+                    {
+                        if (unpreloadActions == null)
+                        {
+                            unpreloadActions = new StringBuilder();
+                        }
+
+                        unpreloadActions.Append(generators.unpreload.Invoke(match.Groups));
+                    }
+
+                    if (generators.forceCheckpoint != null)
+                    {
+                        if (forceCheckpointActions == null)
+                        {
+                            forceCheckpointActions = new StringBuilder();
+                        }
+
+                        forceCheckpointActions.Append(generators.forceCheckpoint.Invoke(match.Groups));
+                    }
                 }
             }
 
-            // if (preloadActions != "") Debug.LogFormat("<color=blue>{0}</color>", preloadActions);
-            // if (unpreloadActions != "") Debug.LogFormat("<color=blue>{0}</color>", unpreloadActions);
+            // if (preloadActions.Length > 0) Debug.Log($"preloadActions: <color=magenta>{preloadActions.ToString()}</color>");
+            // if (unpreloadActions.Length > 0) Debug.Log($"unpreloadActions: <color=magenta>{unpreloadActions.ToString()}</color>");
+            // if (forceCheckpointActions.Length > 0) Debug.Log($"forceCheckpointActions: <color=magenta>{forceCheckpointActions.ToString()}</color>");
         }
 
-        private static void CombineActions(IDictionary<int, string> dict, int index, string actions)
+        private static void AppendActions(IList<StringBuilder> indexToCode, int index, StringBuilder actions)
         {
-            if (string.IsNullOrEmpty(actions)) return;
-            dict.TryGetValue(index, out string old);
-            dict[index] = (old ?? "") + actions;
+            if (actions == null || actions.Length == 0)
+            {
+                return;
+            }
+
+            var old = indexToCode[index];
+            if (old == null || old.Length == 0)
+            {
+                indexToCode[index] = actions;
+            }
+            else
+            {
+                indexToCode[index] = old.Append(actions);
+            }
+        }
+
+        private static void ParseNameDialogue(string text, out string characterName, out string dialogue)
+        {
+            var m = Regex.Match(text, NameDialoguePattern);
+            if (m.Success)
+            {
+                characterName = m.Groups[1].Value;
+                dialogue = m.Groups[2].Value;
+            }
+            else
+            {
+                characterName = "";
+                dialogue = text;
+            }
         }
 
         public static List<DialogueEntry> ParseDialogueEntries(IReadOnlyList<string> dialogueEntryTexts)
         {
-            var indexToCode = new string[dialogueEntryTexts.Count];
+            var indexToCode = new StringBuilder[dialogueEntryTexts.Count];
             var indexToText = new string[dialogueEntryTexts.Count];
-            var indexToAdditionalActions = new Dictionary<int, string>();
             for (int i = 0; i < dialogueEntryTexts.Count; ++i)
             {
                 ParseText(dialogueEntryTexts[i], out string code, out string text);
-                indexToCode[i] = code;
                 indexToText[i] = text;
+
                 if (!string.IsNullOrEmpty(code))
                 {
-                    GenerateAdditionalActions(code, out string preloadActions, out string unpreloadActions,
-                        out string forceCheckpointActions);
-                    CombineActions(indexToAdditionalActions, Math.Max(i - PreloadDialogueSteps, 0), preloadActions);
-                    CombineActions(indexToAdditionalActions, i, unpreloadActions);
+                    indexToCode[i] = new StringBuilder(code);
 
-                    // The first entry of a node must have a real checkpoint, so no need to force here
+                    GenerateAdditionalActions(code, out StringBuilder preloadActions,
+                        out StringBuilder unpreloadActions, out StringBuilder forceCheckpointActions);
+                    AppendActions(indexToCode, Math.Max(i - PreloadDialogueSteps, 0), preloadActions);
+                    AppendActions(indexToCode, i, unpreloadActions);
+
+                    // The first entry of a node must have a real checkpoint, so no need to force there
                     if (i > 0)
                     {
-                        CombineActions(indexToAdditionalActions, i - 1, forceCheckpointActions);
+                        AppendActions(indexToCode, i - 1, forceCheckpointActions);
                     }
                 }
             }
 
+            var combinedCode = new StringBuilder();
             var results = new List<DialogueEntry>();
             for (int i = 0; i < dialogueEntryTexts.Count; ++i)
             {
-                string code = indexToCode[i];
                 string text = indexToText[i];
-                indexToAdditionalActions.TryGetValue(i, out string additionalActions);
+                ParseNameDialogue(text, out string characterName, out string dialogue);
 
-                var m = Regex.Match(text, @"(.*?)(?:：：|::)(.*)");
-                string characterName, dialogue;
-                if (m.Success)
+                combinedCode.Clear();
+                combinedCode.AppendFormat(ActionBeforeLazyBlock, characterName);
+                var code = indexToCode[i];
+                if (code != null)
                 {
-                    characterName = m.Groups[1].Value;
-                    dialogue = m.Groups[2].Value;
+                    combinedCode.Append(code);
                 }
-                else
-                {
-                    characterName = "";
-                    dialogue = text;
-                }
+
+                combinedCode.AppendFormat(ActionAfterLazyBlock, characterName);
+                string combinedCodeStr = combinedCode.ToString();
 
                 LuaFunction action = null;
-                string combinedCode = string.Format(ActionBeforeLazyBlock, characterName)
-                                      + (code ?? "")
-                                      + (additionalActions ?? "")
-                                      + string.Format(ActionAfterLazyBlock, characterName);
-                if (!string.IsNullOrEmpty(combinedCode))
+                if (!string.IsNullOrEmpty(combinedCodeStr))
                 {
-                    action = LuaRuntime.Instance.WrapClosure(combinedCode);
+                    action = LuaRuntime.Instance.WrapClosure(combinedCodeStr);
                     if (action == null)
                     {
                         throw new ScriptParseException(
-                            $"Syntax error while parsing lazy execution block:\nText: {text}\nCode: {combinedCode}");
+                            $"Syntax error while parsing lazy execution block:\nText: {text}\nCode: {combinedCodeStr}");
                     }
+
+                    // Debug.Log($"combinedCodeStr: <color=magenta>{combinedCodeStr}</color>");
                 }
 
                 // TODO: there may be some grammar to set different internal and displayed character names
@@ -224,24 +289,13 @@ namespace Nova
             return results;
         }
 
-        public static List<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(IReadOnlyList<string> dialogueEntryTexts)
+        public static List<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(
+            IReadOnlyList<string> dialogueEntryTexts)
         {
             var results = new List<LocalizedDialogueEntry>();
             foreach (var text in dialogueEntryTexts)
             {
-                var m = Regex.Match(text, @"(.*?)(?:：：|::)(.*)");
-                string characterName, dialogue;
-                if (m.Success)
-                {
-                    characterName = m.Groups[1].Value;
-                    dialogue = m.Groups[2].Value;
-                }
-                else
-                {
-                    characterName = "";
-                    dialogue = text;
-                }
-
+                ParseNameDialogue(text, out string characterName, out string dialogue);
                 results.Add(new LocalizedDialogueEntry {displayName = characterName, dialogue = dialogue});
             }
 

@@ -33,7 +33,7 @@ namespace Nova
         {
             this.controller = controller;
             this.index = index;
-            key = this.controller.currentCompoundKeys[index];
+            key = controller.currentCompoundKeys[index];
             RefreshDisplay();
         }
 

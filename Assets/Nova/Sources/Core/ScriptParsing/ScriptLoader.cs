@@ -225,7 +225,7 @@ namespace Nova
 
             if (currentNode == null)
             {
-                throw new ArgumentException("Nova: Dangling node text " + flowChartNodeText);
+                throw new ArgumentException("Nova: Dangling node text: " + flowChartNodeText);
             }
 
             var dialogueEntryTexts = Regex.Split(flowChartNodeText, EmptyLinePattern);

@@ -45,7 +45,7 @@ namespace Nova
             buttonRing.gameObject.SetActive(true);
             backgroundBlur.gameObject.SetActive(true);
 
-            if (this.holdOpen)
+            if (holdOpen)
             {
                 buttonRing.BeginEntryAnimation();
             }
