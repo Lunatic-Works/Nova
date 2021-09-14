@@ -13,6 +13,7 @@ namespace Nova
     {
         private const int PreloadDialogueSteps = 5;
         private const string LazyExecutionBlockPattern = @"^<\|((?:.|[\r\n])*?)\|>\r?\n";
+        private const string LuaCommentPattern = @"--.*";
         private const string NameDialoguePattern = @"(.*?)(?:：：|::)(.*)";
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
@@ -141,12 +142,14 @@ namespace Nova
             // Debug.Log($"text: <color=green>{text}</color>");
         }
 
-        private static void GenerateAdditionalActions(string code, out StringBuilder preloadActions,
+        private static void GenerateActions(string code, out StringBuilder preloadActions,
             out StringBuilder unpreloadActions, out StringBuilder forceCheckpointActions)
         {
             preloadActions = null;
             unpreloadActions = null;
             forceCheckpointActions = null;
+
+            code = Regex.Replace(code, LuaCommentPattern, "");
 
             foreach (var pair in PatternToActionGenerator)
             {
@@ -238,7 +241,7 @@ namespace Nova
                 {
                     indexToCode[i] = new StringBuilder(code);
 
-                    GenerateAdditionalActions(code, out StringBuilder preloadActions,
+                    GenerateActions(code, out StringBuilder preloadActions,
                         out StringBuilder unpreloadActions, out StringBuilder forceCheckpointActions);
                     AppendActions(indexToCode, Math.Max(i - PreloadDialogueSteps, 0), preloadActions);
                     AppendActions(indexToCode, i, unpreloadActions);
