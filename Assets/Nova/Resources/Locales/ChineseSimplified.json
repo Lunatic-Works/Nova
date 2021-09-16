@@ -51,7 +51,7 @@
   "config.key.EditorRerunAction": "（调试）重新运行对话",
   "config.key.EditorRerunNode": "（调试）重新运行章节",
   "config.key.FastForward": "快进",
-  "config.key.LeaveView": "离开当前界面",
+  "config.key.LeaveView": "退出当前界面",
   "config.key.Load": "读档",
   "config.key.QuickLoad": "快速读档",
   "config.key.QuickSave": "快速存档",

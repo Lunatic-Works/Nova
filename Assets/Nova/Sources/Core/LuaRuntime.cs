@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// A singleton that offers lua runtime environment
+    /// A singleton that offers Lua runtime environment
     /// </summary>
     public class LuaRuntime : MonoBehaviour
     {
@@ -13,7 +13,7 @@ namespace Nova
         private bool inited;
 
         /// <summary>
-        /// Inititialize the lua runtime environment
+        /// Inititialize the Lua runtime environment
         /// </summary>
         /// <remarks>
         /// This method should be called before every Nova related work happens. The begining of the Start or Awake
@@ -40,7 +40,7 @@ namespace Nova
 
             InitRequires();
 
-            // get the lua load string function
+            // get the Lua load string function
             luaLoadString = lua.GetFunction("loadstring");
             if (luaLoadString == null)
             {
@@ -62,11 +62,11 @@ namespace Nova
         }
 
         /// <summary>
-        /// Make an object visible in lua.
+        /// Make an object visible in Lua.
         /// </summary>
         /// <remarks>
         /// The object will be assigned as an entry of the global variable <code>__Nova</code>, with the given name,
-        /// which can be accessed from lua scripts by <code>__Nova[name]</code>.
+        /// which can be accessed from Lua scripts by <code>__Nova[name]</code>.
         /// </remarks>
         /// <param name="name">The name to assign</param>
         /// <param name="obj">The object to be assigned</param>
@@ -91,7 +91,7 @@ namespace Nova
         /// The code that should be wrapped
         /// </param>
         /// <returns>
-        /// The wrapped lua function
+        /// The wrapped Lua function
         /// </returns>
         public LuaFunction WrapClosure(string code)
         {
@@ -118,7 +118,7 @@ namespace Nova
         }
 
         /// <summary>
-        /// Dispose the lua runtime environment
+        /// Dispose the Lua runtime environment
         /// This method will be called when the Lua Runtime is destroyed
         /// </summary>
         private void Dispose()

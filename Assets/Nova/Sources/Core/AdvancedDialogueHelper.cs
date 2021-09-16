@@ -43,6 +43,13 @@ namespace Nova
             jumpingDestination = to;
         }
 
+        public string GetJump()
+        {
+            string last = jumpingDestination;
+            jumpingDestination = null;
+            return last;
+        }
+
         public void FallThrough()
         {
             fallThrough = true;
@@ -50,15 +57,8 @@ namespace Nova
 
         public bool GetFallThrough()
         {
-            var ft = fallThrough;
+            bool last = fallThrough;
             fallThrough = false;
-            return ft;
-        }
-
-        public string GetJump()
-        {
-            string last = jumpingDestination;
-            jumpingDestination = null;
             return last;
         }
 

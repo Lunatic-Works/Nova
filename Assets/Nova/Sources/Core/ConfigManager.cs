@@ -153,9 +153,8 @@ namespace Nova
         {
             if (key.StartsWith(TrackedKeyPrefix, StringComparison.Ordinal))
             {
-                var alertKeys = new HashSet<string>(GetString(TrackedKeysKey)
-                    .Split(new[] {','}, System.StringSplitOptions.RemoveEmptyEntries)) {key};
-                SetString(TrackedKeysKey, string.Join(",", alertKeys));
+                var trackedKeys = new HashSet<string>(GetAllTrackedKeys()) {key};
+                SetString(TrackedKeysKey, string.Join(",", trackedKeys));
             }
         }
 

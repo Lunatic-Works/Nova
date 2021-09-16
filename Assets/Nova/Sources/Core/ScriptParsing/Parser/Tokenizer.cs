@@ -41,7 +41,7 @@ namespace Nova.Script
                 return c;
             }
 
-            // advance counters
+            // Advance counters
             index += 1;
             column += 1;
             if (c == '\n')
@@ -283,7 +283,7 @@ namespace Nova.Script
                 return;
             }
 
-            // lua multiline text
+            // Lua multiline text
             if (c == '[' && PeekChar(offset + 1) == '[')
             {
                 type = TokenType.Quote;

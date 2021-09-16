@@ -303,7 +303,7 @@ namespace Nova
         /// <remarks>
         /// This method should be called by CharacterController
         /// </remarks>
-        /// <param name="characterName">The unique id of character, usually its lua variable name</param>
+        /// <param name="characterName">The unique id of character, usually its Lua variable name</param>
         /// <param name="voiceEntry"></param>
         public void AddVoiceClipOfNextDialogue(string characterName, VoiceEntry voiceEntry)
         {
