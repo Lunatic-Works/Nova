@@ -18,9 +18,9 @@ namespace Nova
     {
         private Text nameBox;
         public TMP_Text contentBox { get; private set; }
-        public TextProxy contentProxy;
+        public TextProxy contentProxy { get; private set; }
 
-        public DialogueDisplayData displayData;
+        public DialogueDisplayData displayData { get; private set; }
 
         private VerticalLayoutGroup verticalLayoutGroup;
         private LayoutElement textLayoutElement;
@@ -159,7 +159,7 @@ namespace Nova
         public string FindIntersectingLink(Vector3 position, Camera camera)
         {
             int linkIndex = TMP_TextUtilities.FindIntersectingLink(contentBox, position, camera);
-            return linkIndex == -1 ? "" : contentBox.textInfo.linkInfo[linkIndex].GetLinkID();
+            return linkIndex == -1 ? null : contentBox.textInfo.linkInfo[linkIndex].GetLinkID();
         }
 
         public void ScheduleRefresh()

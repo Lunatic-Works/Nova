@@ -121,7 +121,7 @@ namespace Nova
                     case Theme.Default:
                         scrollRectTransform.offsetMin = new Vector2(60f, 0f);
                         scrollRectTransform.offsetMax = new Vector2(-120f, -40f);
-                        dialogueText.layoutSetting = new DialogueEntryLayoutSetting
+                        dialogueEntryLayoutSetting = new DialogueEntryLayoutSetting
                         {
                             leftPadding = 150,
                             rightPadding = 0,
@@ -132,7 +132,7 @@ namespace Nova
                     case Theme.Basic:
                         scrollRectTransform.offsetMin = new Vector2(60f, 120f);
                         scrollRectTransform.offsetMax = new Vector2(-120f, -40f);
-                        dialogueText.layoutSetting = DialogueEntryLayoutSetting.Default;
+                        dialogueEntryLayoutSetting = DialogueEntryLayoutSetting.Default;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -327,9 +327,9 @@ namespace Nova
             }
         }
 
-        public GameObject autoModeIcon;
-        public GameObject fastForwardModeIcon;
-        public Material fastForwardPostProcessingMaterial;
+        [SerializeField] private GameObject autoModeIcon;
+        [SerializeField] private GameObject fastForwardModeIcon;
+        [SerializeField] private Material fastForwardPostProcessingMaterial;
 
         private AndGate dialogueFinished;
         private AndGate dialogueBoxShown;
@@ -555,8 +555,8 @@ namespace Nova
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
             Color nowTextColor = textColorHasSet ? textColor : isReadDialogue ? readColor : unreadColor;
-            dialogueText.textLeftExtraPadding = avatarController.textPaddingOrZero;
-            var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName);
+            textLeftExtraPadding = avatarController.textPaddingOrZero;
+            var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName, dialogueEntryLayoutSetting, textLeftExtraPadding);
 
             if (this.needAnimation && needAnimation && !gameState.isMovingBack && state != DialogueBoxState.FastForward)
             {
@@ -786,8 +786,8 @@ namespace Nova
             }
         }
 
-        public Color readColor;
-        public Color unreadColor;
+        [SerializeField] private Color readColor;
+        [SerializeField] private Color unreadColor;
 
         [HideInInspector] public bool textColorHasSet = false;
 
@@ -817,6 +817,38 @@ namespace Nova
                 foreach (var dec in dialogueText.dialogueEntryControllers)
                 {
                     dec.materialName = value;
+                }
+            }
+        }
+
+        private DialogueEntryLayoutSetting _dialogueEntryLayoutSetting = DialogueEntryLayoutSetting.Default;
+
+        // Modified only by theme
+        private DialogueEntryLayoutSetting dialogueEntryLayoutSetting
+        {
+            get => _dialogueEntryLayoutSetting;
+            set
+            {
+                _dialogueEntryLayoutSetting = value;
+                foreach (var dec in dialogueText.dialogueEntryControllers)
+                {
+                    dec.layoutSetting = value;
+                }
+            }
+        }
+
+        private int _textLeftExtraPadding;
+
+        // Modified only by theme
+        private int textLeftExtraPadding
+        {
+            get => _textLeftExtraPadding;
+            set
+            {
+                _textLeftExtraPadding = value;
+                foreach (var dec in dialogueText.dialogueEntryControllers)
+                {
+                    dec.textLeftExtraPadding = value;
                 }
             }
         }
@@ -861,8 +893,8 @@ namespace Nova
             public readonly List<DialogueDisplayData> displayDatas;
             public readonly bool canClickForward;
             public readonly bool scriptCanAbortAnimation;
-            public readonly int textAlignment;
             public readonly Theme theme;
+            public readonly int textAlignment;
             public readonly bool textColorHasSet;
             public readonly Vector4Data textColor;
             public readonly string materialName;
@@ -871,7 +903,7 @@ namespace Nova
 
             public DialogueBoxRestoreData(RectTransform rect, Color backgroundColor,
                 DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, bool canClickForward,
-                bool scriptCanAbortAnimation, int textAlignment, Theme theme, bool textColorHasSet,
+                bool scriptCanAbortAnimation, Theme theme, int textAlignment, bool textColorHasSet,
                 Color textColor, string materialName, bool closeButtonShown, bool dialogueFinishIconShown)
             {
                 rectTransformRestoreData = new RectTransformRestoreData(rect);
@@ -880,8 +912,8 @@ namespace Nova
                 this.displayDatas = displayDatas;
                 this.canClickForward = canClickForward;
                 this.scriptCanAbortAnimation = scriptCanAbortAnimation;
-                this.textAlignment = textAlignment;
                 this.theme = theme;
+                this.textAlignment = textAlignment;
                 this.textColorHasSet = textColorHasSet;
                 this.textColor = textColor;
                 this.materialName = materialName;
@@ -894,7 +926,7 @@ namespace Nova
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
             return new DialogueBoxRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas,
-                canClickForward, scriptCanAbortAnimation, (int)textAlignment, theme, textColorHasSet,
+                canClickForward, scriptCanAbortAnimation, theme, (int)textAlignment, textColorHasSet,
                 textColor, materialName, closeButtonShown, dialogueFinishIconShown);
         }
 
@@ -908,8 +940,8 @@ namespace Nova
             canClickForward = data.canClickForward;
             scriptCanAbortAnimation = data.scriptCanAbortAnimation;
 
-            textAlignment = (TextAlignmentOptions)data.textAlignment;
             theme = data.theme;
+            textAlignment = (TextAlignmentOptions)data.textAlignment;
             textColorHasSet = data.textColorHasSet;
             textColor = data.textColor;
             materialName = data.materialName;

@@ -38,7 +38,9 @@ namespace Nova
                 TextAlignmentOptions.TopLeft,
                 Color.black,
                 Color.black,
-                ""
+                null,
+                DialogueEntryLayoutSetting.Default,
+                0
             );
             var contentBox = entry.contentBox;
             var contentProxy = entry.contentProxy;

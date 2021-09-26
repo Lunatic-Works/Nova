@@ -40,36 +40,6 @@ namespace Nova
             }
         }
 
-        private DialogueEntryLayoutSetting _layoutSetting = DialogueEntryLayoutSetting.Default;
-
-        public DialogueEntryLayoutSetting layoutSetting
-        {
-            get => _layoutSetting;
-            set
-            {
-                _layoutSetting = value;
-                foreach (var dec in dialogueEntryControllers)
-                {
-                    dec.layoutSetting = value;
-                }
-            }
-        }
-
-        private int _textLeftExtraPadding;
-
-        public int textLeftExtraPadding
-        {
-            get => _textLeftExtraPadding;
-            set
-            {
-                _textLeftExtraPadding = value;
-                foreach (var dec in dialogueEntryControllers)
-                {
-                    dec.textLeftExtraPadding = value;
-                }
-            }
-        }
-
         public void Clear()
         {
             foreach (var dec in dialogueEntryControllers)
@@ -81,7 +51,7 @@ namespace Nova
         }
 
         public DialogueEntryController AddEntry(DialogueDisplayData displayData, TextAlignmentOptions alignment,
-            Color characterNameColor, Color textColor, string materialName)
+            Color characterNameColor, Color textColor, string materialName, DialogueEntryLayoutSetting layoutSetting, int textLeftExtraPadding)
         {
             var dec = prefabFactory.Get<DialogueEntryController>();
             var _transform = dec.transform;

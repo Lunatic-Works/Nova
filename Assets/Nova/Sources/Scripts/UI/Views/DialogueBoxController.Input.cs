@@ -75,7 +75,6 @@ namespace Nova
         }
 
 #if UNITY_EDITOR
-
         private void HandleEditorOnlyShortcut()
         {
             if (viewManager.currentView == CurrentViewType.Game)
@@ -110,7 +109,6 @@ namespace Nova
                 }
             }
         }
-
 #endif
 
         private void HandleShortcut()
@@ -254,7 +252,7 @@ namespace Nova
             foreach (var dec in dialogueText.dialogueEntryControllers)
             {
                 string link = dec.FindIntersectingLink(RealInput.mousePosition, uiCamera);
-                if (link != "")
+                if (!string.IsNullOrEmpty(link))
                 {
                     Application.OpenURL(link);
                     skipTouchOnPointerUp = true;
