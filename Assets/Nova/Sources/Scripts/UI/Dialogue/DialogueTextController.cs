@@ -29,9 +29,9 @@ namespace Nova
                         go = t.gameObject;
                     }
 
-                    var currentFactoryGO = new GameObject("For " + name);
-                    currentFactoryGO.transform.SetParent(go.transform);
-                    _prefabFactory = currentFactoryGO.AddComponent<PrefabFactory>();
+                    var prefabFactoryGO = new GameObject("For " + name);
+                    prefabFactoryGO.transform.SetParent(go.transform);
+                    _prefabFactory = prefabFactoryGO.AddComponent<PrefabFactory>();
                     _prefabFactory.prefab = dialogueEntryPrefab;
                     _prefabFactory.maxBufferSize = 10;
                 }
@@ -44,6 +44,7 @@ namespace Nova
         {
             foreach (var dec in dialogueEntryControllers)
             {
+                dec.Clear();
                 prefabFactory.Put(dec.gameObject);
             }
 

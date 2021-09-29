@@ -245,10 +245,10 @@ namespace Nova
 
             if (needRefreshLineBreak)
             {
-                needRefreshLineBreak = false;
                 if (string.IsNullOrEmpty(text))
                 {
-                    textBox.text = text;
+                    // TODO: the text may not update if we set an empty string. It may be a bug of TMP.
+                    textBox.text = " ";
                 }
                 else
                 {
@@ -258,7 +258,6 @@ namespace Nova
 
             if (needRefreshFade)
             {
-                needRefreshFade = false;
                 ApplyFade();
             }
 
@@ -270,6 +269,9 @@ namespace Nova
             {
                 textBox.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
             }
+
+            needRefreshLineBreak = false;
+            needRefreshFade = false;
         }
     }
 }

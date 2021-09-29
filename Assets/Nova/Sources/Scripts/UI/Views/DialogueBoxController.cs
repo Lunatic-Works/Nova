@@ -569,9 +569,9 @@ namespace Nova
                 }
                 else
                 {
-                    var characterCount = contentProxy.textBox.GetTextInfo(contentProxy.text).characterCount;
+                    var characterCount = contentProxy.textBox.textInfo.characterCount;
 
-                    // TODO: sometimes textInfo.characterCount returns 0, use text.Length
+                    // TODO: sometimes textInfo.characterCount returns 0 and it may be a bug of TMP when init, so we use text.Length
                     if (characterCount <= 0 && contentProxy.text.Length > 0)
                     {
                         Debug.LogWarning(
@@ -580,12 +580,6 @@ namespace Nova
                     }
 
                     textDuration = perCharacterFadeInDuration * characterCount;
-
-                    // TMP has many strange behaviour, if the character animation looks strange, uncomment following
-                    // lines to debug
-                    // Debug.LogFormat("pc duration: {0}, char cnt: {1}, total duration: {2}, text: {3}",
-                    //      PerCharacterFadeInDuration,
-                    //      contentBox.textInfo.characterCount, textDuration, contentBox.text);
                 }
 
                 var animEntry = textAnimation.Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text

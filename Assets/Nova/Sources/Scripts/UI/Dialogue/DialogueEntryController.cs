@@ -57,9 +57,15 @@ namespace Nova
             UpdateText();
         }
 
+        public void Clear()
+        {
+            displayData = null;
+        }
+
         private void UpdateText()
         {
             if (!inited) return;
+            if (displayData == null) return;
             contentBox.pageToDisplay = 1;
             content = I18n.__(displayData.dialogues);
             characterName = I18n.__(displayData.displayNames);
