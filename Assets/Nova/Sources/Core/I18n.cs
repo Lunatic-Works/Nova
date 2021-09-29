@@ -36,7 +36,7 @@ namespace Nova
             set
             {
                 value = FallbackLocale(value);
-                if (value == _currentLocale)
+                if (_currentLocale == value)
                 {
                     return;
                 }

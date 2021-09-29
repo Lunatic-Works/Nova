@@ -6,18 +6,9 @@ namespace Nova
     public class MaterialPool : MonoBehaviour
     {
         // Keep Renderer's default material, used when turning off VFX on the Renderer
-        // DefaultMaterial is null for CameraController
-        private Material _defaultMaterial;
-
-        public Material defaultMaterial
-        {
-            get => _defaultMaterial;
-            set
-            {
-                Utils.DestroyMaterial(_defaultMaterial);
-                _defaultMaterial = value;
-            }
-        }
+        // defaultMaterial is null for CameraController
+        // TODO: will it be freed by UnloadUnusedAssets()?
+        public Material defaultMaterial;
 
         private void Awake()
         {
@@ -28,6 +19,7 @@ namespace Nova
             }
         }
 
+        // TODO: should we call factory.Dispose(), or will those materials be freed by UnloadUnusedAssets()?
         private void OnDestroy()
         {
             defaultMaterial = null;
