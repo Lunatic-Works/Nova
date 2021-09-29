@@ -16,7 +16,17 @@ jump_to 'test_empty_node_1'
 @<| jump_to 'test_empty_node_2' |>
 
 @<| label 'test_empty_node_2' |>
+111
+
 222
+
+<|
+-- 空的文本
+|>
+
+333
+
+444
 @<| jump_to 'test_empty_node_3' |>
 
 @<| label 'test_empty_node_3' |>

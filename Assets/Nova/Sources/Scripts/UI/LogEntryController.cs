@@ -73,6 +73,7 @@ namespace Nova
         {
             if (!inited) return;
             textProxy.text = displayData.FormatNameDialogue();
+            gameObject.SetActive(!string.IsNullOrEmpty(textProxy.text));
         }
 
         private void OnEnable()
