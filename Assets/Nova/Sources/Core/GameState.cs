@@ -101,11 +101,6 @@ namespace Nova
     [Serializable]
     public class CurrentRouteEndedEvent : UnityEvent<CurrentRouteEndedData> { }
 
-    public class BookmarkWillLoadData { }
-
-    [Serializable]
-    public class BookmarkWillLoadEvent : UnityEvent<BookmarkWillLoadData> { }
-
     #endregion
 
     /// <inheritdoc />
@@ -272,11 +267,6 @@ namespace Nova
         /// This event will be triggered if the story reaches an end
         /// </summary>
         public CurrentRouteEndedEvent currentRouteEnded;
-
-        /// <summary>
-        /// A book mark will be loaded
-        /// </summary>
-        public BookmarkWillLoadEvent bookmarkWillLoad;
 
         #endregion
 
@@ -1081,9 +1071,6 @@ namespace Nova
         public void LoadBookmark(Bookmark bookmark)
         {
             CancelAction();
-
-            bookmarkWillLoad.Invoke(new BookmarkWillLoadData());
-
             walkedThroughNodes = bookmark.nodeHistory;
             Assert.IsTrue(walkedThroughNodes.Count > 0);
             MoveBackTo(walkedThroughNodes.Last(), bookmark.dialogueIndex, bookmark.variablesHash);

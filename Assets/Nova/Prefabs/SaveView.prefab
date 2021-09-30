@@ -1533,15 +1533,8 @@ MonoBehaviour:
   maxRow: 3
   maxCol: 3
   saveActionSound: {fileID: 8300000, guid: ef594f8463dbc1e498be799f0eaf269f, type: 3}
-  bookmarkSave:
-    m_PersistentCalls:
-      m_Calls: []
-  bookmarkLoad:
-    m_PersistentCalls:
-      m_Calls: []
-  bookmarkDelete:
-    m_PersistentCalls:
-      m_Calls: []
+  loadActionSound: {fileID: 8300000, guid: ef594f8463dbc1e498be799f0eaf269f, type: 3}
+  deleteActionSound: {fileID: 8300000, guid: ef594f8463dbc1e498be799f0eaf269f, type: 3}
 --- !u!114 &3745355648971507450
 MonoBehaviour:
   m_ObjectHideFlags: 0

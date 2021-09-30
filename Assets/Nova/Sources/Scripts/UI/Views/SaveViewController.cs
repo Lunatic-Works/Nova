@@ -13,63 +13,16 @@ namespace Nova
         Load
     }
 
-    #region Event types and datas
-
-    public class BookmarkSaveData
-    {
-        public BookmarkSaveData(int saveID, Bookmark bookmark)
-        {
-            this.saveID = saveID;
-            this.bookmark = bookmark;
-        }
-
-        public readonly int saveID;
-        public readonly Bookmark bookmark;
-    }
-
-    [Serializable]
-    public class BookmarkSaveEvent : UnityEvent<BookmarkSaveData> { }
-
-    public class BookmarkLoadData
-    {
-        public BookmarkLoadData(Bookmark bookmark)
-        {
-            this.bookmark = bookmark;
-        }
-
-        public readonly Bookmark bookmark;
-    }
-
-    [Serializable]
-    public class BookmarkLoadEvent : UnityEvent<BookmarkLoadData> { }
-
-    public class BookmarkDeleteData
-    {
-        public BookmarkDeleteData(int saveID)
-        {
-            this.saveID = saveID;
-        }
-
-        public readonly int saveID;
-    }
-
-    [Serializable]
-    public class BookmarkDeleteEvent : UnityEvent<BookmarkDeleteData> { }
-
-    #endregion
-
     public class SaveViewController : ViewControllerBase
     {
-        public GameObject saveEntryPrefab;
-        public GameObject saveEntryRowPrefab;
-        public int maxRow;
-        public int maxCol;
+        [SerializeField] private GameObject saveEntryPrefab;
+        [SerializeField] private GameObject saveEntryRowPrefab;
+        [SerializeField] private int maxRow;
+        [SerializeField] private int maxCol;
 
-        public AudioClip saveActionSound;
-
-        public BookmarkSaveEvent bookmarkSave;
-        public BookmarkLoadEvent bookmarkLoad;
-        public BookmarkDeleteEvent bookmarkDelete;
+        [SerializeField] private AudioClip saveActionSound;
+        [SerializeField] private AudioClip loadActionSound;
+        [SerializeField] private AudioClip deleteActionSound;
 
         private GameState gameState;
         private CheckpointManager checkpointManager;
@@ -98,7 +51,7 @@ namespace Nova
         private Sprite dummy;
 
         private readonly List<SaveEntryController> saveEntryControllers = new List<SaveEntryController>();
-        private readonly Dictionary<int, Sprite> cachedThumbnailSprite = new Dictionary<int, Sprite>();
+        private readonly Dictionary<int, Sprite> cachedThumbnailSprites = new Dictionary<int, Sprite>();
 
         private int maxSaveEntry;
         private int page = 1;
@@ -108,7 +61,9 @@ namespace Nova
 
         // selectedSaveID == -1 means no bookmark is selected
         private int _selectedSaveID = -1;
-        private bool keepSelectedSaveIDOnce = false;
+
+        // Used to avoid the flicker of preview when the alert shows
+        private bool keepSelectedSaveIDOnce;
 
         private int selectedSaveID
         {
@@ -148,7 +103,7 @@ namespace Nova
 
         private SaveViewMode saveViewMode = SaveViewMode.Save;
         private BookmarkType saveViewBookmarkType = BookmarkType.NormalSave;
-        private bool fromTitle = false;
+        private bool fromTitle;
 
         // screenTexture and screenSprite are created when Show is called and savePanel is not active
         // They are destroyed when Hide is called and savePanel is active
@@ -402,13 +357,16 @@ namespace Nova
             ShowPage();
         }
 
+        #region Bookmark operations
+
         private void _saveBookmark(int saveID)
         {
-            keepSelectedSaveIDOnce = false;
             var bookmark = gameState.GetBookmark();
             bookmark.screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
-            bookmarkSave.Invoke(new BookmarkSaveData(saveID, bookmark));
+            checkpointManager.SaveBookmark(saveID, bookmark);
+
+            ShowPage();
             ShowPreviewBookmark(saveID);
             viewManager.TryPlaySound(saveActionSound);
         }
@@ -427,18 +385,18 @@ namespace Nova
 
         private void _loadBookmark(int saveID)
         {
-            keepSelectedSaveIDOnce = false;
             var bookmark = checkpointManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
+            gameState.LoadBookmark(bookmark);
+
             if (viewManager.titlePanel.activeSelf)
             {
                 viewManager.titlePanel.SetActive(false);
                 viewManager.dialoguePanel.SetActive(true);
             }
 
-            bookmarkLoad.Invoke(new BookmarkLoadData(bookmark));
-            ShowPreviewBookmark(saveID);
-            viewManager.TryPlaySound(saveActionSound);
+            Hide();
+            viewManager.TryPlaySound(loadActionSound);
             Alert.Show(I18n.__("bookmark.load.complete"));
         }
 
@@ -457,8 +415,11 @@ namespace Nova
         private void _deleteBookmark(int saveID)
         {
             DeleteCachedThumbnailSprite(saveID);
-            bookmarkDelete.Invoke(new BookmarkDeleteData(saveID));
+            checkpointManager.DeleteBookmark(saveID);
+
+            ShowPage();
             selectedSaveID = -1;
+            viewManager.TryPlaySound(deleteActionSound);
         }
 
         private void DeleteBookmark(int saveID)
@@ -478,6 +439,7 @@ namespace Nova
             var texture = ScreenCapturer.GetBookmarkThumbnailTexture();
             bookmark.screenshot = texture;
             // bookmark.description = string.Format("（{0}）{1}", tagText, bookmark.description);
+
             int saveID = checkpointManager.QueryMinUnusedSaveID(beginSaveID, beginSaveID + maxSaveEntry);
             if (saveID >= beginSaveID + maxSaveEntry)
             {
@@ -485,7 +447,7 @@ namespace Nova
                     SaveIDQueryType.Earliest);
             }
 
-            bookmarkSave.Invoke(new BookmarkSaveData(saveID, bookmark));
+            checkpointManager.SaveBookmark(saveID, bookmark);
             Destroy(texture);
         }
 
@@ -497,6 +459,7 @@ namespace Nova
         private void _quickSaveBookmark()
         {
             _autoSaveBookmark((int)BookmarkType.QuickSave, I18n.__("bookmark.quicksave.page"));
+            viewManager.TryPlaySound(saveActionSound);
             Alert.Show(I18n.__("bookmark.quicksave.complete"));
         }
 
@@ -517,7 +480,9 @@ namespace Nova
                 (int)BookmarkType.NormalSave, SaveIDQueryType.Latest);
             var bookmark = checkpointManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
-            bookmarkLoad.Invoke(new BookmarkLoadData(bookmark));
+            gameState.LoadBookmark(bookmark);
+
+            viewManager.TryPlaySound(loadActionSound);
             Alert.Show(I18n.__("bookmark.load.complete"));
         }
 
@@ -539,6 +504,8 @@ namespace Nova
                 Alert.Show(null, I18n.__("bookmark.quickload.nosave"));
             }
         }
+
+        #endregion
 
         private void OnThumbnailButtonClicked(int saveID)
         {
@@ -796,21 +763,21 @@ namespace Nova
         {
             this.RuntimeAssert(checkpointManager.saveSlotsMetadata.ContainsKey(saveID),
                 "GetThumbnailSprite must use a saveID with existing bookmark.");
-            if (!cachedThumbnailSprite.ContainsKey(saveID))
+            if (!cachedThumbnailSprites.ContainsKey(saveID))
             {
                 Bookmark bookmark = checkpointManager[saveID];
-                cachedThumbnailSprite[saveID] = Utils.Texture2DToSprite(bookmark.screenshot);
+                cachedThumbnailSprites[saveID] = Utils.Texture2DToSprite(bookmark.screenshot);
             }
 
-            return cachedThumbnailSprite[saveID];
+            return cachedThumbnailSprites[saveID];
         }
 
         private void DeleteCachedThumbnailSprite(int saveID)
         {
-            if (cachedThumbnailSprite.ContainsKey(saveID))
+            if (cachedThumbnailSprites.ContainsKey(saveID))
             {
-                Destroy(cachedThumbnailSprite[saveID]);
-                cachedThumbnailSprite.Remove(saveID);
+                Destroy(cachedThumbnailSprites[saveID]);
+                cachedThumbnailSprites.Remove(saveID);
             }
         }
 
