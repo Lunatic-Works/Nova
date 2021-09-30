@@ -19,7 +19,7 @@
         /// Get the data essential for the restoration of the game object state
         /// </summary>
         /// <remarks>
-        /// This method will be called each time after DialogueChanged event happens
+        /// This method will be called each time after dialogueChanged event happens
         /// </remarks>
         /// <returns>The data essential for the restoration of the game object state</returns>
         IRestoreData GetRestoreData();

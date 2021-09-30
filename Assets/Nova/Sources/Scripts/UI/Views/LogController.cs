@@ -42,29 +42,32 @@ namespace Nova
             logContent = scrollRect.transform.Find("Viewport/Content").gameObject;
 
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
-
-            gameState.DialogueWillChange += OnDialogueWillChange;
-            gameState.DialogueChanged += OnDialogueChanged;
-            gameState.AddRestorable(this);
-
             closeButton.onClick.AddListener(Hide);
+
+            gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
+            gameState.dialogueChanged.AddListener(OnDialogueChanged);
+            gameState.AddRestorable(this);
 
             previousVariablesHash = 0UL;
 
             lastCheckpointLogParamsRef = null;
         }
 
-        private void OnDialogueWillChange()
-        {
-            previousVariablesHash = gameState.variables.hash;
-        }
-
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            gameState.DialogueWillChange -= OnDialogueWillChange;
-            gameState.DialogueChanged -= OnDialogueChanged;
+
+            myPanel.GetComponent<Button>().onClick.RemoveListener(Hide);
+            closeButton.onClick.RemoveListener(Hide);
+
+            gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
+            gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.RemoveRestorable(this);
+        }
+
+        private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
+        {
+            previousVariablesHash = gameState.variables.hash;
         }
 
         private void OnDialogueChanged(DialogueChangedData dialogueChangedData)

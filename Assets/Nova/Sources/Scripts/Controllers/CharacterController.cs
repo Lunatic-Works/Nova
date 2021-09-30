@@ -122,10 +122,11 @@ namespace Nova
         protected override void Awake()
         {
             base.Awake();
+
             audioSource = GetComponent<AudioSource>();
 
-            gameState.DialogueChanged += OnDialogueChanged;
-            gameState.DialogueWillChange += OnDialogueWillChange;
+            gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
+            gameState.dialogueChanged.AddListener(OnDialogueChanged);
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -136,8 +137,8 @@ namespace Nova
 
         private void OnDestroy()
         {
-            gameState.DialogueChanged -= OnDialogueChanged;
-            gameState.DialogueWillChange -= OnDialogueWillChange;
+            gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
+            gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -158,7 +159,7 @@ namespace Nova
         /// <summary>
         /// Stop the voice when the dialogue will change
         /// </summary>
-        private void OnDialogueWillChange()
+        private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
         {
             if (stopVoiceWhenDialogueWillChange)
             {

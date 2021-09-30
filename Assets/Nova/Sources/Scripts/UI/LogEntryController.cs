@@ -25,7 +25,7 @@ namespace Nova
             inited = true;
         }
 
-        private static void InitButton(Button button, UnityAction onClickAction)
+        private static void InitButton(Button button, UnityAction onClick)
         {
             if (button == null)
             {
@@ -33,13 +33,13 @@ namespace Nova
             }
 
             button.onClick.RemoveAllListeners();
-            if (onClickAction == null)
+            if (onClick == null)
             {
                 button.gameObject.SetActive(false);
             }
             else
             {
-                button.onClick.AddListener(onClickAction);
+                button.onClick.AddListener(onClick);
             }
         }
 

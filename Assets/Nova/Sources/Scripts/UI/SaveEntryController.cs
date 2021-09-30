@@ -24,8 +24,9 @@ namespace Nova
         private Color loadTextOutlineColor;
 
         private bool disableDeleteButton;
-        private UnityEvent onPointerEnter;
-        private UnityEvent onPointerExit;
+
+        private readonly UnityEvent onPointerEnter = new UnityEvent();
+        private readonly UnityEvent onPointerExit = new UnityEvent();
 
         private void Awake()
         {
@@ -45,9 +46,6 @@ namespace Nova
             ColorUtility.TryParseHtmlString("#66FF6643", out saveTextOutlineColor);
             ColorUtility.TryParseHtmlString("#FF3333FF", out loadTextColor);
             ColorUtility.TryParseHtmlString("#FF666643", out loadTextOutlineColor);
-
-            onPointerEnter = new UnityEvent();
-            onPointerExit = new UnityEvent();
         }
 
         public SaveViewMode mode
@@ -59,12 +57,12 @@ namespace Nova
             }
         }
 
-        private static void InitButton(Button button, UnityAction onClickAction)
+        private static void InitButton(Button button, UnityAction onClick)
         {
             button.onClick.RemoveAllListeners();
-            if (onClickAction != null)
+            if (onClick != null)
             {
-                button.onClick.AddListener(onClickAction);
+                button.onClick.AddListener(onClick);
                 button.interactable = true;
             }
             else

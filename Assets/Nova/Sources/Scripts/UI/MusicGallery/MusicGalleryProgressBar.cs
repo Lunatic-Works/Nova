@@ -26,6 +26,11 @@ namespace Nova
             slider.onValueChanged.AddListener(OnValueChanged);
         }
 
+        private void OnDestroy()
+        {
+            slider.onValueChanged.RemoveListener(OnValueChanged);
+        }
+
         private float progressRatio
         {
             get

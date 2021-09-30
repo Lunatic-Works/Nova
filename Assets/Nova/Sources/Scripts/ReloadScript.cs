@@ -15,7 +15,7 @@ namespace Nova
         private List<CharacterController> characterControllers;
         private ulong currentNodeInitialVariablesHash;
 
-        private void Start()
+        private void Awake()
         {
             var gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
@@ -26,15 +26,13 @@ namespace Nova
                 characterControllers = characters.GetComponentsInChildren<CharacterController>().ToList();
             }
 
-            if (!Application.isEditor) return;
-
             currentNodeInitialVariablesHash = 0UL;
-            gameState.NodeChanged += OnNodeChanged;
+            gameState.nodeChanged.AddListener(OnNodeChanged);
         }
 
         private void OnDestroy()
         {
-            gameState.NodeChanged -= OnNodeChanged;
+            gameState.nodeChanged.RemoveListener(OnNodeChanged);
         }
 
         private void OnNodeChanged(NodeChangedData nodeChangedData)

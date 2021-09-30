@@ -57,6 +57,11 @@ namespace Nova
             UpdateDesiredDimensions();
         }
 
+        public void OnDestroy()
+        {
+            fullScreenToggle.onValueChanged.RemoveListener(UpdateFullScreenStatus);
+        }
+
         private void UpdateFullScreenStatus(bool to)
         {
             if (Application.isMobilePlatform)

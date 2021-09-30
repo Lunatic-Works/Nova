@@ -13,9 +13,11 @@ namespace Nova
         Load
     }
 
-    public class BookmarkSaveEventData
+    #region Event types and datas
+
+    public class BookmarkSaveData
     {
-        public BookmarkSaveEventData(int saveID, Bookmark bookmark)
+        public BookmarkSaveData(int saveID, Bookmark bookmark)
         {
             this.saveID = saveID;
             this.bookmark = bookmark;
@@ -26,11 +28,11 @@ namespace Nova
     }
 
     [Serializable]
-    public class BookmarkSaveEvent : UnityEvent<BookmarkSaveEventData> { }
+    public class BookmarkSaveEvent : UnityEvent<BookmarkSaveData> { }
 
-    public class BookmarkLoadEventData
+    public class BookmarkLoadData
     {
-        public BookmarkLoadEventData(Bookmark bookmark)
+        public BookmarkLoadData(Bookmark bookmark)
         {
             this.bookmark = bookmark;
         }
@@ -39,11 +41,11 @@ namespace Nova
     }
 
     [Serializable]
-    public class BookmarkLoadEvent : UnityEvent<BookmarkLoadEventData> { }
+    public class BookmarkLoadEvent : UnityEvent<BookmarkLoadData> { }
 
-    public class BookmarkDeleteEventData
+    public class BookmarkDeleteData
     {
-        public BookmarkDeleteEventData(int saveID)
+        public BookmarkDeleteData(int saveID)
         {
             this.saveID = saveID;
         }
@@ -52,7 +54,9 @@ namespace Nova
     }
 
     [Serializable]
-    public class BookmarkDeleteEvent : UnityEvent<BookmarkDeleteEventData> { }
+    public class BookmarkDeleteEvent : UnityEvent<BookmarkDeleteData> { }
+
+    #endregion
 
     public class SaveViewController : ViewControllerBase
     {
@@ -193,11 +197,9 @@ namespace Nova
             ColorUtility.TryParseHtmlString("#CC3333FF", out loadTextColor);
             ColorUtility.TryParseHtmlString("#808080FF", out disabledTextColor);
 
-            backgroundButton.onClick.AddListener(() => { selectedSaveID = -1; });
-
+            backgroundButton.onClick.AddListener(Unselect);
             saveButton.onClick.AddListener(ShowSave);
             loadButton.onClick.AddListener(ShowLoad);
-
             leftButton.onClick.AddListener(PageLeft);
             rightButton.onClick.AddListener(PageRight);
 
@@ -212,8 +214,8 @@ namespace Nova
                 }
             }
 
-            gameState.NodeChanged += OnNodeChanged;
-            gameState.DialogueChanged += OnDialogueChanged;
+            gameState.nodeChanged.AddListener(OnNodeChanged);
+            gameState.dialogueChanged.AddListener(OnDialogueChanged);
         }
 
         protected override void Start()
@@ -227,8 +229,15 @@ namespace Nova
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            gameState.NodeChanged -= OnNodeChanged;
-            gameState.DialogueChanged -= OnDialogueChanged;
+
+            backgroundButton.onClick.RemoveListener(Unselect);
+            saveButton.onClick.RemoveListener(ShowSave);
+            loadButton.onClick.RemoveListener(ShowLoad);
+            leftButton.onClick.RemoveListener(PageLeft);
+            rightButton.onClick.RemoveListener(PageRight);
+
+            gameState.nodeChanged.RemoveListener(OnNodeChanged);
+            gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
         }
 
         private void OnNodeChanged(NodeChangedData nodeChangedData)
@@ -399,7 +408,7 @@ namespace Nova
             var bookmark = gameState.GetBookmark();
             bookmark.screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
-            bookmarkSave.Invoke(new BookmarkSaveEventData(saveID, bookmark));
+            bookmarkSave.Invoke(new BookmarkSaveData(saveID, bookmark));
             ShowPreviewBookmark(saveID);
             viewManager.TryPlaySound(saveActionSound);
         }
@@ -427,7 +436,7 @@ namespace Nova
                 viewManager.dialoguePanel.SetActive(true);
             }
 
-            bookmarkLoad.Invoke(new BookmarkLoadEventData(bookmark));
+            bookmarkLoad.Invoke(new BookmarkLoadData(bookmark));
             ShowPreviewBookmark(saveID);
             viewManager.TryPlaySound(saveActionSound);
             Alert.Show(I18n.__("bookmark.load.complete"));
@@ -448,7 +457,7 @@ namespace Nova
         private void _deleteBookmark(int saveID)
         {
             DeleteCachedThumbnailSprite(saveID);
-            bookmarkDelete.Invoke(new BookmarkDeleteEventData(saveID));
+            bookmarkDelete.Invoke(new BookmarkDeleteData(saveID));
             selectedSaveID = -1;
         }
 
@@ -476,7 +485,7 @@ namespace Nova
                     SaveIDQueryType.Earliest);
             }
 
-            bookmarkSave.Invoke(new BookmarkSaveEventData(saveID, bookmark));
+            bookmarkSave.Invoke(new BookmarkSaveData(saveID, bookmark));
             Destroy(texture);
         }
 
@@ -508,7 +517,7 @@ namespace Nova
                 (int)BookmarkType.NormalSave, SaveIDQueryType.Latest);
             var bookmark = checkpointManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
-            bookmarkLoad.Invoke(new BookmarkLoadEventData(bookmark));
+            bookmarkLoad.Invoke(new BookmarkLoadData(bookmark));
             Alert.Show(I18n.__("bookmark.load.complete"));
         }
 
@@ -615,6 +624,11 @@ namespace Nova
             {
                 selectedSaveID = -1;
             }
+        }
+
+        private void Unselect()
+        {
+            selectedSaveID = -1;
         }
 
         private void ShowPreview(Sprite newThumbnailSprite, string newText)

@@ -9,7 +9,12 @@ using UnityEngine.Events;
 
 namespace Nova
 {
-    #region Event types and event datas
+    #region Event types and datas
+
+    public class DialogueWillChangeData { }
+
+    [Serializable]
+    public class DialogueWillChangeEvent : UnityEvent<DialogueWillChangeData> { }
 
     public class DialogueChangedData
     {
@@ -32,6 +37,9 @@ namespace Nova
         }
     }
 
+    [Serializable]
+    public class DialogueChangedEvent : UnityEvent<DialogueChangedData> { }
+
     public class NodeChangedData
     {
         public readonly string nodeName;
@@ -41,6 +49,9 @@ namespace Nova
             this.nodeName = nodeName;
         }
     }
+
+    [Serializable]
+    public class NodeChangedEvent : UnityEvent<NodeChangedData> { }
 
     public class SelectionOccursData
     {
@@ -74,6 +85,9 @@ namespace Nova
         }
     }
 
+    [Serializable]
+    public class SelectionOccursEvent : UnityEvent<SelectionOccursData> { }
+
     public class CurrentRouteEndedData
     {
         public readonly string endName;
@@ -84,7 +98,13 @@ namespace Nova
         }
     }
 
+    [Serializable]
+    public class CurrentRouteEndedEvent : UnityEvent<CurrentRouteEndedData> { }
+
     public class BookmarkWillLoadData { }
+
+    [Serializable]
+    public class BookmarkWillLoadEvent : UnityEvent<BookmarkWillLoadData> { }
 
     #endregion
 
@@ -185,7 +205,7 @@ namespace Nova
         private State state = State.Normal;
 
         /// <summary>
-        /// CurrentRouteEnded has been triggered
+        /// currentRouteEnded has been triggered
         /// </summary>
         private bool ended => state == State.Ended;
 
@@ -229,34 +249,34 @@ namespace Nova
         /// This event will be triggered if the content of the dialogue will change. It will be triggered before
         /// the lazy execution block of the next dialogue is invoked.
         /// </summary>
-        public event UnityAction DialogueWillChange;
+        public DialogueWillChangeEvent dialogueWillChange;
 
         /// <summary>
         /// This event will be triggered if the content of the dialogue has changed. The new dialogue text will be
         /// sent to all listeners.
         /// </summary>
-        public event UnityAction<DialogueChangedData> DialogueChanged;
+        public DialogueChangedEvent dialogueChanged;
 
         /// <summary>
         /// This event will be triggered if the node has changed. The name and the description of the new node will be
         /// sent to all listeners.
         /// </summary>
-        public event UnityAction<NodeChangedData> NodeChanged;
+        public NodeChangedEvent nodeChanged;
 
         /// <summary>
         /// This event will be triggered if selection occurs, either when branches occur or when a selection is triggered from scripts.
         /// </summary>
-        public event UnityAction<SelectionOccursData> SelectionOccurs;
+        public SelectionOccursEvent selectionOccurs;
 
         /// <summary>
         /// This event will be triggered if the story reaches an end
         /// </summary>
-        public event UnityAction<CurrentRouteEndedData> CurrentRouteEnded;
+        public CurrentRouteEndedEvent currentRouteEnded;
 
         /// <summary>
         /// A book mark will be loaded
         /// </summary>
-        public event UnityAction<BookmarkWillLoadData> BookmarkWillLoad;
+        public BookmarkWillLoadEvent bookmarkWillLoad;
 
         #endregion
 
@@ -362,7 +382,7 @@ namespace Nova
             {
                 // Debug.Log($"Nova: Node changed to {currentNode.name}");
 
-                NodeChanged?.Invoke(new NodeChangedData(currentNode.name));
+                this.nodeChanged.Invoke(new NodeChangedData(currentNode.name));
 
                 if (firstEntryOfNode)
                 {
@@ -411,7 +431,7 @@ namespace Nova
             }
 
             DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped, out var hasBeenReached, out var hasBeenReachedForAnyVariables);
-            DialogueWillChange?.Invoke();
+            dialogueWillChange.Invoke(new DialogueWillChangeData());
             variablesHashBeforeDefaultAction = variables.hash;
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isMovingBack);
@@ -422,7 +442,7 @@ namespace Nova
             // The game author should define overriding dialogues for each locale
             // By the way, we don't need to store all dialogues in save data,
             // just those overridden
-            DialogueChanged?.Invoke(new DialogueChangedData(currentNode.name, currentIndex,
+            dialogueChanged.Invoke(new DialogueChangedData(currentNode.name, currentIndex,
                 currentDialogueEntry.displayData, new Dictionary<string, VoiceEntry>(voicesOfNextDialogue),
                 hasBeenReached, hasBeenReachedForAnyVariables));
 
@@ -752,7 +772,7 @@ namespace Nova
                         checkpointManager.SetReached(endName);
                     }
 
-                    CurrentRouteEnded?.Invoke(new CurrentRouteEndedData(endName));
+                    currentRouteEnded.Invoke(new CurrentRouteEndedData(endName));
                     onFinish?.Invoke();
                     break;
                 default:
@@ -762,7 +782,7 @@ namespace Nova
 
         public void RaiseSelection(List<SelectionOccursData.Selection> selections)
         {
-            SelectionOccurs?.Invoke(new SelectionOccursData(selections));
+            selectionOccurs.Invoke(new SelectionOccursData(selections));
         }
 
         /// <summary>
@@ -1062,7 +1082,7 @@ namespace Nova
         {
             CancelAction();
 
-            BookmarkWillLoad?.Invoke(new BookmarkWillLoadData());
+            bookmarkWillLoad.Invoke(new BookmarkWillLoadData());
 
             walkedThroughNodes = bookmark.nodeHistory;
             Assert.IsTrue(walkedThroughNodes.Count > 0);

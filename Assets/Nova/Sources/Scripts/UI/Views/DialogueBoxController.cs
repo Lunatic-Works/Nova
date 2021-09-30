@@ -259,28 +259,28 @@ namespace Nova
 
         private void OnEnable()
         {
-            gameState.DialogueWillChange += OnDialogueWillChange;
-            gameState.DialogueChanged += OnDialogueChanged;
-            gameState.CurrentRouteEnded += OnCurrentRouteEnded;
+            gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
+            gameState.dialogueChanged.AddListener(OnDialogueChanged);
+            gameState.currentRouteEnded.AddListener(OnCurrentRouteEnded);
             gameState.AddRestorable(this);
         }
 
         private void OnDisable()
         {
             StopAllCoroutines();
-            gameState.DialogueWillChange -= OnDialogueWillChange;
-            gameState.DialogueChanged -= OnDialogueChanged;
-            gameState.CurrentRouteEnded -= OnCurrentRouteEnded;
+            gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
+            gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
+            gameState.currentRouteEnded.RemoveListener(OnCurrentRouteEnded);
             gameState.RemoveRestorable(this);
         }
 
-        private void OnCurrentRouteEnded(CurrentRouteEndedData arg0)
+        private void OnCurrentRouteEnded(CurrentRouteEndedData currentRouteEndedData)
         {
             state = DialogueBoxState.Normal;
             this.SwitchView<TitleController>();
         }
 
-        private void OnDialogueWillChange()
+        private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
         {
             StopTimer();
             ResetTextAnimationConfig();

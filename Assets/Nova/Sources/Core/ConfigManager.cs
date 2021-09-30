@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Nova
 {
@@ -179,23 +178,23 @@ namespace Nova
             Notify(key);
         }
 
-        private readonly Dictionary<string, UnityAction> valueChangeListeners = new Dictionary<string, UnityAction>();
+        private readonly Dictionary<string, Action> valueChangeListeners = new Dictionary<string, Action>();
 
-        public void AddValueChangeListener(string key, UnityAction onValueChangeAction)
+        public void AddValueChangeListener(string key, Action onValueChange)
         {
             if (valueChangeListeners.ContainsKey(key))
             {
-                valueChangeListeners[key] += onValueChangeAction;
+                valueChangeListeners[key] += onValueChange;
                 return;
             }
 
-            valueChangeListeners.Add(key, onValueChangeAction);
+            valueChangeListeners.Add(key, onValueChange);
         }
 
-        public void RemoveValueChangeListener(string key, UnityAction onValueChangeAction)
+        public void RemoveValueChangeListener(string key, Action onValueChange)
         {
             if (!valueChangeListeners.ContainsKey(key)) return;
-            if (onValueChangeAction != null) valueChangeListeners[key] -= onValueChangeAction;
+            if (onValueChange != null) valueChangeListeners[key] -= onValueChange;
         }
 
         private void Notify(string key)

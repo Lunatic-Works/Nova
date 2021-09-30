@@ -14,13 +14,13 @@ namespace Nova
         private void Awake()
         {
             gameState = Utils.FindNovaGameController().GameState;
-            gameState.SelectionOccurs += RaiseSelectionsCallback;
+            gameState.selectionOccurs.AddListener(RaiseSelectionsCallback);
             gameState.AddRestorable(this);
         }
 
         private void OnDestroy()
         {
-            gameState.SelectionOccurs -= RaiseSelectionsCallback;
+            gameState.selectionOccurs.RemoveListener(RaiseSelectionsCallback);
             gameState.RemoveRestorable(this);
         }
 

@@ -14,7 +14,7 @@ namespace Nova
             checkpointManager = Utils.FindNovaGameController().CheckpointManager;
             saveViewController = GetComponent<SaveViewController>();
 
-            gameState.SelectionOccurs += OnSelectionOccurs;
+            gameState.selectionOccurs.AddListener(OnSelectionOccurs);
 
             saveViewController.bookmarkSave.AddListener(OnBookmarkSave);
             saveViewController.bookmarkLoad.AddListener(OnBookmarkLoad);
@@ -23,27 +23,31 @@ namespace Nova
 
         private void OnDestroy()
         {
-            gameState.SelectionOccurs -= OnSelectionOccurs;
+            gameState.selectionOccurs.RemoveListener(OnSelectionOccurs);
+
+            saveViewController.bookmarkSave.RemoveListener(OnBookmarkSave);
+            saveViewController.bookmarkLoad.RemoveListener(OnBookmarkLoad);
+            saveViewController.bookmarkDelete.RemoveListener(OnBookmarkDelete);
         }
 
-        private void OnBookmarkSave(BookmarkSaveEventData bookmarkSaveEventData)
+        private void OnBookmarkSave(BookmarkSaveData bookmarkSaveData)
         {
             // Debug.Log("Bookmark save");
-            checkpointManager.SaveBookmark(bookmarkSaveEventData.saveID, bookmarkSaveEventData.bookmark);
+            checkpointManager.SaveBookmark(bookmarkSaveData.saveID, bookmarkSaveData.bookmark);
             saveViewController.ShowPage();
         }
 
-        private void OnBookmarkLoad(BookmarkLoadEventData bookmarkLoadEventData)
+        private void OnBookmarkLoad(BookmarkLoadData bookmarkLoadData)
         {
             // Debug.Log("Bookmark load");
-            gameState.LoadBookmark(bookmarkLoadEventData.bookmark);
+            gameState.LoadBookmark(bookmarkLoadData.bookmark);
             saveViewController.Hide();
         }
 
-        private void OnBookmarkDelete(BookmarkDeleteEventData bookmarkDeleteEventData)
+        private void OnBookmarkDelete(BookmarkDeleteData bookmarkDeleteData)
         {
             // Debug.Log("Bookmark delete");
-            checkpointManager.DeleteBookmark(bookmarkDeleteEventData.saveID);
+            checkpointManager.DeleteBookmark(bookmarkDeleteData.saveID);
             saveViewController.ShowPage();
         }
 
