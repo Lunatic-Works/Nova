@@ -210,7 +210,7 @@ namespace Nova
 
         public IRestoreData GetRestoreData()
         {
-            // Material must be RestorableMaterial or DefaultMaterial
+            // Material must be RestorableMaterial or defaultMaterial
             MaterialRestoreData materialRestoreData;
             if (sharedMaterial is RestorableMaterial)
             {
@@ -232,7 +232,7 @@ namespace Nova
             data.transformRestoreData.Restore(transform);
             color = data.color;
 
-            // Material must be RestorableMaterial or DefaultMaterial
+            // Material must be RestorableMaterial or defaultMaterial
             if (data.materialRestoreData != null)
             {
                 MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;

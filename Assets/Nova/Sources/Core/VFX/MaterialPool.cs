@@ -7,8 +7,22 @@ namespace Nova
     {
         // Keep Renderer's default material, used when turning off VFX on the Renderer
         // defaultMaterial is null for CameraController
-        // TODO: will it be freed by UnloadUnusedAssets()?
-        public Material defaultMaterial;
+        private Material _defaultMaterial;
+
+        public Material defaultMaterial
+        {
+            get => _defaultMaterial;
+            set
+            {
+                if (_defaultMaterial == value)
+                {
+                    return;
+                }
+
+                Utils.DestroyMaterial(_defaultMaterial);
+                _defaultMaterial = value;
+            }
+        }
 
         private void Awake()
         {
@@ -19,13 +33,13 @@ namespace Nova
             }
         }
 
-        // TODO: should we call factory.Dispose(), or will those materials be freed by UnloadUnusedAssets()?
         private void OnDestroy()
         {
             defaultMaterial = null;
+            factory.Dispose();
         }
 
-        public MaterialFactory factory { get; } = new MaterialFactory();
+        public readonly MaterialFactory factory = new MaterialFactory();
 
         public Material Get(string shaderName)
         {

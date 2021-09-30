@@ -21,8 +21,8 @@ namespace Nova
             this.bookmark = bookmark;
         }
 
-        public int saveID { get; }
-        public Bookmark bookmark { get; }
+        public readonly int saveID;
+        public readonly Bookmark bookmark;
     }
 
     [Serializable]
@@ -35,7 +35,7 @@ namespace Nova
             this.bookmark = bookmark;
         }
 
-        public Bookmark bookmark { get; }
+        public readonly Bookmark bookmark;
     }
 
     [Serializable]
@@ -48,7 +48,7 @@ namespace Nova
             this.saveID = saveID;
         }
 
-        public int saveID { get; }
+        public readonly int saveID;
     }
 
     [Serializable]
