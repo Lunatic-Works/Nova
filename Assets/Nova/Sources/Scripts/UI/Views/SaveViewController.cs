@@ -48,7 +48,7 @@ namespace Nova
         private Color loadTextColor;
         private Color disabledTextColor;
 
-        private Sprite dummy;
+        private Sprite corruptedThumbnailSprite;
 
         private readonly List<SaveEntryController> saveEntryControllers = new List<SaveEntryController>();
         private readonly Dictionary<int, Sprite> cachedThumbnailSprites = new Dictionary<int, Sprite>();
@@ -62,9 +62,6 @@ namespace Nova
         // selectedSaveID == -1 means no bookmark is selected
         private int _selectedSaveID = -1;
 
-        // Used to avoid the flicker of preview when the alert shows
-        private bool keepSelectedSaveIDOnce;
-
         private int selectedSaveID
         {
             get => _selectedSaveID;
@@ -73,15 +70,6 @@ namespace Nova
             {
                 this.RuntimeAssert(checkpointManager.saveSlotsMetadata.ContainsKey(value) || value == -1,
                     "selectedSaveID must be a saveID with existing bookmark, or -1.");
-
-                if (keepSelectedSaveIDOnce)
-                {
-                    keepSelectedSaveIDOnce = false;
-                    if (value == -1)
-                    {
-                        return;
-                    }
-                }
 
                 if (_selectedSaveID >= 0)
                 {
@@ -119,8 +107,6 @@ namespace Nova
         {
             base.Awake();
 
-            dummy = Utils.Texture2DToSprite(Utils.ClearTexture);
-
             maxSaveEntry = maxRow * maxCol;
 
             gameState = Utils.FindNovaGameController().GameState;
@@ -151,6 +137,8 @@ namespace Nova
             ColorUtility.TryParseHtmlString("#33CC33FF", out saveTextColor);
             ColorUtility.TryParseHtmlString("#CC3333FF", out loadTextColor);
             ColorUtility.TryParseHtmlString("#808080FF", out disabledTextColor);
+
+            corruptedThumbnailSprite = Utils.Texture2DToSprite(Utils.ClearTexture);
 
             backgroundButton.onClick.AddListener(Unselect);
             saveButton.onClick.AddListener(ShowSave);
@@ -205,6 +193,8 @@ namespace Nova
             currentDialogueText = dialogueChangedData.displayData.FormatNameDialogue();
         }
 
+        #region Show and hide
+
         private void Show(SaveViewMode newSaveViewMode, bool newFromTitle)
         {
             saveViewMode = newSaveViewMode;
@@ -255,7 +245,10 @@ namespace Nova
             if (!myPanel.activeSelf)
             {
                 if (screenTexture != null)
+                {
                     Destroy(screenTexture);
+                }
+
                 screenTexture = ScreenCapturer.GetBookmarkThumbnailTexture();
                 screenSprite = Utils.Texture2DToSprite(screenTexture);
             }
@@ -307,55 +300,7 @@ namespace Nova
             base.OnHideComplete();
         }
 
-        private void PageLeft()
-        {
-            if (page == 1)
-            {
-                // Cannot see auto save and quick save in save mode
-                if (saveViewMode == SaveViewMode.Load)
-                {
-                    if (saveViewBookmarkType == BookmarkType.QuickSave)
-                    {
-                        saveViewBookmarkType = BookmarkType.AutoSave;
-                        page = 1;
-                    }
-                    else if (saveViewBookmarkType == BookmarkType.NormalSave)
-                    {
-                        saveViewBookmarkType = BookmarkType.QuickSave;
-                        page = 1;
-                    }
-                }
-            }
-            else
-            {
-                --page;
-            }
-
-            ShowPage();
-        }
-
-        private void PageRight()
-        {
-            if (page == maxPage)
-            {
-                if (saveViewBookmarkType == BookmarkType.AutoSave)
-                {
-                    saveViewBookmarkType = BookmarkType.QuickSave;
-                    page = 1;
-                }
-                else if (saveViewBookmarkType == BookmarkType.QuickSave)
-                {
-                    saveViewBookmarkType = BookmarkType.NormalSave;
-                    page = 1;
-                }
-            }
-            else
-            {
-                ++page;
-            }
-
-            ShowPage();
-        }
+        #endregion
 
         #region Bookmark operations
 
@@ -373,7 +318,6 @@ namespace Nova
 
         private void SaveBookmark(int saveID)
         {
-            keepSelectedSaveIDOnce = true;
             Alert.Show(
                 null,
                 I18n.__("bookmark.overwrite.confirm", SaveIDToDisplayID(saveID)),
@@ -402,7 +346,6 @@ namespace Nova
 
         private void LoadBookmark(int saveID)
         {
-            keepSelectedSaveIDOnce = true;
             Alert.Show(
                 null,
                 I18n.__("bookmark.load.confirm", SaveIDToDisplayID(saveID)),
@@ -507,6 +450,8 @@ namespace Nova
 
         #endregion
 
+        #region Preview
+
         private void OnThumbnailButtonClicked(int saveID)
         {
             if (Input.touchCount == 0) // Mouse
@@ -576,6 +521,11 @@ namespace Nova
 
         private void OnThumbnailButtonEnter(int saveID)
         {
+            if (viewManager.currentView != CurrentViewType.UI)
+            {
+                return;
+            }
+
             if (Input.touchCount == 0) // Mouse
             {
                 if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
@@ -587,6 +537,11 @@ namespace Nova
 
         private void OnThumbnailButtonExit(int saveID)
         {
+            if (viewManager.currentView != CurrentViewType.UI)
+            {
+                return;
+            }
+
             if (Input.touchCount == 0) // Mouse
             {
                 selectedSaveID = -1;
@@ -601,7 +556,6 @@ namespace Nova
         private void ShowPreview(Sprite newThumbnailSprite, string newText)
         {
             previewEntry.InitAsPreview(newThumbnailSprite, Hide);
-
             thumbnailTextProxy.text = newText;
         }
 
@@ -631,8 +585,62 @@ namespace Nova
             {
                 // TODO: do not load a bookmark multiple times when it is corrupted
                 Debug.LogWarning(e);
-                ShowPreview(dummy, I18n.__("bookmark.corrupted.title"));
+                ShowPreview(corruptedThumbnailSprite, I18n.__("bookmark.corrupted.title"));
             }
+        }
+
+        #endregion
+
+        #region Page
+
+        private void PageLeft()
+        {
+            if (page == 1)
+            {
+                // Cannot see auto save and quick save in save mode
+                if (saveViewMode == SaveViewMode.Load)
+                {
+                    if (saveViewBookmarkType == BookmarkType.QuickSave)
+                    {
+                        saveViewBookmarkType = BookmarkType.AutoSave;
+                        page = 1;
+                    }
+                    else if (saveViewBookmarkType == BookmarkType.NormalSave)
+                    {
+                        saveViewBookmarkType = BookmarkType.QuickSave;
+                        page = 1;
+                    }
+                }
+            }
+            else
+            {
+                --page;
+            }
+
+            ShowPage();
+        }
+
+        private void PageRight()
+        {
+            if (page == maxPage)
+            {
+                if (saveViewBookmarkType == BookmarkType.AutoSave)
+                {
+                    saveViewBookmarkType = BookmarkType.QuickSave;
+                    page = 1;
+                }
+                else if (saveViewBookmarkType == BookmarkType.QuickSave)
+                {
+                    saveViewBookmarkType = BookmarkType.NormalSave;
+                    page = 1;
+                }
+            }
+            else
+            {
+                ++page;
+            }
+
+            ShowPage();
         }
 
         public void ShowPage()
@@ -642,7 +650,6 @@ namespace Nova
             saveText.color = (saveButton.interactable ? disabledTextColor : saveTextColor);
             loadText.color = (loadButton.interactable ? disabledTextColor : loadTextColor);
 
-            keepSelectedSaveIDOnce = false;
             if (saveViewBookmarkType == BookmarkType.NormalSave)
             {
                 int maxSaveID = checkpointManager.QueryMaxSaveID((int)BookmarkType.NormalSave);
@@ -725,7 +732,7 @@ namespace Nova
                         Debug.LogWarning(e);
                         newHeaderText = "";
                         newFooterText = I18n.__("bookmark.corrupted.title");
-                        newThumbnailSprite = dummy;
+                        newThumbnailSprite = corruptedThumbnailSprite;
                         onEditButtonClicked = null;
                         onDeleteButtonClicked = () => DeleteBookmark(saveID);
                         onThumbnailButtonClicked = null;
@@ -758,6 +765,8 @@ namespace Nova
 
             previewEntry.mode = saveViewMode;
         }
+
+        #endregion
 
         private Sprite GetThumbnailSprite(int saveID)
         {
@@ -802,12 +811,6 @@ namespace Nova
             {
                 return null;
             }
-        }
-
-        protected override void BackHide()
-        {
-            base.BackHide();
-            selectedSaveID = -1;
         }
     }
 }

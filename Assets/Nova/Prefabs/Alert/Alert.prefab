@@ -845,6 +845,8 @@ GameObject:
   - component: {fileID: 9165014816017422660}
   - component: {fileID: 8948137454497538896}
   - component: {fileID: 8948137454497538903}
+  - component: {fileID: 9197022072608965934}
+  - component: {fileID: 9094550140339481880}
   m_Layer: 5
   m_Name: AlertPanel
   m_TagString: Untagged
@@ -908,6 +910,29 @@ MonoBehaviour:
   rotationPercentage: 0.5
   fade: 1
   duration: 0.1
+--- !u!222 &9197022072608965934
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8947422096609587780}
+  m_CullTransparentMesh: 0
+--- !u!114 &9094550140339481880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8947422096609587780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fef1c70061b61a44865e0630b7aab2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
 --- !u!1 &8947435375261486640
 GameObject:
   m_ObjectHideFlags: 0

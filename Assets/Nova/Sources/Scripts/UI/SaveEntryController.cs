@@ -23,7 +23,7 @@ namespace Nova
         private Color loadTextColor;
         private Color loadTextOutlineColor;
 
-        private bool disableDeleteButton;
+        private bool deleteButtonEnabled;
 
         private readonly UnityEvent onPointerEnter = new UnityEvent();
         private readonly UnityEvent onPointerExit = new UnityEvent();
@@ -77,7 +77,7 @@ namespace Nova
             // headerText.gameObject.SetActive(false);
             dateText.gameObject.SetActive(false);
 
-            disableDeleteButton = true;
+            deleteButtonEnabled = false;
             deleteButton.gameObject.SetActive(false);
 
             thumbnailImage.sprite = newThumbnailSprite == null ? defaultThumbnailSprite : newThumbnailSprite;
@@ -99,14 +99,14 @@ namespace Nova
             if (newThumbnailSprite == null)
             {
                 latest.SetActive(false);
-                disableDeleteButton = true;
+                deleteButtonEnabled = false;
                 deleteButton.gameObject.SetActive(false);
                 thumbnailImage.sprite = defaultThumbnailSprite;
             }
             else
             {
                 latest.SetActive(isLatest);
-                disableDeleteButton = false;
+                deleteButtonEnabled = true;
                 thumbnailImage.sprite = newThumbnailSprite;
             }
 
@@ -128,7 +128,7 @@ namespace Nova
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!disableDeleteButton)
+            if (deleteButtonEnabled)
             {
                 deleteButton.gameObject.SetActive(true);
             }
@@ -138,7 +138,7 @@ namespace Nova
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (!disableDeleteButton)
+            if (deleteButtonEnabled)
             {
                 deleteButton.gameObject.SetActive(false);
             }
@@ -146,7 +146,7 @@ namespace Nova
             onPointerExit.Invoke();
         }
 
-        // OnPointerExit does not work on Android?
+        // TODO: OnPointerExit does not work on Android?
         public void HideDeleteButton()
         {
             deleteButton.gameObject.SetActive(false);
