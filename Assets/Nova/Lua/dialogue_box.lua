@@ -207,6 +207,8 @@ function set_box(pos_name, style_name, auto_new_page)
     text_color(style['text_color'])
     text_material(style['text_material'])
     box_theme(style['theme'])
+
+    __Nova.dialogueBoxController:ResetTextScroll()
 end
 
 function new_page()

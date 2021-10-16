@@ -505,7 +505,6 @@ namespace Nova
         public void NewPage()
         {
             dialogueText.Clear();
-            dialogueTextScrollRect.verticalNormalizedPosition = 0f;
         }
 
         [SerializeField] private NovaAnimation textAnimation;
@@ -542,6 +541,11 @@ namespace Nova
         {
             var position = dialogueTextRect.localPosition;
             dialogueTextRect.localPosition = new Vector3(position.x, value, position.z);
+        }
+
+        public void ResetTextScroll()
+        {
+            dialogueTextScrollRect.verticalNormalizedPosition = 0f;
         }
 
         public RectTransformAnimationProperty GetTextScrollAnimationProperty(float start, float target)
@@ -590,18 +594,25 @@ namespace Nova
                     );
                 if (!textScrollOverriden)
                 {
-                    animEntry.And(
-                        new VerticalScrollRectAnimationProperty(dialogueTextScrollRect, 0f),
-                        textDuration,
-                        AnimationEntry.CubicEasing(0f, 1f)
-                    );
+                    if (dialogueText.dialogueEntryControllers.Count == 1)
+                    {
+                        ResetTextScroll();
+                    }
+                    else
+                    {
+                        animEntry.And(
+                            new VerticalScrollRectAnimationProperty(dialogueTextScrollRect, 0f),
+                            textDuration,
+                            AnimationEntry.CubicEasing(0f, 1f)
+                        );
+                    }
                 }
             }
             else
             {
                 if (!textScrollOverriden)
                 {
-                    dialogueTextScrollRect.verticalNormalizedPosition = 0f;
+                    ResetTextScroll();
                 }
             }
         }
@@ -703,7 +714,7 @@ namespace Nova
 
         private bool NextPageOrStep()
         {
-            if (dialogueText.dialogueEntryControllers.Count != 1 || !dialogueText.dialogueEntryControllers[0].Forward())
+            if (dialogueText.dialogueEntryControllers.Count == 0 || !dialogueText.dialogueEntryControllers.Last().Forward())
             {
                 gameState.Step();
                 return false;
