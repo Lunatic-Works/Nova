@@ -39,7 +39,7 @@ namespace Nova
         // TODO: handle line break in patterns
         public static void AddPattern(string funcName)
         {
-            string pattern = $@"(^|[ \(:]){funcName}(\(| *,) *(?<obj>[^ ,]+) *, *'(?<res>[^']+)'";
+            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*'(?<res>[^']+)'";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
                 preload = groups => $"preload({groups["obj"].Value}, '{groups["res"].Value}')\n",
@@ -50,7 +50,7 @@ namespace Nova
         // Generate `preload(obj, 'resource')` when matching `func('resource', ...)` or `...(func, 'resource', ...)`
         public static void AddPatternWithObject(string funcName, string objName)
         {
-            string pattern = $@"(^|[ \(:]){funcName}(\(| *,) *'(?<res>[^']+)'";
+            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*'(?<res>[^']+)'";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
                 preload = groups => $"preload({objName}, '{groups["res"].Value}')\n",
@@ -62,7 +62,7 @@ namespace Nova
         // when matching `func(obj, {'resource_1', 'resource_2', ...}, ...)` or `...(func, obj, {'resource_1', 'resource_2', ...}, ...)`
         public static void AddPatternForTable(string funcName)
         {
-            string pattern = $@"(^|[ \(:]){funcName}(\(| *,) *(?<obj>[^ ,]+) *, *\{{(?<res>[^\}}]+)\}}";
+            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*\{{(?<res>[^\}}]+)\}}";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
                 preload = groups => string.Concat(
@@ -78,7 +78,7 @@ namespace Nova
         // when matching `func({'resource_1', 'resource_2', ...}, ...)` or `...(func, {'resource_1', 'resource_2', ...}, ...)`
         public static void AddPatternWithObjectForTable(string funcName, string objName)
         {
-            string pattern = $@"(^|[ \(:]){funcName}(\(| *,) *\{{(?<res>[^\}}]+)\}}";
+            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*\{{(?<res>[^\}}]+)\}}";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
                 preload = groups => string.Concat(
@@ -93,7 +93,7 @@ namespace Nova
         // Generate `preload(obj, 'resource')` when matching `func(...)` or `...(func, ...)`
         public static void AddPatternWithObjectAndResource(string funcName, string objName, string resource)
         {
-            string pattern = $@"(^|[ \(:]){funcName}(\(| *,)";
+            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
                 preload = groups => $"preload({objName}, '{resource}')\n",
