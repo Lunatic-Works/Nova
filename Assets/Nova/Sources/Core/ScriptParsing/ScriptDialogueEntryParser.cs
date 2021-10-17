@@ -21,40 +21,32 @@ namespace Nova
         {
             public Func<GroupCollection, string> preload;
             public Func<GroupCollection, string> unpreload;
-            public Func<GroupCollection, string> forceCheckpoint;
+            public Func<GroupCollection, string> checkpoint;
         }
 
         private static readonly Dictionary<string, ActionGenerators> PatternToActionGenerator =
             new Dictionary<string, ActionGenerators>();
 
-        public static void AddCheckpointPattern(string triggeringFuncName, string yieldingFuncName)
-        {
-            PatternToActionGenerator[triggeringFuncName] = new ActionGenerators
-            {
-                forceCheckpoint = _ => $"{yieldingFuncName}()\n"
-            };
-        }
-
         // Generate `preload(obj, 'resource')` when matching `func(obj, 'resource', ...)` or `...(func, obj, 'resource', ...)`
         // TODO: handle line break in patterns
         public static void AddPattern(string funcName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*'(?<res>[^']+)'";
+            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*(?<res>['""][^'""]+['""])";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
-                preload = groups => $"preload({groups["obj"].Value}, '{groups["res"].Value}')\n",
-                unpreload = groups => $"unpreload({groups["obj"].Value}, '{groups["res"].Value}')\n"
+                preload = groups => $"preload({groups["obj"].Value}, {groups["res"].Value})\n",
+                unpreload = groups => $"unpreload({groups["obj"].Value}, {groups["res"].Value})\n"
             };
         }
 
         // Generate `preload(obj, 'resource')` when matching `func('resource', ...)` or `...(func, 'resource', ...)`
         public static void AddPatternWithObject(string funcName, string objName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*'(?<res>[^']+)'";
+            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<res>['""][^'""]+['""])";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
-                preload = groups => $"preload({objName}, '{groups["res"].Value}')\n",
-                unpreload = groups => $"unpreload({objName}, '{groups["res"].Value}')\n"
+                preload = groups => $"preload({objName}, {groups["res"].Value})\n",
+                unpreload = groups => $"unpreload({objName}, {groups["res"].Value})\n"
             };
         }
 
@@ -101,12 +93,20 @@ namespace Nova
             };
         }
 
+        public static void AddCheckpointPattern(string triggeringFuncName, string yieldingFuncName)
+        {
+            PatternToActionGenerator[triggeringFuncName] = new ActionGenerators
+            {
+                checkpoint = _ => $"{yieldingFuncName}()\n"
+            };
+        }
+
         private static void GenerateActions(string code, out StringBuilder preloadActions,
-            out StringBuilder unpreloadActions, out StringBuilder forceCheckpointActions)
+            out StringBuilder unpreloadActions, out StringBuilder checkpointActions)
         {
             preloadActions = null;
             unpreloadActions = null;
-            forceCheckpointActions = null;
+            checkpointActions = null;
 
             code = Regex.Replace(code, LuaCommentPattern, "");
 
@@ -137,21 +137,21 @@ namespace Nova
                         unpreloadActions.Append(generators.unpreload.Invoke(match.Groups));
                     }
 
-                    if (generators.forceCheckpoint != null)
+                    if (generators.checkpoint != null)
                     {
-                        if (forceCheckpointActions == null)
+                        if (checkpointActions == null)
                         {
-                            forceCheckpointActions = new StringBuilder();
+                            checkpointActions = new StringBuilder();
                         }
 
-                        forceCheckpointActions.Append(generators.forceCheckpoint.Invoke(match.Groups));
+                        checkpointActions.Append(generators.checkpoint.Invoke(match.Groups));
                     }
                 }
             }
 
             // if (preloadActions.Length > 0) Debug.Log($"preloadActions: <color=magenta>{preloadActions.ToString()}</color>");
             // if (unpreloadActions.Length > 0) Debug.Log($"unpreloadActions: <color=magenta>{unpreloadActions.ToString()}</color>");
-            // if (forceCheckpointActions.Length > 0) Debug.Log($"forceCheckpointActions: <color=magenta>{forceCheckpointActions.ToString()}</color>");
+            // if (checkpointActions.Length > 0) Debug.Log($"checkpointActions: <color=magenta>{checkpointActions.ToString()}</color>");
         }
 
         private static void AppendActions(IList<StringBuilder> codeBuilders, int index, StringBuilder actions)
@@ -284,14 +284,14 @@ namespace Nova
                     codeBuilders[i] = codeBuilder;
 
                     GenerateActions(code, out StringBuilder preloadActions, out StringBuilder unpreloadActions,
-                        out StringBuilder forceCheckpointActions);
+                        out StringBuilder checkpointActions);
                     AppendActions(codeBuilders, Math.Max(i - PreloadDialogueSteps, 0), preloadActions);
                     AppendActions(codeBuilders, i, unpreloadActions);
 
                     // The first entry of a node must have a checkpoint, so no need to force here
                     if (i > 0)
                     {
-                        AppendActions(codeBuilders, i - 1, forceCheckpointActions);
+                        AppendActions(codeBuilders, i - 1, checkpointActions);
                     }
                 }
             }
