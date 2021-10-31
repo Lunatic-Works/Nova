@@ -182,6 +182,19 @@ namespace Nova
             textBox.text = text;
         }
 
+        public int GetPageCharacterCount()
+        {
+            var textInfo = textBox.textInfo;
+            if (textInfo.pageCount > 0)
+            {
+                return textInfo.pageInfo[textBox.pageToDisplay - 1].lastCharacterIndex + 1;
+            }
+            else
+            {
+                return textInfo.characterCount;
+            }
+        }
+
         public void SetTextAlpha(byte a)
         {
             textBox.color = Utils.SetAlpha32(textBox.color, a);
@@ -215,7 +228,7 @@ namespace Nova
 
             SetTextAlpha(0);
 
-            var characterCount = textBox.textInfo.characterCount;
+            var characterCount = GetPageCharacterCount();
             var fadingCharacterIndex = Mathf.FloorToInt(characterCount * fadeValue);
             // handle fully visible characters
             for (var i = 0; i < fadingCharacterIndex; ++i)
