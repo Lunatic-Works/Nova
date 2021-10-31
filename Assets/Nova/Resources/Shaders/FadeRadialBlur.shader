@@ -52,7 +52,6 @@ Shader "Nova/VFX/Fade Radial Blur"
             float4 _MainTex_TexelSize, _SubColor;
             float _T, _Size, _Zoom, _Dir;
 
-
             fixed4 frag(v2f i) : SV_Target
             {
                 float2 uvShift = i.uv - 0.5;
@@ -61,6 +60,7 @@ Shader "Nova/VFX/Fade Radial Blur"
                 float2 uvZoom2 = uvShift * (1.0 - _Zoom * (1.0 - _T) * (1.0 - _Dir)) + 0.5;
                 float4 col2 = tex2DMotionBlur(_SubTex, _MainTex_TexelSize * 1.0, uvZoom2, uvShift * _Size * (1.0 - _T)) * _SubColor;
                 col = lerp(col, col2, _T);
+
                 return col;
             }
             ENDCG

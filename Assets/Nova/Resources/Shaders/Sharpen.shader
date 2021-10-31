@@ -48,12 +48,12 @@ Shader "Nova/VFX/Sharpen"
             float4 _MainTex_TexelSize;
             float _T, _Size;
 
-
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv);
                 col = 2.0 * col - tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, _Size * _T);
                 col *= i.color;
+
                 return col;
             }
             ENDCG

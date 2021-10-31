@@ -2,7 +2,7 @@
   "dependencies": {
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.textmeshpro": "2.1.6",
-    "com.unity.timeline": "1.6.2",
+    "com.unity.timeline": "1.6.3",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.assetbundle": "1.0.0",
     "com.unity.modules.audio": "1.0.0",

@@ -53,6 +53,7 @@ Shader "Nova/Post Processing/Sharpen"
                 float4 col = tex2D(_MainTex, i.uv);
                 col = 2.0 * col - tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * _GScale, i.uv, _Size * _T);
                 col *= i.color;
+
                 return col;
             }
             ENDCG

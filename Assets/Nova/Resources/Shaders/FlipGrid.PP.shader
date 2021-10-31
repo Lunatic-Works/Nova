@@ -66,7 +66,7 @@ Shader "Nova/Post Processing/Flip Grid"
                 float flipStartTime = gridDiagIndex * i.gridInfo.y;
                 float flipEndTime = flipStartTime + _FlipDuration;
 
-                fixed4 col = _BackColor;
+                float4 col = _BackColor;
 
                 if (flipStartTime > _T)
                 {

@@ -69,6 +69,8 @@ Shader "Nova/$VARIANT_NAME$/Fade"
                 float4 col2 = tex2D(_SubTex, i.uv) * _SubColor;
                 col = lerp(col, col2, mask);
 
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

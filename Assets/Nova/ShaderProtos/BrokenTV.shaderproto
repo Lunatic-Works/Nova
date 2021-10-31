@@ -82,6 +82,8 @@ Shader "Nova/$VARIANT_NAME$/Broken TV"
                 // Snow noise
                 col.rgb += srand(uv * 100.0 + _Time.y) * 0.04 * powerT * col.a;
 
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

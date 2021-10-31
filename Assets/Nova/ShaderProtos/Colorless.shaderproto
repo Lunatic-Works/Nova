@@ -1,3 +1,4 @@
+VARIANTS: PP
 Shader "Nova/$VARIANT_NAME$/Colorless"
 {
     Properties

@@ -87,8 +87,8 @@ Shader "Nova/Post Processing/Ripple Move"
                 {
                     col = tex2D(_MainTex, uv);
                 }
-
                 col *= i.color;
+
                 return col;
             }
             ENDCG

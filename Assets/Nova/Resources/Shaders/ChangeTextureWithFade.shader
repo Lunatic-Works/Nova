@@ -24,6 +24,8 @@ Shader "Nova/VFX/Change Texture With Fade"
 
             #include "UnityCG.cginc"
 
+            #define clamped2D(tex, uv) tex2D((tex), clamp((uv), 0, 1))
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -48,16 +50,13 @@ Shader "Nova/VFX/Change Texture With Fade"
             float4 _Offsets, _Color, _SubColor;
             float _T;
 
-            #define clamped2D(tex, uv) tex2D((tex), clamp((uv), 0, 1))
-
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 col = lerp(
+                return lerp(
                     clamped2D(_PrimaryTex, i.uv - _Offsets.xy) * _Color,
                     clamped2D(_SubTex, i.uv - _Offsets.zw) * _SubColor,
                     _T
                 );
-                return col;
             }
             ENDCG
         }

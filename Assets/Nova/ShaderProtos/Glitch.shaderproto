@@ -105,6 +105,8 @@ Shader "Nova/$VARIANT_NAME$/Glitch"
                 blockOffset += blockOffsetPass(uv, 2.0, 4.0, 0.1, 0.002 * powerT, 1.0);
                 col.rgb += blockOffset;
 
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

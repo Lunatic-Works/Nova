@@ -49,12 +49,12 @@ Shader "Nova/VFX/Lens Blur"
             float4 _MainTex_TexelSize;
             float _T, _Size, _Offset;
 
-
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 col = tex2DLensBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * _T;
+
                 return col;
             }
             ENDCG

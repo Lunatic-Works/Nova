@@ -64,7 +64,7 @@ Shader "Nova/$VARIANT_NAME$/Flip Grid"
                 float flipStartTime = gridDiagIndex * i.gridInfo.y;
                 float flipEndTime = flipStartTime + _FlipDuration;
 
-                fixed4 col = _BackColor;
+                float4 col = _BackColor;
 
                 if (flipStartTime > _T)
                 {
@@ -106,6 +106,8 @@ Shader "Nova/$VARIANT_NAME$/Flip Grid"
                         col = tex2D(_SubTex, realUV) * _SubColor;
                     }
                 }
+
+                $VARIANT_RGB$
 
                 return col;
             }

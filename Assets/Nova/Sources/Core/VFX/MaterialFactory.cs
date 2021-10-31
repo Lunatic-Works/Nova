@@ -26,7 +26,7 @@ namespace Nova
             mat = new Material(shader)
             {
                 name = string.Format("Nova - {0}",
-                    shaderName.Substring(shaderName.LastIndexOf("/", StringComparison.Ordinal) + 1)),
+                    shaderName.Substring(shaderName.IndexOf("/", StringComparison.Ordinal) + 1)),
                 hideFlags = HideFlags.DontSave
             };
 
@@ -45,7 +45,7 @@ namespace Nova
             resMat = new RestorableMaterial(shader)
             {
                 name = string.Format("Nova:Restorable - {0}",
-                    shaderName.Substring(shaderName.LastIndexOf("/", StringComparison.Ordinal) + 1)),
+                    shaderName.Substring(shaderName.IndexOf("/", StringComparison.Ordinal) + 1)),
                 hideFlags = HideFlags.DontSave
             };
 

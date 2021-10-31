@@ -72,8 +72,10 @@ Shader "Nova/$VARIANT_NAME$/Ripple"
                 {
                     col = tex2D(_MainTex, uv);
                 }
-
                 col *= i.color;
+
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

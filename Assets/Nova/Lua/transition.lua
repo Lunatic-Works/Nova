@@ -1,12 +1,5 @@
 local shader_alias_map = {
     broken_tv = 'Broken TV',
-    color = 'Color Correction',
-    kaleido = 'Kaleidoscope',
-    mono = 'Monochrome',
-    mono_mosaic = 'Monochrome Mosaic',
-    multiply_rand_roll = 'Multiply Random Roll',
-    rand_roll = 'Random Roll',
-    screen_rand_roll = 'Screen Random Roll',
 }
 
 local cam_trans_layer_id = 1
@@ -16,19 +9,47 @@ local function get_base_shader_name(s)
     return string.upper(string.sub(s, 1, 1)) .. string.gsub(string.sub(s, 2), '_(.)', function(x) return ' ' .. string.upper(x) end)
 end
 
+local function pop_prefix(s, prefix, sep_len)
+    if string.sub(s, 1, #prefix) == prefix then
+        return prefix, string.sub(s, #prefix + sep_len + 1)
+    else
+        return false, s
+    end
+end
+
 local function get_full_shader_name(shader_name, pp)
-    local base_shader_name = shader_alias_map[shader_name]
-    if base_shader_name == nil then
-        base_shader_name = get_base_shader_name(shader_name)
+    local raw_shader_name = shader_name
+
+    local variant
+    variant, shader_name = pop_prefix(shader_name, 'multiply', 1)
+    if not variant then
+        variant, shader_name = pop_prefix(shader_name, 'screen', 1)
     end
 
+    if shader_name == '' then
+        shader_name = 'default'
+    end
+
+    local base_shader_name = shader_alias_map[shader_name] or get_base_shader_name(shader_name)
+
+    local full_shader_name
     if pp then
+        if variant then
+            warn('Post processing does not support multiply or screen shader, raw_shader_name: ' .. raw_shader_name)
+        end
         full_shader_name = 'Nova/Post Processing/' .. base_shader_name
     else
-        full_shader_name = 'Nova/VFX/' .. base_shader_name
+        if variant == 'multiply' then
+            full_shader_name = 'Nova/VFX Multiply/' .. base_shader_name
+        elseif variant == 'screen' then
+            full_shader_name = 'Nova/VFX Screen/' .. base_shader_name
+        else
+            full_shader_name = 'Nova/VFX/' .. base_shader_name
+            variant = 'default'
+        end
     end
 
-    return full_shader_name, base_shader_name
+    return full_shader_name, base_shader_name, variant
 end
 
 --- get material from the MaterialPool attached to the GameObject
@@ -44,11 +65,11 @@ local function get_mat(obj, shader_name, restorable)
     local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
     local pp = obj:GetComponent(typeof(Nova.PostProcessing))
     if renderer == nil and pp == nil then
-        warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. tostring(obj))
+        warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. obj)
         return nil
     end
 
-    local full_shader_name, base_shader_name = get_full_shader_name(shader_name, pp)
+    local full_shader_name, base_shader_name, variant = get_full_shader_name(shader_name, pp)
 
     local pool = Nova.MaterialPool.Ensure(get_go(obj))
     local mat
@@ -63,7 +84,7 @@ local function get_mat(obj, shader_name, restorable)
         return nil
     end
 
-    return mat, base_shader_name
+    return mat, base_shader_name, variant
 end
 
 local function get_default_mat(obj)
@@ -93,11 +114,11 @@ local function set_mat(obj, mat, layer_id)
 
     local character = obj:GetComponent(typeof(Nova.CharacterController))
     if character then
-        warn('Cannot set material for CharacterController ' .. tostring(obj))
+        warn('Cannot set material for CharacterController ' .. obj)
         return
     end
 
-    warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. tostring(obj))
+    warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. obj)
     return
 end
 
@@ -156,7 +177,7 @@ local function set_mat_properties(mat, base_shader_name, properties)
                 mat:SetTexture(name, tex)
             end
         else
-            warn('Unknown dtype ' .. tostring(dtype) .. ' for property ' .. tostring(name))
+            warn('Unknown dtype ' .. dtype .. ' for property ' .. name)
         end
     end
 end
@@ -195,7 +216,7 @@ end
 make_anim_method('trans', function(self, obj, image_name, shader_layer, times, properties, color2)
     local shader_name, layer_id = parse_shader_layer(shader_layer, cam_trans_layer_id)
     -- mat is not RestorableMaterial
-    local mat, base_shader_name = get_mat(obj, shader_name, false)
+    local mat, base_shader_name, _ = get_mat(obj, shader_name, false)
     local duration, easing = parse_times(times)
     properties = properties or {}
 
@@ -259,7 +280,7 @@ end, add_preload_pattern)
 make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, properties, times2, properties2, color2)
     local shader_name, layer_id = parse_shader_layer(shader_layer, cam_trans_layer_id)
     -- mat is not RestorableMaterial
-    local mat, base_shader_name = get_mat(obj, shader_name, false)
+    local mat, base_shader_name, _ = get_mat(obj, shader_name, false)
     local duration, easing = parse_times(times)
     properties = properties or {}
     local duration2, easing2 = parse_times(times2)
@@ -324,7 +345,7 @@ end, add_preload_pattern)
 function vfx(obj, shader_layer, t, properties)
     local shader_name, layer_id = parse_shader_layer(shader_layer)
     if shader_name then
-        local mat, base_shader_name = get_mat(obj, shader_name)
+        local mat, base_shader_name, _ = get_mat(obj, shader_name)
         t = t or 1
         properties = properties or {}
         set_mat_default_properties(mat, base_shader_name, properties)
@@ -353,7 +374,7 @@ end
 ---     vfx(obj, 'shader_name', {start_t, target_t}, duration, [{ name = value }])
 make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times, properties)
     local shader_name, layer_id = parse_shader_layer(shader_layer)
-    local mat, base_shader_name = get_mat(obj, shader_name)
+    local mat, base_shader_name, variant = get_mat(obj, shader_name)
     local start_t, target_t = unpack(start_target_t)
     local duration, easing = parse_times(times)
     properties = properties or {}
@@ -375,7 +396,11 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
             if tostring(obj:GetType()) == 'Nova.CameraOverlayMask' then
                 obj.blitMaterial = nil
             else
-                set_mat(obj, get_default_mat(obj), layer_id)
+                if variant then
+                    set_mat(obj, get_mat(obj, variant), layer_id)
+                else
+                    set_mat(obj, get_default_mat(obj), layer_id)
+                end
             end
         end
     end
@@ -391,7 +416,7 @@ end)
 ---     vfx_free(obj, 'shader_name', duration, {{'name', start_value, target_value}, ...}, [{ name = value }])
 make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_properties, properties)
     local shader_name, layer_id = parse_shader_layer(shader_layer)
-    local mat, base_shader_name = get_mat(obj, shader_name)
+    local mat, base_shader_name, _ = get_mat(obj, shader_name)
     local duration, easing = parse_times(times)
     properties = properties or {}
 

@@ -84,7 +84,8 @@ Shader "Nova/VFX/Water"
             fixed4 frag(v2f i) : SV_Target
             {
                 float2 uvDelta = _Distort * waterNormal(i.uvEffect);
-                fixed4 col = tex2D(_MainTex, i.uv + uvDelta) * i.color;
+                float4 col = tex2D(_MainTex, i.uv + uvDelta) * i.color;
+
                 return col;
             }
             ENDCG

@@ -55,6 +55,7 @@ Shader "Nova/Post Processing/Rotation Blur"
                 float4 col = tex2DMotionBlur(_MainTex, _MainTex_TexelSize * _GScale, i.uv, float2(uvShift.y, -uvShift.x) * _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * length(uvShift) * _T;
+
                 return col;
             }
             ENDCG

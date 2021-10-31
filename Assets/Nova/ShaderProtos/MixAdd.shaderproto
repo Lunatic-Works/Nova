@@ -61,6 +61,9 @@ Shader "Nova/$VARIANT_NAME$/Mix Add"
                 float4 maskColor = mask * _ColorMul + _ColorAdd;
                 maskColor.a *= _AlphaFactor;
                 col = saturate(col + _T * maskColor);
+
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

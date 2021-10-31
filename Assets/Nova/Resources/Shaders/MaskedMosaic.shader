@@ -50,7 +50,6 @@ Shader "Nova/VFX/Masked Mosaic"
             float4 _MainTex_TexelSize;
             float _T, _Size, _Strength;
 
-
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv);

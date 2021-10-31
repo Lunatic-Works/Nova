@@ -35,7 +35,7 @@ function get_go(obj)
         o = obj
     end
     if o == nil then
-        warn('Cannot find obj: ' .. tostring(obj))
+        warn('Cannot find obj: ' .. obj)
     end
     return o and o.gameObject
 end
@@ -61,7 +61,7 @@ function dump(o)
         local s = '{ '
         for k, v in pairs(o) do
             if type(k) ~= 'number' then
-                k = '"' .. tostring(k) .. '"'
+                k = '"' .. k .. '"'
             end
             s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
         end

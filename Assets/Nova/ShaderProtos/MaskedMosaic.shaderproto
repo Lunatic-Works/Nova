@@ -60,6 +60,8 @@ Shader "Nova/$VARIANT_NAME$/Masked Mosaic"
                 float mask = tex2D(_Mask, i.uv).r * _T;
                 col = lerp(col, col2, mask) * i.color;
 
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

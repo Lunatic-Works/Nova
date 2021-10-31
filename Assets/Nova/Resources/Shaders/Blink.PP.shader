@@ -54,8 +54,10 @@ Shader "Nova/Post Processing/Blink"
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
                 col.rgb *= _Mul;
                 col.rgb += _Offset;
+
                 float n = noise(_Freq * _Time.y);
                 col.rgb += _Amp * n * n * _T;
+
                 return col;
             }
             ENDCG

@@ -52,7 +52,6 @@ Shader "Nova/VFX/Ripple"
             float4 _MainTex_TexelSize;
             float _T, _Aspect, _Amp, _RFreq, _TFreq, _BlurSize;
 
-
             fixed4 frag(v2f i) : SV_Target
             {
                 float2 uv = i.uv;
@@ -75,8 +74,8 @@ Shader "Nova/VFX/Ripple"
                 {
                     col = tex2D(_MainTex, uv);
                 }
-
                 col *= i.color;
+
                 return col;
             }
             ENDCG

@@ -119,7 +119,6 @@ Shader "Nova/VFX/Rain"
             float4 _MainTex_TexelSize;
             float _T;
 
-
             fixed4 frag(v2f i) : SV_Target
             {
                 float2 UV = i.uv;

@@ -6,6 +6,8 @@ Shader "Nova/VFX/Shake"
     {
         [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
         _T ("Time", Range(0.0, 1.0)) = 0.0
+        _XAmp ("X Amplitude", Float) = 1.0
+        _YAmp ("Y Amplitude", Float) = 1.0
         _Freq ("Frequency", Float) = 10.0
     }
     SubShader
@@ -35,13 +37,13 @@ Shader "Nova/VFX/Shake"
                 float4 color : COLOR;
             };
 
-            float _T, _Freq;
+            float _T, _XAmp, _YAmp, _Freq;
 
             v2f vert(appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv + rand2(floor(_Freq * _Time.y)) * _T;
+                o.uv = v.uv + float2(_XAmp, _YAmp) * rand2(floor(_Freq * _Time.y)) * _T;
                 o.color = v.color;
                 return o;
             }
@@ -50,7 +52,9 @@ Shader "Nova/VFX/Shake"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                return tex2D(_MainTex, i.uv) * i.color;
+                float4 col = tex2D(_MainTex, i.uv) * i.color;
+
+                return col;
             }
             ENDCG
         }

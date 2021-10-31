@@ -4,15 +4,19 @@ shader_type_data = {
     ['Barrel'] = {
         _Aspect = 'Float',
         _BackColor = 'Color',
-        _Scale = 'Float',
-        _Sigma = 'Float',
-    },
-    ['Barrel Chroma'] = {
-        _Aspect = 'Float',
+        _Chroma = 'Float',
         _Offset = 'Float',
         _Scale = 'Float',
         _Sigma = 'Float',
-        _Strength = 'Float',
+        _T = 'Float',
+    },
+    ['Barrel Hyper'] = {
+        _Aspect = 'Float',
+        _BackColor = 'Color',
+        _Chroma = 'Float',
+        _Offset = 'Float',
+        _Scale = 'Float',
+        _Sigma = 'Float',
         _T = 'Float',
     },
     ['Blink'] = {
@@ -34,7 +38,7 @@ shader_type_data = {
         _SubTex = '2D',
         _T = 'Float',
     },
-    ['Color Correction'] = {
+    ['Color'] = {
         _ColorAdd = 'Color',
         _ColorMul = 'Color',
         _T = 'Float',
@@ -80,7 +84,12 @@ shader_type_data = {
         _Strength = 'Float',
         _T = 'Float',
     },
-    ['Kaleidoscope'] = {
+    ['Gray Wave'] = {
+        _Freq = 'Float',
+        _Size = 'Float',
+        _T = 'Float',
+    },
+    ['Kaleido'] = {
         _Freq = 'Float',
         _Repeat = 'Float',
         _T = 'Float',
@@ -104,11 +113,11 @@ shader_type_data = {
         _Mask = '2D',
         _T = 'Float',
     },
-    ['Monochrome'] = {
+    ['Mono'] = {
         _Offset = 'Float',
         _T = 'Float',
     },
-    ['Monochrome Mosaic'] = {
+    ['Mono Mosaic'] = {
         _Size = 'Float',
         _Strength = 'Float',
         _T = 'Float',
@@ -118,13 +127,6 @@ shader_type_data = {
         _Size = 'Float',
         _T = 'Float',
         _Theta = 'Float',
-    },
-    ['Multiply'] = {
-        _T = 'Float',
-    },
-    ['Multiply Random Roll'] = {
-        _Freq = 'Float',
-        _T = 'Float',
     },
     ['Overglow'] = {
         _CenterX = 'Float',
@@ -143,7 +145,7 @@ shader_type_data = {
         _Size = 'Float',
         _T = 'Float',
     },
-    ['Random Roll'] = {
+    ['Rand Roll'] = {
         _Freq = 'Float',
         _T = 'Float',
     },
@@ -175,50 +177,11 @@ shader_type_data = {
         _Size = 'Float',
         _T = 'Float',
     },
-    ['Screen'] = {
-        _T = 'Float',
-    },
-    ['Screen Blink'] = {
-        _Amp = 'Float',
-        _Freq = 'Float',
-        _Mul = 'Float',
-        _Offset = 'Float',
-        _T = 'Float',
-    },
-    ['Screen Fade'] = {
-        _InvertMask = 'Float',
-        _Mask = '2D',
-        _SubColor = 'Color',
-        _SubTex = '2D',
-        _T = 'Float',
-        _Vague = 'Float',
-    },
-    ['Screen Gray Wave'] = {
-        _Freq = 'Float',
-        _Size = 'Float',
-        _T = 'Float',
-    },
-    ['Screen Random Roll'] = {
-        _Freq = 'Float',
-        _T = 'Float',
-    },
-    ['Screen Wiggle'] = {
-        _AAmp = 'Float',
-        _BlinkAmp = 'Float',
-        _BlinkFreq = 'Float',
-        _Mono = 'Float',
-        _Mul = 'Float',
-        _Offset = 'Float',
-        _T = 'Float',
-        _TFreq = 'Float',
-        _XAmp = 'Float',
-        _XFreq = 'Float',
-        _YAmp = 'Float',
-        _YFreq = 'Float',
-    },
     ['Shake'] = {
         _Freq = 'Float',
         _T = 'Float',
+        _XAmp = 'Float',
+        _YAmp = 'Float',
     },
     ['Sharpen'] = {
         _Size = 'Float',
@@ -235,6 +198,12 @@ shader_type_data = {
         _T = 'Float',
     },
     ['Wiggle'] = {
+        _AAmp = 'Float',
+        _BlinkAmp = 'Float',
+        _BlinkFreq = 'Float',
+        _Mono = 'Float',
+        _Mul = 'Float',
+        _Offset = 'Float',
         _T = 'Float',
         _TFreq = 'Float',
         _XAmp = 'Float',
@@ -247,15 +216,18 @@ shader_type_data = {
 shader_float_data = {
     ['Barrel'] = {
         _Aspect = 1.77777778,
-        _Scale = 1,
-        _Sigma = 0.2,
-    },
-    ['Barrel Chroma'] = {
-        _Aspect = 1.77777778,
+        _Chroma = 0,
         _Offset = 0,
         _Scale = 1,
         _Sigma = 0.2,
-        _Strength = 0.02,
+        _T = 0,
+    },
+    ['Barrel Hyper'] = {
+        _Aspect = 1.77777778,
+        _Chroma = 0,
+        _Offset = 0,
+        _Scale = 1,
+        _Sigma = 0.2,
         _T = 0,
     },
     ['Blink'] = {
@@ -272,7 +244,7 @@ shader_float_data = {
     ['Change Texture With Fade'] = {
         _T = 0,
     },
-    ['Color Correction'] = {
+    ['Color'] = {
         _T = 0,
     },
     ['Colorless'] = {
@@ -308,7 +280,12 @@ shader_float_data = {
         _Strength = 1,
         _T = 0,
     },
-    ['Kaleidoscope'] = {
+    ['Gray Wave'] = {
+        _Freq = 0.5,
+        _Size = 50,
+        _T = 0,
+    },
+    ['Kaleido'] = {
         _Freq = 1,
         _Repeat = 8,
         _T = 0,
@@ -328,11 +305,11 @@ shader_float_data = {
         _InvertMask = 0,
         _T = 0,
     },
-    ['Monochrome'] = {
+    ['Mono'] = {
         _Offset = 0,
         _T = 0,
     },
-    ['Monochrome Mosaic'] = {
+    ['Mono Mosaic'] = {
         _Size = 4,
         _Strength = 8,
         _T = 0,
@@ -342,13 +319,6 @@ shader_float_data = {
         _Size = 1,
         _T = 0,
         _Theta = 0,
-    },
-    ['Multiply'] = {
-        _T = 0,
-    },
-    ['Multiply Random Roll'] = {
-        _Freq = 10,
-        _T = 0,
     },
     ['Overglow'] = {
         _CenterX = 0.5,
@@ -367,7 +337,7 @@ shader_float_data = {
         _Size = 2,
         _T = 0,
     },
-    ['Random Roll'] = {
+    ['Rand Roll'] = {
         _Freq = 10,
         _T = 0,
     },
@@ -399,47 +369,11 @@ shader_float_data = {
         _Size = 1,
         _T = 0,
     },
-    ['Screen'] = {
-        _T = 0,
-    },
-    ['Screen Blink'] = {
-        _Amp = -0.5,
-        _Freq = 10,
-        _Mul = 1,
-        _Offset = 0,
-        _T = 0,
-    },
-    ['Screen Fade'] = {
-        _InvertMask = 0,
-        _T = 0,
-        _Vague = 0.25,
-    },
-    ['Screen Gray Wave'] = {
-        _Freq = 0.5,
-        _Size = 50,
-        _T = 0,
-    },
-    ['Screen Random Roll'] = {
-        _Freq = 10,
-        _T = 0,
-    },
-    ['Screen Wiggle'] = {
-        _AAmp = 0,
-        _BlinkAmp = 0,
-        _BlinkFreq = 0,
-        _Mono = 0,
-        _Mul = 1,
-        _Offset = 0,
-        _T = 0,
-        _TFreq = 0,
-        _XAmp = 0,
-        _XFreq = 0,
-        _YAmp = 0,
-        _YFreq = 0,
-    },
     ['Shake'] = {
         _Freq = 10,
         _T = 0,
+        _XAmp = 1,
+        _YAmp = 1,
     },
     ['Sharpen'] = {
         _Size = 1,
@@ -453,6 +387,12 @@ shader_float_data = {
         _T = 0,
     },
     ['Wiggle'] = {
+        _AAmp = 0,
+        _BlinkAmp = 0,
+        _BlinkFreq = 0,
+        _Mono = 0,
+        _Mul = 1,
+        _Offset = 0,
         _T = 0,
         _TFreq = 0,
         _XAmp = 0,
@@ -466,11 +406,14 @@ shader_color_data = {
     ['Barrel'] = {
         _BackColor = Color.black,
     },
+    ['Barrel Hyper'] = {
+        _BackColor = Color.black,
+    },
     ['Change Texture With Fade'] = {
         _Color = Color.white,
         _SubColor = Color.white,
     },
-    ['Color Correction'] = {
+    ['Color'] = {
         _ColorAdd = Color.clear,
         _ColorMul = Color.white,
     },
@@ -487,9 +430,6 @@ shader_color_data = {
     ['Mix Add'] = {
         _ColorAdd = Color.clear,
         _ColorMul = Color.white,
-    },
-    ['Screen Fade'] = {
-        _SubColor = Color.white,
     },
 }
 

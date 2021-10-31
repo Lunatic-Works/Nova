@@ -51,6 +51,9 @@ Shader "Nova/$VARIANT_NAME$/Sharpen"
                 float4 col = tex2D(_MainTex, i.uv);
                 col = 2.0 * col - tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * $GSCALE$, i.uv, _Size * _T);
                 col *= i.color;
+
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

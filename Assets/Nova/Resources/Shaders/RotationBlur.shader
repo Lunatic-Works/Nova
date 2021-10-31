@@ -49,13 +49,13 @@ Shader "Nova/VFX/Rotation Blur"
             float4 _MainTex_TexelSize;
             float _T, _Size, _Offset;
 
-
             fixed4 frag(v2f i) : SV_Target
             {
                 float2 uvShift = i.uv - 0.5;
                 float4 col = tex2DMotionBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, float2(uvShift.y, -uvShift.x) * _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * length(uvShift) * _T;
+
                 return col;
             }
             ENDCG

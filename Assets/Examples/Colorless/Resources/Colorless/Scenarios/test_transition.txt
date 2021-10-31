@@ -37,6 +37,8 @@ anim:vfx(cam, 'color', {0, 1}, 1, { _ColorMul = 0 })
 先让画面变黑
 
 <|
+-- 不在trans里的时候，角色的show和hide默认有零点几秒的淡入淡出动画
+-- 现在我们不需要这个动画，就要用auto_fade_off()和auto_fade_on()
 auto_fade_off()
 hide(xiben)
 show(gaotian, 'normal', pos_r)
@@ -45,8 +47,6 @@ auto_fade_on()
 anim:vfx(cam, 'color', {1, 0}, 1, { _ColorMul = 0 })
 |>
 再让画面出现
-不在trans里的时候，角色的show和hide默认有零点几秒的淡入淡出动画
-现在我们不需要这个动画，就要用auto_fade_off()和auto_fade_on()
 
 <|
 anim:vfx(bg, 'mix_add', {0, 1}, 1, { _Mask = 'Masks/vertical' })
@@ -73,6 +73,7 @@ anim:vfx(cam, 'lens_blur', {1, 0}, 1, { _Size = 4 })
 摄像机特效结束
 
 <|
+-- 先把gaotian和bg2的layer设为cam_mask.maskLayer，再给cam_mask加vfx
 gaotian.layer = cam_mask.maskLayer
 bg2.layer = cam_mask.maskLayer
 show(xiben, 'normal', pos_l)
@@ -82,9 +83,9 @@ show(bg2, 'corridor')
 anim:vfx(cam_mask, 'fade', {0, 0.5}, 1, { _Mask = 'Masks/wipe_left', _Vague = 0.1 })
 |>
 测试遮罩
-先把gaotian和bg2的layer设为cam_mask.maskLayer，再给cam_mask加vfx
 
 <|
+-- 把gaotian和bg2的layer重置为0，并把cam2的cullingMask设为1，就是拍摄layer 0
 gaotian.layer = 0
 bg2.layer = 0
 cam2.cullingMask = 1
@@ -92,7 +93,6 @@ hide(bg2)
 anim:move(cam2, {-3, 0})
 |>
 也可以让两个摄像机拍同一个图层
-把gaotian和bg2的layer重置为0，并把cam2的cullingMask设为1，就是拍摄layer 0
 
 <|
 anim:vfx(cam_mask, 'fade', {0.5, 0}, 1, { _Mask = 'Masks/wipe_left', _Vague = 0.1 })

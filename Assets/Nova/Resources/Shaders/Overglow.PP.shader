@@ -55,6 +55,7 @@ Shader "Nova/Post Processing/Overglow"
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
                 float4 col2 = tex2D(_MainTex, uv2) * i.color;
                 col.rgb += col2.rgb * _Mul * (1.0 - _T);
+
                 return col;
             }
             ENDCG

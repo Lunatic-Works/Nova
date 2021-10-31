@@ -52,6 +52,9 @@ Shader "Nova/$VARIANT_NAME$/Lens Blur"
                 float4 col = tex2DLensBlur(_MainTex, _MainTex_TexelSize * $GSCALE$, i.uv, _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * _T;
+
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

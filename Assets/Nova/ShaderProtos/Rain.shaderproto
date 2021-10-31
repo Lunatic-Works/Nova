@@ -137,6 +137,8 @@ Shader "Nova/$VARIANT_NAME$/Rain"
                 float4 col2 = tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * $GSCALE$, UV, 3.0 * _T) * (1.0 - 0.1 * _T);
                 col = lerp(col2, col, saturate(c.x + c.y)) * i.color;
 
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

@@ -16,19 +16,23 @@ namespace Nova.Generate
                 {
                     {"_Aspect", ShaderPropertyType.Float},
                     {"_BackColor", ShaderPropertyType.Color},
-                    {"_Scale", ShaderPropertyType.Float},
-                    {"_Sigma", ShaderPropertyType.Float},
-                }
-            },
-            {
-                "Barrel Chroma",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_Aspect", ShaderPropertyType.Float},
+                    {"_Chroma", ShaderPropertyType.Float},
                     {"_Offset", ShaderPropertyType.Float},
                     {"_Scale", ShaderPropertyType.Float},
                     {"_Sigma", ShaderPropertyType.Float},
-                    {"_Strength", ShaderPropertyType.Float},
+                    {"_T", ShaderPropertyType.Float},
+                }
+            },
+            {
+                "Barrel Hyper",
+                new Dictionary<string, ShaderPropertyType>
+                {
+                    {"_Aspect", ShaderPropertyType.Float},
+                    {"_BackColor", ShaderPropertyType.Color},
+                    {"_Chroma", ShaderPropertyType.Float},
+                    {"_Offset", ShaderPropertyType.Float},
+                    {"_Scale", ShaderPropertyType.Float},
+                    {"_Sigma", ShaderPropertyType.Float},
                     {"_T", ShaderPropertyType.Float},
                 }
             },
@@ -64,7 +68,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Color Correction",
+                "Color",
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_ColorAdd", ShaderPropertyType.Color},
@@ -77,6 +81,12 @@ namespace Nova.Generate
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_T", ShaderPropertyType.Float},
+                }
+            },
+            {
+                "Default",
+                new Dictionary<string, ShaderPropertyType>
+                {
                 }
             },
             {
@@ -142,7 +152,16 @@ namespace Nova.Generate
                 }
             },
             {
-                "Kaleidoscope",
+                "Gray Wave",
+                new Dictionary<string, ShaderPropertyType>
+                {
+                    {"_Freq", ShaderPropertyType.Float},
+                    {"_Size", ShaderPropertyType.Float},
+                    {"_T", ShaderPropertyType.Float},
+                }
+            },
+            {
+                "Kaleido",
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_Freq", ShaderPropertyType.Float},
@@ -182,7 +201,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Monochrome",
+                "Mono",
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_Offset", ShaderPropertyType.Float},
@@ -190,7 +209,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Monochrome Mosaic",
+                "Mono Mosaic",
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_Size", ShaderPropertyType.Float},
@@ -206,21 +225,6 @@ namespace Nova.Generate
                     {"_Size", ShaderPropertyType.Float},
                     {"_T", ShaderPropertyType.Float},
                     {"_Theta", ShaderPropertyType.Float},
-                }
-            },
-            {
-                "Multiply",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_T", ShaderPropertyType.Float},
-                }
-            },
-            {
-                "Multiply Random Roll",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_Freq", ShaderPropertyType.Float},
-                    {"_T", ShaderPropertyType.Float},
                 }
             },
             {
@@ -253,7 +257,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Random Roll",
+                "Rand Roll",
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_Freq", ShaderPropertyType.Float},
@@ -305,76 +309,13 @@ namespace Nova.Generate
                 }
             },
             {
-                "Screen",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_T", ShaderPropertyType.Float},
-                }
-            },
-            {
-                "Screen Blink",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_Amp", ShaderPropertyType.Float},
-                    {"_Freq", ShaderPropertyType.Float},
-                    {"_Mul", ShaderPropertyType.Float},
-                    {"_Offset", ShaderPropertyType.Float},
-                    {"_T", ShaderPropertyType.Float},
-                }
-            },
-            {
-                "Screen Fade",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_InvertMask", ShaderPropertyType.Float},
-                    {"_Mask", ShaderPropertyType.TexEnv},
-                    {"_SubColor", ShaderPropertyType.Color},
-                    {"_SubTex", ShaderPropertyType.TexEnv},
-                    {"_T", ShaderPropertyType.Float},
-                    {"_Vague", ShaderPropertyType.Float},
-                }
-            },
-            {
-                "Screen Gray Wave",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_Freq", ShaderPropertyType.Float},
-                    {"_Size", ShaderPropertyType.Float},
-                    {"_T", ShaderPropertyType.Float},
-                }
-            },
-            {
-                "Screen Random Roll",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_Freq", ShaderPropertyType.Float},
-                    {"_T", ShaderPropertyType.Float},
-                }
-            },
-            {
-                "Screen Wiggle",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_AAmp", ShaderPropertyType.Float},
-                    {"_BlinkAmp", ShaderPropertyType.Float},
-                    {"_BlinkFreq", ShaderPropertyType.Float},
-                    {"_Mono", ShaderPropertyType.Float},
-                    {"_Mul", ShaderPropertyType.Float},
-                    {"_Offset", ShaderPropertyType.Float},
-                    {"_T", ShaderPropertyType.Float},
-                    {"_TFreq", ShaderPropertyType.Float},
-                    {"_XAmp", ShaderPropertyType.Float},
-                    {"_XFreq", ShaderPropertyType.Float},
-                    {"_YAmp", ShaderPropertyType.Float},
-                    {"_YFreq", ShaderPropertyType.Float},
-                }
-            },
-            {
                 "Shake",
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_Freq", ShaderPropertyType.Float},
                     {"_T", ShaderPropertyType.Float},
+                    {"_XAmp", ShaderPropertyType.Float},
+                    {"_YAmp", ShaderPropertyType.Float},
                 }
             },
             {
@@ -407,6 +348,12 @@ namespace Nova.Generate
                 "Wiggle",
                 new Dictionary<string, ShaderPropertyType>
                 {
+                    {"_AAmp", ShaderPropertyType.Float},
+                    {"_BlinkAmp", ShaderPropertyType.Float},
+                    {"_BlinkFreq", ShaderPropertyType.Float},
+                    {"_Mono", ShaderPropertyType.Float},
+                    {"_Mul", ShaderPropertyType.Float},
+                    {"_Offset", ShaderPropertyType.Float},
                     {"_T", ShaderPropertyType.Float},
                     {"_TFreq", ShaderPropertyType.Float},
                     {"_XAmp", ShaderPropertyType.Float},
@@ -425,19 +372,22 @@ namespace Nova.Generate
                 new Dictionary<string, float>
                 {
                     {"_Aspect", 1.77777778f},
-                    {"_Scale", 1.0f},
-                    {"_Sigma", 0.2f},
-                }
-            },
-            {
-                "Barrel Chroma",
-                new Dictionary<string, float>
-                {
-                    {"_Aspect", 1.77777778f},
+                    {"_Chroma", 0.0f},
                     {"_Offset", 0.0f},
                     {"_Scale", 1.0f},
                     {"_Sigma", 0.2f},
-                    {"_Strength", 0.02f},
+                    {"_T", 0.0f},
+                }
+            },
+            {
+                "Barrel Hyper",
+                new Dictionary<string, float>
+                {
+                    {"_Aspect", 1.77777778f},
+                    {"_Chroma", 0.0f},
+                    {"_Offset", 0.0f},
+                    {"_Scale", 1.0f},
+                    {"_Sigma", 0.2f},
                     {"_T", 0.0f},
                 }
             },
@@ -468,7 +418,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Color Correction",
+                "Color",
                 new Dictionary<string, float>
                 {
                     {"_T", 0.0f},
@@ -536,7 +486,16 @@ namespace Nova.Generate
                 }
             },
             {
-                "Kaleidoscope",
+                "Gray Wave",
+                new Dictionary<string, float>
+                {
+                    {"_Freq", 0.5f},
+                    {"_Size", 50.0f},
+                    {"_T", 0.0f},
+                }
+            },
+            {
+                "Kaleido",
                 new Dictionary<string, float>
                 {
                     {"_Freq", 1.0f},
@@ -572,7 +531,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Monochrome",
+                "Mono",
                 new Dictionary<string, float>
                 {
                     {"_Offset", 0.0f},
@@ -580,7 +539,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Monochrome Mosaic",
+                "Mono Mosaic",
                 new Dictionary<string, float>
                 {
                     {"_Size", 4.0f},
@@ -596,21 +555,6 @@ namespace Nova.Generate
                     {"_Size", 1.0f},
                     {"_T", 0.0f},
                     {"_Theta", 0.0f},
-                }
-            },
-            {
-                "Multiply",
-                new Dictionary<string, float>
-                {
-                    {"_T", 0.0f},
-                }
-            },
-            {
-                "Multiply Random Roll",
-                new Dictionary<string, float>
-                {
-                    {"_Freq", 10.0f},
-                    {"_T", 0.0f},
                 }
             },
             {
@@ -643,7 +587,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Random Roll",
+                "Rand Roll",
                 new Dictionary<string, float>
                 {
                     {"_Freq", 10.0f},
@@ -695,73 +639,13 @@ namespace Nova.Generate
                 }
             },
             {
-                "Screen",
-                new Dictionary<string, float>
-                {
-                    {"_T", 0.0f},
-                }
-            },
-            {
-                "Screen Blink",
-                new Dictionary<string, float>
-                {
-                    {"_Amp", -0.5f},
-                    {"_Freq", 10.0f},
-                    {"_Mul", 1.0f},
-                    {"_Offset", 0.0f},
-                    {"_T", 0.0f},
-                }
-            },
-            {
-                "Screen Fade",
-                new Dictionary<string, float>
-                {
-                    {"_InvertMask", 0.0f},
-                    {"_T", 0.0f},
-                    {"_Vague", 0.25f},
-                }
-            },
-            {
-                "Screen Gray Wave",
-                new Dictionary<string, float>
-                {
-                    {"_Freq", 0.5f},
-                    {"_Size", 50.0f},
-                    {"_T", 0.0f},
-                }
-            },
-            {
-                "Screen Random Roll",
-                new Dictionary<string, float>
-                {
-                    {"_Freq", 10.0f},
-                    {"_T", 0.0f},
-                }
-            },
-            {
-                "Screen Wiggle",
-                new Dictionary<string, float>
-                {
-                    {"_AAmp", 0.0f},
-                    {"_BlinkAmp", 0.0f},
-                    {"_BlinkFreq", 0.0f},
-                    {"_Mono", 0.0f},
-                    {"_Mul", 1.0f},
-                    {"_Offset", 0.0f},
-                    {"_T", 0.0f},
-                    {"_TFreq", 0.0f},
-                    {"_XAmp", 0.0f},
-                    {"_XFreq", 0.0f},
-                    {"_YAmp", 0.0f},
-                    {"_YFreq", 0.0f},
-                }
-            },
-            {
                 "Shake",
                 new Dictionary<string, float>
                 {
                     {"_Freq", 10.0f},
                     {"_T", 0.0f},
+                    {"_XAmp", 1.0f},
+                    {"_YAmp", 1.0f},
                 }
             },
             {
@@ -787,6 +671,12 @@ namespace Nova.Generate
                 "Wiggle",
                 new Dictionary<string, float>
                 {
+                    {"_AAmp", 0.0f},
+                    {"_BlinkAmp", 0.0f},
+                    {"_BlinkFreq", 0.0f},
+                    {"_Mono", 0.0f},
+                    {"_Mul", 1.0f},
+                    {"_Offset", 0.0f},
                     {"_T", 0.0f},
                     {"_TFreq", 0.0f},
                     {"_XAmp", 0.0f},
@@ -808,6 +698,13 @@ namespace Nova.Generate
                 }
             },
             {
+                "Barrel Hyper",
+                new Dictionary<string, Color>
+                {
+                    {"_BackColor", Color.black},
+                }
+            },
+            {
                 "Change Texture With Fade",
                 new Dictionary<string, Color>
                 {
@@ -816,7 +713,7 @@ namespace Nova.Generate
                 }
             },
             {
-                "Color Correction",
+                "Color",
                 new Dictionary<string, Color>
                 {
                     {"_ColorAdd", Color.clear},
@@ -851,13 +748,6 @@ namespace Nova.Generate
                 {
                     {"_ColorAdd", Color.clear},
                     {"_ColorMul", Color.white},
-                }
-            },
-            {
-                "Screen Fade",
-                new Dictionary<string, Color>
-                {
-                    {"_SubColor", Color.white},
                 }
             },
         };

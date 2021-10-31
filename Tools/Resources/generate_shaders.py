@@ -16,13 +16,17 @@ def indent_lines(s, n):
                      for line in s.strip('\r\n').splitlines())
 
 
-def write_shader(filename, text, ext_name, variant_name, variant_tags,
-                 def_gscale, gscale):
+def write_shader(filename, text, *, ext_name, variant_name, variant_tags,
+                 variant_rgb, def_gscale, gscale):
     filename = filename.replace('.shaderproto', ext_name)
+
     text = text.replace('$VARIANT_NAME$', variant_name)
     text = text.replace(indent_lines('$VARIANT_TAGS$', 8), variant_tags)
+    text = text.replace(indent_lines('$VARIANT_RGB$', 16), variant_rgb)
     text = text.replace(indent_lines('$DEF_GSCALE$', 12), def_gscale)
     text = text.replace('$GSCALE$', gscale)
+    text = re.compile(r'\n{3,}').sub(r'\n\n', text)
+
     with open(os.path.join(shader_dir, filename),
               'w',
               encoding='utf-8',
@@ -31,6 +35,76 @@ def write_shader(filename, text, ext_name, variant_name, variant_tags,
             '// This file is generated. Do not edit it manually. Please edit .shaderproto files.\n\n'
         )
         f.write(text)
+
+
+def generate_shader(filename, text, variant):
+    if variant == 'Default':
+        write_shader(
+            filename,
+            text,
+            ext_name='.shader',
+            variant_name='VFX',
+            variant_tags=indent_lines(
+                """
+Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
+""", 8),
+            variant_rgb='',
+            def_gscale='',
+            gscale='1.0',
+        )
+    elif variant == 'Multiply':
+        write_shader(
+            filename,
+            text,
+            ext_name='.Multiply.shader',
+            variant_name='VFX Multiply',
+            variant_tags=indent_lines(
+                """
+Cull Off ZWrite Off Blend DstColor Zero
+Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
+""", 8),
+            variant_rgb=indent_lines(
+                """
+col.rgb = 1.0 - (1.0 - col.rgb) * col.a;
+col.a = 1.0;
+""", 16),
+            def_gscale='',
+            gscale='1.0',
+        )
+    elif variant == 'Screen':
+        write_shader(
+            filename,
+            text,
+            ext_name='.Screen.shader',
+            variant_name='VFX Screen',
+            variant_tags=indent_lines(
+                """
+Cull Off ZWrite Off Blend OneMinusDstColor One
+Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
+""", 8),
+            variant_rgb=indent_lines("""
+col.rgb *= col.a;
+col.a = 1.0;
+""", 16),
+            def_gscale='',
+            gscale='1.0',
+        )
+    elif variant == 'PP':
+        write_shader(
+            filename,
+            text,
+            ext_name='.PP.shader',
+            variant_name='Post Processing',
+            variant_tags=indent_lines("""
+Cull Off ZWrite Off ZTest Always
+""", 8),
+            variant_rgb='',
+            def_gscale=indent_lines('float _GScale;', 12),
+            gscale='_GScale',
+        )
+    else:
+        raise ValueError(f'Unknown variant: {variant}')
 
 
 def generate_shaders(filenames):
@@ -49,76 +123,20 @@ def generate_shaders(filenames):
 
         print(filename)
         timestamps[filename] = mtime
+
         with open(path, 'r', encoding='utf-8') as f:
             text = f.read()
+        line = text.split('\n', 1)[0]
+        if line.startswith('VARIANTS:'):
+            text = text[len(line) + 1:]
 
-        if filename.startswith('Multiply'):
-            write_shader(
-                filename,
-                text,
-                '.shader',
-                'VFX',
-                indent_lines(
-                    """
-Cull Off ZWrite Off Blend DstColor Zero
-Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
-""", 8),
-                '',
-                '1.0',
-            )
-        elif filename.startswith('Screen'):
-            write_shader(
-                filename,
-                text,
-                '.shader',
-                'VFX',
-                indent_lines(
-                    """
-Cull Off ZWrite Off Blend OneMinusDstColor One
-Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
-""", 8),
-                '',
-                '1.0',
-            )
-        elif filename == 'ChangeTextureWithFade.shaderproto':
-            write_shader(
-                filename,
-                text,
-                '.shader',
-                'VFX',
-                indent_lines(
-                    """
-Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
-Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
-""", 8),
-                '',
-                '1.0',
-            )
+            line = line.replace('VARIANTS:', '')
+            variants = [x.strip() for x in line.split(',')]
         else:
-            write_shader(
-                filename,
-                text,
-                '.shader',
-                'VFX',
-                indent_lines(
-                    """
-Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
-Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
-""", 8),
-                '',
-                '1.0',
-            )
-            write_shader(
-                filename,
-                text,
-                '.PP.shader',
-                'Post Processing',
-                indent_lines("""
-Cull Off ZWrite Off ZTest Always
-""", 8),
-                indent_lines('float _GScale;', 12),
-                '_GScale',
-            )
+            variants = ['Default', 'Multiply', 'Screen', 'PP']
+
+        for variant in variants:
+            generate_shader(filename, text, variant)
 
     print()
 
@@ -135,6 +153,8 @@ def parse_shader_properties(filename):
 
     with open(filename, 'r', encoding='utf-8') as f:
         line = f.__next__()
+        if line.startswith('VARIANTS:'):
+            line = f.__next__()
         shader_name = line.strip().split('/')[-1][:-1]
 
         for _ in range(3):
