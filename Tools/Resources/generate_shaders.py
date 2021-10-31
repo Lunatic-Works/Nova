@@ -11,9 +11,20 @@ shader_info_cs_filename = '../../Assets/Nova/Sources/Generate/ShaderInfoDatabase
 shader_info_lua_filename = '../../Assets/Nova/Lua/shader_info.lua'
 
 
-def indent_lines(s, n):
-    return '\n'.join(' ' * n + line if line else ''
-                     for line in s.strip('\r\n').splitlines())
+def indent_lines(s, indent):
+    if isinstance(indent, int):
+        indent = ' ' * indent
+    indent = indent.replace('\t', ' ' * 4)
+    s = ''.join(indent + line if line else ''
+                for line in s.strip('\r\n').splitlines(keepends=True))
+    return s
+
+
+def replace_indented(s, old, new):
+    old = old.replace('$', r'\$')
+    s = re.compile(fr'^([ \t]*){old}$', re.MULTILINE).sub(
+        lambda match: indent_lines(new, match.group(1)), s)
+    return s
 
 
 def write_shader(filename, text, *, ext_name, variant_name, variant_tags,
@@ -21,9 +32,9 @@ def write_shader(filename, text, *, ext_name, variant_name, variant_tags,
     filename = filename.replace('.shaderproto', ext_name)
 
     text = text.replace('$VARIANT_NAME$', variant_name)
-    text = text.replace(indent_lines('$VARIANT_TAGS$', 8), variant_tags)
-    text = text.replace(indent_lines('$VARIANT_RGB$', 16), variant_rgb)
-    text = text.replace(indent_lines('$DEF_GSCALE$', 12), def_gscale)
+    text = replace_indented(text, '$VARIANT_TAGS$', variant_tags)
+    text = replace_indented(text, '$VARIANT_RGB$', variant_rgb)
+    text = replace_indented(text, '$DEF_GSCALE$', def_gscale)
     text = text.replace('$GSCALE$', gscale)
     text = re.compile(r'\n{3,}').sub(r'\n\n', text)
 
@@ -44,11 +55,10 @@ def generate_shader(filename, text, variant):
             text,
             ext_name='.shader',
             variant_name='VFX',
-            variant_tags=indent_lines(
-                """
+            variant_tags="""
 Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
 Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
-""", 8),
+""",
             variant_rgb='',
             def_gscale='',
             gscale='1.0',
@@ -59,16 +69,14 @@ Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
             text,
             ext_name='.Multiply.shader',
             variant_name='VFX Multiply',
-            variant_tags=indent_lines(
-                """
+            variant_tags="""
 Cull Off ZWrite Off Blend DstColor Zero
 Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
-""", 8),
-            variant_rgb=indent_lines(
-                """
+""",
+            variant_rgb="""
 col.rgb = 1.0 - (1.0 - col.rgb) * col.a;
 col.a = 1.0;
-""", 16),
+""",
             def_gscale='',
             gscale='1.0',
         )
@@ -78,15 +86,14 @@ col.a = 1.0;
             text,
             ext_name='.Screen.shader',
             variant_name='VFX Screen',
-            variant_tags=indent_lines(
-                """
+            variant_tags="""
 Cull Off ZWrite Off Blend OneMinusDstColor One
 Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
-""", 8),
-            variant_rgb=indent_lines("""
+""",
+            variant_rgb="""
 col.rgb *= col.a;
 col.a = 1.0;
-""", 16),
+""",
             def_gscale='',
             gscale='1.0',
         )
@@ -96,11 +103,11 @@ col.a = 1.0;
             text,
             ext_name='.PP.shader',
             variant_name='Post Processing',
-            variant_tags=indent_lines("""
+            variant_tags="""
 Cull Off ZWrite Off ZTest Always
-""", 8),
+""",
             variant_rgb='',
-            def_gscale=indent_lines('float _GScale;', 12),
+            def_gscale='float _GScale;',
             gscale='_GScale',
         )
     else:
@@ -152,13 +159,13 @@ def parse_shader_properties(filename):
     vector_data = {}
 
     with open(filename, 'r', encoding='utf-8') as f:
-        line = f.__next__()
+        line = next(f)
         if line.startswith('VARIANTS:'):
-            line = f.__next__()
+            line = next(f)
         shader_name = line.strip().split('/')[-1][:-1]
 
         for _ in range(3):
-            f.__next__()
+            next(f)
 
         for line in f:
             line = line.strip()
