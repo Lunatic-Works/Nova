@@ -148,13 +148,14 @@ namespace Nova
             if (textInfo.lineCount >= 2)
             {
                 var lineInfo = textInfo.lineInfo[textInfo.lineCount - 1];
-                int firstIdx = lineInfo.firstCharacterIndex;
+                var characterInfos = textInfo.characterInfo;
+                int firstIdx = characterInfos[lineInfo.firstCharacterIndex].index;
 
                 bool needBreak = firstIdx >= 1 && IsChineseCharacter(text[firstIdx]);
 
                 if (needBreak)
                 {
-                    int lastIdx = lineInfo.lastCharacterIndex;
+                    int lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
                     for (int i = firstIdx + 1; i <= lastIdx; ++i)
                     {
                         if (!ChineseFollowingPunctuations.Contains(text[i]))
