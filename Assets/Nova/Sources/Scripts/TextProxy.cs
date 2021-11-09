@@ -149,6 +149,7 @@ namespace Nova
             {
                 var lineInfo = textInfo.lineInfo[textInfo.lineCount - 1];
                 var characterInfos = textInfo.characterInfo;
+                // characterInfo.index is the index in the original text with XML tags
                 int firstIdx = characterInfos[lineInfo.firstCharacterIndex].index;
 
                 bool needBreak = firstIdx >= 1 && IsChineseCharacter(text[firstIdx]);
@@ -183,6 +184,7 @@ namespace Nova
             textBox.text = text;
         }
 
+        // Count of the parsed text without XML tags
         public int GetPageCharacterCount()
         {
             var textInfo = textBox.textInfo;

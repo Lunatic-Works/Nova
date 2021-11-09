@@ -4,29 +4,42 @@
 
 基于Unity，对程序员友好的视觉小说（VN）/文字冒险游戏（AVG）框架
 
-设计思路和一些特点的介绍：https://zhuanlan.zhihu.com/p/272466277
-
-本框架支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台
-
-新功能将会随着我们的下一部作品一起开发，预计的功能包括URP，以及更稳定、更灵活的脚本
-
-## 快速上手
+## 使用说明
 
 1. `git clone`，为了节约时间可以加上`--depth 1`
-2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
-3. 准备打开我们的示例工程
+2. 准备打开我们的示例工程
+    * 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
     * 将`Assets/Examples/Colorless/`文件夹下的`Scenes/, StandingsUncropped/`和对应的`.meta`文件移动到`Assets/`文件夹下
     * 将`Assets/Examples/Colorless/Resources/`文件夹下的`Colorless/, Locales/`和对应的`.meta`文件移动到`Assets/Resources/`文件夹下
     * 如果操作正确，移动的过程中不会覆盖任何文件，`Assets/Examples/`文件夹下也不会剩下任何文件（除了空文件夹和对应的`.meta`文件）
-4. 打开`Assets/Scenes/Main.unity`，体验示例作品
-5. 在开始改脚本之前，先删除英文版的脚本，以免发生冲突
+3. 在Unity Editor中打开`Assets/Scenes/Main.unity`，运行游戏，把示例作品《Colorless》看一遍
+4. 在开始改脚本之前，先删除英文版的脚本，以免发生冲突
     * `Assets/Resources/Locales/English/Colorless/Scenarios/`文件夹下是英文版的脚本，可以全部删除
-    * `Assets/Resources/LocalizedResourcePaths.txt`记录英文版用到的文件，可以删除
-5. 试着改一改脚本吧，脚本放在`Assets/Resources/Colorless/Scenarios/`文件夹下
+    * `Assets/Resources/LocalizedResourcePaths.txt`用来记录英文版用到的文件，可以删除
+5. 在Unity Editor中把教程看一遍，同时可以试着改一改脚本，脚本放在`Assets/Resources/Colorless/Scenarios/`文件夹下
+6. 其他资料可以参考[GitHub Wiki](https://github.com/Lunatic-Works/Nova/wiki/)
 
-## 说明文档
+## 常见问题
 
-GitHub Wiki（正在施工中）：https://github.com/Lunatic-Works/Nova/wiki/
+* **网上已经有很多视觉小说引擎/框架了，Nova与它们的差异在哪里？**
+
+    这篇文章介绍了设计思路：https://zhuanlan.zhihu.com/p/272466277
+
+* **支持什么版本的Unity、什么操作系统/平台？**
+
+    支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台。
+
+* **支持热更新/AssetBundle/Addressable吗？**
+
+    目前不支持，我们只用了Resources，下一个大版本中应该会支持。
+
+* **我可以把解谜/战棋等游戏加到Nova里吗？我可以把Nova作为对话系统加到解谜/战棋等游戏里吗？**
+
+    绝大多数Unity能做的gameplay都可以加到Nova里，但是把Nova加到其他游戏里会比较困难。目前Nova的定位是“框架/模板”，而不是“插件/扩展包”。
+
+* **打算从Unity迁移到Godot吗？**
+
+    再等等吧，先等Godot 4出来了再说。。
 
 ## 友情链接
 
@@ -34,16 +47,23 @@ GitHub Wiki（正在施工中）：https://github.com/Lunatic-Works/Nova/wiki/
 * 我们的微博：[@LunaticWorks](https://weibo.com/LunaticWorks)
 * 我们的QQ群：876212259，如果以后讨论程序的人多了可能会再开一个程序群
 
-也可以看一看其他的引擎：
+也可以看一看其他的视觉小说引擎：
 
 * [Ren'Py](https://github.com/renpy/renpy)：如果你没有编程基础但是想学，或者有Python基础，推荐用这个引擎
 * [AVG.js](https://github.com/avgjs/avg-core)：如果你信仰web前端，推荐用这个引擎
-* [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎
+* [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎，作者是个萝莉控
 * [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个使用web前端的引擎，似乎得到了Xihe Animation的支持
 * [Snowing](https://github.com/Strrationalism/Snowing)：用C++写的硬核引擎
-* [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家自研引擎的碎片化问题，而定义的通用脚本格式
-* [EtherEngine](https://github.com/VoidmatrixHeathcliff/EtherEngine)：基于Lua和SDL的跨平台游戏接口
+
+以及通用游戏引擎：
+
+* [PainterEngine](https://github.com/matrixcascade/PainterEngine)：由C语言编写的跨平台图形应用框架
+* [EtherEngine](https://github.com/EtherProject/EtherEngine)：基于Lua的跨平台游戏接口
 * [Luna Engine](https://github.com/JX-Master/Luna-Engine-0.6)：这个引擎不是我们做的，不过看起来很有意思
+
+以及
+
+* [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家视觉小说引擎的碎片化问题，而定义的通用脚本格式
 
 本框架的依赖：
 

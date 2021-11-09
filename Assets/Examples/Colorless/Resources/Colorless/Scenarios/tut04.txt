@@ -1,0 +1,12 @@
+@<|
+label('tut04', '教程4 对话框')
+is_start()
+|>
+<|
+stop(bgm)
+set_box()
+|>
+文本中可以使用TextMeshPro提供的rich text XML标记（详见[TextMeshPro官网](http://digitalnativestudios.com/textmeshpro/docs/rich-text/)）
+
+比如<b>粗体</b>、<i>斜体</i>、<s>删除线</s>、<color=#FF0000>改变颜色</color>、<size=100%>改变大小</size>
+@<| is_end() |>

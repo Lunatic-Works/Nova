@@ -13,7 +13,8 @@ namespace Nova
     {
         private const int PreloadDialogueSteps = 5;
         private const string LuaCommentPattern = @"--.*";
-        private const string NameDialoguePattern = @"(.*?)(?:：：|::)(.*)";
+        private const string LuaMultilineCommentPattern = @"--\[(=*)\[(.|\n)*?\]\1\]";
+        private const string NameDialoguePattern = @"(?<name>.*?)(：：|::)(?<dialogue>(.|\n)*)";
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
 
@@ -108,6 +109,7 @@ namespace Nova
             unpreloadActions = null;
             checkpointActions = null;
 
+            code = Regex.Replace(code, LuaMultilineCommentPattern, "");
             code = Regex.Replace(code, LuaCommentPattern, "");
 
             foreach (var pair in PatternToActionGenerator)
@@ -174,11 +176,11 @@ namespace Nova
 
         private static void ParseNameDialogue(string text, out string characterName, out string dialogue)
         {
-            var m = Regex.Match(text, NameDialoguePattern);
+            var m = Regex.Match(text, NameDialoguePattern, RegexOptions.ExplicitCapture);
             if (m.Success)
             {
-                characterName = m.Groups[1].Value;
-                dialogue = m.Groups[2].Value;
+                characterName = m.Groups["name"].Value;
+                dialogue = m.Groups["dialogue"].Value;
             }
             else
             {
@@ -212,6 +214,10 @@ namespace Nova
             }
 
             var text = sb.ToString();
+
+            text = Regex.Replace(text, @"`([^`]*)`", @"<style=Code>$1</style>");
+            text = Regex.Replace(text, @"\[([^\]]*)\]\(([^\)]*)\)", @"<link=""$2""><style=Link>$1</style></link>");
+
             // Debug.Log($"text: <color=green>{text}</color>");
             return text;
         }

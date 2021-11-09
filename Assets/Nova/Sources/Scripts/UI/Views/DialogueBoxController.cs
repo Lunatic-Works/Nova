@@ -119,14 +119,14 @@ namespace Nova
                 switch (value)
                 {
                     case Theme.Default:
-                        scrollRectTransform.offsetMin = new Vector2(60f, 0f);
-                        scrollRectTransform.offsetMax = new Vector2(-120f, -40f);
+                        scrollRectTransform.offsetMin = new Vector2(120f, 0f);
+                        scrollRectTransform.offsetMax = new Vector2(-180f, -40f);
                         dialogueEntryLayoutSetting = new DialogueEntryLayoutSetting
                         {
-                            leftPadding = 150,
+                            leftPadding = 0,
                             rightPadding = 0,
                             nameTextSpacing = 16f,
-                            preferredHeight = 150f
+                            preferredHeight = 180f
                         };
                         break;
                     case Theme.Basic:
