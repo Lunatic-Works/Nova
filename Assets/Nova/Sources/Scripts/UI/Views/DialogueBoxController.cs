@@ -81,6 +81,7 @@ namespace Nova
         private ScrollRect dialogueTextScrollRect;
         private DialogueTextController dialogueText;
         private RectTransform dialogueTextRect;
+        private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
 
         private ButtonRingTrigger buttonRingTrigger;
         private LogController logController;
@@ -121,6 +122,7 @@ namespace Nova
                     case Theme.Default:
                         scrollRectTransform.offsetMin = new Vector2(120f, 0f);
                         scrollRectTransform.offsetMax = new Vector2(-180f, -40f);
+                        dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 0);
                         dialogueEntryLayoutSetting = new DialogueEntryLayoutSetting
                         {
                             leftPadding = 0,
@@ -130,8 +132,9 @@ namespace Nova
                         };
                         break;
                     case Theme.Basic:
-                        scrollRectTransform.offsetMin = new Vector2(60f, 120f);
-                        scrollRectTransform.offsetMax = new Vector2(-120f, -40f);
+                        scrollRectTransform.offsetMin = new Vector2(60f, 42f);
+                        scrollRectTransform.offsetMax = new Vector2(-120f, -42f);
+                        dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 120);
                         dialogueEntryLayoutSetting = DialogueEntryLayoutSetting.Default;
                         break;
                     default:
@@ -205,6 +208,7 @@ namespace Nova
             dialogueTextScrollRect = GetComponentInChildren<ScrollRect>();
             dialogueText = GetComponentInChildren<DialogueTextController>();
             dialogueTextRect = dialogueText.transform as RectTransform;
+            dialogueTextVerticalLayoutGroup = dialogueText.GetComponent<VerticalLayoutGroup>();
 
             buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
             logController = transform.parent.GetComponentInChildren<LogController>();
@@ -536,7 +540,8 @@ namespace Nova
             textScrollOverriden = true;
         }
 
-        // ScrollRect.verticalNormalizedPosition cannot be out of [0, 1]
+        // dialogueTextScrollRect.verticalNormalizedPosition cannot be out of [0, 1],
+        // and it may be out of sync with dialogueTextRect.localPosition.y when the content changes
         public void SetTextScroll(float value)
         {
             var position = dialogueTextRect.localPosition;
@@ -596,7 +601,7 @@ namespace Nova
                 {
                     if (dialogueText.dialogueEntryControllers.Count == 1)
                     {
-                        ResetTextScroll();
+                        SetTextScroll(0f);
                     }
                     else
                     {

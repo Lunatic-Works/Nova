@@ -117,11 +117,6 @@ shader_type_data = {
         _Offset = 'Float',
         _T = 'Float',
     },
-    ['Mono Mosaic'] = {
-        _Size = 'Float',
-        _Strength = 'Float',
-        _T = 'Float',
-    },
     ['Motion Blur'] = {
         _Offset = 'Float',
         _Size = 'Float',
@@ -307,11 +302,6 @@ shader_float_data = {
     },
     ['Mono'] = {
         _Offset = 0,
-        _T = 0,
-    },
-    ['Mono Mosaic'] = {
-        _Size = 4,
-        _Strength = 8,
         _T = 0,
     },
     ['Motion Blur'] = {

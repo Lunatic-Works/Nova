@@ -27,19 +27,21 @@
 
 * **支持什么版本的Unity、什么操作系统/平台？**
 
-    支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台。
-
-* **支持热更新/AssetBundle/Addressable吗？**
-
-    目前不支持，我们只用了Resources，下一个大版本中应该会支持。
+    支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台。WebGL目前不支持，不过似乎已经有人成功让我们的依赖（tolua#和Json.NET）支持WebGL了，我们真要做的话应该也可以。
 
 * **我可以把解谜/战棋等游戏加到Nova里吗？我可以把Nova作为对话系统加到解谜/战棋等游戏里吗？**
 
     绝大多数Unity能做的gameplay都可以加到Nova里，但是把Nova加到其他游戏里会比较困难。目前Nova的定位是“框架/模板”，而不是“插件/扩展包”。
 
-* **打算从Unity迁移到Godot吗？**
+* **Unity已死，Godot万岁！**
 
-    再等等吧，先等Godot 4出来了再说。。
+    等Godot 4出来了再说。。
+
+## 版本说明
+
+* v0.1：与《青箱》完全兼容的版本
+* v0.2：`master` branch上滚动更新的版本，重要的新功能包括新的脚本parser，预计还会加入新的基于JSON的存档系统，这些新功能不会影响游戏制作者的工作流程
+* v0.3：正在与我们的新作同步开发的版本（等我们把代码整理好了会放出来一个branch），预计的新功能包括URP和Addressable，这些新功能对游戏制作者的工作流程有一定影响
 
 ## 友情链接
 

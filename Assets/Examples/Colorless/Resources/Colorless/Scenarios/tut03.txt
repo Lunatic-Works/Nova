@@ -1,0 +1,69 @@
+@<|
+label('tut03', '教程3 声音')
+is_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+教程3 声音
+
+<|
+play(bgm, 'final')
+|>
+`play`函数可以播放背景音乐
+
+在Unity Editor的Hierarchy窗口里选中`Audios/BGM`，在Inspector窗口里就能看到背景音乐的状态
+
+<|
+play(bgm, 'final', 1)
+|>
+`play`的第三个参数是音量，范围为0..1，默认为0.5
+
+<|
+volume(bgm, 0.5)
+|>
+也可以用`volume`函数改变音量
+
+<|
+play(bgm, 'final', 0.1)
+play(bgs, 'rain', 1)
+|>
+可以同时播放多首音乐，每首音乐由一个game object控制
+
+`bgs`一般用来播放背景音效，它会像背景音乐一样循环，但文件位置（`AudioController.audioFolder`）和音量设置（`AudioVolumeController.configKeyName`）与音效相同
+
+<|
+stop(bgm)
+stop(bgs)
+|>
+`stop`函数可以停止背景音乐
+
+顺便说一句：：标题界面已经有背景音乐了，所以这些教程的开头都有`stop(bgm)`
+
+<|
+show(xiben, 'normal', pos_c)
+sound('clap')
+|>
+`sound`函数可以播放音效
+
+<|
+sound('clap', 0.5)
+|>
+`sound`的第二个参数是音量，默认为1（与`play`的音量默认值不同）
+
+<|
+say(xiben, '08')
+|>
+`say`函数可以播放语音
+
+顺便说一句：：Colorless的脚本中用到的都是自动语音，这个以后再讲
+
+<|
+hide(xiben)
+|>
+西本同学出来骂了你一顿之后又回去了
+
+教程3 声音 到此结束
+@<| jump_to 'tut04' |>

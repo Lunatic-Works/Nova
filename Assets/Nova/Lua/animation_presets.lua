@@ -2,6 +2,8 @@ pos_l = {-4, -0.3, 0.4, 0, 0}
 pos_c = { 0, -0.3, 0.4, 0, 0}
 pos_r = { 4, -0.3, 0.4, 0, 0}
 
+color_sunset = {1, 240/255, 220/255}
+
 make_anim_method('cam_punch', function(self)
     local entry = self:_then(_move {cam, Vector3(0, -0.2, 0), RELATIVE}):_with(parse_easing({'shake', 20, 0.5})):_for(0.4
         ):_and(Nova.CameraSizeAnimationProperty(cam, 0.9, RELATIVE)):_with(parse_easing({1, 0})):_for(0.05

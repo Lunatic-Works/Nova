@@ -21,12 +21,14 @@ show(bg, 'rain')
 
 `rain`是这个文件夹中的图片文件名（不需要后缀名）
 
+顺便说一句：：把图片素材导入到Nova的方法详见[Wiki：背景图片导入](https://github.com/Lunatic-Works/Nova/wiki/Image-Import)
+
 <|
 show(bg2, 'room', {2, 2})
 |>
-可以同时显示多个图层，每个图层对应一个game object。上面的`bg2`对应的就是`BackgroundImage2`
+可以同时显示多个图层，每个图层由一个game object控制。上面的`bg2`对应的就是`BackgroundImage2`
 
-如果需要更多图层，可以在Unity Editor中复制更多的game object
+如果需要更多图层，可以在Unity Editor中复制更多的game object，并修改`luaGlobalName`
 
 顺便说一句：：图层的顺序一般由z坐标决定。上面的`{2, 2}`是x、y坐标，马上就会讲到
 
@@ -69,12 +71,12 @@ move(bg, {nil, nil, {0.5, 2}})
 <|
 move(bg, {0, 0, 1, 11, 30})
 |>
-如果还有第四、第五个参数，则是z坐标和绕z轴的旋转角度
+顺便说一句：：如果还有第四、第五个参数，则是z坐标和绕z轴的旋转角度
 
 <|
 move(bg, {nil, nil, nil, nil, {60, 40, 20}})
 |>
-如果第五个参数是一个table，则会分别设置绕x、y、z轴的旋转
+顺便说一句：：如果第五个参数是一个table，则会分别设置绕x、y、z轴的旋转
 
 顺便说一句：：为了方便只有二维演出的作品，Nova脚本中的坐标的前三个参数是x、y、缩放，而不是x、y、z
 
@@ -82,7 +84,7 @@ move(bg, {nil, nil, nil, nil, {60, 40, 20}})
 
 顺便说一句：：如果需要做三维演出，你可以把摄像机改成perspective，这时z坐标就会影响图片显示的大小
 
-顺便说一句：：Unity的渲染顺序也不完全是由z坐标决定的，如果要仔细调整的话可以用render queue，这个以后再说。。
+顺便说一句：：Unity的渲染顺序也不完全是由z坐标决定的，如果要仔细调整的话可以用render queue，这个以后再讲。。
 
 <|
 move(bg, {0, 0, 1, 10, 0})
@@ -126,5 +128,100 @@ hide(bg2)
 move(bg2, {0, 0})
 tint(bg2, 1)
 |>
-隐藏`bg2`。如果接下来长时间用不到一个图层，最好把坐标和颜色恢复原状，以免下次用到的时候忘了
-@<| is_end() |>
+好了，隐藏`bg2`。如果接下来长时间用不到一个图层，最好把坐标和颜色恢复原状，以免下次用到的时候忘了
+
+<|
+show(bg, 'room', {1, 1}, {1, 0.5, 0})
+|>
+坐标和颜色也可以在`show`当中设置
+
+<|
+show(bg, 'rain', nil, {0, 0.5, 1})
+|>
+如果省略则是保持之前的值
+
+<|
+show(bg, 'room', {0, 0}, 1)
+|>
+好了，把背景恢复正常
+
+<|
+show(gaotian, 'normal', {0, -0.3, 0.4})
+|>
+`show`也可以用来显示角色立绘
+
+角色立绘通常是由几个部件组合而成的，称为一个pose，`normal`是pose的名称
+
+所有角色pose的信息在`pose.lua`中定义
+
+顺便说一句：：把立绘素材导入到Nova的方法详见[Wiki：立绘导入](https://github.com/Lunatic-Works/Nova/wiki/Standing-Import)
+
+<|
+show(gaotian, 'cry')
+|>
+改变一下立绘的表情
+
+<|
+show(gaotian, 'normal')
+|>
+立绘改变的时候默认有零点几秒的淡入淡出，更复杂的动画以后再讲
+
+<|
+move(gaotian, {-4, nil})
+|>
+`move`也可以用来移动立绘
+
+<|
+move(gaotian, pos_r)
+|>
+可以把`move`用到的坐标定义成一个变量`pos_r`，避免把同一个坐标输很多遍。这样的变量一般在`animation_presets.lua`中定义
+
+<|
+tint(gaotian, {0.5, 1, 0.5})
+|>
+`tint`也可以用来改变立绘的颜色
+
+<|
+env_tint(gaotian, color_sunset)
+tint(gaotian, 1)
+|>
+还有一个函数`env_tint`，也用来改变立绘的颜色（不能用在普通图片上面）。这里的`color_sunset`也是定义在`animation_presets.lua`中的变量
+
+<|
+tint(gaotian, 0.5)
+|>
+`env_tint`与`tint`的效果可以叠加。`env_tint`一般用于黄昏、夜晚等环境引起的长时间的颜色变化，`tint`则用于短时间的演出效果
+
+<|
+move(gaotian, pos_c)
+env_tint(gaotian, 1)
+tint(gaotian, 1)
+|>
+好了，恢复立绘的位置和颜色
+
+<|
+move(cam, {1, 0})
+|>
+`move`还可以用来移动摄像机
+
+顺便说一句：：目前我们用到的摄像机都是Hierarchy中的`MainCamera`，`MaskCamera`的用处以后再讲
+
+顺便说一句：：目前的摄像机模式是orthographic，所以立绘和背景看起来像一整张图片一样移动。如果把摄像机改成perspective，就会有三维视差的效果
+
+<|
+move(cam, {1, 1, 6})
+|>
+注意，摄像机的坐标中的缩放控制的不是`Transform`中的`scale`，而是`Camera`中的`size`
+
+顺便说一句：：如果摄像机的模式是perspective，坐标中的缩放控制的则是`Camera.fieldOfView`
+
+<|
+move(cam, {0, 0, 5})
+|>
+恢复摄像机位置
+
+<|
+hide(gaotian)
+|>
+教程2 图像 到此结束
+@<| jump_to 'tut03' |>

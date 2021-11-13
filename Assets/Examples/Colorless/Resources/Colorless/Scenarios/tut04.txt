@@ -3,10 +3,130 @@ label('tut04', '教程4 对话框')
 is_start()
 |>
 <|
+show(bg, 'rain')
 stop(bgm)
+set_box()
+|>
+教程4 对话框
+
+<|
+set_box('full', 'dark')
+|>
+`set_box`函数用来设置对话框的位置和风格
+
+它的第一个参数是对话框位置的预设名称，比如`full`就是把对话框位置设成全屏
+
+所有的位置预设在`dialogue_box.lua`里的`box_pos_presets`当中定义
+
+其中的`anchor`是对话框的左右下上四条边在屏幕中的位置，用0..1之间的数表示
+
+`offset`则是左右下上四条边在`anchor`的基础上向里移动的距离，用像素表示
+
+`anchor`和`offset`一般只需要用到两者之一，可以根据你设计UI的习惯来用
+
+`update_mode`是对话框的更新方式，可以设为`Overwrite`或`Append`
+
+平常对话框在屏幕下方时，更新方式是`Overwrite`，每显示一条新的对话，旧的对话就不显示了
+
+而全屏对话框的更新方式是`Append`，显示新的对话时，旧的对话还在上面
+
+更新方式包括在位置的预设中，因为设置位置的同时一般也会设置更新方式
+
+<|
+new_page()
+|>
+顺便说一句：：`new_page`函数用来清空对话框
+
+<|
+set_box('left', 'dark')
+|>
+改变对话框位置时，对话框也会自动清空
+
+<|
+set_box('right', 'dark', false)
+|>
+如果不想自动清空，可以把`set_box`的第三个参数设为false
+
+<|
+set_box('full', 'dark')
+|>
+`set_box`的第二个参数是风格的预设名称
+
+所有的风格预设在`dialogue_box.lua`里的`box_style_presets`当中定义
+
+其中的`tint`是对话框背景的颜色，这个颜色会乘到对话框背景图片原本的RGBA数值上
+
+`alignment`是文本的对齐方式，`text_color`是文本的颜色
+
+`text_material`是文本的材质，一般用来做描边或者发光等等效果，`outline`就是描边
+
+<|
+set_box('full', 'transparent', false)
+|>
+当对话框的背景透明时，一般需要给文本加上描边
+
+<|
+set_box('full', 'dark')
+|>
+顺便说一句：：创建material preset的方法详见[Unity官网](https://learn.unity.com/tutorial/textmesh-pro-working-with-material-presets)。在创建之后，还要在`UI` game object里的`I18nFontConfig.config`中设置每种语言对应的字体、材质和材质名称
+
+顺便说一句：：位置预设当中的`theme`的实现详见`DialogueBoxController.cs`，用来控制对话框的更多排版要素，包括背景图片的替换、关闭按钮和对话结束图标的位置、文本与对话框边缘的距离、角色名字与说话内容的距离等等
+
+<|
+set_box('hide')
+|>
+
+<|
+set_box()
+|>
+`set_box('hide')`可以隐藏对话框，其实就是把对话框的位置移到屏幕之外
+
+`set_box()`的所有参数都是默认值，就是把对话框设置成默认的位置和风格
+
+顺便说一句：：游戏开始时对话框是隐藏的，所以这些教程的开头都有`set_box()`
+
+顺便说一句：：这种每章开头都要写的代码如果很多，可以写成一个函数放到`animation_presets.lua`里
+
+<|
+box_alignment('center')
+|>
+`dialogue_box.lua`当中提供的其他函数也可以单独用，`set_box`其实就是把预设的值传到这些函数里
+
+<|
 set_box()
 |>
 文本中可以使用TextMeshPro提供的rich text XML标记（详见[TextMeshPro官网](http://digitalnativestudios.com/textmeshpro/docs/rich-text/)）
 
-比如<b>粗体</b>、<i>斜体</i>、<s>删除线</s>、<color=#FF0000>改变颜色</color>、<size=100%>改变大小</size>
+比如<b>粗体</b>、<i>斜体</i>、<s>删除线</s>、<color=#FF0000>改变颜色</color>、<size=150%>改变大小</size>
+
+顺便说一句：：为了方便写这些教程，我们还parse了Markdown的超链接和代码块，但是一般的游戏里应该不会用到吧
+
+<|
+show(xiben, 'normal', pos_c)
+sound('clap')
+box_hide_show(2)
+|>
+`box_hide_show`用来让对话框消失几秒再出现，这个技巧可以把空间留给演出
+
+<|
+hide(xiben)
+stop_ff()
+|>
+`stop_ff`函数用来停止快进，`stop_auto_ff`则用来停止自动播放和快进
+
+你可以试试回到几条对话之前，然后按住Ctrl键快进，就会在上面那条对话停下来。在每章结束或者重要的剧情之前可以这么做
+
+<|
+alert('这是警告框')
+|>
+`alert`函数用来显示警告
+
+<|
+notify('这是通知框')
+|>
+`notify`函数用来显示通知
+
+教程4 对话框 到此结束
+
+更多教程正在施工，如果还有疑问可以在GitHub上发issue，或者加QQ群讨论
 @<| is_end() |>

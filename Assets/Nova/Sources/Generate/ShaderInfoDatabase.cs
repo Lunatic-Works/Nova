@@ -209,15 +209,6 @@ namespace Nova.Generate
                 }
             },
             {
-                "Mono Mosaic",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_Size", ShaderPropertyType.Float},
-                    {"_Strength", ShaderPropertyType.Float},
-                    {"_T", ShaderPropertyType.Float},
-                }
-            },
-            {
                 "Motion Blur",
                 new Dictionary<string, ShaderPropertyType>
                 {
@@ -535,15 +526,6 @@ namespace Nova.Generate
                 new Dictionary<string, float>
                 {
                     {"_Offset", 0.0f},
-                    {"_T", 0.0f},
-                }
-            },
-            {
-                "Mono Mosaic",
-                new Dictionary<string, float>
-                {
-                    {"_Size", 4.0f},
-                    {"_Strength", 8.0f},
                     {"_T", 0.0f},
                 }
             },

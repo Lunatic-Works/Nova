@@ -13,10 +13,6 @@ function force_step()
     __Nova.dialogueBoxController:ForceStep()
 end
 
-function box_update_mode(mode)
-    __Nova.dialogueBoxController.dialogueUpdateMode = mode
-end
-
 --- offset: {left, right, top, bottom}
 function box_offset(offset)
     __Nova.dialogueBoxController.rect.offsetMin = Vector2(offset[1], offset[4])
@@ -43,6 +39,14 @@ make_anim_method('box_anchor', function(self, anchor, duration, easing)
     return self:_then(property):_with(easing):_for(duration)
 end)
 
+function box_update_mode(mode)
+    __Nova.dialogueBoxController.dialogueUpdateMode = mode
+end
+
+function box_theme(theme)
+    __Nova.dialogueBoxController.theme = theme
+end
+
 function box_tint(color)
     __Nova.dialogueBoxController.backgroundColor = parse_color(color)
 end
@@ -53,10 +57,6 @@ make_anim_method('box_tint', function(self, color, duration, easing)
     local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(__Nova.dialogueBoxController, Nova.DialogueBoxColor.Type.Background), parse_color(color))
     return self:_then(property):_with(easing):_for(duration)
 end)
-
-function box_theme(theme)
-    __Nova.dialogueBoxController.theme = theme
-end
 
 function box_alignment(mode)
     if mode == 'left' then
@@ -94,39 +94,46 @@ end
 
 box_pos_presets = {
     bottom = {
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.05, 0.35},
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
+        theme = Nova.DialogueBoxController.Theme.Default,
     },
     top = {
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.65, 0.95},
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
+        theme = Nova.DialogueBoxController.Theme.Default,
     },
     center = {
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.35, 0.65},
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
+        theme = Nova.DialogueBoxController.Theme.Default,
     },
     left = {
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
         offset = {0, 0, 0, 0},
         anchor = {0, 0.5, 0, 1},
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
+        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     right = {
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
         offset = {0, 0, 0, 0},
         anchor = {0.5, 1, 0, 1},
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
+        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     full = {
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
         offset = {0, 0, 0, 0},
         anchor = {0.05, 0.95, 0, 1},
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
+        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     hide = {
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 2.05, 2.35},
+        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
+        theme = Nova.DialogueBoxController.Theme.Basic,
     },
 }
 
@@ -136,42 +143,36 @@ box_style_presets = {
         alignment = 'left',
         text_color = 0,
         text_material = '',
-        theme = Nova.DialogueBoxController.Theme.Default,
     },
     center = {
         tint = 1,
         alignment = 'center',
         text_color = 0,
         text_material = '',
-        theme = Nova.DialogueBoxController.Theme.Default,
     },
     dark = {
         tint = {0, 0.5},
         alignment = 'left',
         text_color = 1,
         text_material = 'outline',
-        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     dark_center = {
         tint = {0, 0.5},
         alignment = 'center',
         text_color = 1,
         text_material = 'outline',
-        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     transparent = {
         tint = {0, 0},
         alignment = 'left',
         text_color = 1,
         text_material = 'outline',
-        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     subtitle = {
         tint = {0, 0},
         alignment = 'center',
         text_color = 1,
         text_material = 'outline',
-        theme = Nova.DialogueBoxController.Theme.Basic,
     },
 }
 
@@ -198,15 +199,15 @@ function set_box(pos_name, style_name, auto_new_page)
         new_page()
     end
 
-    box_update_mode(pos['update_mode'])
     box_offset(pos['offset'])
     box_anchor(pos['anchor'])
+    box_update_mode(pos['update_mode'])
+    box_theme(pos['theme'])
 
     box_tint(style['tint'])
     box_alignment(style['alignment'])
     text_color(style['text_color'])
     text_material(style['text_material'])
-    box_theme(style['theme'])
 
     __Nova.dialogueBoxController:ResetTextScroll()
 end

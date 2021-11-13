@@ -144,8 +144,8 @@ show(qianye, 'normal', pos_r)
 <|
 anim_persist_begin()
 hide(qianye)
-play(bgm, 'final', 0)
-anim_persist:wait(1.7):volume(bgm, 0.5, 5):wait(1.7)
+play(bgm, 'final', 0.1)
+anim_persist:volume(bgm, 0.5, 6.4)
 |>
 时间好像在这一刻凝固。
 
