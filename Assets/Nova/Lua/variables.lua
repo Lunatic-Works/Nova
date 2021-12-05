@@ -27,7 +27,7 @@ function v(name, value)
     end
 end
 
--- global variable
+-- global variable, not calculated in variables hash
 function gv(name, value)
     if value == nil then
         local entry = __Nova.checkpointHelper:GetGlobalVariable(name)
@@ -53,7 +53,7 @@ function gv(name, value)
     end
 end
 
--- temporary variable, not saved in checkpoints, not calculated in varables hash
+-- temporary variable, not saved in checkpoints, not calculated in variables hash
 local tv_storage = {}
 
 function tv(name, value)

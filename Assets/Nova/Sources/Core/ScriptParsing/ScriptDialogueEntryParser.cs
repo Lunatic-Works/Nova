@@ -213,8 +213,12 @@ namespace Nova
                 }
             }
 
+            // Normalize line endings
+            sb.Replace("\r", "");
+
             var text = sb.ToString();
 
+            // Markdown syntaxes used in tutorials, not in NovaScript spec
             text = Regex.Replace(text, @"`([^`]*)`", @"<style=Code>$1</style>");
             text = Regex.Replace(text, @"\[([^\]]*)\]\(([^\)]*)\)", @"<link=""$2""><style=Link>$1</style></link>");
 

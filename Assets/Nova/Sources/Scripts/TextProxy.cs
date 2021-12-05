@@ -190,7 +190,8 @@ namespace Nova
             var textInfo = textBox.textInfo;
             if (textInfo.pageCount > 0)
             {
-                return textInfo.pageInfo[textBox.pageToDisplay - 1].lastCharacterIndex + 1;
+                var pageInfo = textInfo.pageInfo[textBox.pageToDisplay - 1];
+                return pageInfo.lastCharacterIndex - pageInfo.firstCharacterIndex + 1;
             }
             else
             {
