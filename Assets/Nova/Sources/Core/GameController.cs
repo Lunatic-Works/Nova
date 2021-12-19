@@ -12,7 +12,9 @@ namespace Nova
         public CheckpointManager CheckpointManager { get; private set; }
         public ConfigManager ConfigManager { get; private set; }
         public InputMapper InputMapper { get; private set; }
-        public FancyCursor FancyCursor { get; private set; }
+        public AssetLoader AssetLoader { get; private set; }
+        public CheckpointHelper CheckpointHelper { get; private set; }
+        public InputHelper InputHelper { get; private set; }
         public NovaAnimation PersistAnimation { get; private set; }
         public NovaAnimation PerDialogueAnimation { get; private set; }
 
@@ -22,7 +24,9 @@ namespace Nova
             CheckpointManager = FindComponent<CheckpointManager>();
             ConfigManager = FindComponent<ConfigManager>();
             InputMapper = FindComponent<InputMapper>();
-            FancyCursor = FindComponent<FancyCursor>();
+            AssetLoader = FindComponent<AssetLoader>();
+            CheckpointHelper = FindComponent<CheckpointHelper>();
+            InputHelper = FindComponent<InputHelper>();
             PerDialogueAnimation = FindComponent<NovaAnimation>("NovaAnimation/PerDialogue");
             PersistAnimation = FindComponent<NovaAnimation>("NovaAnimation/Persistent");
         }
