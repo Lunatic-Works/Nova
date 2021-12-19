@@ -21,7 +21,7 @@ namespace Nova
     [ExportCustomType]
     public static class I18n
     {
-        public const string LocalePath = "Locales/";
+        public const string LocalePath = "LocalizedStrings/";
 
         public static readonly SystemLanguage[] SupportedLocales =
             {SystemLanguage.ChineseSimplified, SystemLanguage.English};

@@ -4,12 +4,10 @@ import re
 from glob import glob
 
 patterns = [
-    '../../Assets/Examples/Colorless/Resources/Colorless/Scenarios/*.txt',
-    '../../Assets/Examples/Colorless/Resources/Locales/*/Colorless/Scenarios/*.txt',
     '../../Assets/Nova/Fonts/Charset3500.txt',
-    '../../Assets/Nova/Resources/Locales/*.json',
-    '../../Assets/Resources/Colorless/Scenarios/*.txt',
-    '../../Assets/Resources/Locales/*/Colorless/Scenarios/*.txt',
+    '../../Assets/Resources/Scenarios/*.txt',
+    '../../Assets/Resources/LocalizedResources/*/Scenarios/*.txt',
+    '../../Assets/Resources/LocalizedStrings/*.json',
 ]
 out_filename = '../../Assets/Nova/Fonts/Charset.txt'
 out_bold_filename = '../../Assets/Nova/Fonts/CharsetBold.txt'

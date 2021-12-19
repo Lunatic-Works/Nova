@@ -191,10 +191,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9c6e380c82c7444dbeb5d75b3600170, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageFolder: Colorless/Standings/Ergong
+  imageFolder: Standings/Ergong
   characterTextureMerger: {fileID: 0}
   luaGlobalName: ergong
-  voiceFolder: Colorless/Voices/Ergong
+  voiceFolder: Voices/Ergong
   stopVoiceWhenDialogueWillChange: 0
   suppressSound: 0
 --- !u!114 &537562892

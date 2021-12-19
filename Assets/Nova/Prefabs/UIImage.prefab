@@ -88,4 +88,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaGlobalName: ui_img
-  imageFolder: Colorless/UIImages
+  imageFolder: UIImages

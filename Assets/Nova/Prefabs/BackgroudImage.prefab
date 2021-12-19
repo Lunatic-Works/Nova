@@ -95,4 +95,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaGlobalName: bg
-  imageFolder: Colorless/Backgrounds
+  imageFolder: Backgrounds

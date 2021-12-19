@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ad38311eb714f96a1b9f62be871f1e5, type: 3}
-  m_Name: prelude_entry
+  m_Name: qianye_entry
   m_EditorClassIdentifier: 
-  id: prelude
+  id: qianye
   displayNames:
   - locale: 40
-    value: "C\u5927\u8C03\u524D\u594F\u66F2"
+    value: "D\u5C0F\u8C03\u5C0F\u63D0\u7434\u7ADE\u594F\u66F2"
   - locale: 10
-    value: Prelude in C Major
-  resourcePath: Colorless/BGM/prelude
+    value: Violin Partita No. 2 in D Minor
+  resourcePath: BGM/qianye
   loopBeginSample: 0
-  loopEndSample: 4167099
+  loopEndSample: 5380481

@@ -52,7 +52,7 @@ MonoBehaviour:
   branchButtonPrefab: {fileID: 8702215254368758180, guid: 715673b90003e4c0a97eeaa9141dc935,
     type: 3}
   backPanel: {fileID: 0}
-  imageFolder: Colorless/Branches
+  imageFolder: Branches
 --- !u!114 &114847438731727154
 MonoBehaviour:
   m_ObjectHideFlags: 0

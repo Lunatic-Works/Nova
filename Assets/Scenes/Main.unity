@@ -229,12 +229,12 @@ PrefabInstance:
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
       propertyPath: imageFolder
-      value: Colorless/Standings/Gaotian
+      value: Standings/Gaotian
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
       propertyPath: voiceFolder
-      value: Colorless/Voices/Gaotian
+      value: Voices/Gaotian
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
@@ -1096,7 +1096,7 @@ PrefabInstance:
     - target: {fileID: 114921118950064596, guid: 1afd3bb28e69148ba92e05bf594c5bc9,
         type: 3}
       propertyPath: audioFolder
-      value: Colorless/Sounds
+      value: Sounds
       objectReference: {fileID: 0}
     - target: {fileID: 114921118950064596, guid: 1afd3bb28e69148ba92e05bf594c5bc9,
         type: 3}
@@ -1266,12 +1266,12 @@ PrefabInstance:
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
       propertyPath: imageFolder
-      value: Colorless/Standings/Xiben
+      value: Standings/Xiben
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
       propertyPath: voiceFolder
-      value: Colorless/Voices/Xiben
+      value: Voices/Xiben
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
@@ -1910,12 +1910,12 @@ PrefabInstance:
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
       propertyPath: imageFolder
-      value: Colorless/Standings/Qianye
+      value: Standings/Qianye
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
       propertyPath: voiceFolder
-      value: Colorless/Voices/Qianye
+      value: Voices/Qianye
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}

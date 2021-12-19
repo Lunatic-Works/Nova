@@ -7,16 +7,11 @@
 ## 使用说明
 
 1. `git clone`，为了节约时间可以加上`--depth 1`
-2. 准备打开我们的示例工程
-    * 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
-    * 将`Assets/Examples/Colorless/`文件夹下的`Scenes/, StandingsUncropped/`和对应的`.meta`文件移动到`Assets/`文件夹下
-    * 将`Assets/Examples/Colorless/Resources/`文件夹下的`Colorless/, Locales/`和对应的`.meta`文件移动到`Assets/Resources/`文件夹下
-    * （如果操作正确，移动的过程中不会覆盖任何文件，`Assets/Examples/`文件夹下也不会剩下任何文件，除了空文件夹和对应的`.meta`文件）
-    * （如果你知道自己在做什么，也可以不移动示例工程，而是在`Assets/`和`Assets/Resources/`文件夹下新建自己的工程）
+2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 在Unity Editor中打开`Assets/Scenes/Main.unity`，运行游戏，把示例作品《Colorless》看一遍
-4. 把游戏中的教程看一遍，同时可以试着改一改脚本，脚本是`Assets/Resources/Colorless/Scenarios/`文件夹下的`tut01.txt`等文件
+4. 把游戏中的教程看一遍，同时可以试着改一改脚本，脚本是`Assets/Resources/Scenarios/`文件夹下的`tut01.txt`等文件
 5. 如果你想修改Colorless的脚本，需要先删除英文版的脚本，否则中文与英文的脚本会对不上
-    * `Assets/Resources/Locales/English/Colorless/Scenarios/`文件夹下是英文版的脚本，可以全部删除
+    * `Assets/Resources/LocalizedResources/English/Scenarios/`文件夹下是英文版的脚本，可以全部删除
     * `Assets/Resources/LocalizedResourcePaths.txt`用来记录英文版用到的文件，可以删除
 6. 其他资料可以参考[GitHub Wiki](https://github.com/Lunatic-Works/Nova/wiki/)
 

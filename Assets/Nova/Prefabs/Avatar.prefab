@@ -85,7 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a09cce11385c07a43b146b79266ad550, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageFolder: Colorless/Faces
+  imageFolder: Faces
   characterTextureMerger: {fileID: 0}
   luaGlobalName: avatar
   avatarConfigs:

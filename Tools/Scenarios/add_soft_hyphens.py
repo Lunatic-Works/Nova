@@ -5,7 +5,7 @@ import re
 from hyphen import Hyphenator
 from nova_script_parser import parse_chapters
 
-filename = '../../Assets/Resources/Locales/English/Scenarios/001.txt'
+filename = '../../Assets/Resources/LocalizedResources/English/Scenarios/001.txt'
 
 SOFT_HYPHEN = '\xad'
 NBSP = '\xa0'

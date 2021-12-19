@@ -18,6 +18,6 @@ MonoBehaviour:
     value: still
   - locale: 10
     value: still
-  resourcePath: Colorless/BGM/final
+  resourcePath: BGM/final
   loopBeginSample: 0
-  loopEndSample: 5352199
+  loopEndSample: 4797632

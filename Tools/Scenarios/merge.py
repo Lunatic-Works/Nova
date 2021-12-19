@@ -2,7 +2,7 @@
 
 import os
 
-in_dir = '../../Assets/Examples/Colorless/Resources/Colorless/Scenarios'
+in_dir = '../../Assets/Resources/Scenarios/'
 template_filename = 'template.txt'
 out_filename = 'scenario.txt'
 

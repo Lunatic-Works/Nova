@@ -144,7 +144,7 @@ MonoBehaviour:
   slider: {fileID: 0}
   text: {fileID: 0}
   luaGlobalName: bgm
-  audioFolder: Colorless/BGM
+  audioFolder: BGM
   musicEntryList: {fileID: 0}
 --- !u!114 &754503223
 MonoBehaviour:

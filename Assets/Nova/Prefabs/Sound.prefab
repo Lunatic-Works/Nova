@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaName: soundController
-  audioFolder: Colorless/Sounds
+  audioFolder: Sounds
   configVolume: 0
   suppressSound: 0
 --- !u!114 &1542636872

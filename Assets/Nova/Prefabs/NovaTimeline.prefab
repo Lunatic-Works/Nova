@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaName: timelineController
-  timelinePrefabFolder: Colorless/TimelinePrefabs
+  timelinePrefabFolder: TimelinePrefabs
   mainCamera: {fileID: 0}
   cameraPP: {fileID: 0}

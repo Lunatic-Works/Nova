@@ -1,5 +1,5 @@
-Locales/English/Colorless/Backgrounds/staff
-Locales/English/Colorless/Scenarios/ch1
-Locales/English/Colorless/Scenarios/ch2
-Locales/English/Colorless/Scenarios/ch3
-Locales/English/Colorless/Scenarios/ch4
+../../Assets/Resources/LocalizedResources/English/Backgrounds/staff
+../../Assets/Resources/LocalizedResources/English/Scenarios/ch1
+../../Assets/Resources/LocalizedResources/English/Scenarios/ch2
+../../Assets/Resources/LocalizedResources/English/Scenarios/ch3
+../../Assets/Resources/LocalizedResources/English/Scenarios/ch4

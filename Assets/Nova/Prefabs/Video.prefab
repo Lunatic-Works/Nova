@@ -79,4 +79,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaName: videoController
-  videoFolder: Colorless/Videos
+  videoFolder: Videos

@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ad38311eb714f96a1b9f62be871f1e5, type: 3}
-  m_Name: xiben_entry
+  m_Name: gaotian_entry
   m_EditorClassIdentifier: 
-  id: xiben
+  id: gaotian
   displayNames:
   - locale: 40
-    value: "\u964DE\u5927\u8C03\u591C\u66F2"
+    value: "A\u5C0F\u8C03\u534E\u5C14\u5179"
   - locale: 10
-    value: Nocturne in E-flat Major
-  resourcePath: Colorless/BGM/xiben
+    value: Waltz in A Minor
+  resourcePath: BGM/gaotian
   loopBeginSample: 0
-  loopEndSample: 6099580
+  loopEndSample: 2063534
