@@ -164,7 +164,7 @@ namespace Nova
         }
 
 #if UNITY_EDITOR
-        private static string EditorTranslationPath => "Assets/Nova/Resources/" + LocalePath + CurrentLocale + ".json";
+        private static string EditorTranslationPath => "Assets/Resources/" + LocalePath + CurrentLocale + ".json";
 
         private static DateTime LastWriteTime;
 
