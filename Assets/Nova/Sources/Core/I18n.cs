@@ -21,7 +21,8 @@ namespace Nova
     [ExportCustomType]
     public static class I18n
     {
-        public const string LocalePath = "LocalizedStrings/";
+        public const string LocalizedResourcesPath = "LocalizedResources/";
+        public const string LocalizedStringsPath = "LocalizedStrings/";
 
         public static readonly SystemLanguage[] SupportedLocales =
             {SystemLanguage.ChineseSimplified, SystemLanguage.English};
@@ -77,7 +78,7 @@ namespace Nova
         {
             foreach (var locale in SupportedLocales)
             {
-                var textAsset = Resources.Load(LocalePath + locale) as TextAsset;
+                var textAsset = Resources.Load(LocalizedStringsPath + locale) as TextAsset;
                 TranslationBundles[locale] = JsonConvert.DeserializeObject<TranslationBundle>(textAsset.text);
             }
         }
@@ -164,7 +165,7 @@ namespace Nova
         }
 
 #if UNITY_EDITOR
-        private static string EditorTranslationPath => "Assets/Resources/" + LocalePath + CurrentLocale + ".json";
+        private static string EditorTranslationPath => "Assets/Nova/Resources/" + LocalizedStringsPath + CurrentLocale + ".json";
 
         private static DateTime LastWriteTime;
 

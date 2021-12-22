@@ -80,7 +80,7 @@ namespace Nova
                 return path;
             }
 
-            var localizedPath = I18n.LocalePath + I18n.CurrentLocale + "/" + path;
+            var localizedPath = I18n.LocalizedResourcesPath + I18n.CurrentLocale + "/" + path;
 
             if (!LocalizedResourcePaths.Contains(localizedPath))
             {
@@ -180,7 +180,7 @@ namespace Nova
             var cache = cachedAssets[AssetCacheType.Image];
             foreach (var path in cache.Keys)
             {
-                var localizedPath = I18n.LocalePath + I18n.CurrentLocale + "/" + path;
+                var localizedPath = I18n.LocalizedResourcesPath + I18n.CurrentLocale + "/" + path;
                 if (LocalizedResourcePaths.Contains(localizedPath))
                 {
                     cache[path].request = Resources.LoadAsync(localizedPath);

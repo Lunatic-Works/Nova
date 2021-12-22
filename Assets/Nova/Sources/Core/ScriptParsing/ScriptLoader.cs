@@ -96,7 +96,7 @@ namespace Nova
                 string localizedPath = path;
                 if (locale != I18n.DefaultLocale)
                 {
-                    localizedPath = I18n.LocalePath + locale + "/" + path;
+                    localizedPath = I18n.LocalizedResourcesPath + locale + "/" + path;
                 }
 
                 var scripts = Resources.LoadAll(localizedPath, typeof(TextAsset)).Cast<TextAsset>();
