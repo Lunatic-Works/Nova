@@ -404,7 +404,22 @@ namespace Nova
                     case DialogueBoxState.FastForward:
                         if (!isReadDialogue && onlyFastForwardRead && !fastForwardHotKeyHolding)
                         {
-                            Alert.Show(I18n.__("dialogue.noreadtext"));
+                            int clicks = configManager.GetInt(FastForwardReadFirstShownKey);
+                            if (clicks < HintFastForwardReadClicks)
+                            {
+                                Alert.Show(I18n.__("dialogue.noreadtext"));
+                                configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
+                            }
+                            else if (clicks == HintFastForwardReadClicks)
+                            {
+                                Alert.Show(I18n.__("dialogue.hint.fastforwardread"));
+                                configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
+                            }
+                            else
+                            {
+                                Alert.Show(I18n.__("dialogue.noreadtext"));
+                            }
+
                             return;
                         }
 
