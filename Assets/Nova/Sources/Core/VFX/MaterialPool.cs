@@ -36,7 +36,12 @@ namespace Nova
         private void OnDestroy()
         {
             defaultMaterial = null;
-            factory.Dispose();
+
+            // TODO: We need to consider how to dispose it properly.
+            // There can be a camera in a timeline prefab, and a MaterialPool on it.
+            // If we dispose it too early, it may cause the current material on the
+            // current camera to be null.
+            // factory.Dispose();
         }
 
         public readonly MaterialFactory factory = new MaterialFactory();

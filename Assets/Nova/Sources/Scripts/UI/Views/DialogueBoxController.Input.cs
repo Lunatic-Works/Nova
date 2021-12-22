@@ -354,7 +354,7 @@ namespace Nova
                 }
                 else if (clicks == HintAbortAnimationClicks)
                 {
-                    Alert.Show(I18n.__("dialogue.hint.clickstopchoreo"));
+                    Alert.Show(I18n.__("dialogue.hint.clickstopanimation"));
                     configManager.SetInt(AbortAnimationFirstShownKey, clicks + 1);
                 }
 

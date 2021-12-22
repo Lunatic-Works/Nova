@@ -71,7 +71,7 @@ namespace Nova
         {
             var displayNames = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = displayName };
             var dialogues = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = dialogue };
-            this.displayData = new DialogueDisplayData(characterName, displayNames, dialogues);
+            displayData = new DialogueDisplayData(characterName, displayNames, dialogues);
             this.actions = actions;
         }
 
