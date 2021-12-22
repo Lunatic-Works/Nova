@@ -27,7 +27,7 @@ function show(obj, image_name, coord, color, fade)
         tint(obj, color)
     end
 
-    if tostring(obj:GetType()) == 'Nova.SpriteController' then
+    if obj:GetType() == typeof(Nova.SpriteController) then
         obj:SetImage(image_name, fade)
         __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. image_name)
     else

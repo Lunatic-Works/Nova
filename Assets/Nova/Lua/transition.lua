@@ -166,7 +166,7 @@ local function set_mat_properties(mat, base_shader_name, properties)
         elseif dtype == 'Vector' then
             mat:SetVector(name, Vector4(unpack(value)))
         elseif dtype == '2D' then
-            if tostring(mat:GetType()) == 'Nova.RestorableMaterial' then
+            if mat:GetType() == typeof(Nova.RestorableMaterial) then
                 mat:SetTexturePath(name, value)
             else
                 local tex
@@ -221,7 +221,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
     properties = properties or {}
 
     local action_begin, action_end
-    if tostring(obj:GetType()) == 'Nova.CameraController' then
+    if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
             __Nova.screenCapturer:CaptureGameTexture()
             mat:SetTexture('_SubTex', __Nova.screenCapturer.capturedGameTexture)
@@ -287,7 +287,7 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
     properties2 = properties2 or {}
 
     local action_begin, action_middle, action_end
-    if tostring(obj:GetType()) == 'Nova.CameraController' then
+    if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
@@ -352,13 +352,13 @@ function vfx(obj, shader_layer, t, properties)
         set_mat_properties(mat, base_shader_name, properties)
         mat:SetFloat('_T', t)
 
-        if tostring(obj:GetType()) == 'Nova.CameraOverlayMask' then
+        if obj:GetType() == typeof(Nova.CameraOverlayMask) then
             obj.blitMaterial = mat
         else
             set_mat(obj, mat, layer_id)
         end
     else
-        if tostring(obj:GetType()) == 'Nova.CameraOverlayMask' then
+        if obj:GetType() == typeof(Nova.CameraOverlayMask) then
             obj.blitMaterial = nil
         else
             set_mat(obj, get_default_mat(obj), layer_id)
@@ -384,7 +384,7 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
         set_mat_properties(mat, base_shader_name, properties)
         mat:SetFloat('_T', start_t)
 
-        if tostring(obj:GetType()) == 'Nova.CameraOverlayMask' then
+        if obj:GetType() == typeof(Nova.CameraOverlayMask) then
             obj.blitMaterial = mat
         else
             set_mat(obj, mat, layer_id)
@@ -393,7 +393,7 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
 
     local action_end = function()
         if target_t == 0 then
-            if tostring(obj:GetType()) == 'Nova.CameraOverlayMask' then
+            if obj:GetType() == typeof(Nova.CameraOverlayMask) then
                 obj.blitMaterial = nil
             else
                 if variant then
@@ -428,7 +428,7 @@ make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_prope
         end
         mat:SetFloat('_T', 1)
 
-        if tostring(obj:GetType()) == 'Nova.CameraOverlayMask' then
+        if obj:GetType() == typeof(Nova.CameraOverlayMask) then
             obj.blitMaterial = mat
         else
             set_mat(obj, mat, layer_id)
