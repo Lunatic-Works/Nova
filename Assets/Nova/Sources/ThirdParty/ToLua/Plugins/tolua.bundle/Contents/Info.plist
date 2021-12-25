@@ -3,13 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>16E195</string>
+	<string>21A344</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>tolua</string>
-	<key>CFBundleIdentifier</key>
-	<string>ameng.tolua</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -47,18 +45,22 @@
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
-	<string>8E2002</string>
+	<string>13C90</string>
+	<key>DTPlatformName</key>
+	<string>macosx</string>
 	<key>DTPlatformVersion</key>
-	<string>GM</string>
+	<string>12.1</string>
 	<key>DTSDKBuild</key>
-	<string>16E185</string>
+	<string>21C46</string>
 	<key>DTSDKName</key>
-	<string>macosx10.12</string>
+	<string>macosx12.1</string>
 	<key>DTXcode</key>
-	<string>0832</string>
+	<string>1320</string>
 	<key>DTXcodeBuild</key>
-	<string>8E2002</string>
+	<string>13C90</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.9</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2014 topameng. All rights reserved.</string>
+	<string>Copyright © 2013 topameng. All rights reserved.</string>
 </dict>
 </plist>
