@@ -110,6 +110,15 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "me.qiankanglai.loopscrollrect": {
+      "version": "1.1.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0"
+      },
+      "url": "https://package.openupm.cn"
+    },
     "com.unity.modules.animation": {
       "version": "1.0.0",
       "depth": 1,

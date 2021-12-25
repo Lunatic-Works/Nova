@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Nova
 {
-    public class LogEntryController : MonoBehaviour, IPointerExitHandler
+    public class LogEntryController : MonoBehaviour, IPointerExitHandler, ILayoutElement
     {
         [HideInInspector] public int logEntryIndex;
 
@@ -15,6 +15,20 @@ namespace Nova
         private DialogueDisplayData displayData;
         private bool inited;
 
+        # region Layout
+        private float height;
+        public float minWidth { get { return -1; } }
+        public float preferredWidth { get { return -1; } }
+        public float flexibleWidth { get { return -1; } }
+        public float minHeight { get { return -1; } }
+        public float preferredHeight { get { return height; } }
+        public float flexibleHeight { get { return -1; } }
+        public int layoutPriority { get { return 1; } } // override VerticalLayoutGroup
+
+        public void CalculateLayoutInputHorizontal() { }
+        public void CalculateLayoutInputVertical() { }
+        # endregion
+    
         private void InitReferences()
         {
             if (inited) return;
@@ -66,7 +80,7 @@ namespace Nova
         /// <param name="onPlayVoiceButtonClicked">The action to perform when the play voice button clicked</param>
         /// <param name="logEntryIndex"></param>
         public void Init(DialogueDisplayData displayData, UnityAction<int> onGoBackButtonClicked,
-            UnityAction onPlayVoiceButtonClicked, UnityAction<int> onPointerExit, int logEntryIndex)
+            UnityAction onPlayVoiceButtonClicked, UnityAction<int> onPointerExit, int logEntryIndex, float height)
         {
             InitReferences();
             this.logEntryIndex = logEntryIndex;
@@ -76,13 +90,13 @@ namespace Nova
             this.onPointerExit = onPointerExit;
             this.displayData = displayData;
             UpdateText();
+            this.height = height;
         }
 
         private void UpdateText()
         {
             if (!inited) return;
             textProxy.text = displayData.FormatNameDialogue();
-            gameObject.SetActive(!string.IsNullOrEmpty(textProxy.text));
         }
 
         private void OnEnable()
