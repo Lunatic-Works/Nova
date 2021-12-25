@@ -5232,6 +5232,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LogView
       objectReference: {fileID: 0}
+    - target: {fileID: 114670746149515138, guid: 60803c007c3ce4e5a876197907c5c3aa, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 224649617486178882, guid: 60803c007c3ce4e5a876197907c5c3aa, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

@@ -1,4 +1,4 @@
-﻿// TODO: use circular buffer for log entries
+// TODO: use circular buffer for log entries
 
 using System;
 using System.Collections.Generic;
@@ -7,12 +7,13 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Nova
 {
     using NodeHistoryEntry = KeyValuePair<string, int>;
 
-    public class LogController : ViewControllerBase, IRestorable
+    public class LogController : ViewControllerBase, IRestorable, LoopScrollPrefabSource, LoopScrollDataSource, LoopScrollSizeHelper
     {
         [Serializable]
         private class LogParam
@@ -45,10 +46,12 @@ namespace Nova
         private CheckpointManager checkpointManager;
         private ConfigManager configManager;
 
-        private ScrollRect scrollRect;
+        private LoopScrollRect scrollRect;
+        private TMP_Text logEntryForTest;
         private GameObject logContent;
-        private readonly List<LogEntryController> logEntries = new List<LogEntryController>();
         private readonly List<LogParam> logParams = new List<LogParam>();
+        private readonly List<float> logHeights = new List<float>();
+        private readonly List<float> logPrefixHeights = new List<float>();
         private LogParam lastCheckpointLogParams;
 
         protected override void Awake()
@@ -60,8 +63,14 @@ namespace Nova
             checkpointManager = controller.CheckpointManager;
             configManager = controller.ConfigManager;
 
-            scrollRect = myPanel.GetComponentInChildren<ScrollRect>();
-            logContent = scrollRect.transform.Find("Viewport/Content").gameObject;
+            scrollRect = myPanel.GetComponentInChildren<LoopScrollRect>();
+            scrollRect.prefabSource = this;
+            scrollRect.dataSource = this;
+            scrollRect.sizeHelper = this;
+            // fake content to test size
+            var logEntry2 = Instantiate(logEntryPrefab, scrollRect.viewport);
+            logEntry2.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -500);
+            logEntryForTest = logEntry2.transform.Find("Text").GetComponent<TMP_Text>();
 
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
@@ -93,7 +102,7 @@ namespace Nova
         private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
             AddEntry(new LogParam(dialogueChangedData.displayData, dialogueChangedData.nodeHistoryEntry,
-                dialogueChangedData.dialogueIndex, dialogueChangedData.voicesNextDialogue, logEntries.Count));
+                dialogueChangedData.dialogueIndex, dialogueChangedData.voicesNextDialogue, logParams.Count));
         }
 
         private bool TryGetCheckpoint(LogParam logParam, bool isLatest, out GameStateCheckpoint checkpoint)
@@ -130,8 +139,93 @@ namespace Nova
                 lastCheckpointLogParams = logParam;
             }
 
-            var logEntry = Instantiate(logEntryPrefab, logContent.transform);
+            if (string.IsNullOrEmpty(logParam.displayData.FormatNameDialogue()))
+            {
+                return;
+            }
 
+            logParams.Add(logParam);
+            // TODO: better way to calc size
+            string text = logParam.displayData.FormatNameDialogue();
+            var rect = scrollRect.content.rect;
+            rect.width -= 180 * 2;
+            Vector2 size = logEntryForTest.GetPreferredValues(text, rect.width, rect.height);
+            logHeights.Add(size.y);
+            logPrefixHeights.Add(size.y + (logPrefixHeights.Count > 0 ? logPrefixHeights[logPrefixHeights.Count - 1] : 0));
+
+            if (!RestrainLogEntryNum(maxLogEntryNum))
+                scrollRect.totalCount = logParams.Count;
+        }
+
+        private bool RestrainLogEntryNum(int num)
+        {
+            int cnt = logParams.Count;
+            if (cnt <= num) return false;
+            RemoveRange(0, cnt - num);
+            return true;
+        }
+
+        private void RemoveRange(int index, int count)
+        {
+            logParams.RemoveRange(index, count);
+            logHeights.RemoveRange(index, count);
+            logPrefixHeights.Clear();
+            for (int i = 0; i < logHeights.Count; i++)
+            {
+                logPrefixHeights[i] = logHeights[i];
+                if (i > 0)
+                    logPrefixHeights[i] += logPrefixHeights[i - 1];
+            }
+            // Refine log entry indices
+            int cnt = logParams.Count;
+            for (int i = index; i < cnt; ++i)
+            {
+                logParams[i].logEntryIndex = i;
+            }
+            
+            scrollRect.totalCount = logParams.Count;
+            scrollRect.RefillCellsFromEnd();
+        }
+
+        public void Clear()
+        {
+            RemoveRange(0, logParams.Count);
+        }
+        
+        #region LoopScrollRect
+
+        public Vector2 GetItemsSize(int itemsCount)
+        {
+            if (itemsCount <= 0) return new Vector2(0, 0);
+            itemsCount = Mathf.Min(itemsCount, logPrefixHeights.Count);
+            return new Vector2(0, logPrefixHeights[itemsCount - 1]);
+        }
+
+        Stack<Transform> pool = new Stack<Transform>();
+        public GameObject GetObject(int index)
+        {
+            if (pool.Count == 0)
+            {
+                var element = Instantiate(logEntryPrefab, scrollRect.content);
+                return element.gameObject;
+            }
+            Transform candidate = pool.Pop();
+            candidate.SetParent(scrollRect.content, false);
+            candidate.gameObject.SetActive(true);
+            return candidate.gameObject;
+        }
+
+        public void ReturnObject(Transform trans)
+        {
+            trans.gameObject.SetActive(false);
+            trans.SetParent(scrollRect.transform, false);
+            pool.Push(trans);
+        }
+
+        public void ProvideData(Transform transform, int idx)
+        {
+            var logParam = logParams[idx];
+            
             UnityAction<int> onGoBackButtonClicked = logEntryIndex =>
                 OnGoBackButtonClicked(logParam.nodeHistoryEntry, logParam.dialogueIndex, logEntryIndex);
 
@@ -143,43 +237,11 @@ namespace Nova
 
             UnityAction<int> onPointerExit = logEntryIndex => OnPointerExit(logEntryIndex);
 
+            var logEntry = transform.GetComponent<LogEntryController>();
             logEntry.Init(logParam.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked, onPointerExit,
-                logParam.logEntryIndex);
-
-            logEntries.Add(logEntry);
-            logParams.Add(logParam);
-            RestrainLogEntryNum(maxLogEntryNum);
+                logParam.logEntryIndex, logHeights[idx]);
         }
-
-        private void RestrainLogEntryNum(int num)
-        {
-            int cnt = logEntries.Count;
-            if (cnt <= num) return;
-            RemoveRange(0, cnt - num);
-        }
-
-        private void RemoveRange(int index, int count)
-        {
-            for (int i = index; i < index + count; ++i)
-            {
-                Destroy(logEntries[i].gameObject);
-            }
-
-            logEntries.RemoveRange(index, count);
-            logParams.RemoveRange(index, count);
-            // Refine log entry indices
-            int cnt = logEntries.Count;
-            for (int i = index; i < cnt; ++i)
-            {
-                logEntries[i].logEntryIndex = i;
-                logParams[i].logEntryIndex = i;
-            }
-        }
-
-        public void Clear()
-        {
-            RemoveRange(0, logEntries.Count);
-        }
+        #endregion
 
         private void _onGoBackButtonClicked(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex)
         {
@@ -237,7 +299,7 @@ namespace Nova
 
             base.Show(onFinish);
 
-            scrollRect.verticalNormalizedPosition = 0.0f;
+            scrollRect.RefillCellsFromEnd();
             lastClickedLogIndex = -1;
         }
 

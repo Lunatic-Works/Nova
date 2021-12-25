@@ -1,10 +1,20 @@
 {
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.cn",
+      "url": "https://package.openupm.cn",
+      "scopes": [
+        "me.qiankanglai.loopscrollrect"
+      ]
+    }
+  ],
   "dependencies": {
     "com.unity.inputsystem": "1.4.1",
     "com.unity.nuget.newtonsoft-json": "3.0.2",
     "com.unity.render-pipelines.universal": "10.9.0",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.1",
+    "me.qiankanglai.loopscrollrect": "1.1.2",
     "com.unity.modules.assetbundle": "1.0.0",
     "com.unity.modules.imageconversion": "1.0.0",
     "com.unity.modules.physics": "1.0.0",
