@@ -593,17 +593,7 @@ namespace Nova
                 }
                 else
                 {
-                    var characterCount = contentProxy.GetPageCharacterCount();
-
-                    // TODO: sometimes textInfo.characterCount returns 0 and it may be a bug of TMP when init, so we use text.Length
-                    if (characterCount <= 0 && contentProxy.text.Length > 0)
-                    {
-                        Debug.LogWarning(
-                            $"characterCount mismatch: {characterCount} {contentProxy.text.Length} {contentProxy.text}");
-                        characterCount = contentProxy.text.Length;
-                    }
-
-                    textDuration = perCharacterFadeInDuration * characterCount;
+                    textDuration = perCharacterFadeInDuration * contentProxy.GetPageCharacterCount();
                 }
 
                 var animEntry = textAnimation.Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text

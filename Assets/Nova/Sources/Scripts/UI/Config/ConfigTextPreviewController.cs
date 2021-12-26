@@ -42,9 +42,8 @@ namespace Nova
                 DialogueEntryLayoutSetting.Default,
                 0
             );
-            var contentBox = entry.contentBox;
             var contentProxy = entry.contentProxy;
-            var textDuration = perCharacterFadeInDuration * contentBox.textInfo.characterCount;
+            var textDuration = perCharacterFadeInDuration * contentProxy.GetPageCharacterCount();
             currentTextPreviewTimeLeft = textDuration + autoDelay;
             textAnimation.Do(
                 new TextFadeInAnimationProperty(contentProxy, 255),

@@ -184,19 +184,26 @@ namespace Nova
             textBox.text = text;
         }
 
-        // Count of the parsed text without XML tags
+        // Character count of the parsed text without XML tags
+        // TODO: sometimes textInfo.characterCount or pageInfo.lastCharacterIndex returns 0, which may be a bug of TMP
         public int GetPageCharacterCount()
         {
             var textInfo = textBox.textInfo;
-            if (textInfo.pageCount > 0)
+            if (textInfo.pageCount > 1)
             {
                 var pageInfo = textInfo.pageInfo[textBox.pageToDisplay - 1];
-                return pageInfo.lastCharacterIndex - pageInfo.firstCharacterIndex + 1;
+                if (pageInfo.lastCharacterIndex > 0)
+                {
+                    return pageInfo.lastCharacterIndex - pageInfo.firstCharacterIndex + 1;
+                }
             }
-            else
+
+            if (textInfo.characterCount > 0)
             {
                 return textInfo.characterCount;
             }
+
+            return textBox.text.Length;
         }
 
         public void SetTextAlpha(byte a)
