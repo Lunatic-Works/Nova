@@ -66,7 +66,7 @@ function box_alignment(mode)
     elseif mode == 'right' then
         mode = TMPro.TextAlignmentOptions.TopRight
     else
-        warn('Unknown text alignment: ' .. mode)
+        warn('Unknown text alignment: ' .. dump(mode))
         return
     end
     __Nova.dialogueBoxController.textAlignment = mode
@@ -185,13 +185,13 @@ function set_box(pos_name, style_name, auto_new_page)
 
     local pos = box_pos_presets[pos_name]
     if pos == nil then
-        warn('Unknown box pos ' .. pos_name)
+        warn('Unknown box pos ' .. dump(pos_name))
         return
     end
 
     local style = box_style_presets[style_name]
     if style == nil then
-        warn('Unknown box style ' .. style_name)
+        warn('Unknown box style ' .. dump(style_name))
         return
     end
 

@@ -38,7 +38,7 @@ function show(obj, image_name, coord, color, fade)
             if pose then
                 obj:SetPose(pose, fade)
             else
-                warn('Unknown pose ' .. image_name .. ' for character ' .. obj.luaGlobalName)
+                warn('Unknown pose ' .. dump(image_name) .. ' for character ' .. obj.luaGlobalName)
             end
         end
     end

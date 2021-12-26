@@ -65,7 +65,7 @@ local function get_mat(obj, shader_name, restorable)
     local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
     local pp = obj:GetComponent(typeof(Nova.PostProcessing))
     if renderer == nil and pp == nil then
-        warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. obj)
+        warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. dump(obj))
         return nil
     end
 
@@ -114,11 +114,11 @@ local function set_mat(obj, mat, layer_id)
 
     local character = obj:GetComponent(typeof(Nova.CharacterController))
     if character then
-        warn('Cannot set material for CharacterController ' .. obj)
+        warn('Cannot set material for CharacterController ' .. dump(obj))
         return
     end
 
-    warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. obj)
+    warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. dump(obj))
     return
 end
 
@@ -177,7 +177,7 @@ local function set_mat_properties(mat, base_shader_name, properties)
                 mat:SetTexture(name, tex)
             end
         else
-            warn('Unknown dtype ' .. dtype .. ' for property ' .. name)
+            warn('Unknown dtype ' .. dump(dtype) .. ' for property ' .. dump(name))
         end
     end
 end

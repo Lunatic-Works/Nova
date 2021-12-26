@@ -22,7 +22,7 @@ function v(name, value)
         elseif type(value) == 'string' then
             __Nova.variables:Set(name, Nova.VariableType.String, value)
         else
-            warn('Variable can only be boolean, number, or string, but found ' .. type(value) .. ': ' .. value)
+            warn('Variable can only be boolean, number, or string, but found ' .. type(value) .. ': ' .. dump(value))
         end
     end
 end
@@ -48,7 +48,7 @@ function gv(name, value)
         elseif type(value) == 'string' then
             __Nova.checkpointHelper:SetGlobalVariable(name, Nova.VariableType.String, value)
         else
-            warn('Variable can only be boolean, number, or string, but found ' .. type(value) .. ': ' .. value)
+            warn('Variable can only be boolean, number, or string, but found ' .. type(value) .. ': ' .. dump(value))
         end
     end
 end

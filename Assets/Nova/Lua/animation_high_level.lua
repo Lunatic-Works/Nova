@@ -218,7 +218,7 @@ function get_color(obj)
         return color.r, color.g, color.b, color.a
     end
 
-    warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. obj)
+    warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. dump(obj))
     return nil
 end
 
@@ -251,7 +251,7 @@ function tint(obj, color)
         return
     end
 
-    warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. obj)
+    warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. dump(obj))
 end
 
 --- usage:
@@ -260,7 +260,7 @@ make_anim_method('tint', function(self, obj, color, duration, easing)
     local character = obj:GetComponent(typeof(Nova.CharacterController))
     local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
     if character == nil and renderer == nil then
-        warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. obj)
+        warn('Cannot find SpriteRenderer or CharacterController or Image for ' .. dump(obj))
         return self
     end
 
@@ -284,7 +284,7 @@ function env_tint(obj, color)
         return
     end
 
-    warn('Cannot find CharacterController for ' .. obj)
+    warn('Cannot find CharacterController for ' .. dump(obj))
 end
 
 --- usage:
@@ -292,7 +292,7 @@ end
 make_anim_method('env_tint', function(self, obj, color, duration, easing)
     local character = obj:GetComponent(typeof(Nova.CharacterController))
     if character == nil then
-        warn('Cannot find CharacterController for ' .. obj)
+        warn('Cannot find CharacterController for ' .. dump(obj))
         return self
     end
 
