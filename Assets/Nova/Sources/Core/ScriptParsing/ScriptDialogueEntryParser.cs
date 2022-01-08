@@ -218,7 +218,9 @@ namespace Nova
 
             var text = sb.ToString();
 
-            // Markdown syntaxes used in tutorials, not in NovaScript spec
+            // Markdown syntaxes used in tutorials
+            // They are not in the NovaScript spec. If they interfere with your scenarios or you have performance concern,
+            // you can comment out them.
             text = Regex.Replace(text, @"`([^`]*)`", @"<style=Code>$1</style>");
             text = Regex.Replace(text, @"\[([^\]]*)\]\(([^\)]*)\)", @"<link=""$2""><style=Link>$1</style></link>");
 

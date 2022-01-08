@@ -13,6 +13,6 @@ with open(out_filename, 'w', encoding='utf-8', newline='\n') as f:
                 continue
             filename = os.path.join(root, os.path.splitext(file)[0])
             filename = filename.replace('\\', '/')
-            filename = filename.replace(resources_dir + '/', '')
+            filename = filename.replace(resources_dir, '')
             print(filename)
             f.write(filename + '\n')

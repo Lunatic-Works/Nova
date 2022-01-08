@@ -32,6 +32,7 @@ set_box()
 
 <|
 print('111')
+-- 这是Lua里的注释
 |>
 在文字的上面可以用`<| ... |>`插入一个Lua代码块。上面的代码会在Unity Editor的Console窗口中输出“111”
 
@@ -61,7 +62,7 @@ label 'tut01_2'
 
 一行文本的结尾不能出现<noparse>|</noparse><noparse>></noparse>
 
-<noparse>：</noparse><noparse>：</noparse>和<noparse>:</noparse><noparse>:</noparse>也不能出现在文本中
+<noparse>：</noparse><noparse>：</noparse>和<noparse>:</noparse><noparse>:</noparse>不能出现在文本中
 
 它们都是Nova脚本的保留字，如果一定要出现，可以用XML标记把它们拆开（因为Nova先来parse这些保留字，TextMeshPro再来parse XML）
 

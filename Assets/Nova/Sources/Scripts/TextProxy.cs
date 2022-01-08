@@ -186,6 +186,7 @@ namespace Nova
 
         // Character count of the parsed text without XML tags
         // TODO: sometimes textInfo.characterCount or pageInfo.lastCharacterIndex returns 0, which may be a bug of TMP
+        // In this case, we need to remove XML tags when counting the text length
         public int GetPageCharacterCount()
         {
             var textInfo = textBox.textInfo;

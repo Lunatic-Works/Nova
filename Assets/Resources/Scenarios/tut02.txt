@@ -11,7 +11,7 @@ set_box()
 <|
 show(bg, 'rain')
 |>
-`show`函数可以显示图片
+`show`函数用来显示图片
 
 `bg`是图片的controller在Lua中的名称
 
@@ -19,14 +19,14 @@ show(bg, 'rain')
 
 图片所在的文件夹由`SpriteController`的`imageFolder`设置
 
-`rain`是这个文件夹中的图片文件名（不需要后缀名）
+`rain`是这个文件夹中的图片文件名（这里不需要`.png`等后缀名）
 
 顺便说一句：：把图片素材导入到Nova的方法详见[Wiki：背景图片导入](https://github.com/Lunatic-Works/Nova/wiki/Image-Import)
 
 <|
 show(bg2, 'room', {2, 2})
 |>
-可以同时显示多个图层，每个图层由一个game object控制。上面的`bg2`对应的就是`BackgroundImage2`
+可以同时显示多个图层，每个图层由一个game object控制。上面的`bg2`对应的就是Hierarchy里的`BackgroundImage2`
 
 如果需要更多图层，可以在Unity Editor中复制更多的game object，并修改`luaGlobalName`
 
@@ -42,12 +42,12 @@ Inspector中的`SpriteRenderer`的`sprite`会显示这个图层当前的图片
 <|
 hide(bg2)
 |>
-`hide`函数可以隐藏图片
+`hide`函数用来隐藏图片
 
 <|
 move(bg, {1, 0})
 |>
-`move`函数可以移动图片
+`move`函数用来移动图片
 
 `{1, 0}`是图片的x、y坐标，可以在Inspector中的`Transform`里看到
 
@@ -95,7 +95,7 @@ show(bg2, 'room', {2, 2})
 <|
 tint(bg2, {1, 0.5, 0})
 |>
-`tint`函数可以改变图片的颜色
+`tint`函数用来改变图片的颜色
 
 原理是给图片的RGBA通道分别乘上一个0..1之间的系数，可以在Inspector中的`SpriteRenderer`的`color`里看到
 
@@ -148,11 +148,11 @@ show(bg, 'room', {0, 0}, 1)
 <|
 show(gaotian, 'normal', {0, -0.3, 0.4})
 |>
-`show`也可以用来显示角色立绘
+`show`也可以显示角色立绘，`gaotian`对应的就是Hierarchy里的`Characters/Gaotian`
 
-角色立绘通常是由几个部件组合而成的，称为一个pose，`normal`是pose的名称
+角色立绘通常是由几个部件组合而成的，称为一个pose，上面的`normal`是pose的名称
 
-所有角色pose的信息在`pose.lua`中定义
+所有角色的pose在`pose.lua`中定义
 
 顺便说一句：：把立绘素材导入到Nova的方法详见[Wiki：立绘导入](https://github.com/Lunatic-Works/Nova/wiki/Standing-Import)
 
@@ -164,12 +164,14 @@ show(gaotian, 'cry')
 <|
 show(gaotian, 'normal')
 |>
-立绘改变的时候默认有零点几秒的淡入淡出，更复杂的动画以后再讲
+立绘改变的时候默认有零点几秒的淡入淡出
+
+顺便说一句：：教程5会讲更复杂的动画
 
 <|
 move(gaotian, {-4, nil})
 |>
-`move`也可以用来移动立绘
+`move`也可以移动立绘
 
 <|
 move(gaotian, pos_r)
@@ -179,7 +181,7 @@ move(gaotian, pos_r)
 <|
 tint(gaotian, {0.5, 1, 0.5})
 |>
-`tint`也可以用来改变立绘的颜色
+`tint`也可以改变立绘的颜色
 
 <|
 env_tint(gaotian, color_sunset)
@@ -202,7 +204,7 @@ tint(gaotian, 1)
 <|
 move(cam, {1, 0})
 |>
-`move`还可以用来移动摄像机
+`move`还可以移动摄像机
 
 顺便说一句：：目前我们用到的摄像机都是Hierarchy中的`MainCamera`，`MaskCamera`的用处以后再讲
 
@@ -211,9 +213,9 @@ move(cam, {1, 0})
 <|
 move(cam, {1, 1, 6})
 |>
-注意，摄像机的坐标中的缩放控制的不是`Transform`中的`scale`，而是`Camera`中的`size`
+注意，摄像机的坐标中的缩放参数控制的不是`Transform`中的`scale`，而是`Camera`中的`size`
 
-顺便说一句：：如果摄像机的模式是perspective，坐标中的缩放控制的则是`Camera.fieldOfView`
+顺便说一句：：如果摄像机的模式是perspective，缩放参数控制的则是`Camera.fieldOfView`
 
 <|
 move(cam, {0, 0, 5})

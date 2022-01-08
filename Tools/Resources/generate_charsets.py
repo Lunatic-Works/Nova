@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import unicodedata
 from glob import glob
 
 patterns = [
@@ -28,6 +29,11 @@ bolds = re.compile('<b>(.*?)</b>').findall(text)
 
 text = ''.join(sorted(set(text))).strip('\n')
 text_bold = ''.join(sorted(set(''.join(bolds)))).strip('\n')
+
+for c in text:
+    if unicodedata.category(c)[0] == 'C':
+        code = hex(ord(c)).replace('0x', 'U+').upper()
+        print(f'Special character: {code}')
 
 if all(x in old_text for x in text):
     print('Need to rebuild font asset: NO')

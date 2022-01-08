@@ -1,5 +1,5 @@
-../../Assets/Resources/LocalizedResources/English/Backgrounds/staff
-../../Assets/Resources/LocalizedResources/English/Scenarios/ch1
-../../Assets/Resources/LocalizedResources/English/Scenarios/ch2
-../../Assets/Resources/LocalizedResources/English/Scenarios/ch3
-../../Assets/Resources/LocalizedResources/English/Scenarios/ch4
+LocalizedResources/English/Backgrounds/staff
+LocalizedResources/English/Scenarios/ch1
+LocalizedResources/English/Scenarios/ch2
+LocalizedResources/English/Scenarios/ch3
+LocalizedResources/English/Scenarios/ch4

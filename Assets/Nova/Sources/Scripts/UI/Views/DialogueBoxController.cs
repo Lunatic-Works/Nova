@@ -597,7 +597,7 @@ namespace Nova
                 }
 
                 var animEntry = textAnimation.Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
-                    .Then(null).For(textAnimationDelay)
+                    .Then(null, textAnimationDelay)
                     .Then(
                         new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
                         textDuration

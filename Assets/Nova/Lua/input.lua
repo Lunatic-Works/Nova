@@ -3,5 +3,6 @@ function input_on()
 end
 
 function input_off()
+    stop_auto_ff()
     __Nova.inputHelper:DisableInput()
 end
