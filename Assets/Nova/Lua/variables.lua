@@ -1,65 +1,65 @@
+function get_nova_variable(name, global)
+    local entry
+    if global then
+        entry = __Nova.checkpointHelper:GetGlobalVariable(name)
+    else
+        entry = __Nova.variables:Get(name)
+    end
+
+    if entry == nil then
+        return nil
+    elseif entry.type == Nova.VariableType.Boolean then
+        return toboolean(entry.value)
+    elseif entry.type == Nova.VariableType.Number then
+        return tonumber(entry.value)
+    else -- entry.type == Nova.VariableType.String
+        return entry.value
+    end
+end
+
+function set_nova_variable(name, value, global)
+    local obj, func
+    if global then
+        obj = __Nova.checkpointHelper
+        func = obj.SetGlobalVariable
+    else
+        obj = __Nova.variables
+        func = obj.Set
+    end
+
+    local _type = type(value)
+    if value == nil then
+        func(obj, name, Nova.VariableType.String, nil)
+    elseif _type == 'boolean' then
+        func(obj, name, Nova.VariableType.Boolean, tostring(value))
+    elseif _type == 'number' then
+        func(obj, name, Nova.VariableType.Number, tostring(value))
+    elseif _type == 'string' then
+        func(obj, name, Nova.VariableType.String, value)
+    else
+        warn('Variable value can only be boolean, number, string, or nil, but found ' .. _type .. ': ' .. dump(value))
+    end
+end
+
 -- access variable at run time (lazy only)
--- value can be boolean, number, or string
+-- value can be boolean, number, string, or nil
 -- get: v(name)
 -- set: v(name, value)
 function v(name, value)
+    warn('Function `v` is deprecated. Please use Lua global variable starting with `v_` instead.')
     if value == nil then
-        local entry = __Nova.variables:Get(name)
-        if entry == nil then
-            return nil
-        elseif entry.type == Nova.VariableType.Boolean then
-            return toboolean(entry.value)
-        elseif entry.type == Nova.VariableType.Number then
-            return tonumber(entry.value)
-        else -- entry.type == Nova.VariableType.String
-            return entry.value
-        end
+        return get_nova_variable(name, false)
     else
-        if type(value) == 'boolean' then
-            __Nova.variables:Set(name, Nova.VariableType.Boolean, tostring(value))
-        elseif type(value) == 'number' then
-            __Nova.variables:Set(name, Nova.VariableType.Number, tostring(value))
-        elseif type(value) == 'string' then
-            __Nova.variables:Set(name, Nova.VariableType.String, value)
-        else
-            warn('Variable can only be boolean, number, or string, but found ' .. type(value) .. ': ' .. dump(value))
-        end
+        set_nova_variable(name, value, false)
     end
 end
 
 -- global variable, not calculated in variables hash
 function gv(name, value)
+    warn('Function `gv` is deprecated. Please use Lua global variable starting with `gv_` instead.')
     if value == nil then
-        local entry = __Nova.checkpointHelper:GetGlobalVariable(name)
-        if entry == nil then
-            return nil
-        elseif entry.type == Nova.VariableType.Boolean then
-            return toboolean(entry.value)
-        elseif entry.type == Nova.VariableType.Number then
-            return tonumber(entry.value)
-        else -- entry.type == Nova.VariableType.String
-            return entry.value
-        end
+        return get_nova_variable(name, true)
     else
-        if type(value) == 'boolean' then
-            __Nova.checkpointHelper:SetGlobalVariable(name, Nova.VariableType.Boolean, tostring(value))
-        elseif type(value) == 'number' then
-            __Nova.checkpointHelper:SetGlobalVariable(name, Nova.VariableType.Number, tostring(value))
-        elseif type(value) == 'string' then
-            __Nova.checkpointHelper:SetGlobalVariable(name, Nova.VariableType.String, value)
-        else
-            warn('Variable can only be boolean, number, or string, but found ' .. type(value) .. ': ' .. dump(value))
-        end
-    end
-end
-
--- temporary variable, not saved in checkpoints, not calculated in variables hash
-local tv_storage = {}
-
-function tv(name, value)
-    if value == nil then
-        return tv_storage[name]
-    else
-        tv_storage[name] = value
+        set_nova_variable(name, value, true)
     end
 end

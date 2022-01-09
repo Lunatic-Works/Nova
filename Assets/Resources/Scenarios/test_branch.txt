@@ -6,7 +6,7 @@ label 'test_branch'
 show(bg, 'room')
 stop(bgm)
 set_box()
-v('flag', 0)
+v_flag = 0
 |>
 测试选项
 @<| jump_to 'begin_loop' |>
@@ -22,22 +22,22 @@ branch {
 
 @<| label 'add_flag' |>
 <|
-v('flag', v('flag') + 1)
-print(v('flag'))
+v_flag = v_flag + 1
+print(v_flag)
 |>
 加了一个flag
 @<| jump_to 'begin_loop' |>
 
 @<| label 'end_loop' |>
-如果flag > 5会直接跳到最后
+如果flag > 3会直接跳到最后
 @<|
 branch {
     { dest = 'test_branch_end', text = '普通的选项'},
     { dest = 'test_branch_end', text = 'flag > 1才会出现', mode = 'show', cond = function()
-        return v('flag') > 1
+        return v_flag > 1
     end },
-    { dest = 'test_branch_end', text = 'flag < 2才能点击', mode = 'enable', cond = "v('flag') < 2" },
-    { dest = 'test_branch_end', mode = 'jump', cond = "v('flag') > 5" },
+    { dest = 'test_branch_end', text = 'flag < 2才能点击', mode = 'enable', cond = 'v_flag < 2' },
+    { dest = 'test_branch_end', mode = 'jump', cond = 'v_flag > 3' },
 }
 |>
 

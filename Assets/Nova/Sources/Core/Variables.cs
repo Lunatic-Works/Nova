@@ -63,10 +63,21 @@ namespace Nova
         public void Set(string name, VariableType type, string value)
         {
             variables.TryGetValue(name, out var oldEntry);
-            if (oldEntry == null || oldEntry.type != type || oldEntry.value != value)
+            if (value == null)
             {
-                variables[name] = new VariableEntry(type, value);
-                needCalculateHash = true;
+                if (oldEntry != null)
+                {
+                    variables.Remove(name);
+                    needCalculateHash = true;
+                }
+            }
+            else
+            {
+                if (oldEntry == null || oldEntry.type != type || oldEntry.value != value)
+                {
+                    variables[name] = new VariableEntry(type, value);
+                    needCalculateHash = true;
+                }
             }
         }
 

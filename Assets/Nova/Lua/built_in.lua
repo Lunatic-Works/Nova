@@ -1,17 +1,51 @@
---- Disable implicit global variable declaration
---- See https://www.lua.org/pil/14.2.html
-local declared_names = {}
+function pop_prefix(s, prefix, sep_len)
+    sep_len = sep_len or 0
+    if string.sub(s, 1, #prefix) == prefix then
+        return prefix, string.sub(s, #prefix + sep_len + 1)
+    else
+        return false, s
+    end
+end
 
+--- Handle Nova variable whose name starts with `v_` or `gv_` in Lua
+--- Disable implicit global variable declaration, see https://www.lua.org/pil/14.2.html
+local declared_global_variables = {}
+local _pop_prefix = pop_prefix
 setmetatable(_G, {
-    __index = function(t, n)
-        if not declared_names[n] then
-            warn('Attempt to read undeclared global variable: ' .. n)
+    __index = function(t, name)
+        local _type
+        _type, name = _pop_prefix(name, 'v_')
+        if not _type then
+            _type, name = _pop_prefix(name, 'gv_')
         end
-        return rawget(t, n)
+
+        if _type == 'v_' then
+            return get_nova_variable(name, false)
+        elseif _type == 'gv_' then
+            return get_nova_variable(name, true)
+        else
+            if not declared_global_variables[name] then
+                warn('Attempt to read undeclared global variable: ' .. name)
+            end
+            return rawget(t, name)
+        end
     end,
-    __newindex = function(t, n, v)
-        declared_names[n] = true
-        rawset(t, n, v)
+
+    __newindex = function(t, name, value)
+        local _type
+        _type, name = _pop_prefix(name, 'v_')
+        if not _type then
+            _type, name = _pop_prefix(name, 'gv_')
+        end
+
+        if _type == 'v_' then
+            return set_nova_variable(name, value, false)
+        elseif _type == 'gv_' then
+            return set_nova_variable(name, value, true)
+        else
+            declared_global_variables[name] = true
+            rawset(t, name, value)
+        end
     end,
 })
 
@@ -20,39 +54,6 @@ __Nova = {}
 --- show warning without halting the game
 function warn(s)
     print('<color=red>' .. s .. '</color>\n' .. debug.traceback())
-end
-
---- get GameObject
---- caching everything might cause memory leak, so this function will do no cache
---- find GameObject by name might be slow. It is the author's work to decide whether to cache the result or not
-function get_go(obj)
-    local o
-    if type(obj) == 'string' then
-        o = __Nova[obj] -- first search Nova default binding table
-            or _G[obj] -- then search global variable
-            or UnityEngine.GameObject.Find(obj) -- finally find GameObject by name
-    elseif type(obj) == 'userdata' then
-        o = obj
-    end
-    if o == nil then
-        warn('Cannot find obj: ' .. dump(obj))
-    end
-    return o and o.gameObject
-end
-
-function remove_entry(t, entry)
-    local idx = 0
-    for i = 1, #t do
-        if t[i] == entry then
-            idx = i
-            break
-        end
-    end
-    if idx == 0 then
-        warn('Entry not found')
-        return
-    end
-    table.remove(t, idx)
 end
 
 --- dump a table to string, for debug
@@ -69,6 +70,21 @@ function dump(o)
     else
         return tostring(o)
     end
+end
+
+function remove_entry(t, entry)
+    local idx = 0
+    for i = 1, #t do
+        if t[i] == entry then
+            idx = i
+            break
+        end
+    end
+    if idx == 0 then
+        warn('Entry not found')
+        return
+    end
+    table.remove(t, idx)
 end
 
 --- inverse of tostring()

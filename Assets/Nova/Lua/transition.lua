@@ -9,14 +9,6 @@ local function get_base_shader_name(s)
     return string.upper(string.sub(s, 1, 1)) .. string.gsub(string.sub(s, 2), '_(.)', function(x) return ' ' .. string.upper(x) end)
 end
 
-local function pop_prefix(s, prefix, sep_len)
-    if string.sub(s, 1, #prefix) == prefix then
-        return prefix, string.sub(s, #prefix + sep_len + 1)
-    else
-        return false, s
-    end
-end
-
 local function get_full_shader_name(shader_name, pp)
     local raw_shader_name = shader_name
 
@@ -71,7 +63,7 @@ local function get_mat(obj, shader_name, restorable)
 
     local full_shader_name, base_shader_name, variant = get_full_shader_name(shader_name, pp)
 
-    local pool = Nova.MaterialPool.Ensure(get_go(obj))
+    local pool = Nova.MaterialPool.Ensure(obj.gameObject)
     local mat
     if restorable then
         mat = pool:GetRestorableMaterial(full_shader_name)
@@ -88,7 +80,7 @@ local function get_mat(obj, shader_name, restorable)
 end
 
 local function get_default_mat(obj)
-    return Nova.MaterialPool.Ensure(get_go(obj)).defaultMaterial
+    return Nova.MaterialPool.Ensure(obj.gameObject).defaultMaterial
 end
 
 local function set_mat(obj, mat, layer_id)

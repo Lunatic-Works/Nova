@@ -59,7 +59,15 @@ namespace Nova
 
         public void SetGlobalVariable(string name, VariableType type, string value)
         {
-            globalVariables[name] = new VariableEntry(type, value);
+            if (value == null)
+            {
+                globalVariables.Remove(name);
+            }
+            else
+            {
+                globalVariables[name] = new VariableEntry(type, value);
+            }
+
             checkpointManager.Set(GlobalVariablesKey, globalVariables);
         }
 

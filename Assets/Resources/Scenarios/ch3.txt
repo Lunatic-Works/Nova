@@ -14,7 +14,7 @@ auto_voice_off('张浅野')
 auto_voice_on('孙西本', 2)
 auto_voice_off('陈高天')
 auto_voice_off('？？？')
-v('flag_xiben', 1)
+v_flag_xiben = 1
 |>
 我在走廊看着不断落下的雨，让自己的头脑冷静下来。
 

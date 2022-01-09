@@ -47,7 +47,7 @@ show(qianye, 'normal', pos_r)
 @<|
 branch {
     { dest = 'ch4_true', mode = 'jump', cond = function()
-        return v('flag_xiben') == 1
+        return v_flag_xiben == 1
     end },
     { dest = 'ch4_bad', mode = 'jump' },
 }
