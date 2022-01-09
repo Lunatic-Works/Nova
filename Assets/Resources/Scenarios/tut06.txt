@@ -1,0 +1,153 @@
+@<|
+label('tut06', '教程6 特效与转场')
+is_start()
+|>
+<|
+show(bg, 'rain')
+stop(bgm)
+set_box()
+|>
+教程6 特效与转场
+
+<|
+vfx(bg, 'lens_blur', 1, { _Size = 10 })
+|>
+`vfx`函数用来给图片添加特效
+
+每个特效都是一个shader，由`Assets/Nova/ShaderProtos/`中的`.shaderproto`文件定义
+
+第二个参数是特效的名称，比如Unity中的shader名称是`Lens Blur`，对应的Lua中的特效名称就是`lens_blur`
+
+第三个参数是特效的显示程度，0为完全不显示，1为完全显示，默认为1
+
+第四个参数用来设置shader的其他property，每个shader可以设置的property在`.shaderproto`文件中定义，比如`lens_blur`的property有`_Size`和`_Offset`
+
+每个`SpriteController`只能添加一个特效，新的特效会替换旧的特效
+
+<|
+vfx(bg, 'mono')
+|>
+还有一些常用的shader，比如`mono`用来把图片变成黑白
+
+<|
+vfx(bg, 'glow', 1, { _Size = 10, _Strength = 10 })
+|>
+`glow`用来给图片加光晕
+
+<|
+vfx(bg, 'wiggle', 1, { _XAmp = 0.1, _XFreq = 10, _TFreq = 10 })
+|>
+`wiggle`用来让图片随机扭动，shader里面的动画与Nova的动画系统是独立的
+
+<|
+vfx(bg, nil)
+|>
+把特效名称设为nil就是取消特效
+
+<|
+show(fg, 'film_dirt', {0, 0, 0.5})
+vfx(fg, 'multiply')
+|>
+`multiply`把图片的混合模式设为相乘，也就是这个图层黑色的地方会让背景变黑，而白色的地方不变，可以用来制作灰尘等效果
+
+<|
+show(fg, 'moon_halo', {0, 0, 0.5})
+vfx(fg, 'screen')
+|>
+`screen`把图片的混合模式设为补数相乘，也就是这个图层白色的地方会让背景变白，而黑色的地方不变，可以用来制作发光等效果
+
+<|
+vfx(fg, 'screen_blink')
+|>
+大多数特效都有multiply和screen的版本
+
+<|
+show(gaotian, 'normal', pos_c)
+hide(fg)
+move(fg, {0, 0, 1})
+vfx(fg, nil)
+|>
+目前不能对角色立绘添加特效，如果需要的话可以把立绘做成一张图片，再用`SpriteController`来显示
+
+<|
+vfx(cam, 'lens_blur', 1, { _Size = 10 })
+|>
+也可以对摄像机添加特效，这时立绘和背景一起被模糊了
+
+<|
+vfx(cam, {'mono', 1})
+|>
+摄像机可以添加多层特效，只要把特效名称设为一个table，其中的第二个参数是特效的图层，默认为0
+
+现在摄像机拍下的图片先经过图层0的特效`lens_blur`，再经过图层1的特效`mono`
+
+<|
+vfx(cam, {'wiggle', 1}, 1, { _XAmp = 0.1, _XFreq = 10, _TFreq = 10 })
+|>
+同一个图层上新的特效会替换旧的特效
+
+<|
+vfx(cam, nil)
+vfx(cam, {nil, 1})
+|>
+取消特效时要分别取消每个图层的特效
+
+<|
+anim:vfx(bg, 'lens_blur', {0, 1}, 1, { _Size = 10 })
+|>
+`anim:vfx`函数用来创建特效动画
+
+它的第三个参数是初始和最终时特效的显示程度，第四个参数是动画的时长
+
+<|
+anim:vfx(bg, 'lens_blur', {1, 0}, 1, { _Size = 10 })
+|>
+把第三个参数反过来，就是特效消失的动画
+
+<|
+anim:trans(bg, 'room', 'fade', 1, { _Mask = 'Masks/wipe_left' })
+|>
+`anim:trans`函数用来创建转场动画，比如把背景图片变成另一张
+
+它的第二个参数是新的图片的名称，第三个参数是特效的名称，第四个参数是动画的时长
+
+<|
+anim:trans2(bg, 'rain', 'color', 1, { _ColorAdd = 1 })
+|>
+`anim:trans2`函数则是第二类转场动画
+
+<|
+anim:trans(bg, 'room', 'fade', 1, { _Mask = 'Masks/wipe_left' })
+|>
+第一类与第二类转场的区别在于，第一类转场同时显示转场前后的两张图片
+
+<|
+anim:trans2(bg, 'rain', 'color', 1, { _ColorAdd = 1 })
+|>
+而第二类转场一次只显示一张图片，先让前一张图片消失（比如画面变白），再让后一张图片出现
+
+<|
+anim:trans(cam, function()
+        hide(gaotian)
+        show(xiben, 'normal', pos_c)
+        show(bg, 'room')
+    end, 'fade', 1, { _Mask = 'Masks/wipe_left' })
+|>
+也可以给摄像机加转场，这时立绘和背景一起被转场了
+
+转场其实也是一种特效，在`SpriteController`上，转场会让当前的特效消失
+
+而在摄像机上，转场默认占用特效图层1，可以在特效名称的参数中设置图层
+
+<|
+anim:trans_left(bg, 'rain'):trans_right(bg, 'room')
+|>
+`animation_presets.lua`中定义了`trans_left`、`trans_right`等函数，就是把转场加上一些常用的参数
+
+<|
+hide(xiben)
+|>
+教程6 特效与转场 到此结束
+
+更多教程正在施工，如果还有疑问可以在GitHub上发issue，或者加QQ群讨论
+@<| is_end() |>

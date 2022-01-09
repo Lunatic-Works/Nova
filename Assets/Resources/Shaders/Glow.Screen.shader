@@ -56,7 +56,8 @@ Shader "Nova/VFX Screen/Glow"
                 glow = glow * glow;
                 glow = glow * glow;
                 glow *= _Strength * _T;
-                col.rgb = saturate(col.rgb + glow - col.rgb * glow);
+                col.rgb = col.rgb + glow - col.rgb * glow;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
                 col.a = 1.0;

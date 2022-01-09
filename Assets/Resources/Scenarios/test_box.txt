@@ -1,0 +1,55 @@
+@<|
+label 'test_box'
+-- is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试对话框
+
+很多行文字
+111
+222
+333
+444
+555
+666
+777
+888
+999
+
+很长的文字
+一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零
+
+英文换行 abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg
+
+<|
+set_box('full', 'dark')
+|>
+全屏文本
+
+很多行文字
+111
+222
+333
+444
+555
+666
+777
+888
+999
+
+很长的文字
+一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零一二三四五六七八九零
+
+英文换行 abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg
+
+<|
+set_box()
+|>
+取消全屏文本
+
+测试结束
+@<| is_end() |>

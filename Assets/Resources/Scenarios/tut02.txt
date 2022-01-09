@@ -24,23 +24,23 @@ show(bg, 'rain')
 顺便说一句：：把图片素材导入到Nova的方法详见[Wiki：背景图片导入](https://github.com/Lunatic-Works/Nova/wiki/Image-Import)
 
 <|
-show(bg2, 'room', {2, 2})
+show(fg, 'moon_halo', {2, 2, 0.5})
 |>
-可以同时显示多个图层，每个图层由一个game object控制。上面的`bg2`对应的就是Hierarchy里的`BackgroundImage2`
+可以同时显示多个图层，每个图层由一个game object控制。上面的`fg`对应的就是Hierarchy里的`ForegroundImage`
 
 如果需要更多图层，可以在Unity Editor中复制更多的game object，并修改`luaGlobalName`
 
 顺便说一句：：图层的顺序一般由z坐标决定。上面的`{2, 2}`是x、y坐标，马上就会讲到
 
 <|
-show(bg, 'corridor')
+show(bg, 'room')
 |>
 对同一个图层再次使用`show`，则会替换当前的图片
 
 Inspector中的`SpriteRenderer`的`sprite`会显示这个图层当前的图片
 
 <|
-hide(bg2)
+hide(fg)
 |>
 `hide`函数用来隐藏图片
 
@@ -88,12 +88,12 @@ move(bg, {nil, nil, nil, nil, {60, 40, 20}})
 
 <|
 move(bg, {0, 0, 1, 10, 0})
-show(bg2, 'room', {2, 2})
+show(fg, 'moon_halo')
 |>
-好了，把背景恢复正常，并且把`bg2`显示出来
+好了，把背景恢复正常，并且把`fg`显示出来
 
 <|
-tint(bg2, {1, 0.5, 0})
+tint(fg, {1, 0.5, 0})
 |>
 `tint`函数用来改变图片的颜色
 
@@ -104,44 +104,44 @@ tint(bg2, {1, 0.5, 0})
 Nova脚本中的颜色用一个table表示，可以包括1..4个数值
 
 <|
-tint(bg2, 0.5)
+tint(fg, 0.5)
 |>
 1个数值：`r, g, b`均为该值，`a`为1，只改变明暗而不改变色调（这时可以不用table，只用一个数值）
 
 <|
-tint(bg2, {1, 0.5})
+tint(fg, {1, 0.5})
 |>
 2个数值：`r, g, b`均为第一个值，`a`为第二个值
 
 <|
-tint(bg2, {0, 0.5, 1})
+tint(fg, {0, 0.5, 1})
 |>
 3个数值：`r, g, b`为这三个数值，`a`为1
 
 <|
-tint(bg2, {0.5, 0, 1, 0.5})
+tint(fg, {0.5, 0, 1, 0.5})
 |>
 4个数值：`r, g, b, a`为这四个数值
 
 <|
-hide(bg2)
-move(bg2, {0, 0})
-tint(bg2, 1)
+hide(fg)
+move(fg, {0, 0, 1})
+tint(fg, 1)
 |>
-好了，隐藏`bg2`。如果接下来长时间用不到一个图层，最好把坐标和颜色恢复原状，以免下次用到的时候忘了
+好了，隐藏`fg`。如果接下来长时间用不到一个图层，最好把坐标和颜色恢复原状，以免下次用到的时候忘了
 
 <|
-show(bg, 'room', {1, 1}, {1, 0.5, 0})
+show(bg, 'rain', {1, 1}, {1, 0.5, 0})
 |>
 坐标和颜色也可以在`show`当中设置
 
 <|
-show(bg, 'rain', nil, {0, 0.5, 1})
+show(bg, 'room', nil, {0, 0.5, 1})
 |>
 如果省略则是保持之前的值
 
 <|
-show(bg, 'room', {0, 0}, 1)
+show(bg, 'rain', {0, 0}, 1)
 |>
 好了，把背景恢复正常
 

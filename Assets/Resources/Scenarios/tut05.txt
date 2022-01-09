@@ -75,7 +75,7 @@ move(xiben, {-5})
 anim:move(gaotian, {5}, 2, {'shake', 20, 0.5})
 anim:move(xiben, {5}, 2, {1, 1})
 |>
-顺便说一句：：`shake`可以做出晃动，注意它最后不会停在`move`定义的目标位置，而是停在起始位置
+顺便说一句：：`shake`可以做出晃动，注意它最后不会停在`move`定义的目标位置，而是停在初始位置
 
 <|
 move(gaotian, pos_c)
@@ -204,9 +204,9 @@ end)
 因为是无限循环，它只能作为持续动画，而不能作为对话内动画
 
 <|
+hide(gaotian)
+hide(xiben)
 anim_persist_end()
 |>
 教程5 动画 到此结束
-
-更多教程正在施工，如果还有疑问可以在GitHub上发issue，或者加QQ群讨论
-@<| is_end() |>
+@<| jump_to 'tut06' |>

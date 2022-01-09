@@ -54,7 +54,8 @@ Shader "Nova/$VARIANT_NAME$/Glow"
                 glow = glow * glow;
                 glow = glow * glow;
                 glow *= _Strength * _T;
-                col.rgb = saturate(col.rgb + glow - col.rgb * glow);
+                col.rgb = col.rgb + glow - col.rgb * glow;
+                col.rgb = saturate(col.rgb);
 
                 $VARIANT_RGB$
 

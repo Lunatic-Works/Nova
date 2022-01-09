@@ -76,6 +76,7 @@ Shader "Nova/Post Processing/Wiggle"
 
                 float noiseA = _AAmp * noise(xyt);
                 col.rgb *= 1.0 - noiseA;
+                col.rgb = saturate(col.rgb);
 
                 return col;
             }

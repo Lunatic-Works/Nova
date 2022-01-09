@@ -3,7 +3,7 @@ label('tut03', '教程3 声音')
 is_start()
 |>
 <|
-show(bg, 'room')
+show(bg, 'rain')
 stop(bgm)
 set_box()
 |>

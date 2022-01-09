@@ -56,7 +56,8 @@ Shader "Nova/Post Processing/Glow"
                 glow = glow * glow;
                 glow = glow * glow;
                 glow *= _Strength * _T;
-                col.rgb = saturate(col.rgb + glow - col.rgb * glow);
+                col.rgb = col.rgb + glow - col.rgb * glow;
+                col.rgb = saturate(col.rgb);
 
                 return col;
             }

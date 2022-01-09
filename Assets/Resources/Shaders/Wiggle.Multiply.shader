@@ -77,6 +77,7 @@ Shader "Nova/VFX Multiply/Wiggle"
 
                 float noiseA = _AAmp * noise(xyt);
                 col.rgb *= 1.0 - noiseA;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb = 1.0 - (1.0 - col.rgb) * col.a;
                 col.a = 1.0;

@@ -291,8 +291,10 @@ namespace Nova
                         continue;
                     }
 
-                    var codeBuilder = new StringBuilder(code);
-                    codeBuilder.Append('\n');
+                    var codeBuilder = new StringBuilder();
+                    codeBuilder.Append("-- Begin original code block\n");
+                    codeBuilder.Append(code);
+                    codeBuilder.Append("\n-- End original code block\n");
                     codeBuilders[i] = codeBuilder;
 
                     GenerateActions(code, out StringBuilder preloadActions, out StringBuilder unpreloadActions,

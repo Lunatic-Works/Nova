@@ -34,5 +34,10 @@ anim_persist_end()
 |>
 停止持续动画
 
+<|
+anim:action(function() anim:stop() end)
+|>
+停止动画的奇怪情况
+
 测试结束
 @<| is_end() |>

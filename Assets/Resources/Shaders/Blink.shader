@@ -58,6 +58,7 @@ Shader "Nova/VFX/Blink"
 
                 float n = noise(_Freq * _Time.y);
                 col.rgb += _Amp * n * n * _T;
+                col.rgb = saturate(col.rgb);
 
                 return col;
             }

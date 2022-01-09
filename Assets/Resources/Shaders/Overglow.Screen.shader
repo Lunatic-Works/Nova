@@ -56,6 +56,7 @@ Shader "Nova/VFX Screen/Overglow"
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
                 float4 col2 = tex2D(_MainTex, uv2) * i.color;
                 col.rgb += col2.rgb * _Mul * (1.0 - _T);
+                col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
                 col.a = 1.0;
