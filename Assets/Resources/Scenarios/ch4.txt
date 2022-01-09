@@ -46,9 +46,7 @@ show(qianye, 'normal', pos_r)
 发生了什么？
 @<|
 branch {
-    { dest = 'ch4_true', mode = 'jump', cond = function()
-        return v_flag_xiben == 1
-    end },
+    { dest = 'ch4_true', mode = 'jump', cond = 'v_flag_xiben' },
     { dest = 'ch4_bad', mode = 'jump' },
 }
 |>
