@@ -204,7 +204,8 @@ namespace Nova.Generate
                 "Mono",
                 new Dictionary<string, ShaderPropertyType>
                 {
-                    {"_Offset", ShaderPropertyType.Float},
+                    {"_ColorAdd", ShaderPropertyType.Color},
+                    {"_ColorMul", ShaderPropertyType.Color},
                     {"_T", ShaderPropertyType.Float},
                 }
             },
@@ -525,7 +526,6 @@ namespace Nova.Generate
                 "Mono",
                 new Dictionary<string, float>
                 {
-                    {"_Offset", 0.0f},
                     {"_T", 0.0f},
                 }
             },
@@ -726,6 +726,14 @@ namespace Nova.Generate
             },
             {
                 "Mix Add",
+                new Dictionary<string, Color>
+                {
+                    {"_ColorAdd", Color.clear},
+                    {"_ColorMul", Color.white},
+                }
+            },
+            {
+                "Mono",
                 new Dictionary<string, Color>
                 {
                     {"_ColorAdd", Color.clear},

@@ -5,7 +5,7 @@ import unicodedata
 from glob import glob
 
 patterns = [
-    '../../Assets/Nova/Fonts/Charset3500.txt',
+    '../../Assets/Nova/Fonts/CharsetChinese.txt',
     '../../Assets/Resources/Scenarios/*.txt',
     '../../Assets/Resources/LocalizedResources/*/Scenarios/*.txt',
     '../../Assets/Resources/LocalizedStrings/*.json',
@@ -32,7 +32,7 @@ text_bold = ''.join(sorted(set(''.join(bolds)))).strip('\n')
 
 for c in text:
     if unicodedata.category(c)[0] == 'C':
-        code = hex(ord(c)).replace('0x', 'U+').upper()
+        code = f'U+{ord(c):04X}'
         print(f'Special character: {code}')
 
 if all(x in old_text for x in text):

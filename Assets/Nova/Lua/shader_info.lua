@@ -114,7 +114,8 @@ shader_type_data = {
         _T = 'Float',
     },
     ['Mono'] = {
-        _Offset = 'Float',
+        _ColorAdd = 'Color',
+        _ColorMul = 'Color',
         _T = 'Float',
     },
     ['Motion Blur'] = {
@@ -301,7 +302,6 @@ shader_float_data = {
         _T = 0,
     },
     ['Mono'] = {
-        _Offset = 0,
         _T = 0,
     },
     ['Motion Blur'] = {
@@ -418,6 +418,10 @@ shader_color_data = {
         _SubColor = Color.white,
     },
     ['Mix Add'] = {
+        _ColorAdd = Color.clear,
+        _ColorMul = Color.white,
+    },
+    ['Mono'] = {
         _ColorAdd = Color.clear,
         _ColorMul = Color.white,
     },

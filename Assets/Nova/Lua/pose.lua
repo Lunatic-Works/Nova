@@ -15,8 +15,5 @@ local poses = {
 }
 
 function get_pose(obj, pose_name)
-    if poses[obj.luaGlobalName] and poses[obj.luaGlobalName][pose_name] then
-        return poses[obj.luaGlobalName][pose_name]
-    end
-    return nil
+    return poses[obj.luaGlobalName] and poses[obj.luaGlobalName][pose_name]
 end

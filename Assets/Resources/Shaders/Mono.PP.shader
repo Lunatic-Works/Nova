@@ -6,7 +6,8 @@ Shader "Nova/Post Processing/Mono"
     {
         [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
         _T ("Time", Range(0.0, 1.0)) = 0.0
-        _Offset ("Offset", Float) = 0.0
+        _ColorMul ("Color Multiplier", Color) = (1, 1, 1, 1)
+        _ColorAdd ("Color Offset", Color) = (0, 0, 0, 0)
     }
     SubShader
     {
@@ -18,7 +19,6 @@ Shader "Nova/Post Processing/Mono"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
-            #include "Assets/Nova/CGInc/Rand.cginc"
 
             struct appdata
             {
@@ -44,13 +44,15 @@ Shader "Nova/Post Processing/Mono"
             }
 
             sampler2D _MainTex;
-            float _T, _Offset;
+            float _T;
+            float4 _ColorMul, _ColorAdd;
 
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv);
-                float gray = Luminance(col.rgb) + _Offset;
-                col.rgb = lerp(col.rgb, gray, _T);
+                float gray = Luminance(col.rgb);
+                float3 mono = gray * _ColorMul.rgb + _ColorAdd.rgb;
+                col.rgb = lerp(col.rgb, mono, _T);
                 col *= i.color;
 
                 return col;
