@@ -25,7 +25,7 @@ namespace Nova
                 I18n.SupportedLocales.ToDictionary(x => x, x => I18n.__(x, "config.textpreview.name"));
             var dialogues =
                 I18n.SupportedLocales.ToDictionary(x => x, x => I18n.__(x, TextPreviewKeys[textPreviewIndex]));
-            return new DialogueDisplayData("Preview", displayNames, dialogues);
+            return new DialogueDisplayData(displayNames, dialogues);
         }
 
         private void ResetTextPreview()

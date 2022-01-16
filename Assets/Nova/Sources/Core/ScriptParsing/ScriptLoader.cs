@@ -48,6 +48,8 @@ namespace Nova
         // Current locale of the state machine
         public SystemLanguage stateLocale;
 
+        private readonly Dictionary<string, string> hiddenCharacterNames = new Dictionary<string, string>();
+
         private class LazyBindingEntry
         {
             public readonly FlowChartNode from;
@@ -202,6 +204,7 @@ namespace Nova
         /// <param name="text">Text of a script</param>
         private void ParseScript(string text)
         {
+            hiddenCharacterNames.Clear();
             LuaRuntime.Instance.DoString("action_new_file()");
 
             var blocks = Parser.Parse(text).blocks;
@@ -244,7 +247,7 @@ namespace Nova
 
             if (stateLocale == I18n.DefaultLocale)
             {
-                var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks);
+                var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks, hiddenCharacterNames);
                 currentNode.SetDialogueEntries(entries);
             }
             else

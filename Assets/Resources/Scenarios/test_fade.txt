@@ -1,0 +1,33 @@
+@<|
+label 'test_fade'
+-- is_unlocked_start()
+|>
+<|
+show(bg, 'room')
+stop(bgm)
+set_box()
+|>
+测试转场
+
+<|
+vfx(bg, 'fade', 0.5, { _SubTex = 'Backgrounds/black', _Mask = 'Masks/fade_left', _Vague = 0 })
+|>
+现在画面应该有一半是黑色
+
+<|
+vfx(bg, nil)
+|>
+恢复
+
+<|
+vfx(cam, 'fade', 0.5, { _SubTex = 'Backgrounds/black', _Mask = 'Masks/fade_left', _Vague = 0 })
+|>
+现在画面应该有一半是黑色
+
+<|
+vfx(cam, nil)
+|>
+恢复
+
+测试结束
+@<| is_end() |>

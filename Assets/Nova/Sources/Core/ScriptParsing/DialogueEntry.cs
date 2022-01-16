@@ -18,19 +18,15 @@ namespace Nova
     [Serializable]
     public class DialogueDisplayData
     {
-        /// <value>Internally used character name.</value>
-        public readonly string characterName;
-
         /// <value>Displayed character name for each locale.</value>
         public readonly Dictionary<SystemLanguage, string> displayNames;
 
         /// <value>Displayed dialogue for each locale.</value>
         public readonly Dictionary<SystemLanguage, string> dialogues;
 
-        public DialogueDisplayData(string characterName, Dictionary<SystemLanguage, string> displayNames,
+        public DialogueDisplayData(Dictionary<SystemLanguage, string> displayNames,
             Dictionary<SystemLanguage, string> dialogues)
         {
-            this.characterName = characterName;
             this.displayNames = displayNames;
             this.dialogues = dialogues;
         }
@@ -55,9 +51,11 @@ namespace Nova
     /// </summary>
     public class DialogueEntry
     {
+        /// <value>Internally used character name.</value>
+        public readonly string characterName;
+
         public readonly DialogueDisplayData displayData;
 
-        public string characterName => displayData.characterName;
         public Dictionary<SystemLanguage, string> displayNames => displayData.displayNames;
         public Dictionary<SystemLanguage, string> dialogues => displayData.dialogues;
 
@@ -69,9 +67,10 @@ namespace Nova
         public DialogueEntry(string characterName, string displayName, string dialogue,
             Dictionary<DialogueActionStage, LuaFunction> actions)
         {
+            this.characterName = characterName;
             var displayNames = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = displayName };
             var dialogues = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = dialogue };
-            displayData = new DialogueDisplayData(characterName, displayNames, dialogues);
+            displayData = new DialogueDisplayData(displayNames, dialogues);
             this.actions = actions;
         }
 

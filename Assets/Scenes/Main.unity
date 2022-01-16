@@ -1438,9 +1438,6 @@ MonoBehaviour:
   - characterName: "\u9648\u9AD8\u5929"
     characterController: {fileID: 1992234137}
     prefix: 
-  - characterName: "\uFF1F\uFF1F\uFF1F"
-    characterController: {fileID: 1839185672}
-    prefix: 
   padWidth: 2
 --- !u!4 &880587543 stripped
 Transform:

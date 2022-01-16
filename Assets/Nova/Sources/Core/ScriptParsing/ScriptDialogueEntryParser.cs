@@ -14,7 +14,7 @@ namespace Nova
         private const int PreloadDialogueSteps = 5;
         private const string LuaCommentPattern = @"--.*";
         private const string LuaMultilineCommentPattern = @"--\[(=*)\[(.|\n)*?\]\1\]";
-        private const string NameDialoguePattern = @"(?<name>.*?)(：：|::)(?<dialogue>(.|\n)*)";
+        private const string NameDialoguePattern = @"(?<name>.*?)(//(?<hidden>.*?))?(：：|::)(?<dialogue>(.|\n)*)";
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
 
@@ -174,17 +174,20 @@ namespace Nova
             }
         }
 
-        private static void ParseNameDialogue(string text, out string characterName, out string dialogue)
+        private static void ParseNameDialogue(string text, out string displayName, out string hiddenName,
+            out string dialogue)
         {
             var m = Regex.Match(text, NameDialoguePattern, RegexOptions.ExplicitCapture);
             if (m.Success)
             {
-                characterName = m.Groups["name"].Value;
+                displayName = m.Groups["name"].Value;
+                hiddenName = m.Groups["hidden"].Value;
                 dialogue = m.Groups["dialogue"].Value;
             }
             else
             {
-                characterName = "";
+                displayName = "";
+                hiddenName = "";
                 dialogue = text;
             }
         }
@@ -331,7 +334,8 @@ namespace Nova
             }
         }
 
-        public static List<DialogueEntry> ParseDialogueEntries(IReadOnlyList<ScriptLoader.Chunk> chunks)
+        public static List<DialogueEntry> ParseDialogueEntries(IReadOnlyList<ScriptLoader.Chunk> chunks,
+            IDictionary<string, string> hiddenCharacterNames)
         {
             var codes = new Dictionary<DialogueActionStage, string[]>();
             foreach (DialogueActionStage stage in Enum.GetValues(typeof(DialogueActionStage)))
@@ -340,6 +344,7 @@ namespace Nova
             }
 
             var characterNames = new string[chunks.Count];
+            var displayNames = new string[chunks.Count];
             var dialogues = new string[chunks.Count];
             for (var i = 0; i < chunks.Count; ++i)
             {
@@ -349,7 +354,32 @@ namespace Nova
                 }
 
                 var text = GetText(chunks[i]);
-                ParseNameDialogue(text, out characterNames[i], out dialogues[i]);
+                ParseNameDialogue(text, out var displayName, out var hiddenName, out dialogues[i]);
+
+                if (string.IsNullOrEmpty(hiddenName))
+                {
+                    if (!string.IsNullOrEmpty(displayName))
+                    {
+                        if (hiddenCharacterNames.ContainsKey(displayName))
+                        {
+                            hiddenName = hiddenCharacterNames[displayName];
+                        }
+                        else
+                        {
+                            hiddenName = displayName;
+                        }
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(displayName))
+                    {
+                        hiddenCharacterNames[displayName] = hiddenName;
+                    }
+                }
+
+                characterNames[i] = hiddenName;
+                displayNames[i] = displayName;
             }
 
             PatchDefaultActionCode(codes, characterNames);
@@ -358,6 +388,7 @@ namespace Nova
             for (var i = 0; i < chunks.Count; ++i)
             {
                 var characterName = characterNames[i];
+                var displayName = displayNames[i];
                 var dialogue = dialogues[i];
 
                 var actions = new Dictionary<DialogueActionStage, LuaFunction>();
@@ -375,7 +406,7 @@ namespace Nova
                     {
                         throw new ParseException(
                             "Syntax error while parsing lazy execution block\n" +
-                            $"characterName: {characterName}, dialogue: {dialogue}\n" +
+                            $"characterName: {characterName}, displayName: {displayName}, dialogue: {dialogue}\n" +
                             $"stage: {stage}, code: {code}");
                     }
 
@@ -383,7 +414,7 @@ namespace Nova
                 }
 
                 // TODO: there may be some grammar to set different internal and displayed character names
-                results.Add(new DialogueEntry(characterName, characterName, dialogue, actions));
+                results.Add(new DialogueEntry(characterName, displayName, dialogue, actions));
             }
 
             return results;
@@ -396,8 +427,8 @@ namespace Nova
             foreach (var chunk in chunks)
             {
                 var text = GetText(chunk);
-                ParseNameDialogue(text, out var characterName, out var dialogue);
-                results.Add(new LocalizedDialogueEntry { displayName = characterName, dialogue = dialogue });
+                ParseNameDialogue(text, out var displayName, out var _, out var dialogue);
+                results.Add(new LocalizedDialogueEntry { displayName = displayName, dialogue = dialogue });
             }
 
             return results;
