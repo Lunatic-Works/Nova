@@ -307,6 +307,7 @@ namespace Nova
         private void _saveBookmark(int saveID)
         {
             var bookmark = gameState.GetBookmark();
+            bookmark.description = currentDialogueText;
             bookmark.screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
             checkpointManager.SaveBookmark(saveID, bookmark);
@@ -379,9 +380,9 @@ namespace Nova
         private void _autoSaveBookmark(int beginSaveID, string tagText)
         {
             var bookmark = gameState.GetBookmark();
+            bookmark.description = currentDialogueText;
             var texture = ScreenCapturer.GetBookmarkThumbnailTexture();
             bookmark.screenshot = texture;
-            // bookmark.description = string.Format("（{0}）{1}", tagText, bookmark.description);
 
             int saveID = checkpointManager.QueryMinUnusedSaveID(beginSaveID, beginSaveID + maxSaveEntry);
             if (saveID >= beginSaveID + maxSaveEntry)
@@ -432,7 +433,7 @@ namespace Nova
         public void QuickLoadBookmark()
         {
             if (checkpointManager.saveSlotsMetadata.Values.Any(m =>
-                m.saveID >= (int)BookmarkType.QuickSave && m.saveID < (int)BookmarkType.QuickSave + maxSaveEntry))
+                    m.saveID >= (int)BookmarkType.QuickSave && m.saveID < (int)BookmarkType.QuickSave + maxSaveEntry))
             {
                 Alert.Show(
                     null,
@@ -577,7 +578,7 @@ namespace Nova
                 ShowPreview(GetThumbnailSprite(saveID), I18n.__(
                     "bookmark.summary",
                     checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
-                    I18nHelper.NodeNames.Get(bookmark.nodeHistory.Last()),
+                    I18nHelper.NodeNames.Get(checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash).Last()),
                     bookmark.description
                 ));
             }
@@ -719,7 +720,8 @@ namespace Nova
                     try
                     {
                         Bookmark bookmark = checkpointManager[saveID];
-                        newHeaderText = I18nHelper.NodeNames.Get(bookmark.nodeHistory.Last());
+                        newHeaderText =
+                            I18nHelper.NodeNames.Get(checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash).Last());
                         newFooterText = bookmark.creationTime.ToString(DateTimeFormat);
                         newThumbnailSprite = GetThumbnailSprite(saveID);
                         onEditButtonClicked = null;

@@ -41,7 +41,7 @@ namespace Nova
             {
                 if (needCalculateHash)
                 {
-                    _hash = CalculateHash();
+                    _hash = GetHash();
                     needCalculateHash = false;
                 }
 
@@ -81,7 +81,7 @@ namespace Nova
             }
         }
 
-        private ulong CalculateHash()
+        private ulong GetHash()
         {
             unchecked
             {

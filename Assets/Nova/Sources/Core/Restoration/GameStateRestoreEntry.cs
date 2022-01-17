@@ -39,8 +39,7 @@ namespace Nova
     [Serializable]
     public class GameStateCheckpoint : GameStateRestoreEntry
     {
-        private readonly Dictionary<string, IRestoreData> restoreDatas;
-
+        public readonly Dictionary<string, IRestoreData> restoreDatas;
         public readonly Variables variables;
 
         public GameStateCheckpoint(Dictionary<string, IRestoreData> restoreDatas, Variables variables,
@@ -51,22 +50,16 @@ namespace Nova
             this.variables = new Variables();
             this.variables.CopyFrom(variables);
         }
-
-        public IRestoreData this[string restorableObjectName] => restoreDatas[restorableObjectName];
     }
 
     [Serializable]
     public class GameStateSimpleEntry : GameStateRestoreEntry
     {
-        public readonly ulong lastCheckpointVariablesHash;
-
-        public GameStateSimpleEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum,
-            ulong lastCheckpointVariablesHash)
+        public GameStateSimpleEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum)
             : base(stepNumFromLastCheckpoint, restrainCheckpointNum)
         {
             Assert.IsTrue(stepNumFromLastCheckpoint > 0,
                 $"Nova: Invalid stepNumFromLastCheckpoint for GameStateSimpleEntry: {stepNumFromLastCheckpoint}");
-            this.lastCheckpointVariablesHash = lastCheckpointVariablesHash;
         }
     }
 }

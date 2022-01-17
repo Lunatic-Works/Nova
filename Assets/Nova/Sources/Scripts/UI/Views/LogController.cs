@@ -24,10 +24,9 @@ namespace Nova
 
         private ScrollRect scrollRect;
         private GameObject logContent;
-        private ulong previousVariablesHash;
         private readonly List<LogEntryController> logEntries = new List<LogEntryController>();
         private readonly List<InitParams> logParams = new List<InitParams>();
-        private InitParams lastCheckpointLogParamsRef;
+        private InitParams lastCheckpointLogParams;
 
         protected override void Awake()
         {
@@ -44,13 +43,10 @@ namespace Nova
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
 
-            gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.AddRestorable(this);
 
-            previousVariablesHash = 0UL;
-
-            lastCheckpointLogParamsRef = null;
+            lastCheckpointLogParams = null;
         }
 
         protected override void OnDestroy()
@@ -60,46 +56,35 @@ namespace Nova
             myPanel.GetComponent<Button>().onClick.RemoveListener(Hide);
             closeButton.onClick.RemoveListener(Hide);
 
-            gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.RemoveRestorable(this);
         }
 
-        private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
-        {
-            previousVariablesHash = gameState.variables.hash;
-        }
-
         private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
-            string currentNodeName = dialogueChangedData.nodeName;
-            int currentDialogueIndex = dialogueChangedData.dialogueIndex;
-            int logEntryIndex = logEntries.Count;
-            var voices = dialogueChangedData.voicesForNextDialogue;
-
             AddEntry(new InitParams
             {
                 displayData = dialogueChangedData.displayData,
-                currentNodeName = currentNodeName,
-                currentDialogueIndex = currentDialogueIndex,
-                variablesHashBeforeChange = previousVariablesHash,
-                voices = voices,
-                logEntryIndex = logEntryIndex
+                currentNodeName = dialogueChangedData.nodeName,
+                currentDialogueIndex = dialogueChangedData.dialogueIndex,
+                voices = dialogueChangedData.voicesForNextDialogue,
+                logEntryIndex = logEntries.Count
             });
         }
 
         private void AddEntry(InitParams initParams)
         {
-            if (checkpointManager.GetReached(initParams.currentNodeName, initParams.currentDialogueIndex,
-                initParams.variablesHashBeforeChange) is GameStateCheckpoint)
+            var backNodeIndex = gameState.nodeHistory.FindLastIndex(x => x == initParams.currentNodeName);
+            if (checkpointManager.GetReached(gameState.nodeHistory.GetHash(0, backNodeIndex + 1),
+                    initParams.currentDialogueIndex) is GameStateCheckpoint)
             {
-                lastCheckpointLogParamsRef = initParams;
+                lastCheckpointLogParams = initParams;
             }
 
             var logEntry = Instantiate(logEntryPrefab, logContent.transform);
 
             UnityAction<int> onGoBackButtonClicked = logEntryIndex => OnGoBackButtonClicked(initParams.currentNodeName,
-                initParams.currentDialogueIndex, logEntryIndex, initParams.variablesHashBeforeChange);
+                initParams.currentDialogueIndex, logEntryIndex);
 
             UnityAction onPlayVoiceButtonClicked = null;
             if (initParams.voices.Any())
@@ -145,9 +130,9 @@ namespace Nova
             RemoveLogEntriesRange(0, logEntries.Count);
         }
 
-        private void _onGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex, ulong variablesHash)
+        private void _onGoBackButtonClicked(string nodeName, int dialogueIndex)
         {
-            gameState.MoveBackTo(nodeName, dialogueIndex, variablesHash);
+            gameState.MoveBackTo(nodeName, dialogueIndex);
             // Debug.LogFormat("Remain log entries count: {0}", logEntries.Count);
             if (hideOnGoBackButtonClicked)
             {
@@ -157,14 +142,14 @@ namespace Nova
 
         private int lastClickedLogIndex = -1;
 
-        private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex, ulong variablesHash)
+        private void OnGoBackButtonClicked(string nodeName, int dialogueIndex, int logEntryIndex)
         {
             if (logEntryIndex == lastClickedLogIndex)
             {
                 Alert.Show(
                     null,
                     I18n.__("log.back.confirm"),
-                    () => _onGoBackButtonClicked(nodeName, dialogueIndex, logEntryIndex, variablesHash),
+                    () => _onGoBackButtonClicked(nodeName, dialogueIndex),
                     null,
                     "LogBack"
                 );
@@ -213,7 +198,6 @@ namespace Nova
             public DialogueDisplayData displayData;
             public string currentNodeName;
             public int currentDialogueIndex;
-            public ulong variablesHashBeforeChange;
             public Dictionary<string, VoiceEntry> voices;
             public int logEntryIndex;
         }
@@ -233,7 +217,7 @@ namespace Nova
                 return new LogControllerRestoreData {logParams = new List<InitParams>()};
             }
 
-            int lastCheckpointParamsIndex = logParams.IndexOf(lastCheckpointLogParamsRef);
+            int lastCheckpointParamsIndex = logParams.IndexOf(lastCheckpointLogParams);
             if (lastCheckpointParamsIndex < 0)
             {
                 lastCheckpointParamsIndex = 0;
@@ -261,11 +245,12 @@ namespace Nova
                 }
 
                 var lastParams = curr.logParams[0];
-                var entry = checkpointManager.GetReached(lastParams.currentNodeName, lastParams.currentDialogueIndex,
-                    lastParams.variablesHashBeforeChange) as GameStateCheckpoint;
+                var backNodeIndex = gameState.nodeHistory.FindLastIndex(x => x == lastParams.currentNodeName);
+                var entry = checkpointManager.GetReached(gameState.nodeHistory.GetHash(0, backNodeIndex + 1),
+                    lastParams.currentDialogueIndex) as GameStateCheckpoint;
                 this.RuntimeAssert(entry != null,
-                    "the earliest log in each restore data must be pointing at another checkpoint");
-                curr = entry[restorableObjectName] as LogControllerRestoreData;
+                    "The earliest log in each restore data must point at another checkpoint.");
+                curr = entry.restoreDatas[restorableObjectName] as LogControllerRestoreData;
             }
 
             Clear();

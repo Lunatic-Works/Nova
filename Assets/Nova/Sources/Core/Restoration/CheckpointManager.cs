@@ -10,25 +10,27 @@ namespace Nova
 {
     #region Classes
 
-    /// <summary>
-    /// Containing progress and snapshots of reached FlowChartNode.
-    /// </summary>
     [Serializable]
     public class NodeSaveInfo
     {
-        public readonly Dictionary<int, GameStateRestoreEntry> restoreEntries = new Dictionary<int, GameStateRestoreEntry>();
+        public readonly List<string> nodeHistory;
+
+        public readonly Dictionary<int, GameStateRestoreEntry> restoreEntries =
+            new Dictionary<int, GameStateRestoreEntry>();
+
         public readonly SerializableHashSet<string> reachedBranches = new SerializableHashSet<string>();
+
+        public NodeSaveInfo(List<string> nodeHistory)
+        {
+            this.nodeHistory = nodeHistory;
+        }
     }
 
-    /// <summary>
-    /// Global save file. Containing progress of FlowChartTree.
-    /// </summary>
     [Serializable]
     public class GlobalSave
     {
-        public readonly Dictionary<ulong, Dictionary<string, NodeSaveInfo>> savedNodes =
-            new Dictionary<ulong, Dictionary<string, NodeSaveInfo>>();
-
+        public readonly Dictionary<ulong, NodeSaveInfo> savedNodes = new Dictionary<ulong, NodeSaveInfo>();
+        public readonly Dictionary<string, ulong> nodeToHistoryHash = new Dictionary<string, ulong>();
         public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
         public readonly long globalSaveIdentifier = DateTime.Now.ToBinary();
 
@@ -37,20 +39,15 @@ namespace Nova
         public readonly Dictionary<string, object> data = new Dictionary<string, object>();
     }
 
-    /// <summary>
-    /// Individual save file.
-    /// Acting as a "Bookmark" recording current FlowChartNode and index of dialogue.
-    /// </summary>
     [Serializable]
     public class Bookmark
     {
         public const int ScreenshotWidth = 320;
         public const int ScreenshotHeight = 180;
 
-        public readonly List<string> nodeHistory;
+        public readonly ulong nodeHistoryHash;
         public readonly int dialogueIndex;
-        public readonly string description;
-        public readonly ulong variablesHash;
+        public string description;
         public readonly DateTime creationTime = DateTime.Now;
         public long globalSaveIdentifier;
 
@@ -87,16 +84,12 @@ namespace Nova
         /// <summary>
         /// Create a bookmark based on all reached nodes in current gameplay.
         /// </summary>
-        /// <param name="nodeHistory">List of all reached nodes, including the current node as the last one.</param>
+        /// <param name="nodeHistory">List of all reached node names, including the current node as the last one.</param>
         /// <param name="dialogueIndex">Index of the current dialogue.</param>
-        /// <param name="description">Description of the bookmark.</param>
-        /// <param name="variablesHash">Variables hash of current bookmark.</param>
-        public Bookmark(List<string> nodeHistory, int dialogueIndex, string description, ulong variablesHash)
+        public Bookmark(HashableList<string> nodeHistory, int dialogueIndex)
         {
-            this.nodeHistory = new List<string>(nodeHistory);
+            nodeHistoryHash = nodeHistory.Hash;
             this.dialogueIndex = dialogueIndex;
-            this.description = description;
-            this.variablesHash = variablesHash;
         }
 
         public void TryDestroyTexture()
@@ -172,8 +165,6 @@ namespace Nova
         private readonly Dictionary<int, Bookmark> cachedSaveSlots = new Dictionary<int, Bookmark>();
         public readonly Dictionary<int, BookmarkMetadata> saveSlotsMetadata = new Dictionary<int, BookmarkMetadata>();
 
-        [HideInInspector] public GameStateCheckpoint clearSceneRestoreEntry;
-
         private readonly CheckpointSerializer serializer = new CheckpointSerializer();
 
         private void Start()
@@ -232,27 +223,38 @@ namespace Nova
 
         #region Global save
 
+        private NodeSaveInfo EnsureNodeHistory(HashableList<string> nodeHistory)
+        {
+            if (globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info))
+            {
+                return info;
+            }
+
+            info = new NodeSaveInfo(nodeHistory.CopyToList());
+            globalSave.savedNodes[nodeHistory.Hash] = info;
+            globalSave.nodeToHistoryHash[nodeHistory.Last()] = nodeHistory.Hash;
+            return info;
+        }
+
         /// <summary>
         /// Set a dialogue to "reached" state and save the restore entry for the dialogue.
         /// </summary>
-        /// <param name="nodeName">The name of FlowChartNode containing the dialogue.</param>
+        /// <param name="nodeHistory">The list of all reached node names.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
-        /// <param name="variables">Current variables.</param>
         /// <param name="entry">Restore entry for the dialogue</param>
-        public void SetReached(string nodeName, int dialogueIndex, Variables variables, GameStateRestoreEntry entry)
+        public void SetReached(HashableList<string> nodeHistory, int dialogueIndex, GameStateRestoreEntry entry)
         {
-            globalSave.savedNodes.Ensure(variables.hash).Ensure(nodeName).restoreEntries[dialogueIndex] = entry;
+            EnsureNodeHistory(nodeHistory).restoreEntries[dialogueIndex] = entry;
         }
 
         /// <summary>
         /// Set a branch to "reached" state.
         /// </summary>
-        /// <param name="nodeName">The name of FlowChartNode containing the branch.</param>
+        /// <param name="nodeHistory">The list of all reached node names.</param>
         /// <param name="branchName">The name of the branch.</param>
-        /// <param name="variables">Current variables.</param>
-        public void SetReached(string nodeName, string branchName, Variables variables)
+        public void SetReached(HashableList<string> nodeHistory, string branchName)
         {
-            globalSave.savedNodes.Ensure(variables.hash).Ensure(nodeName).reachedBranches.Add(branchName);
+            EnsureNodeHistory(nodeHistory).reachedBranches.Add(branchName);
         }
 
         /// <summary>
@@ -264,76 +266,84 @@ namespace Nova
             globalSave.reachedEnds.Add(endName);
         }
 
-        // DEBUG ONLY METHOD: will unset all versions regardless of variables
-        public void UnsetReached(string nodeName, int dialogueIndex)
+        public void UnsetReached(ulong nodeHistoryHash)
         {
-            foreach (var dict in globalSave.savedNodes.Values)
+            globalSave.savedNodes.Remove(nodeHistoryHash);
+        }
+
+        public void UnsetReached(HashableList<string> nodeHistory, int dialogueIndex)
+        {
+            if (globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info))
             {
-                if (dict.TryGetValue(nodeName, out NodeSaveInfo nodeInfo))
-                    nodeInfo.restoreEntries.Remove(dialogueIndex);
+                info.restoreEntries.Remove(dialogueIndex);
             }
         }
 
-        // DEBUG ONLY METHOD: will unset all versions regardless of variables
-        public void UnsetReached(string nodeName)
+        public GameStateRestoreEntry GetReached(ulong nodeHistoryHash, int dialogueIndex)
         {
-            foreach (var dict in globalSave.savedNodes.Values)
+            if (globalSave.savedNodes.TryGetValue(nodeHistoryHash, out var info)
+                && info.restoreEntries.TryGetValue(dialogueIndex, out var entry))
             {
-                dict.Remove(nodeName);
-            }
-        }
-
-        /// <summary>
-        /// Check if the dialogue has been reached with any combination of variables.
-        /// </summary>
-        /// <param name="nodeName">The name of FlowChartNode containing the dialogue.</param>
-        /// <param name="dialogueIndex">The index of the dialogue.</param>
-        /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateRestoreEntry GetReachedForAnyVariables(string nodeName, int dialogueIndex)
-        {
-            // If reading global save file failed, globalSave.savedNodes will be null
-            if (globalSave?.savedNodes == null)
-            {
-                return null;
-            }
-
-            foreach (var dict in globalSave.savedNodes.Values)
-            {
-                if (dict.TryGetValue(nodeName, out NodeSaveInfo info) &&
-                    info.restoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
-                    return entry;
+                return entry;
             }
 
             return null;
         }
 
         /// <summary>
-        /// Check if the dialogue has been reached and retrieve the restore entry.
+        /// Get the restore entry for a dialogue.
         /// </summary>
-        /// <param name="nodeName">The name of FlowChartNode containing the dialogue.</param>
+        /// <param name="nodeHistory">The list of all reached node names.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
-        /// <param name="variablesHash">Hash of current variables.</param>
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateRestoreEntry GetReached(string nodeName, int dialogueIndex, ulong variablesHash)
+        public GameStateRestoreEntry GetReached(HashableList<string> nodeHistory, int dialogueIndex)
         {
-            if (globalSave.savedNodes.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
-                if (info.restoreEntries.TryGetValue(dialogueIndex, out GameStateRestoreEntry entry))
-                    return entry;
+            return GetReached(nodeHistory.Hash, dialogueIndex);
+        }
+
+        /// <summary>
+        /// Get the restore entry for a dialogue with any node history.
+        /// </summary>
+        /// <param name="nodeName">The name of the FlowChartNode containing the dialogue.</param>
+        /// <param name="dialogueIndex">The index of the dialogue.</param>
+        /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
+        public GameStateRestoreEntry GetReachedWithAnyHistory(string nodeName, int dialogueIndex)
+        {
+            if (globalSave.nodeToHistoryHash.TryGetValue(nodeName, out var hash))
+            {
+                return GetReached(hash, dialogueIndex);
+            }
+
+            return null;
+        }
+
+        public bool IsReachedWithAnyHistory(string nodeName, int dialogueIndex)
+        {
+            return globalSave.nodeToHistoryHash.TryGetValue(nodeName, out var hash)
+                && globalSave.savedNodes.TryGetValue(hash, out var info)
+                && info.restoreEntries.ContainsKey(dialogueIndex);
+        }
+
+        public List<string> GetNodeHistory(ulong nodeHistoryHash)
+        {
+            if (globalSave.savedNodes.TryGetValue(nodeHistoryHash, out var info))
+            {
+                return info.nodeHistory;
+            }
+
             return null;
         }
 
         /// <summary>
         /// Check if the branch has been reached.
         /// </summary>
-        /// <param name="nodeName">The name of FlowChartNode containing the branch.</param>
+        /// <param name="nodeHistory">The list of all reached node names.</param>
         /// <param name="branchName">The name of the branch.</param>
-        /// <param name="variablesHash">Hash of current variables.</param>
         /// <returns>Whether the branch has been reached.</returns>
-        public bool IsReached(string nodeName, string branchName, ulong variablesHash)
+        public bool IsReached(HashableList<string> nodeHistory, string branchName)
         {
-            if (globalSave.savedNodes.Ensure(variablesHash).TryGetValue(nodeName, out NodeSaveInfo info))
-                return info.reachedBranches.Contains(branchName);
-            return false;
+            return globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info)
+                   && info.reachedBranches.Contains(branchName);
         }
 
         /// <summary>

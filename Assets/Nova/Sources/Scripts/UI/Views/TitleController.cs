@@ -56,7 +56,7 @@ namespace Nova
                 {
                     var unlockedChapterCount = gameState.GetAllUnlockedStartNodeNames().Count;
                     var reachedChapterCount = gameState.GetAllStartNodeNames()
-                        .Count(name => checkpointManager.GetReachedForAnyVariables(name, 0) != null);
+                        .Count(name => checkpointManager.IsReachedWithAnyHistory(name, 0));
                     if (unlockedChapterCount == 1 && reachedChapterCount > 1)
                     {
                         Alert.Show(I18n.__("title.first.selectchapter"));

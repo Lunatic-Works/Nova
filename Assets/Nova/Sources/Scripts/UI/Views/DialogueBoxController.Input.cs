@@ -6,7 +6,10 @@ namespace Nova
     public partial class DialogueBoxController
     {
         private const string AbortAnimationFirstShownKey = ConfigViewController.FirstShownKeyPrefix + "AbortAnimation";
-        private const string FastForwardReadFirstShownKey = ConfigViewController.FirstShownKeyPrefix + "FastForwardRead";
+
+        private const string FastForwardReadFirstShownKey =
+            ConfigViewController.FirstShownKeyPrefix + "FastForwardRead";
+
         private const int HintAbortAnimationClicks = 10;
         private const int HintFastForwardReadClicks = 3;
 
@@ -87,7 +90,7 @@ namespace Nova
                     try
                     {
                         gameState.SeekBackStep(1, out var nodeName, out var dialogueIndex);
-                        gameState.MoveBackTo(nodeName, dialogueIndex, 0UL);
+                        gameState.MoveBackTo(nodeName, dialogueIndex);
                     }
                     catch
                     {
@@ -287,7 +290,7 @@ namespace Nova
             if (Input.mousePresent && (
                     RealInput.mousePosition.x < 0 || RealInput.mousePosition.x > RealScreen.width ||
                     RealInput.mousePosition.y < 0 || RealInput.mousePosition.y > RealScreen.height)
-            )
+               )
             {
                 // Ignore input when mouse is outside of the game window
                 return;

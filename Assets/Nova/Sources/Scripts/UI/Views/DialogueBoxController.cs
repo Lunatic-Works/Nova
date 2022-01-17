@@ -444,8 +444,6 @@ namespace Nova
         public UnityEvent fastForwardModeStarts;
         public UnityEvent fastForwardModeStops;
 
-        private string currentNodeName;
-
         /// <summary>
         /// The content of the dialogue box needs to be changed
         /// </summary>
@@ -453,8 +451,6 @@ namespace Nova
         private void OnDialogueChanged(DialogueChangedData dialogueData)
         {
             RestartTimer();
-
-            currentNodeName = dialogueData.nodeName;
 
             isReadDialogue = dialogueData.hasBeenReachedForAnyVariables;
             if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead &&
@@ -490,7 +486,7 @@ namespace Nova
         private void JumpChapter(int offset)
         {
             var chapters = gameState.GetAllStartNodeNames();
-            int targetChapterIndex = chapters.IndexOf(currentNodeName) + offset;
+            int targetChapterIndex = chapters.IndexOf(gameState.currentNode.name) + offset;
             if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Count)
             {
                 NovaAnimation.StopAll();

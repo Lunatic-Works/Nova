@@ -71,7 +71,7 @@ namespace Nova
         private bool IsUnlocked(string name)
         {
             return unlockAllChaptersForDebug || unlockedStartNodeNames.Contains(name) ||
-                   checkpointManager.GetReachedForAnyVariables(name, 0) != null;
+                   checkpointManager.IsReachedWithAnyHistory(name, 0);
         }
 
         private int ReachedChapterCount()

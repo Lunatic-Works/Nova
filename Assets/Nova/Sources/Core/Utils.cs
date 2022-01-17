@@ -62,8 +62,9 @@ namespace Nova
                 return value;
             }
 
-            dict[key] = new TValue();
-            return dict[key];
+            value = new TValue();
+            dict[key] = value;
+            return value;
         }
 
         public static Rect ToRect(this RectInt rectInt)

@@ -13,7 +13,6 @@ namespace Nova
         private GameState gameState;
         private InputMapper inputMapper;
         private List<CharacterController> characterControllers;
-        private ulong currentNodeInitialVariablesHash;
 
         private void Awake()
         {
@@ -25,19 +24,6 @@ namespace Nova
             {
                 characterControllers = characters.GetComponentsInChildren<CharacterController>().ToList();
             }
-
-            currentNodeInitialVariablesHash = 0UL;
-            gameState.nodeChanged.AddListener(OnNodeChanged);
-        }
-
-        private void OnDestroy()
-        {
-            gameState.nodeChanged.RemoveListener(OnNodeChanged);
-        }
-
-        private void OnNodeChanged(NodeChangedData nodeChangedData)
-        {
-            currentNodeInitialVariablesHash = gameState.variables.hash;
         }
 
         private void Update()
@@ -80,7 +66,7 @@ namespace Nova
             var currentNode = gameState.currentNode;
             var currentIndex = gameState.currentIndex;
             SuppressSound(true);
-            gameState.MoveBackTo(currentNode.name, 0, currentNodeInitialVariablesHash, clearFuture: true);
+            gameState.MoveBackTo(currentNode.name, 0, clearFuture: true);
             gameState.ReloadScripts();
 
             // step back to current index
