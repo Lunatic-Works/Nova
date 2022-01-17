@@ -289,8 +289,7 @@ namespace Nova
         {
             if (Input.mousePresent && (
                     RealInput.mousePosition.x < 0 || RealInput.mousePosition.x > RealScreen.width ||
-                    RealInput.mousePosition.y < 0 || RealInput.mousePosition.y > RealScreen.height)
-               )
+                    RealInput.mousePosition.y < 0 || RealInput.mousePosition.y > RealScreen.height))
             {
                 // Ignore input when mouse is outside of the game window
                 return;

@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Nova
 {
-    public class HashableList<T>
+    public class HashableList<T> : IEnumerable<T>
     {
         private readonly List<T> list = new List<T>();
 
@@ -32,7 +33,7 @@ namespace Nova
                 for (var i = index; i < index + count; ++i)
                 {
                     x += (ulong)list[i].GetHashCode();
-                    x *= 3074457345618258799UL;
+                    x *= 11400714819323199563UL;
                 }
 
                 return x;
@@ -80,14 +81,19 @@ namespace Nova
             return list.FindLastIndex(match);
         }
 
-        public List<T> CopyToList()
-        {
-            return new List<T>(list);
-        }
-
         public T Last()
         {
             return list[Count - 1];
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return list.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public override string ToString()

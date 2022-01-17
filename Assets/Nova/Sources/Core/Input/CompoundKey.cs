@@ -381,12 +381,31 @@ namespace Nova
 
         public override bool Equals(object obj)
         {
-            return obj is CompoundKey anotherKey && ToString().Equals(anotherKey.ToString());
+            return obj is CompoundKey other
+                   && Key == other.Key
+                   && Ctrl == other.Ctrl
+                   && Win == other.Win
+                   && Alt == other.Alt
+                   && Shift == other.Shift;
         }
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            unchecked
+            {
+                var x = 0U;
+                x += (uint)Key;
+                x *= 2654435789U;
+                x += Ctrl ? 1U : 0U;
+                x *= 2654435789U;
+                x += Win ? 1U : 0U;
+                x *= 2654435789U;
+                x += Alt ? 1U : 0U;
+                x *= 2654435789U;
+                x += Shift ? 1U : 0U;
+                x *= 2654435789U;
+                return (int)x;
+            }
         }
     }
 }

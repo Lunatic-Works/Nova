@@ -91,16 +91,16 @@ namespace Nova
                     foreach (var c in pair.Key)
                     {
                         x += c;
-                        x *= 3074457345618258799UL;
+                        x *= 11400714819323199563UL;
                     }
 
                     x += (ulong)pair.Value.type;
-                    x *= 3074457345618258799UL;
+                    x *= 11400714819323199563UL;
 
                     foreach (var c in pair.Value.value)
                     {
                         x += c;
-                        x *= 3074457345618258799UL;
+                        x *= 11400714819323199563UL;
                     }
                 }
 

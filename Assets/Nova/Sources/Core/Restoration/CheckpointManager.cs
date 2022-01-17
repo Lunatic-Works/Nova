@@ -8,6 +8,8 @@ using UnityEngine.Assertions;
 
 namespace Nova
 {
+    using NodeHistory = CountedHashableList<string>;
+
     #region Classes
 
     [Serializable]
@@ -30,7 +32,7 @@ namespace Nova
     public class GlobalSave
     {
         public readonly Dictionary<ulong, NodeSaveInfo> savedNodes = new Dictionary<ulong, NodeSaveInfo>();
-        public readonly Dictionary<string, ulong> nodeToHistoryHash = new Dictionary<string, ulong>();
+        public readonly Dictionary<string, int> reachedWithAnyHistory = new Dictionary<string, int>();
         public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
         public readonly long globalSaveIdentifier = DateTime.Now.ToBinary();
 
@@ -84,9 +86,9 @@ namespace Nova
         /// <summary>
         /// Create a bookmark based on all reached nodes in current gameplay.
         /// </summary>
-        /// <param name="nodeHistory">List of all reached node names, including the current node as the last one.</param>
+        /// <param name="nodeHistory">List of all reached nodes, including the current node as the last one.</param>
         /// <param name="dialogueIndex">Index of the current dialogue.</param>
-        public Bookmark(HashableList<string> nodeHistory, int dialogueIndex)
+        public Bookmark(NodeHistory nodeHistory, int dialogueIndex)
         {
             nodeHistoryHash = nodeHistory.Hash;
             this.dialogueIndex = dialogueIndex;
@@ -223,36 +225,45 @@ namespace Nova
 
         #region Global save
 
-        private NodeSaveInfo EnsureNodeHistory(HashableList<string> nodeHistory)
+        private NodeSaveInfo EnsureNodeHistory(NodeHistory nodeHistory)
         {
             if (globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info))
             {
                 return info;
             }
 
-            info = new NodeSaveInfo(nodeHistory.CopyToList());
+            info = new NodeSaveInfo(nodeHistory.Select(x => x.Key).ToList());
             globalSave.savedNodes[nodeHistory.Hash] = info;
-            globalSave.nodeToHistoryHash[nodeHistory.Last()] = nodeHistory.Hash;
             return info;
         }
 
         /// <summary>
         /// Set a dialogue to "reached" state and save the restore entry for the dialogue.
         /// </summary>
-        /// <param name="nodeHistory">The list of all reached node names.</param>
+        /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <param name="entry">Restore entry for the dialogue</param>
-        public void SetReached(HashableList<string> nodeHistory, int dialogueIndex, GameStateRestoreEntry entry)
+        public void SetReached(NodeHistory nodeHistory, int dialogueIndex, GameStateRestoreEntry entry)
         {
             EnsureNodeHistory(nodeHistory).restoreEntries[dialogueIndex] = entry;
+
+            var nodeName = nodeHistory.Last().Key;
+            if (globalSave.reachedWithAnyHistory.TryGetValue(nodeName, out var oldIndex))
+            {
+                globalSave.reachedWithAnyHistory[nodeName] = Math.Max(oldIndex, dialogueIndex);
+            }
+            else
+            {
+                globalSave.reachedWithAnyHistory[nodeName] = dialogueIndex;
+            }
         }
 
         /// <summary>
         /// Set a branch to "reached" state.
         /// </summary>
-        /// <param name="nodeHistory">The list of all reached node names.</param>
+        /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="branchName">The name of the branch.</param>
-        public void SetReached(HashableList<string> nodeHistory, string branchName)
+        public void SetReached(NodeHistory nodeHistory, string branchName)
         {
             EnsureNodeHistory(nodeHistory).reachedBranches.Add(branchName);
         }
@@ -271,7 +282,7 @@ namespace Nova
             globalSave.savedNodes.Remove(nodeHistoryHash);
         }
 
-        public void UnsetReached(HashableList<string> nodeHistory, int dialogueIndex)
+        public void UnsetReached(NodeHistory nodeHistory, int dialogueIndex)
         {
             if (globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info))
             {
@@ -293,35 +304,18 @@ namespace Nova
         /// <summary>
         /// Get the restore entry for a dialogue.
         /// </summary>
-        /// <param name="nodeHistory">The list of all reached node names.</param>
+        /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateRestoreEntry GetReached(HashableList<string> nodeHistory, int dialogueIndex)
+        public GameStateRestoreEntry GetReached(NodeHistory nodeHistory, int dialogueIndex)
         {
             return GetReached(nodeHistory.Hash, dialogueIndex);
         }
 
-        /// <summary>
-        /// Get the restore entry for a dialogue with any node history.
-        /// </summary>
-        /// <param name="nodeName">The name of the FlowChartNode containing the dialogue.</param>
-        /// <param name="dialogueIndex">The index of the dialogue.</param>
-        /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateRestoreEntry GetReachedWithAnyHistory(string nodeName, int dialogueIndex)
-        {
-            if (globalSave.nodeToHistoryHash.TryGetValue(nodeName, out var hash))
-            {
-                return GetReached(hash, dialogueIndex);
-            }
-
-            return null;
-        }
-
         public bool IsReachedWithAnyHistory(string nodeName, int dialogueIndex)
         {
-            return globalSave.nodeToHistoryHash.TryGetValue(nodeName, out var hash)
-                && globalSave.savedNodes.TryGetValue(hash, out var info)
-                && info.restoreEntries.ContainsKey(dialogueIndex);
+            return globalSave.reachedWithAnyHistory.TryGetValue(nodeName, out var oldIndex)
+                   && oldIndex >= dialogueIndex;
         }
 
         public List<string> GetNodeHistory(ulong nodeHistoryHash)
@@ -337,10 +331,10 @@ namespace Nova
         /// <summary>
         /// Check if the branch has been reached.
         /// </summary>
-        /// <param name="nodeHistory">The list of all reached node names.</param>
+        /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="branchName">The name of the branch.</param>
         /// <returns>Whether the branch has been reached.</returns>
-        public bool IsReached(HashableList<string> nodeHistory, string branchName)
+        public bool IsReached(NodeHistory nodeHistory, string branchName)
         {
             return globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info)
                    && info.reachedBranches.Contains(branchName);

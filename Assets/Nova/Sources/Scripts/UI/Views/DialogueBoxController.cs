@@ -452,7 +452,7 @@ namespace Nova
         {
             RestartTimer();
 
-            isReadDialogue = dialogueData.hasBeenReachedForAnyVariables;
+            isReadDialogue = dialogueData.hasBeenReachedWithAnyHistory;
             if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead &&
                 !fastForwardHotKeyHolding)
             {
@@ -673,7 +673,7 @@ namespace Nova
         /// </remarks>
         private void StartAuto()
         {
-            Assert.AreEqual(state, DialogueBoxState.Normal, "DialogueBoxState State != DialogueBoxState.Normal");
+            this.RuntimeAssert(state == DialogueBoxState.Normal, "Dialogue box state != Normal");
             _state = DialogueBoxState.Auto;
             TrySchedule(GetDialogueTimeAuto());
         }
@@ -686,7 +686,7 @@ namespace Nova
         /// </remarks>
         private void StopAuto()
         {
-            Assert.AreEqual(state, DialogueBoxState.Auto, "DialogueBoxState State != DialogueBoxState.Auto");
+            this.RuntimeAssert(state == DialogueBoxState.Auto, "Dialogue box state != Auto");
             _state = DialogueBoxState.Normal;
             TryRemoveSchedule();
         }
@@ -699,7 +699,7 @@ namespace Nova
         /// </remarks>
         private void StartFastForward()
         {
-            Assert.AreEqual(state, DialogueBoxState.Normal, "DialogueBoxState State != DialogueBoxState.Normal");
+            this.RuntimeAssert(state == DialogueBoxState.Normal, "Dialogue box state != Normal");
             _state = DialogueBoxState.FastForward;
             TrySchedule(fastForwardDelay);
         }
@@ -712,8 +712,7 @@ namespace Nova
         /// </remarks>
         private void StopFastForward()
         {
-            Assert.AreEqual(state, DialogueBoxState.FastForward,
-                "DialogueBoxState State != DialogueBoxState.FastForward");
+            this.RuntimeAssert(state == DialogueBoxState.FastForward, "Dialogue box state != FastForward");
             _state = DialogueBoxState.Normal;
             TryRemoveSchedule();
         }

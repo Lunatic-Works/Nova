@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class ReloadScript : MonoBehaviour
+    public class ReloadScriptsHelper : MonoBehaviour
     {
         [SerializeField] private GameObject characters;
         [SerializeField] private SoundController soundController;
@@ -63,22 +63,25 @@ namespace Nova
         private void ReloadScripts()
         {
             NovaAnimation.StopAll();
-            var currentNode = gameState.currentNode;
             var currentIndex = gameState.currentIndex;
-            SuppressSound(true);
-            gameState.MoveBackTo(currentNode.name, 0, clearFuture: true);
+
             gameState.ReloadScripts();
 
-            // step back to current index
-            for (var i = 0; i < currentIndex - 1; i++)
+            SuppressSound(true);
+            gameState.MoveBackTo(gameState.nodeHistory.GetCounted(gameState.currentNode.name), 0, clearFuture: true);
+
+            // Step back to current index
+            for (var i = 0; i < currentIndex; ++i)
             {
+                // Only the last step can play sound
+                if (i == currentIndex - 1)
+                {
+                    SuppressSound(false);
+                }
+
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 gameState.Step();
             }
-
-            NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-            SuppressSound(false); // only the last step can play sound
-            gameState.Step();
         }
 
         private void RerunAction()

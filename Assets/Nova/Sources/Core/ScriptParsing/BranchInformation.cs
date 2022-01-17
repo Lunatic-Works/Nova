@@ -89,10 +89,10 @@ namespace Nova
             return Equals(Default);
         }
 
-        // BranchInformations are considered equal if they have the same name
+        // BranchInformation are considered equal if they have the same name
         public override bool Equals(object obj)
         {
-            return obj is BranchInformation anotherBranch && name.Equals(anotherBranch.name);
+            return obj is BranchInformation other && name == other.name;
         }
 
         public override int GetHashCode()
