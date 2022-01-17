@@ -83,26 +83,29 @@ namespace Nova
 
         private ulong CalculateHash()
         {
-            var x = 0UL;
-            foreach (var pair in variables)
+            unchecked
             {
-                foreach (var c in pair.Key)
+                var x = 0UL;
+                foreach (var pair in variables)
                 {
-                    x += c;
+                    foreach (var c in pair.Key)
+                    {
+                        x += c;
+                        x *= 3074457345618258799UL;
+                    }
+
+                    x += (ulong)pair.Value.type;
                     x *= 3074457345618258799UL;
+
+                    foreach (var c in pair.Value.value)
+                    {
+                        x += c;
+                        x *= 3074457345618258799UL;
+                    }
                 }
 
-                x += (ulong)pair.Value.type;
-                x *= 3074457345618258799UL;
-
-                foreach (var c in pair.Value.value)
-                {
-                    x += c;
-                    x *= 3074457345618258799UL;
-                }
+                return x;
             }
-
-            return x;
         }
 
         public void CopyFrom(Variables variables)

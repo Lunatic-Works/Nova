@@ -57,9 +57,9 @@ namespace Nova
 
         public static TValue Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key) where TValue : new()
         {
-            if (dict.TryGetValue(key, out TValue info))
+            if (dict.TryGetValue(key, out TValue value))
             {
-                return info;
+                return value;
             }
 
             dict[key] = new TValue();

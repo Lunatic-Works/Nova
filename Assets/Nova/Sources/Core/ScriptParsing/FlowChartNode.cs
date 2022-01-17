@@ -180,7 +180,7 @@ namespace Nova
         // Two flow chart nodes are considered equal if they have the same name
         public override bool Equals(object obj)
         {
-            return obj is FlowChartNode anotherObject && name.Equals(anotherObject.name);
+            return obj is FlowChartNode anotherNode && name.Equals(anotherNode.name);
         }
 
         public override int GetHashCode()

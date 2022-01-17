@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -19,14 +16,8 @@ namespace Nova
     [Serializable]
     public class NodeSaveInfo
     {
-        public readonly Dictionary<int, GameStateRestoreEntry> restoreEntries;
-        public readonly SerializableHashSet<string> reachedBranches;
-
-        public NodeSaveInfo()
-        {
-            restoreEntries = new Dictionary<int, GameStateRestoreEntry>();
-            reachedBranches = new SerializableHashSet<string>();
-        }
+        public readonly Dictionary<int, GameStateRestoreEntry> restoreEntries = new Dictionary<int, GameStateRestoreEntry>();
+        public readonly SerializableHashSet<string> reachedBranches = new SerializableHashSet<string>();
     }
 
     /// <summary>
@@ -41,8 +32,8 @@ namespace Nova
         public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
         public readonly long globalSaveIdentifier = DateTime.Now.ToBinary();
 
-        /// The global flags and status of the game. For example, the unlock status of music or CG
-        /// It is the game author's job to make sure all values are serializable
+        /// The global data of the game. For example, the global variables and the unlock status of images and musics.
+        /// It is the game author's job to make sure all values are serializable.
         public readonly Dictionary<string, object> data = new Dictionary<string, object>();
     }
 
@@ -55,8 +46,6 @@ namespace Nova
     {
         public const int ScreenshotWidth = 320;
         public const int ScreenshotHeight = 180;
-
-        private static readonly byte[] JPEGHeader = {0xFF, 0xD8, 0xFF, 0xE0};
 
         public readonly List<string> nodeHistory;
         public readonly int dialogueIndex;
@@ -81,16 +70,7 @@ namespace Nova
                 if (screenshotTexture == null)
                 {
                     screenshotTexture = new Texture2D(ScreenshotWidth, ScreenshotHeight, TextureFormat.RGB24, false);
-
-                    if (screenshotBytes.Take(JPEGHeader.Length).SequenceEqual(JPEGHeader))
-                    {
-                        screenshotTexture.LoadImage(screenshotBytes);
-                    }
-                    else
-                    {
-                        screenshotTexture.LoadRawTextureData(screenshotBytes);
-                        screenshotTexture.Apply();
-                    }
+                    screenshotTexture.LoadImage(screenshotBytes);
                 }
 
                 return screenshotTexture;
@@ -102,14 +82,14 @@ namespace Nova
             }
         }
 
-        // NOTE: Do not use default parameter in constructor or it will fail to compile silently...
+        // NOTE: Do not use default parameters in constructor or it will fail to compile silently...
 
         /// <summary>
         /// Create a bookmark based on all reached nodes in current gameplay.
         /// </summary>
-        /// <param name="nodeHistory">List of all reached nodes, including the current one as the last node.</param>
+        /// <param name="nodeHistory">List of all reached nodes, including the current node as the last one.</param>
         /// <param name="dialogueIndex">Index of the current dialogue.</param>
-        /// <param name="description">Description of this bookmark.</param>
+        /// <param name="description">Description of the bookmark.</param>
         /// <param name="variablesHash">Variables hash of current bookmark.</param>
         public Bookmark(List<string> nodeHistory, int dialogueIndex, string description, ulong variablesHash)
         {
@@ -183,47 +163,30 @@ namespace Nova
     /// </summary>
     public class CheckpointManager : MonoBehaviour
     {
-        private const int Version = 2;
-
+        public string saveFolder;
         private string savePathBase;
         private string globalSavePath;
-        private byte[] fileHeader;
-
-        private BinaryFormatter formatter;
 
         private GlobalSave globalSave;
 
-        private Dictionary<int, Bookmark> cachedSaveSlots;
-        public string saveFolder = "";
-        public Dictionary<int, BookmarkMetadata> saveSlotsMetadata { get; private set; }
+        private readonly Dictionary<int, Bookmark> cachedSaveSlots = new Dictionary<int, Bookmark>();
+        public readonly Dictionary<int, BookmarkMetadata> saveSlotsMetadata = new Dictionary<int, BookmarkMetadata>();
 
         [HideInInspector] public GameStateCheckpoint clearSceneRestoreEntry;
 
-        /// <summary>
-        /// Initialization of members which are unlikely to change in the future
-        /// </summary>
-        public void InitVariables()
-        {
-            clearSceneRestoreEntry = null;
-            savePathBase = Path.Combine(Application.persistentDataPath, "Save", saveFolder);
-            globalSavePath = Path.Combine(savePathBase, "global.nsav");
-            fileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
-            formatter = new BinaryFormatter();
-            cachedSaveSlots = new Dictionary<int, Bookmark>();
-            saveSlotsMetadata = new Dictionary<int, BookmarkMetadata>();
-        }
+        private readonly CheckpointSerializer serializer = new CheckpointSerializer();
 
         private void Start()
         {
-            InitVariables();
-
+            savePathBase = Path.Combine(Application.persistentDataPath, "Save", saveFolder);
+            globalSavePath = Path.Combine(savePathBase, "global.nsav");
             Directory.CreateDirectory(savePathBase);
 
             if (File.Exists(globalSavePath))
             {
                 try
                 {
-                    globalSave = SafeRead<GlobalSave>(globalSavePath);
+                    globalSave = serializer.SafeRead<GlobalSave>(globalSavePath);
                 }
                 catch (Exception ex)
                 {
@@ -301,7 +264,7 @@ namespace Nova
             globalSave.reachedEnds.Add(endName);
         }
 
-        // DEBUG ONLY METHOD: will destroy all versions regardless of variables
+        // DEBUG ONLY METHOD: will unset all versions regardless of variables
         public void UnsetReached(string nodeName, int dialogueIndex)
         {
             foreach (var dict in globalSave.savedNodes.Values)
@@ -311,7 +274,7 @@ namespace Nova
             }
         }
 
-        // DEBUG ONLY METHOD: will destroy all versions regardless of variables
+        // DEBUG ONLY METHOD: will unset all versions regardless of variables
         public void UnsetReached(string nodeName)
         {
             foreach (var dict in globalSave.savedNodes.Values)
@@ -328,7 +291,7 @@ namespace Nova
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
         public GameStateRestoreEntry GetReachedForAnyVariables(string nodeName, int dialogueIndex)
         {
-            // If reading global save file fails, globalSave.savedNodes will be null
+            // If reading global save file failed, globalSave.savedNodes will be null
             if (globalSave?.savedNodes == null)
             {
                 return null;
@@ -389,7 +352,7 @@ namespace Nova
         /// TODO: UpdateGlobalSave() is slow when there are many saved dialogue entries
         public void UpdateGlobalSave()
         {
-            SafeWrite(globalSave, globalSavePath);
+            serializer.SafeWrite(globalSave, globalSavePath);
         }
 
         /// <summary>
@@ -403,166 +366,41 @@ namespace Nova
                 file.Delete();
 
             globalSave = new GlobalSave();
-            using (var fs = File.OpenWrite(globalSavePath))
-                WriteSave(globalSave, fs);
-        }
-
-        #endregion
-
-        #region Read and write
-
-        private T SafeRead<T>(string path)
-        {
-            return SafeRead<T>(path, _ => { });
-        }
-
-        private T SafeRead<T>(string path, Action<T> assertion)
-        {
-            try
-            {
-                try
-                {
-                    using (var fs = File.OpenRead(path))
-                    {
-                        var result = ReadSave<T>(fs);
-                        assertion(result);
-                        return result;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning($"Nova: {path} is corrupted, details below. Try to recover...");
-                    Debug.LogWarning(ex.Message);
-
-                    var oldPath = path + ".old";
-                    using (var fs = File.OpenRead(oldPath))
-                    {
-                        var result = ReadSave<T>(fs);
-                        assertion(result);
-
-                        // Recover only if the old file is good
-                        File.Delete(path); // no exception if not exist
-                        File.Move(oldPath, path); // exception if exists
-
-                        return result;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                Debug.LogError($"Nova: Error loading {path}, details below");
-                throw; // Nested exception cannot display full message here
-            }
-        }
-
-        private bool alertOnSafeWriteFail = true;
-
-        private void SafeWrite<T>(T obj, string path)
-        {
-            try
-            {
-                var oldPath = path + ".old";
-                if (File.Exists(path))
-                {
-                    File.Delete(oldPath); // no exception if not exist
-                    File.Move(path, oldPath); // exception if exists
-                }
-
-                using (var fs = File.OpenWrite(path)) // overwrite if needed
-                    WriteSave(obj, fs); // May be interrupted
-
-                File.Delete(oldPath);
-            }
-            catch (Exception ex)
-            {
-                // If there is some problem with Alert.Show, we need to avoid infinite recursion
-                if (alertOnSafeWriteFail)
-                {
-                    alertOnSafeWriteFail = false;
-                    Alert.Show(I18n.__("bookmark.save.fail"), ex.Message);
-                }
-
-                throw;
-            }
-        }
-
-        private T ReadSave<T>(Stream s)
-        {
-            using (var bw = new BinaryReader(s))
-            {
-                this.RuntimeAssert(fileHeader.SequenceEqual(bw.ReadBytes(fileHeader.Length)),
-                    "Invalid save file format.");
-
-                int version = bw.ReadInt32();
-                this.RuntimeAssert(Version >= version,
-                    "Save file is incompatible with the current version of Nova.");
-
-                if (version == 2)
-                {
-                    using (var compressed = new DeflateStream(s, CompressionMode.Decompress))
-                    using (var uncompressed = new MemoryStream())
-                    {
-                        compressed.CopyTo(uncompressed);
-                        uncompressed.Position = 0;
-                        return (T)formatter.Deserialize(uncompressed);
-                    }
-                }
-                else // version == 1
-                {
-                    return (T)formatter.Deserialize(new XorStream(s, fileHeader));
-                }
-            }
-        }
-
-        private void WriteSave<T>(T obj, Stream s)
-        {
-            using (var bw = new BinaryWriter(s))
-            {
-                bw.Write(fileHeader);
-                bw.Write(Version);
-
-                using (var compressed = new DeflateStream(s, CompressionMode.Compress))
-                using (var uncompressed = new MemoryStream())
-                {
-                    formatter.Serialize(uncompressed, obj);
-                    uncompressed.Position = 0;
-                    uncompressed.CopyTo(compressed);
-                }
-            }
+            serializer.SafeWrite(globalSave, globalSavePath);
         }
 
         #endregion
 
         #region Bookmarks
 
-        private string ComposeFileName(int saveID)
+        private string GetBookmarkFileName(int saveID)
         {
             return Path.Combine(savePathBase, $"sav{saveID:D3}.nsav");
         }
 
-        private Bookmark ReplaceCache(int saveID, Bookmark newBookmark)
+        private Bookmark ReplaceCache(int saveID, Bookmark bookmark)
         {
             if (cachedSaveSlots.ContainsKey(saveID))
             {
                 var old = cachedSaveSlots[saveID];
-                if (old == newBookmark)
+                if (old == bookmark)
                 {
-                    return newBookmark;
+                    return bookmark;
                 }
 
                 Destroy(old.screenshot);
             }
 
-            if (newBookmark == null)
+            if (bookmark == null)
             {
                 cachedSaveSlots.Remove(saveID);
             }
             else
             {
-                cachedSaveSlots[saveID] = newBookmark;
+                cachedSaveSlots[saveID] = bookmark;
             }
 
-            return newBookmark;
+            return bookmark;
         }
 
         /// <summary>
@@ -570,20 +408,22 @@ namespace Nova
         /// Will throw exception if it fails.
         /// </summary>
         /// <param name="saveID">ID of the bookmark.</param>
-        /// <param name="save">The bookmark to save.</param>
-        public void SaveBookmark(int saveID, Bookmark save)
+        /// <param name="bookmark">The bookmark to save.</param>
+        public void SaveBookmark(int saveID, Bookmark bookmark)
         {
-            var screenshotClone = new Texture2D(save.screenshot.width, save.screenshot.height, save.screenshot.format,
-                false);
-            screenshotClone.SetPixels32(save.screenshot.GetPixels32());
-            screenshotClone.Apply();
-            save.screenshot = screenshotClone;
-            save.globalSaveIdentifier = globalSave.globalSaveIdentifier;
-            SafeWrite(ReplaceCache(saveID, save), ComposeFileName(saveID));
+            var screenshot = new Texture2D(bookmark.screenshot.width, bookmark.screenshot.height,
+                bookmark.screenshot.format, false);
+            screenshot.SetPixels32(bookmark.screenshot.GetPixels32());
+            screenshot.Apply();
+            bookmark.screenshot = screenshot;
+            bookmark.globalSaveIdentifier = globalSave.globalSaveIdentifier;
+
+            serializer.SafeWrite(ReplaceCache(saveID, bookmark), GetBookmarkFileName(saveID));
             UpdateGlobalSave();
 
-            saveSlotsMetadata.Ensure(saveID).saveID = saveID;
-            saveSlotsMetadata.Ensure(saveID).modifiedTime = DateTime.Now;
+            var metadata = saveSlotsMetadata.Ensure(saveID);
+            metadata.saveID = saveID;
+            metadata.modifiedTime = DateTime.Now;
         }
 
         /// <summary>
@@ -594,11 +434,12 @@ namespace Nova
         /// <returns>The loaded bookmark.</returns>
         public Bookmark LoadBookmark(int saveID)
         {
-            return ReplaceCache(saveID, SafeRead<Bookmark>(ComposeFileName(saveID), result =>
+            var bookmark = serializer.SafeRead<Bookmark>(GetBookmarkFileName(saveID), result =>
             {
                 this.RuntimeAssert(result.globalSaveIdentifier == globalSave.globalSaveIdentifier,
                     "Save file is incompatible with the global save file.");
-            }));
+            });
+            return ReplaceCache(saveID, bookmark);
         }
 
         /// <summary>
@@ -607,7 +448,7 @@ namespace Nova
         /// <param name="saveID">ID of the bookmark.</param>
         public void DeleteBookmark(int saveID)
         {
-            File.Delete(ComposeFileName(saveID));
+            File.Delete(GetBookmarkFileName(saveID));
             saveSlotsMetadata.Remove(saveID);
             ReplaceCache(saveID, null);
         }
