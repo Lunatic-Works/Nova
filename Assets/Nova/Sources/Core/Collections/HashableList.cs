@@ -17,7 +17,7 @@ namespace Nova
             {
                 if (needCalculateHash)
                 {
-                    _hash = GetHash(0, Count);
+                    _hash = GetHashULong(0, Count);
                     needCalculateHash = false;
                 }
 
@@ -25,7 +25,8 @@ namespace Nova
             }
         }
 
-        public ulong GetHash(int index, int count)
+        // Knuth's golden ratio multiplicative hashing
+        public ulong GetHashULong(int index, int count)
         {
             unchecked
             {

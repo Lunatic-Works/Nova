@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Events;
 
 namespace Nova
@@ -224,7 +223,7 @@ namespace Nova
             currentNode = null;
             currentIndex = 0;
             currentDialogueEntry = null;
-            variables.Reset();
+            variables.Clear();
             state = State.Normal;
 
             // Restore scene
@@ -453,7 +452,7 @@ namespace Nova
             if (pendingJumpTarget != null)
             {
                 var node = flowChartTree.GetNode(pendingJumpTarget);
-                this.RuntimeAssert(node != null, $"Node {pendingJumpTarget} does not exist!");
+                this.RuntimeAssert(node != null, $"Node {pendingJumpTarget} does not exist.");
                 MoveToNextNode(node, onFinish);
                 yield break;
             }
@@ -520,7 +519,7 @@ namespace Nova
             hasBeenReachedWithAnyHistory = checkpointManager.IsReachedWithAnyHistory(currentNode.name, currentIndex);
             if (entry == null)
             {
-                // Tell the checkpoint manager a new dialogue entry has been reached
+                // Tell the checkpoint manager that a new dialogue entry has been reached
                 checkpointManager.SetReached(nodeHistory, currentIndex, GetRestoreEntry());
             }
 
@@ -598,7 +597,7 @@ namespace Nova
                 // All save data of nodes to be removed are deleted
                 for (var i = backNodeIndex + 1; i < nodeHistory.Count; ++i)
                 {
-                    checkpointManager.UnsetReached(nodeHistory.GetHash(0, i + 1));
+                    checkpointManager.UnsetReached(nodeHistory.GetHashULong(0, i + 1));
                 }
 
                 // All save data of later dialogues are deleted
@@ -712,7 +711,6 @@ namespace Nova
         /// This method runs asynchronously. The callback will run when the step finishes
         /// </remarks>
         /// <param name="onFinish">(canStepForward) => { ... }</param>
-        /// <returns>True if successfully stepped to the next dialogue or trigger some events</returns>
         public void Step(Action<bool> onFinish)
         {
             if (!canStepForward)
@@ -748,9 +746,9 @@ namespace Nova
                 case FlowChartNodeType.End:
                     state = State.Ended;
                     var endName = flowChartTree.GetEndName(currentNode);
-                    if (!checkpointManager.IsReached(endName))
+                    if (!checkpointManager.IsEndReached(endName))
                     {
-                        checkpointManager.SetReached(endName);
+                        checkpointManager.SetEndReached(endName);
                     }
 
                     currentRouteEnded.Invoke(new CurrentRouteEndedData(endName));
@@ -780,10 +778,10 @@ namespace Nova
         {
             state = State.Normal;
             var nextNode = currentNode.GetNext(branchName);
-            if (!checkpointManager.IsReached(nodeHistory, branchName))
+            if (!checkpointManager.IsBranchReached(nodeHistory, branchName))
             {
                 // Tell the checkpoint manager that the branch has been selected
-                checkpointManager.SetReached(nodeHistory, branchName);
+                checkpointManager.SetBranchReached(nodeHistory, branchName);
             }
 
             MoveToNextNode(nextNode, onFinish);

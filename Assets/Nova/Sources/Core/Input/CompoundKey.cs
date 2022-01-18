@@ -247,7 +247,7 @@ namespace Nova
             }
         }
 
-        public bool isNone => !Ctrl && !Win && !Shift && !Alt && Key == KeyCode.None;
+        public bool isNone => Key == KeyCode.None && !Ctrl && !Win && !Shift && !Alt;
 
         public void Clear()
         {
@@ -389,12 +389,12 @@ namespace Nova
                    && Shift == other.Shift;
         }
 
+        // Knuth's golden ratio multiplicative hashing
         public override int GetHashCode()
         {
             unchecked
             {
-                var x = 0U;
-                x += (uint)Key;
+                var x = (uint)Key;
                 x *= 2654435789U;
                 x += Ctrl ? 1U : 0U;
                 x *= 2654435789U;

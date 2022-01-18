@@ -32,8 +32,14 @@ namespace Nova
     public class GlobalSave
     {
         public readonly Dictionary<ulong, NodeSaveInfo> savedNodes = new Dictionary<ulong, NodeSaveInfo>();
+
         public readonly Dictionary<string, int> reachedWithAnyHistory = new Dictionary<string, int>();
+
+        public readonly Dictionary<string, SerializableHashSet<string>> branchReachedWithAnyHistory =
+            new Dictionary<string, SerializableHashSet<string>>();
+
         public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
+
         public readonly long globalSaveIdentifier = DateTime.Now.ToBinary();
 
         /// The global data of the game. For example, the global variables and the unlock status of images and musics.
@@ -237,6 +243,16 @@ namespace Nova
             return info;
         }
 
+        public List<string> GetNodeHistory(ulong nodeHistoryHash)
+        {
+            if (globalSave.savedNodes.TryGetValue(nodeHistoryHash, out var info))
+            {
+                return info.nodeHistory;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Set a dialogue to "reached" state and save the restore entry for the dialogue.
         /// </summary>
@@ -248,14 +264,8 @@ namespace Nova
             EnsureNodeHistory(nodeHistory).restoreEntries[dialogueIndex] = entry;
 
             var nodeName = nodeHistory.Last().Key;
-            if (globalSave.reachedWithAnyHistory.TryGetValue(nodeName, out var oldIndex))
-            {
-                globalSave.reachedWithAnyHistory[nodeName] = Math.Max(oldIndex, dialogueIndex);
-            }
-            else
-            {
-                globalSave.reachedWithAnyHistory[nodeName] = dialogueIndex;
-            }
+            var oldIndex = globalSave.reachedWithAnyHistory.Ensure(nodeName);
+            globalSave.reachedWithAnyHistory[nodeName] = Math.Max(oldIndex, dialogueIndex);
         }
 
         /// <summary>
@@ -263,16 +273,20 @@ namespace Nova
         /// </summary>
         /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="branchName">The name of the branch.</param>
-        public void SetReached(NodeHistory nodeHistory, string branchName)
+        public void SetBranchReached(NodeHistory nodeHistory, string branchName)
         {
             EnsureNodeHistory(nodeHistory).reachedBranches.Add(branchName);
+
+            var nodeName = nodeHistory.Last().Key;
+            var branchNames = globalSave.branchReachedWithAnyHistory.Ensure(nodeName);
+            branchNames.Add(branchName);
         }
 
         /// <summary>
         /// Set an end point to "reached" state.
         /// </summary>
         /// <param name="endName">The name of the end point.</param>
-        public void SetReached(string endName)
+        public void SetEndReached(string endName)
         {
             globalSave.reachedEnds.Add(endName);
         }
@@ -318,26 +332,22 @@ namespace Nova
                    && oldIndex >= dialogueIndex;
         }
 
-        public List<string> GetNodeHistory(ulong nodeHistoryHash)
-        {
-            if (globalSave.savedNodes.TryGetValue(nodeHistoryHash, out var info))
-            {
-                return info.nodeHistory;
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Check if the branch has been reached.
         /// </summary>
         /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="branchName">The name of the branch.</param>
         /// <returns>Whether the branch has been reached.</returns>
-        public bool IsReached(NodeHistory nodeHistory, string branchName)
+        public bool IsBranchReached(NodeHistory nodeHistory, string branchName)
         {
             return globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info)
                    && info.reachedBranches.Contains(branchName);
+        }
+
+        public bool IsBranchReachedWithAnyHistory(string nodeName, string branchName)
+        {
+            return globalSave.branchReachedWithAnyHistory.TryGetValue(nodeName, out var branchNames)
+                   && branchNames.Contains(branchName);
         }
 
         /// <summary>
@@ -345,7 +355,7 @@ namespace Nova
         /// </summary>
         /// <param name="endName">The name of the end point.</param>
         /// <returns>Whether the end point has been reached.</returns>
-        public bool IsReached(string endName)
+        public bool IsEndReached(string endName)
         {
             return globalSave.reachedEnds.Contains(endName);
         }

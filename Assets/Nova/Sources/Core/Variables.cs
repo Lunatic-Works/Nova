@@ -30,7 +30,7 @@ namespace Nova
     [Serializable]
     public class Variables
     {
-        private SortedDictionary<string, VariableEntry> variables = new SortedDictionary<string, VariableEntry>();
+        private SortedDictionary<string, VariableEntry> dict = new SortedDictionary<string, VariableEntry>();
 
         [NonSerialized] private ulong _hash;
         [NonSerialized] private bool needCalculateHash = true;
@@ -41,33 +41,48 @@ namespace Nova
             {
                 if (needCalculateHash)
                 {
-                    _hash = GetHash();
+                    _hash = GetHashULong();
                     needCalculateHash = false;
                 }
 
                 return _hash;
             }
-            private set
+        }
+
+        // Knuth's golden ratio multiplicative hashing
+        private ulong GetHashULong()
+        {
+            unchecked
             {
-                _hash = value;
-                needCalculateHash = false;
+                var x = 0UL;
+                foreach (var pair in dict)
+                {
+                    x += (ulong)pair.Key.GetHashCode();
+                    x *= 11400714819323199563UL;
+                    x += (ulong)pair.Value.type;
+                    x *= 11400714819323199563UL;
+                    x += (ulong)pair.Value.value.GetHashCode();
+                    x *= 11400714819323199563UL;
+                }
+
+                return x;
             }
         }
 
         public VariableEntry Get(string name)
         {
-            variables.TryGetValue(name, out var entry);
+            dict.TryGetValue(name, out var entry);
             return entry;
         }
 
         public void Set(string name, VariableType type, string value)
         {
-            variables.TryGetValue(name, out var oldEntry);
+            dict.TryGetValue(name, out var oldEntry);
             if (value == null)
             {
                 if (oldEntry != null)
                 {
-                    variables.Remove(name);
+                    dict.Remove(name);
                     needCalculateHash = true;
                 }
             }
@@ -75,55 +90,28 @@ namespace Nova
             {
                 if (oldEntry == null || oldEntry.type != type || oldEntry.value != value)
                 {
-                    variables[name] = new VariableEntry(type, value);
+                    dict[name] = new VariableEntry(type, value);
                     needCalculateHash = true;
                 }
             }
         }
 
-        private ulong GetHash()
-        {
-            unchecked
-            {
-                var x = 0UL;
-                foreach (var pair in variables)
-                {
-                    foreach (var c in pair.Key)
-                    {
-                        x += c;
-                        x *= 11400714819323199563UL;
-                    }
-
-                    x += (ulong)pair.Value.type;
-                    x *= 11400714819323199563UL;
-
-                    foreach (var c in pair.Value.value)
-                    {
-                        x += c;
-                        x *= 11400714819323199563UL;
-                    }
-                }
-
-                return x;
-            }
-        }
-
         public void CopyFrom(Variables variables)
         {
-            this.variables = new SortedDictionary<string, VariableEntry>(variables.variables);
+            dict = new SortedDictionary<string, VariableEntry>(variables.dict);
             needCalculateHash = true;
         }
 
-        public void Reset()
+        public void Clear()
         {
-            variables.Clear();
-            hash = 0UL;
+            dict.Clear();
+            needCalculateHash = true;
         }
 
         public override string ToString()
         {
-            return string.Join(",",
-                from pair in variables select pair.Key + ":" + pair.Value.type + "=" + pair.Value.value);
+            return "Variables: " + string.Join(", ",
+                from pair in dict select $"{pair.Key}:{pair.Value.type}={pair.Value.value}");
         }
     }
 }

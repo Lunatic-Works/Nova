@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityObject = UnityEngine.Object;
 
 namespace Nova
@@ -47,11 +48,11 @@ namespace Nova
             RenderTexture.active = old;
         }
 
-        public static void RuntimeAssert(this MonoBehaviour mb, bool conditionToBeTrue, string msg)
+        public static void RuntimeAssert(this MonoBehaviour mb, bool condition, string msg)
         {
-            if (!conditionToBeTrue)
+            if (!condition)
             {
-                throw new Exception($"Nova - {mb.name}: {msg}");
+                throw new AssertionException($"Nova - {mb.name}: {msg}", null);
             }
         }
 

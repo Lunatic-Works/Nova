@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityObject = UnityEngine.Object;
@@ -147,7 +148,7 @@ namespace Nova
             TKey key = usageQueue.Last.Value;
             if (key == null)
             {
-                throw new System.InvalidOperationException("Cache is empty");
+                throw new InvalidOperationException("Cache is empty");
             }
 
             usageQueue.RemoveLast();
