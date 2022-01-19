@@ -839,7 +839,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characters: {fileID: 871599196}
   soundController: {fileID: 1542636873}
-  viewManager: {fileID: 922924601}
 --- !u!4 &671619212
 Transform:
   m_ObjectHideFlags: 0

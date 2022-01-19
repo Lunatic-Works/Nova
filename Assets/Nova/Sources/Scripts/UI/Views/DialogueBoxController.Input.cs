@@ -5,10 +5,8 @@ namespace Nova
 {
     public partial class DialogueBoxController
     {
-        private const string AbortAnimationFirstShownKey = ConfigViewController.FirstShownKeyPrefix + "AbortAnimation";
-
-        private const string FastForwardReadFirstShownKey =
-            ConfigViewController.FirstShownKeyPrefix + "FastForwardRead";
+        private const string AbortAnimationFirstShownKey = ConfigManager.FirstShownKeyPrefix + "AbortAnimation";
+        private const string FastForwardReadFirstShownKey = ConfigManager.FirstShownKeyPrefix + "FastForwardRead";
 
         private const int HintAbortAnimationClicks = 10;
         private const int HintFastForwardReadClicks = 3;

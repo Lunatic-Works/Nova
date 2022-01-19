@@ -9,6 +9,7 @@ namespace Nova
     {
         public const string TrackedKeysKey = "TrackedKeys";
         public const string TrackedKeyPrefix = "_";
+        public const string FirstShownKeyPrefix = TrackedKeyPrefix + "FirstShown";
 
         public class SettingDefinition
         {

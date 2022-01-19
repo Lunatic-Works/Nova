@@ -5,7 +5,6 @@ TagManager:
   serializedVersion: 2
   tags:
   - NovaGameController
-  - Alert
   - NovaAnimation
   - DialogueView
   - UICamera

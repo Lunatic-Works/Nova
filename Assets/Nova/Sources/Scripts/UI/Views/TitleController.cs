@@ -11,7 +11,7 @@ namespace Nova
         public string bgmName;
         public float bgmVolume = 0.5f;
 
-        private const string SelectChapterFirstShownKey = ConfigViewController.FirstShownKeyPrefix + "SelectChapter";
+        private const string SelectChapterFirstShownKey = ConfigManager.FirstShownKeyPrefix + "SelectChapter";
 
         private GameState gameState;
         private ConfigManager configManager;
