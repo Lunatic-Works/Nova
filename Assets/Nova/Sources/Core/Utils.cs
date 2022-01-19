@@ -99,24 +99,13 @@ namespace Nova
             }
         }
 
-        private static GameObject FindNovaGameControllerObject()
-        {
-            var gameControllerObject = GameObject.FindWithTag("NovaGameController");
-            if (gameControllerObject == null)
-            {
-                throw new InvalidAccessException(
-                    "Nova: Cannot find NovaGameController by tag. Maybe you should put NovaCreator prefab in your scene.");
-            }
-
-            return gameControllerObject;
-        }
-
         public static GameController FindNovaGameController()
         {
-            var go = FindNovaGameControllerObject();
+            var go = GameObject.FindWithTag("NovaGameController");
             if (go == null)
             {
-                return null;
+                throw new InvalidAccessException(
+                    "Nova: Cannot find NovaGameController game object by tag. Maybe you should put NovaCreator prefab in your scene.");
             }
 
             var gameController = go.GetComponent<GameController>();
@@ -127,6 +116,23 @@ namespace Nova
             }
 
             return gameController;
+        }
+
+        public static ViewManager FindViewManager()
+        {
+            var go = GameObject.FindWithTag("UIRoot");
+            if (go == null)
+            {
+                throw new InvalidAccessException("Nova: Cannot find UI root game object by tag.");
+            }
+
+            var viewManager = go.GetComponent<ViewManager>();
+            if (viewManager == null)
+            {
+                throw new InvalidAccessException("Nova: No ViewManager component in UI root game object.");
+            }
+
+            return viewManager;
         }
 
         public static Vector3 WorldToCanvasPosition(this Canvas canvas, Vector3 worldPosition, Camera camera = null)

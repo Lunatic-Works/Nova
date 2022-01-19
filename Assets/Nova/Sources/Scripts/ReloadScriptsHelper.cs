@@ -8,10 +8,11 @@ namespace Nova
     {
         [SerializeField] private GameObject characters;
         [SerializeField] private SoundController soundController;
-        [SerializeField] private ViewManager viewManager;
 
         private GameState gameState;
         private InputMapper inputMapper;
+        private ViewManager viewManager;
+
         private List<CharacterController> characterControllers;
 
         private void Awake()
@@ -19,6 +20,7 @@ namespace Nova
             var gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
             inputMapper = gameController.InputMapper;
+            viewManager = Utils.FindViewManager();
 
             if (characters != null)
             {

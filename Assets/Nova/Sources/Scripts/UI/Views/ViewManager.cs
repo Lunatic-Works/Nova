@@ -68,8 +68,8 @@ namespace Nova
         private readonly Type[] overlayViewControllers = {typeof(NotificationViewController)};
 
         public GameObject dialoguePanel => GetController<DialogueBoxController>().myPanel;
-
         public GameObject titlePanel => GetController<TitleController>().myPanel;
+        public GameObject alertPanel => GetController<AlertController>().myPanel;
 
         private void Awake()
         {
@@ -159,7 +159,7 @@ namespace Nova
                 return CurrentViewType.InTransition;
             }
 
-            if (controllers[typeof(AlertController)].myPanel.activeSelf)
+            if (alertPanel.activeSelf)
             {
                 return CurrentViewType.Alert;
             }

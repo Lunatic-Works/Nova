@@ -32,5 +32,10 @@ namespace Nova
         {
             Current = this;
         }
+
+        private void OnDestroy()
+        {
+            Current = null;
+        }
     }
 }

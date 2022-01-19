@@ -249,10 +249,10 @@ namespace Nova
                 return;
             }
 
-            // Stop auto/fast forward on any button or torch
+            // Stop auto/fast forward on any button or touch
             state = DialogueBoxState.Normal;
 
-            // Handle hyperlinks on any button or torch
+            // Handle hyperlinks on any button or touch
             Camera uiCamera = UICameraHelper.Active;
             foreach (var dec in dialogueText.dialogueEntryControllers)
             {

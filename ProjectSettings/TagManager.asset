@@ -10,6 +10,7 @@ TagManager:
   - DialogueView
   - UICamera
   - RenderManager
+  - UIRoot
   layers:
   - Default
   - TransparentFX

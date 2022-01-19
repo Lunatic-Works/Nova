@@ -3,8 +3,8 @@ using UnityEngine.EventSystems;
 
 namespace Nova
 {
-    public class UISound : MonoBehaviour,
-        IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IPointerEnterHandler
+    public class UISound : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler,
+        IPointerEnterHandler
     {
         public AudioClip mouseDown;
         public AudioClip mouseUp;
@@ -12,44 +12,62 @@ namespace Nova
         public AudioClip mouseExit;
         public AudioClip mouseInsideLoop;
 
+        private ViewManager viewManager;
+
+        private void Awake()
+        {
+            viewManager = Utils.FindViewManager();
+        }
+
         public void OnPointerDown(PointerEventData eventData)
         {
-            // Only mouse left button or torch plays sound
+            // Only mouse left button or touch plays sound
             if (eventData.pointerId < -1)
             {
                 return;
             }
 
-            GetComponentInParent<ViewManager>().TryPlaySound(mouseDown);
+            viewManager.TryPlaySound(mouseDown);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            // Only mouse left button or torch plays sound
+            // Only mouse left button or touch plays sound
             if (eventData.pointerId < -1)
             {
                 return;
             }
 
             if (mouseInsideLoop != null)
-                GetComponentInParent<ViewManager>().TryStopSound();
-            GetComponentInParent<ViewManager>().TryPlaySound(mouseUp);
+            {
+                viewManager.TryStopSound();
+            }
+
+            viewManager.TryPlaySound(mouseUp);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (mouseInsideLoop != null)
-                GetComponentInParent<ViewManager>().TryPlaySound(mouseInsideLoop);
+            {
+                viewManager.TryPlaySound(mouseInsideLoop);
+            }
             else
-                GetComponentInParent<ViewManager>().TryPlaySound(mouseEnter);
+            {
+                viewManager.TryPlaySound(mouseEnter);
+            }
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             if (mouseInsideLoop != null)
-                GetComponentInParent<ViewManager>().TryStopSound();
+            {
+                viewManager.TryStopSound();
+            }
             else
-                GetComponentInParent<ViewManager>().TryPlaySound(mouseExit);
+            {
+                viewManager.TryPlaySound(mouseExit);
+            }
         }
     }
 }
