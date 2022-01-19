@@ -10,17 +10,17 @@ namespace Nova
     {
         public string configKeyName;
 
+        private ConfigManager configManager;
         private CanvasGroup canvasGroup;
         private DialogueBoxController dialogueBoxController;
-        private ConfigManager configManager;
 
         private void Awake()
         {
+            configManager = Utils.FindNovaGameController().ConfigManager;
             canvasGroup = GetComponent<CanvasGroup>();
             dialogueBoxController = GetComponent<DialogueBoxController>();
             this.RuntimeAssert(canvasGroup != null || dialogueBoxController != null,
                 "Missing CanvasGroup or DialogueBoxController.");
-            configManager = Utils.FindNovaGameController().ConfigManager;
         }
 
         private void OnEnable()

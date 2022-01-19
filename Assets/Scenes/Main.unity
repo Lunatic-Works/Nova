@@ -4593,11 +4593,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueView
       objectReference: {fileID: 0}
-    - target: {fileID: 224974750847515944, guid: ba2f88a38a7e341dd95278c30faf99d9,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 224981068127226408, guid: ba2f88a38a7e341dd95278c30faf99d9,
         type: 3}
       propertyPath: m_Pivot.x

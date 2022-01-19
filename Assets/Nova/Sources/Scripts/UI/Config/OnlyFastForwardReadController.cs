@@ -11,12 +11,12 @@ namespace Nova
         public string configKeyName;
 
         private ConfigManager configManager;
-        private DialogueBoxController controller;
+        private DialogueBoxController dialogueBoxController;
 
         private void Awake()
         {
             configManager = Utils.FindNovaGameController().ConfigManager;
-            controller = GetComponent<DialogueBoxController>();
+            dialogueBoxController = GetComponent<DialogueBoxController>();
         }
 
         private void OnEnable()
@@ -32,7 +32,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            controller.onlyFastForwardRead = configManager.GetInt(configKeyName) > 0;
+            dialogueBoxController.onlyFastForwardRead = configManager.GetInt(configKeyName) > 0;
         }
     }
 }

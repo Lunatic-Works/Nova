@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -21,12 +20,12 @@ namespace Nova
             Background
         }
 
-        private readonly DialogueBoxController dialogueBox;
+        private readonly DialogueBoxController dialogueBoxController;
         private readonly Type type;
 
-        public DialogueBoxColor(DialogueBoxController dialogueBox, Type type)
+        public DialogueBoxColor(DialogueBoxController dialogueBoxController, Type type)
         {
-            this.dialogueBox = dialogueBox;
+            this.dialogueBoxController = dialogueBoxController;
             this.type = type;
         }
 
@@ -37,9 +36,9 @@ namespace Nova
                 switch (type)
                 {
                     case Type.Text:
-                        return dialogueBox.textColor;
+                        return dialogueBoxController.textColor;
                     case Type.Background:
-                        return dialogueBox.backgroundColor;
+                        return dialogueBoxController.backgroundColor;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -49,10 +48,10 @@ namespace Nova
                 switch (type)
                 {
                     case Type.Text:
-                        dialogueBox.textColor = value;
+                        dialogueBoxController.textColor = value;
                         break;
                     case Type.Background:
-                        dialogueBox.backgroundColor = value;
+                        dialogueBoxController.backgroundColor = value;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

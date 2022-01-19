@@ -18,13 +18,13 @@ namespace Nova
     {
         public string configKeyName;
 
-        private DialogueBoxController dialogueBoxController;
         private ConfigManager configManager;
+        private DialogueBoxController dialogueBoxController;
 
         private void Awake()
         {
-            dialogueBoxController = GetComponent<DialogueBoxController>();
             configManager = Utils.FindNovaGameController().ConfigManager;
+            dialogueBoxController = GetComponent<DialogueBoxController>();
         }
 
         private void OnEnable()

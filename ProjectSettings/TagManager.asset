@@ -6,7 +6,6 @@ TagManager:
   tags:
   - NovaGameController
   - NovaAnimation
-  - DialogueView
   - UICamera
   - RenderManager
   - UIRoot

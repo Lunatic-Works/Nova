@@ -9,19 +9,19 @@ namespace Nova
     {
         public string configKeyName;
 
+        private ConfigManager configManager;
         private DialogueBoxController dialogueBoxController;
         private ConfigTextPreviewController configTextPreviewController;
-        private ConfigManager configManager;
 
         private void Awake()
         {
+            configManager = Utils.FindNovaGameController().ConfigManager;
             dialogueBoxController = GetComponent<DialogueBoxController>();
             configTextPreviewController = GetComponent<ConfigTextPreviewController>();
             this.RuntimeAssert(
                 dialogueBoxController != null || configTextPreviewController != null,
                 "Missing DialogueBoxController or ConfigTextPreviewController."
             );
-            configManager = Utils.FindNovaGameController().ConfigManager;
         }
 
         private void OnEnable()

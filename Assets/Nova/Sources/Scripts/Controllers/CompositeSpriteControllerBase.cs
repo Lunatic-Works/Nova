@@ -20,7 +20,7 @@ namespace Nova
         {
             gameState = Utils.FindNovaGameController().GameState;
             textureChanger = GetComponent<OverlayTextureChangerBase>();
-            dialogueBoxController = GameObject.FindWithTag("DialogueView").GetComponent<DialogueBoxController>();
+            dialogueBoxController = Utils.FindViewManager().GetController<DialogueBoxController>();
         }
 
         #region Color

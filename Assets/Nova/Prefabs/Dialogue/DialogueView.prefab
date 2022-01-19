@@ -1117,7 +1117,7 @@ GameObject:
   - component: {fileID: 387142936}
   m_Layer: 5
   m_Name: DialogueView
-  m_TagString: DialogueView
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1237,8 +1237,6 @@ MonoBehaviour:
   perCharacterFadeInDuration: 0
   autoDelay: 0
   fastForwardDelay: 0
-  continueAutoAfterBranch: 0
-  continueFastForwardAfterBranch: 0
   readColor: {r: 0, g: 0, b: 0, a: 1}
   unreadColor: {r: 0, g: 0, b: 0, a: 1}
   textColorHasSet: 0

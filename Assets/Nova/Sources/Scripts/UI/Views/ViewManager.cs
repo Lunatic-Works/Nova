@@ -92,7 +92,16 @@ namespace Nova
 
         public T GetController<T>() where T : ViewControllerBase
         {
-            return controllers[typeof(T)] as T;
+            var t = typeof(T);
+            if (controllers.ContainsKey(t))
+            {
+                return controllers[t] as T;
+            }
+
+            var controller = GetComponentInChildren<T>();
+            this.RuntimeAssert(controller != null, $"Cannot find {t}.");
+            controllers[t] = controller;
+            return controller;
         }
 
         public CurrentViewType currentView { get; private set; }

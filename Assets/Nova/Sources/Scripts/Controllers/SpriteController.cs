@@ -125,7 +125,7 @@ namespace Nova
 
             this.RuntimeAssert(spriteRenderer != null || image != null, "Missing SpriteRenderer or Image.");
             defaultSprite = sprite;
-            dialogueBoxController = GameObject.FindWithTag("DialogueView").GetComponent<DialogueBoxController>();
+            dialogueBoxController = Utils.FindViewManager().GetController<DialogueBoxController>();
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
