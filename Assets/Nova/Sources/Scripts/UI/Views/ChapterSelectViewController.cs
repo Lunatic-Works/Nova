@@ -11,11 +11,11 @@ namespace Nova
         public GameObject chapterButtonPrefab;
         public GameObject chapterList;
         public Button returnButton;
-        public LogController logController;
         public bool unlockAllChaptersForDebug;
 
         private GameState gameState;
         private CheckpointManager checkpointManager;
+        private LogController logController;
         private NameSorter nameSorter;
 
         private List<string> startNodeNames;
@@ -30,6 +30,7 @@ namespace Nova
             var controller = Utils.FindNovaGameController();
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
+            logController = viewManager.GetController<LogController>();
             nameSorter = GetComponent<NameSorter>();
 
             startNodeNames = gameState.GetAllStartNodeNames();

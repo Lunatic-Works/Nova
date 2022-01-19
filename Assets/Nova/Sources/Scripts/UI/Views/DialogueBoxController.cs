@@ -83,6 +83,7 @@ namespace Nova
         private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
 
         private ButtonRingTrigger buttonRingTrigger;
+        private SaveViewController saveViewController;
         private LogController logController;
         [SerializeField] private AvatarController avatarController;
 
@@ -193,12 +194,14 @@ namespace Nova
 
         private bool inited;
 
-        private void Init()
+        private new void Init()
         {
             if (inited)
             {
                 return;
             }
+
+            base.Init();
 
             gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
@@ -210,7 +213,8 @@ namespace Nova
             dialogueTextVerticalLayoutGroup = dialogueText.GetComponent<VerticalLayoutGroup>();
 
             buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
-            logController = transform.parent.GetComponentInChildren<LogController>();
+            saveViewController = viewManager.GetController<SaveViewController>();
+            logController = viewManager.GetController<LogController>();
 
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
@@ -566,7 +570,8 @@ namespace Nova
         public RectTransformAnimationProperty GetTextScrollAnimationProperty(float start, float target)
         {
             var x = dialogueTextRect.localPosition.x;
-            return new RectTransformAnimationProperty(dialogueTextRect, new Vector2(x, start), new Vector2(x, target), true);
+            return new RectTransformAnimationProperty(dialogueTextRect, new Vector2(x, start), new Vector2(x, target),
+                true);
         }
 
         [HideInInspector] public float perCharacterFadeInDuration;
@@ -575,7 +580,8 @@ namespace Nova
         {
             Color nowTextColor = textColorHasSet ? textColor : isReadDialogue ? readColor : unreadColor;
             textLeftExtraPadding = avatarController.textPaddingOrZero;
-            var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName, dialogueEntryLayoutSetting, textLeftExtraPadding);
+            var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
+                dialogueEntryLayoutSetting, textLeftExtraPadding);
 
             if (this.needAnimation && needAnimation && !gameState.isMovingBack && state != DialogueBoxState.FastForward)
             {
@@ -591,7 +597,8 @@ namespace Nova
                     textDuration = perCharacterFadeInDuration * contentProxy.GetPageCharacterCount();
                 }
 
-                var animEntry = textAnimation.Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
+                var animEntry = textAnimation
+                    .Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
                     .Then(null, textAnimationDelay)
                     .Then(
                         new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
@@ -718,7 +725,8 @@ namespace Nova
 
         private bool NextPageOrStep()
         {
-            if (dialogueText.dialogueEntryControllers.Count == 0 || !dialogueText.dialogueEntryControllers.Last().Forward())
+            if (dialogueText.dialogueEntryControllers.Count == 0 ||
+                !dialogueText.dialogueEntryControllers.Last().Forward())
             {
                 gameState.Step();
                 return false;

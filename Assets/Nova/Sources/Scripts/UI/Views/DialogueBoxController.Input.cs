@@ -33,22 +33,22 @@ namespace Nova
 
             if (inputMapper.GetKeyUp(AbstractKey.Save))
             {
-                viewManager.GetController<SaveViewController>().ShowSave();
+                saveViewController.ShowSave();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.Load))
             {
-                viewManager.GetController<SaveViewController>().ShowLoad();
+                saveViewController.ShowLoad();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.QuickSave))
             {
-                viewManager.GetController<SaveViewController>().QuickSaveBookmark();
+                saveViewController.QuickSaveBookmark();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.QuickLoad))
             {
-                viewManager.GetController<SaveViewController>().QuickLoadBookmark();
+                saveViewController.QuickLoadBookmark();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.ToggleDialogue))
@@ -63,7 +63,7 @@ namespace Nova
 
             if (inputMapper.GetKeyUp(AbstractKey.ShowLog))
             {
-                viewManager.GetController<LogController>().Show();
+                logController.Show();
             }
 
             fastForwardHotKeyHolding = inputMapper.GetKey(AbstractKey.FastForward);

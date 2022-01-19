@@ -14,14 +14,28 @@ namespace Nova
         protected List<UIViewTransitionBase> transitions;
         protected InputMapper inputMapper;
 
-        protected virtual void Awake()
+        private bool inited;
+
+        protected void Init()
         {
+            if (inited)
+            {
+                return;
+            }
+
             this.RuntimeAssert(myPanel != null, "MyPanel is not set.");
             transitions = myPanel.GetComponents<UIViewTransitionBase>().ToList();
             viewManager = GetComponentInParent<ViewManager>();
             this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");
             viewManager.SetController(this);
             inputMapper = Utils.FindNovaGameController().InputMapper;
+
+            inited = true;
+        }
+
+        protected virtual void Awake()
+        {
+            Init();
         }
 
         protected virtual void Start()
