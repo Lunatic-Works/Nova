@@ -482,22 +482,6 @@ namespace Nova
             dialogueTime = GetDialogueTime();
         }
 
-        private void JumpChapter(int offset)
-        {
-            var chapters = gameState.GetAllStartNodeNames();
-            int targetChapterIndex = chapters.IndexOf(gameState.currentNode.name) + offset;
-            if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Count)
-            {
-                NovaAnimation.StopAll();
-                gameState.ResetGameState();
-                gameState.GameStart(chapters[targetChapterIndex]);
-            }
-            else
-            {
-                Debug.LogWarning($"Nova: No chapter index {targetChapterIndex}");
-            }
-        }
-
         private void SetSchedule()
         {
             TryRemoveSchedule();

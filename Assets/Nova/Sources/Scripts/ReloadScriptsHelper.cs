@@ -12,6 +12,7 @@ namespace Nova
         private GameState gameState;
         private InputMapper inputMapper;
         private ViewManager viewManager;
+        private DialogueBoxController dialogueBoxController;
 
         private List<CharacterController> characterControllers;
 
@@ -21,6 +22,7 @@ namespace Nova
             gameState = gameController.GameState;
             inputMapper = gameController.InputMapper;
             viewManager = Utils.FindViewManager();
+            dialogueBoxController = viewManager.GetController<DialogueBoxController>();
 
             if (characters != null)
             {
@@ -65,11 +67,12 @@ namespace Nova
         private void ReloadScripts()
         {
             NovaAnimation.StopAll();
-            var currentIndex = gameState.currentIndex;
+            dialogueBoxController.state = DialogueBoxState.Normal;
 
             gameState.ReloadScripts();
 
             SuppressSound(true);
+            var currentIndex = gameState.currentIndex;
             gameState.MoveBackTo(gameState.nodeHistory.GetCounted(gameState.currentNode.name), 0, clearFuture: true);
 
             // Step back to current index
@@ -88,8 +91,12 @@ namespace Nova
 
         private void RerunAction()
         {
-            gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex)
-                .ExecuteAction(DialogueActionStage.Default, false);
+            // TODO
+            // NovaAnimation.StopAll();
+            // dialogueBoxController.state = DialogueBoxState.Normal;
+            // 
+            // gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex)
+            //     .ExecuteAction(DialogueActionStage.Default, false);
         }
     }
 }

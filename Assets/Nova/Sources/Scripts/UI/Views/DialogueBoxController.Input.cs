@@ -77,43 +77,6 @@ namespace Nova
             }
         }
 
-#if UNITY_EDITOR
-        private void HandleEditorOnlyShortcut()
-        {
-            if (viewManager.currentView == CurrentViewType.Game)
-            {
-                if (inputMapper.GetKeyUp(AbstractKey.EditorBackward))
-                {
-                    state = DialogueBoxState.Normal;
-                    try
-                    {
-                        gameState.SeekBackStep(1, out var nodeName, out var dialogueIndex);
-                        gameState.MoveBackTo(nodeName, dialogueIndex);
-                    }
-                    catch
-                    {
-                        // TODO: handle exceptions
-                    }
-                }
-
-                if (inputMapper.GetKeyUp(AbstractKey.EditorBeginChapter))
-                {
-                    JumpChapter(0);
-                }
-
-                if (inputMapper.GetKeyUp(AbstractKey.EditorPreviousChapter))
-                {
-                    JumpChapter(-1);
-                }
-
-                if (inputMapper.GetKeyUp(AbstractKey.EditorNextChapter))
-                {
-                    JumpChapter(1);
-                }
-            }
-        }
-#endif
-
         private void HandleShortcut()
         {
             if (buttonRingTrigger.buttonShowing)
@@ -135,10 +98,6 @@ namespace Nova
                     HandleShortcutWhenDialogueHidden();
                 }
             }
-
-#if UNITY_EDITOR
-            HandleEditorOnlyShortcut();
-#endif
         }
 
         [HideInInspector] public RightButtonAction rightButtonAction;
