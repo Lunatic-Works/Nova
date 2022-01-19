@@ -183,6 +183,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptPath: Scenarios
+  dialogueWillChange:
+    m_PersistentCalls:
+      m_Calls: []
+  dialogueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  nodeChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  selectionOccurs:
+    m_PersistentCalls:
+      m_Calls: []
+  currentRouteEnded:
+    m_PersistentCalls:
+      m_Calls: []
   maxStepNumFromLastCheckpoint: 10
 --- !u!114 &114045275974384532
 MonoBehaviour:
@@ -222,7 +237,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7845a30a14146a78e9c13bdbeb7306c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultKeyboardMapping: {fileID: 4900000, guid: 68d8a4952fe6747e2b9099f8fb06b5a0, type: 3}
+  defaultKeyboardMapping: {fileID: 4900000, guid: 68d8a4952fe6747e2b9099f8fb06b5a0,
+    type: 3}
 --- !u!114 &114593149028580010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,7 +327,7 @@ GameObject:
   - component: {fileID: 4704473396539670}
   m_Layer: 0
   m_Name: NovaAnimation
-  m_TagString: NovaAnimation
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

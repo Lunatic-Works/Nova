@@ -16,11 +16,11 @@ namespace Nova
 
         private bool inited;
 
-        protected void Init()
+        protected bool Init()
         {
             if (inited)
             {
-                return;
+                return true;
             }
 
             this.RuntimeAssert(myPanel != null, "MyPanel is not set.");
@@ -31,6 +31,7 @@ namespace Nova
             inputMapper = Utils.FindNovaGameController().InputMapper;
 
             inited = true;
+            return false;
         }
 
         protected virtual void Awake()

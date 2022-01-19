@@ -22,8 +22,7 @@ namespace Nova
             spriteRenderer = GetComponent<SpriteRenderer>();
             image = GetComponent<Image>();
             this.RuntimeAssert(spriteRenderer != null || image != null, "Missing SpriteRenderer or Image.");
-            novaAnimation = GameObject.FindWithTag("NovaAnimation").transform.Find("PerDialogue")
-                .GetComponent<NovaAnimation>();
+            novaAnimation = Utils.FindNovaGameController().PerDialogueAnimation;
             ghost = new GameObject("SpriteChangerGhost");
             ghost.transform.SetParent(transform);
             ghost.SetActive(false);

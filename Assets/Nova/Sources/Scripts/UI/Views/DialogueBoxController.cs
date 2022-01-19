@@ -192,16 +192,12 @@ namespace Nova
             }
         }
 
-        private bool inited;
-
-        private new void Init()
+        private new bool Init()
         {
-            if (inited)
+            if (base.Init())
             {
-                return;
+                return true;
             }
-
-            base.Init();
 
             gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
@@ -242,7 +238,7 @@ namespace Nova
 
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
 
-            inited = true;
+            return false;
         }
 
         protected override void Awake()
