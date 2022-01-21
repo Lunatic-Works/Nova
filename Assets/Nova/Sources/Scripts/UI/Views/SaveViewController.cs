@@ -575,10 +575,11 @@ namespace Nova
             try
             {
                 Bookmark bookmark = checkpointManager[saveID];
+                var nodeName = checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash).nodeNames.Last();
                 ShowPreview(GetThumbnailSprite(saveID), I18n.__(
                     "bookmark.summary",
                     checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
-                    I18nHelper.NodeNames.Get(checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash).Last()),
+                    I18nHelper.NodeNames.Get(nodeName),
                     bookmark.description
                 ));
             }
@@ -720,8 +721,8 @@ namespace Nova
                     try
                     {
                         Bookmark bookmark = checkpointManager[saveID];
-                        newHeaderText =
-                            I18nHelper.NodeNames.Get(checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash).Last());
+                        var nodeName = checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash).nodeNames.Last();
+                        newHeaderText = I18nHelper.NodeNames.Get(nodeName);
                         newFooterText = bookmark.creationTime.ToString(DateTimeFormat);
                         newThumbnailSprite = GetThumbnailSprite(saveID);
                         onEditButtonClicked = null;

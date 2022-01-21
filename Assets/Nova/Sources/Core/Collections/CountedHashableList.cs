@@ -11,7 +11,7 @@ namespace Nova
         private readonly Dictionary<T, int> valueCounts = new Dictionary<T, int>();
 
         private ulong _hash;
-        private bool needCalculateHash = true;
+        protected bool needCalculateHash = true;
 
         public ulong Hash
         {
@@ -28,7 +28,7 @@ namespace Nova
         }
 
         // Knuth's golden ratio multiplicative hashing
-        public ulong GetHashULong(int index, int count)
+        public virtual ulong GetHashULong(int index, int count)
         {
             unchecked
             {

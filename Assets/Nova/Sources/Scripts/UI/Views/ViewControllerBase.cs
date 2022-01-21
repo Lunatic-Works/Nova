@@ -16,7 +16,7 @@ namespace Nova
 
         private bool inited;
 
-        protected bool Init()
+        protected virtual bool Init()
         {
             if (inited)
             {

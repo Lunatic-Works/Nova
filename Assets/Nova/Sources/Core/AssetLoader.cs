@@ -50,10 +50,10 @@ namespace Nova
 
             cachedAssets = new Dictionary<AssetCacheType, LRUCache<string, CachedAssetEntry>>
             {
-                [AssetCacheType.Image] = new LRUCache<string, CachedAssetEntry>(autoDestroy: true, maxSize: 20),
-                [AssetCacheType.StandingLayer] = new LRUCache<string, CachedAssetEntry>(autoDestroy: true, maxSize: 20),
-                [AssetCacheType.Timeline] = new LRUCache<string, CachedAssetEntry>(autoDestroy: true, maxSize: 1),
-                [AssetCacheType.Audio] = new LRUCache<string, CachedAssetEntry>(autoDestroy: true, maxSize: 4)
+                [AssetCacheType.Image] = new LRUCache<string, CachedAssetEntry>(20, true),
+                [AssetCacheType.StandingLayer] = new LRUCache<string, CachedAssetEntry>(20, true),
+                [AssetCacheType.Timeline] = new LRUCache<string, CachedAssetEntry>(1, true),
+                [AssetCacheType.Audio] = new LRUCache<string, CachedAssetEntry>(4, true)
             };
 
             gameState = Utils.FindNovaGameController().GameState;

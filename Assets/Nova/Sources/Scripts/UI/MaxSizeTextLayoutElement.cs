@@ -103,7 +103,7 @@ namespace Nova
             LayoutRebuilder.MarkLayoutForRebuild(transform as RectTransform);
         }
 
-        protected new void OnValidate()
+        protected override void OnValidate()
         {
             SetDirty();
         }

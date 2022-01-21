@@ -192,7 +192,7 @@ namespace Nova
             }
         }
 
-        private new bool Init()
+        protected override bool Init()
         {
             if (base.Init())
             {
@@ -244,7 +244,6 @@ namespace Nova
         protected override void Awake()
         {
             base.Awake();
-            Init();
         }
 
         public override void Show(Action onFinish)

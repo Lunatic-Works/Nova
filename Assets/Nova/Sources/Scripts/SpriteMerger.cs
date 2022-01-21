@@ -83,7 +83,7 @@ namespace Nova
             }
             else
             {
-                textureCaches[cacheName] = cache = new LRUCache<string, RenderTexture>(autoDestroy: true, maxSize: 2);
+                textureCaches[cacheName] = cache = new LRUCache<string, RenderTexture>(2, true);
             }
 
             cachesInUse.Add(cacheName);

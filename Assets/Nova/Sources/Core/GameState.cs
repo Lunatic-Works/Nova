@@ -1,5 +1,4 @@
-﻿using Nova.Exceptions;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,6 @@ using UnityEngine.Events;
 
 namespace Nova
 {
-    using NodeHistory = CountedHashableList<string>;
     using NodeHistoryEntry = KeyValuePair<string, int>;
 
     #region Event types and datas
@@ -516,11 +514,11 @@ namespace Nova
 
             var entry = checkpointManager.GetReached(nodeHistory, currentIndex);
             hasBeenReached = entry != null;
-            hasBeenReachedWithAnyHistory = checkpointManager.IsReachedWithAnyHistory(currentNode.name, currentIndex);
+            hasBeenReachedWithAnyHistory = checkpointManager.IsReachedAnyVariables(currentNode.name, currentIndex);
             if (entry == null)
             {
                 // Tell the checkpoint manager that a new dialogue entry has been reached
-                checkpointManager.SetReached(nodeHistory, currentIndex, GetRestoreEntry());
+                checkpointManager.SetReached(nodeHistory, variables, currentIndex, GetRestoreEntry());
             }
 
             // Change states after creating or restoring from checkpoint
@@ -601,10 +599,7 @@ namespace Nova
                 }
 
                 // All save data of later dialogues are deleted
-                for (var i = dialogueIndex + 1; i < flowChartTree.GetNode(nodeHistoryEntry.Key).dialogueEntryCount; ++i)
-                {
-                    checkpointManager.UnsetReached(nodeHistory, i);
-                }
+                checkpointManager.UnsetReachedAfter(nodeHistory, dialogueIndex);
             }
 
             nodeHistory.RemoveRange(backNodeIndex + 1, nodeHistory.Count - (backNodeIndex + 1));
@@ -767,13 +762,8 @@ namespace Nova
         /// <summary>
         /// Call this method to choose a branch
         /// </summary>
-        /// <remarks>
-        /// This method should be called when a branch happens, otherwise An InvalidAccessException will be raised
-        /// </remarks>
         /// <param name="branchName">The name of the branch</param>
         /// <param name="onFinish">Callback on finish</param>
-        /// <exception cref="InvalidAccessException">An InvalidAccessException will be thrown if this method
-        /// is not called on branch happens</exception>
         private void SelectBranch(string branchName, Action onFinish)
         {
             state = State.Normal;
@@ -781,7 +771,7 @@ namespace Nova
             if (!checkpointManager.IsBranchReached(nodeHistory, branchName))
             {
                 // Tell the checkpoint manager that the branch has been selected
-                checkpointManager.SetBranchReached(nodeHistory, branchName);
+                checkpointManager.SetBranchReached(nodeHistory, variables, branchName);
             }
 
             MoveToNextNode(nextNode, onFinish);
@@ -1059,7 +1049,9 @@ namespace Nova
         {
             CancelAction();
             nodeHistory.Clear();
-            nodeHistory.AddRange(checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash));
+            var data = checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash);
+            nodeHistory.AddRange(data.nodeNames);
+            nodeHistory.interrupts = new SortedDictionary<int, SortedDictionary<int, ulong>>(data.interrupts);
             MoveBackTo(nodeHistory.Last(), bookmark.dialogueIndex);
         }
 

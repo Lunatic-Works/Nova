@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nova.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,44 +9,41 @@ using UnityEngine.Assertions;
 
 namespace Nova
 {
-    using NodeHistory = CountedHashableList<string>;
-
-    #region Classes
-
-    [Serializable]
-    public class NodeSaveInfo
-    {
-        public readonly List<string> nodeHistory;
-
-        public readonly Dictionary<int, GameStateRestoreEntry> restoreEntries =
-            new Dictionary<int, GameStateRestoreEntry>();
-
-        public readonly SerializableHashSet<string> reachedBranches = new SerializableHashSet<string>();
-
-        public NodeSaveInfo(List<string> nodeHistory)
-        {
-            this.nodeHistory = nodeHistory;
-        }
-    }
-
     [Serializable]
     public class GlobalSave
     {
-        public readonly Dictionary<ulong, NodeSaveInfo> savedNodes = new Dictionary<ulong, NodeSaveInfo>();
+        // Node name -> dialogue index -> variables hash -> GameStateRestoreEntry
+        public readonly Dictionary<string, Dictionary<int, Dictionary<ulong, GameStateRestoreEntry>>> reachedDialogues =
+            new Dictionary<string, Dictionary<int, Dictionary<ulong, GameStateRestoreEntry>>>();
 
-        public readonly Dictionary<string, int> reachedWithAnyHistory = new Dictionary<string, int>();
+        // Node name -> branch name -> variables hash -> bool
+        public readonly Dictionary<string, Dictionary<string, SerializableHashSet<ulong>>> reachedBranches =
+            new Dictionary<string, Dictionary<string, SerializableHashSet<ulong>>>();
 
-        public readonly Dictionary<string, SerializableHashSet<string>> branchReachedWithAnyHistory =
-            new Dictionary<string, SerializableHashSet<string>>();
-
+        // End name -> bool
         public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
-        public readonly long globalSaveIdentifier = DateTime.Now.ToBinary();
+        // Node history hash -> NodeHistory
+        public readonly Dictionary<ulong, NodeHistoryData> cachedNodeHistories =
+            new Dictionary<ulong, NodeHistoryData>();
+
+        // Node history hash -> dialogue index -> variables hash
+        // TODO: use IntervalDictionary to store dialogue index -> variables hash
+        public readonly Dictionary<ulong, Dictionary<int, ulong>> cachedVariablesHashes =
+            new Dictionary<ulong, Dictionary<int, ulong>>();
+
+        // Node history hash -> branch name -> variables hash
+        public readonly Dictionary<ulong, Dictionary<string, ulong>> cachedBranchVariablesHashes =
+            new Dictionary<ulong, Dictionary<string, ulong>>();
+
+        public readonly long identifier = DateTime.Now.ToBinary();
 
         /// The global data of the game. For example, the global variables and the unlock status of images and musics.
         /// It is the game author's job to make sure all values are serializable.
         public readonly Dictionary<string, object> data = new Dictionary<string, object>();
     }
+
+    #region Bookmark classes
 
     [Serializable]
     public class Bookmark
@@ -231,55 +229,54 @@ namespace Nova
 
         #region Global save
 
-        private NodeSaveInfo EnsureNodeHistory(NodeHistory nodeHistory)
+        public NodeHistoryData GetNodeHistory(ulong nodeHistoryHash)
         {
-            if (globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info))
+            if (!globalSave.cachedNodeHistories.TryGetValue(nodeHistoryHash, out var data))
             {
-                return info;
+                throw new InvalidAccessException("Nova: Node history not found.");
             }
 
-            info = new NodeSaveInfo(nodeHistory.Select(x => x.Key).ToList());
-            globalSave.savedNodes[nodeHistory.Hash] = info;
-            return info;
-        }
-
-        public List<string> GetNodeHistory(ulong nodeHistoryHash)
-        {
-            if (globalSave.savedNodes.TryGetValue(nodeHistoryHash, out var info))
-            {
-                return info.nodeHistory;
-            }
-
-            return null;
+            return data;
         }
 
         /// <summary>
         /// Set a dialogue to "reached" state and save the restore entry for the dialogue.
         /// </summary>
         /// <param name="nodeHistory">The list of all reached nodes.</param>
+        /// <param name="variables">Variables.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <param name="entry">Restore entry for the dialogue</param>
-        public void SetReached(NodeHistory nodeHistory, int dialogueIndex, GameStateRestoreEntry entry)
+        public void SetReached(NodeHistory nodeHistory, Variables variables, int dialogueIndex,
+            GameStateRestoreEntry entry)
         {
-            EnsureNodeHistory(nodeHistory).restoreEntries[dialogueIndex] = entry;
-
             var nodeName = nodeHistory.Last().Key;
-            var oldIndex = globalSave.reachedWithAnyHistory.Ensure(nodeName);
-            globalSave.reachedWithAnyHistory[nodeName] = Math.Max(oldIndex, dialogueIndex);
+            globalSave.reachedDialogues.Ensure(nodeName).Ensure(dialogueIndex)[variables.hash] = entry;
+
+            if (!globalSave.cachedNodeHistories.ContainsKey(nodeHistory.Hash))
+            {
+                globalSave.cachedNodeHistories[nodeHistory.Hash] = new NodeHistoryData(nodeHistory);
+            }
+
+            globalSave.cachedVariablesHashes.Ensure(nodeHistory.Hash)[dialogueIndex] = variables.hash;
         }
 
         /// <summary>
         /// Set a branch to "reached" state.
         /// </summary>
         /// <param name="nodeHistory">The list of all reached nodes.</param>
+        /// <param name="variables">Variables.</param>
         /// <param name="branchName">The name of the branch.</param>
-        public void SetBranchReached(NodeHistory nodeHistory, string branchName)
+        public void SetBranchReached(NodeHistory nodeHistory, Variables variables, string branchName)
         {
-            EnsureNodeHistory(nodeHistory).reachedBranches.Add(branchName);
-
             var nodeName = nodeHistory.Last().Key;
-            var branchNames = globalSave.branchReachedWithAnyHistory.Ensure(nodeName);
-            branchNames.Add(branchName);
+            globalSave.reachedBranches.Ensure(nodeName).Ensure(branchName).Add(variables.hash);
+
+            if (!globalSave.cachedNodeHistories.ContainsKey(nodeHistory.Hash))
+            {
+                globalSave.cachedNodeHistories[nodeHistory.Hash] = new NodeHistoryData(nodeHistory);
+            }
+
+            globalSave.cachedBranchVariablesHashes.Ensure(nodeHistory.Hash)[branchName] = variables.hash;
         }
 
         /// <summary>
@@ -293,26 +290,38 @@ namespace Nova
 
         public void UnsetReached(ulong nodeHistoryHash)
         {
-            globalSave.savedNodes.Remove(nodeHistoryHash);
+            var nodeName = GetNodeHistory(nodeHistoryHash).nodeNames.Last();
+            globalSave.reachedDialogues.Remove(nodeName);
+            globalSave.reachedBranches.Remove(nodeName);
         }
 
-        public void UnsetReached(NodeHistory nodeHistory, int dialogueIndex)
+        public void UnsetReachedAfter(NodeHistory nodeHistory, int dialogueIndex)
         {
-            if (globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info))
+            var nodeName = nodeHistory.Last().Key;
+            if (globalSave.reachedDialogues.TryGetValue(nodeName, out var dict))
             {
-                info.restoreEntries.Remove(dialogueIndex);
+                foreach (var key in dict.Keys.Where(key => key > dialogueIndex).ToList())
+                {
+                    dict.Remove(key);
+                }
             }
         }
 
-        public GameStateRestoreEntry GetReached(ulong nodeHistoryHash, int dialogueIndex)
+        private GameStateRestoreEntry GetReached(string nodeName, int dialogueIndex, ulong variablesHash)
         {
-            if (globalSave.savedNodes.TryGetValue(nodeHistoryHash, out var info)
-                && info.restoreEntries.TryGetValue(dialogueIndex, out var entry))
-            {
-                return entry;
-            }
+            return globalSave.reachedDialogues.TryGetValue(nodeName, out var dict)
+                   && dict.TryGetValue(dialogueIndex, out var dict2)
+                   && dict2.TryGetValue(variablesHash, out var entry)
+                ? entry
+                : null;
+        }
 
-            return null;
+        public GameStateRestoreEntry GetReached(ulong nodeHistoryHash, string nodeName, int dialogueIndex)
+        {
+            return globalSave.cachedVariablesHashes.TryGetValue(nodeHistoryHash, out var dict)
+                   && dict.TryGetValue(dialogueIndex, out var variablesHash)
+                ? GetReached(nodeName, dialogueIndex, variablesHash)
+                : null;
         }
 
         /// <summary>
@@ -323,13 +332,27 @@ namespace Nova
         /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
         public GameStateRestoreEntry GetReached(NodeHistory nodeHistory, int dialogueIndex)
         {
-            return GetReached(nodeHistory.Hash, dialogueIndex);
+            var nodeName = nodeHistory.Last().Key;
+            return GetReached(nodeHistory.Hash, nodeName, dialogueIndex);
         }
 
-        public bool IsReachedWithAnyHistory(string nodeName, int dialogueIndex)
+        public bool IsReachedAnyVariables(string nodeName, int dialogueIndex)
         {
-            return globalSave.reachedWithAnyHistory.TryGetValue(nodeName, out var oldIndex)
-                   && oldIndex >= dialogueIndex;
+            return globalSave.reachedDialogues.TryGetValue(nodeName, out var dict) && dict.ContainsKey(dialogueIndex);
+        }
+
+        private bool IsBranchReached(string nodeName, string branchName, ulong variablesHash)
+        {
+            return globalSave.reachedBranches.TryGetValue(nodeName, out var dict)
+                   && dict.TryGetValue(branchName, out var hashSet)
+                   && hashSet.Contains(variablesHash);
+        }
+
+        public bool IsBranchReached(ulong nodeHistoryHash, string nodeName, string branchName)
+        {
+            return globalSave.cachedBranchVariablesHashes.TryGetValue(nodeHistoryHash, out var dict)
+                   && dict.TryGetValue(branchName, out var variablesHash)
+                   && IsBranchReached(nodeName, branchName, variablesHash);
         }
 
         /// <summary>
@@ -340,14 +363,13 @@ namespace Nova
         /// <returns>Whether the branch has been reached.</returns>
         public bool IsBranchReached(NodeHistory nodeHistory, string branchName)
         {
-            return globalSave.savedNodes.TryGetValue(nodeHistory.Hash, out var info)
-                   && info.reachedBranches.Contains(branchName);
+            var nodeName = nodeHistory.Last().Key;
+            return IsBranchReached(nodeHistory.Hash, nodeName, branchName);
         }
 
-        public bool IsBranchReachedWithAnyHistory(string nodeName, string branchName)
+        public bool IsBranchReachedAnyVariables(string nodeName, string branchName)
         {
-            return globalSave.branchReachedWithAnyHistory.TryGetValue(nodeName, out var branchNames)
-                   && branchNames.Contains(branchName);
+            return globalSave.reachedBranches.TryGetValue(nodeName, out var dict) && dict.ContainsKey(branchName);
         }
 
         /// <summary>
@@ -430,7 +452,7 @@ namespace Nova
             screenshot.SetPixels32(bookmark.screenshot.GetPixels32());
             screenshot.Apply();
             bookmark.screenshot = screenshot;
-            bookmark.globalSaveIdentifier = globalSave.globalSaveIdentifier;
+            bookmark.globalSaveIdentifier = globalSave.identifier;
 
             serializer.SafeWrite(ReplaceCache(saveID, bookmark), GetBookmarkFileName(saveID));
             UpdateGlobalSave();
@@ -450,7 +472,7 @@ namespace Nova
         {
             var bookmark = serializer.SafeRead<Bookmark>(GetBookmarkFileName(saveID), result =>
             {
-                this.RuntimeAssert(result.globalSaveIdentifier == globalSave.globalSaveIdentifier,
+                this.RuntimeAssert(result.globalSaveIdentifier == globalSave.identifier,
                     "Save file is incompatible with the global save file.");
             });
             return ReplaceCache(saveID, bookmark);

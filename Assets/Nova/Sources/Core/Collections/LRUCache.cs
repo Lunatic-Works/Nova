@@ -10,8 +10,14 @@ namespace Nova
     {
         private class Node
         {
-            public TValue value;
-            public LinkedListNode<TKey> queueNode;
+            public TValue Value;
+            public readonly LinkedListNode<TKey> QueueNode;
+
+            public Node(TValue value, LinkedListNode<TKey> queueNode)
+            {
+                Value = value;
+                QueueNode = queueNode;
+            }
         }
 
         public readonly int MaxSize;
@@ -22,9 +28,10 @@ namespace Nova
 
         public int Count => dict.Count;
 
+        // For inspector
         public int HistoryMaxCount;
 
-        public LRUCache(bool autoDestroy = false, int maxSize = 10)
+        public LRUCache(int maxSize, bool autoDestroy)
         {
             MaxSize = maxSize;
             AutoDestroy = autoDestroy;
@@ -40,8 +47,8 @@ namespace Nova
 
         private void Touch(Node node)
         {
-            usageQueue.Remove(node.queueNode);
-            usageQueue.AddFirst(node.queueNode);
+            usageQueue.Remove(node.QueueNode);
+            usageQueue.AddFirst(node.QueueNode);
         }
 
         public void Touch(TKey key)
@@ -50,23 +57,27 @@ namespace Nova
         }
 
         // Will touch key
-        public bool TryGetValue(TKey key, out TValue outValue)
+        public bool TryGetValue(TKey key, out TValue value)
         {
             if (dict.TryGetValue(key, out Node node))
             {
                 Touch(node);
-                outValue = node.value;
+                value = node.Value;
                 return true;
             }
 
-            outValue = default;
+            value = default;
             return false;
         }
 
         private void TryDestroyValue(Node node)
         {
-            if (!AutoDestroy) return;
-            var cachedObject = node.value as UnityObject;
+            if (!AutoDestroy)
+            {
+                return;
+            }
+
+            var cachedObject = node.Value as UnityObject;
             if (cachedObject != null)
             {
                 Utils.DestroyObject(cachedObject);
@@ -78,7 +89,7 @@ namespace Nova
             var node = dict[key]; // Throw if not exist
             TryDestroyValue(node);
             dict.Remove(key);
-            usageQueue.Remove(node.queueNode);
+            usageQueue.Remove(node.QueueNode);
         }
 
         public void Clear()
@@ -94,11 +105,11 @@ namespace Nova
 
         public IEnumerable<TKey> Keys => usageQueue;
 
-        public IEnumerable<TValue> Values => usageQueue.Select(key => dict[key].value);
+        public IEnumerable<TValue> Values => usageQueue.Select(key => dict[key].Value);
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return usageQueue.Select(key => new KeyValuePair<TKey, TValue>(key, dict[key].value)).GetEnumerator();
+            return usageQueue.Select(key => new KeyValuePair<TKey, TValue>(key, dict[key].Value)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -113,13 +124,13 @@ namespace Nova
             {
                 var node = dict[key]; // Throw if not exist
                 Touch(node);
-                return node.value;
+                return node.Value;
             }
             set
             {
                 if (dict.TryGetValue(key, out var node))
                 {
-                    node.value = value;
+                    node.Value = value;
                 }
                 else
                 {
@@ -128,7 +139,7 @@ namespace Nova
                         Remove(usageQueue.Last.Value);
                     }
 
-                    dict.Add(key, new Node {value = value, queueNode = usageQueue.AddFirst(key)});
+                    dict.Add(key, new Node(value, usageQueue.AddFirst(key)));
 
                     if (dict.Count > HistoryMaxCount)
                     {
@@ -140,7 +151,7 @@ namespace Nova
 
         public TValue GetNoTouch(TKey key)
         {
-            return dict[key].value; // Throw if not exist
+            return dict[key].Value; // Throw if not exist
         }
 
         public TValue PopLeastUsed()
@@ -152,7 +163,7 @@ namespace Nova
             }
 
             usageQueue.RemoveLast();
-            TValue value = dict[key].value;
+            TValue value = dict[key].Value;
             dict.Remove(key);
             return value;
         }
