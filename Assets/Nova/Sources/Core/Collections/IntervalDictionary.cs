@@ -1,27 +1,39 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nova
 {
     [Serializable]
     public class IntervalDictionary<TKey, TValue>
     {
-        private struct TPair
+        private class TPair
         {
             public readonly TKey Key;
-            public readonly TValue Value;
+            public TValue Value;
 
             public TPair(TKey key, TValue value)
             {
                 Key = key;
                 Value = value;
             }
+
+            public override bool Equals(object obj)
+            {
+                return obj is TPair other && Key.Equals(other.Key);
+            }
+
+            public override int GetHashCode()
+            {
+                return Key.GetHashCode();
+            }
         }
 
         private class KeyComparer : IComparer<TPair>
         {
-            public bool Found { get; private set; }
-            public TPair LowerBound { get; private set; }
+            public TPair Lower { get; private set; }
+            public TPair LowerOrEqual { get; private set; }
+            public TPair Upper { get; private set; }
 
             private readonly IComparer<TKey> comparer;
 
@@ -32,16 +44,27 @@ namespace Nova
 
             public void Reset()
             {
-                Found = false;
+                Lower = null;
+                LowerOrEqual = null;
+                Upper = null;
             }
 
             public int Compare(TPair x, TPair y)
             {
                 var res = comparer.Compare(x.Key, y.Key);
+
+                if (res > 0)
+                {
+                    Lower = y;
+                }
+
                 if (res >= 0)
                 {
-                    Found = true;
-                    LowerBound = y;
+                    LowerOrEqual = y;
+                }
+                else
+                {
+                    Upper = y;
                 }
 
                 return res;
@@ -68,6 +91,47 @@ namespace Nova
 
                 return value;
             }
+            set
+            {
+                comparer.Reset();
+                var pair = new TPair(key, value);
+                dict.Contains(pair);
+                if (comparer.LowerOrEqual == null)
+                {
+                    dict.Add(pair);
+                }
+                else if (comparer.LowerOrEqual.Key.Equals(key))
+                {
+                    if (!comparer.LowerOrEqual.Value.Equals(value))
+                    {
+                        if (comparer.Lower != null && comparer.Lower.Value.Equals(value))
+                        {
+                            dict.Remove(comparer.LowerOrEqual);
+                        }
+                        else
+                        {
+                            comparer.LowerOrEqual.Value = value;
+                        }
+
+                        if (comparer.Upper != null && comparer.Upper.Value.Equals(value))
+                        {
+                            dict.Remove(comparer.Upper);
+                        }
+                    }
+                }
+                else
+                {
+                    if (!comparer.LowerOrEqual.Value.Equals(value))
+                    {
+                        dict.Add(pair);
+
+                        if (comparer.Upper != null && comparer.Upper.Value.Equals(value))
+                        {
+                            dict.Remove(comparer.Upper);
+                        }
+                    }
+                }
+            }
         }
 
         public bool TryGetValue(TKey key, out TValue value)
@@ -75,32 +139,26 @@ namespace Nova
             comparer.Reset();
             var pair = new TPair(key, default);
             dict.Contains(pair);
-            if (comparer.Found)
-            {
-                value = comparer.LowerBound.Value;
-                return true;
-            }
-            else
+            if (comparer.LowerOrEqual == null)
             {
                 value = default;
                 return false;
             }
-        }
-
-        public void Add(TKey key, TValue value)
-        {
-            comparer.Reset();
-            var pair = new TPair(key, value);
-            dict.Contains(pair);
-            if (!comparer.Found || !comparer.LowerBound.Value.Equals(value))
+            else
             {
-                dict.Add(pair);
+                value = comparer.LowerOrEqual.Value;
+                return true;
             }
         }
 
         public void Clear()
         {
             dict.Clear();
+        }
+
+        public override string ToString()
+        {
+            return "IntervalDictionary: " + string.Join(", ", from pair in dict select $"{pair.Key}:{pair.Value}");
         }
     }
 }
