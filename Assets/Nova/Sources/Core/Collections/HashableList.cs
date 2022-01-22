@@ -65,16 +65,16 @@ namespace Nova
         public void Add(T item)
         {
             list.Add(item);
-            UpdateHashULong(item);
+            if (!needCalculateHash)
+            {
+                UpdateHashULong(item);
+            }
         }
 
         public void AddRange(IEnumerable<T> collection)
         {
             list.AddRange(collection);
-            foreach (var item in collection)
-            {
-                UpdateHashULong(item);
-            }
+            needCalculateHash = true;
         }
 
         public void RemoveRange(int index, int count)

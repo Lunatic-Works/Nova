@@ -75,7 +75,10 @@ namespace Nova
         {
             AddCount(item);
             list.Add(new KeyValuePair<T, int>(item, valueCounts[item]));
-            UpdateHashULong(item);
+            if (!needCalculateHash)
+            {
+                UpdateHashULong(item);
+            }
         }
 
         public void AddRange(IEnumerable<T> collection)

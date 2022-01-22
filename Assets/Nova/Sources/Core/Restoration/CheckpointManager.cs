@@ -24,7 +24,7 @@ namespace Nova
         public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
         // Node history hash -> NodeHistory
-        // TODO: use a prefix tree to store node histories
+        // TODO: use a radix tree to store node histories
         public readonly Dictionary<ulong, NodeHistoryData> cachedNodeHistories =
             new Dictionary<ulong, NodeHistoryData>();
 
@@ -230,14 +230,26 @@ namespace Nova
 
         #region Global save
 
-        public NodeHistoryData GetNodeHistory(ulong nodeHistoryHash)
+        public void GetNodeHistory(ulong nodeHistoryHash, NodeHistory nodeHistory)
         {
             if (!globalSave.cachedNodeHistories.TryGetValue(nodeHistoryHash, out var data))
             {
                 throw new ArgumentException("Nova: Node history not found.");
             }
 
-            return data;
+            nodeHistory.Clear();
+            nodeHistory.AddRange(data.nodeNames);
+            nodeHistory.interrupts = new SortedDictionary<int, SortedDictionary<int, ulong>>(data.interrupts);
+        }
+
+        public string GetLastNodeName(ulong nodeHistoryHash)
+        {
+            if (!globalSave.cachedNodeHistories.TryGetValue(nodeHistoryHash, out var data))
+            {
+                throw new ArgumentException("Nova: Node history not found.");
+            }
+
+            return data.nodeNames.Last();
         }
 
         /// <summary>
@@ -291,7 +303,7 @@ namespace Nova
 
         public void UnsetReached(ulong nodeHistoryHash)
         {
-            var nodeName = GetNodeHistory(nodeHistoryHash).nodeNames.Last();
+            var nodeName = GetLastNodeName(nodeHistoryHash);
             globalSave.reachedDialogues.Remove(nodeName);
             globalSave.reachedBranches.Remove(nodeName);
         }

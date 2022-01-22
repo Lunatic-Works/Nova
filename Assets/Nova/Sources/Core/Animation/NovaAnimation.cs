@@ -55,9 +55,8 @@ namespace Nova
 
         public static float GetTotalTimeRemaining(AnimationType type = AnimationType.All)
         {
-            return (from animation in Animations
-                where type.HasFlag(animation.type)
-                select animation.totalTimeRemaining).Max();
+            return (from animation in Animations where type.HasFlag(animation.type) select animation.totalTimeRemaining)
+                .Max();
         }
 
         private static void AddAnimation(NovaAnimation animation)

@@ -9,9 +9,9 @@ namespace Nova
         /// <summary>
         /// if this piece of data comes from a restorable material
         /// </summary>
-        public bool isRestorableMaterial;
+        public readonly bool isRestorableMaterial;
 
-        public string shaderName;
+        public readonly string shaderName;
 
         /// <summary>
         /// stores color info
@@ -37,5 +37,11 @@ namespace Nova
         /// scale and offset of the texture
         /// </summary>
         public readonly Dictionary<string, Vector4Data> textureScaleOffsets = new Dictionary<string, Vector4Data>();
+
+        public MaterialRestoreData(bool isRestorableMaterial, string shaderName)
+        {
+            this.isRestorableMaterial = isRestorableMaterial;
+            this.shaderName = shaderName;
+        }
     }
 }

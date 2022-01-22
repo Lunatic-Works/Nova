@@ -121,11 +121,7 @@ namespace Nova
                 return null;
             }
 
-            var data = new MaterialRestoreData
-            {
-                isRestorableMaterial = material is RestorableMaterial,
-                shaderName = material.shader.name
-            };
+            var data = new MaterialRestoreData(material is RestorableMaterial, material.shader.name);
             foreach (var p in properties)
             {
                 var name = p.Key;

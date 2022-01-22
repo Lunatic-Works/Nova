@@ -1033,10 +1033,7 @@ namespace Nova
         public void LoadBookmark(Bookmark bookmark)
         {
             CancelAction();
-            nodeHistory.Clear();
-            var data = checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash);
-            nodeHistory.AddRange(data.nodeNames);
-            nodeHistory.interrupts = new SortedDictionary<int, SortedDictionary<int, ulong>>(data.interrupts);
+            checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash, nodeHistory);
             MoveBackTo(nodeHistory.Last(), bookmark.dialogueIndex);
         }
 
