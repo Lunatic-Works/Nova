@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace Nova
 {
+    /// <summary>
+    /// A hashable list that supports getting the occurrence count of an element at a specified index with O(1) time.
+    /// </summary>
     public class CountedHashableList<T> : IEnumerable<KeyValuePair<T, int>>
     {
         private readonly List<KeyValuePair<T, int>> list = new List<KeyValuePair<T, int>>();
@@ -43,6 +46,15 @@ namespace Nova
             }
         }
 
+        private void UpdateHashULong(T item)
+        {
+            unchecked
+            {
+                _hash += (ulong)item.GetHashCode();
+                _hash *= 11400714819323199563UL;
+            }
+        }
+
         public int Count => list.Count;
 
         public KeyValuePair<T, int> this[int index] => list[index];
@@ -63,7 +75,7 @@ namespace Nova
         {
             AddCount(item);
             list.Add(new KeyValuePair<T, int>(item, valueCounts[item]));
-            needCalculateHash = true;
+            UpdateHashULong(item);
         }
 
         public void AddRange(IEnumerable<T> collection)

@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Nova
 {
+    /// <summary>
+    /// A dictionary that merges adjacent keys with the same value to save space.
+    /// </summary>
     [Serializable]
     public class IntervalDictionary<TKey, TValue>
     {
@@ -29,6 +32,7 @@ namespace Nova
             }
         }
 
+        // A comparer that tracks adjacent keys when going down the tree
         private class KeyComparer : IComparer<TPair>
         {
             public TPair Lower { get; private set; }
@@ -93,6 +97,7 @@ namespace Nova
             }
             set
             {
+                // When a value is set to a key, the value of all keys after until the next different key also changes
                 comparer.Reset();
                 var pair = new TPair(key, value);
                 dict.Contains(pair);
@@ -106,15 +111,18 @@ namespace Nova
                     {
                         if (comparer.Lower != null && comparer.Lower.Value.Equals(value))
                         {
+                            // Merge this key with the lower one
                             dict.Remove(comparer.LowerOrEqual);
                         }
                         else
                         {
+                            // Change the value in place
                             comparer.LowerOrEqual.Value = value;
                         }
 
                         if (comparer.Upper != null && comparer.Upper.Value.Equals(value))
                         {
+                            // Merge the upper key with this one
                             dict.Remove(comparer.Upper);
                         }
                     }
@@ -127,6 +135,7 @@ namespace Nova
 
                         if (comparer.Upper != null && comparer.Upper.Value.Equals(value))
                         {
+                            // Merge the upper key with this one
                             dict.Remove(comparer.Upper);
                         }
                     }

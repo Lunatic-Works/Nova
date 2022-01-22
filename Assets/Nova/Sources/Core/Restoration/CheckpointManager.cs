@@ -1,5 +1,4 @@
-﻿using Nova.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +12,7 @@ namespace Nova
     public class GlobalSave
     {
         // Node name -> dialogue index -> variables hash -> GameStateRestoreEntry
+        // TODO: deduplicate restoreDatas
         public readonly Dictionary<string, Dictionary<int, Dictionary<ulong, GameStateRestoreEntry>>> reachedDialogues =
             new Dictionary<string, Dictionary<int, Dictionary<ulong, GameStateRestoreEntry>>>();
 
@@ -24,6 +24,7 @@ namespace Nova
         public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
         // Node history hash -> NodeHistory
+        // TODO: use a prefix tree to store node histories
         public readonly Dictionary<ulong, NodeHistoryData> cachedNodeHistories =
             new Dictionary<ulong, NodeHistoryData>();
 
@@ -233,7 +234,7 @@ namespace Nova
         {
             if (!globalSave.cachedNodeHistories.TryGetValue(nodeHistoryHash, out var data))
             {
-                throw new InvalidAccessException("Nova: Node history not found.");
+                throw new ArgumentException("Nova: Node history not found.");
             }
 
             return data;

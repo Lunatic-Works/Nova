@@ -41,6 +41,15 @@ namespace Nova
             }
         }
 
+        private void UpdateHashULong(T item)
+        {
+            unchecked
+            {
+                _hash += (ulong)item.GetHashCode();
+                _hash *= 11400714819323199563UL;
+            }
+        }
+
         public int Count => list.Count;
 
         public T this[int index]
@@ -56,13 +65,16 @@ namespace Nova
         public void Add(T item)
         {
             list.Add(item);
-            needCalculateHash = true;
+            UpdateHashULong(item);
         }
 
         public void AddRange(IEnumerable<T> collection)
         {
             list.AddRange(collection);
-            needCalculateHash = true;
+            foreach (var item in collection)
+            {
+                UpdateHashULong(item);
+            }
         }
 
         public void RemoveRange(int index, int count)
