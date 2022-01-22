@@ -185,7 +185,7 @@ namespace Nova
 
         private void OnNodeChanged(NodeChangedData nodeChangedData)
         {
-            currentNodeName = I18nHelper.NodeNames.Get(nodeChangedData.nodeName);
+            currentNodeName = I18nHelper.NodeNames.Get(nodeChangedData.nodeHistoryEntry.Key);
         }
 
         private void OnDialogueChanged(DialogueChangedData dialogueChangedData)

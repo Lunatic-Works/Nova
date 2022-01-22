@@ -57,7 +57,7 @@ namespace Nova
             var sprites = poseArray.Select(imageName =>
                 AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, imageName))).ToList();
             var texture = characterTextureMerger.GetMergedTexture(name, sprites);
-            if (fade && !gameState.isMovingBack && dialogueBoxController.state != DialogueBoxState.FastForward)
+            if (fade && !gameState.isRestoring && dialogueBoxController.state != DialogueBoxState.FastForward)
             {
                 textureChanger.SetTexture(texture);
             }
@@ -120,7 +120,7 @@ namespace Nova
                 return;
             }
 
-            if (fade && !gameState.isMovingBack && dialogueBoxController.state != DialogueBoxState.FastForward)
+            if (fade && !gameState.isRestoring && dialogueBoxController.state != DialogueBoxState.FastForward)
             {
                 textureChanger.SetTexture(null);
             }

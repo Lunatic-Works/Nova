@@ -34,7 +34,7 @@ namespace Nova
         protected override void Start()
         {
             base.Start();
-            gameState.SaveInitialState();
+            gameState.SaveInitialCheckpoint();
             Show(null);
         }
 

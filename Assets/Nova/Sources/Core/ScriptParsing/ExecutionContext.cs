@@ -18,8 +18,15 @@
     [ExportCustomType]
     public class ExecutionContext
     {
-        public DialogueActionStage stage;
-        public ExecutionMode mode;
-        public bool isRestore;
+        public readonly ExecutionMode mode;
+        public readonly DialogueActionStage stage;
+        public readonly bool isRestoring;
+
+        public ExecutionContext(ExecutionMode mode, DialogueActionStage stage, bool isRestoring)
+        {
+            this.stage = stage;
+            this.mode = mode;
+            this.isRestoring = isRestoring;
+        }
     }
 }

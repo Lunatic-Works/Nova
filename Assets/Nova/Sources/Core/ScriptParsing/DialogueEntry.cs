@@ -90,16 +90,11 @@ namespace Nova
         /// <summary>
         /// Execute the action stored in this dialogue entry.
         /// </summary>
-        public void ExecuteAction(DialogueActionStage stage, bool isRestore)
+        public void ExecuteAction(DialogueActionStage stage, bool isRestoring)
         {
             if (actions.TryGetValue(stage, out var action))
             {
-                LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext
-                {
-                    mode = ExecutionMode.Lazy,
-                    stage = stage,
-                    isRestore = isRestore
-                });
+                LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Lazy, stage, isRestoring));
                 try
                 {
                     action.Call();

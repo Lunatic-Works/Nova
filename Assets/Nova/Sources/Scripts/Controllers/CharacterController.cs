@@ -154,7 +154,7 @@ namespace Nova
         private bool willSaySomething = false;
         private float voiceDelay = 0.0f;
 
-        private bool dontPlaySound => gameState.isMovingBack || suppressSound;
+        private bool dontPlaySound => gameState.isRestoring || suppressSound;
 
         /// <summary>
         /// Stop the voice when the dialogue will change
@@ -248,7 +248,7 @@ namespace Nova
             willSaySomething = true;
             voiceDelay = delay;
             audioSource.clip = audioClip;
-            gameState.AddVoiceClipOfNextDialogue(luaGlobalName, new VoiceEntry(voiceFileName, delay));
+            gameState.AddVoiceNextDialogue(luaGlobalName, new VoiceEntry(voiceFileName, delay));
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace Nova
             }
         }
 
-        public static float MaxVoiceDurationOfNextDialogue
+        public static float MaxVoiceDurationNextDialogue
         {
             get
             {

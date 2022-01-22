@@ -263,7 +263,7 @@ namespace Nova
         {
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
-            gameState.currentRouteEnded.AddListener(OnCurrentRouteEnded);
+            gameState.routeEnded.AddListener(OnRouteEnded);
             gameState.AddRestorable(this);
         }
 
@@ -272,11 +272,11 @@ namespace Nova
             StopAllCoroutines();
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
-            gameState.currentRouteEnded.RemoveListener(OnCurrentRouteEnded);
+            gameState.routeEnded.RemoveListener(OnRouteEnded);
             gameState.RemoveRestorable(this);
         }
 
-        private void OnCurrentRouteEnded(CurrentRouteEndedData currentRouteEndedData)
+        private void OnRouteEnded(RouteEndedData routeEndedData)
         {
             state = DialogueBoxState.Normal;
             this.SwitchView<TitleController>();
@@ -450,7 +450,7 @@ namespace Nova
         {
             RestartTimer();
 
-            isReadDialogue = dialogueData.hasBeenReachedWithAnyHistory;
+            isReadDialogue = dialogueData.hasBeenReachedAnyVariables;
             if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead &&
                 !fastForwardHotKeyHolding)
             {
@@ -562,7 +562,7 @@ namespace Nova
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
 
-            if (this.needAnimation && needAnimation && !gameState.isMovingBack && state != DialogueBoxState.FastForward)
+            if (this.needAnimation && needAnimation && !gameState.isRestoring && state != DialogueBoxState.FastForward)
             {
                 var contentProxy = entry.contentProxy;
 
@@ -638,7 +638,7 @@ namespace Nova
         {
             return Mathf.Max(
                 NovaAnimation.GetTotalTimeRemaining(AnimationType.PerDialogue | AnimationType.Text) + offset,
-                CharacterController.MaxVoiceDurationOfNextDialogue + voiceOffset
+                CharacterController.MaxVoiceDurationNextDialogue + voiceOffset
             );
         }
 

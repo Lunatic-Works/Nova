@@ -74,7 +74,7 @@ namespace Nova
             }
         }
 
-        public void RemoveRange(int index, int count)
+        public virtual void RemoveRange(int index, int count)
         {
             for (var i = index; i < index + count; ++i)
             {
@@ -85,7 +85,7 @@ namespace Nova
             needCalculateHash = true;
         }
 
-        public void Clear()
+        public virtual void Clear()
         {
             list.Clear();
             valueCounts.Clear();

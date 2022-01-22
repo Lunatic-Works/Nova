@@ -21,20 +21,20 @@ namespace Nova
         public readonly NodeHistoryEntry nodeHistoryEntry;
         public readonly int dialogueIndex;
         public readonly DialogueDisplayData displayData;
-        public readonly Dictionary<string, VoiceEntry> voicesForNextDialogue;
+        public readonly Dictionary<string, VoiceEntry> voicesNextDialogue;
         public readonly bool hasBeenReached;
-        public readonly bool hasBeenReachedWithAnyHistory;
+        public readonly bool hasBeenReachedAnyVariables;
 
         public DialogueChangedData(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex,
-            DialogueDisplayData displayData, Dictionary<string, VoiceEntry> voicesForNextDialogue, bool hasBeenReached,
-            bool hasBeenReachedWithAnyHistory)
+            DialogueDisplayData displayData, Dictionary<string, VoiceEntry> voicesNextDialogue, bool hasBeenReached,
+            bool hasBeenReachedAnyVariables)
         {
             this.nodeHistoryEntry = nodeHistoryEntry;
             this.dialogueIndex = dialogueIndex;
             this.displayData = displayData;
-            this.voicesForNextDialogue = voicesForNextDialogue;
+            this.voicesNextDialogue = voicesNextDialogue;
             this.hasBeenReached = hasBeenReached;
-            this.hasBeenReachedWithAnyHistory = hasBeenReachedWithAnyHistory;
+            this.hasBeenReachedAnyVariables = hasBeenReachedAnyVariables;
         }
     }
 
@@ -43,11 +43,11 @@ namespace Nova
 
     public class NodeChangedData
     {
-        public readonly string nodeName;
+        public readonly NodeHistoryEntry nodeHistoryEntry;
 
-        public NodeChangedData(string nodeName)
+        public NodeChangedData(NodeHistoryEntry nodeHistoryEntry)
         {
-            this.nodeName = nodeName;
+            this.nodeHistoryEntry = nodeHistoryEntry;
         }
     }
 
@@ -88,18 +88,18 @@ namespace Nova
     [Serializable]
     public class SelectionOccursEvent : UnityEvent<SelectionOccursData> { }
 
-    public class CurrentRouteEndedData
+    public class RouteEndedData
     {
         public readonly string endName;
 
-        public CurrentRouteEndedData(string endName)
+        public RouteEndedData(string endName)
         {
             this.endName = endName;
         }
     }
 
     [Serializable]
-    public class CurrentRouteEndedEvent : UnityEvent<CurrentRouteEndedData> { }
+    public class RouteEndedEvent : UnityEvent<RouteEndedData> { }
 
     #endregion
 
@@ -112,9 +112,12 @@ namespace Nova
         [SerializeField] private string scriptPath;
 
         private CheckpointManager checkpointManager;
-        private GameStateCheckpoint clearSceneRestoreEntry;
+        private GameStateCheckpoint initialCheckpoint;
         private readonly ScriptLoader scriptLoader = new ScriptLoader();
         private FlowChartTree flowChartTree;
+
+        private AdvancedDialogueHelper advancedDialogueHelper;
+        private CoroutineHelper coroutineHelper;
 
         private void Awake()
         {
@@ -139,7 +142,6 @@ namespace Nova
 
         /// <summary>
         /// Used for faster iterations during the development, like to preview changes in scripts without restarting the game
-        /// Assume we already moved to the first dialogue entry in the current node, and provided initial variables hash
         /// </summary>
         public void ReloadScripts()
         {
@@ -151,7 +153,7 @@ namespace Nova
         #region States
 
         /// <summary>
-        /// Names of the nodes that have been walked through, including the current node
+        /// Names and visit counts of the nodes that have been walked through, including the current node
         /// </summary>
         /// <remarks>
         /// Modified by MoveToNextNode() and MoveBackTo()
@@ -197,17 +199,17 @@ namespace Nova
         private State state = State.Normal;
 
         /// <summary>
-        /// currentRouteEnded has been triggered
+        /// routeEnded has been triggered
         /// </summary>
-        private bool ended => state == State.Ended;
+        private bool isEnded => state == State.Ended;
 
         /// <summary>
-        /// True when any action is running
+        /// Any action is running
         /// </summary>
-        private bool actionIsRunning => state == State.ActionRunning;
+        private bool isActionRunning => state == State.ActionRunning;
 
         /// <summary>
-        /// Reset GameState, make it the same as the game is not started
+        /// Reset GameState, make it the same as if the game is not started
         /// </summary>
         /// <remarks>
         /// No event will be triggered when this method is called
@@ -225,9 +227,9 @@ namespace Nova
             state = State.Normal;
 
             // Restore scene
-            if (clearSceneRestoreEntry != null)
+            if (initialCheckpoint != null)
             {
-                RestoreCheckpoint(clearSceneRestoreEntry);
+                RestoreCheckpoint(initialCheckpoint);
             }
         }
 
@@ -237,7 +239,7 @@ namespace Nova
 
         /// <summary>
         /// This event will be triggered if the content of the dialogue will change. It will be triggered before
-        /// the lazy execution block of the next dialogue is invoked.
+        /// the lazy execution block of the new dialogue is invoked.
         /// </summary>
         public DialogueWillChangeEvent dialogueWillChange;
 
@@ -248,20 +250,20 @@ namespace Nova
         public DialogueChangedEvent dialogueChanged;
 
         /// <summary>
-        /// This event will be triggered if the node has changed. The name and the description of the new node will be
+        /// This event will be triggered if the node has changed. The new node name will be
         /// sent to all listeners.
         /// </summary>
         public NodeChangedEvent nodeChanged;
 
         /// <summary>
-        /// This event will be triggered if selection occurs, either when branches occur or when a selection is triggered from scripts.
+        /// This event will be triggered if a selection occurs, either when branches occur or when a selection is triggered from the script.
         /// </summary>
         public SelectionOccursEvent selectionOccurs;
 
         /// <summary>
-        /// This event will be triggered if the story reaches an end
+        /// This event will be triggered if the story route has reached an end.
         /// </summary>
-        public CurrentRouteEndedEvent currentRouteEnded;
+        public RouteEndedEvent routeEnded;
 
         #endregion
 
@@ -273,12 +275,12 @@ namespace Nova
         private readonly CounterLock actionPauseLock = new CounterLock();
 
         /// <summary>
-        /// Methods invoked from lazy execution blocks can ask the GameState to pause, i.e. dialogue changes only after
-        /// these method release the GameState
+        /// Methods invoked from lazy execution blocks can ask the GameState to pause, i.e. the dialogue changes only after
+        /// these methods release the GameState
         /// </summary>
         public void ActionAcquirePause()
         {
-            this.RuntimeAssert(actionIsRunning, "Action pause lock can only be acquired when action is running.");
+            this.RuntimeAssert(isActionRunning, "Action pause lock can only be acquired when an action is running.");
             actionPauseLock.Acquire();
         }
 
@@ -287,7 +289,7 @@ namespace Nova
         /// </summary>
         public void ActionReleasePause()
         {
-            this.RuntimeAssert(actionIsRunning, "Action pause lock can only be released when action is running.");
+            this.RuntimeAssert(isActionRunning, "Action pause lock can only be released when an action is running.");
             actionPauseLock.Release();
         }
 
@@ -300,28 +302,33 @@ namespace Nova
 
         #region Voice
 
-        private readonly Dictionary<string, VoiceEntry> voicesOfNextDialogue = new Dictionary<string, VoiceEntry>();
+        private readonly Dictionary<string, VoiceEntry> voicesNextDialogue = new Dictionary<string, VoiceEntry>();
 
         /// <summary>
         /// Add a voice clip to be played on the next dialogue
         /// </summary>
         /// <remarks>
-        /// This method should be called by CharacterController
+        /// This method is called by CharacterController
         /// </remarks>
-        /// <param name="characterName">The unique id of character, usually its Lua variable name</param>
-        /// <param name="voiceEntry"></param>
-        public void AddVoiceClipOfNextDialogue(string characterName, VoiceEntry voiceEntry)
+        public void AddVoiceNextDialogue(string characterName, VoiceEntry voiceEntry)
         {
-            voicesOfNextDialogue.Add(characterName, voiceEntry);
+            voicesNextDialogue.Add(characterName, voiceEntry);
         }
 
         #endregion
 
         private Coroutine actionCoroutine;
 
+        private void ExecuteAction(IEnumerator coroutine)
+        {
+            ResetActionContext();
+            state = State.ActionRunning;
+            actionCoroutine = StartCoroutine(coroutine);
+        }
+
         private void CancelAction()
         {
-            if (!actionIsRunning)
+            if (!isActionRunning)
             {
                 actionCoroutine = null;
                 return;
@@ -332,7 +339,7 @@ namespace Nova
             DialogueEntry.StopActionCoroutine();
 
             ResetActionContext();
-            if (state == State.ActionRunning)
+            if (isActionRunning)
             {
                 state = State.Normal;
             }
@@ -340,26 +347,20 @@ namespace Nova
 
         private void ResetActionContext()
         {
-            voicesOfNextDialogue.Clear();
+            voicesNextDialogue.Clear();
             advancedDialogueHelper.Reset();
             actionPauseLock.Reset();
             coroutineHelper.Reset();
         }
 
         /// <summary>
-        /// Called after the current node or the index of the current dialogue entry has changed.
+        /// Called after the current node or the current dialogue index has changed
         /// </summary>
         /// <remarks>
-        /// Trigger events according to the current game state and how it is changed
+        /// Trigger events according to the current game state and how it was changed
         /// </remarks>
-        /// <param name="nodeChanged"></param>
-        /// <param name="dialogueChanged"></param>
-        /// <param name="firstEntryOfNode"></param>
-        /// <param name="dialogueStepped"></param>
-        /// <param name="isCheckpoint"></param>
-        /// <param name="onFinish">Callback on finish</param>
         private void UpdateGameState(bool nodeChanged, bool dialogueChanged, bool firstEntryOfNode,
-            bool dialogueStepped, bool isCheckpoint, Action onFinish)
+            bool dialogueStepped, bool fromCheckpoint, Action onFinish)
         {
             // Debug.Log($"UpdateGameState begin {debugState}");
 
@@ -367,7 +368,7 @@ namespace Nova
             {
                 // Debug.Log($"Nova: Node changed to {currentNode.name}");
 
-                this.nodeChanged.Invoke(new NodeChangedData(currentNode.name));
+                this.nodeChanged.Invoke(new NodeChangedData(nodeHistory.Last()));
 
                 if (firstEntryOfNode)
                 {
@@ -384,7 +385,7 @@ namespace Nova
                 if (currentNode.dialogueEntryCount > 0)
                 {
                     currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
-                    ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, isCheckpoint, onFinish));
+                    ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, fromCheckpoint, onFinish));
                 }
                 else
                 {
@@ -399,29 +400,22 @@ namespace Nova
             // Debug.Log($"UpdateGameState end {debugState}");
         }
 
-        private void ExecuteAction(IEnumerator coroutine)
-        {
-            ResetActionContext();
-            state = State.ActionRunning;
-            actionCoroutine = StartCoroutine(coroutine);
-        }
-
-        private IEnumerator UpdateDialogue(bool firstEntryOfNode, bool dialogueStepped, bool isCheckpoint,
+        private IEnumerator UpdateDialogue(bool firstEntryOfNode, bool dialogueStepped, bool fromCheckpoint,
             Action onFinish)
         {
-            if (!isCheckpoint)
+            if (!fromCheckpoint)
             {
                 // If the following two lines of code are put into a new coroutine function, one frame delay will be introduced,
                 // so don't do that
-                currentDialogueEntry.ExecuteAction(DialogueActionStage.BeforeCheckpoint, isMovingBack);
+                currentDialogueEntry.ExecuteAction(DialogueActionStage.BeforeCheckpoint, isRestoring);
                 while (actionPauseLock.isLocked) yield return null;
             }
 
             DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped, out var hasBeenReached,
-                out var hasBeenReachedWithAnyHistory);
+                out var hasBeenReachedAnyVariables);
             dialogueWillChange.Invoke(new DialogueWillChangeData());
 
-            currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isMovingBack);
+            currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
             // Everything that makes game state pause has ended, so change dialogue
@@ -429,13 +423,13 @@ namespace Nova
             // The game author should define overriding dialogues for each locale
             // By the way, we don't need to store all dialogues in save data,
             // just those overridden
-            dialogueChanged.Invoke(new DialogueChangedData(nodeHistory.GetCounted(currentNode.name), currentIndex,
-                currentDialogueEntry.displayData, new Dictionary<string, VoiceEntry>(voicesOfNextDialogue),
-                hasBeenReached, hasBeenReachedWithAnyHistory));
+            dialogueChanged.Invoke(new DialogueChangedData(nodeHistory.Last(), currentIndex,
+                currentDialogueEntry.displayData, new Dictionary<string, VoiceEntry>(voicesNextDialogue),
+                hasBeenReached, hasBeenReachedAnyVariables));
 
-            voicesOfNextDialogue.Clear();
+            voicesNextDialogue.Clear();
 
-            currentDialogueEntry.ExecuteAction(DialogueActionStage.AfterDialogue, isMovingBack);
+            currentDialogueEntry.ExecuteAction(DialogueActionStage.AfterDialogue, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
             state = State.Normal;
@@ -505,7 +499,7 @@ namespace Nova
         }
 
         private void DialogueSaveCheckpoint(bool firstEntryOfNode, bool dialogueStepped, out bool hasBeenReached,
-            out bool hasBeenReachedWithAnyHistory)
+            out bool hasBeenReachedAnyVariables)
         {
             if (!firstEntryOfNode && dialogueStepped)
             {
@@ -514,7 +508,7 @@ namespace Nova
 
             var entry = checkpointManager.GetReached(nodeHistory, currentIndex);
             hasBeenReached = entry != null;
-            hasBeenReachedWithAnyHistory = checkpointManager.IsReachedAnyVariables(currentNode.name, currentIndex);
+            hasBeenReachedAnyVariables = checkpointManager.IsReachedAnyVariables(currentNode.name, currentIndex);
             if (entry == null)
             {
                 // Tell the checkpoint manager that a new dialogue entry has been reached
@@ -544,9 +538,6 @@ namespace Nova
             forceCheckpoint = false;
         }
 
-        private AdvancedDialogueHelper advancedDialogueHelper;
-        private CoroutineHelper coroutineHelper;
-
         /// <summary>
         /// Move on to the next node
         /// </summary>
@@ -560,7 +551,7 @@ namespace Nova
             UpdateGameState(true, true, true, true, false, onFinish);
         }
 
-        public bool isMovingBack { get; private set; }
+        public bool isRestoring { get; private set; }
 
         /// <summary>
         /// Move back to a previously stepped node, the lazy execution block and callbacks at the target dialogue entry
@@ -622,12 +613,12 @@ namespace Nova
 
         #region Game start
 
-        public void SaveInitialState()
+        public void SaveInitialCheckpoint()
         {
             // Save a clean state of game scene
-            if (clearSceneRestoreEntry == null)
+            if (initialCheckpoint == null)
             {
-                clearSceneRestoreEntry = GetCheckpoint();
+                initialCheckpoint = GetCheckpoint();
             }
         }
 
@@ -637,9 +628,7 @@ namespace Nova
         /// <param name="startNode">The node from where the game starts</param>
         private void GameStart(FlowChartNode startNode)
         {
-            // Clear possible history
-            nodeHistory.Clear();
-            state = State.Normal;
+            ResetGameState();
             MoveToNextNode(startNode, () => { });
         }
 
@@ -648,20 +637,16 @@ namespace Nova
         /// </summary>
         public void GameStart()
         {
-            CancelAction();
-            var startNode = flowChartTree.defaultStartNode;
-            GameStart(startNode);
+            GameStart(flowChartTree.defaultStartNode);
         }
 
         /// <summary>
         /// Start the game from a named start point
         /// </summary>
-        /// <param name="startName">the name of the start</param>
+        /// <param name="startName">the name of the start point</param>
         public void GameStart(string startName)
         {
-            CancelAction();
-            var startNode = flowChartTree.GetStartNode(startName);
-            GameStart(startNode);
+            GameStart(flowChartTree.GetStartNode(startName));
         }
 
         public List<string> GetAllStartNodeNames()
@@ -694,16 +679,11 @@ namespace Nova
             }
         }
 
-        public void Step()
-        {
-            Step(_ => { });
-        }
-
         /// <summary>
         /// Step to the next dialogue entry
         /// </summary>
         /// <remarks>
-        /// This method runs asynchronously. The callback will run when the step finishes
+        /// This method can run asynchronously. The callback will run when the step finishes.
         /// </remarks>
         /// <param name="onFinish">(canStepForward) => { ... }</param>
         public void Step(Action<bool> onFinish)
@@ -728,6 +708,11 @@ namespace Nova
             }
         }
 
+        public void Step()
+        {
+            Step(_ => { });
+        }
+
         private void StepAtEndOfNode(Action onFinish)
         {
             switch (currentNode.type)
@@ -746,7 +731,7 @@ namespace Nova
                         checkpointManager.SetEndReached(endName);
                     }
 
-                    currentRouteEnded.Invoke(new CurrentRouteEndedData(endName));
+                    routeEnded.Invoke(new RouteEndedData(endName));
                     onFinish?.Invoke();
                     break;
                 default:
@@ -936,7 +921,7 @@ namespace Nova
         /// <param name="steps">number to step back</param>
         /// <param name="nodeHistoryEntry">node name and visit count at given steps before</param>
         /// <param name="dialogueIndex">dialogue index at given steps before</param>
-        /// <returns>true when success, false when step is too large or a minus number</returns>
+        /// <returns>true when succeed, false when steps is too large or a negative number</returns>
         public bool SeekBackStep(int steps, out NodeHistoryEntry nodeHistoryEntry, out int dialogueIndex)
         {
             if (steps < 0)
@@ -954,8 +939,8 @@ namespace Nova
             }
 
             // The following code won't be frequently executed, since there is always a checkpoint at the
-            // start of the node, and the step number in GameStateRestoreEntry never steps across node
-            // boundary.
+            // start of the node, and the step number in the restore entry never steps across node
+            // boundaries.
 
             steps -= currentIndex;
             for (var i = nodeHistory.Count - 2; i >= 0; i--)
@@ -997,14 +982,14 @@ namespace Nova
                         simpleEntry.stepNumFromLastCheckpoint);
                 }
 
-                isMovingBack = true;
+                isRestoring = true;
 
                 void Callback(int i, int stepCount)
                 {
                     var isLast = i == stepCount - 1;
                     if (isLast)
                     {
-                        isMovingBack = false;
+                        isRestoring = false;
                     }
 
                     NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);

@@ -31,7 +31,13 @@ namespace Nova
                 var x = base.GetHashULong(index, count);
                 foreach (var pair in interrupts)
                 {
-                    if (pair.Key >= index + count)
+                    var nodeHistoryIndex = pair.Key;
+                    if (nodeHistoryIndex < index)
+                    {
+                        continue;
+                    }
+
+                    if (nodeHistoryIndex >= index + count)
                     {
                         break;
                     }
@@ -55,6 +61,11 @@ namespace Nova
                 foreach (var pair in interrupts)
                 {
                     var nodeHistoryIndex = pair.Key;
+                    if (nodeHistoryIndex < index)
+                    {
+                        continue;
+                    }
+
                     if (nodeHistoryIndex >= index + count)
                     {
                         break;
@@ -74,6 +85,31 @@ namespace Nova
 
                 return x;
             }
+        }
+
+        public override void RemoveRange(int index, int count)
+        {
+            base.RemoveRange(index, count);
+            foreach (var nodeHistoryIndex in interrupts.Keys.ToList())
+            {
+                if (nodeHistoryIndex < index)
+                {
+                    continue;
+                }
+
+                if (nodeHistoryIndex >= index + count)
+                {
+                    break;
+                }
+
+                interrupts.Remove(nodeHistoryIndex);
+            }
+        }
+
+        public override void Clear()
+        {
+            base.Clear();
+            interrupts.Clear();
         }
     }
 }

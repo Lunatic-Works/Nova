@@ -37,7 +37,7 @@ namespace Nova
             }
         }
 
-        private bool dontPlaySound => gameState.isMovingBack || suppressSound;
+        private bool dontPlaySound => gameState.isRestoring || suppressSound;
 
         /// <summary>
         /// Play audio at a point in space, handy for sound effect

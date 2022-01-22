@@ -82,11 +82,7 @@ namespace Nova
 
             // requires.lua is executed and ScriptDialogueEntryParser.PatternToActionGenerator is filled before calling ParseScript()
             LuaRuntime.Instance.BindObject("scriptLoader", this);
-            LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext
-            {
-                mode = ExecutionMode.Eager,
-                stage = DialogueActionStage.Default
-            });
+            LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Eager, DialogueActionStage.Default, false));
             InitOnlyIncludedNames();
 
             flowChartTree.Unfreeze();

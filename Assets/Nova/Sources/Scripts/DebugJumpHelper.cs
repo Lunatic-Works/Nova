@@ -64,7 +64,6 @@ namespace Nova
                 NovaAnimation.StopAll();
                 dialogueBoxController.state = DialogueBoxState.Normal;
 
-                gameState.ResetGameState();
                 gameState.GameStart(chapters[targetChapterIndex]);
             }
             else

@@ -69,7 +69,7 @@ namespace Nova
                 displayData = dialogueChangedData.displayData,
                 nodeHistoryEntry = dialogueChangedData.nodeHistoryEntry,
                 dialogueIndex = dialogueChangedData.dialogueIndex,
-                voices = dialogueChangedData.voicesForNextDialogue,
+                voices = dialogueChangedData.voicesNextDialogue,
                 logEntryIndex = logEntries.Count
             });
         }
