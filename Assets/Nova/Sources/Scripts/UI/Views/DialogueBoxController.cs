@@ -450,7 +450,7 @@ namespace Nova
         {
             RestartTimer();
 
-            isReadDialogue = dialogueData.hasBeenReachedAnyVariables;
+            isReadDialogue = dialogueData.isReachedAnyHistory;
             if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead &&
                 !fastForwardHotKeyHolding)
             {

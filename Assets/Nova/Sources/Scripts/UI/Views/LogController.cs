@@ -137,21 +137,21 @@ namespace Nova
         {
             int cnt = logEntries.Count;
             if (cnt <= num) return;
-            RemoveLogEntriesRange(0, cnt - num);
+            RemoveRange(0, cnt - num);
         }
 
-        private void RemoveLogEntriesRange(int startIndex, int endIndex)
+        private void RemoveRange(int index, int count)
         {
-            for (int i = startIndex; i < endIndex; ++i)
+            for (int i = index; i < index + count; ++i)
             {
                 Destroy(logEntries[i].gameObject);
             }
 
-            logEntries.RemoveRange(startIndex, endIndex - startIndex);
-            logParams.RemoveRange(startIndex, endIndex - startIndex);
+            logEntries.RemoveRange(index, count);
+            logParams.RemoveRange(index, count);
             // Refine log entry indices
             int cnt = logEntries.Count;
-            for (int i = startIndex; i < cnt; ++i)
+            for (int i = index; i < cnt; ++i)
             {
                 logEntries[i].logEntryIndex = i;
                 logParams[i].logEntryIndex = i;
@@ -160,7 +160,7 @@ namespace Nova
 
         public void Clear()
         {
-            RemoveLogEntriesRange(0, logEntries.Count);
+            RemoveRange(0, logEntries.Count);
         }
 
         private void _onGoBackButtonClicked(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex)

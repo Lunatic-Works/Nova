@@ -11,12 +11,12 @@ namespace Nova
     [Serializable]
     public class GlobalSave
     {
-        // Node name -> dialogue index -> variables hash -> GameStateRestoreEntry
+        // Node name -> dialogue index -> node history hash -> GameStateRestoreEntry
         // TODO: deduplicate restoreDatas
         public readonly Dictionary<string, Dictionary<int, Dictionary<ulong, GameStateRestoreEntry>>> reachedDialogues =
             new Dictionary<string, Dictionary<int, Dictionary<ulong, GameStateRestoreEntry>>>();
 
-        // Node name -> branch name -> variables hash -> bool
+        // Node name -> branch name -> node history hash -> bool
         public readonly Dictionary<string, Dictionary<string, SerializableHashSet<ulong>>> reachedBranches =
             new Dictionary<string, Dictionary<string, SerializableHashSet<ulong>>>();
 
@@ -27,15 +27,6 @@ namespace Nova
         // TODO: use a radix tree to store node histories
         public readonly Dictionary<ulong, NodeHistoryData> cachedNodeHistories =
             new Dictionary<ulong, NodeHistoryData>();
-
-        // Node history hash -> dialogue index -> variables hash
-        // TODO: use IntervalDictionary to store dialogue index -> variables hash
-        public readonly Dictionary<ulong, Dictionary<int, ulong>> cachedVariablesHashes =
-            new Dictionary<ulong, Dictionary<int, ulong>>();
-
-        // Node history hash -> branch name -> variables hash
-        public readonly Dictionary<ulong, Dictionary<string, ulong>> cachedBranchVariablesHashes =
-            new Dictionary<ulong, Dictionary<string, ulong>>();
 
         public readonly long identifier = DateTime.Now.ToBinary();
 
@@ -101,10 +92,7 @@ namespace Nova
 
         public void TryDestroyTexture()
         {
-            if (screenshotTexture)
-            {
-                UnityEngine.Object.Destroy(screenshotTexture);
-            }
+            Utils.DestroyObject(screenshotTexture);
         }
     }
 
@@ -256,40 +244,33 @@ namespace Nova
         /// Set a dialogue to "reached" state and save the restore entry for the dialogue.
         /// </summary>
         /// <param name="nodeHistory">The list of all reached nodes.</param>
-        /// <param name="variables">Variables.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <param name="entry">Restore entry for the dialogue</param>
-        public void SetReached(NodeHistory nodeHistory, Variables variables, int dialogueIndex,
-            GameStateRestoreEntry entry)
+        public void SetReached(NodeHistory nodeHistory, int dialogueIndex, GameStateRestoreEntry entry)
         {
             var nodeName = nodeHistory.Last().Key;
-            globalSave.reachedDialogues.Ensure(nodeName).Ensure(dialogueIndex)[variables.hash] = entry;
+            globalSave.reachedDialogues.Ensure(nodeName).Ensure(dialogueIndex)[nodeHistory.Hash] = entry;
 
             if (!globalSave.cachedNodeHistories.ContainsKey(nodeHistory.Hash))
             {
                 globalSave.cachedNodeHistories[nodeHistory.Hash] = new NodeHistoryData(nodeHistory);
             }
-
-            globalSave.cachedVariablesHashes.Ensure(nodeHistory.Hash)[dialogueIndex] = variables.hash;
         }
 
         /// <summary>
         /// Set a branch to "reached" state.
         /// </summary>
         /// <param name="nodeHistory">The list of all reached nodes.</param>
-        /// <param name="variables">Variables.</param>
         /// <param name="branchName">The name of the branch.</param>
-        public void SetBranchReached(NodeHistory nodeHistory, Variables variables, string branchName)
+        public void SetBranchReached(NodeHistory nodeHistory, string branchName)
         {
             var nodeName = nodeHistory.Last().Key;
-            globalSave.reachedBranches.Ensure(nodeName).Ensure(branchName).Add(variables.hash);
+            globalSave.reachedBranches.Ensure(nodeName).Ensure(branchName).Add(nodeHistory.Hash);
 
             if (!globalSave.cachedNodeHistories.ContainsKey(nodeHistory.Hash))
             {
                 globalSave.cachedNodeHistories[nodeHistory.Hash] = new NodeHistoryData(nodeHistory);
             }
-
-            globalSave.cachedBranchVariablesHashes.Ensure(nodeHistory.Hash)[branchName] = variables.hash;
         }
 
         /// <summary>
@@ -320,20 +301,12 @@ namespace Nova
             }
         }
 
-        private GameStateRestoreEntry GetReached(string nodeName, int dialogueIndex, ulong variablesHash)
+        public GameStateRestoreEntry GetReached(ulong nodeHistoryHash, string nodeName, int dialogueIndex)
         {
             return globalSave.reachedDialogues.TryGetValue(nodeName, out var dict)
                    && dict.TryGetValue(dialogueIndex, out var dict2)
-                   && dict2.TryGetValue(variablesHash, out var entry)
+                   && dict2.TryGetValue(nodeHistoryHash, out var entry)
                 ? entry
-                : null;
-        }
-
-        public GameStateRestoreEntry GetReached(ulong nodeHistoryHash, string nodeName, int dialogueIndex)
-        {
-            return globalSave.cachedVariablesHashes.TryGetValue(nodeHistoryHash, out var dict)
-                   && dict.TryGetValue(dialogueIndex, out var variablesHash)
-                ? GetReached(nodeName, dialogueIndex, variablesHash)
                 : null;
         }
 
@@ -349,23 +322,16 @@ namespace Nova
             return GetReached(nodeHistory.Hash, nodeName, dialogueIndex);
         }
 
-        public bool IsReachedAnyVariables(string nodeName, int dialogueIndex)
+        public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
         {
             return globalSave.reachedDialogues.TryGetValue(nodeName, out var dict) && dict.ContainsKey(dialogueIndex);
         }
 
-        private bool IsBranchReached(string nodeName, string branchName, ulong variablesHash)
+        public bool IsBranchReached(ulong nodeHistoryHash, string nodeName, string branchName)
         {
             return globalSave.reachedBranches.TryGetValue(nodeName, out var dict)
                    && dict.TryGetValue(branchName, out var hashSet)
-                   && hashSet.Contains(variablesHash);
-        }
-
-        public bool IsBranchReached(ulong nodeHistoryHash, string nodeName, string branchName)
-        {
-            return globalSave.cachedBranchVariablesHashes.TryGetValue(nodeHistoryHash, out var dict)
-                   && dict.TryGetValue(branchName, out var variablesHash)
-                   && IsBranchReached(nodeName, branchName, variablesHash);
+                   && hashSet.Contains(nodeHistoryHash);
         }
 
         /// <summary>
@@ -380,7 +346,7 @@ namespace Nova
             return IsBranchReached(nodeHistory.Hash, nodeName, branchName);
         }
 
-        public bool IsBranchReachedAnyVariables(string nodeName, string branchName)
+        public bool IsBranchReachedAnyHistory(string nodeName, string branchName)
         {
             return globalSave.reachedBranches.TryGetValue(nodeName, out var dict) && dict.ContainsKey(branchName);
         }

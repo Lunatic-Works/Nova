@@ -9,26 +9,50 @@ set_box()
 v_flag = 0
 |>
 测试选项
-@<| jump_to 'begin_loop' |>
 
-@<| label 'begin_loop' |>
-要加一个flag吗
+选一个吧
 @<|
 branch {
-    { dest = 'add_flag', text = '加一个flag'},
-    { dest = 'end_loop', text = '不加了'},
+    { dest = 'test_branch_1', text = '敲妹妹的门'},
+    { dest = 'test_branch_2', text = '去新年参拜'},
+    { dest = 'test_branch_3', text = '带走伊莉雅'},
 }
 |>
 
-@<| label 'add_flag' |>
+@<| label 'test_branch_1' |>
+你选了：敲妹妹的门
+@<| jump_to 'test_branch_end_choice' |>
+
+@<| label 'test_branch_2' |>
+你选了：去新年参拜
+@<| jump_to 'test_branch_end_choice' |>
+
+@<| label 'test_branch_3' |>
+你选了：带走伊莉雅
+@<| jump_to 'test_branch_end_choice' |>
+
+@<| label 'test_branch_end_choice' |>
+接下来测试剧本的循环
+@<| jump_to 'test_branch_begin_loop' |>
+
+@<| label 'test_branch_begin_loop' |>
+要加一个flag吗
+@<|
+branch {
+    { dest = 'test_branch_add_flag', text = '加一个flag'},
+    { dest = 'test_branch_end_loop', text = '不加了'},
+}
+|>
+
+@<| label 'test_branch_add_flag' |>
 <|
 v_flag = v_flag + 1
 print(v_flag)
 |>
 加了一个flag
-@<| jump_to 'begin_loop' |>
+@<| jump_to 'test_branch_begin_loop' |>
 
-@<| label 'end_loop' |>
+@<| label 'test_branch_end_loop' |>
 如果flag > 3会直接跳到最后
 @<|
 branch {

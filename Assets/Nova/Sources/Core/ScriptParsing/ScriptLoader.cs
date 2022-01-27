@@ -15,7 +15,6 @@ namespace Nova
     [ExportCustomType]
     public class ScriptLoader
     {
-        // Variable indicating whether the script loader is initialized
         private bool inited;
 
         /// <summary>

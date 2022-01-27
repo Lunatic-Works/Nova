@@ -22,19 +22,19 @@ namespace Nova
         public readonly int dialogueIndex;
         public readonly DialogueDisplayData displayData;
         public readonly Dictionary<string, VoiceEntry> voicesNextDialogue;
-        public readonly bool hasBeenReached;
-        public readonly bool hasBeenReachedAnyVariables;
+        public readonly bool isReached;
+        public readonly bool isReachedAnyHistory;
 
         public DialogueChangedData(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex,
-            DialogueDisplayData displayData, Dictionary<string, VoiceEntry> voicesNextDialogue, bool hasBeenReached,
-            bool hasBeenReachedAnyVariables)
+            DialogueDisplayData displayData, Dictionary<string, VoiceEntry> voicesNextDialogue, bool isReached,
+            bool isReachedAnyHistory)
         {
             this.nodeHistoryEntry = nodeHistoryEntry;
             this.dialogueIndex = dialogueIndex;
             this.displayData = displayData;
             this.voicesNextDialogue = voicesNextDialogue;
-            this.hasBeenReached = hasBeenReached;
-            this.hasBeenReachedAnyVariables = hasBeenReachedAnyVariables;
+            this.isReached = isReached;
+            this.isReachedAnyHistory = isReachedAnyHistory;
         }
     }
 
@@ -411,8 +411,8 @@ namespace Nova
                 while (actionPauseLock.isLocked) yield return null;
             }
 
-            DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped, out var hasBeenReached,
-                out var hasBeenReachedAnyVariables);
+            DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped, out var isReached,
+                out var isReachedAnyHistory);
             dialogueWillChange.Invoke(new DialogueWillChangeData());
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
@@ -425,7 +425,7 @@ namespace Nova
             // just those overridden
             dialogueChanged.Invoke(new DialogueChangedData(nodeHistory.Last(), currentIndex,
                 currentDialogueEntry.displayData, new Dictionary<string, VoiceEntry>(voicesNextDialogue),
-                hasBeenReached, hasBeenReachedAnyVariables));
+                isReached, isReachedAnyHistory));
 
             voicesNextDialogue.Clear();
 
@@ -498,8 +498,8 @@ namespace Nova
             SelectBranch(selectionNames[index], onFinish);
         }
 
-        private void DialogueSaveCheckpoint(bool firstEntryOfNode, bool dialogueStepped, out bool hasBeenReached,
-            out bool hasBeenReachedAnyVariables)
+        private void DialogueSaveCheckpoint(bool firstEntryOfNode, bool dialogueStepped, out bool isReached,
+            out bool isReachedAnyHistory)
         {
             if (!firstEntryOfNode && dialogueStepped)
             {
@@ -507,12 +507,12 @@ namespace Nova
             }
 
             var entry = checkpointManager.GetReached(nodeHistory, currentIndex);
-            hasBeenReached = entry != null;
-            hasBeenReachedAnyVariables = checkpointManager.IsReachedAnyVariables(currentNode.name, currentIndex);
+            isReached = entry != null;
+            isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
             if (entry == null)
             {
                 // Tell the checkpoint manager that a new dialogue entry has been reached
-                checkpointManager.SetReached(nodeHistory, variables, currentIndex, GetRestoreEntry());
+                checkpointManager.SetReached(nodeHistory, currentIndex, GetRestoreEntry());
             }
 
             // Change states after creating or restoring from checkpoint
@@ -756,7 +756,7 @@ namespace Nova
             if (!checkpointManager.IsBranchReached(nodeHistory, branchName))
             {
                 // Tell the checkpoint manager that the branch has been selected
-                checkpointManager.SetBranchReached(nodeHistory, variables, branchName);
+                checkpointManager.SetBranchReached(nodeHistory, branchName);
             }
 
             MoveToNextNode(nextNode, onFinish);
