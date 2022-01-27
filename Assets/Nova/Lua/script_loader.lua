@@ -6,8 +6,20 @@ function action_new_file()
     last_display_name = nil
 end
 
+local function check_eager(name)
+    if __Nova.executionContext.mode ~= Nova.ExecutionMode.Eager then
+        error(name .. ' should only be called in eager execution blocks')
+        return false
+    end
+    return true
+end
+
 --- define a node
 function label(name, display_name)
+    if not check_eager('label') then
+        return
+    end
+
     if display_name == nil then
         if last_display_name == nil then
             display_name = name
@@ -30,6 +42,9 @@ end
 --- jump to the given destination
 --- should be called at the end of the node
 function jump_to(dest)
+    if not check_eager('jump_to') then
+        return
+    end
     __Nova.scriptLoader:RegisterJump(dest)
 end
 
@@ -46,6 +61,10 @@ end
 --- }
 --- if cond is a string, it will be converted to a function returning that expression
 function branch(branches)
+    if not check_eager('branch') then
+        return
+    end
+
     for i, branch in ipairs(branches) do
         local name = tostring(i)
 
@@ -92,6 +111,9 @@ end
 --- the name should be unique among all start point names
 --- if no name is given, the name of the current node will be used
 function is_start(name)
+    if not check_eager('is_start') then
+        return
+    end
     __Nova.scriptLoader:SetCurrentAsStart(name)
 end
 
@@ -99,6 +121,9 @@ end
 --- should be called at the end of the node
 --- indicates is_start()
 function is_unlocked_start(name)
+    if not check_eager('is_unlocked_start') then
+        return
+    end
     __Nova.scriptLoader:SetCurrentAsUnlockedStart(name)
 end
 
@@ -107,6 +132,9 @@ end
 --- a game can have only one default start node, so this function cannot be called under different nodes
 --- indicates is_unlocked_start()
 function is_default_start(name)
+    if not check_eager('is_default_start') then
+        return
+    end
     __Nova.scriptLoader:SetCurrentAsDefaultStart(name)
 end
 
@@ -118,5 +146,8 @@ end
 --- all nodes without child nodes should be marked as end nodes
 --- if is_end() is not called under those nodes, they will be marked as end nodes automatically
 function is_end(name)
+    if not check_eager('is_end') then
+        return
+    end
     __Nova.scriptLoader:SetCurrentAsEnd(name)
 end

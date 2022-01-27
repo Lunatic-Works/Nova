@@ -56,7 +56,7 @@ namespace Nova
             }
         }
 
-        public static TValue Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key) where TValue : new()
+        public static TValue Ensure<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key) where TValue : new()
         {
             if (dict.TryGetValue(key, out TValue value))
             {

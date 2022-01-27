@@ -6,9 +6,7 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// If it is used as a server,
-    /// this component should be disabled,
-    /// and let another PostProcessing be a proxy of this
+    /// If it is used as a server, it should be disabled, and another PostProcessing should be a proxy of it
     /// </summary>
     [ExportCustomType]
     public class PostProcessing : MonoBehaviour, IRestorable

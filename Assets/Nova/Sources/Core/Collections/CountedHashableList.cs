@@ -10,7 +10,7 @@ namespace Nova
     /// </summary>
     public class CountedHashableList<T> : IEnumerable<KeyValuePair<T, int>>
     {
-        private readonly List<KeyValuePair<T, int>> list = new List<KeyValuePair<T, int>>();
+        protected readonly List<KeyValuePair<T, int>> list = new List<KeyValuePair<T, int>>();
         private readonly Dictionary<T, int> valueCounts = new Dictionary<T, int>();
 
         private ulong _hash;

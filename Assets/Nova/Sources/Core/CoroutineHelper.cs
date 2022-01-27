@@ -11,26 +11,36 @@ namespace Nova
             this.gameState = gameState;
         }
 
-        public void AcquireGameStateLock()
+        public void AcquireActionPause()
         {
-            gameState.ActionAcquirePause();
+            gameState.AcquireActionPause();
         }
 
-        public void ReleaseGameStateLock()
+        public void ReleaseActionPause()
         {
-            gameState.ActionReleasePause();
+            gameState.ReleaseActionPause();
+        }
+
+        public void SaveInterrupt()
+        {
+            gameState.SaveInterrupt();
+        }
+
+        public void SignalFence(object value)
+        {
+            fence = value;
+        }
+
+        public object TakeFence()
+        {
+            var v = fence;
+            fence = null;
+            return v;
         }
 
         public void Reset()
         {
             fence = null;
-        }
-
-        public object Take()
-        {
-            var v = fence;
-            fence = null;
-            return v;
         }
     }
 }

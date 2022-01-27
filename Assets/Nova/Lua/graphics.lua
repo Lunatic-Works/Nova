@@ -27,7 +27,10 @@ function show(obj, image_name, coord, color, fade)
         tint(obj, color)
     end
 
-    if obj:GetType() == typeof(Nova.SpriteController) then
+    local _type = obj:GetType()
+    if _type == typeof(Nova.PrefabLoader) then
+        obj:SetPrefab(image_name)
+    elseif _type == typeof(Nova.SpriteController) then
         obj:SetImage(image_name, fade)
         __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. image_name)
     else
@@ -55,7 +58,11 @@ function hide(obj, fade)
         fade = (auto_fade_off_count == 0)
     end
 
-    obj:ClearImage(fade)
+    if obj:GetType() == typeof(Nova.PrefabLoader) then
+        obj:ClearPrefab()
+    else
+        obj:ClearImage(fade)
+    end
     schedule_gc()
 end
 

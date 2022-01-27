@@ -29,6 +29,8 @@ namespace Nova
             InputHelper = FindComponent<InputHelper>();
             PerDialogueAnimation = FindComponent<NovaAnimation>("NovaAnimation/PerDialogue");
             PersistAnimation = FindComponent<NovaAnimation>("NovaAnimation/Persistent");
+
+            inputEnabled = true;
         }
 
         private static T AssertNotNull<T>(T component, string name) where T : MonoBehaviour
@@ -49,20 +51,20 @@ namespace Nova
             return AssertNotNull(cmp, childPath + "/" + typeof(T).Name);
         }
 
-        // inputDisabled is not in RestoreData, because the user cannot save when the input is disabled
-        public bool inputDisabled { get; private set; }
+        // inputEnabled is not in RestoreData, because the user cannot save when the input is disabled
+        public bool inputEnabled { get; private set; }
 
         // Disable all abstract keys except StepForward
         public void DisableInput()
         {
-            inputDisabled = true;
+            inputEnabled = false;
             InputMapper.SetEnableGroup(AbstractKeyGroup.None);
             InputMapper.SetEnable(AbstractKey.StepForward, true);
         }
 
         public void EnableInput()
         {
-            inputDisabled = false;
+            inputEnabled = true;
             InputMapper.SetEnableGroup(AbstractKeyGroup.Game | AbstractKeyGroup.UI);
         }
     }

@@ -4602,10 +4602,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 702255952}
     - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
-      propertyPath: characterTextureMerger
-      value: 
-      objectReference: {fileID: 702255952}
-    - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: avatarConfigs.Array.data[0].characterController
       value: 
       objectReference: {fileID: 537562888}

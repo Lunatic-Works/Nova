@@ -75,7 +75,7 @@ namespace Nova
             var currentIndex = gameState.currentIndex;
             gameState.MoveBackTo(gameState.nodeHistory.GetCounted(gameState.currentNode.name), 0, clearFuture: true);
 
-            // Step back to current index
+            // Step back to the current index
             for (var i = 0; i < currentIndex; ++i)
             {
                 // Only the last step can play sound
@@ -94,7 +94,7 @@ namespace Nova
             // TODO
             // NovaAnimation.StopAll();
             // dialogueBoxController.state = DialogueBoxState.Normal;
-            // 
+            //
             // gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex)
             //     .ExecuteAction(DialogueActionStage.Default, false);
         }

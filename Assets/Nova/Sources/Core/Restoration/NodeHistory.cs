@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Nova
 {
+    // TODO: use a radix tree to store node histories
     [Serializable]
     public class NodeHistoryData
     {
@@ -71,6 +72,9 @@ namespace Nova
                         break;
                     }
 
+                    x += (ulong)nodeHistoryIndex;
+                    x *= 11400714819323199563UL;
+
                     foreach (var pair2 in pair.Value)
                     {
                         if (nodeHistoryIndex == index + count - 1 && pair2.Key >= dialogueCount)
@@ -78,6 +82,8 @@ namespace Nova
                             break;
                         }
 
+                        x += (ulong)pair2.Key;
+                        x *= 11400714819323199563UL;
                         x += pair2.Value;
                         x *= 11400714819323199563UL;
                     }
@@ -85,6 +91,12 @@ namespace Nova
 
                 return x;
             }
+        }
+
+        public void AddInterrupt(int dialogueIndex, Variables variables)
+        {
+            interrupts.Ensure(list.Count - 1)[dialogueIndex] = variables.hash;
+            needCalculateHash = true;
         }
 
         public override void RemoveRange(int index, int count)
@@ -104,6 +116,28 @@ namespace Nova
 
                 interrupts.Remove(nodeHistoryIndex);
             }
+        }
+
+        // The interrupt at dialogueIndex is also removed, because NodeHistory saves the state before the checkpoint
+        public void RemoveInterruptsAfter(int dialogueIndex)
+        {
+            var dict = interrupts.Values.LastOrDefault();
+            if (dict == null)
+            {
+                return;
+            }
+
+            foreach (var index in dict.Keys.ToList())
+            {
+                if (index >= dialogueIndex)
+                {
+                    break;
+                }
+
+                dict.Remove(index);
+            }
+
+            needCalculateHash = true;
         }
 
         public override void Clear()

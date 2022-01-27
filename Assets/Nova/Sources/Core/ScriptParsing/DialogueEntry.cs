@@ -113,9 +113,9 @@ namespace Nova
         {
             return $@"
 {ActionCoroutineName} = coroutine.start(function()
-    __Nova.coroutineHelper:AcquireGameStateLock()
+    __Nova.coroutineHelper:AcquireActionPause()
     {code}
-    __Nova.coroutineHelper:ReleaseGameStateLock()
+    __Nova.coroutineHelper:ReleaseActionPause()
 end)";
         }
 

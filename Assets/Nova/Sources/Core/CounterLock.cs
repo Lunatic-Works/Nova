@@ -5,10 +5,10 @@ using UnityEngine.Assertions;
 namespace Nova
 {
     /// <summary>
-    /// A trivial counting lock
+    /// A trivial counter lock (semaphore)
     /// </summary>
     /// <remarks>
-    /// The lock is considered locked only if the number of occupation exceeds the threshold
+    /// The lock is considered locked only if the number of acquisition exceeds the threshold
     /// </remarks>
     public class CounterLock
     {

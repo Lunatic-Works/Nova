@@ -267,39 +267,6 @@ namespace Nova
 
         #endregion
 
-        #region Action pause lock
-
-        /// <summary>
-        /// Acquiring this lock will make the game state pause and wait for the lock being released
-        /// </summary>
-        private readonly CounterLock actionPauseLock = new CounterLock();
-
-        /// <summary>
-        /// Methods invoked from lazy execution blocks can ask the GameState to pause, i.e. the dialogue changes only after
-        /// these methods release the GameState
-        /// </summary>
-        public void ActionAcquirePause()
-        {
-            this.RuntimeAssert(isActionRunning, "Action pause lock can only be acquired when an action is running.");
-            actionPauseLock.Acquire();
-        }
-
-        /// <summary>
-        /// Methods that acquire pause of the GameState should release the GameState when their actions finishes
-        /// </summary>
-        public void ActionReleasePause()
-        {
-            this.RuntimeAssert(isActionRunning, "Action pause lock can only be released when an action is running.");
-            actionPauseLock.Release();
-        }
-
-        public void SignalFence(object value)
-        {
-            coroutineHelper.fence = value;
-        }
-
-        #endregion
-
         #region Voice
 
         private readonly Dictionary<string, VoiceEntry> voicesNextDialogue = new Dictionary<string, VoiceEntry>();
@@ -316,6 +283,8 @@ namespace Nova
         }
 
         #endregion
+
+        #region Action coroutine
 
         private Coroutine actionCoroutine;
 
@@ -349,9 +318,45 @@ namespace Nova
         {
             voicesNextDialogue.Clear();
             advancedDialogueHelper.Reset();
-            actionPauseLock.Reset();
             coroutineHelper.Reset();
+            actionPauseLock.Reset();
         }
+
+        /// <summary>
+        /// Acquiring this lock will make the game state pause and wait for the lock being released
+        /// </summary>
+        private readonly CounterLock actionPauseLock = new CounterLock();
+
+        /// <summary>
+        /// Methods invoked from lazy execution blocks can acquire the GameState to pause, i.e. the dialogue changes
+        /// only after these methods release the GameState
+        /// </summary>
+        public void AcquireActionPause()
+        {
+            this.RuntimeAssert(isActionRunning, "Action pause lock can only be acquired when an action is running.");
+            actionPauseLock.Acquire();
+        }
+
+        /// <summary>
+        /// Methods that acquire pauses of the GameState should release the GameState when their actions finishes
+        /// </summary>
+        public void ReleaseActionPause()
+        {
+            this.RuntimeAssert(isActionRunning, "Action pause lock can only be released when an action is running.");
+            actionPauseLock.Release();
+        }
+
+        public void SaveInterrupt()
+        {
+            nodeHistory.AddInterrupt(currentIndex, variables);
+        }
+
+        public void SignalFence(object value)
+        {
+            coroutineHelper.SignalFence(value);
+        }
+
+        #endregion
 
         /// <summary>
         /// Called after the current node or the current dialogue index has changed
@@ -421,8 +426,6 @@ namespace Nova
             // Everything that makes game state pause has ended, so change dialogue
             // TODO: use advancedDialogueHelper to override dialogue
             // The game author should define overriding dialogues for each locale
-            // By the way, we don't need to store all dialogues in save data,
-            // just those overridden
             dialogueChanged.Invoke(new DialogueChangedData(nodeHistory.Last(), currentIndex,
                 currentDialogueEntry.displayData, new Dictionary<string, VoiceEntry>(voicesNextDialogue),
                 isReached, isReachedAnyHistory));
@@ -494,7 +497,7 @@ namespace Nova
                 yield return null;
             }
 
-            var index = (int)coroutineHelper.Take();
+            var index = (int)coroutineHelper.TakeFence();
             SelectBranch(selectionNames[index], onFinish);
         }
 
@@ -598,6 +601,8 @@ namespace Nova
             {
                 nodeHistory.Add(nodeHistoryEntry.Key);
             }
+
+            nodeHistory.RemoveInterruptsAfter(dialogueIndex);
 
             currentNode = flowChartTree.GetNode(nodeHistoryEntry.Key);
             currentIndex = dialogueIndex;
@@ -983,31 +988,24 @@ namespace Nova
                 }
 
                 isRestoring = true;
+                MoveBackTo(storedNode, storedDialogueIndex);
 
-                void Callback(int i, int stepCount)
+                for (var i = 0; i < simpleEntry.stepNumFromLastCheckpoint; ++i)
                 {
-                    var isLast = i == stepCount - 1;
+                    var isLast = i == simpleEntry.stepNumFromLastCheckpoint - 1;
                     if (isLast)
                     {
                         isRestoring = false;
                     }
 
                     NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-                    Step(_ =>
-                    {
-                        if (isLast)
-                        {
-                            onFinish?.Invoke();
-                        }
-                        else
-                        {
-                            Callback(i + 1, stepCount);
-                        }
-                    });
-                }
+                    Step();
 
-                MoveBackTo(storedNode, storedDialogueIndex, false,
-                    () => Callback(0, simpleEntry.stepNumFromLastCheckpoint));
+                    if (isLast)
+                    {
+                        onFinish?.Invoke();
+                    }
+                }
             }
             else
             {

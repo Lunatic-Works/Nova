@@ -107,7 +107,7 @@ namespace Nova
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (gameController.inputDisabled)
+            if (!gameController.inputEnabled)
             {
                 // Touch finger
                 if (eventData.pointerId >= 0)
@@ -185,7 +185,7 @@ namespace Nova
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (gameController.inputDisabled)
+            if (!gameController.inputEnabled)
             {
                 // Mouse left button
                 if (eventData.pointerId == -1)
