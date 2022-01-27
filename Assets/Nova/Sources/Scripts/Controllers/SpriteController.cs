@@ -16,7 +16,6 @@ namespace Nova
         private SpriteRenderer spriteRenderer;
         private Image image;
         private Sprite defaultSprite;
-        private DialogueBoxController dialogueBoxController;
 
         public Sprite sprite
         {
@@ -125,7 +124,6 @@ namespace Nova
 
             this.RuntimeAssert(spriteRenderer != null || image != null, "Missing SpriteRenderer or Image.");
             defaultSprite = sprite;
-            dialogueBoxController = Utils.FindViewManager().GetController<DialogueBoxController>();
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -251,7 +249,7 @@ namespace Nova
                 return;
             }
 
-            if (data.currentImageName != null)
+            if (!string.IsNullOrEmpty(data.currentImageName))
             {
                 SetImage(data.currentImageName, fade: false);
             }

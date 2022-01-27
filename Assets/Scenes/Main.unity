@@ -238,6 +238,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
+      propertyPath: spriteMerger
+      value: 
+      objectReference: {fileID: 25935806}
+    - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
+        type: 3}
       propertyPath: luaGlobalName
       value: gaotian
       objectReference: {fileID: 0}
@@ -1287,6 +1292,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
+      propertyPath: spriteMerger
+      value: 
+      objectReference: {fileID: 25935806}
+    - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
+        type: 3}
       propertyPath: luaGlobalName
       value: xiben
       objectReference: {fileID: 0}
@@ -1926,6 +1936,11 @@ PrefabInstance:
       propertyPath: voiceFolder
       value: Voices/Qianye
       objectReference: {fileID: 0}
+    - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
+        type: 3}
+      propertyPath: spriteMerger
+      value: 
+      objectReference: {fileID: 25935806}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
       propertyPath: luaGlobalName
@@ -3474,7 +3489,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114018086876222034, guid: e708087f7cf8343899832a554e39a531,
         type: 3}
-      propertyPath: characterTextureMerger
+      propertyPath: spriteMerger
       value: 
       objectReference: {fileID: 25935806}
     m_RemovedComponents: []
@@ -4582,6 +4597,10 @@ PrefabInstance:
       propertyPath: _sectors.Array.data[6].action.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1123056137}
+    - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+      propertyPath: spriteMerger
+      value: 
+      objectReference: {fileID: 702255952}
     - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: characterTextureMerger
       value: 

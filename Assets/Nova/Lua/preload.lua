@@ -12,7 +12,7 @@ function preload(obj, resource_name)
     if obj == 'Texture' then
         Nova.AssetLoader.Preload(Nova.AssetCacheType.Image, resource_name)
     elseif obj == __Nova.timelineController then
-        Nova.AssetLoader.Preload(Nova.AssetCacheType.Timeline, obj.timelinePrefabFolder .. '/' .. resource_name)
+        Nova.AssetLoader.Preload(Nova.AssetCacheType.Prefab, obj.prefabFolder .. '/' .. resource_name)
     elseif obj:GetType() == typeof(Nova.AudioController) then
         obj:Preload(resource_name)
     else
@@ -37,7 +37,7 @@ function unpreload(obj, resource_name)
     if obj == 'Texture' then
         Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Image, resource_name)
     elseif obj == __Nova.timelineController then
-        Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Timeline, obj.timelinePrefabFolder .. '/' .. resource_name)
+        Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Prefab, obj.prefabFolder .. '/' .. resource_name)
     elseif obj:GetType() == typeof(Nova.AudioController) then
         obj:Unpreload(resource_name)
     else

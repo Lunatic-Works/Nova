@@ -55,7 +55,7 @@ namespace Nova
         // Use after animation entry of TimeAnimationProperty is destroyed
         public void ClearVideo()
         {
-            if (currentVideoName == null)
+            if (string.IsNullOrEmpty(currentVideoName))
             {
                 return;
             }
@@ -87,7 +87,7 @@ namespace Nova
         public void Restore(IRestoreData restoreData)
         {
             var data = restoreData as VideoRestoreData;
-            if (data.currentVideoName != null)
+            if (!string.IsNullOrEmpty(data.currentVideoName))
             {
                 SetVideo(data.currentVideoName);
             }

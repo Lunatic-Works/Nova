@@ -116,7 +116,7 @@ namespace Nova
             AudioClip clip = null;
             AudioClip headClip = null;
 
-            if (currentAudioName != null)
+            if (!string.IsNullOrEmpty(currentAudioName))
             {
                 var audioPath = System.IO.Path.Combine(audioFolder, currentAudioName);
                 clip = AssetLoader.LoadOrNull<AudioClip>(audioPath + "_loop");

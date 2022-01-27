@@ -192,7 +192,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imageFolder: Standings/Ergong
-  characterTextureMerger: {fileID: 0}
+  spriteMerger: {fileID: 0}
   luaGlobalName: ergong
   voiceFolder: Voices/Ergong
   stopVoiceWhenDialogueWillChange: 0

@@ -5,67 +5,37 @@ using UnityEngine.Playables;
 namespace Nova
 {
     [ExportCustomType]
-    public class TimelineController : MonoBehaviour, IPrioritizedRestorable
+    public class TimelineController : PrefabLoader
     {
-        public string luaName;
-        public string timelinePrefabFolder;
         public Camera mainCamera;
 
-        public string currentTimelinePrefabName { get; private set; }
-
-        private GameState gameState;
-
-        private GameObject timelinePrefab;
-        private GameObject timeline;
         public PlayableDirector playableDirector { get; private set; }
 
-        public PostProcessing cameraPP;
+        private CameraController cameraController;
+        private PostProcessing cameraPP;
 
-        private void Awake()
+        protected override void Awake()
         {
-            gameState = Utils.FindNovaGameController().GameState;
+            base.Awake();
+
+            cameraController = mainCamera.GetComponent<CameraController>();
             cameraPP = mainCamera.GetComponent<PostProcessing>();
-
-            if (!string.IsNullOrEmpty(luaName))
-            {
-                LuaRuntime.Instance.BindObject(luaName, this);
-                gameState.AddRestorable(this);
-            }
-        }
-
-        private void OnDestroy()
-        {
-            if (!string.IsNullOrEmpty(luaName))
-            {
-                gameState.RemoveRestorable(this);
-            }
         }
 
         #region Methods called by external scripts
 
-        public GameObject LoadTimelinePrefab(string timelinePrefabName)
+        public override void SetPrefab(string prefabName)
         {
-            if (timelinePrefabName == currentTimelinePrefabName)
-            {
-                return timelinePrefab;
-            }
-
-            return AssetLoader.Load<GameObject>(System.IO.Path.Combine(timelinePrefabFolder, timelinePrefabName));
-        }
-
-        public void SetTimelinePrefab(string timelinePrefabName)
-        {
-            if (timelinePrefabName == currentTimelinePrefabName)
+            if (prefabName == currentPrefabName)
             {
                 return;
             }
 
-            ClearTimelinePrefab();
-            timelinePrefab = LoadTimelinePrefab(timelinePrefabName);
-            timeline = Instantiate(timelinePrefab, transform);
-            timeline.SetActive(false);
+            base.SetPrefab(prefabName);
 
-            playableDirector = timeline.GetComponent<PlayableDirector>();
+            prefabInstance.SetActive(false);
+
+            playableDirector = prefabInstance.GetComponent<PlayableDirector>();
             if (playableDirector != null)
             {
                 playableDirector.timeUpdateMode = DirectorUpdateMode.Manual;
@@ -73,63 +43,55 @@ namespace Nova
                 playableDirector.Evaluate();
             }
 
-            Camera newCamera = timeline.GetComponentInChildren<Camera>();
+            Camera newCamera = prefabInstance.GetComponentInChildren<Camera>();
             if (newCamera != null)
             {
-                PostProcessing ppClient = newCamera.GetComponent<PostProcessing>();
+                this.RuntimeAssert(newCamera.GetComponent<CameraController>() == null,
+                    "The camera in the timeline prefab should not have a CameraController.");
+
+                var ppClient = newCamera.GetComponent<PostProcessing>();
                 ppClient.asProxyOf = cameraPP;
-                mainCamera.GetComponent<CameraController>().overridingCamera = newCamera;
+
+                cameraController.overridingCamera = newCamera;
                 mainCamera.enabled = false;
                 newCamera.targetTexture = mainCamera.targetTexture;
-                this.RuntimeAssert(newCamera.GetComponent<CameraController>() == null,
-                    "Timeline does not include another CameraController.");
                 // Debug.Log("Switched main camera to timeline provided camera");
             }
 
-            timeline.SetActive(true);
-            currentTimelinePrefabName = timelinePrefabName;
+            prefabInstance.SetActive(true);
         }
 
-        // Use after animation entry of TimeAnimationProperty is destroyed
-        public void ClearTimelinePrefab()
+        // Use after all animation entries of TimeAnimationProperty are terminated
+        public override void ClearPrefab()
         {
-            if (currentTimelinePrefabName == null)
+            if (string.IsNullOrEmpty(currentPrefabName))
             {
                 return;
             }
 
-            mainCamera.GetComponent<CameraController>().overridingCamera = null;
+            playableDirector = null;
+
+            cameraController.overridingCamera = null;
             mainCamera.enabled = true;
             // Debug.Log("Switched main camera back to original camera");
-            timeline.SetActive(false);
-            Destroy(timeline);
-            timeline = null;
-            playableDirector = null;
-            currentTimelinePrefabName = null;
+
+            base.ClearPrefab();
         }
 
         #endregion
 
         [Serializable]
-        private class TimelineRestoreData : IRestoreData
+        private class TimelineRestoreData : PrefabRestoreData
         {
-            public readonly string currentTimelinePrefabName;
-            public readonly TransformRestoreData transformRestoreData;
             public readonly float time;
 
-            public TimelineRestoreData(string currentTimelinePrefabName, Transform transform, float time)
+            public TimelineRestoreData(PrefabRestoreData baseData, float time) : base(baseData)
             {
-                this.currentTimelinePrefabName = currentTimelinePrefabName;
-                transformRestoreData = new TransformRestoreData(transform);
                 this.time = time;
             }
         }
 
-        public string restorableObjectName => luaName;
-
-        public RestorablePriority priority => RestorablePriority.Early;
-
-        public IRestoreData GetRestoreData()
+        public override IRestoreData GetRestoreData()
         {
             float time;
             if (playableDirector != null)
@@ -141,25 +103,19 @@ namespace Nova
                 time = 0.0f;
             }
 
-            return new TimelineRestoreData(currentTimelinePrefabName, transform, time);
+            return new TimelineRestoreData(base.GetRestoreData() as PrefabRestoreData, time);
         }
 
-        public void Restore(IRestoreData restoreData)
+        public override void Restore(IRestoreData restoreData)
         {
+            var baseData = restoreData as PrefabRestoreData;
+            base.Restore(baseData);
+
             var data = restoreData as TimelineRestoreData;
-            data.transformRestoreData.Restore(transform);
-            if (data.currentTimelinePrefabName != null)
+            if (playableDirector != null)
             {
-                SetTimelinePrefab(data.currentTimelinePrefabName);
-                if (playableDirector != null)
-                {
-                    playableDirector.time = data.time;
-                    playableDirector.Evaluate();
-                }
-            }
-            else
-            {
-                ClearTimelinePrefab();
+                playableDirector.time = data.time;
+                playableDirector.Evaluate();
             }
         }
     }

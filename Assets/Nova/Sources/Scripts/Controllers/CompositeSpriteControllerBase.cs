@@ -8,7 +8,7 @@ namespace Nova
     public abstract class CompositeSpriteControllerBase : MonoBehaviour, IRestorable
     {
         public string imageFolder;
-        public SpriteMerger characterTextureMerger;
+        public SpriteMerger spriteMerger;
 
         public string currentImageName { get; protected set; }
         public OverlayTextureChangerBase textureChanger { get; protected set; }
@@ -19,8 +19,8 @@ namespace Nova
         protected virtual void Awake()
         {
             gameState = Utils.FindNovaGameController().GameState;
-            textureChanger = GetComponent<OverlayTextureChangerBase>();
             dialogueBoxController = Utils.FindViewManager().GetController<DialogueBoxController>();
+            textureChanger = GetComponent<OverlayTextureChangerBase>();
         }
 
         #region Color
@@ -56,7 +56,7 @@ namespace Nova
 
             var sprites = poseArray.Select(imageName =>
                 AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, imageName))).ToList();
-            var texture = characterTextureMerger.GetMergedTexture(name, sprites);
+            var texture = spriteMerger.GetMergedTexture(name, sprites);
             if (fade && !gameState.isRestoring && dialogueBoxController.state != DialogueBoxState.FastForward)
             {
                 textureChanger.SetTexture(texture);
@@ -108,8 +108,8 @@ namespace Nova
 
         public void SetPose(LuaInterface.LuaTable pose, bool fade = true)
         {
-            this.RuntimeAssert(characterTextureMerger != null && textureChanger != null,
-                "CharacterTextureMerger and OverlayTextureChanger must be present when setting pose.");
+            this.RuntimeAssert(spriteMerger != null && textureChanger != null,
+                "SpriteMerger and OverlayTextureChanger must be present when setting pose.");
             SetPose(pose.ToArray().Cast<string>().ToArray(), fade);
         }
 
@@ -131,7 +131,7 @@ namespace Nova
 
             currentImageName = null;
 
-            characterTextureMerger.ReleaseCache(name);
+            spriteMerger.ReleaseCache(name);
         }
 
         #endregion

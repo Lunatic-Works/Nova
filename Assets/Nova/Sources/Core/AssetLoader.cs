@@ -11,7 +11,7 @@ namespace Nova
     {
         Image,
         StandingLayer,
-        Timeline,
+        Prefab,
         Audio
     }
 
@@ -52,7 +52,7 @@ namespace Nova
             {
                 [AssetCacheType.Image] = new LRUCache<string, CachedAssetEntry>(20, true),
                 [AssetCacheType.StandingLayer] = new LRUCache<string, CachedAssetEntry>(20, true),
-                [AssetCacheType.Timeline] = new LRUCache<string, CachedAssetEntry>(1, true),
+                [AssetCacheType.Prefab] = new LRUCache<string, CachedAssetEntry>(1, true),
                 [AssetCacheType.Audio] = new LRUCache<string, CachedAssetEntry>(4, true)
             };
 
