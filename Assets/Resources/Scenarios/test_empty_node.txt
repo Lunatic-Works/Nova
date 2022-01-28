@@ -3,7 +3,7 @@ label 'test_empty_node'
 -- is_unlocked_start()
 |>
 <|
-show(bg, 'room')
+show(bg, 'rain')
 stop(bgm)
 set_box()
 |>

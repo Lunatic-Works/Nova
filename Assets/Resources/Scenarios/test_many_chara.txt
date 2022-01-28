@@ -3,7 +3,7 @@ label 'test_many_chara'
 -- is_unlocked_start()
 |>
 <|
-show(bg, 'room')
+show(bg, 'rain')
 stop(bgm)
 set_box()
 |>

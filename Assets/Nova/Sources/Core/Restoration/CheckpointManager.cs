@@ -545,49 +545,31 @@ namespace Nova
         #region Auxiliary data
 
         /// <summary>
-        /// Get the stored global flag
+        /// Get global data
         /// </summary>
         /// <see cref="GlobalSave"/>
-        /// <param name="key">the key of the global flag</param>
-        /// <param name="defaultValue">
-        /// the default value if the value is not found or cannot be converted to the target type T
-        /// </param>
-        /// <typeparam name="T">
-        /// the type of value
-        /// </typeparam>
-        /// <returns>the value of the flag</returns>
+        /// <param name="key">the key of the data</param>
+        /// <param name="defaultValue">the default value if the key is not found</param>
+        /// <typeparam name="T">the type of the data</typeparam>
+        /// <returns>the stored data</returns>
         public T Get<T>(string key, T defaultValue = default)
         {
-            if (!globalSave.data.TryGetValue(key, out object value))
+            if (globalSave.data.TryGetValue(key, out var value))
             {
-                return defaultValue;
+                return (T)value;
             }
-
-            if (value is T tValue)
-            {
-                return tValue;
-            }
-
-            try
-            {
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
-            catch (InvalidCastException)
+            else
             {
                 return defaultValue;
             }
         }
 
         /// <summary>
-        /// Set global flag to the given value
+        /// Set global data
         /// </summary>
         /// <see cref="GlobalSave"/>
-        /// <param name="key">
-        /// the key of the flag
-        /// </param>
-        /// <param name="value">
-        /// the value of the flag
-        /// </param>
+        /// <param name="key">the key of the data</param>
+        /// <param name="value">the data to store</param>
         public void Set(string key, object value)
         {
             globalSave.data[key] = value;

@@ -21,9 +21,14 @@ namespace Nova
             gameState.ReleaseActionPause();
         }
 
-        public void SaveInterrupt()
+        public void StartInterrupt()
         {
-            gameState.SaveInterrupt();
+            gameState.StartInterrupt();
+        }
+
+        public void StopInterrupt()
+        {
+            gameState.StopInterrupt();
         }
 
         public void SignalFence(object value)

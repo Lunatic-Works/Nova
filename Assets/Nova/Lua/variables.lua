@@ -8,11 +8,7 @@ function get_nova_variable(name, global)
 
     if entry == nil then
         return nil
-    elseif entry.type == Nova.VariableType.Boolean then
-        return entry.value
-    elseif entry.type == Nova.VariableType.Number then
-        return entry.value
-    else -- entry.type == Nova.VariableType.String
+    else
         return entry.value
     end
 end
@@ -37,7 +33,7 @@ function set_nova_variable(name, value, global)
     elseif _type == 'string' then
         func(obj, name, Nova.VariableType.String, value)
     else
-        warn('Variable value can only be boolean, number, string, or nil, but found ' .. _type .. ': ' .. dump(value))
+        warn('Variable can only be boolean, number, string, or nil, but found ' .. _type .. ': ' .. dump(value))
     end
 end
 

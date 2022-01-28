@@ -75,6 +75,18 @@ namespace Nova
             return entry;
         }
 
+        public T Get<T>(string name, T defaultValue = default)
+        {
+            if (dict.TryGetValue(name, out var entry))
+            {
+                return (T)entry.value;
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+
         public void Set(string name, VariableType type, object value)
         {
             dict.TryGetValue(name, out var oldEntry);
@@ -93,6 +105,32 @@ namespace Nova
                     dict[name] = new VariableEntry(type, value);
                     needCalculateHash = true;
                 }
+            }
+        }
+
+        public void Set<T>(string name, T value)
+        {
+            var t = typeof(T);
+            if (value == null)
+            {
+                Set(name, VariableType.String, null);
+            }
+            else if (t == typeof(bool))
+            {
+                Set(name, VariableType.Boolean, value);
+            }
+            else if (Utils.IsNumericType(t))
+            {
+                Set(name, VariableType.Number, value);
+            }
+            else if (t == typeof(string))
+            {
+                Set(name, VariableType.String, value);
+            }
+            else
+            {
+                throw new ArgumentException(
+                    $"Nova: Variable can only be bool, numeric types, string, or null, but found {t}: {value}");
             }
         }
 

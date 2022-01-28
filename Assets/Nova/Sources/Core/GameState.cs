@@ -346,9 +346,19 @@ namespace Nova
             actionPauseLock.Release();
         }
 
-        public void SaveInterrupt()
+        private ulong variablesHashBeforeInterrupt;
+
+        public void StartInterrupt()
         {
-            nodeHistory.AddInterrupt(currentIndex, variables);
+            variablesHashBeforeInterrupt = variables.hash;
+        }
+
+        public void StopInterrupt()
+        {
+            if (variables.hash != variablesHashBeforeInterrupt)
+            {
+                nodeHistory.AddInterrupt(currentIndex, variables);
+            }
         }
 
         public void SignalFence(object value)

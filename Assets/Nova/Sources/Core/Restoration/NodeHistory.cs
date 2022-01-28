@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Nova
 {
@@ -72,14 +73,20 @@ namespace Nova
                         break;
                     }
 
-                    x += (ulong)nodeHistoryIndex;
-                    x *= 11400714819323199563UL;
-
+                    var first = true;
                     foreach (var pair2 in pair.Value)
                     {
                         if (nodeHistoryIndex == index + count - 1 && pair2.Key >= dialogueCount)
                         {
                             break;
+                        }
+
+                        // Add nodeHistoryIndex to the hash only if there is any pair2.Key < dialogueCount
+                        if (first)
+                        {
+                            first = false;
+                            x += (ulong)nodeHistoryIndex;
+                            x *= 11400714819323199563UL;
                         }
 
                         x += (ulong)pair2.Key;
@@ -129,12 +136,17 @@ namespace Nova
 
             foreach (var index in dict.Keys.ToList())
             {
-                if (index >= dialogueIndex)
+                if (index < dialogueIndex)
                 {
-                    break;
+                    continue;
                 }
 
                 dict.Remove(index);
+            }
+
+            if (dict.Count <= 0)
+            {
+                interrupts.Remove(interrupts.Keys.Last());
             }
 
             needCalculateHash = true;
@@ -144,6 +156,33 @@ namespace Nova
         {
             base.Clear();
             interrupts.Clear();
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append("NodeHistory: ");
+            sb.Append(string.Join(", ", from pair in list select $"{pair.Key}:{pair.Value}"));
+            sb.Append(", interrupts: {");
+            var first = true;
+            foreach (var pair in interrupts)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append($"{pair.Key}: {{");
+                sb.Append(string.Join(", ", from pair2 in pair.Value select $"{pair2.Key}:{pair2.Value}"));
+                sb.Append("}");
+            }
+
+            sb.Append("}");
+            return sb.ToString();
         }
     }
 }

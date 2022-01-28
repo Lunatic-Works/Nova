@@ -1,0 +1,66 @@
+@<|
+label 'test_minigame'
+is_unlocked_start()
+|>
+<|
+show(bg, 'rain')
+stop(bgm)
+set_box()
+|>
+测试小游戏
+
+<|
+show(__Nova.prefabLoader, 'ExampleCube')
+|>
+显示普通的prefab
+
+<|
+hide(__Nova.prefabLoader)
+|>
+隐藏prefab
+
+先来一个选项
+@<|
+branch {
+    { dest = 'test_minigame_1', text = '敲妹妹的门'},
+    { dest = 'test_minigame_2', text = '去新年参拜'},
+    { dest = 'test_minigame_3', text = '带走伊莉雅'},
+}
+|>
+
+@<| label 'test_minigame_1' |>
+<|
+v_choice = '敲妹妹的门'
+|>
+你选了：敲妹妹的门
+@<| jump_to 'test_minigame_end_choice' |>
+
+@<| label 'test_minigame_2' |>
+<|
+v_choice = '去新年参拜'
+|>
+你选了：去新年参拜
+@<| jump_to 'test_minigame_end_choice' |>
+
+@<| label 'test_minigame_3' |>
+<|
+v_choice = '带走伊莉雅'
+|>
+你选了：带走伊莉雅
+@<| jump_to 'test_minigame_end_choice' |>
+
+@<| label 'test_minigame_end_choice' |>
+接下来显示小游戏
+
+<|
+minigame(__Nova.uiPrefabLoader, 'ExampleMinigame')
+|>
+小游戏结束
+
+<|
+print(v_minigame_text)
+|>
+刚才输入的文本会在Console窗口中显示
+
+测试结束
+@<| is_end() |>
