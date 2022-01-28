@@ -32,3 +32,4 @@ function minigame(prefab_loader, prefab_name)
     __Nova.coroutineHelper:StopInterrupt()
     input_on()
 end
+Nova.ScriptDialogueEntryParser.AddCheckpointPattern('minigame', 'ensure_ckpt_on_next_dialogue')

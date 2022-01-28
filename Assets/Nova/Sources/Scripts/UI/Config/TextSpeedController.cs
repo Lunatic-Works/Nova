@@ -40,7 +40,7 @@ namespace Nova
             {
                 dialogueBoxController.perCharacterFadeInDuration = val;
             }
-            else
+            else // configTextPreviewController != null
             {
                 configTextPreviewController.perCharacterFadeInDuration = val;
             }

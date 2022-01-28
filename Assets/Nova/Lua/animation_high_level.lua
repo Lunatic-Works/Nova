@@ -79,6 +79,10 @@ end
 local function parse_coord(obj, camera, coord)
     local pos, angle, scale, relative
 
+    if type(coord) == 'function' then
+        coord = coord(obj)
+    end
+
     if coord and coord[#coord] == RELATIVE then
         relative = RELATIVE
         coord[#coord] = nil

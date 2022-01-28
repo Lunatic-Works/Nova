@@ -89,7 +89,7 @@ namespace Nova
         {
             foreach (var go in sectorObjects)
             {
-                DestroyImmediate(go);
+                Destroy(go);
             }
 
             // Assert.AreEqual(transform.childCount, 0);
