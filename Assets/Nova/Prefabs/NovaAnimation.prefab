@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 4310286167048136}
   m_Layer: 0
   m_Name: NovaAnimation
-  m_TagString: NovaAnimation
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

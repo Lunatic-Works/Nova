@@ -5,21 +5,6 @@ namespace Nova
     [ExportCustomType]
     public class SoundController : MonoBehaviour
     {
-        private static SoundController _current;
-
-        public static SoundController Current
-        {
-            get
-            {
-                if (_current == null)
-                {
-                    _current = GameObject.FindWithTag("SoundController").GetComponent<SoundController>();
-                }
-
-                return _current;
-            }
-        }
-
         public string luaName;
         public string audioFolder;
         [HideInInspector] public float configVolume;
