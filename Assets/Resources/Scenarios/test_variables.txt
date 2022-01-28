@@ -1,0 +1,28 @@
+@<|
+label 'test_variables'
+-- is_unlocked_start()
+|>
+<|
+show(bg, 'rain')
+stop(bgm)
+set_box()
+|>
+测试变量
+
+<|
+v_test_bool = true
+v_test_number = 123
+v_test_string = 'abc'
+|>
+设置变量
+
+<|
+print(v_test_bool)
+print(v_test_number)
+print(v_test_string)
+print(__Nova.variables:ToString())
+|>
+读取变量
+
+测试结束
+@<| is_end() |>

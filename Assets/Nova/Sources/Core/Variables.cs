@@ -17,9 +17,9 @@ namespace Nova
     public class VariableEntry
     {
         public readonly VariableType type;
-        public readonly string value;
+        public readonly object value;
 
-        public VariableEntry(VariableType type, string value)
+        public VariableEntry(VariableType type, object value)
         {
             this.type = type;
             this.value = value;
@@ -75,7 +75,7 @@ namespace Nova
             return entry;
         }
 
-        public void Set(string name, VariableType type, string value)
+        public void Set(string name, VariableType type, object value)
         {
             dict.TryGetValue(name, out var oldEntry);
             if (value == null)
@@ -88,7 +88,7 @@ namespace Nova
             }
             else
             {
-                if (oldEntry == null || oldEntry.type != type || oldEntry.value != value)
+                if (oldEntry == null || oldEntry.type != type || !oldEntry.value.Equals(value))
                 {
                     dict[name] = new VariableEntry(type, value);
                     needCalculateHash = true;

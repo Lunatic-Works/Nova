@@ -9,9 +9,9 @@ function get_nova_variable(name, global)
     if entry == nil then
         return nil
     elseif entry.type == Nova.VariableType.Boolean then
-        return toboolean(entry.value)
+        return entry.value
     elseif entry.type == Nova.VariableType.Number then
-        return tonumber(entry.value)
+        return entry.value
     else -- entry.type == Nova.VariableType.String
         return entry.value
     end
@@ -31,9 +31,9 @@ function set_nova_variable(name, value, global)
     if value == nil then
         func(obj, name, Nova.VariableType.String, nil)
     elseif _type == 'boolean' then
-        func(obj, name, Nova.VariableType.Boolean, tostring(value))
+        func(obj, name, Nova.VariableType.Boolean, value)
     elseif _type == 'number' then
-        func(obj, name, Nova.VariableType.Number, tostring(value))
+        func(obj, name, Nova.VariableType.Number, value)
     elseif _type == 'string' then
         func(obj, name, Nova.VariableType.String, value)
     else
