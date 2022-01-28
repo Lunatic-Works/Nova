@@ -1,3 +1,10 @@
+local function wait_fence()
+    while __Nova.coroutineHelper.fence == nil do
+        coroutine.step()
+    end
+    return __Nova.coroutineHelper:TakeFence()
+end
+
 local function check_lazy_not_before(name)
     if __Nova.executionContext.mode ~= Nova.ExecutionMode.Lazy then
         error(name .. ' should only be called in lazy execution blocks')
@@ -19,12 +26,7 @@ function minigame(prefab_loader, prefab_name)
     __Nova.coroutineHelper:StartInterrupt()
 
     show(prefab_loader, prefab_name)
-
-    while __Nova.coroutineHelper.fence == nil do
-        coroutine.step()
-    end
-    __Nova.coroutineHelper:Reset()
-
+    wait_fence()
     hide(prefab_loader)
 
     __Nova.coroutineHelper:StopInterrupt()
