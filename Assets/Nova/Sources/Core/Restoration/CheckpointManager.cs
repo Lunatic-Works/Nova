@@ -556,7 +556,7 @@ namespace Nova
         {
             if (globalSave.data.TryGetValue(key, out var value))
             {
-                return (T)value;
+                return (T)Convert.ChangeType(value, typeof(T));
             }
             else
             {

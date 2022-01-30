@@ -1,6 +1,6 @@
 @<|
 label 'test_minigame'
--- is_unlocked_start()
+is_unlocked_start()
 |>
 <|
 show(bg, 'rain')
@@ -50,6 +50,12 @@ v_choice = '带走伊莉雅'
 @<| jump_to 'test_minigame_end_choice' |>
 
 @<| label 'test_minigame_end_choice' |>
+<|
+v_test_bool = true
+v_test_int = 123
+v_test_float = 4.56
+v_test_double = 7.89
+|>
 接下来显示小游戏
 
 <|
@@ -59,6 +65,7 @@ minigame(__Nova.uiPrefabLoader, 'ExampleMinigame')
 
 <|
 print(v_minigame_text)
+print(v_test_bool, v_test_int, v_test_float, v_test_double)
 |>
 刚才输入的文本会在Console窗口中显示
 

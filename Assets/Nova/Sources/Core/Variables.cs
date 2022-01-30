@@ -79,7 +79,7 @@ namespace Nova
         {
             if (dict.TryGetValue(name, out var entry))
             {
-                return (T)entry.value;
+                return (T)Convert.ChangeType(entry.value, typeof(T));
             }
             else
             {

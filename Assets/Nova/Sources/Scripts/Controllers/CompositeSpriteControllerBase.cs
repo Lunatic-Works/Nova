@@ -109,7 +109,7 @@ namespace Nova
         public void SetPose(LuaInterface.LuaTable pose, bool fade = true)
         {
             this.RuntimeAssert(spriteMerger != null && textureChanger != null,
-                "SpriteMerger and OverlayTextureChanger must be present when setting pose.");
+                "SpriteMerger and OverlayTextureChangerBase must be present when setting pose.");
             SetPose(pose.ToArray().Cast<string>().ToArray(), fade);
         }
 
