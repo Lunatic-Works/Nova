@@ -303,8 +303,12 @@ namespace Nova
                 return;
             }
 
-            StopCoroutine(actionCoroutine);
-            actionCoroutine = null;
+            if (actionCoroutine != null)
+            {
+                StopCoroutine(actionCoroutine);
+                actionCoroutine = null;
+            }
+
             DialogueEntry.StopActionCoroutine();
 
             ResetActionContext();
@@ -918,8 +922,7 @@ namespace Nova
             {
                 try
                 {
-                    var restoreData = entry.restoreDatas[pair.Key];
-                    pair.Value.Restore(restoreData);
+                    pair.Value.Restore(entry.restoreDatas[pair.Key]);
                 }
                 catch (KeyNotFoundException)
                 {

@@ -227,7 +227,11 @@ namespace Nova
 
             nodeHistory.Clear();
             nodeHistory.AddRange(data.nodeNames);
-            nodeHistory.interrupts = new SortedDictionary<int, SortedDictionary<int, ulong>>(data.interrupts);
+            nodeHistory.interrupts.Clear();
+            foreach (var pair in data.interrupts)
+            {
+                nodeHistory.interrupts[pair.Key] = new SortedDictionary<int, ulong>(pair.Value);
+            }
         }
 
         public string GetLastNodeName(ulong nodeHistoryHash)

@@ -23,7 +23,7 @@ namespace Nova
                 I18n.CurrentLocale = (SystemLanguage)localeInt;
             }
 
-            this.RuntimeAssert(localeTogglePairs.Count > 0, "Empty language toggle list");
+            this.RuntimeAssert(localeTogglePairs.Count > 0, "Empty language toggle list.");
             foreach (var pair in localeTogglePairs)
             {
                 pair.toggle.onValueChanged.AddListener(value => SetLocale(value, pair.locale));

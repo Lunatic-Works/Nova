@@ -205,8 +205,8 @@ namespace Nova
                 cachedAssetCounts = cachedAssets.ToDictionary(
                     pair => pair.Key,
                     pair => pair.Value.ToDictionary(
-                        innerPair => innerPair.Key,
-                        innerPair => innerPair.Value.count
+                        pair2 => pair2.Key,
+                        pair2 => pair2.Value.count
                     )
                 );
             }
