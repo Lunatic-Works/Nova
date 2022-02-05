@@ -12,7 +12,7 @@ set_box()
 <|
 v_test_bool = true
 v_test_number = 123
-v_test_string = 'abc'
+v_test_string = '啊啊啊'
 |>
 设置变量
 
@@ -23,6 +23,19 @@ print(v_test_string)
 print(__Nova.variables:ToString())
 |>
 读取变量
+
+变量可以显示在文本中：{{v_test_string}}
+
+{{v_test_string}}：：变量也可以显示在姓名中
+
+<|
+a = 123
+b = 4.56
+c = '啊啊啊'
+|>
+设置一些临时变量，它们不是以`v_`开头，不会保存在存档中
+
+把它们显示在文本中：{{a}} {{b}} {{c}}
 
 测试结束
 @<| is_end() |>
