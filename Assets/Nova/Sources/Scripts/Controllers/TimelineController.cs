@@ -12,14 +12,12 @@ namespace Nova
         public PlayableDirector playableDirector { get; private set; }
 
         private CameraController cameraController;
-        private PostProcessing cameraPP;
 
         protected override void Awake()
         {
             base.Awake();
 
             cameraController = mainCamera.GetComponent<CameraController>();
-            cameraPP = mainCamera.GetComponent<PostProcessing>();
         }
 
         #region Methods called by external scripts
@@ -48,9 +46,6 @@ namespace Nova
             {
                 this.RuntimeAssert(newCamera.GetComponent<CameraController>() == null,
                     "The camera in the timeline prefab should not have a CameraController.");
-
-                var ppClient = newCamera.GetComponent<PostProcessing>();
-                ppClient.asProxyOf = cameraPP;
 
                 cameraController.overridingCamera = newCamera;
                 mainCamera.enabled = false;

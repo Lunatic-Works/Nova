@@ -30,8 +30,8 @@ namespace Nova
         #region Proxied methods and properties
 
         public new Transform transform => activeCamera.transform;
-
         public new GameObject gameObject => activeCamera.gameObject;
+        public GameObject baseGameObject => base.gameObject;
 
         public new Component GetComponent(Type t)
         {

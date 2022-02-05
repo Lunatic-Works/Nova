@@ -5,18 +5,14 @@ using UnityEngine;
 
 namespace Nova
 {
-    /// <summary>
-    /// If it is used as a server, it should be disabled, and another PostProcessing should be a proxy of it
-    /// </summary>
     [ExportCustomType]
     public class PostProcessing : MonoBehaviour, IRestorable
     {
         public string luaName;
-        public PostProcessing asProxyOf;
 
         private GameState gameState;
 
-        public void Awake()
+        private void Awake()
         {
             gameState = Utils.FindNovaGameController().GameState;
 
@@ -27,7 +23,7 @@ namespace Nova
             }
         }
 
-        public void OnDestroy()
+        private void OnDestroy()
         {
             if (!string.IsNullOrEmpty(luaName))
             {
@@ -35,53 +31,15 @@ namespace Nova
             }
         }
 
-        private readonly List<List<Material>> _layers = new List<List<Material>>();
+        private readonly List<List<Material>> layers = new List<List<Material>>();
 
-        private List<List<Material>> layers
+        private int layersEnabledUntil; // Layers with id in [0, this) are enabled
+
+        private int layerCount
         {
-            get
-            {
-                if (asProxyOf != null)
-                    return asProxyOf.layers;
-                return _layers;
-            }
-        }
-
-        private int _layersEnabledUntil;
-
-        public int layersEnabledUntil // Layers with id in [0, this) are enabled
-        {
-            get
-            {
-                if (asProxyOf != null)
-                    return asProxyOf.layersEnabledUntil;
-                return _layersEnabledUntil;
-            }
+            get => layers.Count;
             set
             {
-                if (asProxyOf != null)
-                    asProxyOf.layersEnabledUntil = value;
-                else
-                    _layersEnabledUntil = value;
-            }
-        }
-
-        public int layerCount
-        {
-            get
-            {
-                if (asProxyOf != null)
-                    return asProxyOf.layerCount;
-                return layers.Count;
-            }
-            set
-            {
-                if (asProxyOf != null)
-                {
-                    asProxyOf.layerCount = value;
-                    return;
-                }
-
                 if (value < layers.Count)
                     layers.Clear();
                 for (int i = layers.Count; i < value; i++)
@@ -128,14 +86,8 @@ namespace Nova
             }
         }
 
-        public void OnRenderImage(RenderTexture src, RenderTexture dest)
+        private void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
-            if (asProxyOf != null)
-            {
-                asProxyOf.OnRenderImage(src, dest);
-                return;
-            }
-
             var matCnt = EnabledMaterials().Count();
             if (matCnt == 0)
             {

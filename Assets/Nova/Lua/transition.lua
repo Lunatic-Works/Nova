@@ -44,6 +44,18 @@ local function get_full_shader_name(shader_name, pp)
     return full_shader_name, base_shader_name, variant
 end
 
+local function get_renderer_pp(obj)
+    local go, renderer, pp
+    if obj:GetType() == typeof(Nova.CameraController) then
+        go = obj.baseGameObject
+        pp = go:GetComponent(typeof(Nova.PostProcessing))
+    else
+        go = obj.gameObject
+        renderer = go:GetComponent(typeof(UnityEngine.SpriteRenderer)) or go:GetComponent(typeof(UnityEngine.UI.Image))
+    end
+    return go, renderer, pp
+end
+
 --- get material from the MaterialPool attached to the GameObject
 local function get_mat(obj, shader_name, restorable)
     if shader_name == nil then
@@ -54,8 +66,7 @@ local function get_mat(obj, shader_name, restorable)
         restorable = true
     end
 
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
-    local pp = obj:GetComponent(typeof(Nova.PostProcessing))
+    local go, renderer, pp = get_renderer_pp(obj)
     if renderer == nil and pp == nil then
         warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. dump(obj))
         return nil
@@ -63,7 +74,9 @@ local function get_mat(obj, shader_name, restorable)
 
     local full_shader_name, base_shader_name, variant = get_full_shader_name(shader_name, pp)
 
-    local pool = Nova.MaterialPool.Ensure(obj.gameObject)
+    -- Overriding cameras do not have MaterialPool, otherwise their
+    -- materials may be disposed before some animations finish
+    local pool = Nova.MaterialPool.Ensure(go)
     local mat
     if restorable then
         mat = pool:GetRestorableMaterial(full_shader_name)
@@ -80,13 +93,20 @@ local function get_mat(obj, shader_name, restorable)
 end
 
 local function get_default_mat(obj)
-    return Nova.MaterialPool.Ensure(obj.gameObject).defaultMaterial
+    local go
+    if obj:GetType() == typeof(Nova.CameraController) then
+        go = obj.baseGameObject
+    else
+        go = obj.gameObject
+    end
+    return Nova.MaterialPool.Ensure(go).defaultMaterial
 end
 
 local function set_mat(obj, mat, layer_id)
     layer_id = layer_id or 0
 
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
+    local go, renderer, pp = get_renderer_pp(obj)
+
     if renderer then
         if layer_id ~= 0 then
             warn('layer_id should be 0 for SpriteRenderer or Image')
@@ -95,7 +115,6 @@ local function set_mat(obj, mat, layer_id)
         return
     end
 
-    local pp = obj:GetComponent(typeof(Nova.PostProcessing))
     if pp then
         pp:ClearLayer(layer_id)
         if mat then
@@ -104,7 +123,7 @@ local function set_mat(obj, mat, layer_id)
         return
     end
 
-    local character = obj:GetComponent(typeof(Nova.CharacterController))
+    local character = go:GetComponent(typeof(Nova.CharacterController))
     if character then
         warn('Cannot set material for CharacterController ' .. dump(obj))
         return

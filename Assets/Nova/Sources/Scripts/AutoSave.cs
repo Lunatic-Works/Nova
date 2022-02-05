@@ -19,13 +19,13 @@ namespace Nova
             time += Time.deltaTime;
         }
 
-        public void OnApplicationFocus(bool hasFocus)
+        private void OnApplicationFocus(bool hasFocus)
         {
             isPaused = !hasFocus;
             TrySave();
         }
 
-        public void OnApplicationPause(bool pauseStatus)
+        private void OnApplicationPause(bool pauseStatus)
         {
             isPaused = pauseStatus;
             TrySave();

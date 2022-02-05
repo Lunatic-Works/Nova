@@ -647,6 +647,7 @@ namespace Nova
         /// <param name="startNode">The node from where the game starts</param>
         private void GameStart(FlowChartNode startNode)
         {
+            CancelAction();
             ResetGameState();
             MoveToNextNode(startNode, () => { });
         }
@@ -1011,6 +1012,7 @@ namespace Nova
                         isRestoring = false;
                     }
 
+                    // Make sure there is no blocking action running
                     NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                     Step();
 
