@@ -69,8 +69,9 @@ namespace Nova
 
         private void InitOnlyIncludedNames()
         {
-            onlyIncludedNames = new HashSet<string>(LuaRuntime.Instance
-                .DoString<LuaTable>("return only_included_scenario_names").ToArray().Cast<string>());
+            var table = LuaRuntime.Instance.GetTable("only_included_scenario_names");
+            onlyIncludedNames = new HashSet<string>(table.ToArray().Cast<string>());
+            table.Dispose();
         }
 
         public void ForceInit(string path)
@@ -200,7 +201,7 @@ namespace Nova
         private void ParseScript(string text)
         {
             hiddenCharacterNames.Clear();
-            LuaRuntime.Instance.DoString("action_new_file()");
+            LuaRuntime.Instance.GetFunction("action_new_file").Call();
 
             var blocks = Parser.Parse(text).blocks;
 

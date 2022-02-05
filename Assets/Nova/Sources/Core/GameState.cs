@@ -145,7 +145,7 @@ namespace Nova
         /// </summary>
         public void ReloadScripts()
         {
-            LuaRuntime.Instance.InitRequires();
+            LuaRuntime.Instance.Reset();
             scriptLoader.ForceInit(scriptPath);
             flowChartTree = scriptLoader.GetFlowChartTree();
         }
@@ -441,7 +441,7 @@ namespace Nova
             // TODO: use advancedDialogueHelper to override dialogue
             // The game author should define overriding dialogues for each locale
             dialogueChanged.Invoke(new DialogueChangedData(nodeHistory.Last(), currentIndex,
-                currentDialogueEntry.displayData, new Dictionary<string, VoiceEntry>(voicesNextDialogue),
+                currentDialogueEntry.GetDisplayData(), new Dictionary<string, VoiceEntry>(voicesNextDialogue),
                 isReached, isReachedAnyHistory));
 
             voicesNextDialogue.Clear();

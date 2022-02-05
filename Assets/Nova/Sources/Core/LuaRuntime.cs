@@ -1,23 +1,25 @@
 ﻿using LuaInterface;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
 {
     /// <summary>
-    /// A singleton that offers Lua runtime environment
+    /// A singleton that offers the Lua runtime
     /// </summary>
     public class LuaRuntime : MonoBehaviour
     {
         private LuaState lua;
-        private LuaFunction luaLoadString;
+        private readonly Dictionary<string, LuaFunction> cachedLuaFunctions = new Dictionary<string, LuaFunction>();
+
         private bool inited;
 
         /// <summary>
         /// Inititialize the Lua runtime environment
         /// </summary>
         /// <remarks>
-        /// This method should be called before every Nova related work happens. The begining of the Start or Awake
-        /// of the GameController might be a good choice
+        /// This method should be called before any Nova-related code runs. The beginning of Start or Awake
+        /// of GameController might be a good choice.
         /// </remarks>
         private void Init()
         {
@@ -32,41 +34,39 @@ namespace Nova
             lua.Start();
             LuaBinder.Bind(lua);
 
-            // enable coroutine
+            // Enable coroutine
             var looper = gameObject.AddComponent<LuaLooper>();
             looper.luaState = lua;
 
             lua.AddSearchPath(Application.dataPath + "/Nova/Lua");
-
-            InitRequires();
-
-            // get the Lua load string function
-            luaLoadString = lua.GetFunction("loadstring");
-            if (luaLoadString == null)
-            {
-                // loadstring is deprecated after Lua 5.2
-                luaLoadString = lua.GetFunction("load");
-            }
+            Reset();
 
             inited = true;
         }
 
-        public void InitRequires()
+        public void Reset()
         {
-            lua.DoString("require 'requires'");
+            foreach (var func in cachedLuaFunctions.Values)
+            {
+                func.Dispose();
+            }
+
+            cachedLuaFunctions.Clear();
+
+            lua.Require("requires");
         }
 
         private void CheckInit()
         {
-            this.RuntimeAssert(inited, "LuaRuntime methods should be called after Init().");
+            this.RuntimeAssert(inited, "LuaRuntime methods should be called after Init.");
         }
 
         /// <summary>
         /// Make an object visible in Lua.
         /// </summary>
         /// <remarks>
-        /// The object will be assigned as an entry of the global variable <code>__Nova</code>, with the given name,
-        /// which can be accessed from Lua scripts by <code>__Nova[name]</code>.
+        /// The object will be assigned as an entry of the global variable __Nova or another namespace,
+        /// and can be accessed from Lua scripts by __Nova[name].
         /// </remarks>
         /// <param name="name">The name to assign</param>
         /// <param name="obj">The object to be assigned</param>
@@ -96,13 +96,7 @@ namespace Nova
         public LuaFunction WrapClosure(string code)
         {
             CheckInit();
-            return luaLoadString.Invoke<string, LuaFunction>(code);
-        }
-
-        public void DoFile(string name)
-        {
-            CheckInit();
-            lua.DoFile(name);
+            return GetFunction("loadstring").Invoke<string, LuaFunction>(code);
         }
 
         public void DoString(string chunk)
@@ -111,28 +105,45 @@ namespace Nova
             lua.DoString(chunk);
         }
 
-        public T DoString<T>(string chunk)
+        // The LuaTable will not be cached, and the user needs to dispose it
+        public LuaTable GetTable(string name)
         {
             CheckInit();
-            return lua.DoString<T>(chunk);
+            return lua.GetTable(name);
+        }
+
+        // The LuaFunction will be cached, and will be disposed in Dispose
+        public LuaFunction GetFunction(string name)
+        {
+            CheckInit();
+            if (!cachedLuaFunctions.TryGetValue(name, out var func))
+            {
+                func = lua.GetFunction(name);
+                if (func != null)
+                {
+                    cachedLuaFunctions[name] = func;
+                }
+            }
+
+            return func;
         }
 
         /// <summary>
         /// Dispose the Lua runtime environment
-        /// This method will be called when the Lua Runtime is destroyed
+        /// This method will be called when LuaRuntime is destroyed
         /// </summary>
         private void Dispose()
         {
             CheckInit();
-            luaLoadString.Dispose();
+            foreach (var func in cachedLuaFunctions.Values)
+            {
+                func.Dispose();
+            }
+
             lua.Dispose();
         }
 
         #region Singleton pattern
-
-        static LuaRuntime() { }
-
-        private LuaRuntime() { }
 
         // Codes from http://wiki.unity3d.com/index.php/Singleton
         private static LuaRuntime _instance;
@@ -154,37 +165,32 @@ namespace Nova
 
                 lock (Lock)
                 {
-                    if (_instance == null)
+                    if (_instance != null)
                     {
-                        _instance = (LuaRuntime)FindObjectOfType(typeof(LuaRuntime));
+                        return _instance;
+                    }
 
-                        if (FindObjectsOfType(typeof(LuaRuntime)).Length > 1)
-                        {
-                            Debug.LogError("Nova: [Singleton] Something went really wrong --- " +
-                                           "there should never be more than 1 singleton! " +
-                                           "Reopening the scene might fix it.");
-                            return _instance;
-                        }
-
-                        if (_instance == null)
-                        {
-                            var singleton = new GameObject();
-                            _instance = singleton.AddComponent<LuaRuntime>();
-                            _instance.Init();
-                            singleton.name = "(singleton) " + typeof(LuaRuntime);
-
-                            DontDestroyOnLoad(singleton);
-
-                            // Debug.LogFormat("Nova: [Singleton] An instance of {0} " +
-                            //                 "is needed in the scene, so {1} " +
-                            //                 "was created with DontDestroyOnLoad.",
-                            //     typeof(LuaRuntime), singleton);
-                        }
-                        else
-                        {
-                            // Debug.LogFormat("Nova: [Singleton] Using instance already created: {0}",
-                            //     _instance.gameObject.name);
-                        }
+                    var instances = FindObjectsOfType<LuaRuntime>();
+                    if (instances.Length == 0)
+                    {
+                        var singleton = new GameObject();
+                        singleton.name = $"[Singleton] {typeof(LuaRuntime)}";
+                        DontDestroyOnLoad(singleton);
+                        _instance = singleton.AddComponent<LuaRuntime>();
+                        _instance.Init();
+                        // Debug.Log($"Nova: [Singleton] An instance of {typeof(LuaRuntime)} is needed in the scene, " +
+                        //     $"so {singleton} is created with DontDestroyOnLoad.");
+                    }
+                    else if (instances.Length == 1)
+                    {
+                        // Debug.Log($"Nova: [Singleton] Using instance already created: {_instance}");
+                        _instance = instances[0];
+                    }
+                    else
+                    {
+                        Debug.LogError("Nova: [Singleton] There should never be more than one instance of " +
+                            $"{typeof(LuaRuntime)}! Reopening the scene might fix it.");
+                        _instance = instances[0];
                     }
 
                     return _instance;
@@ -196,10 +202,10 @@ namespace Nova
 
         /// <summary>
         /// When Unity quits, it destroys objects in a random order.
-        /// In principle, a Singleton is only destroyed when application quits.
-        /// If any script calls Instance after it have been destroyed,
-        ///   it will create a buggy ghost object that will stay on the Editor scene
-        ///   even after stopping playing the Application. Really bad!
+        /// In principle, a singleton is only destroyed when the application quits.
+        /// If any script calls Instance after it has been destroyed,
+        /// it will create a buggy ghost object that will stay in the editor scene
+        /// even after stopping playing the application. Really bad!
         /// So, this was made to be sure we're not creating that buggy ghost object.
         /// </summary>
         private void OnDestroy()

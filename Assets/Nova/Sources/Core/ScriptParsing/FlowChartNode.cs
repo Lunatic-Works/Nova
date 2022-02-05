@@ -54,12 +54,12 @@ namespace Nova
 
         private FlowChartNodeType _type = FlowChartNodeType.Normal;
 
-        /// <value>
-        /// Type of this flow chart node. The value of this field is default to be normal
-        /// </value>
+        /// <summary>
+        /// Type of this flow chart node. Defaults to Normal.
+        /// </summary>
         /// <remarks>
-        /// The type of a node is always readable but only settable before its type if frozen.
-        /// A flow chart tree should freeze all its nodes after construction.
+        /// The type of a node is always gettable but only settable before it is frozen.
+        /// A flow chart tree should freeze all its nodes after the construction.
         /// </remarks>
         public FlowChartNodeType type
         {
@@ -73,9 +73,9 @@ namespace Nova
 
         #region Dialogue entries
 
-        /// <value>
-        /// Dialogue entries in this node
-        /// </value>
+        /// <summary>
+        /// Dialogue entries in this node.
+        /// </summary>
         private List<DialogueEntry> dialogueEntries = new List<DialogueEntry>();
 
         public int dialogueEntryCount => dialogueEntries.Count;
