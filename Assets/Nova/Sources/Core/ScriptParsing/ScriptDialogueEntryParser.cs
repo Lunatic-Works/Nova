@@ -96,9 +96,19 @@ namespace Nova
 
         public static void AddCheckpointPattern(string triggeringFuncName, string yieldingFuncName)
         {
-            PatternToActionGenerator[triggeringFuncName] = new ActionGenerators
+            string pattern = $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)";
+            PatternToActionGenerator[pattern] = new ActionGenerators
             {
                 checkpoint = _ => $"{yieldingFuncName}()\n"
+            };
+        }
+
+        public static void AddCheckpointNextPattern(string triggeringFuncName, string yieldingFuncName)
+        {
+            string pattern = $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)";
+            PatternToActionGenerator[pattern] = new ActionGenerators
+            {
+                unpreload = _ => $"{yieldingFuncName}()\n"
             };
         }
 

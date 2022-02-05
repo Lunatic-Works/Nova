@@ -549,7 +549,7 @@ namespace Nova
                 restrainCheckpointNum--;
             }
 
-            // As the action for this dialogue will be rerun, it's fine to just reset _forceCheckpoint to false
+            // As the action for this dialogue will be rerun, it's fine to just reset forceCheckpoint to false
             forceCheckpoint = false;
         }
 
@@ -1051,6 +1051,6 @@ namespace Nova
         #endregion
 
         private string debugState =>
-            $"{currentNode.name} {currentIndex} {variables.hash} | {stepNumFromLastCheckpoint} {restrainCheckpointNum} {forceCheckpoint} {shouldSaveCheckpoint}";
+            $"{currentNode?.name} {currentIndex} {variables.hash} | {stepNumFromLastCheckpoint} {restrainCheckpointNum} {forceCheckpoint} {shouldSaveCheckpoint}";
     }
 }
