@@ -20,9 +20,8 @@ v_round_count = (gv_round_count or 0) + 1
 
 <|
 gv_count = (gv_count or 0) + 1
-print(gv_count)
 |>
-Console中会输出这句话进行了多少次
+现在是第{{gv_count}}次到达这里
 每次读档/回跳到这里时都会加一次
 
 333
@@ -45,9 +44,8 @@ branch {
 if v_round_count > (gv_round_count or 0) then
     gv_round_count = v_round_count
 end
-print(gv_round_count)
 |>
-Console中会输出进行了多少周目
+现在是第{{gv_round_count}}周目
 
 测试结束
 @<| is_end() |>

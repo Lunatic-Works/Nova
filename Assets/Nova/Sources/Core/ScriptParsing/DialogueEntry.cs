@@ -2,6 +2,7 @@
 using Nova.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -93,9 +94,24 @@ namespace Nova
                 return cachedDisplayData;
             }
 
-            // TODO
-            cachedDisplayData = new DialogueDisplayData(displayNames, dialogues);
-            return cachedDisplayData;
+            LuaRuntime.Instance.GetFunction("reset_text_need_interpolate").Call();
+
+            var interpolatedDisplayNames = displayNames.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
+            var interpolatedDialogues = dialogues.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
+
+            DialogueDisplayData displayData;
+            if (LuaRuntime.Instance.GetFunction("get_text_need_interpolate").Invoke<bool>())
+            {
+                displayData = new DialogueDisplayData(interpolatedDisplayNames, interpolatedDialogues);
+            }
+            else
+            {
+                // Release references of interpolatedDisplayNames and interpolatedDialogues
+                displayData = new DialogueDisplayData(displayNames, dialogues);
+                cachedDisplayData = displayData;
+            }
+
+            return displayData;
         }
 
         /// <summary>
@@ -133,6 +149,16 @@ end)";
         public static void StopActionCoroutine()
         {
             LuaRuntime.Instance.GetFunction("coroutine.stop").Call(ActionCoroutineName);
+        }
+
+        public static string InterpolateText(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                return s;
+            }
+
+            return LuaRuntime.Instance.GetFunction("interpolate_text").Invoke<string, string>(s);
         }
     }
 }

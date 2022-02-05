@@ -438,8 +438,6 @@ namespace Nova
             while (actionPauseLock.isLocked) yield return null;
 
             // Everything that makes game state pause has ended, so change dialogue
-            // TODO: use advancedDialogueHelper to override dialogue
-            // The game author should define overriding dialogues for each locale
             dialogueChanged.Invoke(new DialogueChangedData(nodeHistory.Last(), currentIndex,
                 currentDialogueEntry.GetDisplayData(), new Dictionary<string, VoiceEntry>(voicesNextDialogue),
                 isReached, isReachedAnyHistory));

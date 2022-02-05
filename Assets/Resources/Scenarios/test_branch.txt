@@ -6,7 +6,6 @@ label 'test_branch'
 show(bg, 'rain')
 stop(bgm)
 set_box()
-v_flag = 0
 |>
 测试选项
 
@@ -46,10 +45,9 @@ branch {
 
 @<| label 'test_branch_add_flag' |>
 <|
-v_flag = v_flag + 1
-print(v_flag)
+v_flag = (v_flag or 0) + 1
 |>
-加了一个flag
+现在有{{v_flag}}个flag
 @<| jump_to 'test_branch_begin_loop' |>
 
 @<| label 'test_branch_end_loop' |>

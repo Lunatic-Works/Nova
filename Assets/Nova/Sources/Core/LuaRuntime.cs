@@ -96,6 +96,7 @@ namespace Nova
         public LuaFunction WrapClosure(string code)
         {
             CheckInit();
+            // loadstring is deprecated after Lua 5.2
             return GetFunction("loadstring").Invoke<string, LuaFunction>(code);
         }
 

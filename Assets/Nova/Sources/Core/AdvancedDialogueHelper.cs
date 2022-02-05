@@ -16,7 +16,6 @@ namespace Nova
     [ExportCustomType]
     public class AdvancedDialogueHelper
     {
-        private string overridingText;
         private string jumpingDestination;
         private bool fallThrough;
         private GameState gameState;
@@ -24,18 +23,6 @@ namespace Nova
         public AdvancedDialogueHelper(GameState gameState)
         {
             this.gameState = gameState;
-        }
-
-        public void Override(string to)
-        {
-            overridingText = to;
-        }
-
-        public string GetOverride()
-        {
-            string last = overridingText;
-            overridingText = null;
-            return last;
         }
 
         public void Jump(string to)
@@ -64,7 +51,6 @@ namespace Nova
 
         public void Reset()
         {
-            overridingText = null;
             jumpingDestination = null;
             fallThrough = false;
         }

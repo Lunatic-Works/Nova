@@ -56,6 +56,8 @@ v_test_int = 123
 v_test_float = 4.56
 v_test_double = 7.89
 |>
+测试各种类型的变量
+
 接下来显示小游戏
 
 <|
@@ -63,11 +65,12 @@ minigame(__Nova.uiPrefabLoader, 'ExampleMinigame')
 |>
 小游戏结束
 
+刚才输入的是{{v_minigame_text}}
+
 <|
-print(v_minigame_text)
 print(v_test_bool, v_test_int, v_test_float, v_test_double)
 |>
-刚才输入的文本会在Console窗口中显示
+测试各种类型的变量
 
 测试结束
 @<| is_end() |>
