@@ -667,6 +667,11 @@ namespace Nova
             GameStart(flowChartTree.GetStartNode(startName));
         }
 
+        public FlowChartNode GetNode(string name)
+        {
+            return flowChartTree.GetNode(name);
+        }
+
         public List<string> GetAllStartNodeNames()
         {
             return flowChartTree.GetAllStartNodeNames();

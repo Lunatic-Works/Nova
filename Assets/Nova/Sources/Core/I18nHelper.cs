@@ -5,10 +5,9 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    [ExportCustomType]
     public class I18nHelper
     {
-        // internal name => locale => display name
+        // internal name -> locale -> display name
         private readonly Dictionary<string, Dictionary<SystemLanguage, string>> map =
             new Dictionary<string, Dictionary<SystemLanguage, string>>();
 
@@ -26,8 +25,6 @@ namespace Nova
 
             map[internalName][locale] = displayName;
         }
-
-        public static readonly I18nHelper NodeNames = new I18nHelper();
     }
 
     // Used in editor

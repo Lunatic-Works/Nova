@@ -104,7 +104,7 @@ namespace Nova
                 if (IsUnlocked(chapter.Key))
                 {
                     chapter.Value.GetComponent<Button>().enabled = true;
-                    chapter.Value.GetComponent<Text>().text = I18nHelper.NodeNames.Get(chapter.Key);
+                    chapter.Value.GetComponent<Text>().text = I18n.__(gameState.GetNode(chapter.Key).displayNames);
                 }
                 else
                 {
@@ -122,7 +122,7 @@ namespace Nova
                 foreach (var chapter in buttons)
                 {
                     chapter.Value.GetComponent<Button>().enabled = true;
-                    chapter.Value.GetComponent<Text>().text = I18nHelper.NodeNames.Get(chapter.Key);
+                    chapter.Value.GetComponent<Text>().text = I18n.__(gameState.GetNode(chapter.Key).displayNames);
                 }
             }
         }

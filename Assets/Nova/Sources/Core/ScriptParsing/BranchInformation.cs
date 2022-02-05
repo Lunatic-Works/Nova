@@ -73,7 +73,7 @@ namespace Nova
             this.condition = condition;
         }
 
-        public void AddLocale(SystemLanguage locale, string text)
+        public void AddLocalizedText(SystemLanguage locale, string text)
         {
             texts[locale] = text;
         }

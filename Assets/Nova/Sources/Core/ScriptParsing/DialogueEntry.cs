@@ -78,7 +78,7 @@ namespace Nova
             this.actions = actions;
         }
 
-        public void AddLocale(SystemLanguage locale, LocalizedDialogueEntry entry)
+        public void AddLocalized(SystemLanguage locale, LocalizedDialogueEntry entry)
         {
             displayNames[locale] = entry.displayName;
             dialogues[locale] = entry.dialogue;

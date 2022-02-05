@@ -23,9 +23,13 @@ namespace Nova
         /// <summary>
         /// Internally used name of the flow chart node.
         /// The name should be unique for each node.
-        /// Localized names are stored in I18nHelper.NodeNames
         /// </summary>
         public readonly string name;
+
+        /// <summary>
+        /// Displayed node name in each locale.
+        /// </summary>
+        public readonly Dictionary<SystemLanguage, string> displayNames = new Dictionary<SystemLanguage, string>();
 
         public FlowChartNode(string name)
         {
@@ -71,6 +75,12 @@ namespace Nova
             }
         }
 
+        public void AddLocalizedName(SystemLanguage locale, string displayName)
+        {
+            CheckFreeze();
+            displayNames[locale] = displayName;
+        }
+
         #region Dialogue entries
 
         /// <summary>
@@ -86,13 +96,13 @@ namespace Nova
             dialogueEntries = entries;
         }
 
-        public void AddLocaleForDialogueEntries(SystemLanguage locale, IReadOnlyList<LocalizedDialogueEntry> entries)
+        public void AddLocalizedDialogueEntries(SystemLanguage locale, IReadOnlyList<LocalizedDialogueEntry> entries)
         {
             Assert.IsTrue(entries.Count == dialogueEntries.Count, "Nova: Localized dialogue entry count differs.");
             CheckFreeze();
             for (int i = 0; i < entries.Count; ++i)
             {
-                dialogueEntries[i].AddLocale(locale, entries[i]);
+                dialogueEntries[i].AddLocalized(locale, entries[i]);
             }
         }
 
