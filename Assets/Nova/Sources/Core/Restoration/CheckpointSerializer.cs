@@ -65,6 +65,10 @@ namespace Nova
 
         public void SafeWrite<T>(T obj, string path)
         {
+#if UNITY_EDITOR
+            Debug.Log($"SafeWrite {obj:GetType()} {path}");
+#endif
+
             try
             {
                 var oldPath = path + ".old";

@@ -17,6 +17,7 @@ function anim_persist_end()
     anim_persist_begun = false
 end
 
+-- Use after something important happens
 function update_global_save()
     __Nova.checkpointHelper:UpdateGlobalSave()
 end
