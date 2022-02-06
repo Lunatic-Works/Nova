@@ -7,12 +7,29 @@ namespace Nova
     [Serializable]
     public class AlertParameters
     {
-        public string title;
-        public string bodyContent;
-        public Action onConfirm;
-        public Action onCancel;
-        public string ignoreKey;
-        public bool lite;
+        public readonly string title;
+        public readonly string bodyContent;
+        public readonly Action onConfirm;
+        public readonly Action onCancel;
+        public readonly string ignoreKey;
+        public readonly bool lite;
+
+        public AlertParameters(string title, string bodyContent, Action onConfirm, Action onCancel, string ignoreKey)
+        {
+            this.title = title;
+            this.bodyContent = bodyContent;
+            this.onConfirm = onConfirm;
+            this.onCancel = onCancel;
+            this.ignoreKey = ignoreKey;
+            lite = false;
+        }
+
+        public AlertParameters(string bodyContent, Action onCancel)
+        {
+            this.bodyContent = bodyContent;
+            this.onCancel = onCancel;
+            lite = true;
+        }
     }
 
     [Serializable]
@@ -66,15 +83,8 @@ namespace Nova
             string ignoreKey = "")
         {
             AssertAlertFunction();
-            _alert.Invoke(new AlertParameters
-            {
-                title = title,
-                bodyContent = bodyContent,
-                onConfirm = onClickConfirm,
-                onCancel = onClickCancel,
-                ignoreKey = ignoreKey == "" ? "" : AlertKeyPrefix + ignoreKey,
-                lite = false
-            });
+            _alert.Invoke(new AlertParameters(title, bodyContent, onClickConfirm, onClickCancel,
+                ignoreKey == "" ? "" : AlertKeyPrefix + ignoreKey));
         }
 
         /// <summary>
@@ -83,12 +93,7 @@ namespace Nova
         public static void Show(string content, Action onFinish = null)
         {
             AssertAlertFunction();
-            _alert.Invoke(new AlertParameters
-            {
-                bodyContent = content,
-                onCancel = onFinish,
-                lite = true
-            });
+            _alert.Invoke(new AlertParameters(content, onFinish));
         }
     }
 }

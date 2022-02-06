@@ -152,7 +152,7 @@ namespace Nova
         }
 
         // Get localized string with fallback to DefaultLocale
-        public static string __(Dictionary<SystemLanguage, string> dict)
+        public static string __(IReadOnlyDictionary<SystemLanguage, string> dict)
         {
             if (dict.ContainsKey(CurrentLocale))
             {

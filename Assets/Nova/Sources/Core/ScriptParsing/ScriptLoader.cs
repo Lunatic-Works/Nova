@@ -155,7 +155,7 @@ namespace Nova
         /// Split blocks at separator and eager execution blocks. All chunks in the result contain
         /// at least one ParsedBlock.
         /// </summary>
-        private static List<Chunk> DivideBlocksToChunks(IReadOnlyList<ParsedBlock> blocks)
+        private static IReadOnlyList<Chunk> DivideBlocksToChunks(IReadOnlyList<ParsedBlock> blocks)
         {
             var res = new List<Chunk>();
             var chunk = new Chunk();

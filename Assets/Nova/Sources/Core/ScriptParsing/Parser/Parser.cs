@@ -23,7 +23,7 @@ namespace Nova.Script
 
     public class ParsedScript
     {
-        public List<ParsedBlock> blocks;
+        public IReadOnlyList<ParsedBlock> blocks;
     }
 
     public static class Parser
@@ -272,7 +272,7 @@ namespace Nova.Script
             return ParseTextBlock(tokenizer, sb);
         }
 
-        private static List<ParsedBlock> MergeConsecutiveSeparators(IReadOnlyList<ParsedBlock> oldBlocks)
+        private static IReadOnlyList<ParsedBlock> MergeConsecutiveSeparators(IReadOnlyList<ParsedBlock> oldBlocks)
         {
             var blocks = new List<ParsedBlock>();
 

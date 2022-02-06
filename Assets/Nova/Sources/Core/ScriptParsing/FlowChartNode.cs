@@ -25,11 +25,6 @@ namespace Nova
         /// </summary>
         public readonly string name;
 
-        /// <summary>
-        /// Displayed node name in each locale.
-        /// </summary>
-        public readonly Dictionary<SystemLanguage, string> displayNames = new Dictionary<SystemLanguage, string>();
-
         public FlowChartNode(string name)
         {
             this.name = name;
@@ -74,22 +69,33 @@ namespace Nova
             }
         }
 
+        #region Displayed names
+
+        /// <summary>
+        /// Displayed node name in each locale.
+        /// </summary>
+        private readonly Dictionary<SystemLanguage, string> _displayNames = new Dictionary<SystemLanguage, string>();
+
+        public IReadOnlyDictionary<SystemLanguage, string> displayNames => _displayNames;
+
         public void AddLocalizedName(SystemLanguage locale, string displayName)
         {
             CheckFreeze();
-            displayNames[locale] = displayName;
+            _displayNames[locale] = displayName;
         }
+
+        #endregion
 
         #region Dialogue entries
 
         /// <summary>
         /// Dialogue entries in this node.
         /// </summary>
-        private List<DialogueEntry> dialogueEntries = new List<DialogueEntry>();
+        private IReadOnlyList<DialogueEntry> dialogueEntries = new List<DialogueEntry>();
 
         public int dialogueEntryCount => dialogueEntries.Count;
 
-        public void SetDialogueEntries(List<DialogueEntry> entries)
+        public void SetDialogueEntries(IReadOnlyList<DialogueEntry> entries)
         {
             CheckFreeze();
             dialogueEntries = entries;

@@ -344,7 +344,7 @@ namespace Nova
             }
         }
 
-        public static List<DialogueEntry> ParseDialogueEntries(IReadOnlyList<ScriptLoader.Chunk> chunks,
+        public static IReadOnlyList<DialogueEntry> ParseDialogueEntries(IReadOnlyList<ScriptLoader.Chunk> chunks,
             IDictionary<string, string> hiddenCharacterNames)
         {
             var codes = new Dictionary<DialogueActionStage, string[]>();
@@ -430,7 +430,7 @@ namespace Nova
             return results;
         }
 
-        public static List<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(
+        public static IReadOnlyList<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(
             IReadOnlyList<ScriptLoader.Chunk> chunks)
         {
             var results = new List<LocalizedDialogueEntry>();

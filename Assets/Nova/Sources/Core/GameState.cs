@@ -21,12 +21,12 @@ namespace Nova
         public readonly NodeHistoryEntry nodeHistoryEntry;
         public readonly int dialogueIndex;
         public readonly DialogueDisplayData displayData;
-        public readonly Dictionary<string, VoiceEntry> voicesNextDialogue;
+        public readonly IReadOnlyDictionary<string, VoiceEntry> voicesNextDialogue;
         public readonly bool isReached;
         public readonly bool isReachedAnyHistory;
 
         public DialogueChangedData(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex,
-            DialogueDisplayData displayData, Dictionary<string, VoiceEntry> voicesNextDialogue, bool isReached,
+            DialogueDisplayData displayData, IReadOnlyDictionary<string, VoiceEntry> voicesNextDialogue, bool isReached,
             bool isReachedAnyHistory)
         {
             this.nodeHistoryEntry = nodeHistoryEntry;
@@ -59,11 +59,12 @@ namespace Nova
         [ExportCustomType]
         public class Selection
         {
-            public readonly Dictionary<SystemLanguage, string> texts;
+            public readonly IReadOnlyDictionary<SystemLanguage, string> texts;
             public readonly BranchImageInformation imageInfo;
             public readonly bool active;
 
-            public Selection(Dictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo, bool active)
+            public Selection(IReadOnlyDictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo,
+                bool active)
             {
                 this.texts = texts;
                 this.imageInfo = imageInfo;
@@ -77,9 +78,9 @@ namespace Nova
                 }, imageInfo, active) { }
         }
 
-        public readonly List<Selection> selections;
+        public readonly IReadOnlyList<Selection> selections;
 
-        public SelectionOccursData(List<Selection> selections)
+        public SelectionOccursData(IReadOnlyList<Selection> selections)
         {
             this.selections = selections;
         }
@@ -762,7 +763,7 @@ namespace Nova
             }
         }
 
-        public void RaiseSelection(List<SelectionOccursData.Selection> selections)
+        public void RaiseSelection(IReadOnlyList<SelectionOccursData.Selection> selections)
         {
             selectionOccurs.Invoke(new SelectionOccursData(selections));
         }

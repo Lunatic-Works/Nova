@@ -11,11 +11,11 @@ namespace Nova
         public Image image;
         public Button button;
 
-        private Dictionary<SystemLanguage, string> displayTexts;
+        private IReadOnlyDictionary<SystemLanguage, string> displayTexts;
         private BranchImageInformation imageInfo;
         private string imageFolder;
 
-        public void Init(Dictionary<SystemLanguage, string> displayTexts, BranchImageInformation imageInfo,
+        public void Init(IReadOnlyDictionary<SystemLanguage, string> displayTexts, BranchImageInformation imageInfo,
             string imageFolder, UnityAction onClick, bool interactable)
         {
             this.displayTexts = displayTexts;

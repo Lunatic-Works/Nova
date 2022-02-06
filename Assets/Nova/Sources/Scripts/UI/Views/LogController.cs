@@ -23,12 +23,12 @@ namespace Nova
             public int logEntryIndex;
 
             public LogParam(DialogueDisplayData displayData, NodeHistoryEntry nodeHistoryEntry, int dialogueIndex,
-                Dictionary<string, VoiceEntry> voices, int logEntryIndex)
+                IReadOnlyDictionary<string, VoiceEntry> voices, int logEntryIndex)
             {
                 this.displayData = displayData;
                 this.nodeHistoryEntry = nodeHistoryEntry;
                 this.dialogueIndex = dialogueIndex;
-                this.voices = voices;
+                this.voices = (Dictionary<string, VoiceEntry>)voices;
                 this.logEntryIndex = logEntryIndex;
             }
         }
