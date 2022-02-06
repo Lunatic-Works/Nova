@@ -1,7 +1,6 @@
 ﻿using Nova.Exceptions;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -53,7 +52,7 @@ namespace Nova
 
         private void CheckFreeze()
         {
-            Assert.IsFalse(isFrozen, "Nova: Cannot modify a flow chart node when it is frozen.");
+            Utils.RuntimeAssert(!isFrozen, "Cannot modify a flow chart node when it is frozen.");
         }
 
         private FlowChartNodeType _type = FlowChartNodeType.Normal;
@@ -98,7 +97,7 @@ namespace Nova
 
         public void AddLocalizedDialogueEntries(SystemLanguage locale, IReadOnlyList<LocalizedDialogueEntry> entries)
         {
-            Assert.IsTrue(entries.Count == dialogueEntries.Count, "Nova: Localized dialogue entry count differs.");
+            Utils.RuntimeAssert(entries.Count == dialogueEntries.Count, "Localized dialogue entry count differs.");
             CheckFreeze();
             for (int i = 0; i < entries.Count; ++i)
             {

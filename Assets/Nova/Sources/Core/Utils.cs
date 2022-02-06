@@ -48,6 +48,14 @@ namespace Nova
             RenderTexture.active = old;
         }
 
+        public static void RuntimeAssert(bool condition, string msg)
+        {
+            if (!condition)
+            {
+                throw new AssertionException($"Nova: {msg}", null);
+            }
+        }
+
         public static void RuntimeAssert(this MonoBehaviour mb, bool condition, string msg)
         {
             if (!condition)

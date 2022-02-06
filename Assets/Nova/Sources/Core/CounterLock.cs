@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -31,7 +30,7 @@ namespace Nova
         /// </summary>
         public void Acquire()
         {
-            Assert.IsTrue(count < int.MaxValue, "Nova: More than Int32.MaxValue calls acquiring lock.");
+            Utils.RuntimeAssert(count < int.MaxValue, "More than Int32.MaxValue calls acquiring the lock.");
             count++;
         }
 
@@ -40,7 +39,7 @@ namespace Nova
         /// </summary>
         public void Release()
         {
-            Assert.IsTrue(count > 0, "Nova: Too many calls releasing lock.");
+            Utils.RuntimeAssert(count > 0, "Too many calls releasing the lock.");
             count--;
         }
 

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -133,7 +132,7 @@ namespace Nova
 
         private void CheckInit()
         {
-            Assert.IsTrue(inited, "Nova: ScriptLoader methods should be called after Init().");
+            Utils.RuntimeAssert(inited, "ScriptLoader methods should be called after Init().");
         }
 
         /// <summary>

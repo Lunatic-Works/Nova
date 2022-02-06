@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -58,7 +57,7 @@ namespace Nova
             {
                 if (screenshotBytes == null)
                 {
-                    Assert.IsTrue(screenshotTexture == null, "Nova: Screenshot cache is not consistent.");
+                    Utils.RuntimeAssert(screenshotTexture == null, "Screenshot cache is not consistent.");
                     return null;
                 }
 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -100,12 +99,11 @@ namespace Nova
         {
             using (var bw = new BinaryReader(s))
             {
-                Assert.IsTrue(FileHeader.SequenceEqual(bw.ReadBytes(FileHeader.Length)),
-                    "Nova: Invalid save file format.");
+                var fileHeader = bw.ReadBytes(FileHeader.Length);
+                Utils.RuntimeAssert(FileHeader.SequenceEqual(fileHeader), "Invalid save file format.");
 
                 int version = bw.ReadInt32();
-                Assert.IsTrue(Version >= version,
-                    "Nova: Save file is incompatible with the current version of Nova.");
+                Utils.RuntimeAssert(Version >= version, "Save file is incompatible with the current version of Nova.");
 
                 using (var compressed = new DeflateStream(s, CompressionMode.Decompress))
                 using (var uncompressed = new MemoryStream())
