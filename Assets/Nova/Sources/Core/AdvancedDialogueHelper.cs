@@ -18,7 +18,7 @@ namespace Nova
     {
         private string jumpingDestination;
         private bool fallThrough;
-        private GameState gameState;
+        private readonly GameState gameState;
 
         public AdvancedDialogueHelper(GameState gameState)
         {

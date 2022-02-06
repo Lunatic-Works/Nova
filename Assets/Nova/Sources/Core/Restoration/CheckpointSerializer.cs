@@ -32,9 +32,7 @@ namespace Nova
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"Nova: {path} is corrupted, details below. Try to recover...");
-                    Debug.LogWarning(ex.Message);
-
+                    Debug.LogWarning($"Nova: {path} is corrupted: {ex.Message}\nTry to recover...");
                     var oldPath = path + ".old";
                     using (var fs = File.OpenRead(oldPath))
                     {
@@ -49,9 +47,9 @@ namespace Nova
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debug.LogError($"Nova: Error loading {path}, details below");
+                Debug.LogError($"Nova: Error loading {path}: {ex.Message}");
                 throw; // Nested exception cannot display full message here
             }
         }
@@ -79,7 +77,9 @@ namespace Nova
                 }
 
                 using (var fs = File.OpenWrite(path)) // overwrite if needed
+                {
                     Write(obj, fs); // May be interrupted
+                }
 
                 File.Delete(oldPath);
             }

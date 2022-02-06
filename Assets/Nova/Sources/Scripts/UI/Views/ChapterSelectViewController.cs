@@ -48,6 +48,8 @@ namespace Nova
         {
             base.Start();
 
+            checkpointManager.Init();
+
             buttons = startNodeNames.Select(chapter =>
             {
                 var go = Instantiate(chapterButtonPrefab, chapterList.transform);
@@ -66,6 +68,7 @@ namespace Nova
             }
 
             UpdateAllButtons();
+
             base.Show(onFinish);
         }
 
@@ -117,6 +120,7 @@ namespace Nova
         protected override void OnActivatedUpdate()
         {
             base.OnActivatedUpdate();
+
             if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
             {
                 foreach (var chapter in buttons)

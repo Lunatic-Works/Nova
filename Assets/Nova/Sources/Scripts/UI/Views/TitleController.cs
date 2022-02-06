@@ -34,6 +34,8 @@ namespace Nova
         protected override void Start()
         {
             base.Start();
+
+            checkpointManager.Init();
             gameState.SaveInitialCheckpoint();
             Show(null);
         }

@@ -59,6 +59,9 @@ namespace Nova
         protected override void Start()
         {
             base.Start();
+
+            checkpointManager.Init();
+
             imageViewer.Hide();
             ShowPage();
         }
@@ -67,6 +70,7 @@ namespace Nova
         {
             imageViewer.Hide();
             ShowPage();
+
             base.Show(onFinish);
         }
 
@@ -210,6 +214,7 @@ namespace Nova
         protected override void OnActivatedUpdate()
         {
             base.OnActivatedUpdate();
+
             if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
             {
                 UnlockAllImages();

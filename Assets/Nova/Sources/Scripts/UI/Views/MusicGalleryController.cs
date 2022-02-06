@@ -94,16 +94,25 @@ namespace Nova
         protected override void Awake()
         {
             base.Awake();
+
             checkpointManager = Utils.FindNovaGameController().CheckpointManager;
             allMusics = musicList.entries
                 .Select(entry => new MusicListEntry(LockedIndex, entry))
                 .ToList();
         }
 
+        protected override void Start()
+        {
+            base.Start();
+
+            checkpointManager.Init();
+        }
+
         public override void Show(Action onFinish)
         {
             PauseOtherAudios();
             RefreshContent();
+
             base.Show(onFinish);
         }
 
@@ -111,6 +120,7 @@ namespace Nova
         {
             RestoreOtherAudios();
             musicPlayer.Pause();
+
             base.Hide(onFinish);
         }
 
@@ -203,6 +213,7 @@ namespace Nova
         protected override void OnActivatedUpdate()
         {
             base.OnActivatedUpdate();
+
             if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
             {
                 UnlockAllMusics();

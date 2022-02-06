@@ -162,8 +162,16 @@ namespace Nova
 
         private readonly CheckpointSerializer serializer = new CheckpointSerializer();
 
-        private void Start()
+        private bool inited;
+
+        // Should be called in Start, not in Awake
+        public void Init()
         {
+            if (inited)
+            {
+                return;
+            }
+
             savePathBase = Path.Combine(Application.persistentDataPath, "Save", saveFolder);
             globalSavePath = Path.Combine(savePathBase, "global.nsav");
             Directory.CreateDirectory(savePathBase);
@@ -176,7 +184,7 @@ namespace Nova
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogErrorFormat("Nova: Cannot load global save file: {0}", ex.Message);
+                    Debug.LogError($"Nova: Cannot load global save file: {ex.Message}");
                     Alert.Show(
                         null,
                         I18n.__("bookmark.load.globalfail"),
@@ -204,6 +212,12 @@ namespace Nova
             }
 
             // Debug.Log("Nova: CheckpointManager initialized.");
+            inited = true;
+        }
+
+        private void Start()
+        {
+            Init();
         }
 
         private void OnDestroy()

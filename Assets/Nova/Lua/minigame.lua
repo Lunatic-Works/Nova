@@ -1,8 +1,12 @@
-local function wait_fence()
+function wait_fence()
     while __Nova.coroutineHelper.fence == nil do
         coroutine.step()
     end
     return __Nova.coroutineHelper:TakeFence()
+end
+
+function signal_fence(value)
+    __Nova.coroutineHelper:SignalFence(value)
 end
 
 local function check_lazy_not_before(name)

@@ -71,6 +71,13 @@ namespace Nova
             lastCheckpointLogParams = null;
         }
 
+        protected override void Start()
+        {
+            base.Start();
+
+            checkpointManager.Init();
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -210,7 +217,9 @@ namespace Nova
             }
 
             scrollRect.verticalNormalizedPosition = 0.0f;
+
             base.Show(onFinish);
+
             scrollRect.verticalNormalizedPosition = 0.0f;
             lastClickedLogIndex = -1;
         }

@@ -164,6 +164,8 @@ namespace Nova
         protected override void Start()
         {
             base.Start();
+
+            checkpointManager.Init();
             previewEntry = myPanel.transform.Find("Background/Left/SaveEntry").GetComponent<SaveEntryController>();
             previewEntry.InitAsPreview(null, Hide);
             ShowPage();
@@ -256,6 +258,7 @@ namespace Nova
             selectedSaveID = -1;
 
             ShowPage();
+
             base.Show();
         }
 
