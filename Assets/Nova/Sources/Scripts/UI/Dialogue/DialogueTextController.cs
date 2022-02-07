@@ -7,7 +7,10 @@ namespace Nova
     public class DialogueTextController : MonoBehaviour
     {
         public GameObject dialogueEntryPrefab;
-        public readonly List<DialogueEntryController> dialogueEntryControllers = new List<DialogueEntryController>();
+
+        private readonly List<DialogueEntryController> _dialogueEntryControllers = new List<DialogueEntryController>();
+        public IEnumerable<DialogueEntryController> dialogueEntryControllers => _dialogueEntryControllers;
+        public int Count => _dialogueEntryControllers.Count;
 
         private PrefabFactory _prefabFactory;
 
@@ -42,13 +45,13 @@ namespace Nova
 
         public void Clear()
         {
-            foreach (var dec in dialogueEntryControllers)
+            foreach (var dec in _dialogueEntryControllers)
             {
                 dec.Clear();
                 prefabFactory.Put(dec.gameObject);
             }
 
-            dialogueEntryControllers.Clear();
+            _dialogueEntryControllers.Clear();
         }
 
         public DialogueEntryController AddEntry(DialogueDisplayData displayData, TextAlignmentOptions alignment,
@@ -61,7 +64,7 @@ namespace Nova
             _transform.localPosition = Vector3.zero;
             _transform.localRotation = Quaternion.identity;
             _transform.localScale = Vector3.one;
-            dialogueEntryControllers.Add(dec);
+            _dialogueEntryControllers.Add(dec);
             dec.Init(displayData, alignment, characterNameColor, textColor, materialName,
                 layoutSetting, textLeftExtraPadding);
             return dec;

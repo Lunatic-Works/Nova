@@ -75,7 +75,6 @@ namespace Nova
         /// Displayed node name in each locale.
         /// </summary>
         private readonly Dictionary<SystemLanguage, string> _displayNames = new Dictionary<SystemLanguage, string>();
-
         public IReadOnlyDictionary<SystemLanguage, string> displayNames => _displayNames;
 
         public void AddLocalizedName(SystemLanguage locale, string displayName)

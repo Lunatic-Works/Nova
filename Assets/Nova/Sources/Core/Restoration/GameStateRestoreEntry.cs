@@ -38,10 +38,10 @@ namespace Nova
     [Serializable]
     public class GameStateCheckpoint : GameStateRestoreEntry
     {
-        public readonly Dictionary<string, IRestoreData> restoreDatas;
+        public readonly IReadOnlyDictionary<string, IRestoreData> restoreDatas;
         public readonly Variables variables;
 
-        public GameStateCheckpoint(Dictionary<string, IRestoreData> restoreDatas, Variables variables,
+        public GameStateCheckpoint(IReadOnlyDictionary<string, IRestoreData> restoreDatas, Variables variables,
             int restrainCheckpointNum)
             : base(0, restrainCheckpointNum)
         {

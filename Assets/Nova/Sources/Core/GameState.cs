@@ -673,12 +673,12 @@ namespace Nova
             return flowChartTree.GetNode(name);
         }
 
-        public List<string> GetAllStartNodeNames()
+        public IReadOnlyList<string> GetAllStartNodeNames()
         {
             return flowChartTree.GetAllStartNodeNames();
         }
 
-        public List<string> GetAllUnlockedStartNodeNames()
+        public IReadOnlyList<string> GetAllUnlockedStartNodeNames()
         {
             return flowChartTree.GetAllUnlockedStartNodeNames();
         }

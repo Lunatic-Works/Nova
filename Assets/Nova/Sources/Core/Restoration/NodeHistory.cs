@@ -9,15 +9,15 @@ namespace Nova
     [Serializable]
     public class NodeHistoryData
     {
-        public readonly List<string> nodeNames;
-        public readonly Dictionary<int, Dictionary<int, ulong>> interrupts;
+        public readonly IReadOnlyList<string> nodeNames;
+        public readonly IReadOnlyDictionary<int, IReadOnlyDictionary<int, ulong>> interrupts;
 
         public NodeHistoryData(NodeHistory nodeHistory)
         {
             nodeNames = nodeHistory.Select(x => x.Key).ToList();
             interrupts = nodeHistory.interrupts.ToDictionary(
                 pair => pair.Key,
-                pair => pair.Value.ToDictionary(
+                pair => (IReadOnlyDictionary<int, ulong>)pair.Value.ToDictionary(
                     pair2 => pair2.Key,
                     pair2 => pair2.Value
                 )

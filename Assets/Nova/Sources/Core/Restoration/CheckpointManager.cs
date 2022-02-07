@@ -243,7 +243,7 @@ namespace Nova
             nodeHistory.interrupts.Clear();
             foreach (var pair in data.interrupts)
             {
-                nodeHistory.interrupts[pair.Key] = new SortedDictionary<int, ulong>(pair.Value);
+                nodeHistory.interrupts[pair.Key] = new SortedDictionary<int, ulong>((IDictionary<int, ulong>)pair.Value);
             }
         }
 

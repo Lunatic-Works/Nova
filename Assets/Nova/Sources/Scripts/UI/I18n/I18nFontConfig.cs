@@ -24,7 +24,7 @@ namespace Nova
     {
         private static I18nFontConfig Current;
 
-        public static List<LocalizedFontConfig> Config => Current.config;
+        public static IEnumerable<LocalizedFontConfig> Config => Current.config;
 
         public List<LocalizedFontConfig> config;
 

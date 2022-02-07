@@ -19,7 +19,7 @@ namespace Nova
             public readonly DialogueDisplayData displayData;
             public readonly NodeHistoryEntry nodeHistoryEntry;
             public readonly int dialogueIndex;
-            public readonly Dictionary<string, VoiceEntry> voices;
+            public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
             public int logEntryIndex;
 
             public LogParam(DialogueDisplayData displayData, NodeHistoryEntry nodeHistoryEntry, int dialogueIndex,
@@ -28,7 +28,7 @@ namespace Nova
                 this.displayData = displayData;
                 this.nodeHistoryEntry = nodeHistoryEntry;
                 this.dialogueIndex = dialogueIndex;
-                this.voices = (Dictionary<string, VoiceEntry>)voices;
+                this.voices = voices;
                 this.logEntryIndex = logEntryIndex;
             }
         }

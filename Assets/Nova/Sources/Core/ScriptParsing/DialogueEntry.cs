@@ -19,11 +19,11 @@ namespace Nova
     [Serializable]
     public class DialogueDisplayData
     {
-        public readonly Dictionary<SystemLanguage, string> displayNames;
-        public readonly Dictionary<SystemLanguage, string> dialogues;
+        public readonly IReadOnlyDictionary<SystemLanguage, string> displayNames;
+        public readonly IReadOnlyDictionary<SystemLanguage, string> dialogues;
 
-        public DialogueDisplayData(Dictionary<SystemLanguage, string> displayNames,
-            Dictionary<SystemLanguage, string> dialogues)
+        public DialogueDisplayData(IReadOnlyDictionary<SystemLanguage, string> displayNames,
+            IReadOnlyDictionary<SystemLanguage, string> dialogues)
         {
             this.displayNames = displayNames;
             this.dialogues = dialogues;
@@ -57,12 +57,12 @@ namespace Nova
         /// <summary>
         /// Displayed character name in each locale, before string interpolation.
         /// </summary>
-        public readonly Dictionary<SystemLanguage, string> displayNames;
+        private readonly Dictionary<SystemLanguage, string> displayNames;
 
         /// <summary>
         /// Displayed dialogue text in each locale, before string interpolation.
         /// </summary>
-        public readonly Dictionary<SystemLanguage, string> dialogues;
+        private readonly Dictionary<SystemLanguage, string> dialogues;
 
         /// <summary>
         /// The actions to execute when the game processes to this point.

@@ -18,8 +18,8 @@ namespace Nova
         private LogController logController;
         private NameSorter nameSorter;
 
-        private List<string> startNodeNames;
-        private List<string> unlockedStartNodeNames;
+        private IReadOnlyList<string> startNodeNames;
+        private IReadOnlyList<string> unlockedStartNodeNames;
 
         private Dictionary<string, GameObject> buttons;
 

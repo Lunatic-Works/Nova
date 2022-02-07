@@ -585,7 +585,7 @@ namespace Nova
                     );
                 if (!textScrollOverriden)
                 {
-                    if (dialogueText.dialogueEntryControllers.Count == 1)
+                    if (dialogueText.Count == 1)
                     {
                         SetTextScroll(0f);
                     }
@@ -704,8 +704,7 @@ namespace Nova
 
         private bool NextPageOrStep()
         {
-            if (dialogueText.dialogueEntryControllers.Count == 0 ||
-                !dialogueText.dialogueEntryControllers.Last().Forward())
+            if (dialogueText.Count == 0 || !dialogueText.dialogueEntryControllers.Last().Forward())
             {
                 gameState.Step();
                 return false;

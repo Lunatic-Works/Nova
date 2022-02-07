@@ -107,12 +107,12 @@ namespace Nova
         /// <summary>
         /// Returns names of all start nodes.
         /// </summary>
-        public List<string> GetAllStartNodeNames()
+        public IReadOnlyList<string> GetAllStartNodeNames()
         {
             return startNodes.Keys.ToList();
         }
 
-        public List<string> GetAllUnlockedStartNodeNames()
+        public IReadOnlyList<string> GetAllUnlockedStartNodeNames()
         {
             return unlockedStartNodes.Keys.ToList();
         }

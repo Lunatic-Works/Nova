@@ -431,7 +431,7 @@ namespace Nova
         }
 
         public static IReadOnlyList<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(
-            IReadOnlyList<ScriptLoader.Chunk> chunks)
+            IEnumerable<ScriptLoader.Chunk> chunks)
         {
             var results = new List<LocalizedDialogueEntry>();
             foreach (var chunk in chunks)

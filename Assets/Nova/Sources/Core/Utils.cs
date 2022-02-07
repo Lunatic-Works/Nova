@@ -64,6 +64,11 @@ namespace Nova
             }
         }
 
+        public static int IndexOf<T>(this IReadOnlyList<T> list, T item)
+        {
+            return ((List<T>)list).IndexOf(item);
+        }
+
         public static TValue Ensure<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key) where TValue : new()
         {
             if (dict.TryGetValue(key, out TValue value))
