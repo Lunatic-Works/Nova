@@ -114,7 +114,7 @@ namespace Nova.Editor
                     newSetting.loadType = AudioClipLoadType.DecompressOnLoad;
                     audioImporter.defaultSampleSettings = newSetting;
 
-                    AssetDatabase.ImportAsset(assetPath);
+                    audioImporter.SaveAndReimport();
 
                     sampleData = new float[audioClip.samples];
                     audioClip.LoadAudioData();
@@ -138,7 +138,7 @@ namespace Nova.Editor
                     audioImporter.forceToMono = false;
                     audioImporter.defaultSampleSettings = prevSetting;
 
-                    AssetDatabase.ImportAsset(assetPath);
+                    audioImporter.SaveAndReimport();
                 }
 
                 if (audioClip != null)

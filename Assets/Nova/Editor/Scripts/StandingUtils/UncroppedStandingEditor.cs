@@ -91,50 +91,59 @@ namespace Nova.Editor
 
             if (GUILayout.Button("Write Cropped Textures"))
             {
-                WriteCropResult(standing);
+                WriteCroppedTexture(standing);
             }
 
             if (GUILayout.Button("Generate Metadata"))
             {
-                GenerateMetaData(standing);
+                GenerateMetadata(standing);
             }
         }
 
-        private static void WriteCropResult(UncroppedStanding standing)
+        private static void WriteCroppedTexture(UncroppedStanding standing)
         {
             foreach (var cropper in standing.GetComponentsInChildren<SpriteCropper>())
             {
-                WriteCropResult(standing, cropper);
+                WriteCroppedTexture(standing, cropper);
             }
 
             AssetDatabase.Refresh();
         }
 
-        private static void WriteCropResult(UncroppedStanding standing, SpriteCropper cropper)
+        private static void WriteCroppedTexture(UncroppedStanding standing, SpriteCropper cropper)
         {
             var cropRect = cropper.cropRect;
             var cropped = new Texture2D(cropRect.width, cropRect.height, TextureFormat.RGBA32, false);
-
             var texture = cropper.sprite.texture;
             var pixels = texture.GetPixels(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
             cropped.SetPixels(pixels);
             cropped.Apply();
 
             var bytes = cropped.EncodeToPNG();
-            var absoluteOutputFileName = Path.Combine(standing.absoluteOutputDirectory, cropper.sprite.name + ".png");
-            Directory.CreateDirectory(Path.GetDirectoryName(absoluteOutputFileName));
-            File.WriteAllBytes(absoluteOutputFileName, bytes);
-        }
+            var fileName = cropper.sprite.name + ".png";
+            var absoluteOutputPath = Path.Combine(standing.absoluteOutputDirectory, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(absoluteOutputPath));
+            File.WriteAllBytes(absoluteOutputPath, bytes);
 
-        private static void GenerateMetaData(UncroppedStanding standing)
-        {
-            foreach (var cropper in standing.GetComponentsInChildren<SpriteCropper>())
+            var assetPath = Path.Combine(standing.outputDirectory, fileName);
+            AssetDatabase.ImportAsset(assetPath);
+            var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            if (importer.textureType != TextureImporterType.Sprite)
             {
-                GenerateMetaData(standing, cropper);
+                importer.textureType = TextureImporterType.Sprite;
+                importer.SaveAndReimport();
             }
         }
 
-        private static void GenerateMetaData(UncroppedStanding standing, SpriteCropper cropper)
+        private static void GenerateMetadata(UncroppedStanding standing)
+        {
+            foreach (var cropper in standing.GetComponentsInChildren<SpriteCropper>())
+            {
+                GenerateMetadata(standing, cropper);
+            }
+        }
+
+        private static void GenerateMetadata(UncroppedStanding standing, SpriteCropper cropper)
         {
             var meta = CreateInstance<SpriteWithOffset>();
             meta.offset = (cropper.cropRect.center - cropper.boundRect.center) / cropper.sprite.pixelsPerUnit;

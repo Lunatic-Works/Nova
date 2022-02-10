@@ -91,16 +91,28 @@ namespace Nova.Editor
                     {
                         hasPixelInRow = true;
                         minX = Math.Min(minX, j);
-                        maxX = Math.Max(maxX, j);
+                        break;
                     }
                 }
 
-                if (hasPixelInRow)
+                if (!hasPixelInRow)
                 {
-                    hasPixel = true;
-                    minY = Math.Min(minY, i);
-                    maxY = Math.Max(maxY, i);
+                    continue;
                 }
+
+                for (var j = right - 1; j >= left; --j)
+                {
+                    var color = colors[texture.width * i + j];
+                    if (color.a > cropper.autoCropAlpha)
+                    {
+                        maxX = Math.Max(maxX, j);
+                        break;
+                    }
+                }
+
+                hasPixel = true;
+                minY = Math.Min(minY, i);
+                maxY = Math.Max(maxY, i);
             }
 
             if (hasPixel)
