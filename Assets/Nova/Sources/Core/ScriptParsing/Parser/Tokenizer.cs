@@ -133,7 +133,7 @@ namespace Nova.Script
 
             if (!lastIsRightSquareBracket && PeekChar(offset + len) == ']')
             {
-                throw new ParseException("Unpaired multiline string");
+                throw new ParseException(Peek(), "Unpaired multiline string");
             }
 
             return len + 1;
@@ -160,7 +160,7 @@ namespace Nova.Script
             }
             else
             {
-                Assert.IsTrue(false, "Should not happen");
+                throw new ParseException(Peek(), "Should not happen");
             }
 
             ParseNext();

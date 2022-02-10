@@ -65,7 +65,7 @@ namespace Nova
         }
 
         private readonly Dictionary<Type, ViewControllerBase> controllers = new Dictionary<Type, ViewControllerBase>();
-        private readonly Type[] overlayViewControllers = {typeof(NotificationViewController)};
+        private readonly Type[] overlayViewControllers = {typeof(NotificationController)};
 
         public GameObject dialoguePanel => GetController<DialogueBoxController>().myPanel;
         public GameObject titlePanel => GetController<TitleController>().myPanel;

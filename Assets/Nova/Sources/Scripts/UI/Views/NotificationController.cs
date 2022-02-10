@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class NotificationViewController : ViewControllerBase
+    public class NotificationController : ViewControllerBase
     {
         public GameObject notificationPrefab;
         public float notificationTimePerChar = 0.1f;

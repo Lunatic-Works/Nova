@@ -153,7 +153,7 @@ namespace Nova
         {
             if (key.StartsWith(TrackedKeyPrefix, StringComparison.Ordinal))
             {
-                var trackedKeys = new HashSet<string>(GetAllTrackedKeys()) {key};
+                var trackedKeys = new SortedSet<string>(GetAllTrackedKeys()) {key};
                 SetString(TrackedKeysKey, string.Join(",", trackedKeys));
             }
         }
