@@ -21,7 +21,6 @@ namespace Nova
             {
                 if (textProxy != null)
                 {
-                    textProxy.Init();
                     return textProxy.fontSize;
                 }
                 else if (textPro != null)
@@ -57,6 +56,11 @@ namespace Nova
             textProxy = GetComponent<TextProxy>();
             this.RuntimeAssert(text != null || textPro != null || textProxy != null,
                 "Missing Text or TMP_Text or TextProxy.");
+
+            if (textProxy != null)
+            {
+                textProxy.Init();
+            }
 
             initFontSize = fontSize;
         }

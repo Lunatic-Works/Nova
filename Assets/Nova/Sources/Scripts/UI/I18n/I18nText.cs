@@ -20,6 +20,11 @@ namespace Nova
             textProxy = GetComponent<TextProxy>();
             this.RuntimeAssert(text != null || textPro != null || textProxy != null,
                 "Missing Text or TMP_Text or TextProxy.");
+
+            if (textProxy != null)
+            {
+                textProxy.Init();
+            }
         }
 
         private void UpdateText()
@@ -27,7 +32,6 @@ namespace Nova
             string str = I18n.__(inflateTextKey);
             if (textProxy != null)
             {
-                textProxy.Init();
                 textProxy.text = str;
             }
             else if (textPro != null)

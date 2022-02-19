@@ -68,6 +68,19 @@ namespace Nova
             }
         }
 
+        public void CheckFontInConfig()
+        {
+            foreach (var pair in I18nFontConfig.Config)
+            {
+                if (textBox.font == pair.fontAsset)
+                {
+                    return;
+                }
+            }
+
+            Debug.LogWarning($"Nova：Font asset {textBox.font} is not in I18nFontConfig.");
+        }
+
         public void UpdateFont()
         {
             foreach (var pair in I18nFontConfig.Config)

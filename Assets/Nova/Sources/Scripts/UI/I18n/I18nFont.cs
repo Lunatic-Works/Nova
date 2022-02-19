@@ -10,11 +10,15 @@ namespace Nova
         private void Awake()
         {
             textProxy = GetComponent<TextProxy>();
+            textProxy.Init();
+
+#if UNITY_EDITOR
+            textProxy.CheckFontInConfig();
+#endif
         }
 
         private void OnEnable()
         {
-            textProxy.Init();
             textProxy.UpdateFont();
             I18n.LocaleChanged.AddListener(textProxy.UpdateFont);
         }
