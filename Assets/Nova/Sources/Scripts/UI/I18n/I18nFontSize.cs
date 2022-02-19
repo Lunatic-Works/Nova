@@ -1,21 +1,64 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
 {
-    [RequireComponent(typeof(Text))]
     public class I18nFontSize : MonoBehaviour
     {
         public List<LocaleFloatPair> multipliers;
 
         private Text text;
-        private int fontSize;
+        private TMP_Text textPro;
+        private TextProxy textProxy;
+
+        private float initFontSize;
+
+        private float fontSize
+        {
+            get
+            {
+                if (textProxy != null)
+                {
+                    textProxy.Init();
+                    return textProxy.fontSize;
+                }
+                else if (textPro != null)
+                {
+                    return textPro.fontSize;
+                }
+                else
+                {
+                    return text.fontSize;
+                }
+            }
+            set
+            {
+                if (textProxy != null)
+                {
+                    textProxy.fontSize = value;
+                }
+                else if (textPro != null)
+                {
+                    textPro.fontSize = value;
+                }
+                else
+                {
+                    text.fontSize = Mathf.RoundToInt(value);
+                }
+            }
+        }
 
         private void Awake()
         {
             text = GetComponent<Text>();
-            fontSize = text.fontSize;
+            textPro = GetComponent<TMP_Text>();
+            textProxy = GetComponent<TextProxy>();
+            this.RuntimeAssert(text != null || textPro != null || textProxy != null,
+                "Missing Text or TMP_Text or TextProxy.");
+
+            initFontSize = fontSize;
         }
 
         private void UpdateFontSize()
@@ -24,12 +67,12 @@ namespace Nova
             {
                 if (pair.locale == I18n.CurrentLocale)
                 {
-                    text.fontSize = Mathf.RoundToInt(fontSize * pair.value);
+                    fontSize = initFontSize * pair.value;
                     return;
                 }
             }
 
-            text.fontSize = fontSize;
+            fontSize = initFontSize;
         }
 
         private void OnEnable()

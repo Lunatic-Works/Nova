@@ -15,7 +15,7 @@ namespace Nova.Editor
         }
 
         [MenuItem("Assets/Create/Nova/Uncropped Standing", false)]
-        public static void CreateUncroppedStandingWithSelectedSprites()
+        public static void CreateUncroppedStanding()
         {
             const string assetName = "UncroppedStanding";
             var parent = new GameObject(assetName);
@@ -44,7 +44,7 @@ namespace Nova.Editor
         }
 
         [MenuItem("Assets/Create/Nova/Uncropped Standing", true)]
-        public static bool CreateUncroppedStandingWithSelectedSpritesValidation()
+        public static bool CreateUncroppedStandingValidation()
         {
             var path = AssetDatabase.GetAssetPath(Selection.activeObject);
             return AssetDatabase.GetMainAssetTypeAtPath(path) == typeof(Texture2D);
