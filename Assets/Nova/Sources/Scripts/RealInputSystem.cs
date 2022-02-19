@@ -12,16 +12,14 @@ namespace Nova
             get
             {
                 // Dirty hack to prevent button state from keeping highlighted after click
-                if (Application.isMobilePlatform && touchCount == 0)
-                {
-                    return Vector3.zero;
-                }
+                // if (Application.isMobilePlatform && touchCount == 0)
+                // {
+                //     return Vector3.zero;
+                // }
 
                 return originalInput.mousePosition - RealScreen.offset;
             }
         }
-
-        public override int touchCount => originalInput.touchCount > 0 ? 1 : 0;
 
         public override Touch GetTouch(int index)
         {

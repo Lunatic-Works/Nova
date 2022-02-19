@@ -10,7 +10,7 @@ function force_gc()
 end
 
 add_action_after_lazy_block(function()
-    if gc_scheduled and not anim_persist_begun then
+    if gc_scheduled and not anim_persist_has_begun then
         -- TODO: UnloadUnusedAssets() is too slow at present, maybe we can
         -- uncomment it after using incremental GC
         -- Nova.AssetLoader.UnloadUnusedAssets()

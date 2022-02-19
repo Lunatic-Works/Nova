@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace Nova
 {
     [RequireComponent(typeof(Selectable))]
-    public class HighlightFix : MonoBehaviour, IPointerEnterHandler, IDeselectHandler
+    public class HighlightFix : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private Selectable selectable;
 
@@ -24,9 +24,9 @@ namespace Nova
             }
         }
 
-        public void OnDeselect(BaseEventData eventData)
+        public void OnPointerExit(PointerEventData eventData)
         {
-            selectable.OnPointerExit(null);
+            selectable.OnDeselect(eventData as BaseEventData);
         }
     }
 }

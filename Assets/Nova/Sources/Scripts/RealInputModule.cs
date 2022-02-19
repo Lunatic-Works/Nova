@@ -7,8 +7,6 @@ namespace Nova
     {
         protected override void Awake()
         {
-            Input.multiTouchEnabled = false;
-
             var realInput = gameObject.AddComponent<RealInputSystem>();
             realInput.originalInput = input;
             m_InputOverride = realInput;

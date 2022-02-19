@@ -136,7 +136,9 @@ namespace Nova
             }
 
             // Mouse right button
-            if (eventData.pointerId == -2 || Input.touchCount == 2)
+            // We do not use two-finger tap to simluate right button
+            // if (eventData.pointerId == -2 || Input.touchCount == 2)
+            if (eventData.pointerId == -2)
             {
                 if (!buttonRingTrigger.buttonShowing)
                 {
@@ -160,10 +162,10 @@ namespace Nova
                     buttonRingTrigger.Hide(true);
                 }
 
-                if (Input.touchCount == 2)
-                {
-                    skipNextTouch = true;
-                }
+                // if (Input.touchCount == 2)
+                // {
+                //     skipNextTouch = true;
+                // }
             }
             else
             {
