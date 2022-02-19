@@ -555,15 +555,15 @@ namespace Nova
             selectedSaveID = -1;
         }
 
-        private void ShowPreview(Sprite newThumbnailSprite, string newText)
+        private void ShowPreview(Sprite newThumbnailSprite, UnityAction onThumbnailButtonClicked, string newText)
         {
-            previewEntry.InitAsPreview(newThumbnailSprite, Hide);
+            previewEntry.InitAsPreview(newThumbnailSprite, onThumbnailButtonClicked);
             thumbnailTextProxy.text = newText;
         }
 
         private void ShowPreviewScreen()
         {
-            ShowPreview(screenSprite, I18n.__(
+            ShowPreview(screenSprite, Hide, I18n.__(
                 "bookmark.summary",
                 fromTitle ? "" : DateTime.Now.ToString(DateTimeFormat),
                 currentNode != null ? I18n.__(currentNode.displayNames) : "",
@@ -585,7 +585,7 @@ namespace Nova
                     description = node.GetDialogueEntryAt(bookmark.dialogueIndex).GetDisplayData().FormatNameDialogue();
                 }
 
-                ShowPreview(GetThumbnailSprite(saveID), I18n.__(
+                ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",
                     checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
                     displayName,
@@ -596,7 +596,7 @@ namespace Nova
             {
                 // TODO: do not load a bookmark multiple times when it is corrupted
                 Debug.LogWarning(e);
-                ShowPreview(corruptedThumbnailSprite, I18n.__("bookmark.corrupted.title"));
+                ShowPreview(corruptedThumbnailSprite, null, I18n.__("bookmark.corrupted.title"));
             }
         }
 
