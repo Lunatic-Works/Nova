@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Nova
 {
-    public class LogEntryController : MonoBehaviour
+    public class LogEntryController : MonoBehaviour, IPointerExitHandler
     {
         [HideInInspector] public int logEntryIndex;
 
@@ -50,6 +51,13 @@ namespace Nova
             onGoBackButtonClicked?.Invoke(logEntryIndex);
         }
 
+        private UnityAction<int> onPointerExit;
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            onPointerExit?.Invoke(logEntryIndex);
+        }
+
         /// <summary>
         /// Initialize the log entry prefab
         /// </summary>
@@ -58,13 +66,14 @@ namespace Nova
         /// <param name="onPlayVoiceButtonClicked">The action to perform when the play voice button clicked</param>
         /// <param name="logEntryIndex"></param>
         public void Init(DialogueDisplayData displayData, UnityAction<int> onGoBackButtonClicked,
-            UnityAction onPlayVoiceButtonClicked, int logEntryIndex)
+            UnityAction onPlayVoiceButtonClicked, UnityAction<int> onPointerExit, int logEntryIndex)
         {
             InitReferences();
             this.logEntryIndex = logEntryIndex;
             this.onGoBackButtonClicked = onGoBackButtonClicked;
             InitButton(goBackButton, OnGoBackButtonClicked);
             InitButton(playVoiceButton, onPlayVoiceButtonClicked);
+            this.onPointerExit = onPointerExit;
             this.displayData = displayData;
             UpdateText();
         }

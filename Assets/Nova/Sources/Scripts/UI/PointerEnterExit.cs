@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 namespace Nova
 {
@@ -9,12 +9,12 @@ namespace Nova
         public UnityEvent onPointerEnter;
         public UnityEvent onPointerExit;
 
-        public void OnPointerEnter(PointerEventData pointerEventData)
+        public void OnPointerEnter(PointerEventData eventData)
         {
             onPointerEnter.Invoke();
         }
 
-        public void OnPointerExit(PointerEventData pointerEventData)
+        public void OnPointerExit(PointerEventData eventData)
         {
             onPointerExit.Invoke();
         }

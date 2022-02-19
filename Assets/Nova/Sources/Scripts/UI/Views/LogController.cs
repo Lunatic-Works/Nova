@@ -132,7 +132,9 @@ namespace Nova
                 onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(logParam.voices);
             }
 
-            logEntry.Init(logParam.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked,
+            UnityAction<int> onPointerExit = logEntryIndex => OnPointerExit(logEntryIndex);
+
+            logEntry.Init(logParam.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked, onPointerExit,
                 logParam.logEntryIndex);
 
             logEntries.Add(logEntry);
@@ -203,6 +205,14 @@ namespace Nova
         private static void OnPlayVoiceButtonClicked(IReadOnlyDictionary<string, VoiceEntry> voiceEntries)
         {
             CharacterController.ReplayVoice(voiceEntries);
+        }
+
+        private void OnPointerExit(int logEntryIndex)
+        {
+            if (logEntryIndex == lastClickedLogIndex)
+            {
+                lastClickedLogIndex = -1;
+            }
         }
 
         /// <summary>
