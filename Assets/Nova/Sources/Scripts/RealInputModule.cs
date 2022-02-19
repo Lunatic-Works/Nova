@@ -9,7 +9,7 @@ namespace Nova
         {
             var realInput = gameObject.AddComponent<RealInputSystem>();
             realInput.originalInput = input;
-            m_InputOverride = realInput;
+            inputOverride = realInput;
         }
     }
 }
