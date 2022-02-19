@@ -9,15 +9,24 @@ namespace Nova
     [RequireComponent(typeof(Selectable))]
     public class HighlightFix : MonoBehaviour, IPointerEnterHandler, IDeselectHandler
     {
+        private Selectable selectable;
+
+        private void Awake()
+        {
+            selectable = GetComponent<Selectable>();
+        }
+
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (!EventSystem.current.alreadySelecting)
+            {
                 EventSystem.current.SetSelectedGameObject(gameObject);
+            }
         }
 
         public void OnDeselect(BaseEventData eventData)
         {
-            GetComponent<Selectable>().OnPointerExit(null);
+            selectable.OnPointerExit(null);
         }
     }
 }
