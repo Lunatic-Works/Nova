@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -24,7 +25,8 @@ namespace Nova
     {
         private static I18nFontConfig Current;
 
-        public static IEnumerable<LocalizedFontConfig> Config => Current.config;
+        public static IEnumerable<LocalizedFontConfig> Config =>
+            Current == null ? Enumerable.Empty<LocalizedFontConfig>() : Current.config;
 
         public List<LocalizedFontConfig> config;
 
