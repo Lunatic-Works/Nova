@@ -1,6 +1,3 @@
---- length of the voice filename after padding zeros to the left
-local pad_len = 2
-
 function auto_voice_on(name, index)
     __Nova.autoVoice:SetEnabled(name, true)
     __Nova.autoVoice:SetIndex(name, index)
