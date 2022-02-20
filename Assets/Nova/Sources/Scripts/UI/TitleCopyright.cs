@@ -10,20 +10,34 @@ namespace Nova
     public class TitleCopyright : MonoBehaviour
     {
         public TextAsset textAsset;
+        public bool autoUpdate = true;
 
         private void Start()
         {
-            var textBox = GetComponent<Text>();
+            if (textAsset == null)
+            {
+                return;
+            }
+
+            string copyright;
 
 #if UNITY_EDITOR
-            var copyright = $"© {DateTime.Now.Year} {Application.companyName}";
-            textBox.text = copyright;
+            if (autoUpdate)
+            {
+                copyright = $"© {DateTime.Now.Year} {Application.companyName}";
 
-            var path = AssetDatabase.GetAssetPath(textAsset);
-            File.WriteAllText(path, copyright);
+                var path = AssetDatabase.GetAssetPath(textAsset);
+                File.WriteAllText(path, copyright);
+            }
+            else
+            {
+                copyright = textAsset.text;
+            }
 #else
-            GetComponent<Text>().text = textAsset.text;
+            copyright = textAsset.text;
 #endif
+
+            GetComponent<Text>().text = copyright;
         }
     }
 }
