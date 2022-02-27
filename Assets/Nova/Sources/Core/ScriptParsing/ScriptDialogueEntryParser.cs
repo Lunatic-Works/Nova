@@ -423,7 +423,6 @@ namespace Nova
                     actions.Add(stage, action);
                 }
 
-                // TODO: there may be some grammar to set different internal and displayed character names
                 results.Add(new DialogueEntry(characterName, displayName, dialogue, actions));
             }
 

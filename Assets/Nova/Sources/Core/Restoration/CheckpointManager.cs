@@ -262,7 +262,7 @@ namespace Nova
         /// </summary>
         /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
-        /// <param name="entry">Restore entry for the dialogue</param>
+        /// <param name="entry">Restore entry for the dialogue.</param>
         public void SetReached(NodeHistory nodeHistory, int dialogueIndex, GameStateRestoreEntry entry)
         {
             var nodeName = nodeHistory.Last().Key;

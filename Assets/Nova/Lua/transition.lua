@@ -116,9 +116,10 @@ local function set_mat(obj, mat, layer_id)
     end
 
     if pp then
-        pp:ClearLayer(layer_id)
         if mat then
-            pp:PushMaterial(layer_id, mat)
+            pp:SetLayer(layer_id, mat)
+        else
+            pp:ClearLayer(layer_id)
         end
         return
     end

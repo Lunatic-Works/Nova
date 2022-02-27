@@ -43,17 +43,16 @@ namespace Nova
 
         private void UpdateValue()
         {
-            float floatSize = configManager.GetFloat(configKeyName);
+            float fontSize = configManager.GetFloat(configKeyName);
             foreach (var pair in multipliers)
             {
                 if (pair.locale == I18n.CurrentLocale)
                 {
-                    floatSize *= pair.value;
+                    fontSize *= pair.value;
                     break;
                 }
             }
 
-            int fontSize = Mathf.RoundToInt(floatSize);
             if (textProxy != null)
             {
                 textProxy.fontSize = fontSize;
@@ -64,7 +63,7 @@ namespace Nova
             }
             else
             {
-                text.fontSize = fontSize;
+                text.fontSize = Mathf.RoundToInt(fontSize);
             }
         }
     }

@@ -31,55 +31,47 @@ namespace Nova
             }
         }
 
-        private readonly List<List<Material>> layers = new List<List<Material>>();
+        private readonly List<Material> layers = new List<Material>();
 
-        private int layersEnabledUntil; // Layers with id in [0, this) are enabled
-
-        private int layerCount
+        public void SetLayer(int layerID, Material material)
         {
-            get => layers.Count;
-            set
+            while (layers.Count < layerID)
             {
-                if (value < layers.Count)
-                    layers.Clear();
-                for (int i = layers.Count; i < value; i++)
-                    layers.Add(new List<Material>());
-                layersEnabledUntil = value;
+                layers.Add(null);
+            }
+
+            if (layers.Count == layerID)
+            {
+                layers.Add(material);
+            }
+            else
+            {
+                layers[layerID] = material;
             }
         }
 
-        public void PushMaterial(Material material)
+        public void ClearLayer(int layerID)
         {
-            PushMaterial(0, material);
-        }
+            if (layers.Count == layerID + 1)
+            {
+                layers.RemoveAt(layerID);
+            }
+            else
+            {
+                layers[layerID] = null;
+            }
 
-        public void PushMaterial(int layerID, Material material)
-        {
-            if (!material)
-                return;
-            if (layerCount <= layerID)
-                layerCount = layerID + 1;
-            layers[layerID].Add(material);
-        }
-
-        public void ClearLayer(int layerID = 0)
-        {
-            if (layerCount <= layerID)
-                layerCount = layerID + 1;
-            layers[layerID].Clear();
-        }
-
-        private bool LayerShouldRender(int layerID)
-        {
-            return layers[layerID].Count > 0;
+            while (layers.Count > 0 && !layers[layers.Count - 1])
+            {
+                layers.RemoveAt(layers.Count - 1);
+            }
         }
 
         private IEnumerable<Material> EnabledMaterials()
         {
-            for (var i = 0; i < layersEnabledUntil; i++)
+            foreach (var mat in layers)
             {
-                if (!LayerShouldRender(i)) continue;
-                foreach (var mat in layers[i])
+                if (mat)
                 {
                     yield return mat;
                 }
@@ -143,13 +135,11 @@ namespace Nova
         [Serializable]
         private class PostProcessingRestoreData : IRestoreData
         {
-            public readonly List<List<MaterialRestoreData>> layersData;
-            public readonly int layersEnabledUntil;
+            public readonly List<MaterialRestoreData> layersData;
 
-            public PostProcessingRestoreData(List<List<MaterialRestoreData>> layersData, int layersEnabledUntil)
+            public PostProcessingRestoreData(List<MaterialRestoreData> layersData)
             {
                 this.layersData = layersData;
-                this.layersEnabledUntil = layersEnabledUntil;
             }
         }
 
@@ -158,22 +148,8 @@ namespace Nova
         public IRestoreData GetRestoreData()
         {
             // Materials must be RestorableMaterial
-            var layersData = new List<List<MaterialRestoreData>>();
-            foreach (var layer in layers)
-            {
-                var layerData = new List<MaterialRestoreData>();
-                foreach (var material in layer)
-                {
-                    if (material is RestorableMaterial)
-                    {
-                        layerData.Add(RestorableMaterial.GetRestoreData(material));
-                    }
-                }
-
-                layersData.Add(layerData);
-            }
-
-            return new PostProcessingRestoreData(layersData, layersEnabledUntil);
+            var layersData = layers.Select(RestorableMaterial.GetRestoreData).ToList();
+            return new PostProcessingRestoreData(layersData);
         }
 
         public void Restore(IRestoreData restoreData)
@@ -183,19 +159,11 @@ namespace Nova
             // Materials must be RestorableMaterial
             MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
             layers.Clear();
-            foreach (var layerData in data.layersData)
+            foreach (var materialRestoreData in data.layersData)
             {
-                var layer = new List<Material>();
-                foreach (var materialRestoreData in layerData)
-                {
-                    var material = RestorableMaterial.RestoreMaterialFromData(materialRestoreData, factory);
-                    layer.Add(material);
-                }
-
-                layers.Add(layer);
+                var material = RestorableMaterial.RestoreMaterialFromData(materialRestoreData, factory);
+                layers.Add(material);
             }
-
-            layersEnabledUntil = data.layersEnabledUntil;
         }
 
         #endregion

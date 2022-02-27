@@ -373,7 +373,7 @@ namespace Nova
                         StopFastForward();
                         fastForwardModeStops.Invoke();
 
-                        uiPP.ClearLayer();
+                        uiPP.ClearLayer(0);
                         if (fastForwardModeIcon != null)
                         {
                             fastForwardModeIcon.SetActive(false);
@@ -424,7 +424,7 @@ namespace Nova
                         StartFastForward();
                         fastForwardModeStarts.Invoke();
 
-                        uiPP.PushMaterial(fastForwardPostProcessingMaterial);
+                        uiPP.SetLayer(0, fastForwardPostProcessingMaterial);
                         if (fastForwardModeIcon != null)
                         {
                             fastForwardModeIcon.SetActive(true);

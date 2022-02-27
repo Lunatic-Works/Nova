@@ -5,8 +5,7 @@
     "FontSize": {
         "min": 30,
         "defaultValue": 40,
-        "max": 50,
-        "whole": true
+        "max": 50
     },
     "TextSpeed": {
         "min": 1,
