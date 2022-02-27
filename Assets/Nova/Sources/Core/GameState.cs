@@ -425,10 +425,11 @@ namespace Nova
         {
             if (!fromCheckpoint)
             {
-                // If the following two lines of code are put into a new coroutine function, one frame delay will be introduced,
+                // If the following lines of code are put into a new coroutine function, one frame delay will be introduced,
                 // so don't do that
                 currentDialogueEntry.ExecuteAction(DialogueActionStage.BeforeCheckpoint, isRestoring);
                 while (actionPauseLock.isLocked) yield return null;
+                if (!isActionRunning) yield break;
             }
 
             DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped, out var isReached,
@@ -437,6 +438,7 @@ namespace Nova
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
+            if (!isActionRunning) yield break;
 
             // Everything that makes game state pause has ended, so change dialogue
             dialogueChanged.Invoke(new DialogueChangedData(nodeHistory.Last(), currentIndex,
@@ -447,6 +449,7 @@ namespace Nova
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.AfterDialogue, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
+            if (!isActionRunning) yield break;
 
             state = State.Normal;
 
@@ -646,7 +649,6 @@ namespace Nova
         /// <param name="startNode">The node from where the game starts</param>
         private void GameStart(FlowChartNode startNode)
         {
-            CancelAction();
             ResetGameState();
             MoveToNextNode(startNode, () => { });
         }
