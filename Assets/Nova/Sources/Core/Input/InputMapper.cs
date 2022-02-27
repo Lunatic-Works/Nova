@@ -107,9 +107,9 @@ namespace Nova
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                Debug.LogWarning("Nova: Failed to load input mapping file, use default input mapping.");
+                Debug.LogWarning($"Nova: Failed to load input mapping file.\n{e.Message}\nUse default input mapping...");
                 keyboard.Data = GetDefaultKeyboardData();
             }
         }

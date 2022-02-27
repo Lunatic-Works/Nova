@@ -226,22 +226,32 @@ function get_color(obj)
     return nil
 end
 
-function parse_color(color)
+function parse_color(color, is_vector)
+    if is_vector then
+        Type = Vector4
+        default = Vector4.zero
+        default_alpha = 0
+    else
+        Type = Color
+        default = Color.white
+        default_alpha = 1
+    end
+
     if type(color) == 'number' then
-        return Color(color, color, color, 1)
+        return Type(color, color, color, default_alpha)
     else -- type(color) == 'table'
         if #color == 1 then
             warn('Table is not needed: {' .. color[1] .. '}')
-            return Color(color[1], color[1], color[1], 1)
+            return Type(color[1], color[1], color[1], default_alpha)
         elseif #color == 2 then
-            return Color(color[1], color[1], color[1], color[2])
+            return Type(color[1], color[1], color[1], color[2])
         elseif #color == 3 then
-            return Color(color[1], color[2], color[3], 1)
+            return Type(color[1], color[2], color[3], default_alpha)
         elseif #color == 4 then
-            return Color(color[1], color[2], color[3], color[4])
+            return Type(color[1], color[2], color[3], color[4])
         else
             warn('Parse color failed: ' .. dump(color))
-            return Color.white
+            return default
         end
     end
 end

@@ -334,6 +334,11 @@ namespace Nova
         {
             var bookmark = checkpointManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
+            if (bookmark == null)
+            {
+                return;
+            }
+
             gameState.LoadBookmark(bookmark);
 
             if (viewManager.titlePanel.activeSelf)
@@ -425,6 +430,11 @@ namespace Nova
                 (int)BookmarkType.NormalSave, SaveIDQueryType.Latest);
             var bookmark = checkpointManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
+            if (bookmark == null)
+            {
+                return;
+            }
+
             gameState.LoadBookmark(bookmark);
 
             viewManager.TryPlaySound(loadActionSound);

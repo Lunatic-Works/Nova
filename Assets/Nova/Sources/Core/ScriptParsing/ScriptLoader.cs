@@ -113,9 +113,9 @@ namespace Nova
                     {
                         ParseScript(script.text);
                     }
-                    catch (ParseException parseException)
+                    catch (ParseException e)
                     {
-                        throw new ParseException($"Failed to parse {script.name}", parseException);
+                        throw new ParseException($"Failed to parse {script.name}", e);
                     }
                 }
             }

@@ -6,7 +6,7 @@ Shader "Nova/$VARIANT_NAME$/Mix Add"
         _T ("Time", Range(0.0, 1.0)) = 0.0
         _Mask ("Mask", 2D) = "white" {}
         _ColorMul ("Color Multiplier", Color) = (1, 1, 1, 1)
-        _ColorAdd ("Color Offset", Color) = (0, 0, 0, 0)
+        _ColorAdd ("Color Offset", Vector) = (0, 0, 0, 0)
         _InvertMask ("Invert Mask", Float) = 0.0
         _AlphaFactor ("Alpha Factor", Float) = 0.0
     }

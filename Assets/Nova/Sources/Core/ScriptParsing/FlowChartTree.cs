@@ -286,7 +286,8 @@ namespace Nova
         /// </returns>
         public string GetEndName(FlowChartNode node)
         {
-            return endNodes.TryGetValue(node, out var name) ? name : null;
+            endNodes.TryGetValue(node, out var name);
+            return name;
         }
 
         /// <summary>

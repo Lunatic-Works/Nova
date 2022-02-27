@@ -16,7 +16,7 @@ namespace Nova
 
         private readonly BinaryFormatter formatter = new BinaryFormatter();
 
-        public T SafeRead<T>(string path, Action<T> assertion)
+        public T SafeRead<T>(string path)
         {
             try
             {
@@ -25,18 +25,16 @@ namespace Nova
                     using (var fs = File.OpenRead(path))
                     {
                         var result = Read<T>(fs);
-                        assertion(result);
                         return result;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Debug.LogWarning($"Nova: {path} is corrupted: {ex.Message}\nTry to recover...");
+                    Debug.LogWarning($"Nova: {path} is corrupted.\n{e.Message}\nTry to recover...");
                     var oldPath = path + ".old";
                     using (var fs = File.OpenRead(oldPath))
                     {
                         var result = Read<T>(fs);
-                        assertion(result);
 
                         // Recover only if the old file is good
                         File.Delete(path); // no exception if not exist
@@ -46,16 +44,11 @@ namespace Nova
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Debug.LogError($"Nova: Error loading {path}: {ex.Message}");
+                Debug.LogError($"Nova: Error loading {path}.\n{e.Message}");
                 throw; // Nested exception cannot display full message here
             }
-        }
-
-        public T SafeRead<T>(string path)
-        {
-            return SafeRead<T>(path, _ => { });
         }
 
         private bool alertOnSafeWriteFail = true;
@@ -82,13 +75,13 @@ namespace Nova
 
                 File.Delete(oldPath);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
                 // If there is some problem with Alert.Show, we need to avoid infinite recursion
                 if (alertOnSafeWriteFail)
                 {
                     alertOnSafeWriteFail = false;
-                    Alert.Show(I18n.__("bookmark.save.fail"), ex.Message);
+                    Alert.Show(I18n.__("bookmark.save.fail"), e.Message);
                 }
 
                 throw;

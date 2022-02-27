@@ -181,9 +181,9 @@ namespace Nova
                 {
                     globalSave = serializer.SafeRead<GlobalSave>(globalSavePath);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Debug.LogError($"Nova: Cannot load global save file: {ex.Message}");
+                    Debug.LogError($"Nova: Cannot load global save file.\n{e.Message}");
                     Alert.Show(
                         null,
                         I18n.__("bookmark.load.globalfail"),
@@ -466,11 +466,13 @@ namespace Nova
         /// <returns>The loaded bookmark.</returns>
         public Bookmark LoadBookmark(int saveID)
         {
-            var bookmark = serializer.SafeRead<Bookmark>(GetBookmarkFileName(saveID), result =>
+            var bookmark = serializer.SafeRead<Bookmark>(GetBookmarkFileName(saveID));
+            if (bookmark.globalSaveIdentifier != globalSave.identifier)
             {
-                this.RuntimeAssert(result.globalSaveIdentifier == globalSave.identifier,
-                    "Save file is incompatible with the global save file.");
-            });
+                Debug.LogWarning($"Nova: Save file is incompatible with the global save file, saveID {saveID}");
+                bookmark = null;
+            }
+
             return ReplaceCache(saveID, bookmark);
         }
 

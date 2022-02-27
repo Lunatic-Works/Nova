@@ -39,7 +39,7 @@ shader_type_data = {
         _T = 'Float',
     },
     ['Color'] = {
-        _ColorAdd = 'Color',
+        _ColorAdd = 'Vector',
         _ColorMul = 'Color',
         _T = 'Float',
     },
@@ -107,14 +107,14 @@ shader_type_data = {
     },
     ['Mix Add'] = {
         _AlphaFactor = 'Float',
-        _ColorAdd = 'Color',
+        _ColorAdd = 'Vector',
         _ColorMul = 'Color',
         _InvertMask = 'Float',
         _Mask = '2D',
         _T = 'Float',
     },
     ['Mono'] = {
-        _ColorAdd = 'Color',
+        _ColorAdd = 'Vector',
         _ColorMul = 'Color',
         _T = 'Float',
     },
@@ -404,7 +404,6 @@ shader_color_data = {
         _SubColor = Color.white,
     },
     ['Color'] = {
-        _ColorAdd = Color.clear,
         _ColorMul = Color.white,
     },
     ['Fade'] = {
@@ -418,11 +417,9 @@ shader_color_data = {
         _SubColor = Color.white,
     },
     ['Mix Add'] = {
-        _ColorAdd = Color.clear,
         _ColorMul = Color.white,
     },
     ['Mono'] = {
-        _ColorAdd = Color.clear,
         _ColorMul = Color.white,
     },
 }
@@ -430,5 +427,14 @@ shader_color_data = {
 shader_vector_data = {
     ['Change Texture With Fade'] = {
         _Offsets = Vector4.zero,
+    },
+    ['Color'] = {
+        _ColorAdd = Vector4.zero,
+    },
+    ['Mix Add'] = {
+        _ColorAdd = Vector4.zero,
+    },
+    ['Mono'] = {
+        _ColorAdd = Vector4.zero,
     },
 }

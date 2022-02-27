@@ -127,9 +127,9 @@ namespace Nova
                 scriptLoader.Init(scriptPath);
                 flowChartTree = scriptLoader.GetFlowChartTree();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Debug.LogError(ex);
+                Debug.LogError(e);
                 Utils.Quit();
             }
 
@@ -809,9 +809,9 @@ namespace Nova
             {
                 restorables.Add(restorable.restorableObjectName, restorable);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException e)
             {
-                throw new ArgumentException("Nova: A restorable should have an unique and non-null name.", ex);
+                throw new ArgumentException("Nova: A restorable should have an unique and non-null name.", e);
             }
         }
 

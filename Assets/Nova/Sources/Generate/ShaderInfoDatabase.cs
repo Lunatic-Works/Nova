@@ -71,7 +71,7 @@ namespace Nova.Generate
                 "Color",
                 new Dictionary<string, ShaderPropertyType>
                 {
-                    {"_ColorAdd", ShaderPropertyType.Color},
+                    {"_ColorAdd", ShaderPropertyType.Vector},
                     {"_ColorMul", ShaderPropertyType.Color},
                     {"_T", ShaderPropertyType.Float},
                 }
@@ -193,7 +193,7 @@ namespace Nova.Generate
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_AlphaFactor", ShaderPropertyType.Float},
-                    {"_ColorAdd", ShaderPropertyType.Color},
+                    {"_ColorAdd", ShaderPropertyType.Vector},
                     {"_ColorMul", ShaderPropertyType.Color},
                     {"_InvertMask", ShaderPropertyType.Float},
                     {"_Mask", ShaderPropertyType.TexEnv},
@@ -204,7 +204,7 @@ namespace Nova.Generate
                 "Mono",
                 new Dictionary<string, ShaderPropertyType>
                 {
-                    {"_ColorAdd", ShaderPropertyType.Color},
+                    {"_ColorAdd", ShaderPropertyType.Vector},
                     {"_ColorMul", ShaderPropertyType.Color},
                     {"_T", ShaderPropertyType.Float},
                 }
@@ -698,7 +698,6 @@ namespace Nova.Generate
                 "Color",
                 new Dictionary<string, Color>
                 {
-                    {"_ColorAdd", Color.clear},
                     {"_ColorMul", Color.white},
                 }
             },
@@ -728,7 +727,6 @@ namespace Nova.Generate
                 "Mix Add",
                 new Dictionary<string, Color>
                 {
-                    {"_ColorAdd", Color.clear},
                     {"_ColorMul", Color.white},
                 }
             },
@@ -736,7 +734,6 @@ namespace Nova.Generate
                 "Mono",
                 new Dictionary<string, Color>
                 {
-                    {"_ColorAdd", Color.clear},
                     {"_ColorMul", Color.white},
                 }
             },
@@ -750,6 +747,27 @@ namespace Nova.Generate
                 new Dictionary<string, Vector4>
                 {
                     {"_Offsets", Vector4.zero},
+                }
+            },
+            {
+                "Color",
+                new Dictionary<string, Vector4>
+                {
+                    {"_ColorAdd", Vector4.zero},
+                }
+            },
+            {
+                "Mix Add",
+                new Dictionary<string, Vector4>
+                {
+                    {"_ColorAdd", Vector4.zero},
+                }
+            },
+            {
+                "Mono",
+                new Dictionary<string, Vector4>
+                {
+                    {"_ColorAdd", Vector4.zero},
                 }
             },
         };

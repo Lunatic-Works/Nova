@@ -176,7 +176,7 @@ local function set_mat_properties(mat, base_shader_name, properties)
         elseif dtype == 'Color' then
             mat:SetColor(name, parse_color(value))
         elseif dtype == 'Vector' then
-            mat:SetVector(name, Vector4(unpack(value)))
+            mat:SetVector(name, parse_color(value, true))
         elseif dtype == '2D' then
             if mat:GetType() == typeof(Nova.RestorableMaterial) then
                 mat:SetTexturePath(name, value)

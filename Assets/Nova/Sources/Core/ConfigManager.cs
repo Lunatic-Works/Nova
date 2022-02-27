@@ -84,7 +84,8 @@ namespace Nova
 
         public SettingDefinition GetDefinition(string key)
         {
-            return definitions.TryGetValue(key, out var result) ? result : null;
+            definitions.TryGetValue(key, out var result);
+            return result;
         }
 
         // All get methods first search tmp cache and then player prefs and then default values

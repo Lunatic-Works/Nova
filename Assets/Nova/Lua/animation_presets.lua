@@ -57,7 +57,7 @@ make_anim_method('trans_down', function(self, obj, image_name, duration)
 end, add_preload_pattern)
 
 make_anim_method('trans_fade_in', function(self, obj, image_name, coord, color, duration, mask)
-    duration = duration or 1
+    duration = duration or 0.5
     mask = mask or 'Masks/wipe_up'
     local entry = self:action(function()
             vfx(obj, 'fade', 1, { _SubTex = '' })
@@ -69,7 +69,7 @@ make_anim_method('trans_fade_in', function(self, obj, image_name, coord, color, 
 end, add_preload_pattern)
 
 make_anim_method('trans_fade_out', function(self, obj, duration, mask)
-    duration = duration or 1
+    duration = duration or 0.5
     mask = mask or 'Masks/wipe_up'
     local entry = self:vfx(obj, 'fade', {0, 1}, duration, { _SubTex = '', _Mask = mask, _InvertMask = 1 }
         ):action(function()

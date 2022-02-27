@@ -61,9 +61,9 @@ namespace Nova
                     return SystemLanguage.ChineseSimplified;
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Debug.LogWarning($"Nova: Failed to get CurrentUICulture: {ex.Message}");
+                Debug.LogWarning($"Nova: Failed to get CurrentUICulture.\n{e.Message}");
             }
 
             return Application.systemLanguage;

@@ -126,10 +126,10 @@ namespace Nova
                 {
                     action.Call();
                 }
-                catch (LuaException ex)
+                catch (LuaException e)
                 {
                     throw new ScriptActionException(
-                        $"Nova: Exception occurred when executing action: {I18n.__(dialogues)}", ex);
+                        $"Nova: Exception occurred when executing action: {I18n.__(dialogues)}", e);
                 }
             }
         }
