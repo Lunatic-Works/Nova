@@ -51,19 +51,25 @@ namespace Nova
             NovaAnimation.StopAll();
             dialogueBoxController.state = DialogueBoxState.Normal;
 
-            gameState.SeekBackStep(1, out var nodeName, out var dialogueIndex);
-            gameState.MoveBackTo(nodeName, dialogueIndex);
+            if (gameState.SeekBackStep(1, out var nodeName, out var dialogueIndex))
+            {
+                gameState.MoveBackTo(nodeName, dialogueIndex);
+            }
+            else
+            {
+                Debug.LogWarning($"Nova: Cannot move backward at the first dialogue.");
+            }
         }
 
         private void JumpChapter(int offset)
         {
+            NovaAnimation.StopAll();
+            dialogueBoxController.state = DialogueBoxState.Normal;
+
             var chapters = gameState.GetAllStartNodeNames();
             int targetChapterIndex = chapters.IndexOf(gameState.currentNode.name) + offset;
             if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Count)
             {
-                NovaAnimation.StopAll();
-                dialogueBoxController.state = DialogueBoxState.Normal;
-
                 gameState.GameStart(chapters[targetChapterIndex]);
             }
             else

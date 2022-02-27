@@ -60,7 +60,7 @@ namespace Nova
         {
             if (string.IsNullOrEmpty(characterName))
             {
-                Debug.LogWarning($"Nova: Set avatar {imageName} with empty characterName");
+                Debug.LogWarning($"Nova: Set avatar {imageName} with empty characterName.");
                 return false;
             }
 
