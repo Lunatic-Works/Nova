@@ -56,7 +56,7 @@ namespace Nova
             try
             {
                 var cultureInfo = CultureInfo.CurrentCulture;
-                if (cultureInfo.Name.StartsWith("zh-"))
+                if (cultureInfo.Name.StartsWith("zh-", StringComparison.Ordinal))
                 {
                     return SystemLanguage.ChineseSimplified;
                 }

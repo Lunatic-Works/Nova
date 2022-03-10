@@ -23,7 +23,7 @@ What had happened?
 @<||>
 
 @<|
-label('ch4_true', 'The Last Chapter')
+label('l_true', 'The Last Chapter')
 |>
 Xiben::“I want a drink too.”
 
@@ -109,7 +109,7 @@ In my eyes, the colorless raindrops are shining like rainbows.
 @<||>
 
 @<|
-label('ch4_bad', 'The Last Chapter')
+label('l_bad', 'The Last Chapter')
 |>
 Because you didn't get the flag of Xiben, we cannot make up the plot…
 

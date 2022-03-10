@@ -13,15 +13,15 @@ local declared_global_variables = {}
 local _pop_prefix = pop_prefix
 setmetatable(_G, {
     __index = function(t, name)
-        local _type
-        _type, name = _pop_prefix(name, 'v_')
-        if not _type then
-            _type, name = _pop_prefix(name, 'gv_')
+        local prefix
+        prefix, name = _pop_prefix(name, 'v_')
+        if not prefix then
+            prefix, name = _pop_prefix(name, 'gv_')
         end
 
-        if _type == 'v_' then
+        if prefix == 'v_' then
             return get_nova_variable(name, false)
-        elseif _type == 'gv_' then
+        elseif prefix == 'gv_' then
             return get_nova_variable(name, true)
         else
             if not declared_global_variables[name] then
@@ -32,16 +32,16 @@ setmetatable(_G, {
     end,
 
     __newindex = function(t, name, value)
-        local _type
-        _type, name = _pop_prefix(name, 'v_')
-        if not _type then
-            _type, name = _pop_prefix(name, 'gv_')
+        local prefix
+        prefix, name = _pop_prefix(name, 'v_')
+        if not prefix then
+            prefix, name = _pop_prefix(name, 'gv_')
         end
 
-        if _type == 'v_' then
-            return set_nova_variable(name, value, false)
-        elseif _type == 'gv_' then
-            return set_nova_variable(name, value, true)
+        if prefix == 'v_' then
+            set_nova_variable(name, value, false)
+        elseif prefix == 'gv_' then
+            set_nova_variable(name, value, true)
         else
             declared_global_variables[name] = true
             rawset(t, name, value)

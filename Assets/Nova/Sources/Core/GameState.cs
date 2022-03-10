@@ -506,7 +506,7 @@ namespace Nova
                 selectionNames.Add(branchInfo.name);
             }
 
-            RaiseSelection(selections);
+            RaiseSelections(selections);
 
             while (coroutineHelper.fence == null)
             {
@@ -765,7 +765,7 @@ namespace Nova
             }
         }
 
-        public void RaiseSelection(IReadOnlyList<SelectionOccursData.Selection> selections)
+        public void RaiseSelections(IReadOnlyList<SelectionOccursData.Selection> selections)
         {
             selectionOccurs.Invoke(new SelectionOccursData(selections));
         }

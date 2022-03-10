@@ -62,7 +62,7 @@ namespace Nova
 
             if (string.IsNullOrEmpty(node.name))
             {
-                throw new ArgumentException("Nova: Node name is null or empty");
+                throw new ArgumentException("Nova: Node name is null or empty.");
             }
 
             if (nodes.ContainsKey(node.name))
@@ -136,7 +136,7 @@ namespace Nova
 
             if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentException("Nova: Start name is null or empty");
+                throw new ArgumentException("Nova: Start name is null or empty.");
             }
 
             if (!HasNode(node))
@@ -245,7 +245,7 @@ namespace Nova
 
             if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentException("Nova: End name is null or empty");
+                throw new ArgumentException("Nova: End name is null or empty.");
             }
 
             if (!HasNode(node))

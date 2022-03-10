@@ -56,9 +56,9 @@ namespace Nova
             fallThrough = false;
         }
 
-        public void RaiseSelection(SelectionList selections)
+        public void RaiseSelections(SelectionList selections)
         {
-            gameState.RaiseSelection(selections.selections);
+            gameState.RaiseSelections(selections.selections);
         }
     }
 }

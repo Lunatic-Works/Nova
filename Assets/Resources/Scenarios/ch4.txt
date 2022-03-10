@@ -45,14 +45,12 @@ show(qianye, 'normal', pos_r)
 发生了什么？
 @<|
 branch {
-    { dest = 'ch4_true', mode = 'jump', cond = 'v_flag_xiben' },
-    { dest = 'ch4_bad', mode = 'jump' },
+    { dest = 'l_true', mode = 'jump', cond = 'v_flag_xiben' },
+    { dest = 'l_bad', mode = 'jump' },
 }
 |>
 
-@<|
-label('ch4_true', '终章')
-|>
+@<| label 'l_true' |>
 <|
 hide(qianye)
 show(xiben, 'normal', pos_r)
@@ -216,9 +214,7 @@ stop_auto_ff()
 <align="center">终</align>
 @<| is_end 'true_end' |>
 
-@<|
-label('ch4_bad', '终章')
-|>
+@<| label 'l_bad' |>
 因为你没有获得西本的flag，剧情编不下去了……
 
 <|

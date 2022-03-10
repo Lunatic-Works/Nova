@@ -12,57 +12,57 @@ set_box()
 选一个吧
 @<|
 branch {
-    { dest = 'test_branch_1', text = '敲妹妹的门'},
-    { dest = 'test_branch_2', text = '去新年参拜'},
-    { dest = 'test_branch_3', text = '带走伊莉雅'},
+    { dest = 'l_a', text = '敲妹妹的门'},
+    { dest = 'l_b', text = '去新年参拜'},
+    { dest = 'l_c', text = '带走伊莉雅'},
 }
 |>
 
-@<| label 'test_branch_1' |>
+@<| label 'l_a' |>
 你选了：敲妹妹的门
-@<| jump_to 'test_branch_end_choice' |>
+@<| jump_to 'l_end_choice' |>
 
-@<| label 'test_branch_2' |>
+@<| label 'l_b' |>
 你选了：去新年参拜
-@<| jump_to 'test_branch_end_choice' |>
+@<| jump_to 'l_end_choice' |>
 
-@<| label 'test_branch_3' |>
+@<| label 'l_c' |>
 你选了：带走伊莉雅
-@<| jump_to 'test_branch_end_choice' |>
+@<| jump_to 'l_end_choice' |>
 
-@<| label 'test_branch_end_choice' |>
+@<| label 'l_end_choice' |>
 接下来测试剧本的循环
-@<| jump_to 'test_branch_begin_loop' |>
+@<| jump_to 'l_begin_loop' |>
 
-@<| label 'test_branch_begin_loop' |>
+@<| label 'l_begin_loop' |>
 要加一个flag吗
 @<|
 branch {
-    { dest = 'test_branch_add_flag', text = '加一个flag'},
-    { dest = 'test_branch_end_loop', text = '不加了'},
+    { dest = 'l_add_flag', text = '加一个flag'},
+    { dest = 'l_end_loop', text = '不加了'},
 }
 |>
 
-@<| label 'test_branch_add_flag' |>
+@<| label 'l_add_flag' |>
 <|
 v_flag = (v_flag or 0) + 1
 |>
 现在有{{v_flag}}个flag
-@<| jump_to 'test_branch_begin_loop' |>
+@<| jump_to 'l_begin_loop' |>
 
-@<| label 'test_branch_end_loop' |>
+@<| label 'l_end_loop' |>
 如果flag > 3会直接跳到最后
 @<|
 branch {
-    { dest = 'test_branch_end', text = '普通的选项'},
-    { dest = 'test_branch_end', text = 'flag > 1才会出现', mode = 'show', cond = function()
+    { dest = 'l_end', text = '普通的选项'},
+    { dest = 'l_end', text = 'flag > 1才会出现', mode = 'show', cond = function()
         return v_flag > 1
     end },
-    { dest = 'test_branch_end', text = 'flag < 2才能点击', mode = 'enable', cond = 'v_flag < 2' },
-    { dest = 'test_branch_end', mode = 'jump', cond = 'v_flag > 3' },
+    { dest = 'l_end', text = 'flag < 2才能点击', mode = 'enable', cond = 'v_flag < 2' },
+    { dest = 'l_end', mode = 'jump', cond = 'v_flag > 3' },
 }
 |>
 
-@<| label 'test_branch_end' |>
+@<| label 'l_end' |>
 测试结束
 @<| is_end() |>

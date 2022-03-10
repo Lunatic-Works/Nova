@@ -22,34 +22,34 @@ hide(__Nova.prefabLoader)
 先来一个选项
 @<|
 branch {
-    { dest = 'test_minigame_1', text = '敲妹妹的门'},
-    { dest = 'test_minigame_2', text = '去新年参拜'},
-    { dest = 'test_minigame_3', text = '带走伊莉雅'},
+    { dest = 'l_a', text = '敲妹妹的门'},
+    { dest = 'l_b', text = '去新年参拜'},
+    { dest = 'l_c', text = '带走伊莉雅'},
 }
 |>
 
-@<| label 'test_minigame_1' |>
+@<| label 'l_a' |>
 <|
 v_choice = '敲妹妹的门'
 |>
 你选了：敲妹妹的门
-@<| jump_to 'test_minigame_end_choice' |>
+@<| jump_to 'l_end_choice' |>
 
-@<| label 'test_minigame_2' |>
+@<| label 'l_b' |>
 <|
 v_choice = '去新年参拜'
 |>
 你选了：去新年参拜
-@<| jump_to 'test_minigame_end_choice' |>
+@<| jump_to 'l_end_choice' |>
 
-@<| label 'test_minigame_3' |>
+@<| label 'l_c' |>
 <|
 v_choice = '带走伊莉雅'
 |>
 你选了：带走伊莉雅
-@<| jump_to 'test_minigame_end_choice' |>
+@<| jump_to 'l_end_choice' |>
 
-@<| label 'test_minigame_end_choice' |>
+@<| label 'l_end_choice' |>
 <|
 v_test_bool = true
 v_test_int = 123

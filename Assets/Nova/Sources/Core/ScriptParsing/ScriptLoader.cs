@@ -111,7 +111,7 @@ namespace Nova
 
                     try
                     {
-                        ParseScript(script.text);
+                        ParseScript(script);
                     }
                     catch (ParseException e)
                     {
@@ -194,15 +194,14 @@ namespace Nova
         }
 
         /// <summary>
-        /// Parse the given script text.
+        /// Parse the given TextAsset to chunks and add them to currentNode.
         /// </summary>
-        /// <param name="text">Text of a script</param>
-        private void ParseScript(string text)
+        private void ParseScript(TextAsset script)
         {
             hiddenCharacterNames.Clear();
-            LuaRuntime.Instance.GetFunction("action_new_file").Call();
+            LuaRuntime.Instance.GetFunction("action_new_file").Call(script.name);
 
-            var blocks = Parser.Parse(text).blocks;
+            var blocks = Parser.Parse(script.text).blocks;
 
             if (blocks.Count == 0)
             {
@@ -237,7 +236,7 @@ namespace Nova
         {
             if (currentNode == null)
             {
-                throw new ArgumentException("Nova: Dangling node text");
+                throw new ArgumentException("Nova: Dangling node text.");
             }
 
             if (stateLocale == I18n.DefaultLocale)
@@ -305,6 +304,11 @@ namespace Nova
         public void AddLocalizedNode(string name, string displayName)
         {
             currentNode = flowChartTree.GetNode(name);
+            if (currentNode == null)
+            {
+                throw new ArgumentException($"Nova: Node {name} not found.");
+            }
+
             currentNode.AddLocalizedName(stateLocale, displayName);
         }
 

@@ -41,9 +41,11 @@
 
 ## 友情链接
 
+如果你在用Nova做你的作品，欢迎来告诉我们，我们可以互相宣传一下
+
 * 我们的第一部视觉小说作品《青箱》：[Steam](https://store.steampowered.com/app/1131740) [知乎](https://www.zhihu.com/question/409724349) [Bangumi](https://bgm.tv/subject/311066) [VNDB](https://vndb.org/v26506)
 * 我们的微博：[@LunaticWorks](https://weibo.com/LunaticWorks)
-* 我们的QQ群：876212259，如果以后讨论程序的人多了可能会再开一个程序群
+* 我们的QQ群：876212259，在使用Nova或者读Nova代码的时候遇到任何问题都可以来加群，如果以后讨论程序的人多了可能会再开一个程序群
 
 也可以看一看其他的视觉小说引擎：
 
@@ -51,7 +53,6 @@
 * [AVG.js](https://github.com/avgjs/avg-core)：如果你信仰web前端，推荐用这个引擎
 * [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎，作者是个萝莉控
 * [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个使用web前端的引擎，似乎得到了Xihe Animation的支持
-* [Snowing](https://github.com/Strrationalism/Snowing)：用C++写的硬核引擎
 
 以及通用游戏引擎：
 
@@ -62,6 +63,7 @@
 以及
 
 * [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家视觉小说引擎的碎片化问题，而定义的通用脚本格式
+* [Yukimi Script](https://github.com/Strrationalism/YukimiScript)：为描述视觉小说而设计的领域专用语言
 
 本框架的依赖：
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
@@ -33,7 +34,7 @@ namespace Nova
         {
             if (selections.Count == 0)
             {
-                return;
+                throw new ArgumentException("Nova: No active branch for selection.");
             }
 
             if (backPanel != null)
@@ -46,7 +47,10 @@ namespace Nova
                 var selection = selections[i];
                 var index = i;
                 var button = Instantiate(branchButtonPrefab, transform);
+                // Prevent showing the button before init
+                button.gameObject.SetActive(false);
                 button.Init(selection.texts, selection.imageInfo, imageFolder, () => Select(index), selection.active);
+                button.gameObject.SetActive(true);
             }
         }
 

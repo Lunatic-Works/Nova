@@ -1,8 +1,10 @@
 only_included_scenario_names = {}
 
+local current_filename
 local last_display_name
 
-function action_new_file()
+function action_new_file(filename)
+    current_filename = filename
     last_display_name = nil
 end
 
@@ -12,6 +14,19 @@ local function check_eager(name)
         return false
     end
     return true
+end
+
+local function try_get_local_name(name)
+    if name == nil then
+        return nil
+    end
+
+    local prefix
+    prefix, name = pop_prefix(name, 'l_')
+    if prefix then
+        name = current_filename .. ':' .. name
+    end
+    return name
 end
 
 --- define a node
@@ -30,6 +45,8 @@ function label(name, display_name)
         last_display_name = display_name
     end
 
+    name = try_get_local_name(name)
+
     if __Nova.scriptLoader.stateLocale == Nova.I18n.DefaultLocale then
         __Nova.scriptLoader:RegisterNewNode(name, display_name)
     else
@@ -43,6 +60,7 @@ function jump_to(dest)
     if not check_eager('jump_to') then
         return
     end
+    dest = try_get_local_name(dest)
     __Nova.scriptLoader:RegisterJump(dest)
 end
 
@@ -65,6 +83,8 @@ function branch(branches)
 
     for i, branch in ipairs(branches) do
         local name = tostring(i)
+
+        local dest = try_get_local_name(branch.dest)
 
         local image_info = nil
         if branch.image then
@@ -93,9 +113,9 @@ function branch(branches)
         end
 
         if __Nova.scriptLoader.stateLocale == Nova.I18n.DefaultLocale then
-            __Nova.scriptLoader:RegisterBranch(name, branch.dest, branch.text, image_info, mode, cond)
+            __Nova.scriptLoader:RegisterBranch(name, dest, branch.text, image_info, mode, cond)
         else
-            __Nova.scriptLoader:AddLocalizedBranch(name, branch.dest, branch.text)
+            __Nova.scriptLoader:AddLocalizedBranch(name, dest, branch.text)
         end
     end
     __Nova.scriptLoader:EndRegisterBranch()
@@ -112,6 +132,7 @@ function is_start(name)
     if not check_eager('is_start') then
         return
     end
+    name = try_get_local_name(name)
     __Nova.scriptLoader:SetCurrentAsStart(name)
 end
 
@@ -122,6 +143,7 @@ function is_unlocked_start(name)
     if not check_eager('is_unlocked_start') then
         return
     end
+    name = try_get_local_name(name)
     __Nova.scriptLoader:SetCurrentAsUnlockedStart(name)
 end
 
@@ -133,6 +155,7 @@ function is_default_start(name)
     if not check_eager('is_default_start') then
         return
     end
+    name = try_get_local_name(name)
     __Nova.scriptLoader:SetCurrentAsDefaultStart(name)
 end
 
@@ -147,6 +170,7 @@ function is_end(name)
     if not check_eager('is_end') then
         return
     end
+    name = try_get_local_name(name)
     __Nova.scriptLoader:SetCurrentAsEnd(name)
 end
 

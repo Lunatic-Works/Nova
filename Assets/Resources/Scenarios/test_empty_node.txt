@@ -9,13 +9,13 @@ set_box()
 |>
 测试空节点
 @<|
-jump_to 'test_empty_node_1'
+jump_to 'l_a'
 |>
 
-@<| label 'test_empty_node_1' |>
-@<| jump_to 'test_empty_node_2' |>
+@<| label 'l_a' |>
+@<| jump_to 'l_b' |>
 
-@<| label 'test_empty_node_2' |>
+@<| label 'l_b' |>
 111
 
 222
@@ -27,16 +27,16 @@ jump_to 'test_empty_node_1'
 333
 
 444
-@<| jump_to 'test_empty_node_3' |>
+@<| jump_to 'l_c' |>
 
-@<| label 'test_empty_node_3' |>
+@<| label 'l_c' |>
 @<|
 branch {
-    { dest = 'test_empty_node_end', text = '结束'},
-    { dest = 'test_empty_node_3', text = '不结束' },
+    { dest = 'l_end', text = '结束'},
+    { dest = 'l_c', text = '不结束' },
 }
 |>
 
-@<| label 'test_empty_node_end' |>
+@<| label 'l_end' |>
 测试结束
 @<| is_end() |>

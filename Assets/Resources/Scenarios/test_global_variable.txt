@@ -29,12 +29,12 @@ gv_count = (gv_count or 0) + 1
 444
 @<|
 branch {
-    { dest = 'test_global_variable_next', text = '普通的选项'},
-    { dest = 'test_global_variable_next', text = '二周目才会出现', mode = 'show', cond = 'v_round_count >= 2' },
+    { dest = 'l_next', text = '普通的选项'},
+    { dest = 'l_next', text = '二周目才会出现', mode = 'show', cond = 'v_round_count >= 2' },
 }
 |>
 
-@<| label 'test_global_variable_next' |>
+@<| label 'l_next' |>
 555
 
 666
