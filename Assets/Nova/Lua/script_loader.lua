@@ -190,3 +190,7 @@ function interpolate_text(s)
             return _G[x]
         end)
 end
+
+function is_restoring()
+    return __Nova.executionContext.isRestoring
+end

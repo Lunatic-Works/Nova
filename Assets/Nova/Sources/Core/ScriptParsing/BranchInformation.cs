@@ -55,9 +55,9 @@ namespace Nova
         /// The default branch, used in normal flow chart nodes
         /// </summary>
         /// <remarks>
-        /// Since the default branch owns the default name, all other branches should not have the name 'default'
+        /// Since the default branch owns the default name, all other branches should not have the name '__default'
         /// </remarks>
-        public static readonly BranchInformation Default = new BranchInformation("default");
+        public static readonly BranchInformation Default = new BranchInformation("__default");
 
         public BranchInformation(string name)
         {

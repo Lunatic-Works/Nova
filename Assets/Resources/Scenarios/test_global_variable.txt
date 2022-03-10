@@ -19,10 +19,12 @@ v_round_count = (gv_round_count or 0) + 1
 222
 
 <|
-gv_count = (gv_count or 0) + 1
+if not is_restoring() then
+    gv_count = (gv_count or 0) + 1
+end
 |>
 现在是第{{gv_count}}次到达这里
-每次读档/回跳到这里时都会加一次
+每次读档/回跳到这里时都会加一次，读档过程中经过这里时不会加
 
 333
 
