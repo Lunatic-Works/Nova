@@ -966,37 +966,34 @@ namespace Nova
             }
         }
 
-        public void MoveBackAndFastForward(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, int stepNum,
+        public void MoveBackAndFastForward(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, int stepCount,
             bool clearFuture, Action onFinish)
         {
-            isRestoring = true;
-            MoveBackTo(nodeHistoryEntry, dialogueIndex, clearFuture);
-            if (actionPauseLock.isLocked)
+            void Callback(int stepNum)
             {
-                Debug.LogWarning("Nova: GameState paused by action when restoring");
-            }
-
-            for (var i = 0; i < stepNum; ++i)
-            {
-                var isLast = i == stepNum - 1;
+                var isLast = stepNum == stepCount - 1;
                 if (isLast)
                 {
                     isRestoring = false;
                 }
 
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-                if (actionPauseLock.isLocked)
-                {
-                    Debug.LogWarning("Nova: GameState paused by action when restoring");
-                }
 
-                Step();
-
-                if (isLast)
+                Step(_ =>
                 {
-                    onFinish?.Invoke();
-                }
+                    if (isLast)
+                    {
+                        onFinish?.Invoke();
+                    }
+                    else
+                    {
+                        Callback(stepNum + 1);
+                    }
+                });
             }
+
+            isRestoring = true;
+            MoveBackTo(nodeHistoryEntry, dialogueIndex, clearFuture, () => Callback(0));
         }
 
         #endregion
