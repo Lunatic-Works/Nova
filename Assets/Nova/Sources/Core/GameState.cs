@@ -550,11 +550,15 @@ namespace Nova
                 selectionNames.Add(branchInfo.name);
             }
 
+            AcquireActionPause();
+
             RaiseSelections(selections);
             while (coroutineHelper.fence == null)
             {
                 yield return null;
             }
+
+            ReleaseActionPause();
 
             var index = (int)coroutineHelper.TakeFence();
             SelectBranch(selectionNames[index], onFinish);
@@ -687,8 +691,17 @@ namespace Nova
                     return false;
                 }
 
-                // can step forward only when the state is normal
-                return state == State.Normal;
+                if (state != State.Normal)
+                {
+                    return false;
+                }
+
+                if (actionPauseLock.isLocked)
+                {
+                    return false;
+                }
+
+                return true;
             }
         }
 
