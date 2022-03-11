@@ -425,7 +425,7 @@ namespace Nova
 
             if (advancedDialogueHelper.GetFallThrough())
             {
-                Step(_ => onFinish?.Invoke());
+                Step(Utils.WrapActionWithParameter<bool>(onFinish));
                 yield break;
             }
 
@@ -638,7 +638,7 @@ namespace Nova
         private void GameStart(FlowChartNode startNode)
         {
             ResetGameState();
-            MoveToNextNode(startNode, () => { });
+            MoveToNextNode(startNode, null);
         }
 
         /// <summary>
@@ -699,7 +699,7 @@ namespace Nova
         /// This method can run asynchronously. The callback will be invoked when the step finishes.
         /// </remarks>
         /// <param name="onFinish">(canStepForward) => { ... }</param>
-        public void Step(Action<bool> onFinish)
+        public void Step(Action<bool> onFinish = null)
         {
             if (!canStepForward)
             {
@@ -707,7 +707,7 @@ namespace Nova
                 return;
             }
 
-            var successCallback = new Action(() => { onFinish?.Invoke(true); });
+            var successCallback = Utils.WrapActionWithoutParameter(onFinish, true);
 
             // If the next dialogue entry is in the current node, directly step to it
             if (currentIndex + 1 < currentNode.dialogueEntryCount)
@@ -719,11 +719,6 @@ namespace Nova
             {
                 StepAtEndOfNode(successCallback);
             }
-        }
-
-        public void Step()
-        {
-            Step(_ => { });
         }
 
         public void RaiseSelections(IReadOnlyList<SelectionOccursData.Selection> selections)

@@ -39,7 +39,7 @@ namespace Nova
         public override void Show(Action onFinish)
         {
             fromTitle = false;
-            base.Show(() => { onFinish?.Invoke(); });
+            base.Show(onFinish);
         }
 
         public void ShowFromTitle()

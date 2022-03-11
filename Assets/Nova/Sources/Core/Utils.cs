@@ -374,45 +374,14 @@ namespace Nova
             }
         }
 
-        public static Action<Action> AfterAll(params Action<Action>[] actions)
+        public static Action<T> WrapActionWithParameter<T>(Action action)
         {
-            return callback =>
-            {
-                var callbackCalled = new bool[actions.Length];
-
-                Action SetAndCheckIfAllCalled(int i) =>
-                    () =>
-                    {
-                        callbackCalled[i] = true;
-                        if (callbackCalled.All(x => x))
-                        {
-                            callback();
-                        }
-                    };
-
-                for (int i = 0; i < actions.Length; i++)
-                {
-                    actions[i](SetAndCheckIfAllCalled(i));
-                }
-            };
+            return action != null ? new Action<T>(_ => action.Invoke()) : null;
         }
 
-        public static Action<Action> InjectBeforeCall(Action<Action> action, Action advice)
+        public static Action WrapActionWithoutParameter<T>(Action<T> action, T value)
         {
-            return callback =>
-            {
-                advice();
-                action(callback);
-            };
-        }
-
-        public static Action<Action> InjectBeforeCallback(Action<Action> action, Action advice)
-        {
-            return callback => action(() =>
-            {
-                advice();
-                callback();
-            });
+            return action != null ? new Action(() => action.Invoke(value)) : null;
         }
 
         public static bool GetKeyInEditor(KeyCode key)
