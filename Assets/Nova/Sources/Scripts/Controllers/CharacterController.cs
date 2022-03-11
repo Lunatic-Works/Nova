@@ -149,12 +149,11 @@ namespace Nova
         #region Voice
 
         [HideInInspector] public bool stopVoiceWhenDialogueWillChange;
-        [HideInInspector] public bool suppressSound;
 
         private bool willSaySomething = false;
         private float voiceDelay = 0.0f;
 
-        private bool dontPlaySound => gameState.isRestoring || suppressSound;
+        private bool dontPlaySound => gameState.isRestoring;
 
         /// <summary>
         /// Stop the voice when the dialogue will change

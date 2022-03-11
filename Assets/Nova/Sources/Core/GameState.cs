@@ -953,34 +953,49 @@ namespace Nova
                 if (!SeekBackStep(simpleEntry.stepNumFromLastCheckpoint, out NodeHistoryEntry storedNode,
                         out int storedDialogueIndex))
                 {
-                    Debug.LogErrorFormat("Nova: Failed to seek back, invalid stepNumFromLastCheckpoint: {0}",
-                        simpleEntry.stepNumFromLastCheckpoint);
+                    throw new ArgumentException(
+                        $"Nova: Failed to seek back, invalid stepNumFromLastCheckpoint: {simpleEntry.stepNumFromLastCheckpoint}");
                 }
 
-                isRestoring = true;
-                MoveBackTo(storedNode, storedDialogueIndex);
-
-                for (var i = 0; i < simpleEntry.stepNumFromLastCheckpoint; ++i)
-                {
-                    var isLast = i == simpleEntry.stepNumFromLastCheckpoint - 1;
-                    if (isLast)
-                    {
-                        isRestoring = false;
-                    }
-
-                    // Make sure there is no blocking action running
-                    NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-                    Step();
-
-                    if (isLast)
-                    {
-                        onFinish?.Invoke();
-                    }
-                }
+                MoveBackAndFastForward(storedNode, storedDialogueIndex, simpleEntry.stepNumFromLastCheckpoint, false,
+                    onFinish);
             }
             else
             {
                 throw new ArgumentException($"Nova: {restoreData} is not supported.");
+            }
+        }
+
+        public void MoveBackAndFastForward(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, int stepNum,
+            bool clearFuture, Action onFinish)
+        {
+            isRestoring = true;
+            MoveBackTo(nodeHistoryEntry, dialogueIndex, clearFuture);
+            if (actionPauseLock.isLocked)
+            {
+                Debug.LogWarning("Nova: GameState paused by action when restoring");
+            }
+
+            for (var i = 0; i < stepNum; ++i)
+            {
+                var isLast = i == stepNum - 1;
+                if (isLast)
+                {
+                    isRestoring = false;
+                }
+
+                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+                if (actionPauseLock.isLocked)
+                {
+                    Debug.LogWarning("Nova: GameState paused by action when restoring");
+                }
+
+                Step();
+
+                if (isLast)
+                {
+                    onFinish?.Invoke();
+                }
             }
         }
 

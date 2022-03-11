@@ -8,7 +8,6 @@ namespace Nova
         public string luaName;
         public string audioFolder;
         [HideInInspector] public float configVolume;
-        [HideInInspector] public bool suppressSound;
 
         private GameState gameState;
 
@@ -22,7 +21,7 @@ namespace Nova
             }
         }
 
-        private bool dontPlaySound => gameState.isRestoring || suppressSound;
+        private bool dontPlaySound => gameState.isRestoring;
 
         /// <summary>
         /// Play audio at a point in space, handy for sound effect

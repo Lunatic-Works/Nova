@@ -6,15 +6,10 @@ namespace Nova
 {
     public class ReloadScriptsHelper : MonoBehaviour
     {
-        [SerializeField] private GameObject characters;
-        [SerializeField] private SoundController soundController;
-
         private GameState gameState;
         private InputMapper inputMapper;
         private ViewManager viewManager;
         private DialogueBoxController dialogueBoxController;
-
-        private List<CharacterController> characterControllers;
 
         private void Awake()
         {
@@ -23,11 +18,6 @@ namespace Nova
             inputMapper = gameController.InputMapper;
             viewManager = Utils.FindViewManager();
             dialogueBoxController = viewManager.GetController<DialogueBoxController>();
-
-            if (characters != null)
-            {
-                characterControllers = characters.GetComponentsInChildren<CharacterController>().ToList();
-            }
         }
 
         private void Update()
@@ -48,53 +38,20 @@ namespace Nova
             }
         }
 
-        private void SuppressSound(bool v)
-        {
-            if (characterControllers != null)
-            {
-                foreach (var characterController in characterControllers)
-                {
-                    characterController.suppressSound = v;
-                }
-            }
-
-            if (soundController != null)
-            {
-                soundController.suppressSound = v;
-            }
-        }
-
         private void ReloadScripts()
         {
             NovaAnimation.StopAll();
             dialogueBoxController.state = DialogueBoxState.Normal;
-
             gameState.ReloadScripts();
-
-            SuppressSound(true);
-            var currentIndex = gameState.currentIndex;
-            gameState.MoveBackTo(gameState.nodeHistory.GetCounted(gameState.currentNode.name), 0, clearFuture: true);
-
-            // Step back to the current index
-            for (var i = 0; i < currentIndex; ++i)
-            {
-                // Only the last step can play sound
-                if (i == currentIndex - 1)
-                {
-                    SuppressSound(false);
-                }
-
-                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-                gameState.Step();
-            }
+            var nodeHistoryEntry = gameState.nodeHistory.GetCounted(gameState.currentNode.name);
+            gameState.MoveBackAndFastForward(nodeHistoryEntry, 0, gameState.currentIndex, true, null);
         }
 
         private void RerunAction()
         {
-            // TODO
+            // TODO: how is this useful?
             // NovaAnimation.StopAll();
             // dialogueBoxController.state = DialogueBoxState.Normal;
-            //
             // gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex)
             //     .ExecuteAction(DialogueActionStage.Default, false);
         }
