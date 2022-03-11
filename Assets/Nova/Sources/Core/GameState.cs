@@ -986,14 +986,15 @@ namespace Nova
                 nodeHistory.Add(nodeHistoryEntry.Key);
             }
 
-            nodeHistory.RemoveInterruptsAfter(dialogueIndex);
+            nodeHistory.RemoveInterruptsAfter(backNodeIndex, dialogueIndex);
 
             currentNode = flowChartTree.GetNode(nodeHistoryEntry.Key);
             currentIndex = dialogueIndex;
 
             // Restore data
             var entry = checkpointManager.GetReached(nodeHistory, dialogueIndex);
-            this.RuntimeAssert(entry != null, $"Unable to find node with nodeHistory {nodeHistory}");
+            this.RuntimeAssert(entry != null,
+                $"Unable to find restore entry with {nodeHistory} {nodeHistory.Hash}, dialogueIndex {dialogueIndex}");
 
             Restore(entry, onFinish);
 

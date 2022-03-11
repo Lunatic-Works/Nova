@@ -95,11 +95,19 @@ namespace Nova
                 dialogueChangedData.dialogueIndex, dialogueChangedData.voicesNextDialogue, logEntries.Count));
         }
 
-        private bool TryGetCheckpoint(LogParam logParam, out GameStateCheckpoint checkpoint)
+        private bool TryGetCheckpoint(LogParam logParam, bool isLatest, out GameStateCheckpoint checkpoint)
         {
-            var backNodeIndex = gameState.nodeHistory.FindLastIndex(x => x.Equals(logParam.nodeHistoryEntry));
-            var nodeHistoryHash =
-                gameState.nodeHistory.GetHashULong(0, backNodeIndex + 1, logParam.dialogueIndex + 1);
+            ulong nodeHistoryHash;
+            if (isLatest)
+            {
+                nodeHistoryHash = gameState.nodeHistory.Hash;
+            }
+            else
+            {
+                var backNodeIndex = gameState.nodeHistory.FindLastIndex(x => x.Equals(logParam.nodeHistoryEntry));
+                nodeHistoryHash = gameState.nodeHistory.GetHashULong(0, backNodeIndex + 1, logParam.dialogueIndex + 1);
+            }
+
             var entry = checkpointManager.GetReached(nodeHistoryHash, logParam.nodeHistoryEntry.Key,
                 logParam.dialogueIndex);
             if (entry is GameStateCheckpoint _checkpoint)
@@ -116,7 +124,7 @@ namespace Nova
 
         private void AddEntry(LogParam logParam)
         {
-            if (TryGetCheckpoint(logParam, out _))
+            if (TryGetCheckpoint(logParam, true, out _))
             {
                 lastCheckpointLogParams = logParam;
             }
@@ -289,7 +297,7 @@ namespace Nova
                     }
                 }
 
-                this.RuntimeAssert(TryGetCheckpoint(data.logParams[0], out var entry),
+                this.RuntimeAssert(TryGetCheckpoint(data.logParams[0], false, out var entry),
                     "The earliest log in each restore data must point at another checkpoint.");
                 data = entry.restoreDatas[restorableObjectName] as LogControllerRestoreData;
             }

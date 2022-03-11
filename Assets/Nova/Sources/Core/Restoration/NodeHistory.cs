@@ -34,71 +34,33 @@ namespace Nova
         // Knuth's golden ratio multiplicative hashing
         public override ulong GetHashULong(int index, int count)
         {
-            unchecked
-            {
-                var x = base.GetHashULong(index, count);
-                foreach (var pair in interrupts)
-                {
-                    var nodeHistoryIndex = pair.Key;
-                    if (nodeHistoryIndex < index)
-                    {
-                        continue;
-                    }
-
-                    if (nodeHistoryIndex >= index + count)
-                    {
-                        break;
-                    }
-
-                    foreach (var hash in pair.Value.Values)
-                    {
-                        x += hash;
-                        x *= 11400714819323199563UL;
-                    }
-                }
-
-                return x;
-            }
+            return GetHashULong(index, count, int.MaxValue);
         }
 
         public ulong GetHashULong(int index, int count, int dialogueCount)
         {
             unchecked
             {
-                var x = base.GetHashULong(index, count);
-                foreach (var pair in interrupts)
+                var x = 0UL;
+                for (var i = index; i < index + count; ++i)
                 {
-                    var nodeHistoryIndex = pair.Key;
-                    if (nodeHistoryIndex < index)
-                    {
-                        continue;
-                    }
+                    x += (ulong)list[i].Key.GetHashCode();
+                    x *= 11400714819323199563UL;
 
-                    if (nodeHistoryIndex >= index + count)
+                    if (interrupts.TryGetValue(i, out var dict))
                     {
-                        break;
-                    }
-
-                    var first = true;
-                    foreach (var pair2 in pair.Value)
-                    {
-                        if (nodeHistoryIndex == index + count - 1 && pair2.Key >= dialogueCount)
+                        foreach (var pair in dict)
                         {
-                            break;
-                        }
+                            if (i == index + count - 1 && pair.Key >= dialogueCount)
+                            {
+                                break;
+                            }
 
-                        // Add nodeHistoryIndex to the hash only if there is any pair2.Key < dialogueCount
-                        if (first)
-                        {
-                            first = false;
-                            x += (ulong)nodeHistoryIndex;
+                            x += (ulong)pair.Key;
+                            x *= 11400714819323199563UL;
+                            x += pair.Value;
                             x *= 11400714819323199563UL;
                         }
-
-                        x += (ulong)pair2.Key;
-                        x *= 11400714819323199563UL;
-                        x += pair2.Value;
-                        x *= 11400714819323199563UL;
                     }
                 }
 
@@ -106,10 +68,24 @@ namespace Nova
             }
         }
 
+        private void UpdateHashULong(int dialogueIndex, ulong variablesHash)
+        {
+            unchecked
+            {
+                _hash += (ulong)dialogueIndex;
+                _hash *= 11400714819323199563UL;
+                _hash += (ulong)variablesHash;
+                _hash *= 11400714819323199563UL;
+            }
+        }
+
         public void AddInterrupt(int dialogueIndex, Variables variables)
         {
             interrupts.Ensure(list.Count - 1)[dialogueIndex] = variables.hash;
-            needCalculateHash = true;
+            if (!needCalculateHash)
+            {
+                UpdateHashULong(dialogueIndex, variables.hash);
+            }
         }
 
         public override void RemoveRange(int index, int count)
@@ -131,17 +107,23 @@ namespace Nova
             }
         }
 
-        // The interrupt at dialogueIndex is also removed, because NodeHistory saves the state before the checkpoint
-        public void RemoveInterruptsAfter(int dialogueIndex)
+        public void RemoveInterruptsAfter(int nodeHistoryIndex, int dialogueIndex)
         {
-            var dict = interrupts.Values.LastOrDefault();
-            if (dict == null)
+            if (interrupts.Count <= 0)
             {
                 return;
             }
 
+            var pair = interrupts.Last();
+            if (pair.Key != nodeHistoryIndex)
+            {
+                return;
+            }
+
+            var dict = pair.Value;
             foreach (var index in dict.Keys.ToList())
             {
+                // The interrupt at dialogueIndex is also removed, because NodeHistory saves the state before the checkpoint
                 if (index < dialogueIndex)
                 {
                     continue;
@@ -152,7 +134,7 @@ namespace Nova
 
             if (dict.Count <= 0)
             {
-                interrupts.Remove(interrupts.Keys.Last());
+                interrupts.Remove(pair.Key);
             }
 
             needCalculateHash = true;

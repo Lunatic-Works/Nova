@@ -13,7 +13,7 @@ namespace Nova
         protected readonly List<KeyValuePair<T, int>> list = new List<KeyValuePair<T, int>>();
         private readonly Dictionary<T, int> valueCounts = new Dictionary<T, int>();
 
-        private ulong _hash;
+        protected ulong _hash;
         protected bool needCalculateHash = true;
 
         public ulong Hash
