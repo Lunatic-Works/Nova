@@ -349,6 +349,8 @@ namespace Nova
 
         #endregion
 
+        #region Update game state
+
         /// <summary>
         /// Called after the current node or the current dialogue index has changed
         /// </summary>
@@ -576,54 +578,7 @@ namespace Nova
             MoveToNextNode(nextNode, onFinish);
         }
 
-        public void MoveBackTo(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, bool clearFuture = false,
-            Action onFinish = null)
-        {
-            // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
-
-            CancelAction();
-
-            // Animation should stop
-            NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
-
-            // Restore history
-            var backNodeIndex = nodeHistory.FindLastIndex(x => x.Equals(nodeHistoryEntry));
-            if (backNodeIndex < 0)
-            {
-                Debug.LogWarning($"Nova: Move back to node {nodeHistoryEntry.Key} that has not been walked through.");
-            }
-
-            if (clearFuture)
-            {
-                // All save data of nodes to be removed are deleted
-                for (var i = backNodeIndex + 1; i < nodeHistory.Count; ++i)
-                {
-                    checkpointManager.UnsetReached(nodeHistory.GetHashULong(0, i + 1));
-                }
-
-                // All save data of later dialogues are deleted
-                checkpointManager.UnsetReachedAfter(nodeHistory, dialogueIndex);
-            }
-
-            nodeHistory.RemoveRange(backNodeIndex + 1, nodeHistory.Count - (backNodeIndex + 1));
-            if (backNodeIndex < 0)
-            {
-                nodeHistory.Add(nodeHistoryEntry.Key);
-            }
-
-            nodeHistory.RemoveInterruptsAfter(dialogueIndex);
-
-            currentNode = flowChartTree.GetNode(nodeHistoryEntry.Key);
-            currentIndex = dialogueIndex;
-
-            // Restore data
-            var entry = checkpointManager.GetReached(nodeHistory, dialogueIndex);
-            this.RuntimeAssert(entry != null, $"Unable to find node with nodeHistory {nodeHistory}");
-
-            Restore(entry, onFinish);
-
-            // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
-        }
+        #endregion
 
         #region Game start
 
@@ -994,6 +949,55 @@ namespace Nova
 
             isRestoring = true;
             MoveBackTo(nodeHistoryEntry, dialogueIndex, clearFuture, () => Callback(0));
+        }
+
+        public void MoveBackTo(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, bool clearFuture = false,
+            Action onFinish = null)
+        {
+            // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
+
+            CancelAction();
+
+            // Animation should stop
+            NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
+
+            // Restore history
+            var backNodeIndex = nodeHistory.FindLastIndex(x => x.Equals(nodeHistoryEntry));
+            if (backNodeIndex < 0)
+            {
+                Debug.LogWarning($"Nova: Move back to node {nodeHistoryEntry.Key} that has not been walked through.");
+            }
+
+            if (clearFuture)
+            {
+                // All save data of nodes to be removed are deleted
+                for (var i = backNodeIndex + 1; i < nodeHistory.Count; ++i)
+                {
+                    checkpointManager.UnsetReached(nodeHistory.GetHashULong(0, i + 1));
+                }
+
+                // All save data of later dialogues are deleted
+                checkpointManager.UnsetReachedAfter(nodeHistory, dialogueIndex);
+            }
+
+            nodeHistory.RemoveRange(backNodeIndex + 1, nodeHistory.Count - (backNodeIndex + 1));
+            if (backNodeIndex < 0)
+            {
+                nodeHistory.Add(nodeHistoryEntry.Key);
+            }
+
+            nodeHistory.RemoveInterruptsAfter(dialogueIndex);
+
+            currentNode = flowChartTree.GetNode(nodeHistoryEntry.Key);
+            currentIndex = dialogueIndex;
+
+            // Restore data
+            var entry = checkpointManager.GetReached(nodeHistory, dialogueIndex);
+            this.RuntimeAssert(entry != null, $"Unable to find node with nodeHistory {nodeHistory}");
+
+            Restore(entry, onFinish);
+
+            // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
         }
 
         #endregion
