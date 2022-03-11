@@ -7,22 +7,38 @@ namespace Nova
         private GameState gameState;
         private SaveViewController saveViewController;
 
+        private string currentNodeName;
+        private string lastSavedNodeName;
+
         private void Start()
         {
             gameState = Utils.FindNovaGameController().GameState;
-            saveViewController = GetComponent<SaveViewController>();
+            saveViewController = Utils.FindViewManager().GetController<SaveViewController>();
 
+            gameState.nodeChanged.AddListener(OnNodeChanged);
             gameState.selectionOccurs.AddListener(OnSelectionOccurs);
         }
 
         private void OnDestroy()
         {
+            gameState.nodeChanged.RemoveListener(OnNodeChanged);
             gameState.selectionOccurs.RemoveListener(OnSelectionOccurs);
+        }
+
+        private void OnNodeChanged(NodeChangedData nodeChangedData)
+        {
+            currentNodeName = nodeChangedData.nodeHistoryEntry.Key;
         }
 
         private void OnSelectionOccurs(SelectionOccursData selectionOccursData)
         {
+            if (currentNodeName == lastSavedNodeName)
+            {
+                return;
+            }
+
             saveViewController.AutoSaveBookmark();
+            lastSavedNodeName = currentNodeName;
         }
     }
 }
