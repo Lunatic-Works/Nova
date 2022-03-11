@@ -148,6 +148,7 @@ end)";
 
         public static void StopActionCoroutine()
         {
+            // Do nothing if the coroutine is nil
             LuaRuntime.Instance.GetFunction("coroutine.stop").Call(ActionCoroutineName);
         }
 
