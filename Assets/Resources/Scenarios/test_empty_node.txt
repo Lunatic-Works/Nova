@@ -12,28 +12,29 @@ set_box()
 jump_to 'l_a'
 |>
 
-@<| label 'l_a' |>
+@<|
+-- 这个节点里没有对话
+label 'l_a'
+|>
 @<| jump_to 'l_b' |>
 
 @<| label 'l_b' |>
+这个节点里只有一条对话
+@<| jump_to 'l_c' |>
+
+@<| label 'l_c' |>
 111
 
 222
 
-<|
--- 空的文本
-|>
-
 333
+@<| jump_to 'l_d' |>
 
-444
-@<| jump_to 'l_c' |>
-
-@<| label 'l_c' |>
+@<| label 'l_d' |>
 @<|
 branch {
     { dest = 'l_end', text = '结束'},
-    { dest = 'l_c', text = '不结束' },
+    { dest = 'l_d', text = '不结束' },
 }
 |>
 

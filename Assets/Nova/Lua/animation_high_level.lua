@@ -198,7 +198,6 @@ make_anim_method('move', function(self, obj, coord, duration, easing)
     local pos, angle, scale, relative = parse_coord(obj, camera, coord)
     duration = duration or 1
     easing = parse_easing(easing)
-    local transform = obj.transform
 
     local entry
     self:_then(_move {obj, pos, relative}):_with(easing):_for(duration)

@@ -642,7 +642,7 @@ namespace Nova
             {
                 if (currentNode == null)
                 {
-                    Debug.LogWarning("Nova: Cannot call Step() before game start.");
+                    Debug.LogWarning("Nova: Cannot step forward before the game starts.");
                     return false;
                 }
 
