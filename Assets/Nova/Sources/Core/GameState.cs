@@ -924,31 +924,37 @@ namespace Nova
         public void MoveBackAndFastForward(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, int stepCount,
             bool clearFuture, Action onFinish)
         {
-            void Callback(int stepNum)
+            isRestoring = true;
+            MoveBackTo(nodeHistoryEntry, dialogueIndex, clearFuture);
+            if (actionPauseLock.isLocked)
             {
-                var isLast = stepNum == stepCount - 1;
+                Debug.LogWarning("Nova: GameState paused by action when restoring");
+                isRestoring = false;
+                return;
+            }
+
+            for (var i = 0; i < stepCount; ++i)
+            {
+                var isLast = i == stepCount - 1;
                 if (isLast)
                 {
                     isRestoring = false;
                 }
 
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-
-                Step(_ =>
+                Step();
+                if (actionPauseLock.isLocked)
                 {
-                    if (isLast)
-                    {
-                        onFinish?.Invoke();
-                    }
-                    else
-                    {
-                        Callback(stepNum + 1);
-                    }
-                });
-            }
+                    Debug.LogWarning("Nova: GameState paused by action when restoring");
+                    isRestoring = false;
+                    return;
+                }
 
-            isRestoring = true;
-            MoveBackTo(nodeHistoryEntry, dialogueIndex, clearFuture, () => Callback(0));
+                if (isLast)
+                {
+                    onFinish?.Invoke();
+                }
+            }
         }
 
         public void MoveBackTo(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, bool clearFuture = false,
