@@ -209,7 +209,7 @@ function set_box(pos_name, style_name, auto_new_page)
     text_color(style['text_color'])
     text_material(style['text_material'])
 
-    __Nova.dialogueBoxController:ResetTextScroll()
+    __Nova.dialogueBoxController:SetTextScroll(0)
 end
 
 function new_page()

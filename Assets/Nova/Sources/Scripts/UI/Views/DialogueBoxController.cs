@@ -541,11 +541,6 @@ namespace Nova
             dialogueTextRect.localPosition = new Vector3(position.x, value, position.z);
         }
 
-        public void ResetTextScroll()
-        {
-            dialogueTextScrollRect.verticalNormalizedPosition = 0f;
-        }
-
         public RectTransformAnimationProperty GetTextScrollAnimationProperty(float start, float target)
         {
             var x = dialogueTextRect.localPosition.x;
@@ -603,7 +598,7 @@ namespace Nova
             {
                 if (!textScrollOverriden)
                 {
-                    ResetTextScroll();
+                    SetTextScroll(0f);
                 }
             }
         }

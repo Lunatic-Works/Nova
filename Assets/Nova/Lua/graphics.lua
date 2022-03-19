@@ -71,5 +71,6 @@ function hide_no_fade(obj)
 end
 
 function set_render_queue(obj, to)
+    to = to or -1
     Nova.RenderQueueOverrider.Ensure(obj.gameObject).renderQueue = to
 end

@@ -53,6 +53,7 @@
 * [AVG.js](https://github.com/avgjs/avg-core)：如果你信仰web前端，推荐用这个引擎
 * [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎，作者是个萝莉控
 * [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个使用web前端的引擎，似乎得到了Xihe Animation的支持
+* [WebGAL](https://github.com/MakinoharaShoko/WebGAL)：全新的基于web的视觉小说引擎
 
 以及通用游戏引擎：
 
