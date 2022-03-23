@@ -310,6 +310,7 @@ namespace Nova
         private void _saveBookmark(int saveID)
         {
             var bookmark = gameState.GetBookmark();
+            bookmark.description = currentDialogue.FormatNameDialogue();
             bookmark.screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
             checkpointManager.SaveBookmark(saveID, bookmark);
@@ -387,6 +388,7 @@ namespace Nova
         private void _autoSaveBookmark(int beginSaveID, string tagText)
         {
             var bookmark = gameState.GetBookmark();
+            bookmark.description = currentDialogue.FormatNameDialogue();
             var texture = ScreenCapturer.GetBookmarkThumbnailTexture();
             bookmark.screenshot = texture;
 
@@ -587,19 +589,12 @@ namespace Nova
             {
                 Bookmark bookmark = checkpointManager[saveID];
                 var nodeName = checkpointManager.GetLastNodeName(bookmark.nodeHistoryHash);
-                var node = gameState.GetNode(nodeName);
-                var displayName = I18n.__(node.displayNames);
-                var description = bookmark.description;
-                if (string.IsNullOrEmpty(description))
-                {
-                    description = node.GetDialogueEntryAt(bookmark.dialogueIndex).GetDisplayData().FormatNameDialogue();
-                }
-
+                var displayName = I18n.__(gameState.GetNode(nodeName).displayNames);
                 ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",
                     checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
                     displayName,
-                    description
+                    bookmark.description
                 ));
             }
             catch (Exception e)
