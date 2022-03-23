@@ -69,7 +69,7 @@
 本框架的依赖：
 
 * [tolua#](https://github.com/topameng/tolua)
-* [Json.NET](https://github.com/JamesNK/Newtonsoft.Json)
+* [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
 
 国内镜像（随缘更新）：
 
