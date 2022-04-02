@@ -128,14 +128,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useGhost: 0
-  cubic: 0
+  cubic: 1
   enterSound: {fileID: 0}
   exitSound: {fileID: 0}
   movementDirection: 4
   scalingDirection: 0
   rotationDirection: 0
   movementPercentage: 2
-  scalingPercentage: 1
+  scalingPercentage: 0.5
   rotationPercentage: 0.5
   fade: 1
   duration: 0.2

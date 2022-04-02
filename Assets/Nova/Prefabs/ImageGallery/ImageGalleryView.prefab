@@ -1010,7 +1010,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0531407ed23496b4c8e506a58af9ad3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useGhost: 0
+  useGhost: 1
   cubic: 0
   enterSound: {fileID: 0}
   exitSound: {fileID: 0}
@@ -1021,7 +1021,7 @@ MonoBehaviour:
   scalingPercentage: 0.5
   rotationPercentage: 0.5
   fade: 1
-  duration: 0.5
+  duration: 0.3
 --- !u!1 &8089046610945055201
 GameObject:
   m_ObjectHideFlags: 0

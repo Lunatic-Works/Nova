@@ -330,7 +330,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0531407ed23496b4c8e506a58af9ad3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useGhost: 1
+  useGhost: 0
   cubic: 0
   enterSound: {fileID: 0}
   exitSound: {fileID: 0}
