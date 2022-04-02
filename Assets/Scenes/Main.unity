@@ -797,7 +797,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaName: postProcessing
-  asProxyOf: {fileID: 0}
 --- !u!114 &628759643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -843,8 +842,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf1cbc4ac91948b58486959780bab6c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characters: {fileID: 871599196}
-  soundController: {fileID: 1542636873}
 --- !u!4 &671619212
 Transform:
   m_ObjectHideFlags: 0
@@ -1560,7 +1557,6 @@ GameObject:
   - component: {fileID: 922924602}
   - component: {fileID: 922924603}
   - component: {fileID: 922924604}
-  - component: {fileID: 922924605}
   m_Layer: 5
   m_Name: UI
   m_TagString: UIRoot
@@ -1756,18 +1752,6 @@ MonoBehaviour:
     materials:
     - name: outline
       material: {fileID: 2100000, guid: 56c5a34fab6b3084d9b00b8bbc0dbe52, type: 2}
---- !u!114 &922924605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 922924596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c2de00a754c42c9867fb7895cd4819b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &932302787 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8089046609868017880, guid: 79e0957580781694098a70feb271ad8c,
@@ -2344,7 +2328,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaName: 
-  asProxyOf: {fileID: 0}
 --- !u!4 &1293283701
 Transform:
   m_ObjectHideFlags: 0
@@ -2475,18 +2458,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 4003918090870650449}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1542636873 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1542636873, guid: ed28a84bf5bed423a9613c9aefa4dd7b,
-    type: 3}
-  m_PrefabInstance: {fileID: 7208250513517180523}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96a6887fdd03db245b36ef3bbe80dbe4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1542636874 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4269582755980200, guid: ed28a84bf5bed423a9613c9aefa4dd7b,
