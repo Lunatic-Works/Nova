@@ -70,6 +70,7 @@ namespace Nova
             });
         }
 
+        // Disable BackHide
         protected override void Update() { }
     }
 }

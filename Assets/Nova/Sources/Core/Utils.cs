@@ -425,7 +425,7 @@ namespace Nova
         public static string GetPath(Transform current)
         {
             var parent = current.parent;
-            return (parent == null ? "" : GetPath(parent)) + "/" + current.name;
+            return (parent == null ? "" : GetPath(parent) + "/") + current.name;
         }
 
         public static string GetPath(Component component)
