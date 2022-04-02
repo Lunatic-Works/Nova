@@ -1,4 +1,5 @@
-﻿// https://answers.unity.com/questions/1313950/unity-ui-mouse-keyboard-navigate-un-highlight-butt.html
+﻿// DEPRECATED, please use CursorManager instead
+// https://answers.unity.com/questions/1313950/unity-ui-mouse-keyboard-navigate-un-highlight-butt.html
 
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,15 +19,16 @@ namespace Nova
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!EventSystem.current.alreadySelecting)
-            {
-                EventSystem.current.SetSelectedGameObject(gameObject);
-            }
+            // var eventSystem = EventSystem.current;
+            // if (!eventSystem.alreadySelecting)
+            // {
+            //     eventSystem.SetSelectedGameObject(gameObject);
+            // }
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            selectable.OnDeselect(eventData as BaseEventData);
+            // selectable.OnDeselect(eventData as BaseEventData);
         }
     }
 }
