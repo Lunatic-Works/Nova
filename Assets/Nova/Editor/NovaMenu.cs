@@ -30,5 +30,15 @@ namespace Nova.Editor
                 Directory.Delete(InputMapper.InputFilesDirectory, true);
             }
         }
+
+        [MenuItem("Nova/Find All Active Highlight Fix", false, 1)]
+        public static void FindAllActiveHighlightFix()
+        {
+            var objs = Object.FindObjectsOfType<Nova.HighlightFix>();
+            foreach(var obj in objs)
+            {
+                Debug.Log(Nova.Utils.GetPath(obj));
+            }
+        }
     }
 }
