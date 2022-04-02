@@ -248,15 +248,17 @@ namespace Nova
 
         public override void Show(Action onFinish)
         {
-            base.Show(onFinish);
             dialogueBoxShown.SetActive(true);
+
+            base.Show(onFinish);
         }
 
         public override void Hide(Action onFinish)
         {
             state = DialogueBoxState.Normal;
-            base.Hide(onFinish);
             dialogueBoxShown.SetActive(false);
+
+            base.Hide(onFinish);
         }
 
         private void OnEnable()

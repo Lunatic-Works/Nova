@@ -109,9 +109,10 @@ namespace Nova
         public override void Show(Action onFinish)
         {
             PauseOtherAudios();
-            RefreshContent();
 
             base.Show(onFinish);
+
+            RefreshContent();
         }
 
         public override void Hide(Action onFinish)

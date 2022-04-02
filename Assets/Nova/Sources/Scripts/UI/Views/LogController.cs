@@ -234,8 +234,6 @@ namespace Nova
                 configManager.SetInt(LogViewFirstShownKey, 1);
             }
 
-            scrollRect.verticalNormalizedPosition = 0.0f;
-
             base.Show(onFinish);
 
             scrollRect.verticalNormalizedPosition = 0.0f;
@@ -251,6 +249,8 @@ namespace Nova
                 Hide();
             }
         }
+
+        #region Restoration
 
         [Serializable]
         private class LogControllerRestoreData : IRestoreData
@@ -309,5 +309,7 @@ namespace Nova
                 AddEntry(allParams[i]);
             }
         }
+
+        #endregion
     }
 }
