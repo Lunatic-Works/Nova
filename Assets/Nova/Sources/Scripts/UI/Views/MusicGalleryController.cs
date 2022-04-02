@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Assert = UnityEngine.Assertions.Assert;
+using UnityEngine.Assertions;
 
 namespace Nova
 {
@@ -44,7 +44,7 @@ namespace Nova
             {
                 if (_mode == value) return;
                 _mode = value;
-                RefreshMusicPlayerList();
+                RefreshMusicPlayer();
             }
         }
 
@@ -104,6 +104,7 @@ namespace Nova
             base.Start();
 
             checkpointManager.Init();
+            RefreshContent();
         }
 
         public override void Show(Action onFinish)
@@ -127,7 +128,7 @@ namespace Nova
         {
             UpdateUnlockedMusics();
             RefreshMusicListView();
-            RefreshMusicPlayerList();
+            RefreshMusicPlayer();
         }
 
         private static bool IsUnlocked(MusicListEntry entry)
@@ -189,7 +190,7 @@ namespace Nova
             }
         }
 
-        private void RefreshMusicPlayerList()
+        private void RefreshMusicPlayer()
         {
             if (musicPlayer == null || musicPlayer.musicList == null) return;
             musicPlayer.musicList = GetMusicList(musicPlayer.musicList.Current());

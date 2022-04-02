@@ -55,7 +55,7 @@ namespace Nova
             }
         }
 
-        protected override void OnEnter(Action onAnimationFinish)
+        protected override void OnEnter(Action onFinish)
         {
             var current = GetBaseAnimationEntry();
             bool hasAnimation = false;
@@ -86,13 +86,13 @@ namespace Nova
                 current.With(enterFunction);
             }
 
-            if (onAnimationFinish != null)
+            if (onFinish != null)
             {
-                current.Then(new ActionAnimationProperty(onAnimationFinish));
+                current.Then(new ActionAnimationProperty(onFinish));
             }
         }
 
-        protected override void OnExit(Action onAnimationFinish)
+        protected override void OnExit(Action onFinish)
         {
             var current = GetBaseAnimationEntry();
             bool hasAnimation = false;
@@ -125,7 +125,7 @@ namespace Nova
 
             current.Then(new ActionAnimationProperty(() =>
             {
-                onAnimationFinish?.Invoke();
+                onFinish?.Invoke();
                 SetToTransitionTarget();
             }));
         }

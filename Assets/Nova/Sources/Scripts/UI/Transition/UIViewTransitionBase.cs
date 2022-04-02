@@ -126,11 +126,11 @@ namespace Nova
             }
         }
 
-        protected abstract void OnEnter(Action onAnimationFinish);
+        protected abstract void OnEnter(Action onFinish);
 
-        protected abstract void OnExit(Action onAnimationFinish);
+        protected abstract void OnExit(Action onFinish);
 
-        public void Enter(Action onAnimationFinish, float withDelay = 0f)
+        public void Enter(Action onFinish, float withDelay = 0f)
         {
             delayOffset = withDelay;
             OnBeforeEnter();
@@ -141,19 +141,19 @@ namespace Nova
                 {
                     gameObject.SetActive(true);
                     viewManager.transitionGhost.gameObject.SetActive(false);
-                    onAnimationFinish?.Invoke();
+                    onFinish?.Invoke();
                 });
             }
             else
             {
                 gameObject.SetActive(true);
-                OnEnter(onAnimationFinish);
+                OnEnter(onFinish);
             }
 
             viewManager.TryPlaySound(enterSound);
         }
 
-        public void Exit(Action onAnimationFinish, float withDelay = 0f)
+        public void Exit(Action onFinish, float withDelay = 0f)
         {
             delayOffset = withDelay;
             if (useGhost)
@@ -172,7 +172,7 @@ namespace Nova
                     cg.alpha = 1f;
                 }
 
-                onAnimationFinish?.Invoke();
+                onFinish?.Invoke();
             });
 
             viewManager.TryPlaySound(exitSound);

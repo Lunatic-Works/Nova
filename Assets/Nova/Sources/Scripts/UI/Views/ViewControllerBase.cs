@@ -48,7 +48,7 @@ namespace Nova
 
         protected void ForceRebuildLayoutAndResetTransitionTarget()
         {
-            // Rebuild all layout the hard way
+            // Rebuild all layouts the hard way
             foreach (var layout in GetComponentsInChildren<LayoutGroup>())
             {
                 LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>());
@@ -82,16 +82,16 @@ namespace Nova
             var transition = transitions.FirstOrDefault(t => t.enabled);
             if (transition != null)
             {
+                viewManager.UpdateView(true);
                 transition.Enter(() =>
                 {
                     viewManager.UpdateView(false);
                     onFinish?.Invoke();
                 });
-                viewManager.UpdateView(transition != null);
             }
             else
             {
-                viewManager.UpdateView(transition != null);
+                viewManager.UpdateView(false);
                 onFinish?.Invoke();
             }
         }

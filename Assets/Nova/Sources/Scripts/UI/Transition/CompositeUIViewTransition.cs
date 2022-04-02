@@ -74,7 +74,7 @@ namespace Nova
             }
         }
 
-        private void RunSequence(bool isEnter, Action onAnimationFinish)
+        private void RunSequence(bool isEnter, Action onFinish)
         {
             var seq = isEnter ? forwardChildTransitions : backwardChildTransitions;
             for (int i = 0; i < seq.Count; i++)
@@ -82,12 +82,12 @@ namespace Nova
                 var item = seq[i];
                 if (isEnter)
                 {
-                    item.transition.Enter(i == forwardEndingIdx ? onAnimationFinish : null,
+                    item.transition.Enter(i == forwardEndingIdx ? onFinish : null,
                         item.absoluteOffsetInParent + delayOffset);
                 }
                 else
                 {
-                    item.transition.Exit(i == backwardEndingIdx ? onAnimationFinish : null,
+                    item.transition.Exit(i == backwardEndingIdx ? onFinish : null,
                         item.absoluteOffsetInParent + delayOffset);
                 }
             }
@@ -102,14 +102,14 @@ namespace Nova
             }
         }
 
-        protected override void OnEnter(Action onAnimationFinish)
+        protected override void OnEnter(Action onFinish)
         {
-            RunSequence(true, onAnimationFinish);
+            RunSequence(true, onFinish);
         }
 
-        protected override void OnExit(Action onAnimationFinish)
+        protected override void OnExit(Action onFinish)
         {
-            RunSequence(false, onAnimationFinish);
+            RunSequence(false, onFinish);
         }
     }
 }

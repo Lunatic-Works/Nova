@@ -6,8 +6,9 @@ namespace Nova
 {
     public class MusicGalleryProgressBar : MonoBehaviour
     {
-        private MusicGalleryPlayer player;
         public Text timeLabel;
+
+        private MusicGalleryPlayer player;
         private Slider slider;
 
         public bool interactable
@@ -18,11 +19,25 @@ namespace Nova
 
         private AudioSource audioSource => player.audioSource;
 
+        private bool inited;
+
+        public void Init()
+        {
+            if (inited)
+            {
+                return;
+            }
+
+            player = GetComponentInParent<MusicGalleryPlayer>();
+            slider = GetComponent<Slider>();
+            slider.value = 0.0f;
+            RefreshTimeIndication();
+            inited = true;
+        }
+
         private void Awake()
         {
-            player = GetComponentInParent<MusicGalleryPlayer>();
-            Assert.IsNotNull(player);
-            slider = GetComponent<Slider>();
+            Init();
             slider.onValueChanged.AddListener(OnValueChanged);
         }
 
@@ -37,7 +52,7 @@ namespace Nova
             {
                 if (audioSource == null || audioSource.clip == null)
                 {
-                    return 0;
+                    return 0.0f;
                 }
 
                 return audioSource.time / audioSource.clip.length;
@@ -91,7 +106,11 @@ namespace Nova
             get => _isDragged;
             set
             {
-                if (_isDragged == value) return;
+                if (_isDragged == value)
+                {
+                    return;
+                }
+
                 _isDragged = value;
                 if (_isDragged)
                 {
@@ -108,7 +127,7 @@ namespace Nova
         {
             if (audioSource == null || audioSource.clip == null)
             {
-                timeLabel.text = FormatTimeLabel(0, 0);
+                timeLabel.text = FormatTimeLabel(0.0f, 0.0f);
                 return;
             }
 

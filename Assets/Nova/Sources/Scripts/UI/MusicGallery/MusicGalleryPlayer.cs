@@ -23,6 +23,7 @@ namespace Nova
         {
             audioSource.clip = null;
             titleLabel.text = I18n.__("musicgallery.title");
+            progressBar.Init();
             progressBar.interactable = false;
         }
 
@@ -31,14 +32,8 @@ namespace Nova
             Assert.IsNotNull(music);
             audioSource.clip = AssetLoader.Load<AudioClip>(music.resourcePath);
             titleLabel.text = music.GetDisplayName();
+            progressBar.Init();
             progressBar.interactable = true;
-        }
-
-        private void Start()
-        {
-            // it should wait for other components to be initialized
-            Pause(); // sync IsPlaying flag on initialization
-            ApplyInvalidMusicEntry();
         }
 
         private bool needResetMusicOffset = true;
@@ -51,18 +46,13 @@ namespace Nova
             set
             {
                 if (_currentMusic == value)
+                {
                     return;
+                }
+
                 _currentMusic = value;
                 needResetMusicOffset = true;
-                Pause();
-                if (value == null)
-                {
-                    ApplyInvalidMusicEntry();
-                }
-                else
-                {
-                    ApplyMusicEntry(value);
-                }
+                Refresh();
             }
         }
 
@@ -80,7 +70,19 @@ namespace Nova
 
         private void OnEnable()
         {
-            if (currentMusic != null)
+            Refresh();
+        }
+
+        private void Refresh()
+        {
+            // Sync isPlaying flag on initialization
+            Pause();
+
+            if (currentMusic == null)
+            {
+                ApplyInvalidMusicEntry();
+            }
+            else
             {
                 ApplyMusicEntry(currentMusic);
             }
@@ -92,7 +94,7 @@ namespace Nova
             if (audioSource.isPlaying) return;
             if (needResetMusicOffset)
             {
-                audioSource.time = 0;
+                audioSource.time = 0.0f;
                 needResetMusicOffset = false;
             }
 
