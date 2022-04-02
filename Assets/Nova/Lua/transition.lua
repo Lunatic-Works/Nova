@@ -46,8 +46,12 @@ end
 
 local function get_renderer_pp(obj)
     local go, renderer, pp
-    if obj:GetType() == typeof(Nova.CameraController) then
+    local _type = obj:GetType()
+    if _type == typeof(Nova.CameraController) then
         go = obj.baseGameObject
+        pp = go:GetComponent(typeof(Nova.PostProcessing))
+    elseif _type == typeof(Nova.CameraOverlayMask) then
+        go = obj.gameObject
         pp = go:GetComponent(typeof(Nova.PostProcessing))
     else
         go = obj.gameObject

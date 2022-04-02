@@ -35,33 +35,27 @@ namespace Nova
 
         public void SetLayer(int layerID, Material material)
         {
-            while (layers.Count < layerID)
+            while (layers.Count <= layerID)
             {
                 layers.Add(null);
             }
 
-            if (layers.Count == layerID)
-            {
-                layers.Add(material);
-            }
-            else
-            {
-                layers[layerID] = material;
-            }
+            layers[layerID] = material;
         }
 
         public void ClearLayer(int layerID)
         {
-            if (layers.Count == layerID + 1)
-            {
-                layers.RemoveAt(layerID);
-            }
-            else
+            if (layers.Count > layerID)
             {
                 layers[layerID] = null;
             }
+            else
+            {
+                Debug.LogWarning(
+                    $"Post processing layer already cleared, layerID: {layerID}, layers.Count: {layers.Count}");
+            }
 
-            while (layers.Count > 0 && !layers[layers.Count - 1])
+            while (layers.Count > 0 && layers[layers.Count - 1] == null)
             {
                 layers.RemoveAt(layers.Count - 1);
             }
