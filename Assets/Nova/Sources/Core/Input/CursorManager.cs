@@ -47,7 +47,6 @@ namespace Nova
                 if (idleTime > hideAfterSeconds)
                 {
                     Cursor.visible = false;
-                    idleTime = 0.0f;
                 }
             }
         }

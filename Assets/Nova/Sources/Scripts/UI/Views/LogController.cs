@@ -248,6 +248,19 @@ namespace Nova
             {
                 Hide();
             }
+
+            // TODO: fully support keyboard navigation
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                Cursor.visible = false;
+                scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.down;
+            }
+
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                Cursor.visible = false;
+                scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.up;
+            }
         }
 
         #region Restoration
