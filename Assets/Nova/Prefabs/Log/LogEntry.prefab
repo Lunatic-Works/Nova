@@ -69,7 +69,6 @@ GameObject:
   - component: {fileID: 222489298477018008}
   - component: {fileID: 114611482203095870}
   - component: {fileID: 114976569138266534}
-  - component: {fileID: 114141560599879890}
   m_Layer: 5
   m_Name: PlayVoiceButton
   m_TagString: Untagged
@@ -163,18 +162,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &114141560599879890
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1077478981781368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1137a9baac949a4494bf82556d2396e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1102024353405036
 GameObject:
   m_ObjectHideFlags: 0
@@ -261,7 +248,6 @@ GameObject:
   - component: {fileID: 222390042659053920}
   - component: {fileID: 114287833872531718}
   - component: {fileID: 114155115389934802}
-  - component: {fileID: 114420918348910110}
   m_Layer: 5
   m_Name: GoBackButton
   m_TagString: Untagged
@@ -368,18 +354,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &114420918348910110
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1497717414968056}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1137a9baac949a4494bf82556d2396e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1575391093018588
 GameObject:
   m_ObjectHideFlags: 0
