@@ -70,10 +70,5 @@ namespace Nova
 
             return texture;
         }
-
-        private void OnDestroy()
-        {
-            DestroyGameTexture();
-        }
     }
 }
