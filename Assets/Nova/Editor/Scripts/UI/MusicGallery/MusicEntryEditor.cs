@@ -307,7 +307,7 @@ namespace Nova.Editor
             AudioClip clip = Resources.Load<AudioClip>(loadPath);
             if (clip == null)
             {
-                Debug.LogErrorFormat("Nova: AudioClip {0} not found.", loadPath);
+                Debug.LogError($"Nova: AudioClip {loadPath} not found.");
                 return;
             }
 
@@ -344,7 +344,7 @@ namespace Nova.Editor
                 }
             }
 
-            // Debug.LogFormat("{0} {1} {2}", entry.loopBeginSample, entry.loopEndSample, clip.samples);
+            // Debug.Log($"{entry.loopBeginSample} {entry.loopEndSample} {clip.samples}");
 
             EditorUtility.SetDirty(entry);
         }
@@ -352,7 +352,6 @@ namespace Nova.Editor
         [MenuItem("Assets/Create/Nova/Music Entry", false)]
         public static void CreateMusicEntry()
         {
-            // split path name and file name
             var path = AssetDatabase.GetAssetPath(Selection.activeObject);
             CreateMusicEntry(path);
         }

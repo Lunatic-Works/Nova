@@ -181,6 +181,7 @@ namespace LuaInterface
                     else
                     {
                         IntPtr p = LuaDLL.lua_topointer(L, i);
+
                         if (p == IntPtr.Zero)
                         {
                             sb.Append("nil");

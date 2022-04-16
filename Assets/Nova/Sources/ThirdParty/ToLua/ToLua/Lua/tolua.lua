@@ -42,4 +42,4 @@ require "System.coroutine"
 require "System.ValueType"
 require "System.Reflection.BindingFlags"
 
---require "misc.strict"
+-- require "misc.strict"

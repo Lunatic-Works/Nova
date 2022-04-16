@@ -638,9 +638,9 @@ public static class ToLuaMenu
         sb.AppendLineEx("using UnityEngine;");
         sb.AppendLineEx("using LuaInterface;");
         sb.AppendLineEx();
-        sb.AppendLineEx("public static partial class LuaBinder");
+        sb.AppendLineEx("public static class LuaBinder");
         sb.AppendLineEx("{");
-        sb.AppendLineEx("\tstatic partial void Bind_Gen(LuaState L)");
+        sb.AppendLineEx("\tpublic static void Bind(LuaState L)");
         sb.AppendLineEx("\t{");
         sb.AppendLineEx("\t\tfloat t = Time.realtimeSinceStartup;");
         sb.AppendLineEx("\t\tL.BeginModule(null);");
@@ -685,7 +685,7 @@ public static class ToLuaMenu
             sb.AppendLineEx("\t\tL.EndPreLoad();");
         }
 
-        // sb.AppendLineEx("\t\tDebugger.Log(\"Register lua type cost time: {0}\", Time.realtimeSinceStartup - t);");
+        sb.AppendLineEx("\t\t// Debugger.Log(\"Register lua type cost time: {0}\", Time.realtimeSinceStartup - t);");
         sb.AppendLineEx("\t}");
 
         for (int i = 0; i < dtList.Count; i++)
@@ -706,7 +706,7 @@ public static class ToLuaMenu
 
         sb.AppendLineEx("}\r\n");
         allTypes.Clear();
-        string file = CustomSettings.saveDir + "LuaBinder.Gen.cs";
+        string file = CustomSettings.saveDir + "LuaBinder.cs";
 
         using (StreamWriter textWriter = new StreamWriter(file, false, Encoding.UTF8))
         {
@@ -927,26 +927,26 @@ public static class ToLuaMenu
         ToLuaExport.GenDelegates(list.ToArray());
         ToLuaExport.Clear();
 
-        // StringBuilder sb = new StringBuilder();
-        // sb.AppendLineEx("using System;");
-        // sb.AppendLineEx("using LuaInterface;");
-        // sb.AppendLineEx();
-        // sb.AppendLineEx("public static partial class LuaBinder");
-        // sb.AppendLineEx("{");
-        // sb.AppendLineEx("\tstatic partial void Bind(LuaState L)");
-        // sb.AppendLineEx("\t{");
-        // sb.AppendLineEx("\t\tthrow new LuaException(\"Please generate LuaBinder files first!\");");
-        // sb.AppendLineEx("\t}");
-        // sb.AppendLineEx("}");
-        //
-        // string file = CustomSettings.saveDir + "LuaBinder.cs";
-        //
-        // using (StreamWriter textWriter = new StreamWriter(file, false, Encoding.UTF8))
-        // {
-        //     textWriter.Write(sb.ToString());
-        //     textWriter.Flush();
-        //     textWriter.Close();
-        // }
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLineEx("using System;");
+        sb.AppendLineEx("using LuaInterface;");
+        sb.AppendLineEx();
+        sb.AppendLineEx("public static class LuaBinder");
+        sb.AppendLineEx("{");
+        sb.AppendLineEx("\tpublic static void Bind(LuaState L)");
+        sb.AppendLineEx("\t{");
+        sb.AppendLineEx("\t\tthrow new LuaException(\"Please generate LuaBinder files first!\");");
+        sb.AppendLineEx("\t}");
+        sb.AppendLineEx("}");
+
+        string file = CustomSettings.saveDir + "LuaBinder.cs";
+
+        using (StreamWriter textWriter = new StreamWriter(file, false, Encoding.UTF8))
+        {
+            textWriter.Write(sb.ToString());
+            textWriter.Flush();
+            textWriter.Close();
+        }
 
         AssetDatabase.Refresh();
     }

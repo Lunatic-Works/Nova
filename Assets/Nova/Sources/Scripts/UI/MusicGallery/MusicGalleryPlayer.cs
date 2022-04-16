@@ -4,11 +4,10 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    /// use MusicGalleryPlayer.Play and MusicGalleryPlayer.Pause instead of manipulate
-    /// the underlying AudioSource directly
-    /// MusicGalleryPlayer will maintain an isPlaying status, it will be sync with AudioSource.isPlaying
-    /// If isPlaying flag is out of sync, it means the underlying clip has finished playing. The player
-    /// will play the next music in its playing list
+    /// Use MusicGalleryPlayer.Play and Pause instead of manipulating the underlying AudioSource directly
+    /// MusicGalleryPlayer maintains an isPlaying flag, and it will be in sync with AudioSource.isPlaying
+    /// If isPlaying is out of sync, that means the underlying clip has finished playing, and the player
+    /// will play the next music in musicList
     public class MusicGalleryPlayer : MonoBehaviour
     {
         public AudioSource audioSource;
@@ -144,11 +143,13 @@ namespace Nova
         private void Update()
         {
             if (audioSource.isPlaying == isPlaying) return;
-            // out of sync with the underlying AudioSource
-            // play the next song in the play list
+
+            // Out of sync with the underlying AudioSource
+            // Play the next music in musicList
             Assert.IsTrue(isPlaying);
-            // out of sync also happens when the application lost focus
-            // check the time to ensure the clip has finished playing
+
+            // Out of sync also happens when the application loses focus
+            // Check the time to ensure the clip has finished playing
             if (audioSource.time < float.Epsilon || Mathf.Approximately(audioSource.time, audioSource.clip.length))
             {
                 Step();

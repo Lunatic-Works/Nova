@@ -293,16 +293,16 @@ public static class ToLuaExport
                     continue;
                 }
 
-                if (args[i].Attributes != ParameterAttributes.Out)
+                if (args[i].ParameterType.IsByRef && (args[i].Attributes & ParameterAttributes.Out) != ParameterAttributes.None)
                 {
-                    list.Add(GetGenericBaseType(method, args[i].ParameterType));
+					Type genericClass = typeof(LuaOut<>);
+					Type t = genericClass.MakeGenericType(args[i].ParameterType.GetElementType());
+					list.Add(t);					
                 }
                 else
                 {
-                    Type genericClass = typeof(LuaOut<>);
-                    Type t = genericClass.MakeGenericType(args[i].ParameterType.GetElementType());
-                    list.Add(t);
-                }
+					list.Add(GetGenericBaseType(method, args[i].ParameterType));
+				}
             }
 
             for (int i = offset; i < list.Count - 1; i++)
@@ -465,7 +465,7 @@ public static class ToLuaExport
             {
                 ParameterInfo param = paramInfos[j];
                 string arg = "arg" + j;
-                bool beOutArg = param.Attributes == ParameterAttributes.Out;
+                bool beOutArg = param.ParameterType.IsByRef && ((param.Attributes & ParameterAttributes.Out) != ParameterAttributes.None);
                 bool beParams = IsParams(param);
                 Type t = GetGenericBaseType(method, param.ParameterType);
                 ProcessArg(t, head, arg, offset + j, j >= checkTypePos, beParams, beOutArg);
@@ -475,14 +475,14 @@ public static class ToLuaExport
             {
                 ParameterInfo param = paramInfos[j];
 
-                if (!param.ParameterType.IsByRef)
+                if (!param.ParameterType.IsByRef || ((param.Attributes & ParameterAttributes.In) != ParameterAttributes.None))
                 {
                     sbArgs.Append("arg");
                 }
                 else
                 {
-                    if (param.Attributes == ParameterAttributes.Out)
-                    {
+                    if ((param.Attributes & ParameterAttributes.Out) != ParameterAttributes.None)
+					{
                         sbArgs.Append("out arg");
                     }
                     else
@@ -2129,6 +2129,10 @@ public static class ToLuaExport
                 {
                     return 1;
                 }
+                else if (list1[0].ParameterType.IsPrimitive)
+                {
+                    return -1;
+                }
 
                 list1.RemoveAt(0);
             }
@@ -2137,6 +2141,10 @@ public static class ToLuaExport
                 if (list2[0].ParameterType == typeof(object))
                 {
                     return -1;
+                }
+                else if (list2[0].ParameterType.IsPrimitive)
+                {
+                    return 1;
                 }
 
                 list2.RemoveAt(0);
@@ -2151,6 +2159,14 @@ public static class ToLuaExport
                 else if (list1[i].ParameterType != typeof(object) && list2[i].ParameterType == typeof(object))
                 {
                     return -1;
+                }
+                else if (list1[i].ParameterType.IsPrimitive && !list2[i].ParameterType.IsPrimitive)
+                {
+                    return -1;
+                }
+                else if (!list1[i].ParameterType.IsPrimitive && list2[i].ParameterType.IsPrimitive)
+                {
+                    return 1;
                 }
                 else if (list1[i].ParameterType.IsPrimitive && list2[i].ParameterType.IsPrimitive)
                 {
@@ -3038,16 +3054,16 @@ public static class ToLuaExport
                 continue;
             }
 
-            if (p[i].Attributes != ParameterAttributes.Out)
-            {
-                list.Add(GetGenericBaseType(mb, p[i].ParameterType));
-            }
-            else
-            {
-                Type genericClass = typeof(LuaOut<>);
-                Type t = genericClass.MakeGenericType(p[i].ParameterType);
-                list.Add(t);
-            }
+			if (p[i].ParameterType.IsByRef && (p[i].Attributes & ParameterAttributes.Out) != ParameterAttributes.None)
+			{
+				Type genericClass = typeof(LuaOut<>);
+				Type t = genericClass.MakeGenericType(p[i].ParameterType);
+				list.Add(t);				
+			}
+			else
+			{
+				list.Add(GetGenericBaseType(mb, p[i].ParameterType));
+			}
         }
 
         for (int i = offset; i < list.Count - 1; i++)
@@ -3556,7 +3572,7 @@ public static class ToLuaExport
                 {
                     sb.AppendFormat("{2}\tfunc.PushByteBuffer(param{1});\r\n", push, i, head);
                 }
-                else if (pi[i].Attributes != ParameterAttributes.Out)
+                else if ((pi[i].Attributes & ParameterAttributes.Out) == ParameterAttributes.None)
                 {
                     sb.AppendFormat("{2}\tfunc.{0}(param{1});\r\n", push, i, head);
                 }
@@ -3805,6 +3821,119 @@ public static class ToLuaExport
         sb.AppendLineEx("\t}");    
     }
 
+    static string CreateDelegate = @"    
+    public static Delegate CreateDelegate(Type t, LuaFunction func = null)
+    {
+        DelegateCreate Create = null;
+
+        if (!dict.TryGetValue(t, out Create))
+        {
+            throw new LuaException(string.Format(""Delegate {0} not register"", LuaMisc.GetTypeName(t)));            
+        }
+
+        if (func != null)
+        {
+            LuaState state = func.GetLuaState();
+            LuaDelegate target = state.GetLuaDelegate(func);
+            
+            if (target != null)
+            {
+                return Delegate.CreateDelegate(t, target, target.method);
+            }  
+            else
+            {
+                Delegate d = Create(func, null, false);
+                target = d.Target as LuaDelegate;
+                state.AddLuaDelegate(target, func);
+                return d;
+            }       
+        }
+
+        return Create(null, null, false);        
+    }
+    
+    public static Delegate CreateDelegate(Type t, LuaFunction func, LuaTable self)
+    {
+        DelegateCreate Create = null;
+
+        if (!dict.TryGetValue(t, out Create))
+        {
+            throw new LuaException(string.Format(""Delegate {0} not register"", LuaMisc.GetTypeName(t)));
+        }
+
+        if (func != null)
+        {
+            LuaState state = func.GetLuaState();
+            LuaDelegate target = state.GetLuaDelegate(func, self);
+
+            if (target != null)
+            {
+                return Delegate.CreateDelegate(t, target, target.method);
+            }
+            else
+            {
+                Delegate d = Create(func, self, true);
+                target = d.Target as LuaDelegate;
+                state.AddLuaDelegate(target, func, self);
+                return d;
+            }
+        }
+
+        return Create(null, null, true);
+    }
+";
+
+    static string RemoveDelegate = @"    
+    public static Delegate RemoveDelegate(Delegate obj, LuaFunction func)
+    {
+        LuaState state = func.GetLuaState();
+        Delegate[] ds = obj.GetInvocationList();
+
+        for (int i = 0; i < ds.Length; i++)
+        {
+            LuaDelegate ld = ds[i].Target as LuaDelegate;
+
+            if (ld != null && ld.func == func)
+            {
+                obj = Delegate.Remove(obj, ds[i]);
+                state.DelayDispose(ld.func);
+                break;
+            }
+        }
+
+        return obj;
+    }
+    
+    public static Delegate RemoveDelegate(Delegate obj, Delegate dg)
+    {
+        LuaDelegate remove = dg.Target as LuaDelegate;
+
+        if (remove == null)
+        {
+            obj = Delegate.Remove(obj, dg);
+            return obj;
+        }
+
+        LuaState state = remove.func.GetLuaState();
+        Delegate[] ds = obj.GetInvocationList();        
+
+        for (int i = 0; i < ds.Length; i++)
+        {
+            LuaDelegate ld = ds[i].Target as LuaDelegate;
+
+            if (ld != null && ld == remove)
+            {
+                obj = Delegate.Remove(obj, ds[i]);
+                state.DelayDispose(ld.func);
+                state.DelayDispose(ld.self);
+                break;
+            }
+        }
+
+        return obj;
+    }
+";
+
     static string GetDelegateParams(MethodInfo mi)
     {
         ParameterInfo[] infos = mi.GetParameters();
@@ -3867,8 +3996,8 @@ public static class ToLuaExport
 
         for (int i = 0; i < pis.Length; i++)
         {
-            if (pis[i].Attributes == ParameterAttributes.Out)
-            {
+            if ((pis[i].Attributes & ParameterAttributes.Out) != ParameterAttributes.None)
+			{
                 str += string.Format("\t\t\t\tparam{0} = {1};\r\n", i, GetReturnValue(pis[i].ParameterType.GetElementType()));
                 flag = true;
             }
@@ -3913,10 +4042,18 @@ public static class ToLuaExport
             }          
         }
 
-        sb.Append("public partial class DelegateFactory\r\n");
-        sb.Append("{\r\n");
-
-        sb.Append("\tstatic partial void Register()\r\n");
+        sb.Append("public class DelegateFactory\r\n");
+        sb.Append("{\r\n");        
+        sb.Append("\tpublic delegate Delegate DelegateCreate(LuaFunction func, LuaTable self, bool flag);\r\n");
+        sb.Append("\tpublic static Dictionary<Type, DelegateCreate> dict = new Dictionary<Type, DelegateCreate>();\r\n");
+        sb.Append("\tstatic DelegateFactory factory = new DelegateFactory();\r\n");
+        sb.AppendLineEx();
+        sb.Append("\tpublic static void Init()\r\n");
+        sb.Append("\t{\r\n");
+        sb.Append("\t\tRegister();\r\n");
+        sb.AppendLineEx("\t}\r\n");        
+        
+        sb.Append("\tpublic static void Register()\r\n");
         sb.Append("\t{\r\n");
         sb.Append("\t\tdict.Clear();\r\n");
 
@@ -3955,6 +4092,8 @@ public static class ToLuaExport
         }
 
         sb.Append("\t}\r\n");
+        sb.Append(CreateDelegate);
+        sb.AppendLineEx(RemoveDelegate);
 
         for (int i = 0; i < list.Length; i++)
         {
@@ -4013,7 +4152,7 @@ public static class ToLuaExport
         }
 
         sb.AppendLineEx("}\r\n");        
-        SaveFile(CustomSettings.saveDir + "DelegateFactory.Gen.cs");
+        SaveFile(CustomSettings.saveDir + "DelegateFactory.cs");
 
         Clear();
     }

@@ -36,12 +36,12 @@ public static class CustomSettings
     // 附加导出委托类型（在导出委托时，customTypeList中牵扯的委托类型都会导出，无需写在这里）
     public static DelegateType[] customDelegateList =
     {
-        _DT(typeof(Action)),
-        _DT(typeof(Action<int>)),
-        _DT(typeof(Comparison<int>)),
-        _DT(typeof(Func<int, int>)),
-        _DT(typeof(Predicate<int>)),
-        _DT(typeof(UnityEngine.Events.UnityAction)),
+        // _DT(typeof(Action)),
+        // _DT(typeof(Action<int>)),
+        // _DT(typeof(Comparison<int>)),
+        // _DT(typeof(Func<int, int>)),
+        // _DT(typeof(Predicate<int>)),
+        // _DT(typeof(UnityEngine.Events.UnityAction)),
     };
 
     public static BindType[] customTypeList =>
