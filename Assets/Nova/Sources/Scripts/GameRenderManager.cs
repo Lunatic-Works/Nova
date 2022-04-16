@@ -157,16 +157,7 @@ namespace Nova
             Shader.SetGlobalFloat(GlobalRealScreenWidthID, RealScreen.fWidth);
             Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.fWidth / 1920);
 
-            if (gameRenderTexture)
-            {
-                Destroy(gameRenderTexture);
-            }
-
-            if (finalRenderTexture)
-            {
-                Destroy(finalRenderTexture);
-            }
-
+            Destroy(gameRenderTexture);
             gameRenderTarget.texture = gameRenderTexture =
                 new RenderTexture(RealScreen.width, RealScreen.height, 24)
                 {
@@ -178,6 +169,7 @@ namespace Nova
                 camera.GetComponent<Camera>().targetTexture = gameRenderTexture;
             }
 
+            Destroy(finalRenderTexture);
             UICameraHelper.Active.targetTexture = finalRenderTexture =
                 new RenderTexture(RealScreen.width, RealScreen.height, 24)
                 {

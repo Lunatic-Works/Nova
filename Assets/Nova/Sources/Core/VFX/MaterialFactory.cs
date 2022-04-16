@@ -57,14 +57,14 @@ namespace Nova
         {
             foreach (var m in materials.Values)
             {
-                Utils.DestroyMaterial(m);
+                Utils.DestroyObject(m);
             }
 
             materials.Clear();
 
             foreach (var m in restorableMaterials.Values)
             {
-                Utils.DestroyMaterial(m);
+                Utils.DestroyObject(m);
             }
 
             restorableMaterials.Clear();

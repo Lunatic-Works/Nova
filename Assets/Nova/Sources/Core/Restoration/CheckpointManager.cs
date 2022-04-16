@@ -89,7 +89,7 @@ namespace Nova
             this.dialogueIndex = dialogueIndex;
         }
 
-        public void TryDestroyTexture()
+        public void DestroyTexture()
         {
             Utils.DestroyObject(screenshotTexture);
         }
@@ -225,7 +225,7 @@ namespace Nova
 
             foreach (var bookmark in cachedSaveSlots.Values)
             {
-                bookmark.TryDestroyTexture();
+                bookmark.DestroyTexture();
             }
         }
 

@@ -288,12 +288,8 @@ namespace Nova
 #endif
         }
 
-        public static void DestroyMaterial(Material material, bool destroyInEditor = true)
-        {
-            DestroyObject(material, destroyInEditor);
-        }
-
-        public static void DestroyObject(UnityObject obj, bool destroyInEditor = true)
+        // Only use in editor code
+        public static void DestroyObject(UnityObject obj)
         {
             if (obj == null) return;
 #if UNITY_EDITOR
@@ -301,7 +297,7 @@ namespace Nova
             {
                 UnityObject.Destroy(obj);
             }
-            else if (destroyInEditor)
+            else
             {
                 UnityObject.DestroyImmediate(obj);
             }

@@ -67,11 +67,7 @@ namespace Nova
                 renderTexture.width == masterCamera.pixelWidth &&
                 renderTexture.height == masterCamera.pixelHeight) return;
 
-            if (renderTexture)
-            {
-                Destroy(renderTexture);
-            }
-
+            Destroy(renderTexture);
             renderTexture = new RenderTexture(masterCamera.pixelWidth, masterCamera.pixelHeight, 24)
             {
                 name = $"CameraOverlayMaskRenderTexture({masterCamera.name})"

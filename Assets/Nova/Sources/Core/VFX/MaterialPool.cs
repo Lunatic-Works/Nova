@@ -19,7 +19,7 @@ namespace Nova
                     return;
                 }
 
-                Utils.DestroyMaterial(_defaultMaterial);
+                Utils.DestroyObject(_defaultMaterial);
                 _defaultMaterial = value;
             }
         }
