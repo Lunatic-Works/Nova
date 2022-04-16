@@ -52,7 +52,8 @@ namespace Nova
             else
             {
                 Debug.LogWarning(
-                    $"Post processing layer already cleared, layerID: {layerID}, layers.Count: {layers.Count}");
+                    "Post processing layer already cleared. Maybe a trans is overwritten by another. " +
+                    $"layerID: {layerID}, layers.Count: {layers.Count}");
             }
 
             while (layers.Count > 0 && layers[layers.Count - 1] == null)

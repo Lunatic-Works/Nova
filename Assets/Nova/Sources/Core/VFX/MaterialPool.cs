@@ -6,7 +6,7 @@ namespace Nova
     public class MaterialPool : MonoBehaviour
     {
         // Keep Renderer's default material, used when turning off VFX on the Renderer
-        // defaultMaterial is null for CameraController
+        // defaultMaterial is null for PostProcessing
         private Material _defaultMaterial;
 
         public Material defaultMaterial

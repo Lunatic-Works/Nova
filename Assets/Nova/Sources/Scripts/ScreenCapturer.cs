@@ -7,6 +7,8 @@ namespace Nova
     {
         [HideInInspector] public RenderTexture capturedGameTexture;
 
+        private int captureCount;
+
         private void Awake()
         {
             LuaRuntime.Instance.BindObject("screenCapturer", this);
@@ -28,10 +30,22 @@ namespace Nova
         public void CaptureGameTexture()
         {
             capturedGameTexture = GetGameTexture(withUI: false);
+            ++captureCount;
         }
 
         public void DestroyGameTexture()
         {
+            --captureCount;
+            if (captureCount > 0)
+            {
+                return;
+            }
+
+            if (captureCount < 0)
+            {
+                Debug.LogWarning($"Nova: captureCount {captureCount} < 0");
+            }
+
             Destroy(capturedGameTexture);
             capturedGameTexture = null;
         }

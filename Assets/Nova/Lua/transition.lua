@@ -240,16 +240,19 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
     if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
             __Nova.screenCapturer:CaptureGameTexture()
-            mat:SetTexture('_SubTex', __Nova.screenCapturer.capturedGameTexture)
-            set_mat_default_properties(mat, base_shader_name, properties)
-            set_mat_properties(mat, base_shader_name, properties)
-            mat:SetFloat('_T', 1)
-            set_mat(obj, mat, layer_id)
 
             auto_fade_off()
             local func = image_name
             func()
             auto_fade_on()
+
+            -- set the material for `cam` after `func`, because it may change
+            -- the material for `cam`
+            mat:SetTexture('_SubTex', __Nova.screenCapturer.capturedGameTexture)
+            set_mat_default_properties(mat, base_shader_name, properties)
+            set_mat_properties(mat, base_shader_name, properties)
+            mat:SetFloat('_T', 1)
+            set_mat(obj, mat, layer_id)
         end
 
         action_end = function()
