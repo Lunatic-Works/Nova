@@ -119,11 +119,11 @@ namespace Nova.Editor
             cropped.SetPixels(pixels);
             cropped.Apply();
 
-            var bytes = cropped.EncodeToPNG();
             var fileName = cropper.sprite.name + ".png";
             var absoluteOutputPath = Path.Combine(standing.absoluteOutputDirectory, fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(absoluteOutputPath));
-            File.WriteAllBytes(absoluteOutputPath, bytes);
+            File.WriteAllBytes(absoluteOutputPath, cropped.EncodeToPNG());
+            Utils.DestroyObject(cropped);
 
             var assetPath = Path.Combine(standing.outputDirectory, fileName);
             AssetDatabase.ImportAsset(assetPath);

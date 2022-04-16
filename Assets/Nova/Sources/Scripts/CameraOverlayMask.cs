@@ -51,6 +51,8 @@ namespace Nova
 
         private void OnDestroy()
         {
+            Destroy(renderTexture);
+
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
                 gameState.RemoveRestorable(this);

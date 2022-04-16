@@ -7,47 +7,41 @@ namespace Nova
     {
         [HideInInspector] public RenderTexture capturedGameTexture;
 
-        private int captureCount;
-
         private void Awake()
         {
             LuaRuntime.Instance.BindObject("screenCapturer", this);
         }
 
-        public static RenderTexture GetGameTexture(bool withUI = true)
+        private void OnDestroy()
         {
-            var screenCamera = withUI ? UICameraHelper.Active : Camera.main;
-            var renderTexture = new RenderTexture(RealScreen.width, RealScreen.height, 24)
-            {
-                name = "ScreenCapturerRenderTexture"
-            };
+            Destroy(capturedGameTexture);
+        }
 
+        // Will reuse renderTexture if possible, otherwise destroy it
+        public static RenderTexture GetGameTexture(RenderTexture renderTexture = null, bool withUI = true)
+        {
+            RenderTexture oldRenderTexture = null;
+            if (renderTexture == null || renderTexture.width != RealScreen.width || renderTexture.height != RealScreen.height)
+            {
+                oldRenderTexture = renderTexture;
+                renderTexture = new RenderTexture(RealScreen.width, RealScreen.height, 24)
+                {
+                    name = "ScreenCapturerRenderTexture"
+                };
+            }
+
+            var screenCamera = withUI ? UICameraHelper.Active : Camera.main;
             screenCamera.RenderToTexture(renderTexture);
+
+            // Destroy oldRenderTexture after capturing, because it may be showing on the screen
+            Destroy(oldRenderTexture);
 
             return renderTexture;
         }
 
         public void CaptureGameTexture()
         {
-            capturedGameTexture = GetGameTexture(withUI: false);
-            ++captureCount;
-        }
-
-        public void DestroyGameTexture()
-        {
-            --captureCount;
-            if (captureCount > 0)
-            {
-                return;
-            }
-
-            if (captureCount < 0)
-            {
-                Debug.LogWarning($"Nova: captureCount {captureCount} < 0");
-            }
-
-            Destroy(capturedGameTexture);
-            capturedGameTexture = null;
+            capturedGameTexture = GetGameTexture(capturedGameTexture, withUI: false);
         }
 
         public static Texture2D GetBookmarkThumbnailTexture()

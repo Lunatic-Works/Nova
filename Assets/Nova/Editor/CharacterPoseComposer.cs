@@ -261,6 +261,7 @@ namespace Nova.Editor
                     var absoluteCaptureDest = Path.Combine(Path.GetDirectoryName(Application.dataPath), captureDest);
                     Directory.CreateDirectory(Path.GetDirectoryName(absoluteCaptureDest));
                     File.WriteAllBytes(absoluteCaptureDest, tex.EncodeToPNG());
+                    Utils.DestroyObject(tex);
                     EditorUtility.DisplayDialog("Capture Finished", $"Saved at {absoluteCaptureDest}", "OK");
                 }
 

@@ -257,7 +257,6 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
 
         action_end = function()
             set_mat(obj, get_default_mat(obj), layer_id)
-            __Nova.screenCapturer:DestroyGameTexture()
         end
     else
         action_begin = function()

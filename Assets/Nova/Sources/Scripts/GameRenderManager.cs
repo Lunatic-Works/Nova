@@ -59,6 +59,9 @@ namespace Nova
         private void OnDestroy()
         {
             fullScreenToggle.onValueChanged.RemoveListener(UpdateFullScreenStatus);
+
+            Destroy(gameRenderTexture);
+            Destroy(finalRenderTexture);
         }
 
         private void UpdateFullScreenStatus(bool to)
@@ -154,12 +157,12 @@ namespace Nova
             Shader.SetGlobalFloat(GlobalRealScreenWidthID, RealScreen.fWidth);
             Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.fWidth / 1920);
 
-            if (gameRenderTexture != null)
+            if (gameRenderTexture)
             {
                 Destroy(gameRenderTexture);
             }
 
-            if (finalRenderTexture != null)
+            if (finalRenderTexture)
             {
                 Destroy(finalRenderTexture);
             }

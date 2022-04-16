@@ -15,7 +15,7 @@ namespace Nova
 
         private RectTransform rt;
         private RawImage img;
-        private RenderTexture renderTarget;
+        private RenderTexture renderTexture;
         private Vector3 rotateAxis = Vector3.one;
 
         private void Awake()
@@ -25,16 +25,16 @@ namespace Nova
             this.RuntimeAssert(cube != null && cubeCamera != null, "Missing parameter in DialogueFinishIcon.");
             var rect = rt.rect;
             // Don't do MSAA here. It's hard to check whether the driver supports it.
-            cubeCamera.targetTexture = renderTarget = new RenderTexture((int)rect.height, (int)rect.height, 0)
+            cubeCamera.targetTexture = renderTexture = new RenderTexture((int)rect.height, (int)rect.height, 0)
             {
                 name = "DialogueFinishIconRenderTexture"
             };
-            img.texture = renderTarget;
+            img.texture = renderTexture;
         }
 
         private void OnDestroy()
         {
-            Destroy(renderTarget);
+            Destroy(renderTexture);
         }
 
         private void Update()

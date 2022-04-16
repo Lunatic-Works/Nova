@@ -230,8 +230,7 @@ namespace Nova.Editor
             {
                 if (_snapshotRenderTexture == null)
                 {
-                    _snapshotRenderTexture =
-                        new RenderTexture(SnapshotWidth, SnapshotHeight, 0);
+                    _snapshotRenderTexture = new RenderTexture(SnapshotWidth, SnapshotHeight, 0);
                 }
 
                 return _snapshotRenderTexture;
