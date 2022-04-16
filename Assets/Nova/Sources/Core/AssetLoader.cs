@@ -103,7 +103,7 @@ namespace Nova
             T ret = LoadOrNull<T>(path);
             if (ret == null)
             {
-                Debug.LogErrorFormat("Nova: {0} {1} not found.", typeof(T).Name, path);
+                Debug.LogError($"Nova: {typeof(T)} {path} not found.");
             }
 
             return ret;
@@ -138,7 +138,7 @@ namespace Nova
         {
             path = Utils.ConvertPathSeparator(path);
 
-            // Debug.LogFormat("Preload {0}:{1}", type, path);
+            // Debug.Log($"Preload {type}:{path}");
             var cache = Current.cachedAssets[type];
             if (cache.ContainsKey(path))
             {
@@ -146,7 +146,7 @@ namespace Nova
             }
             else
             {
-                // Debug.LogFormat("Add cache {0}:{1}", type, path);
+                // Debug.Log($"Add cache {type}:{path}");
                 var localizedPath = TryGetLocalizedPath(path);
                 cache[path] = new CachedAssetEntry { count = 1, request = Resources.LoadAsync(localizedPath) };
             }
@@ -156,7 +156,7 @@ namespace Nova
         {
             path = Utils.ConvertPathSeparator(path);
 
-            // Debug.LogFormat("Unpreload {0}:{1}", type, path);
+            // Debug.Log($"Unpreload {type}:{path}");
             var cache = Current.cachedAssets[type];
             if (cache.ContainsKey(path))
             {
@@ -164,13 +164,13 @@ namespace Nova
                 entry.count--;
                 if (entry.count <= 0)
                 {
-                    // Debug.LogFormat("Remove cache {0}:{1}", type, path);
+                    // Debug.Log($"Remove cache {type}:{path}");
                     cache.Remove(path);
                 }
             }
             else
             {
-                Debug.LogWarningFormat("Nova: Asset {0}:{1} not cached when unpreloading.", type, path);
+                Debug.LogWarning($"Nova: Asset {type}:{path} not cached when unpreloading.");
             }
         }
 
@@ -245,7 +245,7 @@ namespace Nova
             {
                 var type = pair.Key;
                 var cache = pair.Value;
-                Debug.LogFormat("{0} {1} {2}", type, cache.Count, cache.HistoryMaxCount);
+                Debug.Log($"{type} {cache.Count} {cache.HistoryMaxCount}");
             }
         }
     }

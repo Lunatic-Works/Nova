@@ -314,8 +314,6 @@ namespace Nova
 
         public static void ReplayVoice(IReadOnlyDictionary<string, VoiceEntry> voices, bool unbiasedDelay = true)
         {
-            // Debug.LogFormat("Called: {0}", voices.Count);
-
             StopVoiceAll();
             float bias = 0.0f;
             if (unbiasedDelay)

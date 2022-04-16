@@ -143,7 +143,7 @@ namespace Nova
             }
 
             currentView = newView;
-            // Debug.LogFormat("Current view: {0}", CurrentView);
+            // Debug.Log($"Current view: {CurrentView}");
         }
 
         public void SwitchView<FromController, TargetController>(Action onFinish = null)

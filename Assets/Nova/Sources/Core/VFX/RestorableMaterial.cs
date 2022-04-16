@@ -25,9 +25,8 @@ namespace Nova
         private static void Init(string shaderName)
         {
             if (ShaderInfoDatabase.TypeData.ContainsKey(GetLastShaderName(shaderName))) return;
-            Debug.LogWarningFormat(
-                "Nova: Shader {0} is not in shader info database. The material will not be restored correctly.",
-                shaderName);
+            Debug.LogWarning($"Nova: Shader {shaderName} is not in the shader info database. " +
+                             "The material will not be restored correctly.");
         }
 
         public RestorableMaterial(Shader shader) : base(shader)
@@ -47,17 +46,15 @@ namespace Nova
 
         public new void SetTexture(string propertyName, Texture value)
         {
-            Debug.LogWarningFormat(
-                "Nova: Setting a texture to {0}:{1} without a path to texture. The material will not be restored correctly. Please use SetTexturePath() instead.",
-                shader.name, propertyName);
+            Debug.LogWarning($"Nova: Setting a texture to {shader.name}:{propertyName} without a path to the texture. " +
+                             "The material will not be restored correctly. Please use SetTexturePath instead.");
             base.SetTexture(propertyName, value);
         }
 
         public new void SetTexture(int id, Texture value)
         {
-            Debug.LogWarningFormat(
-                "Nova: Setting a texture to {0}:{1} without a path to texture. The material will not be restored correctly. Please use SetTexturePath() instead.",
-                shader.name, id);
+            Debug.LogWarning($"Nova: Setting a texture to {shader.name}:{id} without a path to texture. " +
+                             "The material will not be restored correctly. Please use SetTexturePath instead.");
             base.SetTexture(id, value);
         }
 
@@ -115,9 +112,8 @@ namespace Nova
 
             if (!ShaderInfoDatabase.TypeData.TryGetValue(GetLastShaderName(material.shader.name), out var properties))
             {
-                Debug.LogWarningFormat(
-                    "Nova: Shader {0} is not in shader info database. The material will not be restored correctly.",
-                    material.shader.name);
+                Debug.LogWarning($"Nova: Shader {material.shader.name} is not in the shader info database. " +
+                                 "The material will not be restored correctly.");
                 return null;
             }
 

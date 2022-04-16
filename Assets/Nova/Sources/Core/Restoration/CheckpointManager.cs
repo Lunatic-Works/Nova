@@ -469,7 +469,7 @@ namespace Nova
             var bookmark = serializer.SafeRead<Bookmark>(GetBookmarkFileName(saveID));
             if (bookmark.globalSaveIdentifier != globalSave.identifier)
             {
-                Debug.LogWarning($"Nova: Save file is incompatible with the global save file, saveID {saveID}");
+                Debug.LogWarning($"Nova: Save file is incompatible with the global save file. saveID: {saveID}");
                 bookmark = null;
             }
 

@@ -322,9 +322,8 @@ namespace Nova
             {
                 if (node.branchCount == 0 && node.type != FlowChartNodeType.End)
                 {
-                    Debug.LogWarningFormat(
-                        "Nova: Node {0} has no child. It will be marked as an end with name {0}.",
-                        node.name);
+                    Debug.LogWarning(
+                        $"Nova: Node {node.name} has no child. It will be marked as an end with name {node.name}.");
                     node.type = FlowChartNodeType.End;
                     AddEnd(node.name, node);
                 }

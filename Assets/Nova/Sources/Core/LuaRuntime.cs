@@ -157,10 +157,8 @@ namespace Nova
             {
                 if (ApplicationIsQuitting)
                 {
-                    Debug.LogWarningFormat("Nova: [Singleton] Instance {0} " +
-                                           "already destroyed on application quit. " +
-                                           "Won't create again, return null.",
-                        typeof(LuaRuntime));
+                    Debug.LogWarning($"Nova: [Singleton] {typeof(LuaRuntime)} already destroyed on application quit. " +
+                                     "Won't create again, return null.");
                     return null;
                 }
 
@@ -175,12 +173,11 @@ namespace Nova
                     if (instances.Length == 0)
                     {
                         var singleton = new GameObject();
-                        singleton.name = $"[Singleton] {typeof(LuaRuntime)}";
+                        singleton.name = "LuaRuntime";
                         DontDestroyOnLoad(singleton);
                         _instance = singleton.AddComponent<LuaRuntime>();
                         _instance.Init();
-                        // Debug.Log($"Nova: [Singleton] An instance of {typeof(LuaRuntime)} is needed in the scene, " +
-                        //     $"so {singleton} is created with DontDestroyOnLoad.");
+                        // Debug.Log($"Nova: [Singleton] {_instance} created with DontDestroyOnLoad.");
                     }
                     else if (instances.Length == 1)
                     {

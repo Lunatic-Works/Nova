@@ -183,7 +183,7 @@ namespace Nova
         private void _onGoBackButtonClicked(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex)
         {
             gameState.MoveBackTo(nodeHistoryEntry, dialogueIndex);
-            // Debug.LogFormat("Remain log entries count: {0}", logEntries.Count);
+            // Debug.Log($"Remaining log entries count: {logEntries.Count}");
             if (hideOnGoBackButtonClicked)
             {
                 Hide();

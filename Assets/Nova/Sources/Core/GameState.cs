@@ -364,7 +364,7 @@ namespace Nova
 
             if (nodeChanged)
             {
-                // Debug.Log($"Nova: Node changed to {currentNode.name}");
+                // Debug.Log($"Node changed to {currentNode.name}");
 
                 this.nodeChanged.Invoke(new NodeChangedData(nodeHistory.Last()));
 
@@ -838,9 +838,7 @@ namespace Nova
                 }
                 catch (KeyNotFoundException)
                 {
-                    Debug.LogWarningFormat("Nova: Key {0} not found in restoreDatas. Check if the restorable name " +
-                                           "has changed. If that is true, try clear all checkpoint " +
-                                           "files, or undo the change of the restorable name.", pair.Key);
+                    Debug.LogWarning($"Nova: Key {pair.Key} not found in restoreDatas. Please clear save data.");
                 }
             }
         }
@@ -928,7 +926,7 @@ namespace Nova
             MoveBackTo(nodeHistoryEntry, dialogueIndex, clearFuture);
             if (actionPauseLock.isLocked)
             {
-                Debug.LogWarning("Nova: GameState paused by action when restoring");
+                Debug.LogWarning("Nova: GameState paused by action when restoring.");
                 isRestoring = false;
                 return;
             }
@@ -945,7 +943,7 @@ namespace Nova
                 Step();
                 if (actionPauseLock.isLocked)
                 {
-                    Debug.LogWarning("Nova: GameState paused by action when restoring");
+                    Debug.LogWarning("Nova: GameState paused by action when restoring.");
                     isRestoring = false;
                     return;
                 }
@@ -971,7 +969,7 @@ namespace Nova
             var backNodeIndex = nodeHistory.FindLastIndex(x => x.Equals(nodeHistoryEntry));
             if (backNodeIndex < 0)
             {
-                Debug.LogWarning($"Nova: Move back to node {nodeHistoryEntry.Key} that has not been walked through.");
+                Debug.LogWarning($"Nova: Move back to node {nodeHistoryEntry.Key} that is not walked through.");
             }
 
             if (clearFuture)

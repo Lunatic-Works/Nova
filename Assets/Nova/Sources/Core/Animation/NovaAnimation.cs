@@ -61,13 +61,11 @@ namespace Nova
 
         private static void AddAnimation(NovaAnimation animation)
         {
-            // Debug.LogFormat("AddAnimation {0}", Utils.GetPath(animation));
             Animations.Add(animation);
         }
 
         private static void RemoveAnimation(NovaAnimation animation)
         {
-            // Debug.LogFormat("RemoveAnimation {0}", Utils.GetPath(animation));
             Animations.Remove(animation);
         }
 
@@ -194,7 +192,7 @@ namespace Nova
 
         public void DebugPrintEntries()
         {
-            Debug.LogFormat("DebugPrintEntries begin {0}", this);
+            Debug.Log($"DebugPrintEntries begin {this}");
             foreach (Transform child in transform)
             {
                 var entry = child.GetComponent<AnimationEntry>();

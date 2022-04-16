@@ -134,7 +134,7 @@ namespace Nova
                 {
                     if (formats.Length == 0)
                     {
-                        Debug.LogWarningFormat("Nova: Empty translation string list for: {0}", key);
+                        Debug.LogWarning($"Nova: Empty translation string list for: {key}");
                     }
                     else if (args.Length == 0)
                     {
@@ -152,7 +152,7 @@ namespace Nova
                 }
                 else
                 {
-                    Debug.LogWarningFormat("Nova: Invalid translation format for: {0}", key);
+                    Debug.LogWarning($"Nova: Invalid translation format for: {key}");
                 }
 
                 if (args.Length > 0)
@@ -162,7 +162,7 @@ namespace Nova
             }
             else
             {
-                Debug.LogWarningFormat("Nova: Missing translation for: {0}", key);
+                Debug.LogWarning($"Nova: Missing translation for: {key}");
             }
 
             return translation;

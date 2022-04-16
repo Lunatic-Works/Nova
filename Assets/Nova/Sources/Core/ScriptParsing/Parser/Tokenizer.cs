@@ -42,12 +42,12 @@ namespace Nova.Script
             }
 
             // Advance counters
-            index += 1;
-            column += 1;
+            ++index;
+            ++column;
             if (c == '\n')
             {
                 column = 1;
-                line += 1;
+                ++line;
             }
 
             return c;

@@ -63,7 +63,7 @@ namespace Nova
             if (_alert == null)
             {
                 if (StackTraceUtility.ExtractStackTrace().Contains("Awake"))
-                    Debug.LogError("Nova: Alert() should not be called in Awake().");
+                    Debug.LogError("Nova: Alert should not be called in Awake.");
                 else
                     Debug.LogError("Nova: Missing Alert component in initial scene.");
                 Utils.Quit();

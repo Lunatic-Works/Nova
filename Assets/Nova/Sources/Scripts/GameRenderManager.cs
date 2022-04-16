@@ -68,7 +68,7 @@ namespace Nova
                 return;
             }
 
-            // Debug.LogFormat("Full screen status changing from {0} (logical {1}) to {2}", Screen.fullScreen, isLogicalFullScreen, to);
+            // Debug.Log($"Change full screen status from {Screen.fullScreen} (logical {isLogicalFullScreen}) to {to}");
             if (isLogicalFullScreen == to)
             {
                 return;
@@ -121,7 +121,7 @@ namespace Nova
                 return;
             }
 
-            // Debug.LogFormat("Resolution changed: {0}, {1}", Screen.height, Screen.width);
+            // Debug.Log($"Resolution changed to {Screen.height} x {Screen.width}");
             lastScreenHeight = Screen.height;
             lastScreenWidth = Screen.width;
 
@@ -181,7 +181,7 @@ namespace Nova
                     name = "FinalRenderTexture"
                 };
 
-            // Debug.LogFormat("Screen Size: {0} x {1}", RealScreen.width, RealScreen.height);
+            // Debug.Log($"Screen Size: {RealScreen.width} x {RealScreen.height}");
 
             shouldUpdateTransitionsAfter = 2;
         }
