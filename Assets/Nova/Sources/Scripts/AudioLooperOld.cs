@@ -71,8 +71,8 @@ namespace Nova
 
         private void Validation()
         {
-            this.RuntimeAssert(clip != null, "Missing clip when playing loopable music");
-            this.RuntimeAssert(musicEntry != null, "Missing musicEntry when playing loopable music");
+            this.RuntimeAssert(clip != null, "Missing clip when playing loopable music.");
+            this.RuntimeAssert(musicEntry != null, "Missing musicEntry when playing loopable music.");
             // this.RuntimeAssert(
             //     musicEntry.loopEndSample <= clip.samples,
             //     $"Loop end {musicEntry.loopEndSample} is larger than length {clip.samples}"

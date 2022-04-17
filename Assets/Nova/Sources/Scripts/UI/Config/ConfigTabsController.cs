@@ -10,7 +10,7 @@ namespace Nova
 
         private void Awake()
         {
-            this.RuntimeAssert(tabs.Count > 0, "Empty Config Tab List");
+            this.RuntimeAssert(tabs.Count > 0, "Empty config tab list.");
             for (var i = 0; i < tabs.Count; i++)
             {
                 var index = i;

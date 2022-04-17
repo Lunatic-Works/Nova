@@ -819,7 +819,7 @@ namespace Nova
 
         private void RestoreCheckpoint(GameStateCheckpoint entry)
         {
-            this.RuntimeAssert(entry != null, "Checkpoint is null");
+            this.RuntimeAssert(entry != null, "Checkpoint is null.");
 
             stepNumFromLastCheckpoint = 0;
             restrainCheckpointNum = entry.restrainCheckpointNum;

@@ -9,6 +9,7 @@ namespace Nova
     public class PostProcessing : MonoBehaviour, IRestorable
     {
         public string luaName;
+        public PostProcessing asProxyOf;
 
         private GameState gameState;
 
@@ -35,6 +36,8 @@ namespace Nova
 
         public void SetLayer(int layerID, Material material)
         {
+            this.RuntimeAssert(asProxyOf == null, "SetLayer cannot be called on a proxy.");
+
             while (layers.Count <= layerID)
             {
                 layers.Add(null);
@@ -45,6 +48,8 @@ namespace Nova
 
         public void ClearLayer(int layerID)
         {
+            this.RuntimeAssert(asProxyOf == null, "ClearLayer cannot be called on a proxy.");
+
             if (layers.Count > layerID)
             {
                 layers[layerID] = null;
@@ -75,6 +80,12 @@ namespace Nova
 
         private void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
+            if (asProxyOf != null)
+            {
+                asProxyOf.OnRenderImage(src, dest);
+                return;
+            }
+
             var matCnt = EnabledMaterials().Count();
             if (matCnt == 0)
             {
