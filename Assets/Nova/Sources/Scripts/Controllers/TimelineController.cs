@@ -52,16 +52,16 @@ namespace Nova
                 mainCameraController.overridingCamera = newCamera;
                 mainCamera.enabled = false;
                 newCamera.targetTexture = mainCamera.targetTexture;
-            }
 
-            var newPostProcessing = newCamera.GetComponent<PostProcessing>();
-            if (newPostProcessing == null)
-            {
-                Debug.LogWarning("Nova: No PostProcessing on new camera.");
-            }
-            else
-            {
-                newPostProcessing.asProxyOf = mainPostProcessing;
+                var newPostProcessing = newCamera.GetComponent<PostProcessing>();
+                if (newPostProcessing == null)
+                {
+                    Debug.LogWarning("Nova: No PostProcessing on new camera.");
+                }
+                else
+                {
+                    newPostProcessing.asProxyOf = mainPostProcessing;
+                }
             }
 
             prefabInstance.SetActive(true);
