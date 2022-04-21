@@ -71,29 +71,3 @@ function dump(o)
         return tostring(o)
     end
 end
-
-function remove_entry(t, entry)
-    local idx = 0
-    for i = 1, #t do
-        if t[i] == entry then
-            idx = i
-            break
-        end
-    end
-    if idx == 0 then
-        warn('Entry not found')
-        return
-    end
-    table.remove(t, idx)
-end
-
---- inverse of tostring()
-function toboolean(s)
-    if s == 'true' then
-        return true
-    elseif s == 'false' then
-        return false
-    else
-        return nil
-    end
-end

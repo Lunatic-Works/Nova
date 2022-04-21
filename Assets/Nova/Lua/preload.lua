@@ -9,10 +9,13 @@ function preload(obj, resource_name)
         warn('Preload obj == nil', resource_name)
     end
 
-    local _type = obj:GetType()
     if obj == 'Texture' then
         Nova.AssetLoader.Preload(Nova.AssetCacheType.Image, resource_name)
-    elseif _type == typeof(Nova.PrefabLoader) or _type == typeof(Nova.TimelineController) then
+        return
+    end
+
+    local _type = obj:GetType()
+    if _type == typeof(Nova.PrefabLoader) or _type == typeof(Nova.TimelineController) then
         Nova.AssetLoader.Preload(Nova.AssetCacheType.Prefab, obj.prefabFolder .. '/' .. resource_name)
     elseif _type == typeof(Nova.AudioController) then
         obj:Preload(resource_name)
@@ -35,10 +38,13 @@ function unpreload(obj, resource_name)
         warn('Unpreload obj == nil', resource_name)
     end
 
-    local _type = obj:GetType()
     if obj == 'Texture' then
         Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Image, resource_name)
-    elseif _type == typeof(Nova.PrefabLoader) or _type == typeof(Nova.TimelineController) then
+        return
+    end
+
+    local _type = obj:GetType()
+    if _type == typeof(Nova.PrefabLoader) or _type == typeof(Nova.TimelineController) then
         Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Prefab, obj.prefabFolder .. '/' .. resource_name)
     elseif _type == typeof(Nova.AudioController) then
         obj:Unpreload(resource_name)
