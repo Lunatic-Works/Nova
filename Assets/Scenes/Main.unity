@@ -1470,7 +1470,7 @@ MonoBehaviour:
   - characterName: "\u9648\u9AD8\u5929"
     characterController: {fileID: 1992234137}
     prefix: 
-  padWidth: 2
+  padWidth: 6
 --- !u!4 &880587543 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5683051339407815765, guid: 496f273ceaa70f846a7fc9cc4d92372f,

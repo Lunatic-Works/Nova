@@ -11,7 +11,7 @@ anim:volume(bgs, 0.2, 3)
 box_hide_show(2)
 auto_voice_off('王二宫')
 auto_voice_off('张浅野')
-auto_voice_on('孙西本', 2)
+auto_voice_on('孙西本', 003001)
 auto_voice_off('陈高天')
 v_flag_xiben = true
 |>

@@ -9,7 +9,7 @@ anim:trans_fade(cam, function()
 play(bgm, 'qianye')
 box_hide_show(2)
 auto_voice_off('王二宫')
-auto_voice_on('张浅野', 4)
+auto_voice_on('张浅野', 002001)
 auto_voice_off('孙西本')
 auto_voice_off('陈高天')
 |>
