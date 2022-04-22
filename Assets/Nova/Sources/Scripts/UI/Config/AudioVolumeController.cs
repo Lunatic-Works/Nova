@@ -7,13 +7,12 @@ namespace Nova
     /// </summary>
     public class AudioVolumeController : MonoBehaviour
     {
+        private const string GlobalConfigKeyName = "GlobalVolume";
+
         public string configKeyName;
-        public bool useSecondaryConfigKeyName = false;
         public string secondaryConfigKeyName;
         public float multiplier = 1.0f;
         public float gamma = 1.0f;
-
-        private const string GlobalConfigKeyName = "GlobalVolume";
 
         private AudioController audioController;
         private SoundController soundController;
@@ -32,9 +31,9 @@ namespace Nova
 
         private void OnEnable()
         {
-            configManager.AddValueChangeListener(configKeyName, UpdateValue);
             configManager.AddValueChangeListener(GlobalConfigKeyName, UpdateValue);
-            if (useSecondaryConfigKeyName)
+            configManager.AddValueChangeListener(configKeyName, UpdateValue);
+            if (!string.IsNullOrEmpty(secondaryConfigKeyName))
             {
                 configManager.AddValueChangeListener(secondaryConfigKeyName, UpdateValue);
             }
@@ -44,20 +43,20 @@ namespace Nova
 
         private void OnDisable()
         {
-            configManager.RemoveValueChangeListener(configKeyName, UpdateValue);
             configManager.RemoveValueChangeListener(GlobalConfigKeyName, UpdateValue);
-            if (useSecondaryConfigKeyName)
+            configManager.RemoveValueChangeListener(configKeyName, UpdateValue);
+            if (!string.IsNullOrEmpty(secondaryConfigKeyName))
             {
                 configManager.RemoveValueChangeListener(secondaryConfigKeyName, UpdateValue);
             }
         }
 
+        private float globalValue => configManager.GetFloat(GlobalConfigKeyName);
+
         private float masterValue => configManager.GetFloat(configKeyName);
 
         private float secondaryValue =>
-            useSecondaryConfigKeyName ? configManager.GetFloat(secondaryConfigKeyName) : 1.0f;
-
-        private float globalValue => configManager.GetFloat(GlobalConfigKeyName);
+            string.IsNullOrEmpty(secondaryConfigKeyName) ? 1.0f : configManager.GetFloat(secondaryConfigKeyName);
 
         private float combinedValue => globalValue * masterValue * secondaryValue;
 
