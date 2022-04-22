@@ -76,6 +76,14 @@ namespace Nova
             nameToEnabled[name] = value;
         }
 
+        public void DisableAll()
+        {
+            foreach (var name in nameToEnabled.Keys.ToList())
+            {
+                nameToEnabled[name] = false;
+            }
+        }
+
         public void SetIndex(string name, int value)
         {
             nameToIndex[name] = value;

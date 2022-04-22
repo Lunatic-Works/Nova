@@ -7,6 +7,10 @@ function auto_voice_off(name)
     __Nova.autoVoice:SetEnabled(name, false)
 end
 
+function auto_voice_off_all()
+    __Nova.autoVoice:DisableAll()
+end
+
 local auto_voice_delay = 0
 
 function set_auto_voice_delay(value)
