@@ -26,7 +26,7 @@ def save_layer(layer, layer_name):
     img = skimage.img_as_ubyte(img)
     out_filename = os.path.join(
         out_dir, out_prefix + layer_name.replace('-', '_') + '.png')
-    skimage.io.imsave(out_filename, img)
+    skimage.io.imsave(out_filename, img, check_contrast=False)
 
 
 def walk(layer, layer_name):
