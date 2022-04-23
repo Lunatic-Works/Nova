@@ -306,7 +306,9 @@ namespace Nova
             currentNode = flowChartTree.GetNode(name);
             if (currentNode == null)
             {
-                throw new ArgumentException($"Nova: Node {name} not found.");
+                throw new ArgumentException(
+                    $"Nova: Node {name} found in {stateLocale} but not in {I18n.DefaultLocale}. " +
+                    "Maybe you need to delete the default English scenarios.");
             }
 
             currentNode.AddLocalizedName(stateLocale, displayName);

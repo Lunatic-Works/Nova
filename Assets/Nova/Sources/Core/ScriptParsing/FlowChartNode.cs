@@ -102,7 +102,9 @@ namespace Nova
 
         public void AddLocalizedDialogueEntries(SystemLanguage locale, IReadOnlyList<LocalizedDialogueEntry> entries)
         {
-            Utils.RuntimeAssert(entries.Count == dialogueEntries.Count, "Localized dialogue entry count differs.");
+            Utils.RuntimeAssert(entries.Count == dialogueEntries.Count,
+                $"Dialogue entry count for node {name} in {locale} is different from that in {I18n.DefaultLocale}. " +
+                "Maybe you need to delete the default English scenarios.");
             CheckFreeze();
             for (int i = 0; i < entries.Count; ++i)
             {
@@ -148,7 +150,7 @@ namespace Nova
                 if (type != FlowChartNodeType.Normal)
                 {
                     throw new InvalidAccessException(
-                        "Nova: Field Next of a flow chart node is only available when its type is Normal.");
+                        "Nova: A flow chart node only have a next node if its type is Normal.");
                 }
 
                 return branches[BranchInformation.Default];
