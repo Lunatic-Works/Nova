@@ -338,7 +338,7 @@ namespace Nova
 
                 patchBuilder.AppendFormat(ActionAfterLazyBlock, characterName);
 
-                var patchedCode = patchBuilder.ToString();
+                var patchedCode = patchBuilder.ToString().Trim();
                 // Debug.Log($"patchBuilder: <color=orange>{patchedCode}</color>");
                 codes[DialogueActionStage.Default][i] = patchedCode;
             }

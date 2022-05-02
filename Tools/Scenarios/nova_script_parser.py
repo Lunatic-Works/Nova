@@ -253,7 +253,8 @@ def normalize_dialogue(s,
                 return m.group(3)
 
         while True:
-            s_new = re.compile(r'<(.*?)(=.*?)?>(.*?)</\1>').sub(func, s)
+            s_new = re.compile(r'<(.*?)(=.*?)?>(.*?)</\1>',
+                               re.DOTALL).sub(func, s)
             if s_new == s:
                 break
             s = s_new
@@ -266,7 +267,7 @@ def normalize_dialogue(s,
             else:
                 return ''
 
-        s = re.compile(r'\r?\n?（TODO：((.*?)：)?.*?）').sub(func, s)
+        s = re.compile(r'\r?\n?（TODO：((.*?)：)?.*?）', re.DOTALL).sub(func, s)
 
     s = re.compile(' +').sub(' ', s)
 
