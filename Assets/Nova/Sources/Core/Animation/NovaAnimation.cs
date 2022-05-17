@@ -11,7 +11,7 @@ namespace Nova
     {
         None = 0,
         PerDialogue = 1,
-        Persistent = 2,
+        Holding = 2,
         UI = 4,
         Text = 8,
         All = 15

@@ -16,7 +16,7 @@ def is_special_char(c):
     return c != '\n' and unicodedata.category(c)[0] == 'C'
 
 
-def check_code(code, line_num, anim_persist_tracked):
+def check_code(code, line_num, anim_hold_tracked):
     for c in code:
         if is_special_char(c):
             print(f'Line {line_num}: special character U+{ord(c):04X} in code')
@@ -24,7 +24,7 @@ def check_code(code, line_num, anim_persist_tracked):
     if 'TODO' in code:
         print(f'Line {line_num}: TODO in code')
 
-    check_anim_persist_override = False
+    check_anim_hold_override = False
     check_show = False
     check_trans = False
     try:
@@ -32,50 +32,46 @@ def check_code(code, line_num, anim_persist_tracked):
             arg_names = [get_node_name(x) for x in args]
 
             for name in [func_name] + arg_names:
-                if name == 'anim_persist_begin':
-                    if anim_persist_tracked:
-                        print(
-                            f'Line {line_num}: anim_persist_begin() not match')
+                if name == 'anim_hold_begin':
+                    if anim_hold_tracked:
+                        print(f'Line {line_num}: anim_hold_begin() not match')
                     else:
-                        anim_persist_tracked = True
+                        anim_hold_tracked = True
 
                     if env:
-                        check_anim_persist_override = True
+                        check_anim_hold_override = True
 
-                    if 'anim_persist' in env:
+                    if 'anim_hold' in env:
                         print(
-                            f'Line {line_num}: anim_persist_begin() in anim_persist'
-                        )
+                            f'Line {line_num}: anim_hold_begin() in anim_hold')
 
-                elif name == 'anim_persist_end':
-                    if anim_persist_tracked:
-                        anim_persist_tracked = False
+                elif name == 'anim_hold_end':
+                    if anim_hold_tracked:
+                        anim_hold_tracked = False
                     else:
-                        print(f'Line {line_num}: anim_persist_end() not match')
+                        print(f'Line {line_num}: anim_hold_end() not match')
 
                     if env:
-                        check_anim_persist_override = True
+                        check_anim_hold_override = True
 
-                    if 'anim_persist' in env:
-                        print(
-                            f'Line {line_num}: anim_persist_end() in anim_persist'
-                        )
+                    if 'anim_hold' in env:
+                        print(f'Line {line_num}: anim_hold_end() in anim_hold')
 
             if func_name == 'anim':
                 if env:
                     print(f'Line {line_num}: anim in anon function')
 
-            elif func_name == 'anim_persist':
-                if not anim_persist_tracked:
-                    print(f'Line {line_num}: anim_persist not tracked')
+            elif func_name == 'anim_hold':
+                if not anim_hold_tracked:
+                    print(f'Line {line_num}: anim_hold not tracked')
 
-                if check_anim_persist_override and not env:
+                if check_anim_hold_override and not env:
                     print(
-                        f'Line {line_num}: anim_persist overridden by anim_persist_begin() or anim_persist_end()'
+                        f'Line {line_num}: anim_hold overridden by anim_hold_begin() or anim_hold_end()'
                     )
 
-                if 'anim_persist' in env:
-                    print(f'Line {line_num}: anim_persist in anim_persist')
+                if 'anim_hold' in env:
+                    print(f'Line {line_num}: anim_hold in anim_hold')
 
             elif func_name == 'show':
                 if (not env and args and arg_names[0] != 'extra_text'):
@@ -92,7 +88,7 @@ def check_code(code, line_num, anim_persist_tracked):
     if check_show and check_trans:
         print(f'Line {line_num}: show() outside of trans()')
 
-    return anim_persist_tracked
+    return anim_hold_tracked
 
 
 def check_dialogue(chara_name, dialogue, line_num):
@@ -133,14 +129,14 @@ def lint_file(in_filename):
 
     for chapter_name, entries, _, _ in chapters:
         print(chapter_name)
-        anim_persist_tracked = False
+        anim_hold_tracked = False
         for code, chara_name, dialogue, line_num in entries:
             if code and not dialogue:
                 print(f'Line {line_num}: code block with empty dialogue')
 
             if code:
-                anim_persist_tracked = check_code(code, line_num,
-                                                  anim_persist_tracked)
+                anim_hold_tracked = check_code(code, line_num,
+                                               anim_hold_tracked)
 
             if dialogue:
                 check_dialogue(chara_name, dialogue, line_num)

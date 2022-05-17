@@ -1,5 +1,5 @@
 @<|
-label 'test_anim_persist'
+label 'test_anim_hold'
 -- is_unlocked_start()
 |>
 <|
@@ -10,8 +10,8 @@ set_box()
 测试持续动画
 
 <|
-anim_persist_begin()
-anim_persist:move(bg, {5, 0}, 10)
+anim_hold_begin()
+anim_hold:move(bg, {5, 0}, 10)
 |>
 开始持续动画
 
@@ -20,8 +20,8 @@ anim_persist:move(bg, {5, 0}, 10)
 222
 
 <|
-anim_persist:stop()
-anim_persist:tint(bg, {0, 0, 1}, 10)
+anim_hold:stop()
+anim_hold:tint(bg, {0, 0, 1}, 10)
 |>
 停止上一段持续动画，开始下一段持续动画
 
@@ -30,7 +30,7 @@ anim_persist:tint(bg, {0, 0, 1}, 10)
 444
 
 <|
-anim_persist_end()
+anim_hold_end()
 |>
 停止持续动画
 

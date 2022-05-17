@@ -15,8 +15,8 @@ namespace Nova
         public AssetLoader AssetLoader { get; private set; }
         public CheckpointHelper CheckpointHelper { get; private set; }
         public InputHelper InputHelper { get; private set; }
-        public NovaAnimation PersistAnimation { get; private set; }
         public NovaAnimation PerDialogueAnimation { get; private set; }
+        public NovaAnimation HoldingAnimation { get; private set; }
 
         private void Awake()
         {
@@ -29,7 +29,7 @@ namespace Nova
             CheckpointHelper = FindComponent<CheckpointHelper>();
             InputHelper = FindComponent<InputHelper>();
             PerDialogueAnimation = FindComponent<NovaAnimation>("NovaAnimation/PerDialogue");
-            PersistAnimation = FindComponent<NovaAnimation>("NovaAnimation/Persistent");
+            HoldingAnimation = FindComponent<NovaAnimation>("NovaAnimation/Holding");
 
             inputEnabled = true;
         }

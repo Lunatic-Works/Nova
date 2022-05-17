@@ -31,13 +31,13 @@ namespace Nova
 
         private GameController gameController;
 
-        // animationsToPause + gameController.PerDialogueAnimation + gameController.PersistAnimation
+        // animationsToPause + gameController.PerDialogueAnimation + gameController.HoldingAnimation
         private IEnumerable<NovaAnimation> allAnimationsToPause => GetAllAnimationsToPause();
 
         private IEnumerable<NovaAnimation> GetAllAnimationsToPause()
         {
             var hasPerDialogue = false;
-            var hasPersist = false;
+            var hasHolding = false;
             foreach (var anim in animationsToPause)
             {
                 if (anim == gameController.PerDialogueAnimation)
@@ -45,22 +45,22 @@ namespace Nova
                     hasPerDialogue = true;
                 }
 
-                if (anim == gameController.PersistAnimation)
+                if (anim == gameController.HoldingAnimation)
                 {
-                    hasPersist = true;
+                    hasHolding = true;
                 }
 
                 yield return anim;
             }
 
-            if (!hasPersist)
-            {
-                yield return gameController.PersistAnimation;
-            }
-
             if (!hasPerDialogue)
             {
                 yield return gameController.PerDialogueAnimation;
+            }
+
+            if (!hasHolding)
+            {
+                yield return gameController.HoldingAnimation;
             }
         }
 

@@ -170,34 +170,34 @@ anim:move(gaotian, pos_r
 顺便说一句：：虽然`action`里可以写任何代码，但是最好不要在`action`里创建新的动画，这个需求一般可以用动画的串行和并行来实现
 
 <|
-anim_persist:move(gaotian, pos_r, 10)
+anim_hold:move(gaotian, pos_r, 10)
 |>
-上面说的动画都是在一条对话之内的，如果想让动画跨越很多条对话，就要用`anim_persist`代替`anim`
+上面说的动画都是在一条对话之内的，如果想让动画跨越很多条对话，就要用`anim_hold`代替`anim`
 
-持续动画开始时要写`anim_persist_begin()`，它会处理动画系统和存档系统的一些状态
+持续动画开始时要写`anim_hold_begin()`，它会处理动画系统和存档系统的一些状态
 
-顺便说一句：：`anim_persist`当中封装了Hierarchy中的`DontDestroyOnLoad/​NovaGameController/​NovaAnimation/​Persistent`
+顺便说一句：：`anim_hold`当中封装了Hierarchy中的`DontDestroyOnLoad/​NovaGameController/​NovaAnimation/​holdent`
 
-顺便说一句：：如果担心忘了写`anim_persist_begin`和`anim_persist_end`，可以用`Tools/Scenarios/lint.py`来检查
+顺便说一句：：如果担心忘了写`anim_hold_begin`和`anim_hold_end`，可以用`Tools/Scenarios/lint.py`来检查
 
 <|
-anim_persist_end()
+anim_hold_end()
 |>
-持续动画结束之后要写`anim_persist_end()`
+持续动画结束之后要写`anim_hold_end()`
 
 <|
 show(gaotian, 'normal', pos_l)
 show(xiben, 'normal', pos_c)
-anim_persist:loop(function(entry)
+anim_hold:loop(function(entry)
     return entry:move(gaotian, pos_c
         ):move(gaotian, pos_l)
 end)
-anim_persist:loop(function(entry)
+anim_hold:loop(function(entry)
     return entry:move(xiben, pos_r, 1.414
         ):move(xiben, pos_c, 1.414)
 end)
 |>
-`anim_persist:loop`函数用来创建无限循环的动画
+`anim_hold:loop`函数用来创建无限循环的动画
 
 它的参数是一个函数`func`，这个函数以一段动画为输入，在这段动画后面创建新的动画，并输出创建的动画的终点
 
@@ -206,7 +206,7 @@ end)
 <|
 hide(gaotian)
 hide(xiben)
-anim_persist_end()
+anim_hold_end()
 |>
 教程5 动画 到此结束
 @<| jump_to 'tut06' |>

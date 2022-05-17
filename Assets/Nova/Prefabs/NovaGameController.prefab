@@ -70,7 +70,7 @@ GameObject:
   - component: {fileID: 114433989730053762}
   - component: {fileID: 114792932582554646}
   m_Layer: 0
-  m_Name: Persistent
+  m_Name: Holding
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -115,7 +115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e6affca98344ea689291d838a6ff8db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  luaGlobalName: anim_persist
+  luaGlobalName: anim_hold
 --- !u!1 &1737081535048956
 GameObject:
   m_ObjectHideFlags: 0

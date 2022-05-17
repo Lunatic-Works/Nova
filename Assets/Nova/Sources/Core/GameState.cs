@@ -730,9 +730,9 @@ namespace Nova
         }
 
         /// <summary>
-        /// Not all states of objects can be easily restored, like persistent animations.
+        /// Not all states of objects can be easily restored, like holding animations.
         /// We store some checkpoints, and other states can be restored by re-executing from the last checkpoint.
-        /// At least one checkpoint will be saved every maxStepNumFromLastCheckpoint, except during persistent animations.
+        /// At least one checkpoint will be saved every maxStepNumFromLastCheckpoint, except during holding animations.
         /// </summary>
         public int maxStepNumFromLastCheckpoint = 10;
 
@@ -747,7 +747,7 @@ namespace Nova
         /// Restrain saving checkpoints.
         /// </summary>
         /// <remarks>
-        /// This feature is necessary for restoring persistent animations.
+        /// This feature is necessary for restoring holding animations.
         /// This restraint has higher priority than EnsureCheckpoint().
         /// Modified by DialogueSaveCheckpoint(), RestrainCheckpoint() and RestoreCheckpoint()
         /// </remarks>
@@ -770,7 +770,7 @@ namespace Nova
         }
 
         /// <summary>
-        /// Used to force save a checkpoint before a persistent animation begins.
+        /// Used to force save a checkpoint before a holding animation begins.
         /// </summary>
         /// <remarks>
         /// Modified by DialogueSaveCheckpoint(), EnsureCheckpointOnNextDialogue() and RestoreCheckpoint()

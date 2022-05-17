@@ -137,24 +137,24 @@ show(qianye, 'normal', pos_r)
 浅野也看着我。
 
 <|
-anim_persist_begin()
+anim_hold_begin()
 hide(qianye)
 play(bgm, 'final', 0.1)
-anim_persist:volume(bgm, 0.5, 6.4)
+anim_hold:volume(bgm, 0.5, 6.4)
 |>
 时间好像在这一刻凝固。
 
 外面的雨点也仿佛停滞在空中。
 
 <|
-local entry = anim:wait_all(anim_persist)
+local entry = anim:wait_all(anim_hold)
 entry:vfx(cam, 'mono', {0, 0.9}, 0.5)
 entry:trans2(cam, nil, {'radial_blur', 1}, 0.1, { _Size = 200 }, 0.4)
 |>
 我用颤抖的手摘下了自己的墨镜——
 
 <|
-anim_persist_end()
+anim_hold_end()
 |>
 霎时间，世界变成了灰色。
 
@@ -184,8 +184,8 @@ sound('flap')
 获得自由的我虚弱到无法动弹。
 
 <|
-anim_persist_begin()
-anim_persist:trans_up(bg, 'rain', 0.5
+anim_hold_begin()
+anim_hold:trans_up(bg, 'rain', 0.5
     ):vfx(cam, {'color', 1}, {0, 1}, 10, { _ColorMul = 3 })
 |>
 我用尽力气将目光转向窗外。
@@ -195,12 +195,12 @@ anim_persist:trans_up(bg, 'rain', 0.5
 我凝视着无止境般落下的雨点。
 
 <|
-anim:wait_all(anim_persist)
+anim:wait_all(anim_hold)
 |>
 在我眼中，本应该是无色的雨点也闪耀着彩虹的光辉。
 
 <|
-anim_persist_end()
+anim_hold_end()
 anim:trans_fade(cam, function()
         show(bg, 'black')
         vfx(cam, nil)
