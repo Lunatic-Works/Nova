@@ -54,7 +54,7 @@ sound('clap', 0.5)
 `sound`的第二个参数是音量，默认为1（与`play`的音量默认值不同）
 
 <|
-say(xiben, '08')
+say(xiben, '003007')
 |>
 `say`函数用来播放语音
 
