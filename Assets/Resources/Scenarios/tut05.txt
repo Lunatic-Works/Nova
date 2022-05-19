@@ -59,7 +59,7 @@ anim:move(xiben, {5}, 2, {1, 1})
 |>
 上面的小人跑出去一段再回来（结束时的速度为-1）
 
-顺便说一句：：上面这些非线性动画用的都是三次曲线，如果想用其他种类的曲线，可以把easing的第一个参数设为曲线的名字，这些名字在`animation.lua`中的`easing_func_name_map`里定义
+顺便说一句：：上面这些非线性动画用的都是三次曲线，如果想用其他种类的曲线，可以把easing的第一个参数设为曲线的名字，这些名字在`animation_high_level.lua`中的`easing_func_name_map`里定义
 
 <|
 move(gaotian, {-5})
