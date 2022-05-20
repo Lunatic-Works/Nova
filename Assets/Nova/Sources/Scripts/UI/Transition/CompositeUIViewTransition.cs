@@ -12,24 +12,33 @@ namespace Nova
         private int forwardEndingIdx, backwardEndingIdx;
 
         public override float enterDuration => forwardEnding;
-
         public override float exitDuration => backwardEnding;
 
         public override void Awake()
         {
             base.Awake();
+
             BuildSequence(true);
             BuildSequence(false);
+        }
+
+        private void CheckTransition(bool isEnter, UIViewTransitionBase transition, int id)
+        {
+            var name = isEnter ? "Forward" : "Backward";
+            var path = Utils.GetPath(transform);
+            this.RuntimeAssert(transition != null, $"{name} transition {id} is null in {path}");
         }
 
         private void BuildSequence(bool isEnter)
         {
             var seq = isEnter ? forwardChildTransitions : backwardChildTransitions;
-            float globalEnding = 0, lastBeginning = 0, lastEnding = 0;
+            float globalEnding = 0f, lastBeginning = 0f, lastEnding = 0f;
             int maxIdx = 0;
-            for (int i = 0; i < seq.Count; i++)
+            for (int i = 0; i < seq.Count; ++i)
             {
                 var item = seq[i];
+                CheckTransition(isEnter, item.transition, i);
+
                 float beginning;
                 switch (item.offsetBasedOn)
                 {
@@ -77,7 +86,7 @@ namespace Nova
         private void RunSequence(bool isEnter, Action onFinish)
         {
             var seq = isEnter ? forwardChildTransitions : backwardChildTransitions;
-            for (int i = 0; i < seq.Count; i++)
+            for (int i = 0; i < seq.Count; ++i)
             {
                 var item = seq[i];
                 if (isEnter)
@@ -96,6 +105,7 @@ namespace Nova
         protected internal override void OnBeforeEnter()
         {
             base.OnBeforeEnter();
+
             foreach (var item in forwardChildTransitions)
             {
                 item.transition.OnBeforeEnter();

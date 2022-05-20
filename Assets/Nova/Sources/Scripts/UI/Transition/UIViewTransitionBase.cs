@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    [RequireComponent(typeof(CanvasGroup))]
     public abstract class UIViewTransitionBase : MonoBehaviour
     {
         protected const float CubicSlopeStart = 1f;
@@ -15,14 +14,13 @@ namespace Nova
         public AudioClip enterSound;
         public AudioClip exitSound;
 
-        protected RectTransform rt;
-        protected Vector2 pos0, size0, scale0;
-        protected CanvasGroup cg;
-        private RawImage rawImage;
-
         private ViewManager viewManager;
         protected float delayOffset { get; private set; }
-        private bool inited;
+
+        protected CanvasGroup canvasGroup;
+        protected RectTransform rectTransform;
+        protected Vector2 pos0, size0, scale0;
+        private RawImage rawImage;
 
         protected AnimationEntry.EasingFunction enterFunction => cubic
             ? AnimationEntry.CubicEasing(CubicSlopeStart, CubicSlopeTarget)
@@ -35,24 +33,41 @@ namespace Nova
         public abstract float enterDuration { get; }
         public abstract float exitDuration { get; }
 
-        public virtual void Awake()
+        private bool inited;
+        private bool targetInited;
+
+        private void Init()
         {
-            delayOffset = 0f;
+            if (inited)
+            {
+                return;
+            }
+
             viewManager = GetComponentInParent<ViewManager>();
             this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");
-            cg = GetComponent<CanvasGroup>();
+            delayOffset = 0f;
+
             if (useGhost)
             {
                 this.RuntimeAssert(viewManager.transitionGhost != null,
-                    "TransitionGhost is not set in ViewManager when using ghost.");
-                rt = viewManager.transitionGhost.GetComponent<RectTransform>();
-                rawImage = rt.GetComponent<RawImage>();
+                    "transitionGhost is not set in ViewManager when using ghost.");
+                rectTransform = viewManager.transitionGhost.GetComponent<RectTransform>();
+                rawImage = rectTransform.GetComponent<RawImage>();
+                this.RuntimeAssert(rawImage != null, "Missing RawImage on transitionGhost.");
             }
             else
             {
-                this.RuntimeAssert(cg != null, "Missing CanvasGroup when not using ghost.");
-                rt = GetComponent<RectTransform>();
+                canvasGroup = GetComponent<CanvasGroup>();
+                this.RuntimeAssert(canvasGroup != null, "Missing CanvasGroup when not using ghost.");
+                rectTransform = GetComponent<RectTransform>();
             }
+
+            inited = true;
+        }
+
+        public virtual void Awake()
+        {
+            Init();
         }
 
         private void CaptureToGhost()
@@ -67,17 +82,11 @@ namespace Nova
             return viewManager.uiAnimation.Do(null, delayOffset);
         }
 
-        private void Start()
-        {
-            if (!inited)
-            {
-                ResetTransitionTarget();
-            }
-        }
-
         private void OnEnable()
         {
-            if (!inited)
+            Init();
+
+            if (!targetInited)
             {
                 ResetTransitionTarget();
             }
@@ -85,20 +94,20 @@ namespace Nova
 
         public virtual void ResetTransitionTarget()
         {
-            pos0 = rt.position;
-            size0 = rt.rect.size;
-            scale0 = rt.localScale;
-            inited = true;
+            pos0 = rectTransform.position;
+            size0 = rectTransform.rect.size;
+            scale0 = rectTransform.localScale;
+            targetInited = true;
         }
 
         public void SetToTransitionTarget()
         {
-            rt.position = pos0;
-            Vector3 scale = size0.InverseScale(rt.rect.size);
+            rectTransform.position = pos0;
+            Vector3 scale = size0.InverseScale(rectTransform.rect.size);
             scale.x *= scale0.x;
             scale.y *= scale0.y;
             scale.z = 1f;
-            rt.localScale = scale;
+            rectTransform.localScale = scale;
         }
 
         public OpacityAnimationProperty GetOpacityAnimationProperty(float startValue, float targetValue)
@@ -109,13 +118,15 @@ namespace Nova
             }
             else
             {
-                return new OpacityAnimationProperty(cg, startValue, targetValue);
+                return new OpacityAnimationProperty(canvasGroup, startValue, targetValue);
             }
         }
 
         protected internal virtual void OnBeforeEnter()
         {
-            if (!inited)
+            Init();
+
+            if (!targetInited)
             {
                 ResetTransitionTarget();
             }
@@ -162,9 +173,9 @@ namespace Nova
             {
                 viewManager.transitionGhost.gameObject.SetActive(false);
                 gameObject.SetActive(false);
-                if (cg != null)
+                if (canvasGroup != null)
                 {
-                    cg.alpha = 1f;
+                    canvasGroup.alpha = 1f;
                 }
 
                 onFinish?.Invoke();
