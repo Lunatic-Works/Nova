@@ -1,30 +1,25 @@
-function WrapEntry:wait(duration)
+make_anim_method('wait', function(self, duration)
     return self:_then({ duration = duration })
-end
+end)
 
-function WrapAnim:wait(duration)
-    return self:_do({ duration = duration })
-end
-
-function WrapAnim:wait_all(wrap_anim)
-    return self:_do({ duration = wrap_anim.anim.totalTimeRemaining }):_then(_action { function() wrap_anim:stop() end })
-end
+make_anim_method('wait_all', function(self, anim)
+    return self:_then({ duration = anim.anim.totalTimeRemaining }):_then(Nova.ActionAnimationProperty(function() anim:stop() end))
+end)
 
 --- usage:
 ---     action(func, arg1, arg2, arg3)
 ---     action(function() blahblah end)
-function WrapEntry:action(func, ...)
+make_anim_method('action', function(self, func, ...)
     local args = {...}
-    return self:_then(_action { function() func(unpack(args)) end })
-end
-
-function WrapAnim:action(func, ...)
-    local args = {...}
-    return self:_do(_action { function() func(unpack(args)) end })
-end
+    if args then
+        return self:_then(Nova.ActionAnimationProperty(function() func(unpack(args)) end))
+    else
+        return self:_then(Nova.ActionAnimationProperty(func))
+    end
+end)
 
 --- infinite loop at the end of an animation chain
---- func: WrapEntry -> WrapEntry
+--- func: AnimationEntry -> AnimationEntry
 --- if func returns nil, the loop will end
 make_anim_method('loop', function(self, func)
     local loop_action, tail
@@ -64,7 +59,7 @@ function get_coord(obj)
 end
 
 --- use if you already know that obj is CameraController
-function get_coord_cam(camera)
+local function get_coord_cam(camera)
     local transform = camera.transform
     local _pos = transform.localPosition
     local _angle = transform.localEulerAngles
@@ -180,14 +175,25 @@ end
 ---     move(obj, {x, y, [scale, z, angle]})
 function move(obj, coord)
     local camera = obj:GetComponent(typeof(Nova.CameraController))
-    local pos, angle, scale, _ = parse_coord(obj, camera, coord)
+    local pos, angle, scale, relative = parse_coord(obj, camera, coord)
+
     local transform = obj.transform
-    transform.localPosition = pos
-    transform.localEulerAngles = angle
-    if camera then
-        camera.size = scale
+    if relative then
+        transform.localPosition = transform.localPosition + pos
+        transform.localRotation = transform.localRotation * Quaternion.Euler(angle)
+        if camera then
+            camera.size = camera.size.CloneScale(scale)
+        else
+            transform.localScale = transform.localScale.CloneScale(scale)
+        end
     else
-        transform.localScale = scale
+        transform.localPosition = pos
+        transform.localEulerAngles = angle
+        if camera then
+            camera.size = scale
+        else
+            transform.localScale = scale
+        end
     end
 end
 
@@ -199,19 +205,28 @@ make_anim_method('move', function(self, obj, coord, duration, easing)
     duration = duration or 1
     easing = parse_easing(easing)
 
-    local entry
-    self:_then(_move {obj, pos, relative}):_with(easing):_for(duration)
-    self:_then(_rotate {obj, angle, relative}):_with(easing):_for(duration)
-    if camera then
-        if relative then
-            entry = self:_then(Nova.CameraSizeAnimationProperty(camera, scale, relative)):_with(easing):_for(duration)
+    local transform = obj.transform
+    if relative then
+        self:_then(Nova.PositionAnimationProperty(transform, pos, relative)):_with(easing):_for(duration)
+        self:_then(Nova.RotationAnimationProperty(transform, angle, relative)):_with(easing):_for(duration)
+        local property
+        if camera then
+            property = Nova.CameraSizeAnimationProperty(camera, scale, relative)
         else
-            entry = self:_then(Nova.CameraSizeAnimationProperty(camera, scale)):_with(easing):_for(duration)
+            property = Nova.ScaleAnimationProperty(transform, scale, relative)
         end
+        return self:_then(property):_with(easing):_for(duration)
     else
-        entry = self:_then(_scale {obj, scale, relative}):_with(easing):_for(duration)
+        self:_then(Nova.PositionAnimationProperty(transform, pos)):_with(easing):_for(duration)
+        self:_then(Nova.RotationAnimationProperty(transform, angle)):_with(easing):_for(duration)
+        local property
+        if camera then
+            property = Nova.CameraSizeAnimationProperty(camera, scale)
+        else
+            property = Nova.ScaleAnimationProperty(transform, scale)
+        end
+        return self:_then(property):_with(easing):_for(duration)
     end
-    return entry
 end)
 
 function get_color(obj)

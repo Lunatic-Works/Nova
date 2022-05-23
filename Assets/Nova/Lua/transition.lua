@@ -283,9 +283,9 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
 
     -- parallel animation entries should start after `action_begin`, because it
     -- may contain operations conflicting with other animation entries
-    local entry0 = self:_then(_action {action_begin})
-    local entry = entry0:_then(_change_mat_float {mat, '_T', 0}):_with(easing):_for(duration
-        ):_then(_action {action_end})
+    local entry0 = self:action(action_begin)
+    local entry = entry0:_then(Nova.MaterialFloatAnimationProperty(mat, '_T', 0)):_with(easing):_for(duration
+        ):action(action_end)
     entry.head = entry0
     return entry
 end, add_preload_pattern)
@@ -348,11 +348,11 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
         end
     end
 
-    local entry = self:_then(_action {action_begin}
-        ):_then(_change_mat_float {mat, '_T', 1}):_with(easing):_for(duration
-        ):_then(_action {action_middle}
-        ):_then(_change_mat_float {mat, '_T', 0}):_with(easing2):_for(duration2
-        ):_then(_action {action_end})
+    local entry = self:action(action_begin
+        ):_then(Nova.MaterialFloatAnimationProperty(mat, '_T', 1)):_with(easing):_for(duration
+        ):action(action_middle
+        ):_then(Nova.MaterialFloatAnimationProperty(mat, '_T', 0)):_with(easing2):_for(duration2
+        ):action(action_end)
     entry.head = self
     return entry
 end, add_preload_pattern)
@@ -423,9 +423,9 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
         end
     end
 
-    local entry = self:_then(_action {action_begin}
-        ):_then(_change_mat_float {mat, '_T', target_t}):_with(easing):_for(duration
-        ):_then(_action {action_end})
+    local entry = self:action(action_begin
+        ):_then(Nova.MaterialFloatAnimationProperty(mat, '_T', target_t)):_with(easing):_for(duration
+        ):action(action_end)
     entry.head = self
     return entry
 end)
@@ -453,10 +453,10 @@ make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_prope
         end
     end
 
-    local entry0 = self:_then(_action {action_begin})
+    local entry0 = self:action(action_begin)
     local entry
     for i = 1, #anim_properties do
-        entry = entry0:_then(_change_mat_float {mat, anim_properties[i][1], anim_properties[i][3]}):_with(easing):_for(duration)
+        entry = entry0:_then(Nova.MaterialFloatAnimationProperty(mat, anim_properties[i][1], anim_properties[i][3])):_with(easing):_for(duration)
     end
     entry.head = self
     return entry

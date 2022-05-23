@@ -1,17 +1,17 @@
 --- AnimationEntry wrapper
 
-WrapEntry = {}
-WrapEntry.__index = WrapEntry
+AnimationEntry = {}
+AnimationEntry.__index = AnimationEntry
 
-function WrapEntry:new(o)
+function AnimationEntry:new(o)
     return setmetatable(o or {}, self)
 end
 
-function WrapEntry:_then(args)
+function AnimationEntry:_then(args)
     if type(args) ~= 'table' then
         args = { property = args }
     end
-    return WrapEntry:new {
+    return AnimationEntry:new {
         entry = self.entry:Then(
             args.property,
             args.duration or 0,
@@ -21,18 +21,18 @@ function WrapEntry:_then(args)
     }
 end
 
-function WrapEntry:_and(args)
+function AnimationEntry:_and(args)
     if args == nil then
         args = {}
     elseif type(args) ~= 'table' then
         args = { property = args }
     end
 
-    -- if self has head, the new entry will be head's child
     if self.head then
+        -- self has head, so the new entry will be head's child
         if self.head.entry then
-            -- self.head is WrapEntry
-            return WrapEntry:new {
+            -- self.head is AnimationEntry
+            return AnimationEntry:new {
                 entry = self.head.entry:Then(
                     args.property,
                     args.duration or 0,
@@ -41,8 +41,8 @@ function WrapEntry:_and(args)
                 )
             }
         else
-            -- self.head is WrapAnim
-            return WrapEntry:new {
+            -- self.head is NovaAnimation
+            return AnimationEntry:new {
                 entry = self.head.anim:Do(
                     args.property,
                     args.duration or 0,
@@ -52,7 +52,8 @@ function WrapEntry:_and(args)
             }
         end
     else
-        return WrapEntry:new {
+        -- self doesn't have head, so the new entry will be self's child
+        return AnimationEntry:new {
             entry = self.entry:And(
                 args.property,
                 args.duration or 0,
@@ -63,22 +64,22 @@ function WrapEntry:_and(args)
     end
 end
 
-function WrapEntry:_for(duration)
+function AnimationEntry:_for(duration)
     self.entry:For(duration)
     return self
 end
 
-function WrapEntry:_with(func)
+function AnimationEntry:_with(func)
     self.entry:With(func)
     return self
 end
 
-function WrapEntry:_repeat(repeat_num)
+function AnimationEntry:_repeat(repeat_num)
     self.entry:Repeat(repeat_num)
     return self
 end
 
-function WrapEntry:stop()
+function AnimationEntry:stop()
     self.entry:Stop()
 end
 
@@ -86,18 +87,18 @@ end
 
 --- NovaAnimation wrapper
 
-WrapAnim = {}
-WrapAnim.__index = WrapAnim
+NovaAnimation = {}
+NovaAnimation.__index = NovaAnimation
 
-function WrapAnim:new(o)
+function NovaAnimation:new(o)
     return setmetatable(o or {}, self)
 end
 
-function WrapAnim:_do(args)
+function NovaAnimation:_do(args)
     if type(args) ~= 'table' then
         args = { property = args }
     end
-    return WrapEntry:new {
+    return AnimationEntry:new {
         entry = self.anim:Do(
             args.property,
             args.duration or 0,
@@ -107,22 +108,24 @@ function WrapAnim:_do(args)
     }
 end
 
-function WrapAnim:stop()
+function NovaAnimation:stop()
     self.anim:Stop()
 end
 
 --- NovaAnimation wrapper end
 
---- alias for defining methods for both WrapEntry and WrapAnim
-WrapAnim._then = WrapAnim._do
+--- alias for defining methods for both AnimationEntry and NovaAnimation
+NovaAnimation._then = NovaAnimation._do
 
 function make_anim_method(func_name, func, preload_func, preload_param)
-    if WrapEntry[func_name] then
+    if AnimationEntry[func_name] then
         warn('Duplicate animation method: ' .. func_name)
         return
     end
-    WrapEntry[func_name] = func
-    WrapAnim[func_name] = func
+
+    AnimationEntry[func_name] = func
+    NovaAnimation[func_name] = func
+
     if preload_func then
         if preload_param then
             if type(preload_param) == 'table' then
@@ -143,95 +146,4 @@ function make_anim_method(func_name, func, preload_func, preload_param)
     end
 end
 
---- AnimationProperty wrapper
-
 RELATIVE = Nova.UseRelativeValue.Yes
-
---- argument can be specified as positional or named
---- named argument will override positional ones
---- positional:
----     name:     index:  type:               description:
----     obj       1       string or userdata  the object to move
----     to        2       Vector3             target value, Euler angle for rotation
----     from      3       Vector3             start value, Euler angle for rotation, default is the value when the animation entry starts
----     relative  3       UseRelativeValue    use RELATIVE to indicate that target value is relative
-local function wrap_vec3_property(p)
-    return function(t)
-        local obj = t.obj or t[1]
-        if obj == nil then
-            warn('obj == nil')
-            return nil
-        end
-        local transform = obj.transform
-        local to = t.to or t[2]
-        if to == nil then
-            warn('to == nil')
-            return nil
-        end
-
-        local from = t.from
-        local relative = t.relative
-        if t[3] == RELATIVE then
-            relative = relative or t[3]
-        else
-            from = from or t[3]
-        end
-
-        if from then
-            return p(transform, from, to)
-        elseif relative then
-            return p(transform, to, relative)
-        else
-            return p(transform, to)
-        end
-    end
-end
-
-_move = wrap_vec3_property(Nova.PositionAnimationProperty)
-_rotate = wrap_vec3_property(Nova.RotationAnimationProperty)
-_scale = wrap_vec3_property(Nova.ScaleAnimationProperty)
-
---- argument can be specified as positional or named
---- named argument will override positional ones
---- positional:
----     name:   index:  type:     description:
----     action  1       function  action to be done
-function _action(t)
-    local action = t.action or t[1]
-    if action == nil then
-        warn('action == nil')
-        return nil
-    end
-    return Nova.ActionAnimationProperty(action)
-end
-
---- argument can be specified as positional or named
---- named argument will override positional ones
---- positional:
----     name:     index:  type:     description:
----     mat       1       Material  the material to animate
----     name      2       string    name of the material property
----     to        3       Vector3   target value
----     from      4       Vector3   start value, default is the value when the animation entry starts
-function _change_mat_float(t)
-    local mat = t.mat or t[1]
-    if mat == nil then
-        warn('mat == nil')
-        return nil
-    end
-    local name = t.name or t[2]
-    local to = t.to or t[3]
-    if to == nil then
-        warn('to == nil')
-        return nil
-    end
-    local from = t.from or t[4]
-
-    if from then
-       return Nova.MaterialFloatAnimationProperty(mat, name, from, to)
-    else
-       return Nova.MaterialFloatAnimationProperty(mat, name, to)
-    end
-end
-
---- AnimationProperty wrapper end

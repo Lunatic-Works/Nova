@@ -23,7 +23,7 @@
 
 * **支持什么版本的Unity、什么操作系统/平台？**
 
-    支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台。WebGL目前不支持，不过似乎已经有人成功让我们的依赖（tolua#和Json.NET）支持WebGL了，我们真要做的话应该也可以。
+    支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台。WebGL目前不支持，不过似乎已经有人成功让我们的依赖（tolua#）支持WebGL了，我们真要做的话应该也可以。
 
 * **我可以把解谜/战棋等游戏加到Nova里吗？我可以把Nova作为对话系统加到解谜/战棋等游戏里吗？**
 
@@ -74,3 +74,5 @@
 国内镜像（随缘更新）：
 
 * https://gitee.com/woctordho/Nova
+
+国内的小伙伴也可以用各种GitHub镜像网站来访问这个repo

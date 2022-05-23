@@ -24,7 +24,7 @@ make_anim_method('shake', function(self, obj, distance, duration)
 end)
 
 make_anim_method('cam_punch', function(self)
-    local entry = self:_then(_move {cam, Vector3(0, -0.2, 0), RELATIVE}):_with(parse_easing({'shake', 20, 0.5})):_for(0.4
+    local entry = self:_then(Nova.PositionAnimationProperty(cam.transform, Vector3(0, -0.2, 0), RELATIVE)):_with(parse_easing({'shake', 20, 0.5})):_for(0.4
         ):_and(Nova.CameraSizeAnimationProperty(cam, 0.9, RELATIVE)):_with(parse_easing({1, 0})):_for(0.05
         ):_then(Nova.CameraSizeAnimationProperty(cam, 1 / 0.9, RELATIVE)):_with(parse_easing()):_for(0.35)
     entry.head = self
