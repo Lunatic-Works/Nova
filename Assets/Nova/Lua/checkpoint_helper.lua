@@ -17,6 +17,11 @@ function anim_hold_end()
     anim_hold_has_begun = false
 end
 
+-- DEPRECATED
+function anim_persist_begin()
+    error('Please replace anim_persist with anim_hold')
+end
+
 -- Use after something important happens
 function update_global_save()
     __Nova.checkpointHelper:UpdateGlobalSave()
