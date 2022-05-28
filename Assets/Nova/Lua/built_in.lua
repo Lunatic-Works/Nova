@@ -1,27 +1,12 @@
-function pop_prefix(s, prefix, sep_len)
-    sep_len = sep_len or 0
-    if string.sub(s, 1, #prefix) == prefix then
-        return prefix, string.sub(s, #prefix + sep_len + 1)
-    else
-        return false, s
-    end
-end
-
 --- Handle Nova variable whose name starts with `v_` or `gv_` in Lua
 --- Disable implicit global variable declaration, see https://www.lua.org/pil/14.2.html
 local declared_global_variables = {}
-local _pop_prefix = pop_prefix
+local _sub = string.sub
 setmetatable(_G, {
     __index = function(t, name)
-        local prefix
-        prefix, name = _pop_prefix(name, 'v_')
-        if not prefix then
-            prefix, name = _pop_prefix(name, 'gv_')
-        end
-
-        if prefix == 'v_' then
+        if _sub(name, 1, 2) == 'v_' then
             return get_nova_variable(name, false)
-        elseif prefix == 'gv_' then
+        elseif _sub(name, 1, 3) == 'gv_' then
             return get_nova_variable(name, true)
         else
             if not declared_global_variables[name] then
@@ -32,15 +17,9 @@ setmetatable(_G, {
     end,
 
     __newindex = function(t, name, value)
-        local prefix
-        prefix, name = _pop_prefix(name, 'v_')
-        if not prefix then
-            prefix, name = _pop_prefix(name, 'gv_')
-        end
-
-        if prefix == 'v_' then
+        if _sub(name, 1, 2) == 'v_' then
             set_nova_variable(name, value, false)
-        elseif prefix == 'gv_' then
+        elseif _sub(name, 1, 3) == 'gv_' then
             set_nova_variable(name, value, true)
         else
             declared_global_variables[name] = true
@@ -69,5 +48,14 @@ function dump(o)
         return s .. '} '
     else
         return tostring(o)
+    end
+end
+
+function pop_prefix(s, prefix, sep_len)
+    sep_len = sep_len or 0
+    if string.sub(s, 1, #prefix) == prefix then
+        return prefix, string.sub(s, #prefix + sep_len + 1)
+    else
+        return false, s
     end
 end

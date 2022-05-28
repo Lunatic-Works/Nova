@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Nova
 {
@@ -30,6 +31,19 @@ namespace Nova
     [Serializable]
     public class Variables
     {
+        private static string CheckName(string name)
+        {
+            if (name.StartsWith("v_", StringComparison.Ordinal))
+            {
+                return name.Substring(2);
+            }
+            else
+            {
+                Debug.LogWarning($"Nova: Variable name {name} should start with v_");
+                return name;
+            }
+        }
+
         private SortedDictionary<string, VariableEntry> dict = new SortedDictionary<string, VariableEntry>();
 
         [NonSerialized] private ulong _hash;
@@ -71,13 +85,15 @@ namespace Nova
 
         public VariableEntry Get(string name)
         {
+            name = CheckName(name);
             dict.TryGetValue(name, out var entry);
             return entry;
         }
 
         public T Get<T>(string name, T defaultValue = default)
         {
-            if (dict.TryGetValue(name, out var entry))
+            var entry = Get(name);
+            if (entry != null)
             {
                 return (T)Convert.ChangeType(entry.value, typeof(T));
             }
@@ -89,6 +105,7 @@ namespace Nova
 
         public void Set(string name, VariableType type, object value)
         {
+            name = CheckName(name);
             dict.TryGetValue(name, out var oldEntry);
             if (value == null)
             {

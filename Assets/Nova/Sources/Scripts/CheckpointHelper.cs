@@ -45,6 +45,19 @@ namespace Nova
 
         private const string GlobalVariablesKey = "global_variables";
 
+        private static string CheckName(string name)
+        {
+            if (name.StartsWith("gv_", StringComparison.Ordinal))
+            {
+                return name.Substring(3);
+            }
+            else
+            {
+                Debug.LogWarning($"Nova: Global variable name {name} should start with gv_");
+                return name;
+            }
+        }
+
         private GlobalVariables globalVariables;
 
         private void EnsureGlobalVariables()
@@ -58,16 +71,15 @@ namespace Nova
         public VariableEntry GetGlobalVariable(string name)
         {
             EnsureGlobalVariables();
-
+            CheckName(name);
             globalVariables.TryGetValue(name, out var entry);
             return entry;
         }
 
         public T GetGlobalVariable<T>(string name, T defaultValue = default)
         {
-            EnsureGlobalVariables();
-
-            if (globalVariables.TryGetValue(name, out var entry))
+            var entry = GetGlobalVariable(name);
+            if (entry != null)
             {
                 return (T)Convert.ChangeType(entry.value, typeof(T));
             }
@@ -80,7 +92,7 @@ namespace Nova
         public void SetGlobalVariable(string name, VariableType type, object value)
         {
             EnsureGlobalVariables();
-
+            CheckName(name);
             if (value == null)
             {
                 globalVariables.Remove(name);
