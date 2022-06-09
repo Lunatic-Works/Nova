@@ -24,12 +24,12 @@ def sort_lines(lines, idx_begin, idx_end):
         key=lambda x: [get_score(x[0])] + [(get_score(y), y) for y in x[1]])
     for i in range(len(rows) - 1):
         if rows[i][1] == rows[i + 1][1]:
-            print('Duplicate poses: {}, {}'.format(rows[i][0], rows[i + 1][0]))
+            print(f'Duplicate poses: {rows[i][0]}, {rows[i + 1][0]}')
 
     for i, row in enumerate(rows):
         name, tokens = row
-        lines[idx_begin + i] = '        [\'{}\'] = {{{}}},\n'.format(
-            name, ', '.join(['\'{}\''.format(x) for x in tokens]))
+        value = ', '.join([f'\'{x}\'' for x in tokens])
+        lines[idx_begin + i] = f'        [\'{name}\'] = {{{value}}},\n'
 
 
 def main():

@@ -57,7 +57,7 @@ for file_chara_name in chara_names:
                     f.write(chapter_name + '\n\n')
 
                 if auto_voice_status and not auto_voice_overridden:
-                    idx_marker = '{:03d} '.format(auto_voice_id % 1000)
+                    idx_marker = f'{auto_voice_id % 1000:03d} '
                     auto_voice_id += 1
                 else:
                     if say_filename:
@@ -72,7 +72,7 @@ for file_chara_name in chara_names:
                     dialogue_set.add(dialogue)
                     dup_marker = ''
 
-                f.write('{}{}{}\n'.format(idx_marker, dup_marker, dialogue))
+                f.write(f'{idx_marker}{dup_marker}{dialogue}\n')
 
             auto_voice_overridden = False
             say_filename = ''

@@ -113,7 +113,7 @@ def chapter_to_tape(entries, chara_set, bg_set, timeline_set, bgm_set):
 def tapes_to_img(tapes):
     tape_width = dialogue_width + bg_width + bgm_width
     img_height = max(len(tape) for tape in tapes)
-    img = np.zeros([img_height, len(tapes) * tape_width, 3], dtype=np.uint8)
+    img = np.zeros((img_height, len(tapes) * tape_width, 3), dtype=np.uint8)
     for tape_idx, tape in enumerate(tapes):
         img_tape = img[:,
                        tape_idx * tape_width:(tape_idx + 1) * tape_width:, :]
@@ -158,7 +158,7 @@ def main():
     print()
 
     img = tapes_to_img(tapes)
-    skimage.io.imsave(out_filename, img)
+    skimage.io.imsave(out_filename, img, compress_level=1)
 
 
 if __name__ == '__main__':
