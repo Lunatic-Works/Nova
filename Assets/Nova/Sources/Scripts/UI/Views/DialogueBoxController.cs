@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Nova
@@ -60,8 +59,7 @@ namespace Nova
     }
 
     [ExportCustomType]
-    public partial class DialogueBoxController : ViewControllerBase, IPointerDownHandler, IPointerUpHandler,
-        IRestorable
+    public class DialogueBoxController : ViewControllerBase, IRestorable
     {
         [ExportCustomType]
         public enum DialogueUpdateMode
@@ -72,20 +70,15 @@ namespace Nova
 
         [HideInInspector] public DialogueUpdateMode dialogueUpdateMode;
 
-        private GameController gameController;
         private GameState gameState;
         private DialogueState dialogueState;
-        private ConfigManager configManager;
 
         private ScrollRect dialogueTextScrollRect;
         private DialogueTextController dialogueText;
         private RectTransform dialogueTextRect;
         private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
 
-        private ButtonRingTrigger buttonRingTrigger;
-        private SaveViewController saveViewController;
-        private LogController logController;
-        [SerializeField] private AvatarController avatarController;
+        private AvatarController avatarController;
 
         // TODO: there are a lot of magic numbers for the current UI
         [ExportCustomType]
@@ -199,19 +192,16 @@ namespace Nova
                 return true;
             }
 
-            gameController = Utils.FindNovaGameController();
+            var gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
             dialogueState = gameController.DialogueState;
-            configManager = gameController.ConfigManager;
 
             dialogueTextScrollRect = GetComponentInChildren<ScrollRect>();
             dialogueText = GetComponentInChildren<DialogueTextController>();
             dialogueTextRect = dialogueText.transform as RectTransform;
             dialogueTextVerticalLayoutGroup = dialogueText.GetComponent<VerticalLayoutGroup>();
 
-            buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
-            saveViewController = viewManager.GetController<SaveViewController>();
-            logController = viewManager.GetController<LogController>();
+            avatarController = GetComponentInChildren<AvatarController>();
 
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
@@ -233,7 +223,6 @@ namespace Nova
                 }
             });
             dialogueBoxShown = new AndGate(dialogueFinished);
-            dialogueBoxShown.SetActive(true);
 
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
 
@@ -312,15 +301,6 @@ namespace Nova
                 }
             }
 
-            // All shortcut should use InputMapping. Always call this method in update as validity of each AbstractKeys
-            // are defined specifically.
-            HandleShortcut();
-
-            if (gameController.inputEnabled)
-            {
-                HandleInput();
-            }
-
             // Refresh text when size changes
             if (canRefreshTextProxy && rect.hasChanged)
             {
@@ -333,6 +313,12 @@ namespace Nova
 
                 rect.hasChanged = false;
             }
+        }
+
+        // Used when aborting animations by clicking
+        public void ShowDialogueFinishIcon()
+        {
+            dialogueFinished.SetActive(true);
         }
 
         [SerializeField] private GameObject autoModeIcon;
@@ -390,7 +376,6 @@ namespace Nova
         }
 
         [SerializeField] private NovaAnimation textAnimation;
-        [HideInInspector] public bool needAnimation = true;
 
         private float textAnimationDelay;
         private float textDurationOverride = -1f;
@@ -433,7 +418,7 @@ namespace Nova
                 true);
         }
 
-        [HideInInspector] public float perCharacterFadeInDuration;
+        [HideInInspector] public float characterFadeInDuration;
 
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
@@ -442,7 +427,7 @@ namespace Nova
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
 
-            if (this.needAnimation && needAnimation && !gameState.isRestoring && !dialogueState.isFastForward)
+            if (needAnimation && !gameState.isRestoring && !dialogueState.isFastForward)
             {
                 var contentProxy = entry.contentProxy;
 
@@ -453,7 +438,7 @@ namespace Nova
                 }
                 else
                 {
-                    textDuration = perCharacterFadeInDuration * contentProxy.GetPageCharacterCount();
+                    textDuration = characterFadeInDuration * contentProxy.GetPageCharacterCount();
                 }
 
                 var animEntry = textAnimation
@@ -497,7 +482,7 @@ namespace Nova
         [HideInInspector] public float autoDelay;
         [HideInInspector] public float fastForwardDelay;
 
-        private Coroutine scheduledStepCoroutine = null;
+        private Coroutine scheduledStepCoroutine;
 
         private void TrySchedule(float scheduledDelay)
         {
@@ -526,7 +511,7 @@ namespace Nova
         {
             return Mathf.Max(
                 GetDialogueTime(autoDelay, autoDelay * 0.5f),
-                NovaAnimation.GetTotalTimeRemaining(AnimationType.Text) / perCharacterFadeInDuration * autoDelay * 0.1f
+                NovaAnimation.GetTotalTimeRemaining(AnimationType.Text) / characterFadeInDuration * autoDelay * 0.1f
             );
         }
 
@@ -570,7 +555,7 @@ namespace Nova
             }
         }
 
-        private bool NextPageOrStep()
+        public bool NextPageOrStep()
         {
             if (dialogueText.Count == 0 || !dialogueText.dialogueEntryControllers.Last().Forward())
             {
@@ -716,6 +701,12 @@ namespace Nova
             }
         }
 
+        public string FindIntersectingLink(Vector3 position, Camera camera)
+        {
+            return dialogueText.dialogueEntryControllers.Select(dec => dec.FindIntersectingLink(position, camera))
+                .FirstOrDefault(link => !string.IsNullOrEmpty(link));
+        }
+
         #endregion
 
         #region Show/Hide close button and dialogue finish icon
@@ -754,8 +745,6 @@ namespace Nova
             public readonly Vector4Data backgroundColor;
             public readonly DialogueUpdateMode dialogueUpdateMode;
             public readonly List<DialogueDisplayData> displayDatas;
-            public readonly bool canClickForward;
-            public readonly bool scriptCanAbortAnimation;
             public readonly Theme theme;
             public readonly int textAlignment;
             public readonly bool textColorHasSet;
@@ -765,16 +754,14 @@ namespace Nova
             public readonly bool dialogueFinishIconShown;
 
             public DialogueBoxRestoreData(RectTransform rect, Color backgroundColor,
-                DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, bool canClickForward,
-                bool scriptCanAbortAnimation, Theme theme, int textAlignment, bool textColorHasSet,
-                Color textColor, string materialName, bool closeButtonShown, bool dialogueFinishIconShown)
+                DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, Theme theme,
+                int textAlignment, bool textColorHasSet, Color textColor, string materialName, bool closeButtonShown,
+                bool dialogueFinishIconShown)
             {
                 rectTransformRestoreData = new RectTransformRestoreData(rect);
                 this.backgroundColor = backgroundColor;
                 this.dialogueUpdateMode = dialogueUpdateMode;
                 this.displayDatas = displayDatas;
-                this.canClickForward = canClickForward;
-                this.scriptCanAbortAnimation = scriptCanAbortAnimation;
                 this.theme = theme;
                 this.textAlignment = textAlignment;
                 this.textColorHasSet = textColorHasSet;
@@ -788,9 +775,9 @@ namespace Nova
         public IRestoreData GetRestoreData()
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
-            return new DialogueBoxRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas,
-                canClickForward, scriptCanAbortAnimation, theme, (int)textAlignment, textColorHasSet,
-                textColor, materialName, closeButtonShown, dialogueFinishIconShown);
+            return new DialogueBoxRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas, theme,
+                (int)textAlignment, textColorHasSet, textColor, materialName, closeButtonShown,
+                dialogueFinishIconShown);
         }
 
         public void Restore(IRestoreData restoreData)
@@ -800,8 +787,6 @@ namespace Nova
             backgroundColor = data.backgroundColor;
 
             dialogueUpdateMode = data.dialogueUpdateMode;
-            canClickForward = data.canClickForward;
-            scriptCanAbortAnimation = data.scriptCanAbortAnimation;
 
             theme = data.theme;
             textAlignment = (TextAlignmentOptions)data.textAlignment;

@@ -38,11 +38,11 @@ namespace Nova
             float val = Mathf.Max(2f * Mathf.Pow(0.1f, configManager.GetFloat(configKeyName)) - 0.02f, 0.001f);
             if (dialogueBoxController != null)
             {
-                dialogueBoxController.perCharacterFadeInDuration = val;
+                dialogueBoxController.characterFadeInDuration = val;
             }
             else // configTextPreviewController != null
             {
-                configTextPreviewController.perCharacterFadeInDuration = val;
+                configTextPreviewController.characterFadeInDuration = val;
             }
         }
     }

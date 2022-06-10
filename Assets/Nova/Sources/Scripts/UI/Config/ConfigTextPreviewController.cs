@@ -9,7 +9,7 @@ namespace Nova
         [SerializeField] private DialogueTextController dialogueText;
         [SerializeField] private NovaAnimation textAnimation;
 
-        [HideInInspector] public float perCharacterFadeInDuration;
+        [HideInInspector] public float characterFadeInDuration;
         [HideInInspector] public float autoDelay;
 
         private float currentTextPreviewTimeLeft;
@@ -43,7 +43,7 @@ namespace Nova
                 0
             );
             var contentProxy = entry.contentProxy;
-            var textDuration = perCharacterFadeInDuration * contentProxy.GetPageCharacterCount();
+            var textDuration = characterFadeInDuration * contentProxy.GetPageCharacterCount();
             currentTextPreviewTimeLeft = textDuration + autoDelay;
             textAnimation.Do(
                 new TextFadeInAnimationProperty(contentProxy, 255),

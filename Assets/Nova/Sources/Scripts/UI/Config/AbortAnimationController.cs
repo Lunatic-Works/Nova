@@ -11,12 +11,12 @@ namespace Nova
         public string configKeyName;
 
         private ConfigManager configManager;
-        private DialogueBoxController dialogueBoxController;
+        private GameViewInput gameViewInput;
 
         private void Awake()
         {
             configManager = Utils.FindNovaGameController().ConfigManager;
-            dialogueBoxController = GetComponent<DialogueBoxController>();
+            gameViewInput = GetComponent<GameViewInput>();
         }
 
         private void OnEnable()
@@ -32,7 +32,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            dialogueBoxController.canAbortAnimation = configManager.GetInt(configKeyName) > 0;
+            gameViewInput.canAbortAnimation = configManager.GetInt(configKeyName) > 0;
         }
     }
 }
