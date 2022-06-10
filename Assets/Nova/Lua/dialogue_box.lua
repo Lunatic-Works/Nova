@@ -1,10 +1,10 @@
 function stop_auto_ff()
-    __Nova.dialogueBoxController.state = Nova.DialogueBoxState.Normal
+    __Nova.dialogueState.state = Nova.DialogueState.State.Normal
 end
 
 function stop_ff()
-    if __Nova.dialogueBoxController.state == Nova.DialogueBoxState.FastForward then
-        __Nova.dialogueBoxController.state = Nova.DialogueBoxState.Normal
+    if __Nova.dialogueState.isFastForward then
+        __Nova.dialogueState.state = Nova.DialogueState.State.Normal
     end
 end
 

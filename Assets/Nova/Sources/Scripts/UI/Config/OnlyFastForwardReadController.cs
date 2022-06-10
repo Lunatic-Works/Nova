@@ -5,18 +5,18 @@ namespace Nova
     /// <summary>
     /// Toggle whether only fast forward read text based on the value in ConfigManager
     /// </summary>
-    [RequireComponent(typeof(DialogueBoxController))]
     public class OnlyFastForwardReadController : MonoBehaviour
     {
         public string configKeyName;
 
+        private DialogueState dialogueState;
         private ConfigManager configManager;
-        private DialogueBoxController dialogueBoxController;
 
         private void Awake()
         {
-            configManager = Utils.FindNovaGameController().ConfigManager;
-            dialogueBoxController = GetComponent<DialogueBoxController>();
+            var gameController = Utils.FindNovaGameController();
+            dialogueState = gameController.DialogueState;
+            configManager = gameController.ConfigManager;
         }
 
         private void OnEnable()
@@ -32,7 +32,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            dialogueBoxController.onlyFastForwardRead = configManager.GetInt(configKeyName) > 0;
+            dialogueState.onlyFastForwardRead = configManager.GetInt(configKeyName) > 0;
         }
     }
 }

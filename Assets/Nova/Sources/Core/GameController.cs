@@ -8,6 +8,7 @@ namespace Nova
     public class GameController : MonoBehaviour
     {
         public GameState GameState { get; private set; }
+        public DialogueState DialogueState { get; private set; }
         public CheckpointManager CheckpointManager { get; private set; }
         public ConfigManager ConfigManager { get; private set; }
         public InputMapper InputMapper { get; private set; }
@@ -21,6 +22,7 @@ namespace Nova
         private void Awake()
         {
             GameState = FindComponent<GameState>();
+            DialogueState = FindComponent<DialogueState>();
             CheckpointManager = FindComponent<CheckpointManager>();
             ConfigManager = FindComponent<ConfigManager>();
             InputMapper = FindComponent<InputMapper>();

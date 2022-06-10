@@ -6,29 +6,13 @@ namespace Nova
     public partial class DialogueBoxController
     {
         private const string AbortAnimationFirstShownKey = ConfigManager.FirstShownKeyPrefix + "AbortAnimation";
-        private const string FastForwardReadFirstShownKey = ConfigManager.FirstShownKeyPrefix + "FastForwardRead";
-
         private const int HintAbortAnimationClicks = 10;
-        private const int HintFastForwardReadClicks = 3;
-
-        private bool _fastForwardHotKeyHolding;
-
-        private bool fastForwardHotKeyHolding
-        {
-            get => _fastForwardHotKeyHolding;
-            set
-            {
-                if (_fastForwardHotKeyHolding == value) return;
-                _fastForwardHotKeyHolding = value;
-                state = value ? DialogueBoxState.FastForward : DialogueBoxState.Normal;
-            }
-        }
 
         private void HandleShortcutInGameView()
         {
             if (inputMapper.GetKeyUp(AbstractKey.Auto))
             {
-                state = DialogueBoxState.Auto;
+                dialogueState.state = DialogueState.State.Auto;
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.Save))
@@ -66,7 +50,7 @@ namespace Nova
                 logController.Show();
             }
 
-            fastForwardHotKeyHolding = inputMapper.GetKey(AbstractKey.FastForward);
+            dialogueState.fastForwardHotKeyHolding = inputMapper.GetKey(AbstractKey.FastForward);
         }
 
         private void HandleShortcutWhenDialogueHidden()
@@ -136,7 +120,7 @@ namespace Nova
             }
 
             // Mouse right button
-            // We do not use two-finger tap to simluate right button
+            // We do not use two-finger tap to simulate right button
             // if (eventData.pointerId == -2 || Input.touchCount == 2)
             if (eventData.pointerId == -2)
             {
@@ -209,7 +193,7 @@ namespace Nova
             }
 
             // Stop auto/fast forward on any button or touch
-            state = DialogueBoxState.Normal;
+            dialogueState.state = DialogueState.State.Normal;
 
             // Handle hyperlinks on any button or touch
             Camera uiCamera = UICameraHelper.Active;
@@ -264,7 +248,7 @@ namespace Nova
                 float scroll = Input.mouseScrollDelta.y;
                 if (scroll > 0)
                 {
-                    state = DialogueBoxState.Normal;
+                    dialogueState.state = DialogueState.State.Normal;
                     logController.Show();
                 }
                 else if (scroll < 0)
@@ -277,7 +261,6 @@ namespace Nova
         [HideInInspector] public bool canClickForward = true;
         [HideInInspector] public bool canAbortAnimation = true;
         [HideInInspector] public bool scriptCanAbortAnimation = true;
-        [HideInInspector] public bool onlyFastForwardRead = true;
 
         public void ClickForward()
         {
@@ -286,7 +269,7 @@ namespace Nova
                 return;
             }
 
-            state = DialogueBoxState.Normal;
+            dialogueState.state = DialogueState.State.Normal;
 
             bool isAnimating = NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
             bool textIsAnimating = textAnimation.isPlaying;

@@ -1,23 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Nova
 {
     public class ReloadScriptsHelper : MonoBehaviour
     {
         private GameState gameState;
+        private DialogueState dialogueState;
         private InputMapper inputMapper;
         private ViewManager viewManager;
-        private DialogueBoxController dialogueBoxController;
 
         private void Awake()
         {
             var gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
+            dialogueState = gameController.DialogueState;
             inputMapper = gameController.InputMapper;
             viewManager = Utils.FindViewManager();
-            dialogueBoxController = viewManager.GetController<DialogueBoxController>();
         }
 
         private void Update()
@@ -41,7 +39,7 @@ namespace Nova
         private void ReloadScripts()
         {
             NovaAnimation.StopAll();
-            dialogueBoxController.state = DialogueBoxState.Normal;
+            dialogueState.state = DialogueState.State.Normal;
             gameState.ReloadScripts();
             var nodeHistoryEntry = gameState.nodeHistory.GetCounted(gameState.currentNode.name);
             gameState.MoveBackAndFastForward(nodeHistoryEntry, 0, gameState.currentIndex, true, null);
