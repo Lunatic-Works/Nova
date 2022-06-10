@@ -50,10 +50,10 @@
 也可以看一看其他的视觉小说引擎：
 
 * [Ren'Py](https://github.com/renpy/renpy)：如果你没有编程基础但是想学，或者有Python基础，推荐用这个引擎
-* [AVG.js](https://github.com/avgjs/avg-core)：如果你信仰web前端，推荐用这个引擎
+* [WebGAL](https://github.com/MakinoharaShoko/WebGAL)：如果你信仰web前端，推荐用这个引擎
 * [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎，作者是个萝莉控
-* [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个使用web前端的引擎，似乎得到了Xihe Animation的支持
-* [WebGAL](https://github.com/MakinoharaShoko/WebGAL)：全新的基于web的视觉小说引擎
+* [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个基于web的引擎，似乎得到了Xihe Animation的支持
+* [AVG.js](https://github.com/avgjs/avg-core)：一个比较稳定的基于web的引擎
 
 以及通用游戏引擎：
 
