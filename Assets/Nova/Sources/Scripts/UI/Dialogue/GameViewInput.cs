@@ -356,7 +356,7 @@ namespace Nova
             if (isAnimating)
             {
                 NovaAnimation.StopAll(AnimationType.PerDialogue);
-                dialogueBoxController.ShowDialogueFinishIcon();
+                dialogueBoxController.ShowDialogueFinishIcon(true);
             }
         }
 
