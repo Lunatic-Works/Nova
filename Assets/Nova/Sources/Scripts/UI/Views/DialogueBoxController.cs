@@ -215,31 +215,14 @@ namespace Nova
                 btn.onClick.AddListener(Hide);
             }
 
-            dialogueFinished = new AndGate(to =>
-            {
-                foreach (var icon in dialogueFinishIcons)
-                {
-                    icon.SetActive(to);
-                }
-            });
-            dialogueBoxShown = new AndGate(dialogueFinished);
-
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
 
             return false;
         }
 
-        public override void Show(Action onFinish)
-        {
-            dialogueBoxShown.SetActive(true);
-
-            base.Show(onFinish);
-        }
-
         public override void Hide(Action onFinish)
         {
             dialogueState.state = DialogueState.State.Normal;
-            dialogueBoxShown.SetActive(false);
 
             base.Hide(onFinish);
         }
@@ -282,7 +265,7 @@ namespace Nova
         {
             StopTimer();
             ResetTextAnimationConfig();
-            dialogueFinished.SetActive(false);
+            ShowDialogueFinishIcon(false);
         }
 
         // Avoid refreshing text proxy when changing size in animation
@@ -297,7 +280,7 @@ namespace Nova
                 if (dialogueFinishIconShown && dialogueState.isNormal &&
                     viewManager.currentView != CurrentViewType.InTransition && timeAfterDialogueChange > dialogueTime)
                 {
-                    dialogueFinished.SetActive(true);
+                    ShowDialogueFinishIcon(true);
                 }
             }
 
@@ -316,16 +299,16 @@ namespace Nova
         }
 
         // Used when aborting animations by clicking
-        public void ShowDialogueFinishIcon()
+        public void ShowDialogueFinishIcon(bool to)
         {
-            dialogueFinished.SetActive(true);
+            foreach (var icon in dialogueFinishIcons)
+            {
+                icon.SetActive(to);
+            }
         }
 
         [SerializeField] private GameObject autoModeIcon;
         [SerializeField] private GameObject fastForwardModeIcon;
-
-        private AndGate dialogueFinished;
-        private AndGate dialogueBoxShown;
 
         /// <summary>
         /// The content of the dialogue box needs to be changed

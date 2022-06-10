@@ -1,7 +1,6 @@
 ﻿using Nova.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -454,112 +453,6 @@ namespace Nova
                 default:
                     return false;
             }
-        }
-    }
-
-    public class XorStream : Stream
-    {
-        private readonly byte[] xorCodes;
-        private readonly Stream realStream;
-
-        public XorStream(Stream realStream, byte[] xorCodes)
-        {
-            this.xorCodes = xorCodes;
-            this.realStream = realStream;
-        }
-
-        public override bool CanRead => realStream.CanRead;
-
-        public override bool CanSeek => realStream.CanSeek;
-
-        public override bool CanWrite => realStream.CanWrite;
-
-        public override long Length => realStream.Length;
-
-        public override long Position
-        {
-            get => realStream.Position;
-            set => realStream.Position = value;
-        }
-
-        public override void Flush()
-        {
-            realStream.Flush();
-        }
-
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            int position = (int)(Position % xorCodes.Length);
-            int ret = realStream.Read(buffer, offset, count);
-            for (int i = 0; i < count; i++)
-            {
-                buffer[offset + i] ^= xorCodes[(position + i) % xorCodes.Length];
-            }
-
-            return ret;
-        }
-
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            return realStream.Seek(offset, origin);
-        }
-
-        public override void SetLength(long value)
-        {
-            realStream.SetLength(value);
-        }
-
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            byte[] buf = new byte[count];
-            int position = (int)(Position % xorCodes.Length);
-            for (int i = 0; i < count; i++)
-            {
-                buf[i] = (byte)(buffer[i + offset] ^ xorCodes[(position + i) % xorCodes.Length]);
-            }
-
-            realStream.Write(buf, 0, count);
-        }
-    }
-
-    public class AndGate
-    {
-        private readonly Action<bool> callback;
-        private readonly AndGate targetGate;
-        private AndGate parentGate;
-        private bool value;
-
-        public AndGate(Action<bool> callback)
-        {
-            this.callback = callback;
-        }
-
-        public AndGate(AndGate target)
-        {
-            targetGate = target;
-            target.parentGate = this;
-        }
-
-        public bool chainValue
-        {
-            get
-            {
-                return Utils.LazyList(parentGate, g => g.parentGate).All(g => g.value)
-                       && Utils.LazyList(this, g => g.targetGate).All(g => g.value);
-            }
-        }
-
-        public Action<bool> finalCallback
-        {
-            get { return Utils.LazyList(this, g => g.targetGate).Last().callback; }
-        }
-
-        public void SetActive(bool to)
-        {
-            if (value == to)
-                return;
-            value = to;
-            finalCallback?.Invoke(chainValue);
         }
     }
 }
