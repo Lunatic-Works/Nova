@@ -5,7 +5,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Nova
@@ -75,6 +74,7 @@ namespace Nova
 
         private GameController gameController;
         private GameState gameState;
+        private DialogueState dialogueState;
         private ConfigManager configManager;
 
         private ScrollRect dialogueTextScrollRect;
@@ -201,6 +201,7 @@ namespace Nova
 
             gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
+            dialogueState = gameController.DialogueState;
             configManager = gameController.ConfigManager;
 
             dialogueTextScrollRect = GetComponentInChildren<ScrollRect>();
@@ -234,16 +235,9 @@ namespace Nova
             dialogueBoxShown = new AndGate(dialogueFinished);
             dialogueBoxShown.SetActive(true);
 
-            uiPP = UICameraHelper.Active.GetComponent<PostProcessing>();
-
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
 
             return false;
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
         }
 
         public override void Show(Action onFinish)
@@ -255,7 +249,7 @@ namespace Nova
 
         public override void Hide(Action onFinish)
         {
-            state = DialogueBoxState.Normal;
+            dialogueState.state = DialogueState.State.Normal;
             dialogueBoxShown.SetActive(false);
 
             base.Hide(onFinish);
@@ -267,20 +261,31 @@ namespace Nova
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.routeEnded.AddListener(OnRouteEnded);
             gameState.AddRestorable(this);
+
+            dialogueState.autoModeStarts.AddListener(OnAutoModeStarts);
+            dialogueState.autoModeStops.AddListener(OnAutoModeStops);
+            dialogueState.fastForwardModeStarts.AddListener(OnFastForwardModeStarts);
+            dialogueState.fastForwardModeStops.AddListener(OnFastForwardModeStops);
         }
 
         private void OnDisable()
         {
             StopAllCoroutines();
+
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.routeEnded.RemoveListener(OnRouteEnded);
             gameState.RemoveRestorable(this);
+
+            dialogueState.autoModeStarts.RemoveListener(OnAutoModeStarts);
+            dialogueState.autoModeStops.RemoveListener(OnAutoModeStops);
+            dialogueState.fastForwardModeStarts.RemoveListener(OnFastForwardModeStarts);
+            dialogueState.fastForwardModeStops.RemoveListener(OnFastForwardModeStops);
         }
 
         private void OnRouteEnded(RouteEndedData routeEndedData)
         {
-            state = DialogueBoxState.Normal;
+            dialogueState.state = DialogueState.State.Normal;
             this.SwitchView<TitleController>();
         }
 
@@ -300,9 +305,8 @@ namespace Nova
             {
                 timeAfterDialogueChange += Time.deltaTime;
 
-                if (dialogueFinishIconShown &&
-                    state == DialogueBoxState.Normal && viewManager.currentView != CurrentViewType.InTransition &&
-                    timeAfterDialogueChange > dialogueTime)
+                if (dialogueFinishIconShown && dialogueState.isNormal &&
+                    viewManager.currentView != CurrentViewType.InTransition && timeAfterDialogueChange > dialogueTime)
                 {
                     dialogueFinished.SetActive(true);
                 }
@@ -333,116 +337,9 @@ namespace Nova
 
         [SerializeField] private GameObject autoModeIcon;
         [SerializeField] private GameObject fastForwardModeIcon;
-        [SerializeField] private Material fastForwardPostProcessingMaterial;
 
         private AndGate dialogueFinished;
         private AndGate dialogueBoxShown;
-        private PostProcessing uiPP;
-
-        private bool isReadDialogue = false;
-
-        private DialogueBoxState _state = DialogueBoxState.Normal;
-
-        /// <summary>
-        /// Current state of the dialogue box
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public DialogueBoxState state
-        {
-            get => _state;
-            set
-            {
-                if (_state == value)
-                {
-                    return;
-                }
-
-                switch (_state)
-                {
-                    case DialogueBoxState.Normal:
-                        break;
-                    case DialogueBoxState.Auto:
-                        StopAuto();
-                        autoModeStops.Invoke();
-
-                        if (autoModeIcon != null)
-                        {
-                            autoModeIcon.SetActive(false);
-                        }
-
-                        break;
-                    case DialogueBoxState.FastForward:
-                        StopFastForward();
-                        fastForwardModeStops.Invoke();
-
-                        uiPP.ClearLayer(0);
-                        if (fastForwardModeIcon != null)
-                        {
-                            fastForwardModeIcon.SetActive(false);
-                        }
-
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                switch (value)
-                {
-                    case DialogueBoxState.Normal:
-                        _state = DialogueBoxState.Normal;
-                        break;
-                    case DialogueBoxState.Auto:
-                        StartAuto();
-                        autoModeStarts.Invoke();
-
-                        if (autoModeIcon != null)
-                        {
-                            autoModeIcon.SetActive(true);
-                        }
-
-                        break;
-                    case DialogueBoxState.FastForward:
-                        if (!isReadDialogue && onlyFastForwardRead && !fastForwardHotKeyHolding)
-                        {
-                            int clicks = configManager.GetInt(FastForwardReadFirstShownKey);
-                            if (clicks < HintFastForwardReadClicks)
-                            {
-                                Alert.Show(I18n.__("dialogue.noreadtext"));
-                                configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
-                            }
-                            else if (clicks == HintFastForwardReadClicks)
-                            {
-                                Alert.Show(I18n.__("dialogue.hint.fastforwardread"));
-                                configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
-                            }
-                            else
-                            {
-                                Alert.Show(I18n.__("dialogue.noreadtext"));
-                            }
-
-                            return;
-                        }
-
-                        StartFastForward();
-                        fastForwardModeStarts.Invoke();
-
-                        uiPP.SetLayer(0, fastForwardPostProcessingMaterial);
-                        if (fastForwardModeIcon != null)
-                        {
-                            fastForwardModeIcon.SetActive(true);
-                        }
-
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
-
-        public UnityEvent autoModeStarts;
-        public UnityEvent autoModeStops;
-        public UnityEvent fastForwardModeStarts;
-        public UnityEvent fastForwardModeStops;
 
         /// <summary>
         /// The content of the dialogue box needs to be changed
@@ -451,13 +348,6 @@ namespace Nova
         private void OnDialogueChanged(DialogueChangedData dialogueData)
         {
             RestartTimer();
-
-            isReadDialogue = dialogueData.isReachedAnyHistory;
-            if (state == DialogueBoxState.FastForward && !isReadDialogue && onlyFastForwardRead &&
-                !fastForwardHotKeyHolding)
-            {
-                state = DialogueBoxState.Normal;
-            }
 
             switch (dialogueUpdateMode)
             {
@@ -471,29 +361,22 @@ namespace Nova
                     throw new ArgumentOutOfRangeException();
             }
 
-            // No animation playing when fast forwarding
-            if (state == DialogueBoxState.FastForward)
-            {
-                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-            }
-
-            // Check current state and set schedule for the next dialogue entry
             SetSchedule();
-
             dialogueTime = GetDialogueTime();
         }
 
+        // Check current state and set schedule for the next dialogue entry
         private void SetSchedule()
         {
             TryRemoveSchedule();
-            switch (state)
+            switch (dialogueState.state)
             {
-                case DialogueBoxState.Normal:
+                case DialogueState.State.Normal:
                     break;
-                case DialogueBoxState.Auto:
+                case DialogueState.State.Auto:
                     TrySchedule(GetDialogueTimeAuto());
                     break;
-                case DialogueBoxState.FastForward:
+                case DialogueState.State.FastForward:
                     TrySchedule(fastForwardDelay);
                     break;
                 default:
@@ -554,12 +437,12 @@ namespace Nova
 
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
-            Color nowTextColor = textColorHasSet ? textColor : isReadDialogue ? readColor : unreadColor;
+            Color nowTextColor = textColorHasSet ? textColor : dialogueState.isReadDialogue ? readColor : unreadColor;
             textLeftExtraPadding = avatarController.textPaddingOrZero;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
 
-            if (this.needAnimation && needAnimation && !gameState.isRestoring && state != DialogueBoxState.FastForward)
+            if (this.needAnimation && needAnimation && !gameState.isRestoring && !dialogueState.isFastForward)
             {
                 var contentProxy = entry.contentProxy;
 
@@ -647,56 +530,44 @@ namespace Nova
             );
         }
 
-        /// <summary>
-        /// Start auto
-        /// </summary>
-        /// <remarks>
-        /// This method should be called when the state is normal
-        /// </remarks>
-        private void StartAuto()
+        private void OnAutoModeStarts()
         {
-            this.RuntimeAssert(state == DialogueBoxState.Normal, "Dialogue box state != Normal");
-            _state = DialogueBoxState.Auto;
             TrySchedule(GetDialogueTimeAuto());
+
+            if (autoModeIcon != null)
+            {
+                autoModeIcon.SetActive(true);
+            }
         }
 
-        /// <summary>
-        /// Stop Auto
-        /// </summary>
-        /// <remarks>
-        /// This method should be called when the state is auto
-        /// </remarks>
-        private void StopAuto()
+        private void OnAutoModeStops()
         {
-            this.RuntimeAssert(state == DialogueBoxState.Auto, "Dialogue box state != Auto");
-            _state = DialogueBoxState.Normal;
             TryRemoveSchedule();
+
+            if (autoModeIcon != null)
+            {
+                autoModeIcon.SetActive(false);
+            }
         }
 
-        /// <summary>
-        /// Begin fast forward
-        /// </summary>
-        /// <remarks>
-        /// This method should be called when the state is normal
-        /// </remarks>
-        private void StartFastForward()
+        private void OnFastForwardModeStarts()
         {
-            this.RuntimeAssert(state == DialogueBoxState.Normal, "Dialogue box state != Normal");
-            _state = DialogueBoxState.FastForward;
             TrySchedule(fastForwardDelay);
+
+            if (fastForwardModeIcon != null)
+            {
+                fastForwardModeIcon.SetActive(true);
+            }
         }
 
-        /// <summary>
-        /// Stop fast forward
-        /// </summary>
-        /// <remarks>
-        /// This method should be called when the state is fast forward
-        /// </remarks>
-        private void StopFastForward()
+        private void OnFastForwardModeStops()
         {
-            this.RuntimeAssert(state == DialogueBoxState.FastForward, "Dialogue box state != FastForward");
-            _state = DialogueBoxState.Normal;
             TryRemoveSchedule();
+
+            if (fastForwardModeIcon != null)
+            {
+                fastForwardModeIcon.SetActive(false);
+            }
         }
 
         private bool NextPageOrStep()
@@ -734,12 +605,12 @@ namespace Nova
                 if (NextPageOrStep())
                 {
                     timeAfterDialogueChange = 0f;
-                    TrySchedule(state == DialogueBoxState.Auto ? autoDelay : fastForwardDelay);
+                    TrySchedule(dialogueState.isAuto ? autoDelay : fastForwardDelay);
                 }
             }
             else
             {
-                state = DialogueBoxState.Normal;
+                dialogueState.state = DialogueState.State.Normal;
             }
         }
 

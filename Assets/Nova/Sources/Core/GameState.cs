@@ -237,6 +237,8 @@ namespace Nova
         /// This event will be triggered if the content of the dialogue has changed. The new dialogue text will be
         /// sent to all listeners.
         /// </summary>
+        public DialogueChangedEvent dialogueChangedEarly;
+
         public DialogueChangedEvent dialogueChanged;
 
         /// <summary>
@@ -416,9 +418,11 @@ namespace Nova
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
-            dialogueChanged.Invoke(new DialogueChangedData(nodeHistory.Last(), currentIndex,
+            var dialogueChangedData = new DialogueChangedData(nodeHistory.Last(), currentIndex,
                 currentDialogueEntry.GetDisplayData(), new Dictionary<string, VoiceEntry>(voicesNextDialogue),
-                isReached, isReachedAnyHistory));
+                isReached, isReachedAnyHistory);
+            dialogueChangedEarly.Invoke(dialogueChangedData);
+            dialogueChanged.Invoke(dialogueChangedData);
 
             voicesNextDialogue.Clear();
 

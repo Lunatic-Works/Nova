@@ -5,17 +5,17 @@ namespace Nova
     public class DebugJumpHelper : MonoBehaviour
     {
         private GameState gameState;
+        private DialogueState dialogueState;
         private InputMapper inputMapper;
         private ViewManager viewManager;
-        private DialogueBoxController dialogueBoxController;
 
         private void Awake()
         {
             var gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
+            dialogueState = gameController.DialogueState;
             inputMapper = gameController.InputMapper;
             viewManager = Utils.FindViewManager();
-            dialogueBoxController = viewManager.GetController<DialogueBoxController>();
         }
 
         private void Update()
@@ -49,7 +49,7 @@ namespace Nova
         private void MoveBackward()
         {
             NovaAnimation.StopAll();
-            dialogueBoxController.state = DialogueBoxState.Normal;
+            dialogueState.state = DialogueState.State.Normal;
 
             if (gameState.SeekBackStep(1, out var nodeName, out var dialogueIndex))
             {
@@ -57,14 +57,14 @@ namespace Nova
             }
             else
             {
-                Debug.LogWarning($"Nova: Cannot move backward at the first dialogue.");
+                Debug.LogWarning("Nova: Cannot move backward at the first dialogue.");
             }
         }
 
         private void JumpChapter(int offset)
         {
             NovaAnimation.StopAll();
-            dialogueBoxController.state = DialogueBoxState.Normal;
+            dialogueState.state = DialogueState.State.Normal;
 
             var chapters = gameState.GetAllStartNodeNames();
             int targetChapterIndex = chapters.IndexOf(gameState.currentNode.name) + offset;

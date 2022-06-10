@@ -127,6 +127,7 @@ GameObject:
   - component: {fileID: 4466698426868420}
   - component: {fileID: 114316712241269044}
   - component: {fileID: 114397183559913708}
+  - component: {fileID: 8579560473595589777}
   - component: {fileID: 114045275974384532}
   - component: {fileID: 114842112916876254}
   - component: {fileID: 114122158007854770}
@@ -136,6 +137,7 @@ GameObject:
   - component: {fileID: 114014151699594742}
   - component: {fileID: 4085662085105365225}
   - component: {fileID: 7273781188685514655}
+  - component: {fileID: 6935519797362669510}
   m_Layer: 0
   m_Name: NovaGameController
   m_TagString: NovaGameController
@@ -186,6 +188,9 @@ MonoBehaviour:
   dialogueWillChange:
     m_PersistentCalls:
       m_Calls: []
+  dialogueChangedEarly:
+    m_PersistentCalls:
+      m_Calls: []
   dialogueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -195,10 +200,36 @@ MonoBehaviour:
   selectionOccurs:
     m_PersistentCalls:
       m_Calls: []
-  currentRouteEnded:
+  routeEnded:
     m_PersistentCalls:
       m_Calls: []
   maxStepNumFromLastCheckpoint: 10
+--- !u!114 &8579560473595589777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737081535048956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a413916daae5a04cb07b9227c544bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoModeStarts:
+    m_PersistentCalls:
+      m_Calls: []
+  autoModeStops:
+    m_PersistentCalls:
+      m_Calls: []
+  fastForwardModeStarts:
+    m_PersistentCalls:
+      m_Calls: []
+  fastForwardModeStops:
+    m_PersistentCalls:
+      m_Calls: []
+  isReadDialogue: 0
+  onlyFastForwardRead: 0
 --- !u!114 &114045275974384532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,9 +282,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a87d00e059b428b86d1e0191320d9c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cursorTexture: {fileID: 0}
-  hotSpot: {x: 0, y: 0}
-  autoHideAfterDuration: 1
   hideAfterSeconds: 5
 --- !u!114 &114174511625809554
 MonoBehaviour:
@@ -316,6 +344,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c2de00a754c42c9867fb7895cd4819b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6935519797362669510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737081535048956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b55bc709342695c4585a171396005580, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  configKeyName: OnlyFastForwardRead
 --- !u!1 &1963475629363514
 GameObject:
   m_ObjectHideFlags: 0

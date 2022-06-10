@@ -14,12 +14,13 @@ namespace Nova
         public OverlayTextureChangerBase textureChanger { get; protected set; }
 
         protected GameState gameState;
-        private DialogueBoxController dialogueBoxController;
+        protected DialogueState dialogueState;
 
         protected virtual void Awake()
         {
-            gameState = Utils.FindNovaGameController().GameState;
-            dialogueBoxController = Utils.FindViewManager().GetController<DialogueBoxController>();
+            var gameController = Utils.FindNovaGameController();
+            gameState = gameController.GameState;
+            dialogueState = gameController.DialogueState;
             textureChanger = GetComponent<OverlayTextureChangerBase>();
         }
 
@@ -57,7 +58,7 @@ namespace Nova
             var sprites = poseArray.Select(imageName =>
                 AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, imageName))).ToList();
             var texture = spriteMerger.GetMergedTexture(name, sprites);
-            if (fade && !gameState.isRestoring && dialogueBoxController.state != DialogueBoxState.FastForward)
+            if (fade && !gameState.isRestoring && !dialogueState.isFastForward)
             {
                 textureChanger.SetTexture(texture);
             }
@@ -120,7 +121,7 @@ namespace Nova
                 return;
             }
 
-            if (fade && !gameState.isRestoring && dialogueBoxController.state != DialogueBoxState.FastForward)
+            if (fade && !gameState.isRestoring && !dialogueState.isFastForward)
             {
                 textureChanger.SetTexture(null);
             }
