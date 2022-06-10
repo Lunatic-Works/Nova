@@ -13,18 +13,18 @@ namespace Nova
     /// <summary>
     /// Change the action of right button for DialogueBoxController
     /// </summary>
-    [RequireComponent(typeof(DialogueBoxController))]
+    [RequireComponent(typeof(GameViewInput))]
     public class RightButtonActionController : MonoBehaviour
     {
         public string configKeyName;
 
         private ConfigManager configManager;
-        private DialogueBoxController dialogueBoxController;
+        private GameViewInput gameViewInput;
 
         private void Awake()
         {
             configManager = Utils.FindNovaGameController().ConfigManager;
-            dialogueBoxController = GetComponent<DialogueBoxController>();
+            gameViewInput = GetComponent<GameViewInput>();
         }
 
         private void OnEnable()
@@ -40,7 +40,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            dialogueBoxController.rightButtonAction = (RightButtonAction)configManager.GetInt(configKeyName);
+            gameViewInput.rightButtonAction = (RightButtonAction)configManager.GetInt(configKeyName);
         }
     }
 }

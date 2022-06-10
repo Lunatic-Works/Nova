@@ -1,14 +1,63 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Nova
 {
-    public partial class DialogueBoxController
+    [ExportCustomType]
+    public class GameViewInput : MonoBehaviour, IRestorable, IPointerDownHandler, IPointerUpHandler
     {
         private const string AbortAnimationFirstShownKey = ConfigManager.FirstShownKeyPrefix + "AbortAnimation";
         private const int HintAbortAnimationClicks = 10;
 
-        private void HandleShortcutInGameView()
+        private GameController gameController;
+        private GameState gameState;
+        private DialogueState dialogueState;
+        private ConfigManager configManager;
+        private InputMapper inputMapper;
+
+        private ButtonRingTrigger buttonRingTrigger;
+
+        private ViewManager viewManager;
+        private DialogueBoxController dialogueBoxController;
+        private SaveViewController saveViewController;
+        private LogController logController;
+
+        private void Awake()
+        {
+            gameController = Utils.FindNovaGameController();
+            gameState = gameController.GameState;
+            dialogueState = gameController.DialogueState;
+            configManager = gameController.ConfigManager;
+            inputMapper = gameController.InputMapper;
+
+            buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
+
+            viewManager = Utils.FindViewManager();
+            dialogueBoxController = viewManager.GetController<DialogueBoxController>();
+            saveViewController = viewManager.GetController<SaveViewController>();
+            logController = viewManager.GetController<LogController>();
+
+            LuaRuntime.Instance.BindObject("gameViewInput", this);
+            gameState.AddRestorable(this);
+        }
+
+        private void OnDestroy()
+        {
+            gameState.RemoveRestorable(this);
+        }
+
+        private void Update()
+        {
+            HandleShortcut();
+
+            if (gameController.inputEnabled)
+            {
+                HandleInput();
+            }
+        }
+
+        private void HandleShortcutWhenDialogueShown()
         {
             if (inputMapper.GetKeyUp(AbstractKey.Auto))
             {
@@ -37,7 +86,7 @@ namespace Nova
 
             if (inputMapper.GetKeyUp(AbstractKey.ToggleDialogue))
             {
-                Hide();
+                dialogueBoxController.Hide();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.StepForward))
@@ -57,10 +106,11 @@ namespace Nova
         {
             if (inputMapper.GetKeyUp(AbstractKey.ToggleDialogue))
             {
-                Show();
+                dialogueBoxController.Show();
             }
         }
 
+        // All shortcuts should use inputMapper
         private void HandleShortcut()
         {
             if (buttonRingTrigger.buttonShowing)
@@ -74,10 +124,9 @@ namespace Nova
             {
                 if (viewManager.currentView == CurrentViewType.Game)
                 {
-                    HandleShortcutInGameView();
+                    HandleShortcutWhenDialogueShown();
                 }
-
-                if (viewManager.currentView == CurrentViewType.DialogueHidden)
+                else if (viewManager.currentView == CurrentViewType.DialogueHidden)
                 {
                     HandleShortcutWhenDialogueHidden();
                 }
@@ -86,8 +135,8 @@ namespace Nova
 
         [HideInInspector] public RightButtonAction rightButtonAction;
 
-        private bool skipNextTouch = false;
-        private bool skipTouchOnPointerUp = false;
+        private bool skipNextTouch;
+        private bool skipTouchOnPointerUp;
 
         public void OnPointerUp(PointerEventData eventData)
         {
@@ -105,10 +154,11 @@ namespace Nova
             var view = viewManager.currentView;
             if (view == CurrentViewType.DialogueHidden)
             {
-                Show();
+                dialogueBoxController.Show();
                 return;
             }
-            else if (view != CurrentViewType.Game)
+
+            if (view != CurrentViewType.Game)
             {
                 return;
             }
@@ -129,7 +179,7 @@ namespace Nova
                     buttonRingTrigger.NoShowIfMouseMoved();
                     if (rightButtonAction == RightButtonAction.HideDialoguePanel)
                     {
-                        Hide();
+                        dialogueBoxController.Hide();
                     }
                     else if (rightButtonAction == RightButtonAction.ShowButtonRing)
                     {
@@ -196,16 +246,12 @@ namespace Nova
             dialogueState.state = DialogueState.State.Normal;
 
             // Handle hyperlinks on any button or touch
-            Camera uiCamera = UICameraHelper.Active;
-            foreach (var dec in dialogueText.dialogueEntryControllers)
+            var link = dialogueBoxController.FindIntersectingLink(RealInput.mousePosition, UICameraHelper.Active);
+            if (!string.IsNullOrEmpty(link))
             {
-                string link = dec.FindIntersectingLink(RealInput.mousePosition, uiCamera);
-                if (!string.IsNullOrEmpty(link))
-                {
-                    Application.OpenURL(link);
-                    skipTouchOnPointerUp = true;
-                    return;
-                }
+                Application.OpenURL(link);
+                skipTouchOnPointerUp = true;
+                return;
             }
 
             skipTouchOnPointerUp = false;
@@ -272,18 +318,18 @@ namespace Nova
             dialogueState.state = DialogueState.State.Normal;
 
             bool isAnimating = NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
-            bool textIsAnimating = textAnimation.isPlaying;
+            bool textIsAnimating = NovaAnimation.IsPlayingAny(AnimationType.Text);
 
             if (!isAnimating && !textIsAnimating)
             {
-                NextPageOrStep();
+                dialogueBoxController.NextPageOrStep();
                 return;
             }
 
             // When user clicks, text animation should stop, independent of canAbortAnimation
             if (textIsAnimating)
             {
-                textAnimation.Stop();
+                NovaAnimation.StopAll(AnimationType.Text);
             }
 
             if (!scriptCanAbortAnimation)
@@ -310,9 +356,39 @@ namespace Nova
             if (isAnimating)
             {
                 NovaAnimation.StopAll(AnimationType.PerDialogue);
-
-                dialogueFinished.SetActive(true);
+                dialogueBoxController.ShowDialogueFinishIcon();
             }
         }
+
+        #region Restoration
+
+        public string restorableObjectName => "gameViewInput";
+
+        [Serializable]
+        private class GameViewInputRestoreData : IRestoreData
+        {
+            public readonly bool canClickForward;
+            public readonly bool scriptCanAbortAnimation;
+
+            public GameViewInputRestoreData(bool canClickForward, bool scriptCanAbortAnimation)
+            {
+                this.canClickForward = canClickForward;
+                this.scriptCanAbortAnimation = scriptCanAbortAnimation;
+            }
+        }
+
+        public IRestoreData GetRestoreData()
+        {
+            return new GameViewInputRestoreData(canClickForward, scriptCanAbortAnimation);
+        }
+
+        public void Restore(IRestoreData restoreData)
+        {
+            var data = restoreData as GameViewInputRestoreData;
+            canClickForward = data.canClickForward;
+            scriptCanAbortAnimation = data.scriptCanAbortAnimation;
+        }
+
+        #endregion
     }
 }
