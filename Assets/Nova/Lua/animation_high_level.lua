@@ -241,6 +241,7 @@ function get_color(obj)
 end
 
 function parse_color(color, is_vector)
+    local Type, default, default_alpha
     if is_vector then
         Type = Vector4
         default = Vector4.zero

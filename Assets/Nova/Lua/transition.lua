@@ -204,8 +204,7 @@ local function parse_shader_layer(shader_layer, default_layer_id)
         return nil, default_layer_id
     elseif type(shader_layer) == 'string' then
         return shader_layer, default_layer_id
-    else
-        -- type(shader_layer) == 'table'
+    else -- type(shader_layer) == 'table'
         return shader_layer[1], shader_layer[2]
     end
 end
@@ -217,8 +216,7 @@ local function parse_times(times)
         return 1, Nova.AnimationEntry.LinearEasing()
     elseif type(times) == 'number' then
         return times, Nova.AnimationEntry.LinearEasing()
-    else
-        -- type(times) == 'table'
+    else -- type(times) == 'table'
         return times[1], parse_easing(times[2])
     end
 end
