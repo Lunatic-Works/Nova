@@ -86,11 +86,11 @@ namespace Nova
         #endregion
 
         [Serializable]
-        private class TimelineRestoreData : PrefabRestoreData
+        private class TimelineControllerRestoreData : PrefabLoaderRestoreData
         {
             public readonly float time;
 
-            public TimelineRestoreData(PrefabRestoreData baseData, float time) : base(baseData)
+            public TimelineControllerRestoreData(PrefabLoaderRestoreData baseData, float time) : base(baseData)
             {
                 this.time = time;
             }
@@ -108,15 +108,15 @@ namespace Nova
                 time = 0.0f;
             }
 
-            return new TimelineRestoreData(base.GetRestoreData() as PrefabRestoreData, time);
+            return new TimelineControllerRestoreData(base.GetRestoreData() as PrefabLoaderRestoreData, time);
         }
 
         public override void Restore(IRestoreData restoreData)
         {
-            var baseData = restoreData as PrefabRestoreData;
+            var baseData = restoreData as PrefabLoaderRestoreData;
             base.Restore(baseData);
 
-            var data = restoreData as TimelineRestoreData;
+            var data = restoreData as TimelineControllerRestoreData;
             if (playableDirector != null)
             {
                 playableDirector.time = data.time;

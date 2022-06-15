@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Nova
 {
     [Serializable]
-    public class MaterialRestoreData : IRestoreData
+    public class MaterialData
     {
         /// <summary>
         /// if this piece of data comes from a restorable material
@@ -38,7 +38,7 @@ namespace Nova
         /// </summary>
         public readonly Dictionary<string, Vector4Data> textureScaleOffsets = new Dictionary<string, Vector4Data>();
 
-        public MaterialRestoreData(bool isRestorableMaterial, string shaderName)
+        public MaterialData(bool isRestorableMaterial, string shaderName)
         {
             this.isRestorableMaterial = isRestorableMaterial;
             this.shaderName = shaderName;

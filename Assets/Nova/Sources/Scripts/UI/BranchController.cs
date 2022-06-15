@@ -73,7 +73,9 @@ namespace Nova
             }
         }
 
-        public string restorableObjectName => "BranchController";
+        #region Restoration
+
+        public string restorableName => "BranchController";
 
         public IRestoreData GetRestoreData()
         {
@@ -89,5 +91,7 @@ namespace Nova
 
             RemoveAllSelectButton();
         }
+
+        #endregion
     }
 }

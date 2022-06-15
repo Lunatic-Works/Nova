@@ -716,7 +716,7 @@ namespace Nova
         {
             try
             {
-                restorables.Add(restorable.restorableObjectName, restorable);
+                restorables.Add(restorable.restorableName, restorable);
             }
             catch (ArgumentException e)
             {
@@ -730,7 +730,7 @@ namespace Nova
         /// <param name="restorable">The restorable to be removed</param>
         public void RemoveRestorable(IRestorable restorable)
         {
-            restorables.Remove(restorable.restorableObjectName);
+            restorables.Remove(restorable.restorableName);
         }
 
         /// <summary>

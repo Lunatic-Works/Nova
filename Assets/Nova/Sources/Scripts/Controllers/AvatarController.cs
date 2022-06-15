@@ -144,24 +144,26 @@ namespace Nova
             set => SetColor(_color = value);
         }
 
+        #region Restoration
+
+        public override string restorableName => luaGlobalName;
+
         [Serializable]
-        private class AvatarRestoreData : CompositeSpriteControllerBaseRestoreData
+        private class AvatarControllerRestoreData : CompositeSpriteControllerBaseRestoreData
         {
             // No need to save characterName, because it will be set in the action of the dialogue entry
             public readonly Dictionary<string, string> characterToImageName;
 
-            public AvatarRestoreData(CompositeSpriteControllerBaseRestoreData baseData,
+            public AvatarControllerRestoreData(CompositeSpriteControllerBaseRestoreData baseData,
                 Dictionary<string, string> characterToImageName) : base(baseData)
             {
                 this.characterToImageName = characterToImageName;
             }
         }
 
-        public override string restorableObjectName => luaGlobalName;
-
         public override IRestoreData GetRestoreData()
         {
-            return new AvatarRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
+            return new AvatarControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
                 characterToImageName);
         }
 
@@ -174,8 +176,10 @@ namespace Nova
             base.Restore(baseData);
             currentImageName = currentImageNameOld;
 
-            var data = restoreData as AvatarRestoreData;
+            var data = restoreData as AvatarControllerRestoreData;
             characterToImageName = data.characterToImageName;
         }
+
+        #endregion
     }
 }

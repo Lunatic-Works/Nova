@@ -4,13 +4,13 @@ using UnityEngine;
 namespace Nova
 {
     [Serializable]
-    public class TransformRestoreData : IRestoreData
+    public class TransformData
     {
         public readonly Vector3Data localPosition;
         public readonly Vector4Data localRotation;
         public readonly Vector3Data localScale;
 
-        public TransformRestoreData(Transform transform)
+        public TransformData(Transform transform)
         {
             localPosition = transform.localPosition;
             localRotation = transform.localRotation;

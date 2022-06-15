@@ -67,38 +67,39 @@ namespace Nova
 
         #endregion
 
+        #region Restoration
+
+        public string restorableName => luaName;
+        public RestorablePriority priority => RestorablePriority.Early;
+
         [Serializable]
-        protected class PrefabRestoreData : IRestoreData
+        protected class PrefabLoaderRestoreData : IRestoreData
         {
             public readonly string currentPrefabName;
-            public readonly TransformRestoreData transformRestoreData;
+            public readonly TransformData transformData;
 
-            public PrefabRestoreData(string currentPrefabName, Transform transform)
+            public PrefabLoaderRestoreData(string currentPrefabName, Transform transform)
             {
                 this.currentPrefabName = currentPrefabName;
-                transformRestoreData = new TransformRestoreData(transform);
+                transformData = new TransformData(transform);
             }
 
-            public PrefabRestoreData(PrefabRestoreData baseData)
+            public PrefabLoaderRestoreData(PrefabLoaderRestoreData baseData)
             {
                 currentPrefabName = baseData.currentPrefabName;
-                transformRestoreData = baseData.transformRestoreData;
+                transformData = baseData.transformData;
             }
         }
 
-        public string restorableObjectName => luaName;
-
-        public RestorablePriority priority => RestorablePriority.Early;
-
         public virtual IRestoreData GetRestoreData()
         {
-            return new PrefabRestoreData(currentPrefabName, transform);
+            return new PrefabLoaderRestoreData(currentPrefabName, transform);
         }
 
         public virtual void Restore(IRestoreData restoreData)
         {
-            var data = restoreData as PrefabRestoreData;
-            data.transformRestoreData.Restore(transform);
+            var data = restoreData as PrefabLoaderRestoreData;
+            data.transformData.Restore(transform);
             if (!string.IsNullOrEmpty(data.currentPrefabName))
             {
                 SetPrefab(data.currentPrefabName);
@@ -108,5 +109,7 @@ namespace Nova
                 ClearPrefab();
             }
         }
+
+        #endregion
     }
 }

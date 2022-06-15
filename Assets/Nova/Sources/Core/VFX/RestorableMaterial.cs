@@ -75,7 +75,7 @@ namespace Nova
             textureNames[propertyName] = texturePath;
         }
 
-        private static void AddMaterialPropertyData(Material mat, MaterialRestoreData data,
+        private static void AddMaterialPropertyData(Material mat, MaterialData data,
             string name, ShaderPropertyType type)
         {
             switch (type)
@@ -106,7 +106,7 @@ namespace Nova
             }
         }
 
-        public static MaterialRestoreData GetRestoreData(Material material)
+        public static MaterialData GetRestoreData(Material material)
         {
             if (material == null || material.shader == null) return null;
 
@@ -117,7 +117,7 @@ namespace Nova
                 return null;
             }
 
-            var data = new MaterialRestoreData(material is RestorableMaterial, material.shader.name);
+            var data = new MaterialData(material is RestorableMaterial, material.shader.name);
             foreach (var p in properties)
             {
                 var name = p.Key;
@@ -128,7 +128,7 @@ namespace Nova
             return data;
         }
 
-        public static Material RestoreMaterialFromData(MaterialRestoreData data, MaterialFactory factory)
+        public static Material Restore(MaterialData data, MaterialFactory factory)
         {
             Assert.IsNotNull(factory);
             // no data supplied, return nothing

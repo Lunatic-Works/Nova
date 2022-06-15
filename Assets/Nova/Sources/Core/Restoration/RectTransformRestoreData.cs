@@ -4,12 +4,12 @@ using UnityEngine;
 namespace Nova
 {
     [Serializable]
-    public class RectTransformRestoreData : IRestoreData
+    public class RectTransformData
     {
         public readonly Vector4Data anchor;
         public readonly Vector4Data offset;
 
-        public RectTransformRestoreData(RectTransform rect)
+        public RectTransformData(RectTransform rect)
         {
             anchor = new Vector4Data(rect.anchorMin, rect.anchorMax);
             offset = new Vector4Data(rect.offsetMin, rect.offsetMax);

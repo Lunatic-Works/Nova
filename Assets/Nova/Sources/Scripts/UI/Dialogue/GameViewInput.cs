@@ -362,7 +362,7 @@ namespace Nova
 
         #region Restoration
 
-        public string restorableObjectName => "gameViewInput";
+        public string restorableName => "GameViewInput";
 
         [Serializable]
         private class GameViewInputRestoreData : IRestoreData

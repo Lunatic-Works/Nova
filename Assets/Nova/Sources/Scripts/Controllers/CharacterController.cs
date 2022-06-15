@@ -265,32 +265,32 @@ namespace Nova
 
         #region Restoration
 
+        public override string restorableName => luaGlobalName;
+
         [Serializable]
-        private class CharacterRestoreData : CompositeSpriteControllerBaseRestoreData
+        private class CharacterControllerRestoreData : CompositeSpriteControllerBaseRestoreData
         {
             public readonly Vector4Data environmentColor;
             public readonly int layer;
 
-            public CharacterRestoreData(CompositeSpriteControllerBaseRestoreData baseData, Color environmentColor,
-                int layer) : base(baseData)
+            public CharacterControllerRestoreData(CompositeSpriteControllerBaseRestoreData baseData,
+                Color environmentColor, int layer) : base(baseData)
             {
                 this.environmentColor = environmentColor;
                 this.layer = layer;
             }
         }
 
-        public override string restorableObjectName => luaGlobalName;
-
         public override IRestoreData GetRestoreData()
         {
-            return new CharacterRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
+            return new CharacterControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
                 environmentColor, layer);
         }
 
         public override void Restore(IRestoreData restoreData)
         {
             base.Restore(restoreData);
-            var data = restoreData as CharacterRestoreData;
+            var data = restoreData as CharacterControllerRestoreData;
             environmentColor = data.environmentColor;
             layer = data.layer;
         }

@@ -265,6 +265,8 @@ namespace Nova
 
         #region Restoration
 
+        public string restorableName => "LogController";
+
         [Serializable]
         private class LogControllerRestoreData : IRestoreData
         {
@@ -275,8 +277,6 @@ namespace Nova
                 this.logParams = logParams;
             }
         }
-
-        public string restorableObjectName => "logController";
 
         public IRestoreData GetRestoreData()
         {
@@ -312,7 +312,7 @@ namespace Nova
 
                 this.RuntimeAssert(TryGetCheckpoint(data.logParams[0], false, out var entry),
                     "The earliest log in each restore data must point at another checkpoint.");
-                data = entry.restoreDatas[restorableObjectName] as LogControllerRestoreData;
+                data = entry.restoreDatas[restorableName] as LogControllerRestoreData;
             }
 
             Clear();

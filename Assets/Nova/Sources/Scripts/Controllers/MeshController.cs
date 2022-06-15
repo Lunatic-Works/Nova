@@ -39,28 +39,32 @@ namespace Nova
             set => meshRenderer.enabled = value;
         }
 
+        #region Restoration
+
+        public string restorableName => luaGlobalName;
+
         [Serializable]
-        private class MeshRestoreData : IRestoreData
+        private class MeshControllerRestoreData : IRestoreData
         {
             public readonly bool meshEnabled;
 
-            public MeshRestoreData(bool meshEnabled)
+            public MeshControllerRestoreData(bool meshEnabled)
             {
                 this.meshEnabled = meshEnabled;
             }
         }
 
-        public string restorableObjectName => luaGlobalName;
-
         public IRestoreData GetRestoreData()
         {
-            return new MeshRestoreData(meshEnabled);
+            return new MeshControllerRestoreData(meshEnabled);
         }
 
         public void Restore(IRestoreData restoreData)
         {
-            var data = restoreData as MeshRestoreData;
+            var data = restoreData as MeshControllerRestoreData;
             meshEnabled = data.meshEnabled;
         }
+
+        #endregion
     }
 }

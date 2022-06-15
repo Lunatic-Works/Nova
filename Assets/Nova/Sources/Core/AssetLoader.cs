@@ -192,8 +192,8 @@ namespace Nova
 
         #region Restoration
 
+        public string restorableName => "AssetLoader";
         public RestorablePriority priority => RestorablePriority.Preload;
-        public string restorableObjectName => "AssetLoader";
 
         [Serializable]
         private class AssetLoaderRestoreData : IRestoreData

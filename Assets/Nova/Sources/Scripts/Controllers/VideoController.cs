@@ -66,27 +66,29 @@ namespace Nova
 
         #endregion
 
+        #region Restoration
+
+        public string restorableName => luaName;
+
         [Serializable]
-        private class VideoRestoreData : IRestoreData
+        private class VideoControllerRestoreData : IRestoreData
         {
             public readonly string currentVideoName;
 
-            public VideoRestoreData(string currentVideoName)
+            public VideoControllerRestoreData(string currentVideoName)
             {
                 this.currentVideoName = currentVideoName;
             }
         }
 
-        public string restorableObjectName => luaName;
-
         public IRestoreData GetRestoreData()
         {
-            return new VideoRestoreData(currentVideoName);
+            return new VideoControllerRestoreData(currentVideoName);
         }
 
         public void Restore(IRestoreData restoreData)
         {
-            var data = restoreData as VideoRestoreData;
+            var data = restoreData as VideoControllerRestoreData;
             if (!string.IsNullOrEmpty(data.currentVideoName))
             {
                 SetVideo(data.currentVideoName);
@@ -96,5 +98,7 @@ namespace Nova
                 ClearVideo();
             }
         }
+
+        #endregion
     }
 }

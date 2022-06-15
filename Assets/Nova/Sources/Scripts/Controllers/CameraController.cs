@@ -98,41 +98,43 @@ namespace Nova
         }
 
         [Serializable]
-        private class CameraRestoreData : IRestoreData
+        private class CameraData
         {
-            public readonly TransformRestoreData transformRestoreData;
+            public readonly TransformData transformData;
             public readonly float size;
             public readonly int cullingMask;
 
-            public CameraRestoreData(Transform transform, float size, int cullingMask)
+            public CameraData(Transform transform, float size, int cullingMask)
             {
-                transformRestoreData = new TransformRestoreData(transform);
+                transformData = new TransformData(transform);
                 this.size = size;
                 this.cullingMask = cullingMask;
             }
         }
 
+        #region Restoration
+
+        public string restorableName => luaGlobalName;
+
         [Serializable]
         private class CameraControllerRestoreData : IRestoreData
         {
-            public readonly CameraRestoreData cameraRestoreData;
-            public readonly CameraRestoreData overridingCameraRestoreData;
+            public readonly CameraData cameraData;
+            public readonly CameraData overridingCameraData;
 
             public CameraControllerRestoreData(CameraController cameraController)
             {
                 var currentOverridingCamera = cameraController.overridingCamera;
                 cameraController.overridingCamera = null;
-                cameraRestoreData = new CameraRestoreData(cameraController.transform, cameraController.size,
+                cameraData = new CameraData(cameraController.transform, cameraController.size,
                     cameraController.cullingMask);
                 cameraController.overridingCamera = currentOverridingCamera;
-                overridingCameraRestoreData = cameraController.overridingCamera != null
-                    ? new CameraRestoreData(cameraController.transform, cameraController.size,
+                overridingCameraData = cameraController.overridingCamera != null
+                    ? new CameraData(cameraController.transform, cameraController.size,
                         cameraController.cullingMask)
                     : null;
             }
         }
-
-        public string restorableObjectName => luaGlobalName;
 
         public IRestoreData GetRestoreData()
         {
@@ -144,17 +146,19 @@ namespace Nova
             var data = restoreData as CameraControllerRestoreData;
             var currentOverridingCamera = overridingCamera;
             overridingCamera = null;
-            data.cameraRestoreData.transformRestoreData.Restore(transform);
-            size = data.cameraRestoreData.size;
-            cullingMask = data.cameraRestoreData.cullingMask;
+            data.cameraData.transformData.Restore(transform);
+            size = data.cameraData.size;
+            cullingMask = data.cameraData.cullingMask;
             overridingCamera = currentOverridingCamera;
 
-            if (currentOverridingCamera != null && data.overridingCameraRestoreData != null)
+            if (currentOverridingCamera != null && data.overridingCameraData != null)
             {
-                data.overridingCameraRestoreData.transformRestoreData.Restore(transform);
-                size = data.overridingCameraRestoreData.size;
-                cullingMask = data.overridingCameraRestoreData.cullingMask;
+                data.overridingCameraData.transformData.Restore(transform);
+                size = data.overridingCameraData.size;
+                cullingMask = data.overridingCameraData.cullingMask;
             }
         }
+
+        #endregion
     }
 }

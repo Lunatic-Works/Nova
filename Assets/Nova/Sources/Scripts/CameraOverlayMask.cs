@@ -96,33 +96,35 @@ namespace Nova
             }
         }
 
+        #region Restoration
+
+        public string restorableName => luaGlobalName;
+
         [Serializable]
         private class CameraOverlayMaskRestoreData : IRestoreData
         {
-            public readonly MaterialRestoreData materialRestoreData;
+            public readonly MaterialData materialData;
 
-            public CameraOverlayMaskRestoreData(MaterialRestoreData materialRestoreData)
+            public CameraOverlayMaskRestoreData(MaterialData materialData)
             {
-                this.materialRestoreData = materialRestoreData;
+                this.materialData = materialData;
             }
         }
-
-        public string restorableObjectName => luaGlobalName;
 
         public IRestoreData GetRestoreData()
         {
             // BlitMaterial must be RestorableMaterial or null
-            MaterialRestoreData materialRestoreData;
+            MaterialData materialData;
             if (blitMaterial is RestorableMaterial)
             {
-                materialRestoreData = RestorableMaterial.GetRestoreData(blitMaterial);
+                materialData = RestorableMaterial.GetRestoreData(blitMaterial);
             }
             else
             {
-                materialRestoreData = null;
+                materialData = null;
             }
 
-            return new CameraOverlayMaskRestoreData(materialRestoreData);
+            return new CameraOverlayMaskRestoreData(materialData);
         }
 
         public void Restore(IRestoreData restoreData)
@@ -130,15 +132,17 @@ namespace Nova
             var data = restoreData as CameraOverlayMaskRestoreData;
 
             // BlitMaterial must be RestorableMaterial or null
-            if (data.materialRestoreData != null)
+            if (data.materialData != null)
             {
                 MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
-                blitMaterial = RestorableMaterial.RestoreMaterialFromData(data.materialRestoreData, factory);
+                blitMaterial = RestorableMaterial.Restore(data.materialData, factory);
             }
             else
             {
                 blitMaterial = null;
             }
         }
+
+        #endregion
     }
 }

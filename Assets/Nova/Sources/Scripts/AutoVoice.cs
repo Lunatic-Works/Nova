@@ -96,6 +96,8 @@ namespace Nova
 
         #region Restoration
 
+        public string restorableName => luaName;
+
         [Serializable]
         private class AutoVoiceRestoreData : IRestoreData
         {
@@ -108,8 +110,6 @@ namespace Nova
                 this.nameToIndex = nameToIndex.ToDictionary(x => x.Key, x => x.Value);
             }
         }
-
-        public string restorableObjectName => luaName;
 
         public IRestoreData GetRestoreData()
         {

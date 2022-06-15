@@ -210,18 +210,22 @@ namespace Nova
 
         #endregion
 
+        #region Restoration
+
+        public string restorableName => luaGlobalName;
+
         /// <inheritdoc />
         /// <summary>
         /// Data used to restore the state of the audio controller
         /// </summary>
         [Serializable]
-        private class AudioRestoreData : IRestoreData
+        private class AudioControllerRestoreData : IRestoreData
         {
             public readonly string currentAudioName;
             public readonly bool isPlaying;
             public readonly float scriptVolume;
 
-            public AudioRestoreData(string currentAudioName, bool isPlaying, float scriptVolume)
+            public AudioControllerRestoreData(string currentAudioName, bool isPlaying, float scriptVolume)
             {
                 this.currentAudioName = currentAudioName;
                 this.isPlaying = isPlaying;
@@ -229,19 +233,19 @@ namespace Nova
             }
         }
 
-        public string restorableObjectName => luaGlobalName;
-
         public IRestoreData GetRestoreData()
         {
-            return new AudioRestoreData(currentAudioName, isPlaying, scriptVolume);
+            return new AudioControllerRestoreData(currentAudioName, isPlaying, scriptVolume);
         }
 
         public void Restore(IRestoreData restoreData)
         {
-            var data = restoreData as AudioRestoreData;
+            var data = restoreData as AudioControllerRestoreData;
             currentAudioName = data.currentAudioName;
             isPlaying = data.isPlaying;
             scriptVolume = data.scriptVolume;
         }
+
+        #endregion
     }
 }

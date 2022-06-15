@@ -719,12 +719,12 @@ namespace Nova
 
         #region Restoration
 
-        public string restorableObjectName => "dialogueBoxController";
+        public string restorableName => "DialogueBoxController";
 
         [Serializable]
-        private class DialogueBoxRestoreData : IRestoreData
+        private class DialogueBoxControllerRestoreData : IRestoreData
         {
-            public readonly RectTransformRestoreData rectTransformRestoreData;
+            public readonly RectTransformData rectTransformData;
             public readonly Vector4Data backgroundColor;
             public readonly DialogueUpdateMode dialogueUpdateMode;
             public readonly List<DialogueDisplayData> displayDatas;
@@ -736,12 +736,12 @@ namespace Nova
             public readonly bool closeButtonShown;
             public readonly bool dialogueFinishIconShown;
 
-            public DialogueBoxRestoreData(RectTransform rect, Color backgroundColor,
+            public DialogueBoxControllerRestoreData(RectTransform rect, Color backgroundColor,
                 DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, Theme theme,
                 int textAlignment, bool textColorHasSet, Color textColor, string materialName, bool closeButtonShown,
                 bool dialogueFinishIconShown)
             {
-                rectTransformRestoreData = new RectTransformRestoreData(rect);
+                rectTransformData = new RectTransformData(rect);
                 this.backgroundColor = backgroundColor;
                 this.dialogueUpdateMode = dialogueUpdateMode;
                 this.displayDatas = displayDatas;
@@ -758,15 +758,15 @@ namespace Nova
         public IRestoreData GetRestoreData()
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
-            return new DialogueBoxRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas, theme,
+            return new DialogueBoxControllerRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas, theme,
                 (int)textAlignment, textColorHasSet, textColor, materialName, closeButtonShown,
                 dialogueFinishIconShown);
         }
 
         public void Restore(IRestoreData restoreData)
         {
-            var data = restoreData as DialogueBoxRestoreData;
-            data.rectTransformRestoreData.Restore(rect);
+            var data = restoreData as DialogueBoxControllerRestoreData;
+            data.rectTransformData.Restore(rect);
             backgroundColor = data.backgroundColor;
 
             dialogueUpdateMode = data.dialogueUpdateMode;

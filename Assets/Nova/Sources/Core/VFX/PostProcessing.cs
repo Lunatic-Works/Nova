@@ -138,18 +138,18 @@ namespace Nova
 
         #region Restoration
 
+        public string restorableName => luaName;
+
         [Serializable]
         private class PostProcessingRestoreData : IRestoreData
         {
-            public readonly List<MaterialRestoreData> layersData;
+            public readonly List<MaterialData> layersData;
 
-            public PostProcessingRestoreData(List<MaterialRestoreData> layersData)
+            public PostProcessingRestoreData(List<MaterialData> layersData)
             {
                 this.layersData = layersData;
             }
         }
-
-        public string restorableObjectName => luaName;
 
         public IRestoreData GetRestoreData()
         {
@@ -165,9 +165,9 @@ namespace Nova
             // Materials must be RestorableMaterial
             MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
             layers.Clear();
-            foreach (var materialRestoreData in data.layersData)
+            foreach (var materialData in data.layersData)
             {
-                var material = RestorableMaterial.RestoreMaterialFromData(materialRestoreData, factory);
+                var material = RestorableMaterial.Restore(materialData, factory);
                 layers.Add(material);
             }
         }

@@ -143,7 +143,7 @@ namespace Nova
         protected class CompositeSpriteControllerBaseRestoreData : IRestoreData
         {
             public readonly string currentImageName;
-            public readonly TransformRestoreData transformRestoreData;
+            public readonly TransformData transformData;
             public readonly Vector4Data color;
             public readonly int renderQueue;
 
@@ -151,7 +151,7 @@ namespace Nova
                 int renderQueue)
             {
                 this.currentImageName = currentImageName;
-                transformRestoreData = new TransformRestoreData(transform);
+                transformData = new TransformData(transform);
                 this.color = color;
                 this.renderQueue = renderQueue;
             }
@@ -159,13 +159,13 @@ namespace Nova
             public CompositeSpriteControllerBaseRestoreData(CompositeSpriteControllerBaseRestoreData baseData)
             {
                 currentImageName = baseData.currentImageName;
-                transformRestoreData = baseData.transformRestoreData;
+                transformData = baseData.transformData;
                 color = baseData.color;
                 renderQueue = baseData.renderQueue;
             }
         }
 
-        public abstract string restorableObjectName { get; }
+        public abstract string restorableName { get; }
 
         public virtual IRestoreData GetRestoreData()
         {
@@ -176,7 +176,7 @@ namespace Nova
         public virtual void Restore(IRestoreData restoreData)
         {
             var data = restoreData as CompositeSpriteControllerBaseRestoreData;
-            data.transformRestoreData.Restore(transform);
+            data.transformData.Restore(transform);
             color = data.color;
             RenderQueueOverrider.Ensure(gameObject).renderQueue = data.renderQueue;
             SetPose(data.currentImageName, false);

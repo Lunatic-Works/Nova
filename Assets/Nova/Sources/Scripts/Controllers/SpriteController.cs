@@ -182,59 +182,61 @@ namespace Nova
             sprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, currentImageName));
         }
 
+        #region Restoration
+
+        public string restorableName => luaGlobalName;
+
         [Serializable]
-        private class SpriteRestoreData : IRestoreData
+        private class SpriteControllerRestoreData : IRestoreData
         {
             public readonly string currentImageName;
-            public readonly TransformRestoreData transformRestoreData;
+            public readonly TransformData transformData;
             public readonly Vector4Data color;
-            public readonly MaterialRestoreData materialRestoreData;
+            public readonly MaterialData materialData;
             public readonly int renderQueue;
             public readonly int layer;
 
-            public SpriteRestoreData(string currentImageName, Transform transform, Color color,
-                MaterialRestoreData materialRestoreData, int renderQueue, int layer)
+            public SpriteControllerRestoreData(string currentImageName, Transform transform, Color color,
+                MaterialData materialData, int renderQueue, int layer)
             {
                 this.currentImageName = currentImageName;
-                transformRestoreData = new TransformRestoreData(transform);
+                transformData = new TransformData(transform);
                 this.color = color;
-                this.materialRestoreData = materialRestoreData;
+                this.materialData = materialData;
                 this.renderQueue = renderQueue;
                 this.layer = layer;
             }
         }
 
-        public string restorableObjectName => luaGlobalName;
-
         public IRestoreData GetRestoreData()
         {
             // Material must be RestorableMaterial or defaultMaterial
-            MaterialRestoreData materialRestoreData;
+            MaterialData materialData;
             if (sharedMaterial is RestorableMaterial)
             {
-                materialRestoreData = RestorableMaterial.GetRestoreData(sharedMaterial);
+                materialData = RestorableMaterial.GetRestoreData(sharedMaterial);
             }
             else
             {
-                materialRestoreData = null;
+                materialData = null;
             }
 
             int renderQueue = RenderQueueOverrider.Ensure(gameObject).renderQueue;
 
-            return new SpriteRestoreData(currentImageName, transform, color, materialRestoreData, renderQueue, layer);
+            return new SpriteControllerRestoreData(currentImageName, transform, color, materialData, renderQueue, layer);
         }
 
         public void Restore(IRestoreData restoreData)
         {
-            var data = restoreData as SpriteRestoreData;
-            data.transformRestoreData.Restore(transform);
+            var data = restoreData as SpriteControllerRestoreData;
+            data.transformData.Restore(transform);
             color = data.color;
 
             // Material must be RestorableMaterial or defaultMaterial
-            if (data.materialRestoreData != null)
+            if (data.materialData != null)
             {
                 MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
-                material = RestorableMaterial.RestoreMaterialFromData(data.materialRestoreData, factory);
+                material = RestorableMaterial.Restore(data.materialData, factory);
             }
             else
             {
@@ -258,5 +260,7 @@ namespace Nova
                 ClearImage(fade: false);
             }
         }
+
+        #endregion
     }
 }
