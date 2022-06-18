@@ -27,8 +27,10 @@ namespace Nova
     public enum AbstractKeyGroup
     {
         None = 0,
-        Game = 1,
-        UI = 2,
-        All = 3
+        Game = 1 << 0,
+        UI = 1 << 1,
+        Editor = 1 << 2,
+        Always = 1 << 3,
+        All = Game | UI | Editor | Always
     }
 }
