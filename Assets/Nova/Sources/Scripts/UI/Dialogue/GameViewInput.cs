@@ -14,7 +14,7 @@ namespace Nova
         private GameState gameState;
         private DialogueState dialogueState;
         private ConfigManager configManager;
-        private InputMapper inputMapper;
+        private InputSystemManager inputManager;
 
         private ButtonRingTrigger buttonRingTrigger;
 
@@ -29,7 +29,7 @@ namespace Nova
             gameState = gameController.GameState;
             dialogueState = gameController.DialogueState;
             configManager = gameController.ConfigManager;
-            inputMapper = gameController.InputMapper;
+            inputManager = gameController.InputManager;
 
             buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
 
@@ -59,52 +59,52 @@ namespace Nova
 
         private void HandleShortcutWhenDialogueShown()
         {
-            if (inputMapper.GetKeyUp(AbstractKey.Auto))
+            if (inputManager.IsTriggered(AbstractKey.Auto))
             {
                 dialogueState.state = DialogueState.State.Auto;
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.Save))
+            if (inputManager.IsTriggered(AbstractKey.Save))
             {
                 saveViewController.ShowSave();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.Load))
+            if (inputManager.IsTriggered(AbstractKey.Load))
             {
                 saveViewController.ShowLoad();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.QuickSave))
+            if (inputManager.IsTriggered(AbstractKey.QuickSave))
             {
                 saveViewController.QuickSaveBookmark();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.QuickLoad))
+            if (inputManager.IsTriggered(AbstractKey.QuickLoad))
             {
                 saveViewController.QuickLoadBookmark();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.ToggleDialogue))
+            if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
                 dialogueBoxController.Hide();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.StepForward))
+            if (inputManager.IsTriggered(AbstractKey.StepForward))
             {
                 ClickForward();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.ShowLog))
+            if (inputManager.IsTriggered(AbstractKey.ShowLog))
             {
                 logController.Show();
             }
 
-            dialogueState.fastForwardHotKeyHolding = inputMapper.GetKey(AbstractKey.FastForward);
+            dialogueState.fastForwardHotKeyHolding = inputManager.IsTriggered(AbstractKey.FastForward);
         }
 
         private void HandleShortcutWhenDialogueHidden()
         {
-            if (inputMapper.GetKeyUp(AbstractKey.ToggleDialogue))
+            if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
                 dialogueBoxController.Show();
             }
@@ -115,7 +115,7 @@ namespace Nova
         {
             if (buttonRingTrigger.buttonShowing)
             {
-                if (inputMapper.GetKeyUp(AbstractKey.LeaveView))
+                if (inputManager.IsTriggered(AbstractKey.LeaveView))
                 {
                     buttonRingTrigger.Hide(false);
                 }

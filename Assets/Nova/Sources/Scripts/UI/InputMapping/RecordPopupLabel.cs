@@ -17,7 +17,7 @@ namespace Nova
 
         private void Update()
         {
-            label.text = entry.key.ToString();
+            label.text = entry.binding.ToString();
         }
     }
 }

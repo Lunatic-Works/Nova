@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.Utilities;
 
 namespace Nova
 {
@@ -9,24 +12,25 @@ namespace Nova
     {
         public AbstractKeyList abstractKeyList;
         public InputMappingList inputMappingList;
-        public CompoundKeyRecorder compoundKeyRecorder;
+        // public CompoundKeyRecorder compoundKeyRecorder;
 
-        private AbstractKeyboardData keyboardData;
+        // private AbstractKeyboardData keyboardData;
+        private ActionAssetData actionAsset;
 
-        private InputMapper _inputMapper;
+        private InputSystemManager _inputManager;
 
-        private InputMapper inputMapper
+        private InputSystemManager inputManager
         {
             get
             {
-                if (_inputMapper == null)
+                if (_inputManager == null)
                 {
-                    _inputMapper = Utils.FindNovaGameController().InputMapper;
-                    _inputMapper.Init();
+                    _inputManager = Utils.FindNovaGameController().InputManager;
+                    _inputManager.Init();
                     RefreshData();
                 }
 
-                return _inputMapper;
+                return _inputManager;
             }
         }
 
@@ -34,7 +38,7 @@ namespace Nova
         public IEnumerable<AbstractKey> mappableKeys => Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>();
 #else
         public IEnumerable<AbstractKey> mappableKeys => Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>()
-            .Where(ak => !inputMapper.keyIsEditor[ak]);
+            .Where(ak => !inputManager.KeyIsEditor(ak));
 #endif
 
         private AbstractKey _currentSelectedKey;
@@ -55,17 +59,18 @@ namespace Nova
             }
         }
 
-        public List<CompoundKey> currentCompoundKeys => keyboardData[currentSelectedKey];
+        public InputAction currentAction => actionAsset.GetAction(currentSelectedKey);
+        public bool IsRebinding { get; private set; }
 
         public void DeleteCompoundKey(int index)
         {
-            currentCompoundKeys.RemoveAt(index);
+            currentAction.ChangeBinding(index).Erase();
             inputMappingList.Refresh();
         }
 
         public void AddCompoundKey()
         {
-            currentCompoundKeys.Add(new CompoundKey());
+            currentAction.AddBinding();
             var lastEntry = inputMappingList.Refresh();
             StartModifyCompoundKey(lastEntry);
         }
@@ -76,7 +81,7 @@ namespace Nova
             _currentSelectedKey = mappableKeys.First();
             abstractKeyList.RefreshAll();
             inputMappingList.Refresh();
-            compoundKeyRecorder.Init(this);
+            // compoundKeyRecorder.Init(this);
         }
 
         private void OnDisable()
@@ -86,13 +91,13 @@ namespace Nova
 
         private void RefreshData()
         {
-            keyboardData = inputMapper.keyboard.Data.GetCopy();
+            actionAsset = inputManager.CloneActionAsset();
         }
 
         public void Apply()
         {
-            inputMapper.keyboard.Data = keyboardData;
-            inputMapper.Save();
+            inputManager.OverrideActionAsset(actionAsset.data);
+            inputManager.Save();
         }
 
         public void RestoreAll()
@@ -103,34 +108,51 @@ namespace Nova
 
         public void RestoreCurrentKeyMapping()
         {
-            keyboardData[currentSelectedKey] =
-                inputMapper.keyboard.Data[currentSelectedKey].Select(key => new CompoundKey(key)).ToList();
+            currentAction.LoadBindingOverridesFromJson(
+                inputManager.actionAsset.GetAction(currentSelectedKey).SaveBindingOverridesAsJson());
             ResolveDuplicate();
             inputMappingList.Refresh();
         }
 
         public void ResetDefault()
         {
-            keyboardData = inputMapper.GetDefaultKeyboardData();
+            actionAsset.data.RemoveAllBindingOverrides();
             inputMappingList.Refresh();
         }
 
         public void ResetCurrentKeyMappingDefault()
         {
-            keyboardData[currentSelectedKey] = inputMapper.GetDefaultCompoundKeys(currentSelectedKey);
+            currentAction.RemoveAllBindingOverrides();
             ResolveDuplicate();
             inputMappingList.Refresh();
         }
 
         public void StartModifyCompoundKey(InputMappingListEntry entry)
         {
-            compoundKeyRecorder.BeginRecording(entry);
+            IsRebinding = true;
+            currentAction.PerformInteractiveRebinding()
+                .WithExpectedControlType<ButtonControl>()
+                .WithExpectedControlType<KeyControl>()
+                .WithTargetBinding(entry.index)
+                .Start()
+                .OnComplete(operation =>
+                {
+                    IsRebinding = false;
+                    operation.Dispose();
+                })
+                .OnCancel(operation =>
+                {
+                    IsRebinding = false;
+                    operation.Dispose();
+                });
         }
 
         // In all abstract keys other than currentSelectedKey that have any same group as currentSelectedKey,
         // remove any compound key that is in currentSelectedKey
         public void ResolveDuplicate()
         {
+            // TODO: Implement
+            /*
             foreach (var ak in keyboardData.Keys.ToList())
             {
                 if (ak == currentSelectedKey)
@@ -138,13 +160,13 @@ namespace Nova
                     continue;
                 }
 
-                if ((inputMapper.keyGroups[ak] & inputMapper.keyGroups[currentSelectedKey]) == 0)
+                if ((inputManager.keyGroups[ak] & inputManager.keyGroups[currentSelectedKey]) == 0)
                 {
                     continue;
                 }
 
-                keyboardData[ak] = keyboardData[ak].Where(key => !currentCompoundKeys.Contains(key)).ToList();
-            }
+                keyboardData[ak] = keyboardData[ak].Where(key => !currentAction.Contains(key)).ToList();
+            }*/
         }
     }
 }

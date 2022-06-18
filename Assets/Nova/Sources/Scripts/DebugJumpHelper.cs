@@ -6,7 +6,7 @@ namespace Nova
     {
         private GameState gameState;
         private DialogueState dialogueState;
-        private InputMapper inputMapper;
+        private InputSystemManager inputManager;
         private ViewManager viewManager;
 
         private void Awake()
@@ -14,7 +14,7 @@ namespace Nova
             var gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
             dialogueState = gameController.DialogueState;
-            inputMapper = gameController.InputMapper;
+            inputManager = gameController.InputManager;
             viewManager = Utils.FindViewManager();
         }
 
@@ -25,22 +25,22 @@ namespace Nova
                 return;
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorBackward))
+            if (inputManager.IsTriggered(AbstractKey.EditorBackward))
             {
                 MoveBackward();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorBeginChapter))
+            if (inputManager.IsTriggered(AbstractKey.EditorBeginChapter))
             {
                 JumpChapter(0);
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorPreviousChapter))
+            if (inputManager.IsTriggered(AbstractKey.EditorPreviousChapter))
             {
                 JumpChapter(-1);
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorNextChapter))
+            if (inputManager.IsTriggered(AbstractKey.EditorNextChapter))
             {
                 JumpChapter(1);
             }

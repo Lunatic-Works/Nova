@@ -11,7 +11,7 @@
                     "id": "97518737-f6e5-4e52-b2f7-e53d1d2fc506",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -20,7 +20,7 @@
                     "id": "92a46dc0-453a-4666-9de8-883c06876c65",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -38,7 +38,7 @@
                     "id": "85569b9c-0c57-4872-8a36-f99714b4e4fd",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -47,7 +47,7 @@
                     "id": "a92328a6-5459-4764-be99-02e914f88d25",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -56,7 +56,7 @@
                     "id": "627177ba-de96-4285-a826-a5df6e6815fc",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -65,7 +65,7 @@
                     "id": "c9c9db54-8ca8-49ab-b089-2ce20add2fcf",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -74,7 +74,7 @@
                     "id": "9c2946bf-47fe-46f6-ab70-58e3b18b337c",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -83,7 +83,7 @@
                     "id": "544b3e00-c037-40d4-803e-3494c1bec7f3",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
@@ -92,7 +92,7 @@
                     "name": "",
                     "id": "5362a006-d294-4d89-827b-d789d73a8b9c",
                     "path": "<Keyboard>/enter",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "StepForward",
@@ -103,7 +103,7 @@
                     "name": "",
                     "id": "5acc9ceb-9d7e-48a6-b9ce-24b7cc14cb43",
                     "path": "<Keyboard>/numpadEnter",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "StepForward",
@@ -114,7 +114,7 @@
                     "name": "",
                     "id": "420ecd55-0df9-4d09-85d0-8b22e2bf0548",
                     "path": "<Keyboard>/rightArrow",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "StepForward",
@@ -125,7 +125,7 @@
                     "name": "",
                     "id": "8f404172-ba2b-436d-9d5c-01d98f682bba",
                     "path": "<Keyboard>/downArrow",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "StepForward",
@@ -136,7 +136,7 @@
                     "name": "",
                     "id": "feade573-fff2-41dd-bd5c-bb46cfc47039",
                     "path": "<Keyboard>/a",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Auto",
@@ -147,7 +147,7 @@
                     "name": "",
                     "id": "cf7c3290-d63a-4767-9a4c-fc116c9ad206",
                     "path": "<Keyboard>/ctrl",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "FastForward",
@@ -158,7 +158,7 @@
                     "name": "",
                     "id": "a2f14355-a8c3-4cf1-ab58-418da3df5f21",
                     "path": "<Keyboard>/f2",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Save",
@@ -169,7 +169,7 @@
                     "name": "",
                     "id": "1f9d881f-a173-41ee-971e-d71410cf0225",
                     "path": "<Keyboard>/f3",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Load",
@@ -180,7 +180,7 @@
                     "name": "",
                     "id": "36c4d00d-fb1a-4cbe-8f77-fc78b65a8232",
                     "path": "<Keyboard>/f9",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "QuickSave",
@@ -191,7 +191,7 @@
                     "name": "",
                     "id": "09b717e5-ac69-44c7-aabd-7e9281d379e6",
                     "path": "<Keyboard>/f10",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "QuickLoad",
@@ -202,7 +202,7 @@
                     "name": "",
                     "id": "8c3de28e-b588-42e0-8d28-a985558f3268",
                     "path": "<Keyboard>/escape",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ToggleDialogue",
@@ -213,7 +213,7 @@
                     "name": "",
                     "id": "ea5e4dda-97b4-43d8-b433-aa4a3eab5bc5",
                     "path": "<Keyboard>/upArrow",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ShowLog",
@@ -232,7 +232,7 @@
                     "id": "619a9afb-57ff-40d0-bdd2-e72d1959274e",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
@@ -241,7 +241,18 @@
                     "name": "",
                     "id": "4793c7e1-6f36-4028-9194-7eca7a7265c5",
                     "path": "<Keyboard>/escape",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeaveView",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "421fffe9-07b0-4b1f-a881-c1f91ad107f5",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "LeaveView",
@@ -260,7 +271,7 @@
                     "id": "ba4a6554-acba-4119-9cce-dd67f109f99f",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -269,7 +280,7 @@
                     "id": "b6796573-2607-4ef6-b06d-6958c3b7c74c",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -278,7 +289,7 @@
                     "id": "3b6ac5b3-c8f4-4788-8ee3-57d0f686973a",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -287,7 +298,7 @@
                     "id": "b15aab3f-f151-4d29-87f1-d4b6880744be",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -296,7 +307,7 @@
                     "id": "6728966f-e7b3-4cbf-801b-09e49a36aa4c",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -305,7 +316,7 @@
                     "id": "50528df2-f11a-4d9f-a581-73ac487e1006",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
@@ -314,7 +325,7 @@
                     "name": "",
                     "id": "19c7c4d3-be2c-4baf-87b4-052044f1a445",
                     "path": "<Keyboard>/leftArrow",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Backward",
@@ -325,7 +336,7 @@
                     "name": "",
                     "id": "f3eda912-6dba-4b23-b06c-15092b16672d",
                     "path": "<Keyboard>/equals",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "BeginChapter",
@@ -336,7 +347,7 @@
                     "name": "",
                     "id": "61c63c47-e51c-44f0-9c5c-8efd241955a1",
                     "path": "<Keyboard>/leftBracket",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "PreviousChapter",
@@ -347,7 +358,7 @@
                     "name": "",
                     "id": "0d6292d8-2a4f-4f68-9ffa-027a4903d785",
                     "path": "<Keyboard>/rightBracket",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "NextChapter",
@@ -358,7 +369,7 @@
                     "name": "",
                     "id": "36ca22a3-f08f-4d32-8400-56dfbad78dab",
                     "path": "<Keyboard>/r",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ReloadScripts",
@@ -369,7 +380,7 @@
                     "name": "",
                     "id": "45ff6577-3893-48e5-96cb-04d8c6577f97",
                     "path": "<Keyboard>/f",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "RerunAction",
@@ -388,7 +399,7 @@
                     "id": "55d742f2-1c5d-40e5-8984-6be8a8a681c6",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
@@ -397,7 +408,7 @@
                     "name": "",
                     "id": "d125ba94-d955-47b1-9b3f-b3b88108beb5",
                     "path": "<Keyboard>/f11",
-                    "interactions": "Press(behavior=1)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ToggleFullScreen",

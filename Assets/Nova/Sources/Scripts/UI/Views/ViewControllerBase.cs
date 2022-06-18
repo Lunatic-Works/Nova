@@ -12,7 +12,7 @@ namespace Nova
         public ViewManager viewManager { get; private set; }
 
         protected List<UIViewTransitionBase> transitions;
-        protected InputMapper inputMapper;
+        protected InputSystemManager inputManager;
 
         private bool inited;
 
@@ -28,7 +28,7 @@ namespace Nova
             viewManager = GetComponentInParent<ViewManager>();
             this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");
             viewManager.SetController(this);
-            inputMapper = Utils.FindNovaGameController().InputMapper;
+            inputManager = Utils.FindNovaGameController().InputManager;
 
             inited = true;
             return false;
@@ -132,8 +132,6 @@ namespace Nova
             viewManager.UpdateView(false);
         }
 
-        private bool backHotKeyHolding;
-
         protected virtual void BackHide()
         {
             Hide();
@@ -141,18 +139,9 @@ namespace Nova
 
         protected virtual void OnActivatedUpdate()
         {
-            // TODO: elegant way to handle a key down and a key up event
-            if (inputMapper.GetKey(AbstractKey.LeaveView) || Input.GetMouseButton(1))
+            if (inputManager.IsTriggered(AbstractKey.LeaveView))
             {
-                backHotKeyHolding = true;
-            }
-            else
-            {
-                if (backHotKeyHolding)
-                {
-                    backHotKeyHolding = false;
-                    BackHide();
-                }
+                BackHide();
             }
         }
 
