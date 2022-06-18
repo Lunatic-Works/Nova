@@ -33,7 +33,7 @@ namespace Nova
             // Show cursor and disable keyboard navigation when mouse moves or clicks
             var cursorPosition = RealInput.mousePosition;
             if (cursorPosition != lastCursorPosition ||
-                Mouse.current.allControls.Any(control => control.IsPressed()))
+                Mouse.current?.allControls.Any(control => control.IsPressed()) == true)
             {
                 Cursor.visible = true;
                 lastCursorPosition = cursorPosition;
