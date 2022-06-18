@@ -1,3 +1,7 @@
+// Migrated to Input System and this class is no longer used.
+// Commented out to prevent compiler errors.
+
+/*
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -38,17 +42,17 @@ namespace Nova
             {
                 entry.FinishModify();
 
-                if (entry.key.isNone)
+                if (entry.binding.isNone)
                 {
                     controller.DeleteCompoundKey(entry.index);
                 }
                 else
                 {
                     int duplicatedIndex = -1;
-                    for (int i = 0; i < controller.currentCompoundKeys.Count; ++i)
+                    for (int i = 0; i < controller.currentAction.Count; ++i)
                     {
                         // Assuming there can be at most one duplicated key
-                        if (i != entry.index && controller.currentCompoundKeys[i].Equals(entry.key))
+                        if (i != entry.index && controller.currentAction[i].Equals(entry.binding))
                         {
                             duplicatedIndex = i;
                             break;
@@ -94,7 +98,7 @@ namespace Nova
         private void WaitPress()
         {
             if (!AnyKeyPressing) return;
-            entry.key.Clear();
+            entry.binding.Clear();
             isPressing = true;
             HandlePress();
         }
@@ -107,7 +111,7 @@ namespace Nova
                 return;
             }
 
-            var compoundKey = entry.key;
+            var compoundKey = entry.binding;
             var dirty = false;
 
             if (CompoundKey.CtrlIsHolding)
@@ -168,3 +172,4 @@ namespace Nova
         }
     }
 }
+*/

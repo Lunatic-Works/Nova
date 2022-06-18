@@ -1,7 +1,7 @@
-﻿using Nova.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Nova.Exceptions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -257,7 +257,7 @@ namespace Nova
             var gameController = FindNovaGameController();
             gameController.CheckpointManager.UpdateGlobalSave();
             gameController.ConfigManager.Apply();
-            gameController.InputMapper.Save();
+            gameController.InputManager.Save();
         }
 
         public static void QuitWithConfirm()

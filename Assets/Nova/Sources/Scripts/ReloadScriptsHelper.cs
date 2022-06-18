@@ -6,7 +6,7 @@ namespace Nova
     {
         private GameState gameState;
         private DialogueState dialogueState;
-        private InputMapper inputMapper;
+        private InputSystemManager inputManager;
         private ViewManager viewManager;
 
         private void Awake()
@@ -14,7 +14,7 @@ namespace Nova
             var gameController = Utils.FindNovaGameController();
             gameState = gameController.GameState;
             dialogueState = gameController.DialogueState;
-            inputMapper = gameController.InputMapper;
+            inputManager = gameController.InputManager;
             viewManager = Utils.FindViewManager();
         }
 
@@ -25,12 +25,12 @@ namespace Nova
                 return;
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorReloadScripts))
+            if (inputManager.IsTriggered(AbstractKey.EditorReloadScripts))
             {
                 ReloadScripts();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorRerunAction))
+            if (inputManager.IsTriggered(AbstractKey.EditorRerunAction))
             {
                 RerunAction();
             }

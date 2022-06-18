@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Nova
@@ -12,7 +13,7 @@ namespace Nova
         private InputMappingController controller;
 
         public int index { get; private set; }
-        public CompoundKey key { get; private set; }
+        public InputBinding binding { get; private set; }
 
         private void Awake()
         {
@@ -26,14 +27,14 @@ namespace Nova
 
         private void RefreshLabel()
         {
-            label.text = key.ToString();
+            label.text = binding.ToString();
         }
 
         public void Init(InputMappingController controller, int index)
         {
             this.controller = controller;
             this.index = index;
-            key = controller.currentCompoundKeys[index];
+            binding = controller.currentAction.bindings[index];
             RefreshDisplay();
         }
 

@@ -34,7 +34,7 @@ namespace Nova
         public InputMappingListEntry Refresh()
         {
             ClearContent();
-            var cnt = controller.currentCompoundKeys.Count;
+            var cnt = controller.currentAction.bindings.Count;
             InputMappingListEntry entry = null;
             for (var i = 0; i < cnt; i++)
             {

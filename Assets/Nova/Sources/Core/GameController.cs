@@ -11,7 +11,7 @@ namespace Nova
         public DialogueState DialogueState { get; private set; }
         public CheckpointManager CheckpointManager { get; private set; }
         public ConfigManager ConfigManager { get; private set; }
-        public InputMapper InputMapper { get; private set; }
+        public InputSystemManager InputManager { get; private set; }
         public CursorManager CursorManager { get; private set; }
         public AssetLoader AssetLoader { get; private set; }
         public CheckpointHelper CheckpointHelper { get; private set; }
@@ -25,7 +25,7 @@ namespace Nova
             DialogueState = FindComponent<DialogueState>();
             CheckpointManager = FindComponent<CheckpointManager>();
             ConfigManager = FindComponent<ConfigManager>();
-            InputMapper = FindComponent<InputMapper>();
+            InputManager = FindComponent<InputSystemManager>();
             CursorManager = FindComponent<CursorManager>();
             AssetLoader = FindComponent<AssetLoader>();
             CheckpointHelper = FindComponent<CheckpointHelper>();
@@ -61,14 +61,14 @@ namespace Nova
         public void DisableInput()
         {
             inputEnabled = false;
-            InputMapper.SetEnableGroup(AbstractKeyGroup.None);
-            InputMapper.SetEnable(AbstractKey.StepForward, true);
+            InputManager.SetEnableGroup(AbstractKeyGroup.None);
+            InputManager.SetEnable(AbstractKey.StepForward, true);
         }
 
         public void EnableInput()
         {
             inputEnabled = true;
-            InputMapper.SetEnableGroup(AbstractKeyGroup.Game | AbstractKeyGroup.UI);
+            InputManager.SetEnableGroup(AbstractKeyGroup.All);
         }
     }
 }

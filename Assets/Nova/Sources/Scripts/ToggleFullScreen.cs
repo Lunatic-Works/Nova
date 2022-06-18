@@ -4,16 +4,16 @@ namespace Nova
 {
     public class ToggleFullScreen : MonoBehaviour
     {
-        private InputMapper inputMapper;
+        private InputSystemManager inputManager;
 
         private void Awake()
         {
-            inputMapper = Utils.FindNovaGameController().InputMapper;
+            inputManager = Utils.FindNovaGameController().InputManager;
         }
 
         private void Update()
         {
-            if (inputMapper.GetKeyUp(AbstractKey.ToggleFullScreen))
+            if (inputManager.IsTriggered(AbstractKey.ToggleFullScreen))
             {
                 GameRenderManager.SwitchFullScreen();
             }

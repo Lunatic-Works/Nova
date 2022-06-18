@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,11 +11,9 @@ namespace Nova
         private static string BindingsFilePath => Path.Combine(InputFilesDirectory, "bindings.json");
 
         private PlayerInput playerInput;
-        private readonly Dictionary<AbstractKey, AbstractKeyGroup> actionGroupsDic = new();
-        private readonly Dictionary<AbstractKey, InputAction> actionsDic = new();
-        private readonly Dictionary<AbstractKeyGroup, InputActionMap> actionMapsDic = new();
+        public ActionAssetData actionAsset { get; private set; }
 
-        private void LoadBindings()
+        private void Load()
         {
             if (File.Exists(BindingsFilePath))
             {
@@ -26,96 +22,74 @@ namespace Nova
             }
         }
 
-        private void SaveBindings()
+        public void Save()
         {
             var json = playerInput.actions.SaveBindingOverridesAsJson();
             File.WriteAllText(BindingsFilePath, json);
         }
 
-        private string GetActionPath(AbstractKey key)
-        {
-            var group = actionGroupsDic[key];
-            return $"{group}/{key}";
-        }
-
         private void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
+            Init();
         }
 
         private void OnDestroy()
         {
-            SaveBindings();
+            Save();
         }
 
         public void Init()
         {
-            LoadBindings();
-            actionGroupsDic.Clear();
-            foreach (var action in playerInput.actions)
-            {
-                if (!Enum.TryParse(action.name, out AbstractKey key))
-                {
-                    Debug.LogError($"Unknown action name: {action.name}");
-                }
-                else if (actionGroupsDic.ContainsKey(key))
-                {
-                    Debug.LogError($"Duplicate action key: {action.name}");
-                }
-                else if (!Enum.TryParse(action.actionMap.name, out AbstractKeyGroup group))
-                {
-                    Debug.LogError($"Unknown action group: {action.actionMap.name}");
-                }
-                else
-                {
-                    actionGroupsDic[key] = group;
-                    actionsDic[key] = action;
-                }
-            }
-            foreach (var key in Enum.GetValues(typeof(AbstractKey)))
-            {
-                if (!actionsDic.ContainsKey((AbstractKey)key))
-                {
-                    Debug.LogError($"Missing action key: {key}");
-                }
-            }
-            foreach (var key in playerInput.actions.actionMaps)
-            {
-                if (!Enum.TryParse(key.name, out AbstractKeyGroup group))
-                {
-                    Debug.LogError($"Unknown action group: {key.name}");
-                }
-                else
-                {
-                    actionMapsDic[group] = key;
-                }
-            }
+            if (actionAsset != null) return;
+
+            actionAsset = new ActionAssetData(playerInput.actions);
+            Load();
         }
 
         public void SetEnableGroup(AbstractKeyGroup group)
         {
-            for (int i = 0; i < playerInput.actions.actionMaps.Count; i++)
+            foreach (var actionMap in actionAsset.GetActionMaps(group))
+                actionMap.Enable();
+
+            foreach (var actionMap in actionAsset.GetActionMaps(AbstractKeyGroup.All ^ group))
+                actionMap.Disable();
+        }
+
+        public void SetEnable(AbstractKey key, bool enable)
+        {
+            if (!actionAsset.TryGetAction(key, out var action))
             {
-                var map = playerInput.actions.actionMaps[i];
-                if ((((int)group >> i) & 1) > 0)
-                {
-                    map.Enable();
-                }
-                else
-                {
-                    map.Disable();
-                }
+                Debug.LogError($"Missing action key: {key}");
+                return;
+            }
+            if (enable)
+            {
+                action.Enable();
+            }
+            else
+            {
+                action.Disable();
             }
         }
 
-        public InputActionMap GetActionMap(AbstractKeyGroup group)
+        public bool IsTriggered(AbstractKey key)
         {
-            return actionMapsDic[group];
+            if (!actionAsset.TryGetAction(key, out var action))
+            {
+                Debug.LogError($"Missing action key: {key}");
+                return false;
+            }
+            return action.triggered;
         }
 
-        public InputAction GetAction(AbstractKey key)
-        {
-            return actionsDic[key];
-        }
+        public bool KeyIsEditor(AbstractKey key)
+            => actionAsset.KeyIsEditor(key);
+
+        public ActionAssetData CloneActionAsset()
+            => actionAsset.Clone();
+
+        public void OverrideActionAsset(InputActionAsset asset)
+            => actionAsset.data.LoadBindingOverridesFromJson(asset.ToJson());
     }
 }
