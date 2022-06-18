@@ -5,6 +5,7 @@ using Nova.Exceptions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.InputSystem;
 using UnityObject = UnityEngine.Object;
 
 namespace Nova
@@ -379,28 +380,28 @@ namespace Nova
             return action != null ? new Action(() => action.Invoke(value)) : null;
         }
 
-        public static bool GetKeyInEditor(KeyCode key)
+        public static bool GetKeyInEditor(Key key)
         {
 #if UNITY_EDITOR
-            return Input.GetKey(key);
+            return Keyboard.current?[key].isPressed ?? false;
 #else
             return false;
 #endif
         }
 
-        public static bool GetKeyDownInEditor(KeyCode key)
+        public static bool GetKeyDownInEditor(Key key)
         {
 #if UNITY_EDITOR
-            return Input.GetKeyDown(key);
+            return Keyboard.current?[key].wasPressedThisFrame ?? false;
 #else
             return false;
 #endif
         }
 
-        public static bool GetKeyUpInEditor(KeyCode key)
+        public static bool GetKeyUpInEditor(Key key)
         {
 #if UNITY_EDITOR
-            return Input.GetKeyUp(key);
+            return Keyboard.current?[key].wasReleasedThisFrame ?? false;
 #else
             return false;
 #endif

@@ -1,7 +1,9 @@
 ﻿// TODO: check on all platforms that when a touch is detected, the platform will hide the cursor
 
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Nova
 {
@@ -9,7 +11,7 @@ namespace Nova
     {
         public float hideAfterSeconds = 5.0f;
 
-        private Vector3 lastCursorPosition;
+        private Vector2 lastCursorPosition;
         private float idleTime;
 
         private void Awake()
@@ -31,7 +33,7 @@ namespace Nova
             // Show cursor and disable keyboard navigation when mouse moves or clicks
             var cursorPosition = RealInput.mousePosition;
             if (cursorPosition != lastCursorPosition ||
-                Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
+                Mouse.current.allControls.Any(control => control.IsPressed()))
             {
                 Cursor.visible = true;
                 lastCursorPosition = cursorPosition;

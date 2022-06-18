@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Nova
 {
@@ -12,7 +13,7 @@ namespace Nova
 
         private void Update()
         {
-            if (Input.anyKey)
+            if (Keyboard.current?.anyKey.isPressed == true)
             {
                 NovaAnimation.StopAll(AnimationType.UI);
             }

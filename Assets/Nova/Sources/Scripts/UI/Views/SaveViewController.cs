@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 namespace Nova
 {
@@ -468,7 +469,7 @@ namespace Nova
 
         private void OnThumbnailButtonClicked(int saveID)
         {
-            if (Input.touchCount == 0) // Mouse
+            if (Touch.activeTouches.Count == 0) // Mouse
             {
                 if (saveViewMode == SaveViewMode.Save)
                 {
@@ -540,7 +541,7 @@ namespace Nova
                 return;
             }
 
-            if (Input.touchCount == 0) // Mouse
+            if (Touch.activeTouches.Count == 0) // Mouse
             {
                 if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
                 {
@@ -556,7 +557,7 @@ namespace Nova
                 return;
             }
 
-            if (Input.touchCount == 0) // Mouse
+            if (Touch.activeTouches.Count == 0) // Mouse
             {
                 selectedSaveID = -1;
             }

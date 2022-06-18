@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Nova
 {
@@ -276,7 +277,7 @@ namespace Nova
 
         private void HandleInput()
         {
-            if (Input.mousePresent && (
+            if (Mouse.current != null && (
                     RealInput.mousePosition.x < 0 || RealInput.mousePosition.x > RealScreen.width ||
                     RealInput.mousePosition.y < 0 || RealInput.mousePosition.y > RealScreen.height))
             {
@@ -291,7 +292,7 @@ namespace Nova
 
             if (viewManager.currentView == CurrentViewType.Game)
             {
-                float scroll = Input.mouseScrollDelta.y;
+                float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
                 if (scroll > 0)
                 {
                     dialogueState.state = DialogueState.State.Normal;

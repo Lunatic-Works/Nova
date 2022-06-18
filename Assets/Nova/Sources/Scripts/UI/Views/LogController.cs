@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Nova
@@ -244,19 +245,19 @@ namespace Nova
         {
             base.OnActivatedUpdate();
 
-            if (Input.mouseScrollDelta.y < 0 && Mathf.Approximately(scrollRect.verticalScrollbar.value, 0f))
+            if (Mouse.current?.scroll.ReadValue().y < 0 && Mathf.Approximately(scrollRect.verticalScrollbar.value, 0f))
             {
                 Hide();
             }
 
             // TODO: fully support keyboard navigation
-            if (Input.GetKey(KeyCode.UpArrow))
+            if (Keyboard.current?[Key.UpArrow].isPressed == true)
             {
                 Cursor.visible = false;
                 scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.down;
             }
 
-            if (Input.GetKey(KeyCode.DownArrow))
+            if (Keyboard.current?[Key.DownArrow].isPressed == true)
             {
                 Cursor.visible = false;
                 scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.up;
