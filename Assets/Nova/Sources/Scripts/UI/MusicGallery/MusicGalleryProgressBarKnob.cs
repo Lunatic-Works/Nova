@@ -21,7 +21,7 @@ namespace Nova
         private void Update()
         {
             // IPointerUpHandler has undesired behaviour
-            if (bar.isDragged && Mouse.current.leftButton.wasReleasedThisFrame)
+            if (bar.isDragged && Mouse.current?.leftButton.wasReleasedThisFrame == true)
             {
                 bar.isDragged = false;
             }
