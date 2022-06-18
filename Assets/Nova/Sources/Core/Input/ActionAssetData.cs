@@ -118,6 +118,6 @@ namespace Nova
             => actionGroupsDic.TryGetValue(key, out var group) && group == AbstractKeyGroup.Editor;
 
         public ActionAssetData Clone()
-            => new ActionAssetData(data.Clone());
+            => new ActionAssetData(InputActionAsset.FromJson(data.ToJson()));
     }
 }

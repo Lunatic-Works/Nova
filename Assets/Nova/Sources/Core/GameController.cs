@@ -32,8 +32,11 @@ namespace Nova
             InputHelper = FindComponent<InputHelper>();
             PerDialogueAnimation = FindComponent<NovaAnimation>("NovaAnimation/PerDialogue");
             HoldingAnimation = FindComponent<NovaAnimation>("NovaAnimation/Holding");
+        }
 
-            inputEnabled = true;
+        private void Start()
+        {
+            EnableInput();
         }
 
         private static T AssertNotNull<T>(T component, string name) where T : MonoBehaviour

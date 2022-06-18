@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Nova
 {
@@ -20,7 +21,7 @@ namespace Nova
         private void Update()
         {
             // IPointerUpHandler has undesired behaviour
-            if (bar.isDragged && Input.GetMouseButtonUp(0))
+            if (bar.isDragged && Mouse.current.leftButton.wasReleasedThisFrame)
             {
                 bar.isDragged = false;
             }

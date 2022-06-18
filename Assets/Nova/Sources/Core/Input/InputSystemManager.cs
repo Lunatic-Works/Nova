@@ -1,6 +1,7 @@
 using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 namespace Nova
 {
@@ -43,6 +44,8 @@ namespace Nova
         {
             if (actionAsset != null) return;
 
+            EnhancedTouchSupport.Enable();
+            TouchSimulation.Enable();
             actionAsset = new ActionAssetData(playerInput.actions);
             Load();
         }

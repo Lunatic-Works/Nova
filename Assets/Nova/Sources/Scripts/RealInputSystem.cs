@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Nova
 {
@@ -35,6 +36,7 @@ namespace Nova
     {
         // Valid even if the cursor is hidden
         // TODO: may not be needed in newer unity engine
-        public static Vector3 mousePosition => Input.mousePosition - (Vector3)RealScreen.offset;
+        // TODO(Input System): Confirm if this is the intended behavior
+        public static Vector2 mousePosition => (Mouse.current?.position.ReadValue() ?? Vector2.positiveInfinity) - RealScreen.offset;
     }
 }

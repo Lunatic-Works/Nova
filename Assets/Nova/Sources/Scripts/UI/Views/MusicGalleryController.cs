@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.InputSystem;
 
 namespace Nova
 {
@@ -214,7 +215,7 @@ namespace Nova
         {
             base.OnActivatedUpdate();
 
-            if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
+            if (Utils.GetKeyDownInEditor(Key.LeftShift))
             {
                 UnlockAllMusics();
             }
