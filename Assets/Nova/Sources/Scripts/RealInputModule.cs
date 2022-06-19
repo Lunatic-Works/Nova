@@ -1,8 +1,8 @@
-﻿using UnityEngine.EventSystems;
+﻿using UnityEngine.InputSystem.UI;
 
 namespace Nova
 {
-    public class RealInputModule : StandaloneInputModule
+    public class RealInputModule : InputSystemUIInputModule
     {
         protected override void Awake()
         {
