@@ -100,7 +100,8 @@ namespace Nova
                 logController.Show();
             }
 
-            dialogueState.fastForwardHotKeyHolding = inputManager.IsTriggered(AbstractKey.FastForward);
+            dialogueState.fastForwardHotKeyHolding =
+                inputManager.actionAsset.GetAction(AbstractKey.FastForward).IsPressed();
         }
 
         private void HandleShortcutWhenDialogueHidden()
