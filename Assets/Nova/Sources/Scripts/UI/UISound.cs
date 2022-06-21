@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 
 namespace Nova
 {
@@ -19,10 +20,11 @@ namespace Nova
             viewManager = Utils.FindViewManager();
         }
 
-        public void OnPointerDown(PointerEventData eventData)
+        public void OnPointerDown(PointerEventData _eventData)
         {
+            var eventData = (ExtendedPointerEventData)_eventData;
             // Only mouse left button or touch plays sound
-            if (eventData.pointerId < -1)
+            if (eventData.touchId == 0 && eventData.button != PointerEventData.InputButton.Left)
             {
                 return;
             }
@@ -30,10 +32,11 @@ namespace Nova
             viewManager.TryPlaySound(mouseDown);
         }
 
-        public void OnPointerUp(PointerEventData eventData)
+        public void OnPointerUp(PointerEventData _eventData)
         {
+            var eventData = (ExtendedPointerEventData)_eventData;
             // Only mouse left button or touch plays sound
-            if (eventData.pointerId < -1)
+            if (eventData.touchId == 0 && eventData.button != PointerEventData.InputButton.Left)
             {
                 return;
             }

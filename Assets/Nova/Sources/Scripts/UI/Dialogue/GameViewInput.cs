@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 
 namespace Nova
 {
@@ -140,12 +141,13 @@ namespace Nova
         private bool skipNextTouch;
         private bool skipTouchOnPointerUp;
 
-        public void OnPointerUp(PointerEventData eventData)
+        public void OnPointerUp(PointerEventData _eventData)
         {
+            var eventData = (ExtendedPointerEventData)_eventData;
             if (!gameController.inputEnabled)
             {
                 // Touch finger
-                if (eventData.pointerId >= 0)
+                if (eventData.touchId > 0)
                 {
                     ClickForward();
                 }
@@ -167,14 +169,15 @@ namespace Nova
 
             if (buttonRingTrigger.buttonShowing)
             {
-                buttonRingTrigger.Hide(!buttonRingTrigger.holdOpen || eventData.pointerId != -2);
+                buttonRingTrigger.Hide(!buttonRingTrigger.holdOpen
+                    || eventData.button != PointerEventData.InputButton.Right);
                 return;
             }
 
             // Mouse right button
             // We do not use two-finger tap to simulate right button
-            // if (eventData.pointerId == -2 || Input.touchCount == 2)
-            if (eventData.pointerId == -2)
+            // if (eventData.button == PointerEventData.InputButton.Right || Input.touchCount == 2)
+            if (eventData.button == PointerEventData.InputButton.Right)
             {
                 if (!buttonRingTrigger.buttonShowing)
                 {
@@ -207,7 +210,7 @@ namespace Nova
             {
                 // Touch finger
                 // (consequent touch will be converted to 1 / 2 / ... due to unknown reason)
-                if (eventData.pointerId >= 0)
+                if (eventData.touchId > 0)
                 {
                     if (!buttonRingTrigger.buttonShowing && !skipNextTouch && !skipTouchOnPointerUp)
                     {
@@ -221,12 +224,13 @@ namespace Nova
             }
         }
 
-        public void OnPointerDown(PointerEventData eventData)
+        public void OnPointerDown(PointerEventData _eventData)
         {
+            var eventData = (ExtendedPointerEventData)_eventData;
             if (!gameController.inputEnabled)
             {
                 // Mouse left button
-                if (eventData.pointerId == -1)
+                if (eventData.touchId == 0 && eventData.button == PointerEventData.InputButton.Left)
                 {
                     ClickForward();
                 }
@@ -259,13 +263,13 @@ namespace Nova
             skipTouchOnPointerUp = false;
 
             // Mouse left button
-            if (eventData.pointerId == -1)
+            if (eventData.touchId == 0 && eventData.button == PointerEventData.InputButton.Left)
             {
                 ClickForward();
             }
 
             // Mouse right button or touch finger
-            if (eventData.pointerId == -2 || eventData.pointerId >= 0)
+            if (eventData.touchId > 0 || eventData.button == PointerEventData.InputButton.Right)
             {
                 float r = buttonRingTrigger.sectorRadius * RealScreen.fWidth / 1920 * 0.5f;
                 if (RealInput.mousePosition.x > r && RealInput.mousePosition.x < RealScreen.width - r &&

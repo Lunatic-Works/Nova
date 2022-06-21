@@ -76,7 +76,6 @@ namespace Nova
             path = path.Replace("/Keyboard/", "<Keyboard>/");
             path = path.Replace("/Mouse/", "<Mouse>/");
             path = path.Replace("/Joystick/", "<Joystick>/");
-            Debug.Log(path);
             return path;
         }
 
