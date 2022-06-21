@@ -64,7 +64,7 @@ namespace Nova
         public void DisableInput()
         {
             inputEnabled = false;
-            InputManager.SetEnableGroup(AbstractKeyGroup.None);
+            InputManager.SetEnableGroup(AbstractKeyGroup.Always);
             InputManager.SetEnable(AbstractKey.StepForward, true);
         }
 
