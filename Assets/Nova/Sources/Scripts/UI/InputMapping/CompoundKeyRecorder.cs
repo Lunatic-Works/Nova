@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 namespace Nova
 {
@@ -19,6 +20,42 @@ namespace Nova
             Key.NumLock, Key.CapsLock, Key.ScrollLock, Key.Pause, Key.PrintScreen, Key.NumpadMultiply, Key.NumpadDivide, Key.NumpadEnter, Key.NumpadEquals, Key.NumpadPeriod, Key.NumpadPlus, Key.NumpadMinus, Key.Numpad0, Key.Numpad1, Key.Numpad2, Key.Numpad3, Key.Numpad4, Key.Numpad5, Key.Numpad6, Key.Numpad7, Key.Numpad8, Key.Numpad9,
             Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6, Key.F7, Key.F8, Key.F9, Key.F10, Key.F11, Key.F12,
         };
+        private static IEnumerable<ButtonControl> GetAllowedMouseButtons()
+        {
+            var mouse = Mouse.current;
+            if (mouse == null)
+            {
+                yield break;
+            }
+            yield return mouse.middleButton;
+            yield return mouse.forwardButton;
+            yield return mouse.backButton;
+        }
+
+        private static IEnumerable<ButtonControl> GetAllowedGamepadButtons()
+        {
+            var gamepad = Gamepad.current;
+            if (gamepad == null)
+            {
+                yield break;
+            }
+            yield return gamepad.buttonEast;
+            yield return gamepad.buttonSouth;
+            yield return gamepad.buttonWest;
+            yield return gamepad.buttonNorth;
+            yield return gamepad.leftShoulder;
+            yield return gamepad.rightShoulder;
+            yield return gamepad.leftTrigger;
+            yield return gamepad.rightTrigger;
+            yield return gamepad.startButton;
+            yield return gamepad.selectButton;
+            yield return gamepad.leftStickButton;
+            yield return gamepad.rightStickButton;
+            yield return gamepad.dpad.up;
+            yield return gamepad.dpad.down;
+            yield return gamepad.dpad.left;
+            yield return gamepad.dpad.right;
+        }
 
         public RecordPopupController popupController;
 
@@ -39,6 +76,7 @@ namespace Nova
             path = path.Replace("/Keyboard/", "<Keyboard>/");
             path = path.Replace("/Mouse/", "<Mouse>/");
             path = path.Replace("/Joystick/", "<Joystick>/");
+            Debug.Log(path);
             return path;
         }
 
@@ -138,6 +176,7 @@ namespace Nova
         private void Update()
         {
             if (entry == null) return;
+            // Keyboard input
             var keyboard = Keyboard.current;
             if (keyboard != null)
             {
@@ -168,9 +207,29 @@ namespace Nova
                     {
                         AddControl(keyControl);
                         gameObject.SetActive(false);
+                        return;
                     }
                 }
             }
+
+            // Mouse input
+            var mouseButton = GetAllowedMouseButtons().FirstOrDefault(button => button.wasPressedThisFrame);
+            if (mouseButton != null)
+            {
+                AddControl(mouseButton);
+                gameObject.SetActive(false);
+                return;
+            }
+
+            // Gamepad input
+            foreach (var control in GetAllowedGamepadButtons().Where(control => control.wasPressedThisFrame))
+            {
+                AddControl(control);
+                gameObject.SetActive(false);
+                return;
+            }
+
+            // If any previously pressed key is released, finalize the binding
             if (bindingResult.Count > 0)
             {
                 if (bindingResult.Any(input => !input.IsPressed()))
@@ -182,7 +241,11 @@ namespace Nova
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            gameObject.SetActive(false);
+            if (eventData.button == PointerEventData.InputButton.Left
+                || eventData.button == PointerEventData.InputButton.Right)
+            {
+                gameObject.SetActive(false);
+            }
         }
     }
 }
