@@ -82,3 +82,6 @@ NDependOut/
 __pycache__
 
 !.gitkeep
+
+# VS Code
+.vscode/
