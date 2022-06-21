@@ -34,14 +34,16 @@ namespace Nova
         public InputMappingListEntry Refresh()
         {
             ClearContent();
-            var cnt = controller.currentAction.bindings.Count;
             InputMappingListEntry entry = null;
-            for (var i = 0; i < cnt; i++)
+            foreach (var data in controller.bindingData)
             {
-                entry = Instantiate(entryPrefab, content);
-                entry.Init(controller, i);
+                var newEntry = Instantiate(entryPrefab, content);
+                newEntry.Init(controller, data);
+                if (entry == null || data.startIndex > entry.bindingData.startIndex)
+                {
+                    entry = newEntry;
+                }
             }
-
             return entry;
         }
     }

@@ -1,11 +1,8 @@
-// Migrated to Input System and this class is no longer used.
-// Commented out to prevent compiler errors.
-
-/*
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Nova
 {
@@ -13,60 +10,110 @@ namespace Nova
 
     public class CompoundKeyRecorder : MonoBehaviour, IPointerClickHandler
     {
+        private static readonly Key[] AllowedKeys =
+        {
+            Key.A, Key.B, Key.C, Key.D, Key.E, Key.F, Key.G, Key.H, Key.I, Key.J, Key.K, Key.L, Key.M, Key.N, Key.O, Key.P, Key.Q, Key.R, Key.S, Key.T, Key.U, Key.V, Key.W, Key.X, Key.Y, Key.Z,
+            Key.Digit0, Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9,
+            Key.Space, Key.Enter, Key.Tab, Key.Backquote, Key.Quote, Key.Semicolon, Key.Comma, Key.Period, Key.Slash, Key.Backslash, Key.LeftBracket, Key.RightBracket, Key.Minus, Key.Equals, Key.Backspace, Key.Delete, Key.Insert, Key.Home, Key.End, Key.PageUp, Key.PageDown, Key.UpArrow, Key.DownArrow, Key.LeftArrow, Key.RightArrow,
+            Key.Numpad0, Key.Numpad1, Key.Numpad2, Key.Numpad3, Key.Numpad4, Key.Numpad5, Key.Numpad6, Key.Numpad7, Key.Numpad8, Key.Numpad9,
+            Key.NumLock, Key.CapsLock, Key.ScrollLock, Key.Pause, Key.PrintScreen, Key.NumpadMultiply, Key.NumpadDivide, Key.NumpadEnter, Key.NumpadEquals, Key.NumpadPeriod, Key.NumpadPlus, Key.NumpadMinus, Key.Numpad0, Key.Numpad1, Key.Numpad2, Key.Numpad3, Key.Numpad4, Key.Numpad5, Key.Numpad6, Key.Numpad7, Key.Numpad8, Key.Numpad9,
+            Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6, Key.F7, Key.F8, Key.F9, Key.F10, Key.F11, Key.F12,
+        };
+
         public RecordPopupController popupController;
 
-        private InputMapper inputMapper;
         private InputMappingController controller;
-        private readonly HashSet<KeyCode> prefixKeys = new HashSet<KeyCode>(CompoundKey.PrefixKeys);
+        private InputAction action => controller.currentAction;
+        public bool isRebinding { get; private set; }
+        private bool isCtrl;
+        private bool isAlt;
+        private bool isWin;
+        private bool isShift;
+        private readonly List<InputControl> bindingResult = new List<InputControl>();
         private KeyStatus keyEnabled;
 
-        private void Awake()
+        private static string GetGeneralPath(InputControl control)
         {
-            inputMapper = Utils.FindNovaGameController().InputMapper;
+            var path = control.path;
+            path = path.Replace("/Gamepad/", "<Gamepad>/");
+            path = path.Replace("/Keyboard/", "<Keyboard>/");
+            path = path.Replace("/Mouse/", "<Mouse>/");
+            path = path.Replace("/Joystick/", "<Joystick>/");
+            return path;
+        }
+
+        private void UpdateBinding()
+        {
+            action.ChangeBinding(entry.bindingData.startIndex).Erase();
+            if (bindingResult.Count == 1)
+            {
+                action.AddBinding(GetGeneralPath(bindingResult[0]));
+            }
+            else if (bindingResult.Count == 2)
+            {
+                action.AddCompositeBinding("OneModifier")
+                    .With("Modifier", GetGeneralPath(bindingResult[0]))
+                    .With("Binding", GetGeneralPath(bindingResult[1]));
+            }
+            else if (bindingResult.Count == 3)
+            {
+                action.AddCompositeBinding("TwoModifiers")
+                    .With("Modifier1", GetGeneralPath(bindingResult[0]))
+                    .With("Modifier2", GetGeneralPath(bindingResult[1]))
+                    .With("Binding", GetGeneralPath(bindingResult[2]));
+            }
+            entry.RefreshDisplay();
+        }
+
+        private void AddControl(InputControl control)
+        {
+            if (bindingResult.Count < 3
+                && !bindingResult.Any(input => input.path == control.path))
+            {
+                bindingResult.Add(control);
+                UpdateBinding();
+            }
         }
 
         private void OnEnable()
         {
-            keyEnabled = inputMapper.GetEnabledState();
-            inputMapper.SetEnableGroup(AbstractKeyGroup.None);
             popupController.entry = entry;
             popupController.Show();
+            bindingResult.Clear();
+            isRebinding = true;
+            isCtrl = isAlt = isWin = isShift = false;
+            keyEnabled = controller.inputManager.GetEnabledState();
+            controller.inputManager.SetEnableGroup(AbstractKeyGroup.None);
         }
 
         private void OnDisable()
         {
+            isRebinding = false;
+            isCtrl = isAlt = isWin = isShift = false;
+            controller.inputManager.SetEnabledState(keyEnabled);
+
             popupController.Hide();
-            inputMapper.SetEnabledState(keyEnabled);
 
             if (entry != null)
             {
                 entry.FinishModify();
 
-                if (entry.binding.isNone)
+                if (bindingResult.Count == 0 && string.IsNullOrWhiteSpace(entry.bindingData.displayString))
                 {
-                    controller.DeleteCompoundKey(entry.index);
+                    entry.Delete();
                 }
                 else
                 {
-                    int duplicatedIndex = -1;
-                    for (int i = 0; i < controller.currentAction.Count; ++i)
-                    {
-                        // Assuming there can be at most one duplicated key
-                        if (i != entry.index && controller.currentAction[i].Equals(entry.binding))
-                        {
-                            duplicatedIndex = i;
-                            break;
-                        }
-                    }
+                    var duplicate = controller.bindingData
+                        .FirstOrDefault(data => data != entry.bindingData && data.SameButtonAs(entry.bindingData));
 
-                    if (duplicatedIndex >= 0)
+                    if (duplicate != null)
                     {
-                        controller.DeleteCompoundKey(entry.index);
+                        entry.Delete();
                     }
                     else
                     {
                         controller.ResolveDuplicate();
-                        entry.RefreshDisplay();
                     }
                 }
             }
@@ -80,89 +127,56 @@ namespace Nova
             gameObject.SetActive(false);
         }
 
-        private bool isPressing = false;
         private InputMappingListEntry entry;
 
         public void BeginRecording(InputMappingListEntry entry)
         {
-            isPressing = false;
             this.entry = entry;
             gameObject.SetActive(true);
-        }
-
-        private static bool AnyKeyPressing => CompoundKey.KeyboardKeys.Any(Input.GetKey);
-
-        private static IEnumerable<KeyCode> PressedKey =>
-            CompoundKey.KeyboardKeys.Where(Input.GetKey);
-
-        private void WaitPress()
-        {
-            if (!AnyKeyPressing) return;
-            entry.binding.Clear();
-            isPressing = true;
-            HandlePress();
-        }
-
-        private void HandlePress()
-        {
-            if (!AnyKeyPressing)
-            {
-                gameObject.SetActive(false);
-                return;
-            }
-
-            var compoundKey = entry.binding;
-            var dirty = false;
-
-            if (CompoundKey.CtrlIsHolding)
-            {
-                compoundKey.Ctrl = true;
-                dirty = true;
-            }
-
-            if (CompoundKey.WinIsHolding)
-            {
-                compoundKey.Win = true;
-                dirty = true;
-            }
-
-            if (CompoundKey.AltIsHolding)
-            {
-                compoundKey.Alt = true;
-                dirty = true;
-            }
-
-            if (CompoundKey.ShiftIsHolding)
-            {
-                compoundKey.Shift = true;
-                dirty = true;
-            }
-
-            foreach (var key in PressedKey)
-            {
-                if (!prefixKeys.Contains(key))
-                {
-                    compoundKey.Key = key;
-                    dirty = true;
-                }
-            }
-
-            if (dirty)
-            {
-                entry.RefreshDisplay();
-            }
         }
 
         private void Update()
         {
             if (entry == null) return;
-            if (!isPressing)
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
             {
-                WaitPress();
+                if (!isCtrl && keyboard.ctrlKey.wasPressedThisFrame)
+                {
+                    isCtrl = true;
+                    AddControl(keyboard.ctrlKey);
+                }
+                if (!isAlt && keyboard.altKey.wasPressedThisFrame)
+                {
+                    isAlt = true;
+                    AddControl(keyboard.altKey);
+                }
+                if (!isWin && keyboard.leftWindowsKey.wasPressedThisFrame || keyboard.rightWindowsKey.wasPressedThisFrame)
+                {
+                    isWin = true;
+                    AddControl(keyboard.leftWindowsKey);
+                }
+                if (!isShift && keyboard.shiftKey.wasPressedThisFrame)
+                {
+                    isShift = true;
+                    AddControl(keyboard.shiftKey);
+                }
+                foreach (var key in AllowedKeys)
+                {
+                    var keyControl = keyboard[key];
+                    if (keyControl.wasPressedThisFrame)
+                    {
+                        AddControl(keyControl);
+                        gameObject.SetActive(false);
+                    }
+                }
             }
-            else
+            if (bindingResult.Count > 0)
             {
-                HandlePress();
+                if (bindingResult.Any(input => !input.IsPressed()))
+                {
+                    gameObject.SetActive(false);
+                }
             }
         }
 
@@ -172,4 +186,3 @@ namespace Nova
         }
     }
 }
-*/

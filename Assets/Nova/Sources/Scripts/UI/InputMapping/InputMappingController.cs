@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.Utilities;
 
 namespace Nova
 {
@@ -12,14 +10,14 @@ namespace Nova
     {
         public AbstractKeyList abstractKeyList;
         public InputMappingList inputMappingList;
-        // public CompoundKeyRecorder compoundKeyRecorder;
+        public CompoundKeyRecorder compoundKeyRecorder;
 
-        // private AbstractKeyboardData keyboardData;
+        public readonly List<InputBindingData> bindingData = new List<InputBindingData>();
         private ActionAssetData actionAsset;
 
         private InputSystemManager _inputManager;
 
-        private InputSystemManager inputManager
+        public InputSystemManager inputManager
         {
             get
             {
@@ -55,24 +53,24 @@ namespace Nova
 
                 _currentSelectedKey = value;
                 abstractKeyList.RefreshSelection();
-                inputMappingList.Refresh();
+                RefreshBindingList();
             }
         }
 
         public InputAction currentAction => actionAsset.GetAction(currentSelectedKey);
-        public bool IsRebinding { get; private set; }
 
-        public void DeleteCompoundKey(int index)
+        public void DeleteCompoundKey(InputBindingData data)
         {
-            currentAction.ChangeBinding(index).Erase();
-            inputMappingList.Refresh();
+            for (int i = data.endIndex - 1; i >= data.startIndex; i--)
+                currentAction.ChangeBinding(i).Erase();
+            RefreshBindingList();
         }
 
         public void AddCompoundKey()
         {
             currentAction.AddBinding();
-            var lastEntry = inputMappingList.Refresh();
-            StartModifyCompoundKey(lastEntry);
+            var lastEntry = RefreshBindingList();
+            StartModifyBinding(lastEntry);
         }
 
         private void Start()
@@ -80,8 +78,8 @@ namespace Nova
             RefreshData();
             _currentSelectedKey = mappableKeys.First();
             abstractKeyList.RefreshAll();
-            inputMappingList.Refresh();
-            // compoundKeyRecorder.Init(this);
+            RefreshBindingList();
+            compoundKeyRecorder.Init(this);
         }
 
         private void OnDisable()
@@ -94,79 +92,114 @@ namespace Nova
             actionAsset = inputManager.CloneActionAsset();
         }
 
+        private static IEnumerable<InputBindingData> GenerateBindingData(InputAction action)
+        {
+            var cnt = action.bindings.Count;
+            for (var i = 0; i < cnt; i++)
+            {
+                var data = new InputBindingData(action, i);
+                i = data.endIndex - 1;
+                yield return data;
+            }
+        }
+
+        public void RefreshBindingData()
+        {
+            bindingData.Clear();
+            bindingData.AddRange(
+                GenerateBindingData(currentAction).OrderBy(d => d.displayString));
+        }
+
+        public InputMappingListEntry RefreshBindingList()
+        {
+            RefreshBindingData();
+            return inputMappingList.Refresh();
+        }
+
         public void Apply()
         {
-            inputManager.OverrideActionAsset(actionAsset.data);
+            inputManager.SetActionAsset(actionAsset.data);
             inputManager.Save();
         }
 
         public void RestoreAll()
         {
             RefreshData();
-            inputMappingList.Refresh();
+            RefreshBindingList();
         }
 
         public void RestoreCurrentKeyMapping()
         {
-            currentAction.LoadBindingOverridesFromJson(
-                inputManager.actionAsset.GetAction(currentSelectedKey).SaveBindingOverridesAsJson());
+            var original = inputManager.actionAsset.GetAction(currentSelectedKey);
+            while (currentAction.bindings.Count > 0)
+            {
+                currentAction.ChangeBinding(0).Erase();
+            }
+            foreach (var binding in original.bindings)
+            {
+                currentAction.AddBinding(binding);
+            }
             ResolveDuplicate();
-            inputMappingList.Refresh();
         }
 
         public void ResetDefault()
         {
-            actionAsset.data.RemoveAllBindingOverrides();
-            inputMappingList.Refresh();
+            actionAsset.data.LoadFromJson(inputManager.defaultActionAsset.ToJson());
+            RefreshBindingList();
         }
 
         public void ResetCurrentKeyMappingDefault()
         {
-            currentAction.RemoveAllBindingOverrides();
+            var original = inputManager.defaultActionAsset.FindAction(currentAction.id);
+            while (currentAction.bindings.Count > 0)
+            {
+                currentAction.ChangeBinding(0).Erase();
+            }
+            foreach (var binding in original.bindings)
+            {
+                currentAction.AddBinding(binding);
+            }
             ResolveDuplicate();
-            inputMappingList.Refresh();
         }
 
-        public void StartModifyCompoundKey(InputMappingListEntry entry)
+        public void StartModifyBinding(InputMappingListEntry entry)
         {
-            IsRebinding = true;
-            currentAction.PerformInteractiveRebinding()
-                .WithExpectedControlType<ButtonControl>()
-                .WithExpectedControlType<KeyControl>()
-                .WithTargetBinding(entry.index)
-                .Start()
-                .OnComplete(operation =>
-                {
-                    IsRebinding = false;
-                    operation.Dispose();
-                })
-                .OnCancel(operation =>
-                {
-                    IsRebinding = false;
-                    operation.Dispose();
-                });
+            compoundKeyRecorder.BeginRecording(entry);
         }
 
         // In all abstract keys other than currentSelectedKey that have any same group as currentSelectedKey,
         // remove any compound key that is in currentSelectedKey
         public void ResolveDuplicate()
         {
-            // TODO: Implement
-            /*
-            foreach (var ak in keyboardData.Keys.ToList())
+            RefreshBindingData();
+            List<(InputAction, InputBinding)> duplicates = new List<(InputAction, InputBinding)>();
+            foreach (var ak in mappableKeys)
             {
-                if (ak == currentSelectedKey)
+                if (ak == currentSelectedKey || !actionAsset.TryGetAction(ak, out var action))
                 {
                     continue;
                 }
 
-                if ((inputManager.keyGroups[ak] & inputManager.keyGroups[currentSelectedKey]) == 0)
+                if (!actionAsset.TryGetGroup(currentSelectedKey, out var group)
+                    || !actionAsset.TryGetGroup(ak, out var otherGroup))
                 {
                     continue;
                 }
 
-                keyboardData[ak] = keyboardData[ak].Where(key => !currentAction.Contains(key)).ToList();
-            }*/
+                if (group != otherGroup)
+                {
+                    continue;
+                }
+
+                duplicates.AddRange(GenerateBindingData(action)
+                    .Where(d => bindingData.Any(b => b.SameButtonAs(d)))
+                    .Select(d => (d.action, d.bindings.First())));
+            }
+            foreach (var duplicate in duplicates)
+            {
+                duplicate.Item1.ChangeBinding(duplicate.Item2).Erase();
+            }
+            RefreshBindingList();
         }
     }
 }
