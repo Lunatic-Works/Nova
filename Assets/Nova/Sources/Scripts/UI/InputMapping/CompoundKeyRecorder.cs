@@ -69,6 +69,11 @@ namespace Nova
         private readonly List<InputControl> bindingResult = new List<InputControl>();
         private KeyStatus keyEnabled;
 
+        /// <summary>
+        /// Gets general paths from input control.<br/>
+        /// The specific path associated with the input control cannot be used to determine
+        /// duplicate shortcuts or easily generate display strings.
+        /// </summary>
         private static string GetGeneralPath(InputControl control)
         {
             var path = control.path;
@@ -79,6 +84,9 @@ namespace Nova
             return path;
         }
 
+        /// <summary>
+        /// Removes the original binding and adds the new recorded binding.
+        /// </summary>
         private void UpdateBinding()
         {
             action.ChangeBinding(entry.bindingData.startIndex).Erase();
@@ -104,6 +112,7 @@ namespace Nova
 
         private void AddControl(InputControl control)
         {
+            // Allow at most 2 modifiers and 1 binding.
             if (bindingResult.Count < 3
                 && !bindingResult.Any(input => input.path == control.path))
             {

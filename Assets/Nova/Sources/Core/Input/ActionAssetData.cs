@@ -6,6 +6,23 @@ using UnityEngine.InputSystem;
 
 namespace Nova
 {
+    /// <summary>
+    /// Handles the mapping among <see cref="AbstractKey"/>, <see cref="AbstractKeyGroup"/>, <see cref="InputAction"/>, and <see cref="InputActionMap"/>.<br/>
+    /// Due to the implementation of action maps, abstract keys cannot belong to multiple abstract key groups.<br/>
+    /// The input action asset is expected to match exactly with the abstract key (groups):
+    /// <list type="bullet">
+    /// <item>
+    /// <description>
+    /// The action map names must match the abstract key group names.
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// The action names must match the abstract key names.
+    /// </description>
+    /// </item>
+    /// </list>
+    /// </summary>
     public class ActionAssetData
     {
         public readonly InputActionAsset data;
@@ -18,6 +35,11 @@ namespace Nova
         private readonly Dictionary<AbstractKeyGroup, InputActionMap> actionMapsDic
             = new Dictionary<AbstractKeyGroup, InputActionMap>();
 
+        /// <summary>
+        /// Handles the mapping between abstract keys and action names.<br/>
+        /// Usually just parses enum names. Exceptions can be added here.
+        /// </summary>
+        /// <returns>Whether the translation is successful</returns>
         private static bool ActionNameToKey(string actionName, out AbstractKey key)
         {
             if (Enum.TryParse(actionName, out key))

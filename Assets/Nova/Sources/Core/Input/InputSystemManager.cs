@@ -50,6 +50,9 @@ namespace Nova
             Save();
         }
 
+        /// <summary>
+        /// Must be called before accessing any other members.
+        /// </summary>
         public void Init()
         {
             if (actionAsset != null) return;
@@ -88,6 +91,10 @@ namespace Nova
             }
         }
 
+        /// <summary>
+        /// Checks whether an abstract key is triggered.<br/>
+        /// Only activates once. To check whether a key is held, use <see cref="InputAction.IsPressed"/>.
+        /// </summary>
         public bool IsTriggered(AbstractKey key)
         {
             if (!actionAsset.TryGetAction(key, out var action))
