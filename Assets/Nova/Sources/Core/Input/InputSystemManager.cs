@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -5,6 +7,8 @@ using UnityEngine.InputSystem.EnhancedTouch;
 
 namespace Nova
 {
+    using KeyStatus = Dictionary<AbstractKey, bool>;
+
     [RequireComponent(typeof(PlayerInput))]
     public class InputSystemManager : MonoBehaviour
     {
@@ -13,19 +17,25 @@ namespace Nova
 
         private PlayerInput playerInput;
         public ActionAssetData actionAsset { get; private set; }
+        public InputActionAsset defaultActionAsset { get; private set; }
 
         private void Load()
         {
             if (File.Exists(BindingsFilePath))
             {
                 var json = File.ReadAllText(BindingsFilePath);
-                playerInput.actions.LoadBindingOverridesFromJson(json);
+                playerInput.actions = InputActionAsset.FromJson(json);
+                actionAsset = new ActionAssetData(playerInput.actions);
             }
         }
 
         public void Save()
         {
-            var json = playerInput.actions.SaveBindingOverridesAsJson();
+            var json = playerInput.actions.ToJson();
+            if (!Directory.Exists(InputFilesDirectory))
+            {
+                Directory.CreateDirectory(InputFilesDirectory);
+            }
             File.WriteAllText(BindingsFilePath, json);
         }
 
@@ -46,6 +56,8 @@ namespace Nova
 
             EnhancedTouchSupport.Enable();
             TouchSimulation.Enable();
+            defaultActionAsset = InputActionAsset.FromJson(playerInput.actions.ToJson());
+            playerInput.actions = InputActionAsset.FromJson(defaultActionAsset.ToJson());
             actionAsset = new ActionAssetData(playerInput.actions);
             Load();
         }
@@ -92,7 +104,31 @@ namespace Nova
         public ActionAssetData CloneActionAsset()
             => actionAsset.Clone();
 
-        public void OverrideActionAsset(InputActionAsset asset)
-            => actionAsset.data.LoadBindingOverridesFromJson(asset.ToJson());
+        public void SetActionAsset(InputActionAsset asset)
+        {
+            playerInput.actions = InputActionAsset.FromJson(asset.ToJson());
+            actionAsset = new ActionAssetData(playerInput.actions);
+        }
+
+        public KeyStatus GetEnabledState()
+        {
+            var status = new KeyStatus();
+            foreach (var key in Enum.GetValues(typeof(AbstractKey)))
+            {
+                if (actionAsset.TryGetAction((AbstractKey)key, out var action))
+                {
+                    status.Add((AbstractKey)key, action.enabled);
+                }
+            }
+            return status;
+        }
+
+        public void SetEnabledState(KeyStatus status)
+        {
+            foreach (var key in status.Keys)
+            {
+                SetEnable(key, status[key]);
+            }
+        }
     }
 }

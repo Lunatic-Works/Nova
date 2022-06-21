@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Nova
@@ -12,8 +11,7 @@ namespace Nova
 
         private InputMappingController controller;
 
-        public int index { get; private set; }
-        public InputBinding binding { get; private set; }
+        public InputBindingData bindingData { get; private set; }
 
         private void Awake()
         {
@@ -27,20 +25,20 @@ namespace Nova
 
         private void RefreshLabel()
         {
-            label.text = binding.ToString();
+            bindingData.RefreshEndIndex();
+            label.text = bindingData.displayString;
         }
 
-        public void Init(InputMappingController controller, int index)
+        public void Init(InputMappingController controller, InputBindingData bindingData)
         {
             this.controller = controller;
-            this.index = index;
-            binding = controller.currentAction.bindings[index];
+            this.bindingData = bindingData;
             RefreshDisplay();
         }
 
         public void Delete()
         {
-            controller.DeleteCompoundKey(index);
+            controller.DeleteCompoundKey(bindingData);
         }
 
         private bool isModifying
@@ -51,7 +49,7 @@ namespace Nova
         public void TriggerModify()
         {
             isModifying = true;
-            controller.StartModifyCompoundKey(this);
+            controller.StartModifyBinding(this);
         }
 
         public void FinishModify()

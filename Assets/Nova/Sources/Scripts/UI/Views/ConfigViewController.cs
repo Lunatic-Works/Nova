@@ -117,7 +117,7 @@ namespace Nova
         protected override void OnActivatedUpdate()
         {
             // Avoid going back when recoding shortcuts
-            if (inputMappingController.IsRebinding)
+            if (inputMappingController.compoundKeyRecorder.isRebinding)
             {
                 return;
             }

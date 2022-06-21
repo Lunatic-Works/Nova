@@ -6075,7 +6075,7 @@ PrefabInstance:
       value: ConfigView
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 6261866297599152870, guid: 85bfeeaac13b54597b7eff58b793f6d4, type: 3}
+    - {fileID: 7317230337375873164, guid: 85bfeeaac13b54597b7eff58b793f6d4, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 85bfeeaac13b54597b7eff58b793f6d4, type: 3}
 --- !u!1001 &5683051340147279682
 PrefabInstance:
