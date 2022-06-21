@@ -39,6 +39,7 @@ namespace Nova
             {
                 var newEntry = Instantiate(entryPrefab, content);
                 newEntry.Init(controller, data);
+                // The data might not come in increasing order of inde. We need to return the last entry.
                 if (entry == null || data.startIndex > entry.bindingData.startIndex)
                 {
                     entry = newEntry;

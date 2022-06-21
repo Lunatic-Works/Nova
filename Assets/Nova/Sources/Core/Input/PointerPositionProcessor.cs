@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 
 namespace Nova
 {
+    /// <summary>
+    /// Adds offsets to pointer coordinates in case the screen is scaled due to unexpected aspect ratio.
+    /// </summary>
 #if UNITY_EDITOR
     [InitializeOnLoad]
 #endif
