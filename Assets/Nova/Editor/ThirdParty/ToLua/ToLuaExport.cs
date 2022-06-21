@@ -19,15 +19,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+using UnityEngine;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
+using System.Reflection;
+using System.Collections.Generic;
 using LuaInterface;
-using UnityEngine;
+
+using Object = UnityEngine.Object;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 public enum MetaOp
 {
@@ -157,7 +160,7 @@ public static class ToLuaExport
         "UIInput.ProcessEvent",
         "UIWidget.showHandlesWithMoveTool",
         "UIWidget.showHandles",
-        // TODO(Input System): Remove
+        // TODO(Input System): Find an alternative
         // "Input.IsJoystickPreconfigured",
         "UIDrawCall.isActive",
         "Dictionary.TryAdd",
@@ -970,7 +973,7 @@ public static class ToLuaExport
                 }
             }
 
-            foreach (var iter in addList)
+            foreach(var iter in addList)
             {
                 list.Add(new _MethodBase(iter));
             }
@@ -1036,7 +1039,7 @@ public static class ToLuaExport
             {
                 piList.RemoveAt(i);
             }
-            else if (piList[i].GetGetMethod() != null && HasGetIndex(piList[i].GetGetMethod()))
+            else if(piList[i].GetGetMethod() != null && HasGetIndex(piList[i].GetGetMethod()))
             {
                 piList.RemoveAt(i);
             }
@@ -1812,7 +1815,7 @@ public static class ToLuaExport
 
     static void GenConstructFunction()
     {
-        if (ctorExtList.Count > 0)
+        if (ctorExtList.Count  > 0)
         {
             if (HasAttribute(ctorExtList[0], typeof(UseDefinedAttribute)))
             {
@@ -2426,7 +2429,7 @@ public static class ToLuaExport
                         fname = beCheckTypes ? "ToParamsNumber" : "CheckParamsNumber";
                     }
                 }
-                else if (et == typeof(char))
+                else if(et == typeof(char))
                 {
                     fname = "CheckCharBuffer";
                 }
@@ -2921,7 +2924,7 @@ public static class ToLuaExport
         {
             return list[0];
         }
-        else if (list.Count == 0)
+        else if(list.Count == 0)
         {
             return null;
         }
@@ -2973,7 +2976,7 @@ public static class ToLuaExport
 
     public static string GetBaseTypeStr(Type t)
     {
-        if (t.IsGenericType)
+        if(t.IsGenericType)
         {
             return LuaMisc.GetTypeName(t);
         }
@@ -2997,11 +3000,11 @@ public static class ToLuaExport
             str += LuaMisc.GetArrayRank(t);
             return str;
         }
-        else if (t == extendType)
+        else if(t == extendType)
         {
             return GetTypeStr(type);
         }
-        else if (IsIEnumerator(t))
+        else if(IsIEnumerator(t))
         {
             return LuaMisc.GetTypeName(typeof(IEnumerator));
         }
@@ -3129,14 +3132,14 @@ public static class ToLuaExport
         sb.Append("\n\t[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]\n");
         sb.AppendFormat("\tstatic int get_{0}(IntPtr L)\n", varName);
         sb.Append("\t{\n");
-        sb.AppendFormat("\t\tToLua.Push(L, new EventObject(typeof({0})));\n", GetTypeStr(varType));
+        sb.AppendFormat("\t\tToLua.Push(L, new EventObject(typeof({0})));\n",GetTypeStr(varType));
         sb.Append("\t\treturn 1;\n");
         sb.Append("\t}\n");
     }
 
     static void GenIndexFunc()
     {
-        for (int i = 0; i < fields.Length; i++)
+        for(int i = 0; i < fields.Length; i++)
         {
             if (fields[i].IsLiteral && fields[i].FieldType.IsPrimitive && !fields[i].FieldType.IsEnum)
             {
@@ -3177,7 +3180,7 @@ public static class ToLuaExport
     static void GenSetFieldStr(string varName, Type varType, bool isStatic, bool beOverride = false)
     {
         sb.Append("\n\t[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]\n");
-        sb.AppendFormat("\tstatic int {0}_{1}(IntPtr L)\n", beOverride ? "_set" : "set", varName);
+        sb.AppendFormat("\tstatic int {0}_{1}(IntPtr L)\n", beOverride ? "_set" : "set",  varName);
         sb.Append("\t{\n");
 
         if (!isStatic)
@@ -3292,7 +3295,7 @@ public static class ToLuaExport
         }
     }
 
-    static void GenLuaFunctionRetValue(StringBuilder sb, Type t, string head, string name, bool beDefined = false)
+    static void GenLuaFunctionRetValue(StringBuilder sb, Type t, string head, string name , bool beDefined = false)
     {
         if (t == typeof(bool))
         {
@@ -3723,7 +3726,7 @@ public static class ToLuaExport
 
         for (int j = 0; j < attrs.Length; j++)
         {
-            Type t = attrs[j].GetType();
+            Type t = attrs[j].GetType() ;
 
             if (t == typeof(System.ObsoleteAttribute) || t == typeof(NoToLuaAttribute) || t == typeof(MonoPInvokeCallbackAttribute) ||
                 t.Name == "MonoNotSupportedAttribute" || t.Name == "MonoTODOAttribute") // || t.ToString() == "UnityEngine.WrapperlessIcall")
@@ -3820,117 +3823,117 @@ public static class ToLuaExport
     }
 
     // static string CreateDelegate = @"
-    //     public static Delegate CreateDelegate(Type t, LuaFunction func = null)
-    //     {
-    //         DelegateCreate Create = null;
-    //
-    //         if (!dict.TryGetValue(t, out Create))
-    //         {
-    //             throw new LuaException(string.Format(""Delegate {0} not register"", LuaMisc.GetTypeName(t)));
-    //         }
-    //
-    //         if (func != null)
-    //         {
-    //             LuaState state = func.GetLuaState();
-    //             LuaDelegate target = state.GetLuaDelegate(func);
-    //
-    //             if (target != null)
-    //             {
-    //                 return Delegate.CreateDelegate(t, target, target.method);
-    //             }
-    //             else
-    //             {
-    //                 Delegate d = Create(func, null, false);
-    //                 target = d.Target as LuaDelegate;
-    //                 state.AddLuaDelegate(target, func);
-    //                 return d;
-    //             }
-    //         }
-    //
-    //         return Create(null, null, false);
-    //     }
-    //
-    //     public static Delegate CreateDelegate(Type t, LuaFunction func, LuaTable self)
-    //     {
-    //         DelegateCreate Create = null;
-    //
-    //         if (!dict.TryGetValue(t, out Create))
-    //         {
-    //             throw new LuaException(string.Format(""Delegate {0} not register"", LuaMisc.GetTypeName(t)));
-    //         }
-    //
-    //         if (func != null)
-    //         {
-    //             LuaState state = func.GetLuaState();
-    //             LuaDelegate target = state.GetLuaDelegate(func, self);
-    //
-    //             if (target != null)
-    //             {
-    //                 return Delegate.CreateDelegate(t, target, target.method);
-    //             }
-    //             else
-    //             {
-    //                 Delegate d = Create(func, self, true);
-    //                 target = d.Target as LuaDelegate;
-    //                 state.AddLuaDelegate(target, func, self);
-    //                 return d;
-    //             }
-    //         }
-    //
-    //         return Create(null, null, true);
-    //     }
-    // ";
+//     public static Delegate CreateDelegate(Type t, LuaFunction func = null)
+//     {
+//         DelegateCreate Create = null;
+//
+//         if (!dict.TryGetValue(t, out Create))
+//         {
+//             throw new LuaException(string.Format(""Delegate {0} not register"", LuaMisc.GetTypeName(t)));
+//         }
+//
+//         if (func != null)
+//         {
+//             LuaState state = func.GetLuaState();
+//             LuaDelegate target = state.GetLuaDelegate(func);
+//
+//             if (target != null)
+//             {
+//                 return Delegate.CreateDelegate(t, target, target.method);
+//             }
+//             else
+//             {
+//                 Delegate d = Create(func, null, false);
+//                 target = d.Target as LuaDelegate;
+//                 state.AddLuaDelegate(target, func);
+//                 return d;
+//             }
+//         }
+//
+//         return Create(null, null, false);
+//     }
+//
+//     public static Delegate CreateDelegate(Type t, LuaFunction func, LuaTable self)
+//     {
+//         DelegateCreate Create = null;
+//
+//         if (!dict.TryGetValue(t, out Create))
+//         {
+//             throw new LuaException(string.Format(""Delegate {0} not register"", LuaMisc.GetTypeName(t)));
+//         }
+//
+//         if (func != null)
+//         {
+//             LuaState state = func.GetLuaState();
+//             LuaDelegate target = state.GetLuaDelegate(func, self);
+//
+//             if (target != null)
+//             {
+//                 return Delegate.CreateDelegate(t, target, target.method);
+//             }
+//             else
+//             {
+//                 Delegate d = Create(func, self, true);
+//                 target = d.Target as LuaDelegate;
+//                 state.AddLuaDelegate(target, func, self);
+//                 return d;
+//             }
+//         }
+//
+//         return Create(null, null, true);
+//     }
+// ";
 
     // static string RemoveDelegate = @"
-    //     public static Delegate RemoveDelegate(Delegate obj, LuaFunction func)
-    //     {
-    //         LuaState state = func.GetLuaState();
-    //         Delegate[] ds = obj.GetInvocationList();
-    //
-    //         for (int i = 0; i < ds.Length; i++)
-    //         {
-    //             LuaDelegate ld = ds[i].Target as LuaDelegate;
-    //
-    //             if (ld != null && ld.func == func)
-    //             {
-    //                 obj = Delegate.Remove(obj, ds[i]);
-    //                 state.DelayDispose(ld.func);
-    //                 break;
-    //             }
-    //         }
-    //
-    //         return obj;
-    //     }
-    //
-    //     public static Delegate RemoveDelegate(Delegate obj, Delegate dg)
-    //     {
-    //         LuaDelegate remove = dg.Target as LuaDelegate;
-    //
-    //         if (remove == null)
-    //         {
-    //             obj = Delegate.Remove(obj, dg);
-    //             return obj;
-    //         }
-    //
-    //         LuaState state = remove.func.GetLuaState();
-    //         Delegate[] ds = obj.GetInvocationList();
-    //
-    //         for (int i = 0; i < ds.Length; i++)
-    //         {
-    //             LuaDelegate ld = ds[i].Target as LuaDelegate;
-    //
-    //             if (ld != null && ld == remove)
-    //             {
-    //                 obj = Delegate.Remove(obj, ds[i]);
-    //                 state.DelayDispose(ld.func);
-    //                 state.DelayDispose(ld.self);
-    //                 break;
-    //             }
-    //         }
-    //
-    //         return obj;
-    //     }
-    // ";
+//     public static Delegate RemoveDelegate(Delegate obj, LuaFunction func)
+//     {
+//         LuaState state = func.GetLuaState();
+//         Delegate[] ds = obj.GetInvocationList();
+//
+//         for (int i = 0; i < ds.Length; i++)
+//         {
+//             LuaDelegate ld = ds[i].Target as LuaDelegate;
+//
+//             if (ld != null && ld.func == func)
+//             {
+//                 obj = Delegate.Remove(obj, ds[i]);
+//                 state.DelayDispose(ld.func);
+//                 break;
+//             }
+//         }
+//
+//         return obj;
+//     }
+//
+//     public static Delegate RemoveDelegate(Delegate obj, Delegate dg)
+//     {
+//         LuaDelegate remove = dg.Target as LuaDelegate;
+//
+//         if (remove == null)
+//         {
+//             obj = Delegate.Remove(obj, dg);
+//             return obj;
+//         }
+//
+//         LuaState state = remove.func.GetLuaState();
+//         Delegate[] ds = obj.GetInvocationList();
+//
+//         for (int i = 0; i < ds.Length; i++)
+//         {
+//             LuaDelegate ld = ds[i].Target as LuaDelegate;
+//
+//             if (ld != null && ld == remove)
+//             {
+//                 obj = Delegate.Remove(obj, ds[i]);
+//                 state.DelayDispose(ld.func);
+//                 state.DelayDispose(ld.self);
+//                 break;
+//             }
+//         }
+//
+//         return obj;
+//     }
+// ";
 
     static string GetDelegateParams(MethodInfo mi)
     {

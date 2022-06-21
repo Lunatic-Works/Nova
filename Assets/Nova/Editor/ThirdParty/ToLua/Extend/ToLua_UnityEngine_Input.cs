@@ -1,5 +1,5 @@
-﻿using LuaInterface;
-using UnityEngine;
+﻿using UnityEngine;
+using LuaInterface;
 
 public class ToLua_UnityEngine_Input
 {
@@ -20,7 +20,7 @@ public class ToLua_UnityEngine_Input
 
     [UseDefinedAttribute]
     public static Touch GetTouch(int index, int flag)
-    {
+    {        
         return new Touch();
     }
 }
