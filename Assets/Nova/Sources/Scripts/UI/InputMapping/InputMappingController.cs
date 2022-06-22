@@ -15,19 +15,30 @@ namespace Nova
         public readonly List<InputBindingData> bindingData = new List<InputBindingData>();
         private ActionAssetData actionAsset;
 
+        private bool inited;
+
+        private void Init()
+        {
+            if (inited)
+            {
+                return;
+            }
+
+            _inputManager = Utils.FindNovaGameController().InputManager;
+            _inputManager.Init();
+
+            inited = true;
+
+            RefreshData();
+        }
+
         private InputSystemManager _inputManager;
 
         public InputSystemManager inputManager
         {
             get
             {
-                if (_inputManager == null)
-                {
-                    _inputManager = Utils.FindNovaGameController().InputManager;
-                    _inputManager.Init();
-                    RefreshData();
-                }
-
+                Init();
                 return _inputManager;
             }
         }
@@ -75,7 +86,7 @@ namespace Nova
 
         private void Start()
         {
-            RefreshData();
+            Init();
             _currentSelectedKey = mappableKeys.First();
             abstractKeyList.RefreshAll();
             RefreshBindingList();
