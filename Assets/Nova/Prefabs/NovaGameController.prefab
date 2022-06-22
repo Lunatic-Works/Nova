@@ -137,7 +137,6 @@ GameObject:
   - component: {fileID: 4085662085105365225}
   - component: {fileID: 7273781188685514655}
   - component: {fileID: 6935519797362669510}
-  - component: {fileID: 341294325792702966}
   - component: {fileID: 5381135131129481220}
   m_Layer: 0
   m_Name: NovaGameController
@@ -344,37 +343,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configKeyName: OnlyFastForwardRead
---- !u!114 &341294325792702966
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1737081535048956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 1702af3a5691a8b42a8c171528f43c46,
-    type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Game
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!114 &5381135131129481220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -387,6 +355,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbb0ef2eaa610da4ea5cf74855d85f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultActionAsset: {fileID: -944628639613478452, guid: 1702af3a5691a8b42a8c171528f43c46,
+    type: 3}
 --- !u!1 &1963475629363514
 GameObject:
   m_ObjectHideFlags: 0

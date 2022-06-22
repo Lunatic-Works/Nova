@@ -247,17 +247,6 @@
                     "action": "LeaveView",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "421fffe9-07b0-4b1f-a881-c1f91ad107f5",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "LeaveView",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 }
             ]
         },

@@ -9,29 +9,26 @@ namespace Nova
 {
     using KeyStatus = Dictionary<AbstractKey, bool>;
 
-    [RequireComponent(typeof(PlayerInput))]
     public class InputSystemManager : MonoBehaviour
     {
         public static string InputFilesDirectory => Path.Combine(Application.persistentDataPath, "Input");
         private static string BindingsFilePath => Path.Combine(InputFilesDirectory, "bindings.json");
 
-        private PlayerInput playerInput;
+        public InputActionAsset defaultActionAsset;
         public ActionAssetData actionAsset { get; private set; }
-        public InputActionAsset defaultActionAsset { get; private set; }
 
         private void Load()
         {
             if (File.Exists(BindingsFilePath))
             {
                 var json = File.ReadAllText(BindingsFilePath);
-                playerInput.actions = InputActionAsset.FromJson(json);
-                actionAsset = new ActionAssetData(playerInput.actions);
+                actionAsset = new ActionAssetData(InputActionAsset.FromJson(json));
             }
         }
 
         public void Save()
         {
-            var json = playerInput.actions.ToJson();
+            var json = actionAsset.data.ToJson();
             if (!Directory.Exists(InputFilesDirectory))
             {
                 Directory.CreateDirectory(InputFilesDirectory);
@@ -41,7 +38,6 @@ namespace Nova
 
         private void Awake()
         {
-            playerInput = GetComponent<PlayerInput>();
             Init();
         }
 
@@ -59,9 +55,7 @@ namespace Nova
 
             EnhancedTouchSupport.Enable();
             TouchSimulation.Enable();
-            defaultActionAsset = InputActionAsset.FromJson(playerInput.actions.ToJson());
-            playerInput.actions = InputActionAsset.FromJson(defaultActionAsset.ToJson());
-            actionAsset = new ActionAssetData(playerInput.actions);
+            actionAsset = new ActionAssetData(InputActionAsset.FromJson(defaultActionAsset.ToJson()));
             Load();
         }
 
@@ -113,8 +107,10 @@ namespace Nova
 
         public void SetActionAsset(InputActionAsset asset)
         {
-            playerInput.actions = InputActionAsset.FromJson(asset.ToJson());
-            actionAsset = new ActionAssetData(playerInput.actions);
+            var enabledState = GetEnabledState();
+            actionAsset?.data.Disable();
+            actionAsset = new ActionAssetData(InputActionAsset.FromJson(asset.ToJson()));
+            SetEnabledState(enabledState);
         }
 
         public KeyStatus GetEnabledState()
