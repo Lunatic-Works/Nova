@@ -141,7 +141,7 @@ namespace Nova
         protected virtual void OnActivatedUpdate()
         {
             if (inputManager.IsTriggered(AbstractKey.LeaveView)
-                || Mouse.current?.rightButton.wasPressedThisFrame == true)
+                || Mouse.current?.rightButton.wasReleasedThisFrame == true)
             {
                 BackHide();
             }
