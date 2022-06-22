@@ -13,19 +13,30 @@ namespace Nova
 
         private AbstractKeyboardData keyboardData;
 
+        private bool inited;
+
+        private void Init()
+        {
+            if (inited)
+            {
+                return;
+            }
+
+            _inputMapper = Utils.FindNovaGameController().InputMapper;
+            _inputMapper.Init();
+
+            inited = true;
+
+            RefreshData();
+        }
+
         private InputMapper _inputMapper;
 
         private InputMapper inputMapper
         {
             get
             {
-                if (_inputMapper == null)
-                {
-                    _inputMapper = Utils.FindNovaGameController().InputMapper;
-                    _inputMapper.Init();
-                    RefreshData();
-                }
-
+                Init();
                 return _inputMapper;
             }
         }
@@ -72,7 +83,7 @@ namespace Nova
 
         private void Start()
         {
-            RefreshData();
+            Init();
             _currentSelectedKey = mappableKeys.First();
             abstractKeyList.RefreshAll();
             inputMappingList.Refresh();

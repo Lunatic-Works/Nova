@@ -111,6 +111,10 @@ namespace Nova
             }
         }
 
+        /// <remarks>
+        /// This is usually called in Awake or Start
+        /// Do not call this when the game is quitting, because NovaGameController may be already destroyed
+        /// </remarks>
         public static GameController FindNovaGameController()
         {
             var go = GameObject.FindWithTag("NovaGameController");
