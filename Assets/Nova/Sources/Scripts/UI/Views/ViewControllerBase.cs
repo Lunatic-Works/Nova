@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Nova
@@ -139,7 +140,8 @@ namespace Nova
 
         protected virtual void OnActivatedUpdate()
         {
-            if (inputManager.IsTriggered(AbstractKey.LeaveView))
+            if (inputManager.IsTriggered(AbstractKey.LeaveView)
+                || Mouse.current?.rightButton.wasPressedThisFrame == true)
             {
                 BackHide();
             }
