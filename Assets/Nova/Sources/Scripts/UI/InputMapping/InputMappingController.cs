@@ -13,7 +13,15 @@ namespace Nova
         public CompoundKeyRecorder compoundKeyRecorder;
 
         public readonly List<InputBindingData> bindingData = new List<InputBindingData>();
-        private ActionAssetData actionAsset;
+        private ActionAssetData actionAsset
+        {
+            get => inputManager.actionAsset;
+            set => inputManager.SetActionAsset(value.data);
+        }
+        /// <summary>
+        /// Action asset before modification
+        /// </summary>
+        private ActionAssetData oldActionAsset;
 
         private bool inited;
 
@@ -29,7 +37,7 @@ namespace Nova
 
             inited = true;
 
-            RefreshData();
+            oldActionAsset = actionAsset.Clone();
         }
 
         private InputSystemManager _inputManager;
@@ -70,6 +78,44 @@ namespace Nova
 
         public InputAction currentAction => actionAsset.GetAction(currentSelectedKey);
 
+        private static IEnumerable<InputBindingData> GenerateBindingData(InputAction action)
+        {
+            var cnt = action.bindings.Count;
+            InputBindingData data;
+            for (var i = 0; i < cnt; i++)
+            {
+                try
+                {
+                    data = new InputBindingData(action, i);
+                    i = data.endIndex - 1;
+                }
+                catch (InvalidOperationException)
+                {
+                    // When all bindings are erased, action.bindings.Count might be 1,
+                    // but accessing action.bindings[0] will throw an exception.
+                    continue;
+                }
+                yield return data;
+            }
+        }
+
+        private static void RemoveAllBindings(InputAction action)
+        {
+            while (action.bindings.Count > 0)
+            {
+                try
+                {
+                    action.ChangeBinding(0).Erase();
+                }
+                catch (Exception)
+                {
+                    // When all bindings are erased, action.bindings.Count might be 1,
+                    // but accessing action.bindings[0] will throw an exception.
+                    break;
+                }
+            }
+        }
+
         public void DeleteCompoundKey(InputBindingData data)
         {
             for (int i = data.endIndex - 1; i >= data.startIndex; i--)
@@ -98,28 +144,7 @@ namespace Nova
 
         private void RefreshData()
         {
-            actionAsset = inputManager.CloneActionAsset();
-        }
-
-        private static IEnumerable<InputBindingData> GenerateBindingData(InputAction action)
-        {
-            var cnt = action.bindings.Count;
-            InputBindingData data;
-            for (var i = 0; i < cnt; i++)
-            {
-                try
-                {
-                    data = new InputBindingData(action, i);
-                    i = data.endIndex - 1;
-                }
-                catch (InvalidOperationException)
-                {
-                    // When all bindings are erased, action.bindings.Count might be 1,
-                    // but accessing action.bindings[0] will throw an exception.
-                    continue;
-                }
-                yield return data;
-            }
+            actionAsset = oldActionAsset;
         }
 
         public void RefreshBindingData()
@@ -137,23 +162,20 @@ namespace Nova
 
         public void Apply()
         {
-            inputManager.SetActionAsset(actionAsset.data);
             inputManager.Save();
+            oldActionAsset = actionAsset.Clone();
         }
 
         public void RestoreAll()
         {
-            RefreshData();
+            actionAsset = oldActionAsset;
             RefreshBindingList();
         }
 
         public void RestoreCurrentKeyMapping()
         {
-            var original = inputManager.actionAsset.GetAction(currentSelectedKey);
-            while (currentAction.bindings.Count > 0)
-            {
-                currentAction.ChangeBinding(0).Erase();
-            }
+            var original = oldActionAsset.GetAction(currentSelectedKey);
+            RemoveAllBindings(currentAction);
             foreach (var binding in original.bindings)
             {
                 currentAction.AddBinding(binding);
@@ -170,19 +192,7 @@ namespace Nova
         public void ResetCurrentKeyMappingDefault()
         {
             var original = inputManager.defaultActionAsset.FindAction(currentAction.id);
-            while (currentAction.bindings.Count > 0)
-            {
-                try
-                {
-                    currentAction.ChangeBinding(0).Erase();
-                }
-                catch (Exception)
-                {
-                    // When all bindings are erased, action.bindings.Count might be 1,
-                    // but accessing action.bindings[0] will throw an exception.
-                    break;
-                }
-            }
+            RemoveAllBindings(currentAction);
             foreach (var binding in original.bindings)
             {
                 currentAction.AddBinding(binding);
