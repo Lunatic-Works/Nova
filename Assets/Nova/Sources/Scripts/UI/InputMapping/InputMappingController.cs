@@ -106,10 +106,20 @@ namespace Nova
         private static IEnumerable<InputBindingData> GenerateBindingData(InputAction action)
         {
             var cnt = action.bindings.Count;
+            InputBindingData data;
             for (var i = 0; i < cnt; i++)
             {
-                var data = new InputBindingData(action, i);
-                i = data.endIndex - 1;
+                try
+                {
+                    data = new InputBindingData(action, i);
+                    i = data.endIndex - 1;
+                }
+                catch (InvalidOperationException)
+                {
+                    // When all bindings are erased, action.bindings.Count might be 1,
+                    // but accessing action.bindings[0] will throw an exception.
+                    continue;
+                }
                 yield return data;
             }
         }
@@ -164,7 +174,16 @@ namespace Nova
             var original = inputManager.defaultActionAsset.FindAction(currentAction.id);
             while (currentAction.bindings.Count > 0)
             {
-                currentAction.ChangeBinding(0).Erase();
+                try
+                {
+                    currentAction.ChangeBinding(0).Erase();
+                }
+                catch (Exception)
+                {
+                    // When all bindings are erased, action.bindings.Count might be 1,
+                    // but accessing action.bindings[0] will throw an exception.
+                    break;
+                }
             }
             foreach (var binding in original.bindings)
             {
