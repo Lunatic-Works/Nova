@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.unity.inputsystem": "1.3.0",
+    "com.unity.inputsystem": "1.4.1",
     "com.unity.nuget.newtonsoft-json": "3.0.2",
     "com.unity.textmeshpro": "2.1.6",
     "com.unity.timeline": "1.7.1",
