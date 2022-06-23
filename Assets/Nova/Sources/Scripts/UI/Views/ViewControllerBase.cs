@@ -13,7 +13,7 @@ namespace Nova
         public ViewManager viewManager { get; private set; }
 
         protected List<UIViewTransitionBase> transitions;
-        protected InputSystemManager inputManager;
+        protected InputManager inputManager;
 
         private bool inited;
 

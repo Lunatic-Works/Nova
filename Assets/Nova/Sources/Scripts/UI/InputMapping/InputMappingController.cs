@@ -40,9 +40,9 @@ namespace Nova
             oldActionAsset = actionAsset.Clone();
         }
 
-        private InputSystemManager _inputManager;
+        private InputManager _inputManager;
 
-        public InputSystemManager inputManager
+        public InputManager inputManager
         {
             get
             {

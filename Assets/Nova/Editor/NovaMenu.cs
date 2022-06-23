@@ -25,9 +25,9 @@ namespace Nova.Editor
         [MenuItem("Nova/Reset Input Mapping", false, 1)]
         public static void ResetInputMapping()
         {
-            if (Directory.Exists(InputSystemManager.InputFilesDirectory))
+            if (Directory.Exists(InputManager.InputFilesDirectory))
             {
-                Directory.Delete(InputSystemManager.InputFilesDirectory, true);
+                Directory.Delete(InputManager.InputFilesDirectory, true);
             }
         }
     }

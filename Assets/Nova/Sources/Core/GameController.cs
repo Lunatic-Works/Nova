@@ -11,7 +11,7 @@ namespace Nova
         public DialogueState DialogueState { get; private set; }
         public CheckpointManager CheckpointManager { get; private set; }
         public ConfigManager ConfigManager { get; private set; }
-        public InputSystemManager InputManager { get; private set; }
+        public InputManager InputManager { get; private set; }
         public CursorManager CursorManager { get; private set; }
         public AssetLoader AssetLoader { get; private set; }
         public CheckpointHelper CheckpointHelper { get; private set; }
@@ -25,7 +25,7 @@ namespace Nova
             DialogueState = FindComponent<DialogueState>();
             CheckpointManager = FindComponent<CheckpointManager>();
             ConfigManager = FindComponent<ConfigManager>();
-            InputManager = FindComponent<InputSystemManager>();
+            InputManager = FindComponent<InputManager>();
             CursorManager = FindComponent<CursorManager>();
             AssetLoader = FindComponent<AssetLoader>();
             CheckpointHelper = FindComponent<CheckpointHelper>();

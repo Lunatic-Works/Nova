@@ -4,7 +4,7 @@ namespace Nova
 {
     public class ToggleFullScreen : MonoBehaviour
     {
-        private InputSystemManager inputManager;
+        private InputManager inputManager;
 
         private void Awake()
         {
