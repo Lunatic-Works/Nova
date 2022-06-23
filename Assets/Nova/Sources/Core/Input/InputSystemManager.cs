@@ -54,7 +54,6 @@ namespace Nova
             if (actionAsset != null) return;
 
             EnhancedTouchSupport.Enable();
-            TouchSimulation.Enable();
             actionAsset = new ActionAssetData(InputActionAsset.FromJson(defaultActionAsset.ToJson()));
             Load();
         }
@@ -91,6 +90,12 @@ namespace Nova
         /// </summary>
         public bool IsTriggered(AbstractKey key)
         {
+#if !UNITY_EDITOR
+            if (KeyIsEditor(key))
+            {
+                return false;
+            }
+#endif
             if (!actionAsset.TryGetAction(key, out var action))
             {
                 Debug.LogError($"Missing action key: {key}");
