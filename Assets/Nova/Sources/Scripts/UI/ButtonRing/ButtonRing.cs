@@ -194,6 +194,10 @@ namespace Nova
         private void Update()
         {
             var mouseRelativeAngle = CalculateMouseRelative(out var distance);
+            if (float.IsNaN(mouseRelativeAngle))
+            {
+                return;
+            }
             if (distance < innerRatio * _sectorRadius)
             {
                 selectedSectorIndex = -1;
