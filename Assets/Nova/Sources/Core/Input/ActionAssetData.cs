@@ -41,35 +41,7 @@ namespace Nova
         /// </summary>
         /// <returns>Whether the translation is successful</returns>
         private static bool ActionNameToKey(string actionName, out AbstractKey key)
-        {
-            if (Enum.TryParse(actionName, out key))
-            {
-                return true;
-            }
-            switch (actionName)
-            {
-                case "Backward":
-                    key = AbstractKey.EditorBackward;
-                    return true;
-                case "BeginChapter":
-                    key = AbstractKey.EditorBeginChapter;
-                    return true;
-                case "NextChapter":
-                    key = AbstractKey.EditorNextChapter;
-                    return true;
-                case "PreviousChapter":
-                    key = AbstractKey.EditorPreviousChapter;
-                    return true;
-                case "ReloadScripts":
-                    key = AbstractKey.EditorReloadScripts;
-                    return true;
-                case "RerunAction":
-                    key = AbstractKey.EditorRerunAction;
-                    return true;
-                default:
-                    return false;
-            }
-        }
+            => Enum.TryParse(actionName, out key);
 
         public ActionAssetData(InputActionAsset actionAsset)
         {
@@ -137,7 +109,7 @@ namespace Nova
             => actionGroupsDic.TryGetValue(key, out group);
 
         public bool KeyIsEditor(AbstractKey key)
-            => actionGroupsDic.TryGetValue(key, out var group) && group == AbstractKeyGroup.Editor;
+            => key.ToString().ToLower().StartsWith("editor");
 
         public ActionAssetData Clone()
             => new ActionAssetData(InputActionAsset.FromJson(data.ToJson()));

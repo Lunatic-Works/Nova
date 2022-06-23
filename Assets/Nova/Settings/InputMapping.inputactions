@@ -85,6 +85,60 @@
                     "processors": "",
                     "interactions": "Tap",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "EditorBackward",
+                    "type": "Button",
+                    "id": "e2429f1d-13f3-42b4-b49c-f0c8c5147f65",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EditorBeginChapter",
+                    "type": "Button",
+                    "id": "552f0aa8-31f3-402f-937f-f84b87dd516b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EditorPreviousChapter",
+                    "type": "Button",
+                    "id": "eb4090c5-6384-4c4e-bc12-a358bbb1fa6e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EditorNextChapter",
+                    "type": "Button",
+                    "id": "daee26a0-50bb-4746-a9de-39ef9517e1a6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EditorRerunAction",
+                    "type": "Button",
+                    "id": "5677eb08-3099-4edd-8c3c-c9d20b9ffa96",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EditorReloadScripts",
+                    "type": "Button",
+                    "id": "57a915be-4fe8-4ce0-a5b1-30432e1fed4a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -219,6 +273,72 @@
                     "action": "ShowLog",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3bb483e3-d685-46dc-aefc-24a6382c7134",
+                    "path": "<Keyboard>/rightBracket",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EditorNextChapter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bee06911-ee1f-4e66-a466-a61ef72e14b8",
+                    "path": "<Keyboard>/leftBracket",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EditorPreviousChapter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5294cb74-2d3a-44b8-82ea-b88961e4afa8",
+                    "path": "<Keyboard>/equals",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EditorBeginChapter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "27a97de2-5244-4603-822d-fa449280960a",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EditorBackward",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2d2314ed-fa62-4b96-8fd1-f0c8445dd1f5",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EditorReloadScripts",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fc3f895c-86e2-4c01-ba3e-8eb9cad33271",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EditorRerunAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -245,134 +365,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "LeaveView",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "Editor",
-            "id": "372c8054-31c8-4142-a336-8d7485bd1ce0",
-            "actions": [
-                {
-                    "name": "Backward",
-                    "type": "Button",
-                    "id": "ba4a6554-acba-4119-9cce-dd67f109f99f",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "BeginChapter",
-                    "type": "Button",
-                    "id": "b6796573-2607-4ef6-b06d-6958c3b7c74c",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "PreviousChapter",
-                    "type": "Button",
-                    "id": "3b6ac5b3-c8f4-4788-8ee3-57d0f686973a",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "NextChapter",
-                    "type": "Button",
-                    "id": "b15aab3f-f151-4d29-87f1-d4b6880744be",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "ReloadScripts",
-                    "type": "Button",
-                    "id": "6728966f-e7b3-4cbf-801b-09e49a36aa4c",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "RerunAction",
-                    "type": "Button",
-                    "id": "50528df2-f11a-4d9f-a581-73ac487e1006",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "19c7c4d3-be2c-4baf-87b4-052044f1a445",
-                    "path": "<Keyboard>/leftArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Backward",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f3eda912-6dba-4b23-b06c-15092b16672d",
-                    "path": "<Keyboard>/equals",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "BeginChapter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "61c63c47-e51c-44f0-9c5c-8efd241955a1",
-                    "path": "<Keyboard>/leftBracket",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "PreviousChapter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0d6292d8-2a4f-4f68-9ffa-027a4903d785",
-                    "path": "<Keyboard>/rightBracket",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "NextChapter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "36ca22a3-f08f-4d32-8400-56dfbad78dab",
-                    "path": "<Keyboard>/r",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ReloadScripts",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "45ff6577-3893-48e5-96cb-04d8c6577f97",
-                    "path": "<Keyboard>/f",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "RerunAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
