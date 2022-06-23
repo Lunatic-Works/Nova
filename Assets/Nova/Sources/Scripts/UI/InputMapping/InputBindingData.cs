@@ -7,6 +7,7 @@ namespace Nova
     public class InputBindingData
     {
         public InputAction action;
+
         /// <summary>
         /// Inclusive start index of the binding
         /// </summary>
@@ -27,10 +28,12 @@ namespace Nova
                 {
                     yield break;
                 }
+
                 if (startIndex == endIndex - 1)
                 {
                     yield return action.bindings[startIndex];
                 }
+
                 for (var i = startIndex + 1; i < endIndex; i++)
                 {
                     yield return action.bindings[i];
@@ -38,8 +41,7 @@ namespace Nova
             }
         }
 
-        public InputBinding? button => startIndex >= endIndex ? null
-            : (InputBinding?)action.bindings[endIndex - 1];
+        public InputBinding? button => startIndex >= endIndex ? null : (InputBinding?)action.bindings[endIndex - 1];
 
         public string displayString => string.Join(" + ", bindings.Select(b => b.ToDisplayString()));
 
@@ -50,6 +52,7 @@ namespace Nova
                 endIndex = startIndex;
                 return endIndex;
             }
+
             endIndex = startIndex + 1;
             if (action.bindings[startIndex].isComposite)
             {
@@ -58,6 +61,7 @@ namespace Nova
                     ++endIndex;
                 }
             }
+
             return endIndex;
         }
 
@@ -76,5 +80,4 @@ namespace Nova
             RefreshEndIndex();
         }
     }
-
 }

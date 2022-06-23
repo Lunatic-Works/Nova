@@ -26,6 +26,7 @@ namespace Nova
     public class ActionAssetData
     {
         public readonly InputActionAsset data;
+
         private readonly Dictionary<AbstractKey, AbstractKeyGroup> actionGroupsDic
             = new Dictionary<AbstractKey, AbstractKeyGroup>();
 
@@ -67,6 +68,7 @@ namespace Nova
                     actionsDic[key] = action;
                 }
             }
+
             foreach (var key in Enum.GetValues(typeof(AbstractKey)))
             {
                 if (!actionsDic.ContainsKey((AbstractKey)key))
@@ -74,6 +76,7 @@ namespace Nova
                     Debug.LogError($"Missing action key: {key}");
                 }
             }
+
             foreach (var key in actionAsset.actionMaps)
             {
                 if (!Enum.TryParse(key.name, out AbstractKeyGroup group))

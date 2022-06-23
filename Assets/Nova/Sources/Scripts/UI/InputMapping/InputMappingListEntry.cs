@@ -18,7 +18,7 @@ namespace Nova
             label.color = defaultColor;
         }
 
-        public void RefreshDisplay()
+        private void RefreshDisplay()
         {
             RefreshLabel();
         }

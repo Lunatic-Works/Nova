@@ -13,11 +13,13 @@ namespace Nova
         public CompoundKeyRecorder compoundKeyRecorder;
 
         public readonly List<InputBindingData> bindingData = new List<InputBindingData>();
+
         private ActionAssetData actionAsset
         {
             get => inputManager.actionAsset;
             set => inputManager.SetActionAsset(value.data);
         }
+
         /// <summary>
         /// Action asset before modification
         /// </summary>
@@ -96,6 +98,7 @@ namespace Nova
                     Debug.LogException(e);
                     continue;
                 }
+
                 yield return data;
             }
         }
@@ -149,14 +152,14 @@ namespace Nova
             actionAsset = oldActionAsset;
         }
 
-        public void RefreshBindingData()
+        private void RefreshBindingData()
         {
             bindingData.Clear();
             bindingData.AddRange(
                 GenerateBindingData(currentAction).OrderBy(d => d.displayString));
         }
 
-        public InputMappingListEntry RefreshBindingList()
+        private InputMappingListEntry RefreshBindingList()
         {
             RefreshBindingData();
             return inputMappingList.Refresh();
@@ -182,6 +185,7 @@ namespace Nova
             {
                 currentAction.AddBinding(binding);
             }
+
             ResolveDuplicate();
         }
 
@@ -199,6 +203,7 @@ namespace Nova
             {
                 currentAction.AddBinding(binding);
             }
+
             ResolveDuplicate();
         }
 
@@ -212,7 +217,7 @@ namespace Nova
         public void ResolveDuplicate()
         {
             RefreshBindingData();
-            List<(InputAction, InputBinding)> duplicates = new List<(InputAction, InputBinding)>();
+            var duplicates = new List<(InputAction, InputBinding)>();
             foreach (var ak in mappableKeys)
             {
                 if (ak == currentSelectedKey || !actionAsset.TryGetAction(ak, out var action))
@@ -235,10 +240,12 @@ namespace Nova
                     .Where(d => bindingData.Any(b => b.SameButtonAs(d)))
                     .Select(d => (d.action, d.bindings.First())));
             }
+
             foreach (var duplicate in duplicates)
             {
                 duplicate.Item1.ChangeBinding(duplicate.Item2).Erase();
             }
+
             RefreshBindingList();
         }
     }

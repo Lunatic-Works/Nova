@@ -45,6 +45,7 @@ namespace Nova
                     entry = newEntry;
                 }
             }
+
             return entry;
         }
     }
