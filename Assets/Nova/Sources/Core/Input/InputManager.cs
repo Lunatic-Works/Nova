@@ -72,7 +72,7 @@ namespace Nova
         {
             if (!actionAsset.TryGetAction(key, out var action))
             {
-                Debug.LogError($"Missing action key: {key}");
+                Debug.LogError($"Nova: Missing action key: {key}");
                 return;
             }
 
@@ -100,7 +100,7 @@ namespace Nova
 #endif
             if (!actionAsset.TryGetAction(key, out var action))
             {
-                Debug.LogError($"Missing action key: {key}");
+                Debug.LogError($"Nova: Missing action key: {key}");
                 return false;
             }
 

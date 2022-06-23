@@ -52,15 +52,15 @@ namespace Nova
             {
                 if (!ActionNameToKey(action.name, out var key))
                 {
-                    Debug.LogError($"Unknown action name: {action.name}");
+                    Debug.LogError($"Nova: Unknown action name: {action.name}");
                 }
                 else if (actionGroupsDic.ContainsKey(key))
                 {
-                    Debug.LogError($"Duplicate action key: {action.name}");
+                    Debug.LogError($"Nova: Duplicate action key: {action.name}");
                 }
                 else if (!Enum.TryParse(action.actionMap.name, out AbstractKeyGroup group))
                 {
-                    Debug.LogError($"Unknown action group: {action.actionMap.name}");
+                    Debug.LogError($"Nova: Unknown action group: {action.actionMap.name}");
                 }
                 else
                 {
@@ -73,7 +73,7 @@ namespace Nova
             {
                 if (!actionsDic.ContainsKey((AbstractKey)key))
                 {
-                    Debug.LogError($"Missing action key: {key}");
+                    Debug.LogError($"Nova: Missing action key: {key}");
                 }
             }
 
@@ -81,7 +81,7 @@ namespace Nova
             {
                 if (!Enum.TryParse(key.name, out AbstractKeyGroup group))
                 {
-                    Debug.LogError($"Unknown action group: {key.name}");
+                    Debug.LogError($"Nova: Unknown action group: {key.name}");
                 }
                 else
                 {
