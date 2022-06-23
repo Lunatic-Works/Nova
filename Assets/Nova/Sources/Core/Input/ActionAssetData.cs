@@ -109,7 +109,7 @@ namespace Nova
             => actionGroupsDic.TryGetValue(key, out group);
 
         public bool KeyIsEditor(AbstractKey key)
-            => key.ToString().ToLower().StartsWith("editor");
+            => key.ToString().ToLower().StartsWith("editor", StringComparison.Ordinal);
 
         public ActionAssetData Clone()
             => new ActionAssetData(InputActionAsset.FromJson(data.ToJson()));
