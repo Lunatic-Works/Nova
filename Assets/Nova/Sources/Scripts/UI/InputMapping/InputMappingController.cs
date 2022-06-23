@@ -89,10 +89,11 @@ namespace Nova
                     data = new InputBindingData(action, i);
                     i = data.endIndex - 1;
                 }
-                catch (InvalidOperationException)
+                catch (Exception e)
                 {
                     // When all bindings are erased, action.bindings.Count might be 1,
                     // but accessing action.bindings[0] will throw an exception.
+                    Debug.LogException(e);
                     continue;
                 }
                 yield return data;
@@ -107,10 +108,11 @@ namespace Nova
                 {
                     action.ChangeBinding(0).Erase();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     // When all bindings are erased, action.bindings.Count might be 1,
                     // but accessing action.bindings[0] will throw an exception.
+                    Debug.LogException(e);
                     break;
                 }
             }
