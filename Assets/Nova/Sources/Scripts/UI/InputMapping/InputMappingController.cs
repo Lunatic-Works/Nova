@@ -220,8 +220,8 @@ namespace Nova
                     continue;
                 }
 
-                if (!actionAsset.TryGetGroup(currentSelectedKey, out var group)
-                    || !actionAsset.TryGetGroup(ak, out var otherGroup))
+                if (!actionAsset.TryGetActionGroup(currentSelectedKey, out var group)
+                    || !actionAsset.TryGetActionGroup(ak, out var otherGroup))
                 {
                     continue;
                 }
