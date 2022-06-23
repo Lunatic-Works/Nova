@@ -9,7 +9,7 @@ namespace Nova
 {
     using KeyStatus = Dictionary<AbstractKey, bool>;
 
-    public class InputSystemManager : MonoBehaviour
+    public class InputManager : MonoBehaviour
     {
         public static string InputFilesDirectory => Path.Combine(Application.persistentDataPath, "Input");
         private static string BindingsFilePath => Path.Combine(InputFilesDirectory, "bindings.json");

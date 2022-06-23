@@ -6,7 +6,7 @@ namespace Nova
     {
         private GameState gameState;
         private DialogueState dialogueState;
-        private InputSystemManager inputManager;
+        private InputManager inputManager;
         private ViewManager viewManager;
 
         private void Awake()

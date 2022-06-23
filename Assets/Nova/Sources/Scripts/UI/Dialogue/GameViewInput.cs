@@ -16,7 +16,7 @@ namespace Nova
         private GameState gameState;
         private DialogueState dialogueState;
         private ConfigManager configManager;
-        private InputSystemManager inputManager;
+        private InputManager inputManager;
 
         private ButtonRingTrigger buttonRingTrigger;
 
