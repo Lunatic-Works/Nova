@@ -105,7 +105,7 @@ namespace Nova
         public AbstractKeyGroup GetActionGroup(AbstractKey key)
             => actionGroupsDic[key];
 
-        public bool TryGetGroup(AbstractKey key, out AbstractKeyGroup group)
+        public bool TryGetActionGroup(AbstractKey key, out AbstractKeyGroup group)
             => actionGroupsDic.TryGetValue(key, out group);
 
         public bool KeyIsEditor(AbstractKey key)
