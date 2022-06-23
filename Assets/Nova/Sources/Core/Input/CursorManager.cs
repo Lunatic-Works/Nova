@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 namespace Nova
 {
@@ -33,7 +34,7 @@ namespace Nova
             // Show cursor and disable keyboard navigation when mouse moves or clicks
             var cursorPosition = RealInput.mousePosition;
             if (cursorPosition != lastCursorPosition ||
-                Mouse.current?.allControls.Any(control => control.IsPressed()) == true)
+                Mouse.current?.allControls.OfType<ButtonControl>().Any(control => control.isPressed) == true)
             {
                 Cursor.visible = true;
                 lastCursorPosition = cursorPosition;
