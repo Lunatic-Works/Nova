@@ -20,7 +20,7 @@ namespace Nova
 #endif
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void Initialize()
+        private static void Initialize()
         {
             InputSystem.RegisterProcessor<PointerPositionProcessor>();
         }

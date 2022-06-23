@@ -33,6 +33,7 @@ namespace Nova
             {
                 Directory.CreateDirectory(InputFilesDirectory);
             }
+
             File.WriteAllText(BindingsFilePath, json);
         }
 
@@ -74,6 +75,7 @@ namespace Nova
                 Debug.LogError($"Missing action key: {key}");
                 return;
             }
+
             if (enable)
             {
                 action.Enable();
@@ -101,6 +103,7 @@ namespace Nova
                 Debug.LogError($"Missing action key: {key}");
                 return false;
             }
+
             return action.triggered;
         }
 
@@ -128,6 +131,7 @@ namespace Nova
                     status.Add((AbstractKey)key, action.enabled);
                 }
             }
+
             return status;
         }
 

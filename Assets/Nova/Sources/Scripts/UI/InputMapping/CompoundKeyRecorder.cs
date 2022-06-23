@@ -111,6 +111,7 @@ namespace Nova
             Key.F11,
             Key.F12,
         };
+
         private static IEnumerable<ButtonControl> GetAllowedMouseButtons()
         {
             var mouse = Mouse.current;
@@ -118,6 +119,7 @@ namespace Nova
             {
                 yield break;
             }
+
             yield return mouse.middleButton;
             yield return mouse.forwardButton;
             yield return mouse.backButton;
@@ -130,6 +132,7 @@ namespace Nova
             {
                 yield break;
             }
+
             yield return gamepad.buttonEast;
             yield return gamepad.buttonSouth;
             yield return gamepad.buttonWest;
@@ -184,6 +187,7 @@ namespace Nova
             {
                 action.ChangeBinding(entry.bindingData.startIndex).Erase();
             }
+
             if (bindingResult.Count == 1)
             {
                 action.AddBinding(GetGeneralPath(bindingResult[0]));
@@ -246,6 +250,7 @@ namespace Nova
                     isResultValid = false;
                 }
             }
+
             if (isResultValid)
             {
                 ApplyBinding();
@@ -288,21 +293,26 @@ namespace Nova
                     isCtrl = true;
                     AddControl(keyboard.ctrlKey);
                 }
+
                 if (!isAlt && keyboard.altKey.wasPressedThisFrame)
                 {
                     isAlt = true;
                     AddControl(keyboard.altKey);
                 }
-                if (!isWin && keyboard.leftWindowsKey.wasPressedThisFrame || keyboard.rightWindowsKey.wasPressedThisFrame)
+
+                if (!isWin && keyboard.leftWindowsKey.wasPressedThisFrame ||
+                    keyboard.rightWindowsKey.wasPressedThisFrame)
                 {
                     isWin = true;
                     AddControl(keyboard.leftWindowsKey);
                 }
+
                 if (!isShift && keyboard.shiftKey.wasPressedThisFrame)
                 {
                     isShift = true;
                     AddControl(keyboard.shiftKey);
                 }
+
                 foreach (var key in AllowedKeys)
                 {
                     var keyControl = keyboard[key];
