@@ -79,9 +79,7 @@ namespace Nova
 
         public void AddCompoundKey()
         {
-            currentAction.AddBinding();
-            var lastEntry = RefreshBindingList();
-            StartModifyBinding(lastEntry);
+            StartModifyBinding(null);
         }
 
         private void Start()

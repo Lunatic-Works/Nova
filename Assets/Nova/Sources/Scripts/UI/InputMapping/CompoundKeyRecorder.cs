@@ -178,9 +178,12 @@ namespace Nova
         /// <summary>
         /// Removes the original binding and adds the new recorded binding.
         /// </summary>
-        private void UpdateBinding()
+        private void ApplyBinding()
         {
-            action.ChangeBinding(entry.bindingData.startIndex).Erase();
+            if (entry != null)
+            {
+                action.ChangeBinding(entry.bindingData.startIndex).Erase();
+            }
             if (bindingResult.Count == 1)
             {
                 action.AddBinding(GetGeneralPath(bindingResult[0]));
@@ -198,7 +201,6 @@ namespace Nova
                     .With("Modifier2", GetGeneralPath(bindingResult[1]))
                     .With("Binding", GetGeneralPath(bindingResult[2]));
             }
-            entry.RefreshDisplay();
         }
 
         private void AddControl(InputControl control)
@@ -208,16 +210,15 @@ namespace Nova
                 && !bindingResult.Any(input => input.path == control.path))
             {
                 bindingResult.Add(control);
-                UpdateBinding();
             }
         }
 
         private void OnEnable()
         {
-            popupController.entry = entry;
-            popupController.Show();
-            bindingResult.Clear();
             isRebinding = true;
+            bindingResult.Clear();
+            popupController.bindings = bindingResult;
+            popupController.Show();
             isCtrl = isAlt = isWin = isShift = false;
             keyEnabled = controller.inputManager.GetEnabledState();
             controller.inputManager.SetEnableGroup(AbstractKeyGroup.None);
@@ -231,28 +232,28 @@ namespace Nova
 
             popupController.Hide();
 
-            if (entry != null)
+            entry?.FinishModify();
+
+            bool isResultValid = bindingResult.Count > 0;
+
+            if (isResultValid)
             {
-                entry.FinishModify();
-
-                if (bindingResult.Count == 0 && string.IsNullOrWhiteSpace(entry.bindingData.displayString))
+                var buttonPath = GetGeneralPath(bindingResult[bindingResult.Count - 1]);
+                var duplicate = controller.bindingData
+                    .FirstOrDefault(data => data != entry?.bindingData && data.button?.effectivePath == buttonPath);
+                if (duplicate != null)
                 {
-                    entry.Delete();
+                    isResultValid = false;
                 }
-                else
-                {
-                    var duplicate = controller.bindingData
-                        .FirstOrDefault(data => data != entry.bindingData && data.SameButtonAs(entry.bindingData));
-
-                    if (duplicate != null)
-                    {
-                        entry.Delete();
-                    }
-                    else
-                    {
-                        controller.ResolveDuplicate();
-                    }
-                }
+            }
+            if (isResultValid)
+            {
+                ApplyBinding();
+                controller.ResolveDuplicate();
+            }
+            else
+            {
+                entry?.Delete();
             }
 
             entry = null;
@@ -266,6 +267,10 @@ namespace Nova
 
         private InputMappingListEntry entry;
 
+        /// <summary>
+        /// Modify an entry or add a new entry.
+        /// </summary>
+        /// <param name="entry">The entry to modify. If null, adds a new entry.</param>
         public void BeginRecording(InputMappingListEntry entry)
         {
             this.entry = entry;
@@ -274,7 +279,6 @@ namespace Nova
 
         private void Update()
         {
-            if (entry == null) return;
             // Keyboard input
             var keyboard = Keyboard.current;
             if (keyboard != null)

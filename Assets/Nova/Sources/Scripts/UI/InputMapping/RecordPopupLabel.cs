@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Nova
@@ -6,7 +9,7 @@ namespace Nova
     [RequireComponent(typeof(Text))]
     public class RecordPopupLabel : MonoBehaviour
     {
-        public InputMappingListEntry entry;
+        public List<InputControl> bindings;
 
         private Text label;
 
@@ -17,7 +20,7 @@ namespace Nova
 
         private void Update()
         {
-            label.text = entry.bindingData.displayString;
+            label.text = string.Join(" + ", bindings.Select(b => b.shortDisplayName ?? b.displayName));
         }
     }
 }
