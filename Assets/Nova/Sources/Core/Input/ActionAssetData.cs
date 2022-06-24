@@ -115,6 +115,14 @@ namespace Nova
             => key.ToString().ToLower().StartsWith("editor", StringComparison.Ordinal);
 
         public ActionAssetData Clone()
-            => new ActionAssetData(InputActionAsset.FromJson(data.ToJson()));
+            => new ActionAssetData(data.Clone());
+    }
+
+    public static class InputActionAssetExtensions
+    {
+        public static InputActionAsset Clone(this InputActionAsset asset)
+        {
+            return InputActionAsset.FromJson(asset.ToJson());
+        }
     }
 }

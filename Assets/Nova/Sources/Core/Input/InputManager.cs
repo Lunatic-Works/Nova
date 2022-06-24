@@ -51,7 +51,7 @@ namespace Nova
             if (actionAsset != null) return;
 
             EnhancedTouchSupport.Enable();
-            actionAsset = new ActionAssetData(InputActionAsset.FromJson(defaultActionAsset.ToJson()));
+            actionAsset = new ActionAssetData(defaultActionAsset.Clone());
             Load();
         }
 
@@ -104,12 +104,12 @@ namespace Nova
             return action.triggered;
         }
 
-        public void SetActionAsset(InputActionAsset asset)
+        public void SetActionAsset(ActionAssetData other)
         {
             var enabledState = new KeyStatus();
             GetEnabledState(enabledState);
             actionAsset?.data.Disable();
-            actionAsset = new ActionAssetData(InputActionAsset.FromJson(asset.ToJson()));
+            actionAsset = other.Clone();
             SetEnabledState(enabledState);
         }
 

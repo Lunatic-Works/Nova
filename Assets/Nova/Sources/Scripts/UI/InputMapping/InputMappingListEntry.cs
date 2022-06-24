@@ -21,7 +21,7 @@ namespace Nova
         private void Refresh()
         {
             bindingData.RefreshEndIndex();
-            label.text = bindingData.displayString;
+            label.text = bindingData.ToString();
         }
 
         public void Init(InputMappingController controller, InputBindingData bindingData)
