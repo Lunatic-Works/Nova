@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -92,10 +93,19 @@ namespace Nova
         private static string GetGeneralPath(InputControl control)
         {
             var path = control.path;
-            path = path.Replace("/Gamepad/", "<Gamepad>/");
-            path = path.Replace("/Keyboard/", "<Keyboard>/");
-            path = path.Replace("/Mouse/", "<Mouse>/");
-            path = path.Replace("/Joystick/", "<Joystick>/");
+            var regex = new Regex(@"^\/?[^\/]*\/");
+            if (control.device is Mouse)
+            {
+                path = regex.Replace(path, "<Mouse>/");
+            }
+            else if (control.device is Gamepad)
+            {
+                path = regex.Replace(path, "<Gamepad>/");
+            }
+            else if (control.device is Keyboard)
+            {
+                path = regex.Replace(path, "<Keyboard>/");
+            }
             return path;
         }
 
