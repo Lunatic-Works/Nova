@@ -34,7 +34,7 @@ namespace Nova
         public void Refresh()
         {
             ClearContent();
-            foreach (var data in controller.bindingData)
+            foreach (var data in controller.compositeBindings)
             {
                 var entry = Instantiate(entryPrefab, content);
                 entry.Init(controller, data);

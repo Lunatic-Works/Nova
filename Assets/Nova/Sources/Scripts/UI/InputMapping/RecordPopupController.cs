@@ -1,15 +1,16 @@
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Nova
 {
     public class RecordPopupController : ViewControllerBase
     {
-        public RecordPopupLabel label;
+        [SerializeField] private RecordPopupLabel label;
 
-        public List<InputControl> bindings
+        public List<InputControl> controls
         {
-            set => label.bindings = value;
+            set => label.controls = value;
         }
 
         protected override void OnActivatedUpdate()

@@ -82,8 +82,8 @@ namespace Nova
         private bool isWin;
         private bool isShift;
 
-        private readonly List<InputControl> bindingResult = new List<InputControl>();
-        private readonly KeyStatus keyEnabled = new KeyStatus();
+        private readonly List<InputControl> boundControls = new List<InputControl>();
+        private readonly KeyStatus enabledState = new KeyStatus();
 
         /// <summary>
         /// Gets general paths from input control.<br/>
@@ -106,6 +106,7 @@ namespace Nova
             {
                 path = regex.Replace(path, "<Keyboard>/");
             }
+
             return path;
         }
 
@@ -116,45 +117,45 @@ namespace Nova
         {
             if (entry != null)
             {
-                action.ChangeBinding(entry.bindingData.startIndex).Erase();
+                action.ChangeBinding(entry.compositeBinding.startIndex).Erase();
             }
 
-            if (bindingResult.Count == 1)
+            if (boundControls.Count == 1)
             {
-                action.AddBinding(GetGeneralPath(bindingResult[0]));
+                action.AddBinding(GetGeneralPath(boundControls[0]));
             }
-            else if (bindingResult.Count == 2)
+            else if (boundControls.Count == 2)
             {
                 action.AddCompositeBinding("OneModifier")
-                    .With("Modifier", GetGeneralPath(bindingResult[0]))
-                    .With("Binding", GetGeneralPath(bindingResult[1]));
+                    .With("Modifier", GetGeneralPath(boundControls[0]))
+                    .With("Binding", GetGeneralPath(boundControls[1]));
             }
-            else if (bindingResult.Count == 3)
+            else if (boundControls.Count == 3)
             {
                 action.AddCompositeBinding("TwoModifiers")
-                    .With("Modifier1", GetGeneralPath(bindingResult[0]))
-                    .With("Modifier2", GetGeneralPath(bindingResult[1]))
-                    .With("Binding", GetGeneralPath(bindingResult[2]));
+                    .With("Modifier1", GetGeneralPath(boundControls[0]))
+                    .With("Modifier2", GetGeneralPath(boundControls[1]))
+                    .With("Binding", GetGeneralPath(boundControls[2]));
             }
         }
 
         private void AddControl(InputControl control)
         {
             // Allow at most 2 modifiers and 1 binding.
-            if (bindingResult.Count < 3 && bindingResult.All(input => input.path != control.path))
+            if (boundControls.Count < 3 && boundControls.All(input => input.path != control.path))
             {
-                bindingResult.Add(control);
+                boundControls.Add(control);
             }
         }
 
         private void OnEnable()
         {
             isRebinding = true;
-            bindingResult.Clear();
-            popupController.bindings = bindingResult;
+            boundControls.Clear();
+            popupController.controls = boundControls;
             popupController.Show();
             isCtrl = isAlt = isWin = isShift = false;
-            controller.inputManager.GetEnabledState(keyEnabled);
+            controller.inputManager.GetEnabledState(enabledState);
             controller.inputManager.SetEnableGroup(AbstractKeyGroup.None);
         }
 
@@ -162,34 +163,21 @@ namespace Nova
         {
             isRebinding = false;
             isCtrl = isAlt = isWin = isShift = false;
-            controller.inputManager.SetEnabledState(keyEnabled);
+            controller.inputManager.SetEnabledState(enabledState);
 
             popupController.Hide();
-
             entry?.FinishModify();
 
-            bool isResultValid = bindingResult.Count > 0;
-
-            if (isResultValid)
-            {
-                var buttonPath = GetGeneralPath(bindingResult[bindingResult.Count - 1]);
-                var duplicate = controller.bindingData.FirstOrDefault(data =>
-                    data != entry?.bindingData && data.button?.effectivePath == buttonPath);
-                if (duplicate != null)
-                {
-                    isResultValid = false;
-                }
-            }
-
-            if (isResultValid)
-            {
-                ApplyBinding();
-                controller.ResolveDuplicate();
-            }
-            else
+            if (boundControls.Count == 0)
             {
                 entry?.Remove();
+                entry = null;
+                return;
             }
+
+            ApplyBinding();
+            InputMappingController.ResolveDuplicateForAction(action);
+            controller.ResolveDuplicate();
 
             entry = null;
         }
@@ -273,9 +261,9 @@ namespace Nova
             }
 
             // If any previously pressed key is released, finalize the binding
-            if (bindingResult.Count > 0)
+            if (boundControls.Count > 0)
             {
-                if (bindingResult.Any(input => !input.IsPressed()))
+                if (boundControls.Any(input => !input.IsPressed()))
                 {
                     gameObject.SetActive(false);
                 }
