@@ -11,29 +11,23 @@ namespace Nova
 
         private InputMappingController controller;
 
-        public InputBindingData bindingData { get; private set; }
+        public CompositeInputBinding compositeBinding { get; private set; }
 
         private void Awake()
         {
             label.color = defaultColor;
         }
 
-        private void Refresh()
-        {
-            bindingData.RefreshEndIndex();
-            label.text = bindingData.ToString();
-        }
-
-        public void Init(InputMappingController controller, InputBindingData bindingData)
+        public void Init(InputMappingController controller, CompositeInputBinding compositeBinding)
         {
             this.controller = controller;
-            this.bindingData = bindingData;
-            Refresh();
+            this.compositeBinding = compositeBinding;
+            label.text = compositeBinding.ToString();
         }
 
         public void Remove()
         {
-            controller.RemoveBinding(bindingData);
+            controller.RemoveBinding(compositeBinding);
         }
 
         private bool isModifying

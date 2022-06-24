@@ -12,7 +12,7 @@ namespace Nova
         public InputMappingList inputMappingList;
         public CompoundKeyRecorder compoundKeyRecorder;
 
-        public readonly List<InputBindingData> bindingData = new List<InputBindingData>();
+        public readonly List<CompositeInputBinding> compositeBindings = new List<CompositeInputBinding>();
 
         private ActionAssetData actionAsset
         {
@@ -80,26 +80,27 @@ namespace Nova
 
         public InputAction currentAction => actionAsset.GetAction(currentSelectedKey);
 
-        private static IEnumerable<InputBindingData> GenerateBindingData(InputAction action)
+        private static IEnumerable<CompositeInputBinding> GenerateCompositeBindings(InputAction action)
         {
             var cnt = action.bindings.Count;
             for (var i = 0; i < cnt; ++i)
             {
-                InputBindingData data;
+                CompositeInputBinding compositeBinding;
                 try
                 {
-                    data = new InputBindingData(action, i);
-                    i = data.endIndex - 1;
+                    compositeBinding = new CompositeInputBinding(action, i);
+                    i = compositeBinding.endIndex - 1;
                 }
                 catch (Exception e)
                 {
-                    // When all bindings are erased, action.bindings.Count might be 1,
+                    // TODO: When all bindings are erased, action.bindings.Count might be 1,
                     // but accessing action.bindings[0] will throw an exception.
+                    // This may be a bug of Unity.
                     Debug.LogException(e);
                     continue;
                 }
 
-                yield return data;
+                yield return compositeBinding;
             }
         }
 
@@ -113,15 +114,16 @@ namespace Nova
                 }
                 catch (Exception e)
                 {
-                    // When all bindings are erased, action.bindings.Count might be 1,
+                    // TODO: When all bindings are erased, action.bindings.Count might be 1,
                     // but accessing action.bindings[0] will throw an exception.
+                    // This may be a bug of Unity.
                     Debug.LogException(e);
                     break;
                 }
             }
         }
 
-        public void RemoveBinding(InputBindingData data)
+        public void RemoveBinding(CompositeInputBinding data)
         {
             for (var i = data.endIndex - 1; i >= data.startIndex; --i)
             {
@@ -150,15 +152,15 @@ namespace Nova
             Apply();
         }
 
-        private void RefreshBindingData()
+        private void RefreshCompositeBindings()
         {
-            bindingData.Clear();
-            bindingData.AddRange(GenerateBindingData(currentAction).OrderBy(d => d.ToString()));
+            compositeBindings.Clear();
+            compositeBindings.AddRange(GenerateCompositeBindings(currentAction).OrderBy(d => d.ToString()));
         }
 
         private void RefreshBindingList()
         {
-            RefreshBindingData();
+            RefreshCompositeBindings();
             inputMappingList.Refresh();
         }
 
@@ -210,37 +212,71 @@ namespace Nova
         }
 
         // In all abstract keys other than currentSelectedKey that are in any same group as currentSelectedKey,
-        // remove any binding that is in currentSelectedKey
+        // remove all bindings that conflict with any binding in currentSelectedKey
         public void ResolveDuplicate()
         {
-            RefreshBindingData();
-
-            foreach (var ak in mappableKeys)
+            var abstractKeyToCompositeBindings = mappableKeys.ToDictionary(key => key,
+                key => GenerateCompositeBindings(actionAsset.GetAction(key)).ToList());
+            var group = actionAsset.GetActionGroup(currentSelectedKey);
+            var compositeBindings = abstractKeyToCompositeBindings[currentSelectedKey];
+            var bindingIndicesToRemove = new Dictionary<AbstractKey, List<int>>();
+            foreach (var otherAk in mappableKeys)
             {
-                if (ak == currentSelectedKey ||
-                    !actionAsset.TryGetActionGroup(currentSelectedKey, out var group) ||
-                    !actionAsset.TryGetActionGroup(ak, out var otherGroup) ||
-                    (group & otherGroup) == 0 ||
-                    !actionAsset.TryGetAction(ak, out var action))
+                if (otherAk == currentSelectedKey || (actionAsset.GetActionGroup(otherAk) & group) == 0)
                 {
                     continue;
                 }
 
-                foreach (var otherData in GenerateBindingData(action))
+                var bindingIndices = bindingIndicesToRemove[otherAk] = new List<int>();
+                foreach (var otherCb in abstractKeyToCompositeBindings[otherAk])
                 {
-                    if (!bindingData.Any(data => data.SameButtonAs(otherData)))
+                    if (!compositeBindings.Any(cb => cb.AnySameBinding(otherCb)))
                     {
                         continue;
                     }
 
-                    for (var i = otherData.endIndex - 1; i >= otherData.startIndex; --i)
+                    for (var i = otherCb.startIndex; i < otherCb.endIndex; ++i)
                     {
-                        action.ChangeBinding(i).Erase();
+                        bindingIndices.Add(i);
                     }
                 }
             }
 
+            foreach (var pair in bindingIndicesToRemove)
+            {
+                var action = actionAsset.GetAction(pair.Key);
+                foreach (var i in pair.Value.OrderByDescending(i => i))
+                {
+                    action.ChangeBinding(i).Erase();
+                }
+            }
+
             RefreshBindingList();
+        }
+
+        public static void ResolveDuplicateForAction(InputAction action)
+        {
+            var compositeBindings = InputMappingController.GenerateCompositeBindings(action).ToList();
+            // The last composite binding is the newly added one
+            var cb = compositeBindings.Last();
+            var bindingIndicesToRemove = new List<int>();
+            foreach (var otherCb in compositeBindings)
+            {
+                if (cb == otherCb || !cb.AnySameBinding(otherCb))
+                {
+                    continue;
+                }
+
+                for (var i = otherCb.startIndex; i < otherCb.endIndex; ++i)
+                {
+                    bindingIndicesToRemove.Add(i);
+                }
+            }
+
+            foreach (var i in bindingIndicesToRemove.OrderByDescending(i => i))
+            {
+                action.ChangeBinding(i).Erase();
+            }
         }
     }
 }

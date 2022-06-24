@@ -9,7 +9,7 @@ namespace Nova
     [RequireComponent(typeof(Text))]
     public class RecordPopupLabel : MonoBehaviour
     {
-        public List<InputControl> bindings;
+        public List<InputControl> controls;
 
         private Text label;
 
@@ -20,7 +20,7 @@ namespace Nova
 
         private void Update()
         {
-            label.text = string.Join(" + ", bindings.Select(b => b.shortDisplayName ?? b.displayName));
+            label.text = string.Join(" + ", controls.Select(b => b.shortDisplayName ?? b.displayName));
         }
     }
 }
