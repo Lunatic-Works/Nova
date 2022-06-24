@@ -2591,7 +2591,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abstractKeyList: {fileID: 6529979345981925899}
-  inputMappingList: {fileID: 6012900079092459988}
+  inputBindingList: {fileID: 6012900079092459988}
   compoundKeyRecorder: {fileID: 5004877971036850370}
 --- !u!1 &3113775755284081197
 GameObject:
@@ -2903,7 +2903,7 @@ GameObject:
   - component: {fileID: 3113775755983261469}
   - component: {fileID: 6012900079092459988}
   m_Layer: 5
-  m_Name: InputMappingList
+  m_Name: InputBindingList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

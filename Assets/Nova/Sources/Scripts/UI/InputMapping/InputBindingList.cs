@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class InputMappingList : MonoBehaviour
+    public class InputBindingList : MonoBehaviour
     {
         public Transform content;
-        public InputMappingListEntry entryPrefab;
+        public InputBindingEntry entryPrefab;
         public InputMappingController controller;
 
         private void ClearContent()
