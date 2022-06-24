@@ -21,7 +21,7 @@ namespace Nova
             entries.Clear();
         }
 
-        public void RefreshAll()
+        public void Refresh()
         {
             ClearContent();
             foreach (var key in controller.mappableKeys)
@@ -36,7 +36,7 @@ namespace Nova
         {
             foreach (var entry in entries)
             {
-                entry.RefreshColor();
+                entry.Refresh();
             }
         }
     }

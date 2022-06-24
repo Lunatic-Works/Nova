@@ -75,7 +75,7 @@ namespace Nova
             NotifyAll();
         }
 
-        public void ResetToDefault()
+        public void ResetDefault()
         {
             ClearCache();
             PlayerPrefs.DeleteAll();

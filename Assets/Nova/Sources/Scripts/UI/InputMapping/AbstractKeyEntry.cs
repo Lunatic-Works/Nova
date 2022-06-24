@@ -21,7 +21,7 @@ namespace Nova
             label.text = I18n.__($"config.key.{Enum.GetName(typeof(AbstractKey), key)}");
         }
 
-        public void RefreshColor()
+        public void Refresh()
         {
             background.color = selected ? selectedColor : defaultColor;
         }
@@ -31,13 +31,13 @@ namespace Nova
             this.controller = controller;
             this.key = key;
             UpdateText();
-            RefreshColor();
+            Refresh();
         }
 
         private void OnEnable()
         {
             UpdateText();
-            RefreshColor();
+            Refresh();
             I18n.LocaleChanged.AddListener(UpdateText);
         }
 

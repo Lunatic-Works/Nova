@@ -57,7 +57,7 @@ namespace Nova
         public IEnumerable<AbstractKey> mappableKeys => Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>();
 #else
         public IEnumerable<AbstractKey> mappableKeys => Enum.GetValues(typeof(AbstractKey)).Cast<AbstractKey>()
-            .Where(ak => !inputManager.KeyIsEditor(ak));
+            .Where(ak => !ActionAssetData.IsEditorOnly(ak));
 #endif
 
         private AbstractKey _currentSelectedKey;
@@ -83,9 +83,9 @@ namespace Nova
         private static IEnumerable<InputBindingData> GenerateBindingData(InputAction action)
         {
             var cnt = action.bindings.Count;
-            InputBindingData data;
             for (var i = 0; i < cnt; i++)
             {
+                InputBindingData data;
                 try
                 {
                     data = new InputBindingData(action, i);
@@ -123,8 +123,11 @@ namespace Nova
 
         public void DeleteCompoundKey(InputBindingData data)
         {
-            for (int i = data.endIndex - 1; i >= data.startIndex; i--)
+            for (int i = data.endIndex - 1; i >= data.startIndex; --i)
+            {
                 currentAction.ChangeBinding(i).Erase();
+            }
+
             RefreshBindingList();
         }
 
@@ -137,7 +140,7 @@ namespace Nova
         {
             Init();
             _currentSelectedKey = mappableKeys.First();
-            abstractKeyList.RefreshAll();
+            abstractKeyList.Refresh();
             RefreshBindingList();
             compoundKeyRecorder.Init(this);
         }
@@ -147,22 +150,16 @@ namespace Nova
             Apply();
         }
 
-        private void RefreshData()
-        {
-            actionAsset = oldActionAsset;
-        }
-
         private void RefreshBindingData()
         {
             bindingData.Clear();
-            bindingData.AddRange(
-                GenerateBindingData(currentAction).OrderBy(d => d.displayString));
+            bindingData.AddRange(GenerateBindingData(currentAction).OrderBy(d => d.displayString));
         }
 
-        private InputMappingListEntry RefreshBindingList()
+        private void RefreshBindingList()
         {
             RefreshBindingData();
-            return inputMappingList.Refresh();
+            inputMappingList.Refresh();
         }
 
         public void Apply()

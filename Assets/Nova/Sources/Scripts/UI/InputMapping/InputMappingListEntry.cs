@@ -18,12 +18,7 @@ namespace Nova
             label.color = defaultColor;
         }
 
-        private void RefreshDisplay()
-        {
-            RefreshLabel();
-        }
-
-        private void RefreshLabel()
+        private void Refresh()
         {
             bindingData.RefreshEndIndex();
             label.text = bindingData.displayString;
@@ -33,7 +28,7 @@ namespace Nova
         {
             this.controller = controller;
             this.bindingData = bindingData;
-            RefreshDisplay();
+            Refresh();
         }
 
         public void Delete()
