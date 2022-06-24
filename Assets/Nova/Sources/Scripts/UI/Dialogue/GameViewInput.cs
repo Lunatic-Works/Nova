@@ -169,8 +169,8 @@ namespace Nova
 
             if (buttonRingTrigger.buttonShowing)
             {
-                buttonRingTrigger.Hide(!buttonRingTrigger.holdOpen
-                                       || eventData.button != PointerEventData.InputButton.Right);
+                buttonRingTrigger.Hide(!buttonRingTrigger.holdOpen ||
+                                       eventData.button != PointerEventData.InputButton.Right);
                 return;
             }
 

@@ -6,16 +6,16 @@ namespace Nova
 {
     public class InputBindingData
     {
-        public InputAction action;
+        public readonly InputAction action;
 
         /// <summary>
-        /// Inclusive start index of the binding
+        /// Inclusive start index of the binding.
         /// </summary>
         public int startIndex { get; private set; }
 
         /// <summary>
         /// Exclusive end index of the binding.
-        /// If endIndex = startIndex, the binding does not exist.
+        /// If endIndex == startIndex, the binding does not exist.
         /// </summary>
         public int endIndex { get; private set; }
 
@@ -68,9 +68,9 @@ namespace Nova
         /// <summary>
         /// Check if two binding data have the same button, ignoring modifiers.
         /// </summary>
-        public bool SameButtonAs(InputBindingData y)
+        public bool SameButtonAs(InputBindingData other)
         {
-            return button?.effectivePath == y.button?.effectivePath;
+            return button?.effectivePath == other.button?.effectivePath;
         }
 
         public InputBindingData(InputAction action, int startIndex)

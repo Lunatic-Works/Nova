@@ -69,9 +69,9 @@ namespace Nova
                 }
             }
 
-            foreach (var key in Enum.GetValues(typeof(AbstractKey)))
+            foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
-                if (!actionsDic.ContainsKey((AbstractKey)key))
+                if (!actionsDic.ContainsKey(key))
                 {
                     Debug.LogError($"Nova: Missing action key: {key}");
                 }
@@ -111,7 +111,7 @@ namespace Nova
         public bool TryGetActionGroup(AbstractKey key, out AbstractKeyGroup group)
             => actionGroupsDic.TryGetValue(key, out group);
 
-        public bool KeyIsEditor(AbstractKey key)
+        public static bool IsEditorOnly(AbstractKey key)
             => key.ToString().ToLower().StartsWith("editor", StringComparison.Ordinal);
 
         public ActionAssetData Clone()

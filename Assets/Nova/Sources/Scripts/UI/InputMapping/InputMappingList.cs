@@ -31,22 +31,14 @@ namespace Nova
             controller.ResetCurrentKeyMappingDefault();
         }
 
-        public InputMappingListEntry Refresh()
+        public void Refresh()
         {
             ClearContent();
-            InputMappingListEntry entry = null;
             foreach (var data in controller.bindingData)
             {
-                var newEntry = Instantiate(entryPrefab, content);
-                newEntry.Init(controller, data);
-                // The data might not come in increasing order of inde. We need to return the last entry.
-                if (entry == null || data.startIndex > entry.bindingData.startIndex)
-                {
-                    entry = newEntry;
-                }
+                var entry = Instantiate(entryPrefab, content);
+                entry.Init(controller, data);
             }
-
-            return entry;
         }
     }
 }

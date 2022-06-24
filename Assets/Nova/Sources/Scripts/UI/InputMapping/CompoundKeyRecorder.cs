@@ -74,13 +74,15 @@ namespace Nova
 
         private InputMappingController controller;
         private InputAction action => controller.currentAction;
+
         public bool isRebinding { get; private set; }
         private bool isCtrl;
         private bool isAlt;
         private bool isWin;
         private bool isShift;
+
         private readonly List<InputControl> bindingResult = new List<InputControl>();
-        private KeyStatus keyEnabled;
+        private readonly KeyStatus keyEnabled = new KeyStatus();
 
         /// <summary>
         /// Gets general paths from input control.<br/>
@@ -129,8 +131,7 @@ namespace Nova
         private void AddControl(InputControl control)
         {
             // Allow at most 2 modifiers and 1 binding.
-            if (bindingResult.Count < 3
-                && !bindingResult.Any(input => input.path == control.path))
+            if (bindingResult.Count < 3 && bindingResult.All(input => input.path != control.path))
             {
                 bindingResult.Add(control);
             }
@@ -143,7 +144,7 @@ namespace Nova
             popupController.bindings = bindingResult;
             popupController.Show();
             isCtrl = isAlt = isWin = isShift = false;
-            keyEnabled = controller.inputManager.GetEnabledState();
+            controller.inputManager.GetEnabledState(keyEnabled);
             controller.inputManager.SetEnableGroup(AbstractKeyGroup.None);
         }
 
@@ -162,8 +163,8 @@ namespace Nova
             if (isResultValid)
             {
                 var buttonPath = GetGeneralPath(bindingResult[bindingResult.Count - 1]);
-                var duplicate = controller.bindingData
-                    .FirstOrDefault(data => data != entry?.bindingData && data.button?.effectivePath == buttonPath);
+                var duplicate = controller.bindingData.FirstOrDefault(data =>
+                    data != entry?.bindingData && data.button?.effectivePath == buttonPath);
                 if (duplicate != null)
                 {
                     isResultValid = false;
@@ -273,8 +274,8 @@ namespace Nova
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left
-                || eventData.button == PointerEventData.InputButton.Right)
+            if (eventData.button == PointerEventData.InputButton.Left ||
+                eventData.button == PointerEventData.InputButton.Right)
             {
                 gameObject.SetActive(false);
             }

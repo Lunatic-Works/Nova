@@ -29,11 +29,7 @@ namespace Nova
         public void Save()
         {
             var json = actionAsset.data.ToJson();
-            if (!Directory.Exists(InputFilesDirectory))
-            {
-                Directory.CreateDirectory(InputFilesDirectory);
-            }
-
+            Directory.CreateDirectory(InputFilesDirectory);
             File.WriteAllText(BindingsFilePath, json);
         }
 
@@ -93,11 +89,12 @@ namespace Nova
         public bool IsTriggered(AbstractKey key)
         {
 #if !UNITY_EDITOR
-            if (KeyIsEditor(key))
+            if (ActionAssetData.IsEditorOnly(key))
             {
                 return false;
             }
 #endif
+
             if (!actionAsset.TryGetAction(key, out var action))
             {
                 Debug.LogError($"Nova: Missing action key: {key}");
@@ -107,32 +104,24 @@ namespace Nova
             return action.triggered;
         }
 
-        public bool KeyIsEditor(AbstractKey key)
-            => actionAsset.KeyIsEditor(key);
-
-        public ActionAssetData CloneActionAsset()
-            => actionAsset.Clone();
-
         public void SetActionAsset(InputActionAsset asset)
         {
-            var enabledState = GetEnabledState();
+            var enabledState = new KeyStatus();
+            GetEnabledState(enabledState);
             actionAsset?.data.Disable();
             actionAsset = new ActionAssetData(InputActionAsset.FromJson(asset.ToJson()));
             SetEnabledState(enabledState);
         }
 
-        public KeyStatus GetEnabledState()
+        public void GetEnabledState(KeyStatus status)
         {
-            var status = new KeyStatus();
-            foreach (var key in Enum.GetValues(typeof(AbstractKey)))
+            foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
-                if (actionAsset.TryGetAction((AbstractKey)key, out var action))
+                if (actionAsset.TryGetAction(key, out var action))
                 {
-                    status.Add((AbstractKey)key, action.enabled);
+                    status[key] = action.enabled;
                 }
             }
-
-            return status;
         }
 
         public void SetEnabledState(KeyStatus status)
