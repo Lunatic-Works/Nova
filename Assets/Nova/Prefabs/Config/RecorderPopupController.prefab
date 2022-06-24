@@ -247,9 +247,9 @@ RectTransform:
   m_Father: {fileID: 3017507832820004765}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 404, y: -78.10002}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -78.10002}
   m_SizeDelta: {x: 659.1, y: 79.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3020296089655653793
@@ -417,9 +417,9 @@ RectTransform:
   m_Father: {fileID: 3017507832820004765}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 404, y: -160.45}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -160.45}
   m_SizeDelta: {x: 659.1, y: 85.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5787218114708672910
@@ -489,4 +489,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6be116a8ba9444f3baf91f26051d8c8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entry: {fileID: 0}

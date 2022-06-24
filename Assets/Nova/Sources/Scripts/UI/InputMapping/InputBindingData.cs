@@ -34,7 +34,7 @@ namespace Nova
                     yield return action.bindings[startIndex];
                 }
 
-                for (var i = startIndex + 1; i < endIndex; i++)
+                for (var i = startIndex + 1; i < endIndex; ++i)
                 {
                     yield return action.bindings[i];
                 }

@@ -121,9 +121,9 @@ namespace Nova
             }
         }
 
-        public void DeleteCompoundKey(InputBindingData data)
+        public void RemoveBinding(InputBindingData data)
         {
-            for (int i = data.endIndex - 1; i >= data.startIndex; --i)
+            for (var i = data.endIndex - 1; i >= data.startIndex; --i)
             {
                 currentAction.ChangeBinding(i).Erase();
             }
@@ -131,7 +131,7 @@ namespace Nova
             RefreshBindingList();
         }
 
-        public void AddCompoundKey()
+        public void AddBinding()
         {
             StartModifyBinding(null);
         }
@@ -209,38 +209,35 @@ namespace Nova
             compoundKeyRecorder.BeginRecording(entry);
         }
 
-        // In all abstract keys other than currentSelectedKey that have any same group as currentSelectedKey,
-        // remove any compound key that is in currentSelectedKey
+        // In all abstract keys other than currentSelectedKey that are in any same group as currentSelectedKey,
+        // remove any binding that is in currentSelectedKey
         public void ResolveDuplicate()
         {
             RefreshBindingData();
-            var duplicates = new List<(InputAction, InputBinding)>();
+
             foreach (var ak in mappableKeys)
             {
-                if (ak == currentSelectedKey || !actionAsset.TryGetAction(ak, out var action))
+                if (ak == currentSelectedKey ||
+                    !actionAsset.TryGetActionGroup(currentSelectedKey, out var group) ||
+                    !actionAsset.TryGetActionGroup(ak, out var otherGroup) ||
+                    (group & otherGroup) == 0 ||
+                    !actionAsset.TryGetAction(ak, out var action))
                 {
                     continue;
                 }
 
-                if (!actionAsset.TryGetActionGroup(currentSelectedKey, out var group) ||
-                    !actionAsset.TryGetActionGroup(ak, out var otherGroup))
+                foreach (var otherData in GenerateBindingData(action))
                 {
-                    continue;
+                    if (!bindingData.Any(data => data.SameButtonAs(otherData)))
+                    {
+                        continue;
+                    }
+
+                    for (var i = otherData.endIndex - 1; i >= otherData.startIndex; --i)
+                    {
+                        action.ChangeBinding(i).Erase();
+                    }
                 }
-
-                if (group != otherGroup)
-                {
-                    continue;
-                }
-
-                duplicates.AddRange(GenerateBindingData(action)
-                    .Where(d => bindingData.Any(b => b.SameButtonAs(d)))
-                    .Select(d => (d.action, d.bindings.First())));
-            }
-
-            foreach (var duplicate in duplicates)
-            {
-                duplicate.Item1.ChangeBinding(duplicate.Item2).Erase();
             }
 
             RefreshBindingList();

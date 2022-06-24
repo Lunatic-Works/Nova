@@ -273,7 +273,7 @@ PrefabInstance:
     - target: {fileID: 1547301965553955180, guid: 89fb92f6ea352490cb8c58c87a53045d,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Delete
+      value: Remove
       objectReference: {fileID: 0}
     - target: {fileID: 1547301965553955180, guid: 89fb92f6ea352490cb8c58c87a53045d,
         type: 3}

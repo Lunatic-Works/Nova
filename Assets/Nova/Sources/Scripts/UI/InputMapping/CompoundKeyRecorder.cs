@@ -178,7 +178,7 @@ namespace Nova
             }
             else
             {
-                entry?.Delete();
+                entry?.Remove();
             }
 
             entry = null;
