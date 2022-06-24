@@ -27,13 +27,13 @@ namespace Nova
     {
         public readonly InputActionAsset data;
 
-        private readonly Dictionary<AbstractKey, AbstractKeyGroup> actionGroupsDic
+        private readonly Dictionary<AbstractKey, AbstractKeyGroup> actionGroups
             = new Dictionary<AbstractKey, AbstractKeyGroup>();
 
-        private readonly Dictionary<AbstractKey, InputAction> actionsDic
+        private readonly Dictionary<AbstractKey, InputAction> actions
             = new Dictionary<AbstractKey, InputAction>();
 
-        private readonly Dictionary<AbstractKeyGroup, InputActionMap> actionMapsDic
+        private readonly Dictionary<AbstractKeyGroup, InputActionMap> actionMaps
             = new Dictionary<AbstractKeyGroup, InputActionMap>();
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Nova
                 {
                     Debug.LogError($"Nova: Unknown action name: {action.name}");
                 }
-                else if (actionGroupsDic.ContainsKey(key))
+                else if (actionGroups.ContainsKey(key))
                 {
                     Debug.LogError($"Nova: Duplicate action key: {action.name}");
                 }
@@ -64,14 +64,14 @@ namespace Nova
                 }
                 else
                 {
-                    actionGroupsDic[key] = group;
-                    actionsDic[key] = action;
+                    actionGroups[key] = group;
+                    actions[key] = action;
                 }
             }
 
             foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
             {
-                if (!actionsDic.ContainsKey(key))
+                if (!actions.ContainsKey(key))
                 {
                     Debug.LogError($"Nova: Missing action key: {key}");
                 }
@@ -85,31 +85,31 @@ namespace Nova
                 }
                 else
                 {
-                    actionMapsDic[group] = key;
+                    actionMaps[group] = key;
                 }
             }
         }
 
         public IEnumerable<InputActionMap> GetActionMaps(AbstractKeyGroup group)
-            => actionMapsDic.Where(pair => group.HasFlag(pair.Key)).Select(pair => pair.Value);
+            => actionMaps.Where(pair => group.HasFlag(pair.Key)).Select(pair => pair.Value);
 
         public InputActionMap GetActionMap(AbstractKeyGroup group)
-            => actionMapsDic[group];
+            => actionMaps[group];
 
         public bool TryGetActionMap(AbstractKeyGroup group, out InputActionMap actionMap)
-            => actionMapsDic.TryGetValue(group, out actionMap);
+            => actionMaps.TryGetValue(group, out actionMap);
 
         public InputAction GetAction(AbstractKey key)
-            => actionsDic[key];
+            => actions[key];
 
         public bool TryGetAction(AbstractKey key, out InputAction action)
-            => actionsDic.TryGetValue(key, out action);
+            => actions.TryGetValue(key, out action);
 
         public AbstractKeyGroup GetActionGroup(AbstractKey key)
-            => actionGroupsDic[key];
+            => actionGroups[key];
 
         public bool TryGetActionGroup(AbstractKey key, out AbstractKeyGroup group)
-            => actionGroupsDic.TryGetValue(key, out group);
+            => actionGroups.TryGetValue(key, out group);
 
         public static bool IsEditorOnly(AbstractKey key)
             => key.ToString().ToLower().StartsWith("editor", StringComparison.Ordinal);
