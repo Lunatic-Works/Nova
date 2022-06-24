@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class InputMappingListEntry : MonoBehaviour
+    public class InputBindingEntry : MonoBehaviour
     {
         public Text label;
         public Color defaultColor;

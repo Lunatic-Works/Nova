@@ -178,7 +178,6 @@ namespace Nova
             ApplyBinding();
             InputMappingController.ResolveDuplicateForAction(action);
             controller.ResolveDuplicate();
-
             entry = null;
         }
 
@@ -188,13 +187,13 @@ namespace Nova
             gameObject.SetActive(false);
         }
 
-        private InputMappingListEntry entry;
+        private InputBindingEntry entry;
 
         /// <summary>
         /// Modify an entry or add a new entry.
         /// </summary>
         /// <param name="entry">The entry to modify. If null, adds a new entry.</param>
-        public void BeginRecording(InputMappingListEntry entry)
+        public void BeginRecording(InputBindingEntry entry)
         {
             this.entry = entry;
             gameObject.SetActive(true);

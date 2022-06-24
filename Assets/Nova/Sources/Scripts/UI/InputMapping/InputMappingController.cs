@@ -9,7 +9,7 @@ namespace Nova
     public class InputMappingController : MonoBehaviour
     {
         public AbstractKeyList abstractKeyList;
-        public InputMappingList inputMappingList;
+        public InputBindingList inputBindingList;
         public CompoundKeyRecorder compoundKeyRecorder;
 
         public readonly List<CompositeInputBinding> compositeBindings = new List<CompositeInputBinding>();
@@ -60,25 +60,25 @@ namespace Nova
             .Where(ak => !ActionAssetData.IsEditorOnly(ak));
 #endif
 
-        private AbstractKey _currentSelectedKey;
+        private AbstractKey _currentAbstractKey;
 
-        public AbstractKey currentSelectedKey
+        public AbstractKey currentAbstractKey
         {
-            get => _currentSelectedKey;
+            get => _currentAbstractKey;
             set
             {
-                if (_currentSelectedKey == value)
+                if (_currentAbstractKey == value)
                 {
                     return;
                 }
 
-                _currentSelectedKey = value;
+                _currentAbstractKey = value;
                 abstractKeyList.RefreshSelection();
                 RefreshBindingList();
             }
         }
 
-        public InputAction currentAction => actionAsset.GetAction(currentSelectedKey);
+        public InputAction currentAction => actionAsset.GetAction(currentAbstractKey);
 
         private static IEnumerable<CompositeInputBinding> GenerateCompositeBindings(InputAction action)
         {
@@ -141,7 +141,7 @@ namespace Nova
         private void Start()
         {
             Init();
-            _currentSelectedKey = mappableKeys.First();
+            _currentAbstractKey = mappableKeys.First();
             abstractKeyList.Refresh();
             RefreshBindingList();
             compoundKeyRecorder.Init(this);
@@ -161,7 +161,7 @@ namespace Nova
         private void RefreshBindingList()
         {
             RefreshCompositeBindings();
-            inputMappingList.Refresh();
+            inputBindingList.Refresh();
         }
 
         public void Apply()
@@ -178,7 +178,7 @@ namespace Nova
 
         public void RestoreCurrentKeyMapping()
         {
-            var original = oldActionAsset.GetAction(currentSelectedKey);
+            var original = oldActionAsset.GetAction(currentAbstractKey);
             RemoveAllBindings(currentAction);
             foreach (var binding in original.bindings)
             {
@@ -206,23 +206,23 @@ namespace Nova
             ResolveDuplicate();
         }
 
-        public void StartModifyBinding(InputMappingListEntry entry)
+        public void StartModifyBinding(InputBindingEntry entry)
         {
             compoundKeyRecorder.BeginRecording(entry);
         }
 
-        // In all abstract keys other than currentSelectedKey that are in any same group as currentSelectedKey,
-        // remove all bindings that conflict with any binding in currentSelectedKey
+        // In all abstract keys other than currentAbstractKey that are in any same group as currentAbstractKey,
+        // remove all bindings that conflict with any binding in currentAbstractKey
         public void ResolveDuplicate()
         {
             var abstractKeyToCompositeBindings = mappableKeys.ToDictionary(key => key,
                 key => GenerateCompositeBindings(actionAsset.GetAction(key)).ToList());
-            var group = actionAsset.GetActionGroup(currentSelectedKey);
-            var compositeBindings = abstractKeyToCompositeBindings[currentSelectedKey];
+            var group = actionAsset.GetActionGroup(currentAbstractKey);
+            var compositeBindings = abstractKeyToCompositeBindings[currentAbstractKey];
             var bindingIndicesToRemove = new Dictionary<AbstractKey, List<int>>();
             foreach (var otherAk in mappableKeys)
             {
-                if (otherAk == currentSelectedKey || (actionAsset.GetActionGroup(otherAk) & group) == 0)
+                if (otherAk == currentAbstractKey || (actionAsset.GetActionGroup(otherAk) & group) == 0)
                 {
                     continue;
                 }

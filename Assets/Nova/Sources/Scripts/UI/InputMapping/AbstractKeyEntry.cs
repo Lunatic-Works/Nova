@@ -14,7 +14,7 @@ namespace Nova
         private InputMappingController controller;
         private AbstractKey key;
 
-        private bool selected => controller != null && key == controller.currentSelectedKey;
+        private bool selected => controller != null && key == controller.currentAbstractKey;
 
         private void UpdateText()
         {
@@ -46,9 +46,9 @@ namespace Nova
             I18n.LocaleChanged.RemoveListener(UpdateText);
         }
 
-        public void SelectCurrentKey()
+        public void Select()
         {
-            controller.currentSelectedKey = key;
+            controller.currentAbstractKey = key;
         }
     }
 }
