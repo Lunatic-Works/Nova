@@ -17,7 +17,7 @@ namespace Nova
         private ActionAssetData actionAsset
         {
             get => inputManager.actionAsset;
-            set => inputManager.SetActionAsset(value.data);
+            set => inputManager.SetActionAsset(value);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Nova
         private static IEnumerable<InputBindingData> GenerateBindingData(InputAction action)
         {
             var cnt = action.bindings.Count;
-            for (var i = 0; i < cnt; i++)
+            for (var i = 0; i < cnt; ++i)
             {
                 InputBindingData data;
                 try
@@ -153,7 +153,7 @@ namespace Nova
         private void RefreshBindingData()
         {
             bindingData.Clear();
-            bindingData.AddRange(GenerateBindingData(currentAction).OrderBy(d => d.displayString));
+            bindingData.AddRange(GenerateBindingData(currentAction).OrderBy(d => d.ToString()));
         }
 
         private void RefreshBindingList()
@@ -188,7 +188,7 @@ namespace Nova
 
         public void ResetDefault()
         {
-            actionAsset.data.LoadFromJson(inputManager.defaultActionAsset.ToJson());
+            actionAsset = new ActionAssetData(inputManager.defaultActionAsset.Clone());
             RefreshBindingList();
         }
 
@@ -222,8 +222,8 @@ namespace Nova
                     continue;
                 }
 
-                if (!actionAsset.TryGetActionGroup(currentSelectedKey, out var group)
-                    || !actionAsset.TryGetActionGroup(ak, out var otherGroup))
+                if (!actionAsset.TryGetActionGroup(currentSelectedKey, out var group) ||
+                    !actionAsset.TryGetActionGroup(ak, out var otherGroup))
                 {
                     continue;
                 }

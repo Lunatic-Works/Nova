@@ -43,14 +43,14 @@ namespace Nova
 
         public InputBinding? button => startIndex >= endIndex ? null : (InputBinding?)action.bindings[endIndex - 1];
 
-        public string displayString => string.Join(" + ", bindings.Select(b => b.ToDisplayString()));
+        public override string ToString() => string.Join(" + ", bindings.Select(b => b.ToDisplayString()));
 
-        public int RefreshEndIndex()
+        public void RefreshEndIndex()
         {
             if (action.bindings.Count <= startIndex)
             {
                 endIndex = startIndex;
-                return endIndex;
+                return;
             }
 
             endIndex = startIndex + 1;
@@ -61,8 +61,6 @@ namespace Nova
                     ++endIndex;
                 }
             }
-
-            return endIndex;
         }
 
         /// <summary>
