@@ -8661,7 +8661,7 @@ PrefabInstance:
     - target: {fileID: 5239334043934619003, guid: 4ae2df6958f504187b7c3ae32b23ebbf,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: AddCompoundKey
+      value: AddBinding
       objectReference: {fileID: 0}
     - target: {fileID: 5239334043934619003, guid: 4ae2df6958f504187b7c3ae32b23ebbf,
         type: 3}

@@ -31,9 +31,9 @@ namespace Nova
             Refresh();
         }
 
-        public void Delete()
+        public void Remove()
         {
-            controller.DeleteCompoundKey(bindingData);
+            controller.RemoveBinding(bindingData);
         }
 
         private bool isModifying

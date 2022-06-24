@@ -16,9 +16,9 @@ namespace Nova
             }
         }
 
-        public void AddCompoundKey()
+        public void AddBinding()
         {
-            controller.AddCompoundKey();
+            controller.AddBinding();
         }
 
         public void RestoreCurrentKeyMapping()
