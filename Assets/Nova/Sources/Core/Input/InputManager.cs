@@ -36,6 +36,7 @@ namespace Nova
         private void Awake()
         {
             Init();
+            EnableInput();
         }
 
         private void OnDestroy()
@@ -130,6 +131,23 @@ namespace Nova
             {
                 SetEnable(key, status[key]);
             }
+        }
+
+        // inputEnabled is not in RestoreData, because the user cannot save when the input is disabled
+        public bool inputEnabled { get; private set; }
+
+        // Disable all abstract keys except StepForward
+        public void DisableInput()
+        {
+            inputEnabled = false;
+            SetEnableGroup(AbstractKeyGroup.Always);
+            SetEnable(AbstractKey.StepForward, true);
+        }
+
+        public void EnableInput()
+        {
+            inputEnabled = true;
+            SetEnableGroup(AbstractKeyGroup.All);
         }
     }
 }

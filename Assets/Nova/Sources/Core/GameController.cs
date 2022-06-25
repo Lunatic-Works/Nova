@@ -34,11 +34,6 @@ namespace Nova
             HoldingAnimation = FindComponent<NovaAnimation>("NovaAnimation/Holding");
         }
 
-        private void Start()
-        {
-            EnableInput();
-        }
-
         private static T AssertNotNull<T>(T component, string name) where T : MonoBehaviour
         {
             Utils.RuntimeAssert(component != null, $"Cannot find {name}, ill-formed NovaGameController.");
@@ -55,23 +50,6 @@ namespace Nova
 
             var cmp = go.GetComponent<T>();
             return AssertNotNull(cmp, childPath + "/" + typeof(T).Name);
-        }
-
-        // inputEnabled is not in RestoreData, because the user cannot save when the input is disabled
-        public bool inputEnabled { get; private set; }
-
-        // Disable all abstract keys except StepForward
-        public void DisableInput()
-        {
-            inputEnabled = false;
-            InputManager.SetEnableGroup(AbstractKeyGroup.Always);
-            InputManager.SetEnable(AbstractKey.StepForward, true);
-        }
-
-        public void EnableInput()
-        {
-            inputEnabled = true;
-            InputManager.SetEnableGroup(AbstractKeyGroup.All);
         }
     }
 }

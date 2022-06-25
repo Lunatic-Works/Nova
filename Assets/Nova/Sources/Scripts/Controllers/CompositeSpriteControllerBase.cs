@@ -18,9 +18,9 @@ namespace Nova
 
         protected virtual void Awake()
         {
-            var gameController = Utils.FindNovaGameController();
-            gameState = gameController.GameState;
-            dialogueState = gameController.DialogueState;
+            var controller = Utils.FindNovaGameController();
+            gameState = controller.GameState;
+            dialogueState = controller.DialogueState;
             textureChanger = GetComponent<OverlayTextureChangerBase>();
         }
 

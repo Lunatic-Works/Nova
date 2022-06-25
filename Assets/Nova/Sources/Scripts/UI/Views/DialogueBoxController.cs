@@ -192,9 +192,9 @@ namespace Nova
                 return true;
             }
 
-            var gameController = Utils.FindNovaGameController();
-            gameState = gameController.GameState;
-            dialogueState = gameController.DialogueState;
+            var controller = Utils.FindNovaGameController();
+            gameState = controller.GameState;
+            dialogueState = controller.DialogueState;
 
             dialogueTextScrollRect = GetComponentInChildren<ScrollRect>();
             dialogueText = GetComponentInChildren<DialogueTextController>();

@@ -12,7 +12,6 @@ namespace Nova
         private const string AbortAnimationFirstShownKey = ConfigManager.FirstShownKeyPrefix + "AbortAnimation";
         private const int HintAbortAnimationClicks = 10;
 
-        private GameController gameController;
         private GameState gameState;
         private DialogueState dialogueState;
         private ConfigManager configManager;
@@ -27,11 +26,11 @@ namespace Nova
 
         private void Awake()
         {
-            gameController = Utils.FindNovaGameController();
-            gameState = gameController.GameState;
-            dialogueState = gameController.DialogueState;
-            configManager = gameController.ConfigManager;
-            inputManager = gameController.InputManager;
+            var controller = Utils.FindNovaGameController();
+            gameState = controller.GameState;
+            dialogueState = controller.DialogueState;
+            configManager = controller.ConfigManager;
+            inputManager = controller.InputManager;
 
             buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
 
@@ -53,7 +52,7 @@ namespace Nova
         {
             HandleShortcut();
 
-            if (gameController.inputEnabled)
+            if (inputManager.inputEnabled)
             {
                 HandleInput();
             }
@@ -144,7 +143,7 @@ namespace Nova
         public void OnPointerUp(PointerEventData _eventData)
         {
             var eventData = (ExtendedPointerEventData)_eventData;
-            if (!gameController.inputEnabled)
+            if (!inputManager.inputEnabled)
             {
                 // Touch finger
                 if (eventData.touchId > 0)
@@ -227,7 +226,7 @@ namespace Nova
         public void OnPointerDown(PointerEventData _eventData)
         {
             var eventData = (ExtendedPointerEventData)_eventData;
-            if (!gameController.inputEnabled)
+            if (!inputManager.inputEnabled)
             {
                 // Mouse left button
                 if (eventData.touchId == 0 && eventData.button == PointerEventData.InputButton.Left)
