@@ -178,9 +178,9 @@ namespace Nova
 
         public void RestoreCurrentKeyMapping()
         {
-            var original = oldActionAsset.GetAction(currentAbstractKey);
+            var oldAction = oldActionAsset.GetAction(currentAbstractKey).Clone();
             RemoveAllBindings(currentAction);
-            foreach (var binding in original.bindings)
+            foreach (var binding in oldAction.bindings)
             {
                 currentAction.AddBinding(binding);
             }
@@ -196,9 +196,9 @@ namespace Nova
 
         public void ResetCurrentKeyMappingDefault()
         {
-            var original = inputManager.defaultActionAsset.FindAction(currentAction.id);
+            var oldAction = inputManager.defaultActionAsset.FindAction(currentAction.id);
             RemoveAllBindings(currentAction);
-            foreach (var binding in original.bindings)
+            foreach (var binding in oldAction.bindings)
             {
                 currentAction.AddBinding(binding);
             }
@@ -215,10 +215,8 @@ namespace Nova
         // remove all bindings that conflict with any binding in currentAbstractKey
         public void ResolveDuplicate()
         {
-            var abstractKeyToCompositeBindings = mappableKeys.ToDictionary(key => key,
-                key => GenerateCompositeBindings(actionAsset.GetAction(key)).ToList());
             var group = actionAsset.GetActionGroup(currentAbstractKey);
-            var compositeBindings = abstractKeyToCompositeBindings[currentAbstractKey];
+            var compositeBindings = GenerateCompositeBindings(currentAction).ToList();
             var bindingIndicesToRemove = new Dictionary<AbstractKey, List<int>>();
             foreach (var otherAk in mappableKeys)
             {
@@ -228,7 +226,7 @@ namespace Nova
                 }
 
                 var bindingIndices = bindingIndicesToRemove[otherAk] = new List<int>();
-                foreach (var otherCb in abstractKeyToCompositeBindings[otherAk])
+                foreach (var otherCb in GenerateCompositeBindings(actionAsset.GetAction(otherAk)))
                 {
                     if (!compositeBindings.Any(cb => cb.AnySameBinding(otherCb)))
                     {
@@ -256,7 +254,7 @@ namespace Nova
 
         public static void ResolveDuplicateForAction(InputAction action)
         {
-            var compositeBindings = InputMappingController.GenerateCompositeBindings(action).ToList();
+            var compositeBindings = GenerateCompositeBindings(action).ToList();
             // The last composite binding is the newly added one
             var cb = compositeBindings.Last();
             var bindingIndicesToRemove = new List<int>();
