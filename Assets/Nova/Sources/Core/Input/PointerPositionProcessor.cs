@@ -25,9 +25,10 @@ namespace Nova
             InputSystem.RegisterProcessor<PointerPositionProcessor>();
         }
 
+        // Valid even if the cursor is hidden
         public override Vector2 Process(Vector2 value, InputControl control)
         {
-            return Cursor.visible ? value - RealScreen.offset : Vector2.positiveInfinity;
+            return value - RealScreen.offset;
         }
     }
 }

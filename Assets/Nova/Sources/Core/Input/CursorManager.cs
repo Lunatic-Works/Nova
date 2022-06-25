@@ -8,6 +8,9 @@ using UnityEngine.InputSystem.Controls;
 
 namespace Nova
 {
+    /// <summary>
+    /// Hides the cursor and unsets the selection of selectables.
+    /// </summary>
     public class CursorManager : MonoBehaviour
     {
         public float hideAfterSeconds = 5.0f;
