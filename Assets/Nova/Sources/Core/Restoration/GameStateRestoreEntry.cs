@@ -47,7 +47,7 @@ namespace Nova
         {
             this.restoreDatas = restoreDatas;
             this.variables = new Variables();
-            this.variables.CopyFrom(variables);
+            this.variables.CloneFrom(variables);
         }
     }
 

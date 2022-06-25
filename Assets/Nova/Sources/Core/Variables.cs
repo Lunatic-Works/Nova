@@ -151,7 +151,7 @@ namespace Nova
             }
         }
 
-        public void CopyFrom(Variables variables)
+        public void CloneFrom(Variables variables)
         {
             dict = new SortedDictionary<string, VariableEntry>(variables.dict);
             needCalculateHash = true;
