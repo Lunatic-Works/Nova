@@ -15,9 +15,9 @@ namespace Nova
 
         private void Awake()
         {
-            var gameController = Utils.FindNovaGameController();
-            gameState = gameController.GameState;
-            configManager = gameController.ConfigManager;
+            var controller = Utils.FindNovaGameController();
+            gameState = controller.GameState;
+            configManager = controller.ConfigManager;
 
             LuaRuntime.Instance.BindObject("dialogueState", this);
             gameState.dialogueChangedEarly.AddListener(OnDialogueChangedEarly);

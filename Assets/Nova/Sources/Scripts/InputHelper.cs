@@ -5,22 +5,22 @@ namespace Nova
     [ExportCustomType]
     public class InputHelper : MonoBehaviour
     {
-        private GameController gameController;
+        private InputManager inputManager;
 
         private void Awake()
         {
-            gameController = Utils.FindNovaGameController();
+            inputManager = Utils.FindNovaGameController().InputManager;
             LuaRuntime.Instance.BindObject("inputHelper", this);
         }
 
         public void DisableInput()
         {
-            gameController.DisableInput();
+            inputManager.DisableInput();
         }
 
         public void EnableInput()
         {
-            gameController.EnableInput();
+            inputManager.EnableInput();
         }
     }
 }
