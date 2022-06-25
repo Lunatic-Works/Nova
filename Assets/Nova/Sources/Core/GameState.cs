@@ -829,7 +829,7 @@ namespace Nova
             restrainCheckpointNum = entry.restrainCheckpointNum;
             forceCheckpoint = false;
 
-            variables.CopyFrom(entry.variables);
+            variables.CloneFrom(entry.variables);
 
             foreach (var pair in
                      from pair in restorables
