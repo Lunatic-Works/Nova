@@ -1,8 +1,28 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Nova.URP;
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 namespace Nova
 {
+    // a render texture config
+    // GameRenderManager will set targetTexture if isActive
+    // if needUpdate, will generate new texture
+    // if isFinal, GameRenderManager will Blit this to final screen
+    public interface IRenderTargetConfig
+    {
+        RenderTexture targetTexture { get; set; }
+        string textureName { get; }
+        RenderTextureFormat textureFormat { get; }
+        bool isFinal { get; }
+        bool needUpdate { get; }
+        bool isActive { get; }
+    }
+
     /// <summary>
     /// Central component to connect the render process and
     /// preserve aspect ratio by adding black margin around actual game view.
@@ -13,15 +33,15 @@ namespace Nova
     /// * Make current main camera render to the render texture
     /// * Hijack the camera rendering process and directly blit the render texture to screen instead
     /// </summary>
-    public class GameRenderManager : MonoBehaviour
+    [ExecuteInEditMode]
+    public class GameRenderManager : OnPostRenderBehaviour
     {
         private const string LastWindowedHeightKey = "_LastWindowedHeight";
         private const string LastWindowedWidthKey = "_LastWindowedWidth";
         private static readonly int GlobalRealScreenHeightID = Shader.PropertyToID("_GH");
         private static readonly int GlobalRealScreenWidthID = Shader.PropertyToID("_GW");
         private static readonly int Global1920ScaleID = Shader.PropertyToID("_GScale");
-        private bool isLogicalFullScreen;
-
+        private const string SHADER = "Nova/VFX/Final Blit";
         private const string ChangeWindowSizeFirstShownKey = ConfigManager.FirstShownKeyPrefix + "ChangeWindowSize";
 
         public Color marginColor;
@@ -30,11 +50,15 @@ namespace Nova
         public Toggle fullScreenToggle;
 
         private ConfigManager configManager;
-
-        private int lastScreenHeight, lastScreenWidth;
         private Camera finalCamera;
-        private RenderTexture gameRenderTexture, finalRenderTexture;
-        private int shouldUpdateTransitionsAfter = -1;
+        private Material material;
+        private bool isLogicalFullScreen;
+        private bool needUpdateTexture = false;
+        private int lastScreenHeight, lastScreenWidth;
+        private int lastRealHeight, lastRealWidth;
+        private int shouldUpdateUIAfter = -1;
+        private List<IRenderTargetConfig> renderTargets = new List<IRenderTargetConfig>();
+        private IRenderTargetConfig finalTarget => renderTargets.Find(rt => rt.isActive && rt.isFinal);
 
         private void Awake()
         {
@@ -43,25 +67,69 @@ namespace Nova
 
             Tag = tag;
 
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            if (Application.isPlaying)
+            {
+                configManager = Utils.FindNovaGameController().ConfigManager;
 
-            finalCamera = gameObject.AddComponent<Camera>();
+                fullScreenToggle.isOn = isLogicalFullScreen = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
+                fullScreenToggle.onValueChanged.AddListener(UpdateFullScreenStatus);
+            }
+
+            finalCamera = gameObject.Ensure<Camera>();
             finalCamera.backgroundColor = marginColor;
             finalCamera.clearFlags = CameraClearFlags.SolidColor;
             finalCamera.cullingMask = 0;
+            finalCamera.depth = 0;
+            finalCamera.rect = Rect.MinMaxRect(0, 0, 1, 1);
 
-            fullScreenToggle.isOn = isLogicalFullScreen = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
-            fullScreenToggle.onValueChanged.AddListener(UpdateFullScreenStatus);
+            var materialPool = gameObject.Ensure<MaterialPool>();
+            material = materialPool.Get(SHADER);
+            material.color = marginColor;
 
-            UpdateDesiredDimensions();
+            UpdateScreen();
         }
 
         private void OnDestroy()
         {
+            foreach (var rt in renderTargets)
+            {
+                UpdateTexture(rt, null);
+            }
+            renderTargets.Clear();
             fullScreenToggle.onValueChanged.RemoveListener(UpdateFullScreenStatus);
+        }
 
-            Destroy(gameRenderTexture);
-            Destroy(finalRenderTexture);
+        private void Start()
+        {
+            // at this point, UI camera should be initialized
+            if (Application.isPlaying)
+            {
+                UpdateUI();
+            }
+        }
+
+        private void UpdateUI()
+        {
+            RealScreen.uiSize = gameRenderTarget.rectTransform.rect.size;
+            RealScreen.isUIInitialized = true;
+            foreach (var trans in FindObjectsOfType<UIViewTransitionBase>().Where(x => !x.inAnimation))
+            {
+                trans.ResetTransitionTarget();
+            }
+            Debug.Log($"Update UI {RealScreen.uiSize}");
+        }
+
+        private void OnPreRender()
+        {
+            UpdateDesiredDimensions();
+            if (shouldUpdateUIAfter > 0)
+            {
+                shouldUpdateUIAfter--;
+                if (shouldUpdateUIAfter == 0)
+                {
+                    UpdateUI();
+                }
+            }
         }
 
         private void UpdateFullScreenStatus(bool to)
@@ -117,97 +185,143 @@ namespace Nova
             }
         }
 
-        private void UpdateDesiredDimensions()
+        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            if (lastScreenHeight == Screen.height && lastScreenWidth == Screen.width)
+            if (finalTarget == null)
             {
                 return;
             }
+            var cmd = CommandBufferPool.Get("Composition");
+            if (finalTarget.targetTexture != null)
+            {
+                cmd.Blit(finalTarget.targetTexture, BuiltinRenderTextureType.CurrentActive, material);
+            }
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
+        }
 
-            // Debug.Log($"Resolution changed to {Screen.height} x {Screen.width}");
+        public bool RegisterRenderTarget(IRenderTargetConfig target)
+        {
+            if (renderTargets.Find(rt => rt.textureName == target.textureName) != null)
+            {
+                return false;
+            }
+            UpdateScreen();
+            if (target.isActive && RealScreen.isScreenInitialized)
+            {
+                UpdateTexture(target);
+            }
+            renderTargets.Add(target);
+            return true;
+        }
+
+        public void UnregisterRenderTarget(string rtName)
+        {
+            var target = renderTargets.Find(rt => rt.textureName == rtName);
+            if (target == null)
+            {
+                return;
+            }
+            renderTargets.Remove(target);
+            UpdateTexture(target, null);
+        }
+
+        public IRenderTargetConfig GetRenderTarget(string rtName)
+        {
+            Debug.Log($"find {rtName}");
+            return renderTargets.Find(rt => rt.textureName == rtName);
+        }
+
+        private void UpdateScreen()
+        {
+            if (RealScreen.isScreenInitialized && lastScreenHeight == Screen.height && lastScreenWidth == Screen.width)
+            {
+                return;
+            }
+            if (Screen.height <= 0 || Screen.width <= 0)
+            {
+                return;
+            }
             lastScreenHeight = Screen.height;
             lastScreenWidth = Screen.width;
-
             RealScreen.aspectRatio = desiredAspectRatio;
-            var aspectRatio = 1.0f * Screen.width / Screen.height;
+            var aspectRatio = 1.0f * lastScreenWidth / lastScreenHeight;
             if (aspectRatio < desiredAspectRatio)
             {
-                RealScreen.fHeight = Screen.width / desiredAspectRatio;
+                RealScreen.fHeight = lastScreenWidth / desiredAspectRatio;
                 RealScreen.height = (int)RealScreen.fHeight;
-                RealScreen.fWidth = RealScreen.width = Screen.width;
+                RealScreen.fWidth = RealScreen.width = lastScreenWidth;
 
                 var delta = 1 - aspectRatio / RealScreen.aspectRatio;
-                finalCamera.rect = Rect.MinMaxRect(
-                    0, delta / 2, 1, 1 - delta / 2
-                );
             }
             else
             {
-                RealScreen.fWidth = Screen.height * desiredAspectRatio;
+                RealScreen.fWidth = lastScreenHeight * desiredAspectRatio;
                 RealScreen.width = (int)RealScreen.fWidth;
-                RealScreen.fHeight = RealScreen.height = Screen.height;
+                RealScreen.fHeight = RealScreen.height = lastScreenHeight;
 
                 var delta = 1 - RealScreen.aspectRatio / aspectRatio;
-                finalCamera.rect = Rect.MinMaxRect(
-                    delta / 2, 0, 1 - delta / 2, 1
-                );
             }
-
-            Shader.SetGlobalFloat(GlobalRealScreenHeightID, RealScreen.fHeight);
-            Shader.SetGlobalFloat(GlobalRealScreenWidthID, RealScreen.fWidth);
-            Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.fWidth / 1920);
-
-            Destroy(gameRenderTexture);
-            gameRenderTarget.texture = gameRenderTexture =
-                new RenderTexture(RealScreen.width, RealScreen.height, 24)
-                {
-                    name = "GameRenderTexture"
-                };
-
-            foreach (var camera in GameObject.FindGameObjectsWithTag("MainCamera"))
+            if (RealScreen.isScreenInitialized && (lastRealWidth != RealScreen.width || lastRealHeight != RealScreen.height))
             {
-                camera.GetComponent<Camera>().targetTexture = gameRenderTexture;
+                needUpdateTexture = true;
             }
+            lastRealWidth = RealScreen.width;
+            lastRealHeight = RealScreen.height;
+            RealScreen.isScreenInitialized = true;
+            Debug.Log($"Update Screen {lastScreenWidth}x{lastScreenHeight} => {RealScreen.width}x{RealScreen.height}");
+        }
 
-            Destroy(finalRenderTexture);
-            UICameraHelper.Active.targetTexture = finalRenderTexture =
-                new RenderTexture(RealScreen.width, RealScreen.height, 24)
-                {
-                    name = "FinalRenderTexture"
-                };
+        private void UpdateTexture(IRenderTargetConfig rt)
+        {
+            var texture = RenderTexture.GetTemporary(RealScreen.width, RealScreen.height, 0, rt.textureFormat);
+            texture.name = rt.textureName;
+            UpdateTexture(rt, texture);
+        }
 
-            // Debug.Log($"Screen Size: {RealScreen.width} x {RealScreen.height}");
-
-            shouldUpdateTransitionsAfter = 2;
+        private void UpdateTexture(IRenderTargetConfig rt, RenderTexture texture)
+        {
+            var oldTexture = rt.targetTexture;
+            rt.targetTexture = texture;
+            if (oldTexture)
+            {
+                RenderTexture.ReleaseTemporary(oldTexture);
+            }
+            var verb = texture == null ? "Destroy" : "Update";
+            Debug.Log($"{verb} renderTexture {rt.textureName}");
         }
 
         private void Update()
         {
-            UpdateDesiredDimensions();
+            UpdateScreen();
+            OnPreRender();
+        }
 
-            if (shouldUpdateTransitionsAfter >= 0)
+        private void UpdateDesiredDimensions()
+        {
+            if (needUpdateTexture)
             {
-                foreach (var t in FindObjectsOfType<UIViewTransitionBase>())
+                if (Application.isPlaying)
                 {
-                    t.ResetTransitionTarget();
+                    shouldUpdateUIAfter = 2;
                 }
-
-                RealScreen.uiSize = gameRenderTarget.rectTransform.rect.size;
-                shouldUpdateTransitionsAfter--;
+                Shader.SetGlobalFloat(GlobalRealScreenHeightID, RealScreen.fHeight);
+                Shader.SetGlobalFloat(GlobalRealScreenWidthID, RealScreen.fWidth);
+                Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.fWidth / 1920);
             }
-        }
 
-        private void OnPreCull()
-        {
-            GL.Clear(true, true, marginColor, 0f);
-        }
-
-        private void OnRenderImage(RenderTexture src, RenderTexture dest)
-        {
-            if (finalRenderTexture != null)
+            foreach (var rt in renderTargets)
             {
-                Graphics.Blit(finalRenderTexture, dest);
+                if (!rt.isActive && rt.targetTexture != null)
+                {
+                    UpdateTexture(rt, null);
+                }
+                else if (rt.isActive && (needUpdateTexture || rt.needUpdate || rt.targetTexture == null))
+                {
+                    UpdateTexture(rt);
+                }
             }
+            needUpdateTexture = false;
         }
 
         private void _switchFullScreen()

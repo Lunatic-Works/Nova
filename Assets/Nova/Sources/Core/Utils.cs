@@ -81,6 +81,16 @@ namespace Nova
             return value;
         }
 
+        public static T Ensure<T>(this GameObject go) where T : Component
+        {
+            var x = go.GetComponent<T>();
+            if (x == null)
+            {
+                x = go.AddComponent<T>();
+            }
+            return x;
+        }
+
         public static Rect ToRect(this RectInt rectInt)
         {
             return new Rect(rectInt.min, rectInt.size);
@@ -133,6 +143,23 @@ namespace Nova
             }
 
             return gameController;
+        }
+
+        public static GameRenderManager FindGameRenderManager()
+        {
+            var go = GameObject.FindGameObjectWithTag("RenderManager");
+            if (go == null)
+            {
+                throw new InvalidAccessException("Nova: Cannot find RenderManager game object by tag.");
+            }
+
+            var gameRenderManager = go.GetComponent<GameRenderManager>();
+            if (gameRenderManager == null)
+            {
+                throw new InvalidAccessException("Nova: No GameRenderManager component in RenderManager game object.");
+            }
+
+            return gameRenderManager;
         }
 
         public static ViewManager FindViewManager()
@@ -308,6 +335,15 @@ namespace Nova
 #else
             UnityObject.Destroy(obj);
 #endif
+        }
+
+        public static bool IsNotNullOrDestroyed(this object x)
+        {
+            if (x is UnityEngine.Object o)
+            {
+                return o != null;
+            }
+            return x != null;
         }
 
         public static TextAlignmentOptions TextAnchor2TextAlignmentOptions(TextAnchor anchor)

@@ -19,7 +19,7 @@ namespace Nova
 
         protected CanvasGroup canvasGroup;
         protected RectTransform rectTransform;
-        protected Vector2 pos0, size0, scale0;
+        protected Vector2 pos0, size0, scale0, uiSize0;
         private RawImage rawImage;
 
         protected AnimationEntry.EasingFunction enterFunction => cubic
@@ -32,6 +32,7 @@ namespace Nova
 
         public abstract float enterDuration { get; }
         public abstract float exitDuration { get; }
+        public bool inAnimation { get; protected set; } = false;
 
         private bool inited;
         private bool targetInited;
@@ -86,7 +87,7 @@ namespace Nova
         {
             Init();
 
-            if (!targetInited)
+            if (!targetInited && RealScreen.isUIInitialized)
             {
                 ResetTransitionTarget();
             }
@@ -130,6 +131,7 @@ namespace Nova
             {
                 ResetTransitionTarget();
             }
+            inAnimation = true;
         }
 
         protected abstract void OnEnter(Action onFinish);
@@ -147,13 +149,18 @@ namespace Nova
                 {
                     gameObject.SetActive(true);
                     viewManager.transitionGhost.gameObject.SetActive(false);
+                    inAnimation = false;
                     onFinish?.Invoke();
                 });
             }
             else
             {
                 gameObject.SetActive(true);
-                OnEnter(onFinish);
+                OnEnter(() =>
+                {
+                    inAnimation = false;
+                    onFinish?.Invoke();
+                });
             }
 
             viewManager.TryPlaySound(enterSound);
@@ -169,6 +176,7 @@ namespace Nova
             }
 
             ResetTransitionTarget();
+            inAnimation = true;
             OnExit(() =>
             {
                 viewManager.transitionGhost.gameObject.SetActive(false);
@@ -177,7 +185,7 @@ namespace Nova
                 {
                     canvasGroup.alpha = 1f;
                 }
-
+                inAnimation = false;
                 onFinish?.Invoke();
             });
 
