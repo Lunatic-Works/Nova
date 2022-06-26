@@ -24,7 +24,7 @@ Shader "Nova/VFX/Flip Grid"
 
             #include "UnityCG.cginc"
 
-            #define PI 3.1415926
+            #define PI 3.1415927
             #define smoothStepIn(x) ((x) * (x) * (2.0 - x))
 
             struct appdata

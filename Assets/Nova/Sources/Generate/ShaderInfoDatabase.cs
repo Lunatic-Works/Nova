@@ -115,6 +115,13 @@ namespace Nova.Generate
                 }
             },
             {
+                "Final Blit",
+                new Dictionary<string, ShaderPropertyType>
+                {
+                    {"_Color", ShaderPropertyType.Color},
+                }
+            },
+            {
                 "Flip Grid",
                 new Dictionary<string, ShaderPropertyType>
                 {
@@ -713,6 +720,13 @@ namespace Nova.Generate
                 new Dictionary<string, Color>
                 {
                     {"_SubColor", Color.white},
+                }
+            },
+            {
+                "Final Blit",
+                new Dictionary<string, Color>
+                {
+                    {"_Color", Color.black},
                 }
             },
             {

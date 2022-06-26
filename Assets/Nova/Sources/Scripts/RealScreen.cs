@@ -14,5 +14,8 @@ namespace Nova
 
         public static Vector2 offset =>
             new Vector2(((float)Screen.width - width) / 2, ((float)Screen.height - height) / 2);
+
+        public static bool isScreenInitialized = false;
+        public static bool isUIInitialized = false;
     }
 }

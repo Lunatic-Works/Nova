@@ -63,6 +63,9 @@ shader_type_data = {
         _T = 'Float',
         _Zoom = 'Float',
     },
+    ['Final Blit'] = {
+        _Color = 'Color',
+    },
     ['Flip Grid'] = {
         _BackColor = 'Color',
         _FlipDuration = 'Float',
@@ -411,6 +414,9 @@ shader_color_data = {
     },
     ['Fade Radial Blur'] = {
         _SubColor = Color.white,
+    },
+    ['Final Blit'] = {
+        _Color = Color.black,
     },
     ['Flip Grid'] = {
         _BackColor = Color.black,
