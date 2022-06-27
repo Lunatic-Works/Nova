@@ -48,7 +48,7 @@ namespace Nova
                     target = new MyTarget(this);
                     target.Awake();
                 }
-            }      
+            }
 #endif
         }
 
@@ -75,7 +75,8 @@ namespace Nova
                     {
                         img.texture = _targetTexture;
                     }
-                    if (parent.renderCamera != null) {
+                    if (parent.renderCamera != null)
+                    {
                         parent.renderCamera.targetTexture = _targetTexture;
                     }
                 }
