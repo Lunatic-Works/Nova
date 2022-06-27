@@ -45,17 +45,12 @@ local function get_full_shader_name(shader_name, pp)
 end
 
 local function get_renderer_pp(obj)
-    local go, renderer, pp
-    local _type = obj:GetType()
-    if _type == typeof(Nova.CameraController) then
-        go = obj.baseGameObject
-        pp = go:GetComponent(typeof(Nova.PostProcessing))
-    elseif _type == typeof(Nova.CameraOverlayMask) then
-        go = obj.gameObject
+    local go = obj.gameObject
+    local renderer, pp
+    if obj:GetType() == typeof(Nova.CameraController) then
         pp = go:GetComponent(typeof(Nova.PostProcessing))
     else
-        go = obj.gameObject
-        renderer = go:GetComponent(typeof(UnityEngine.SpriteRenderer)) or go:GetComponent(typeof(UnityEngine.UI.Image))
+        renderer = go:GetComponent(typeof(UnityEngine.SpriteRenderer)) or go:GetComponent(typeof(UnityEngine.UI.Image)) or go:GetComponent(typeof(UnityEngine.UI.RawImage))
     end
     return go, renderer, pp
 end
@@ -72,7 +67,7 @@ local function get_mat(obj, shader_name, restorable)
 
     local go, renderer, pp = get_renderer_pp(obj)
     if renderer == nil and pp == nil then
-        warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. dump(obj))
+        warn('Cannot find SpriteRenderer or Image or RawImage or PostProcessing for ' .. dump(obj))
         return nil
     end
 
@@ -97,13 +92,7 @@ local function get_mat(obj, shader_name, restorable)
 end
 
 local function get_default_mat(obj)
-    local go
-    if obj:GetType() == typeof(Nova.CameraController) then
-        go = obj.baseGameObject
-    else
-        go = obj.gameObject
-    end
-    return Nova.MaterialPool.Ensure(go).defaultMaterial
+    return Nova.MaterialPool.Ensure(obj.gameObject).defaultMaterial
 end
 
 local function set_mat(obj, mat, layer_id)
@@ -113,7 +102,7 @@ local function set_mat(obj, mat, layer_id)
 
     if renderer then
         if layer_id ~= 0 then
-            warn('layer_id should be 0 for SpriteRenderer or Image')
+            warn('layer_id should be 0 for SpriteRenderer or Image or RawImage')
         end
         renderer.material = mat
         return
@@ -167,6 +156,25 @@ local function set_mat_default_properties(mat, base_shader_name, skip_properties
     end
 end
 
+-- render targets can be used in this function
+local function set_texture_by_path(mat, name, path)
+    local rtStarts = Nova.AssetLoader.RenderTargetPrefix
+    if mat:GetType() == typeof(Nova.RestorableMaterial) then
+        mat:SetTexturePath(name, path)
+    elseif string.sub(path, 1, string.len(rtStarts)) == rtStarts then
+        local rtName = string.sub(path, string.len(rtStarts) + 1, string.len(path))
+        local rt = Nova.AssetLoader.LoadRenderTarget(rtName)
+        rt:Bind(mat, name)
+    else
+        local tex
+        -- we cannot set value = nil in table, so we use ''
+        if path and path ~= '' then
+            tex = Nova.AssetLoader.LoadTexture(path)
+        end
+        mat:SetTexture(name, tex)
+    end
+end
+
 local function set_mat_properties(mat, base_shader_name, properties)
     local _type_data = shader_type_data[base_shader_name]
     if _type_data == nil then
@@ -182,16 +190,7 @@ local function set_mat_properties(mat, base_shader_name, properties)
         elseif dtype == 'Vector' then
             mat:SetVector(name, parse_color(value, true))
         elseif dtype == '2D' then
-            if mat:GetType() == typeof(Nova.RestorableMaterial) then
-                mat:SetTexturePath(name, value)
-            else
-                local tex
-                -- we cannot set value = nil in table, so we use ''
-                if value and value ~= '' then
-                    tex = Nova.AssetLoader.LoadTexture(value)
-                end
-                mat:SetTexture(name, tex)
-            end
+            set_texture_by_path(mat, name, value)
         else
             warn('Unknown dtype ' .. dump(dtype) .. ' for property ' .. dump(name))
         end
@@ -204,7 +203,8 @@ local function parse_shader_layer(shader_layer, default_layer_id)
         return nil, default_layer_id
     elseif type(shader_layer) == 'string' then
         return shader_layer, default_layer_id
-    else -- type(shader_layer) == 'table'
+    else
+        -- type(shader_layer) == 'table'
         return shader_layer[1], shader_layer[2]
     end
 end
@@ -216,7 +216,8 @@ local function parse_times(times)
         return 1, Nova.AnimationEntry.LinearEasing()
     elseif type(times) == 'number' then
         return times, Nova.AnimationEntry.LinearEasing()
-    else -- type(times) == 'table'
+    else
+        -- type(times) == 'table'
         return times[1], parse_easing(times[2])
     end
 end
@@ -264,7 +265,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
             else
                 mat:SetTexture('_SubTex', nil)
             end
-            local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image))
+            local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 1)
@@ -367,18 +368,9 @@ function vfx(obj, shader_layer, t, properties)
         set_mat_default_properties(mat, base_shader_name, properties)
         set_mat_properties(mat, base_shader_name, properties)
         mat:SetFloat('_T', t)
-
-        if obj:GetType() == typeof(Nova.CameraOverlayMask) then
-            obj.blitMaterial = mat
-        else
-            set_mat(obj, mat, layer_id)
-        end
+        set_mat(obj, mat, layer_id)
     else
-        if obj:GetType() == typeof(Nova.CameraOverlayMask) then
-            obj.blitMaterial = nil
-        else
-            set_mat(obj, get_default_mat(obj), layer_id)
-        end
+        set_mat(obj, get_default_mat(obj), layer_id)
     end
 end
 
@@ -399,24 +391,15 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
         set_mat_default_properties(mat, base_shader_name, properties)
         set_mat_properties(mat, base_shader_name, properties)
         mat:SetFloat('_T', start_t)
-
-        if obj:GetType() == typeof(Nova.CameraOverlayMask) then
-            obj.blitMaterial = mat
-        else
-            set_mat(obj, mat, layer_id)
-        end
+        set_mat(obj, mat, layer_id)
     end
 
     local action_end = function()
         if target_t == 0 then
-            if obj:GetType() == typeof(Nova.CameraOverlayMask) then
-                obj.blitMaterial = nil
+            if variant then
+                set_mat(obj, get_mat(obj, variant), layer_id)
             else
-                if variant then
-                    set_mat(obj, get_mat(obj, variant), layer_id)
-                else
-                    set_mat(obj, get_default_mat(obj), layer_id)
-                end
+                set_mat(obj, get_default_mat(obj), layer_id)
             end
         end
     end
@@ -443,12 +426,7 @@ make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_prope
             mat:SetFloat(anim_properties[i][1], anim_properties[i][2])
         end
         mat:SetFloat('_T', 1)
-
-        if obj:GetType() == typeof(Nova.CameraOverlayMask) then
-            obj.blitMaterial = mat
-        else
-            set_mat(obj, mat, layer_id)
-        end
+        set_mat(obj, mat, layer_id)
     end
 
     local entry0 = self:action(action_begin)

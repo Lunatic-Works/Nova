@@ -7,20 +7,9 @@ namespace Nova
     [ExportCustomType]
     public class TimelineController : PrefabLoader
     {
-        public Camera mainCamera;
+        public CameraController gameCamera;
 
         public PlayableDirector playableDirector { get; private set; }
-
-        private CameraController mainCameraController;
-        private PostProcessing mainPostProcessing;
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            mainCameraController = mainCamera.GetComponent<CameraController>();
-            mainPostProcessing = mainCamera.GetComponent<PostProcessing>();
-        }
 
         #region Methods called by external scripts
 
@@ -49,19 +38,7 @@ namespace Nova
                 this.RuntimeAssert(newCamera.GetComponent<CameraController>() == null,
                     "The camera in the timeline prefab should not have a CameraController.");
 
-                mainCameraController.overridingCamera = newCamera;
-                mainCamera.enabled = false;
-                newCamera.targetTexture = mainCamera.targetTexture;
-
-                var newPostProcessing = newCamera.GetComponent<PostProcessing>();
-                if (newPostProcessing == null)
-                {
-                    Debug.LogWarning("Nova: No PostProcessing on new camera.");
-                }
-                else
-                {
-                    newPostProcessing.asProxyOf = mainPostProcessing;
-                }
+                gameCamera.cameraEnabled = false;
             }
 
             prefabInstance.SetActive(true);
@@ -77,8 +54,7 @@ namespace Nova
 
             playableDirector = null;
 
-            mainCameraController.overridingCamera = null;
-            mainCamera.enabled = true;
+            gameCamera.cameraEnabled = true;
 
             base.ClearPrefab();
         }

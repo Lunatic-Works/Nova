@@ -65,13 +65,18 @@ namespace Nova
                 texturePath = "";
             }
 
-            Texture tex = null;
-            if (texturePath != "")
+            if (texturePath.StartsWith(AssetLoader.RenderTargetPrefix))
             {
-                tex = AssetLoader.Load<Texture>(texturePath);
+                var rtName = texturePath.Substring(AssetLoader.RenderTargetPrefix.Length);
+                var rt = Utils.FindGameRenderManager().GetRenderTarget(rtName) as RenderTarget;
+                rt.Bind(this, propertyName);
+            }
+            else if (texturePath != "")
+            {
+                var tex = AssetLoader.Load<Texture>(texturePath);
+                base.SetTexture(propertyName, tex);
             }
 
-            base.SetTexture(propertyName, tex);
             textureNames[propertyName] = texturePath;
         }
 

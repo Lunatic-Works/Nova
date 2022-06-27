@@ -4,6 +4,8 @@ pos_r = { 4, -0.3, 0.4, 0, 0}
 
 color_sunset = {1, 240/255, 220/255}
 
+cam2_layer = 17
+
 make_anim_method('nod', function(self, obj, distance, duration)
     distance = distance or 0.3
     duration = duration or 0.15

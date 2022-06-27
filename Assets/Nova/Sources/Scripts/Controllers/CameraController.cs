@@ -3,84 +3,57 @@ using UnityEngine;
 
 namespace Nova
 {
-    // a lazy proxy to deal with timeline camera switching
     [ExportCustomType]
     [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour, IRestorable
     {
         public string luaGlobalName;
-        public Camera overridingCamera;
 
         private GameState gameState;
         private new Camera camera;
 
-        private Camera activeCamera
+        public bool cameraEnabled
         {
-            get
-            {
-                if (overridingCamera != null)
-                {
-                    return overridingCamera;
-                }
-
-                return camera;
-            }
+            get => camera.enabled;
+            set => camera.enabled = value;
         }
-
-        #region Proxied methods and properties
-
-        public new Transform transform => activeCamera.transform;
-        public new GameObject gameObject => activeCamera.gameObject;
-        public GameObject baseGameObject => base.gameObject;
-
-        public new Component GetComponent(Type t)
-        {
-            return activeCamera.GetComponent(t);
-        }
-
-        public new T GetComponent<T>()
-        {
-            return activeCamera.GetComponent<T>();
-        }
-
-        public int cullingMask
-        {
-            get => activeCamera.cullingMask;
-            set => activeCamera.cullingMask = value;
-        }
-
-        #endregion
 
         public float size
         {
             get
             {
-                if (activeCamera.orthographic)
+                if (camera.orthographic)
                 {
-                    return activeCamera.orthographicSize;
+                    return camera.orthographicSize;
                 }
                 else
                 {
-                    return activeCamera.fieldOfView;
+                    return camera.fieldOfView;
                 }
             }
             set
             {
-                if (activeCamera.orthographic)
+                if (camera.orthographic)
                 {
-                    activeCamera.orthographicSize = value;
+                    camera.orthographicSize = value;
                 }
                 else
                 {
-                    activeCamera.fieldOfView = value;
+                    camera.fieldOfView = value;
                 }
             }
         }
 
+        public int cullingMask
+        {
+            get => camera.cullingMask;
+            set => camera.cullingMask = value;
+        }
+
         private void Awake()
         {
+            camera = GetComponent<Camera>();
             gameState = Utils.FindNovaGameController().GameState;
-            camera = base.GetComponent<Camera>();
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -120,19 +93,11 @@ namespace Nova
         private class CameraControllerRestoreData : IRestoreData
         {
             public readonly CameraData cameraData;
-            public readonly CameraData overridingCameraData;
 
             public CameraControllerRestoreData(CameraController cameraController)
             {
-                var currentOverridingCamera = cameraController.overridingCamera;
-                cameraController.overridingCamera = null;
                 cameraData = new CameraData(cameraController.transform, cameraController.size,
                     cameraController.cullingMask);
-                cameraController.overridingCamera = currentOverridingCamera;
-                overridingCameraData = cameraController.overridingCamera != null
-                    ? new CameraData(cameraController.transform, cameraController.size,
-                        cameraController.cullingMask)
-                    : null;
             }
         }
 
@@ -144,19 +109,9 @@ namespace Nova
         public void Restore(IRestoreData restoreData)
         {
             var data = restoreData as CameraControllerRestoreData;
-            var currentOverridingCamera = overridingCamera;
-            overridingCamera = null;
             data.cameraData.transformData.Restore(transform);
             size = data.cameraData.size;
             cullingMask = data.cameraData.cullingMask;
-            overridingCamera = currentOverridingCamera;
-
-            if (currentOverridingCamera != null && data.overridingCameraData != null)
-            {
-                data.overridingCameraData.transformData.Restore(transform);
-                size = data.overridingCameraData.size;
-                cullingMask = data.overridingCameraData.cullingMask;
-            }
         }
 
         #endregion
