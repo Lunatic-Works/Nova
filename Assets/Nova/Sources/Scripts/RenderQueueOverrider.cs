@@ -26,7 +26,7 @@ namespace Nova
             image = GetComponent<Image>();
 
             // Create MaterialPool to keep an instance of defaultMaterial
-            MaterialPool.Ensure(gameObject);
+            gameObject.Ensure<MaterialPool>();
 
             renderQueue = GetRenderQueue();
         }
@@ -76,13 +76,7 @@ namespace Nova
 
         public static RenderQueueOverrider Ensure(GameObject gameObject)
         {
-            var overrider = gameObject.GetComponent<RenderQueueOverrider>();
-            if (overrider == null)
-            {
-                overrider = gameObject.AddComponent<RenderQueueOverrider>();
-            }
-
-            return overrider;
+            return gameObject.Ensure<RenderQueueOverrider>();
         }
     }
 }

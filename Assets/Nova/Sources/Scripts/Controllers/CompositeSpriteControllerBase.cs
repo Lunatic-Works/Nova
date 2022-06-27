@@ -169,7 +169,7 @@ namespace Nova
 
         public virtual IRestoreData GetRestoreData()
         {
-            int renderQueue = RenderQueueOverrider.Ensure(gameObject).renderQueue;
+            int renderQueue = gameObject.Ensure<RenderQueueOverrider>().renderQueue;
             return new CompositeSpriteControllerBaseRestoreData(currentImageName, transform, color, renderQueue);
         }
 
@@ -178,7 +178,7 @@ namespace Nova
             var data = restoreData as CompositeSpriteControllerBaseRestoreData;
             data.transformData.Restore(transform);
             color = data.color;
-            RenderQueueOverrider.Ensure(gameObject).renderQueue = data.renderQueue;
+            gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
             SetPose(data.currentImageName, false);
         }
 
