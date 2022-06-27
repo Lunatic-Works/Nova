@@ -116,7 +116,7 @@ namespace Nova
             {
                 trans.ResetTransitionTarget();
             }
-            Debug.Log($"Update UI {RealScreen.uiSize}");
+            // Debug.Log($"Update UI {RealScreen.uiSize}");
         }
 
         private void OnPreRender()
@@ -139,7 +139,7 @@ namespace Nova
                 return;
             }
 
-            // Debug.Log($"Change full screen status from {Screen.fullScreen} (logical {isLogicalFullScreen}) to {to}");
+            // // Debug.Log($"Change full screen status from {Screen.fullScreen} (logical {isLogicalFullScreen}) to {to}");
             if (isLogicalFullScreen == to)
             {
                 return;
@@ -228,7 +228,7 @@ namespace Nova
 
         public IRenderTargetConfig GetRenderTarget(string rtName)
         {
-            Debug.Log($"find {rtName}");
+            // Debug.Log($"find {rtName}");
             return renderTargets.Find(rt => rt.textureName == rtName);
         }
 
@@ -269,7 +269,7 @@ namespace Nova
             lastRealWidth = RealScreen.width;
             lastRealHeight = RealScreen.height;
             RealScreen.isScreenInitialized = true;
-            Debug.Log($"Update Screen {lastScreenWidth}x{lastScreenHeight} => {RealScreen.width}x{RealScreen.height}");
+            // Debug.Log($"Update Screen {lastScreenWidth}x{lastScreenHeight} => {RealScreen.width}x{RealScreen.height}");
         }
 
         private void UpdateTexture(IRenderTargetConfig rt)
@@ -288,7 +288,7 @@ namespace Nova
                 RenderTexture.ReleaseTemporary(oldTexture);
             }
             var verb = texture == null ? "Destroy" : "Update";
-            Debug.Log($"{verb} renderTexture {rt.textureName}");
+            // Debug.Log($"{verb} renderTexture {rt.textureName}");
         }
 
         private void Update()

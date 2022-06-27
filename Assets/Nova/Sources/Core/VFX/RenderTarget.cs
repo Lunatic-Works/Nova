@@ -94,7 +94,7 @@ namespace Nova
             private void SetMatTexture(RenderTexture texture)
             {
                 var x = texture == null ? "null" : texture.name;
-                Debug.Log($"setMatTexture {this}=>{x}");
+                // Debug.Log($"setMatTexture {this}=>{x}");
                 mat.SetTexture(texName, texture);
             }
 
@@ -150,13 +150,13 @@ namespace Nova
 
         public void Unbind(ITextureReceiver recv)
         {
-            Debug.Log($"unbind {recv} => {textureName}");
+            // Debug.Log($"unbind {recv} => {textureName}");
             receivers.Remove(recv);
         }
 
         public void Bind(Material material, string texName)
         {
-            Debug.Log($"bind {material.name}.{texName} => {textureName}");
+            // Debug.Log($"bind {material.name}.{texName} => {textureName}");
             if (receivers.Find(x => IsMaterialBinder(x, material, texName)) == null)
             {
                 var binder = new MaterialBinder(this, material, texName);
