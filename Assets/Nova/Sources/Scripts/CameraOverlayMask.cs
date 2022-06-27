@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    [ExportCustomType]
+    [Obsolete]
     [RequireComponent(typeof(Camera))]
     public class CameraOverlayMask : MonoBehaviour, IRestorable
     {
