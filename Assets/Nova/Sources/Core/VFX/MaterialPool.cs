@@ -53,13 +53,7 @@ namespace Nova
 
         public static MaterialPool Ensure(GameObject gameObject)
         {
-            var pool = gameObject.GetComponent<MaterialPool>();
-            if (pool == null)
-            {
-                pool = gameObject.AddComponent<MaterialPool>();
-            }
-
-            return pool;
+            return gameObject.Ensure<MaterialPool>();
         }
     }
 }
