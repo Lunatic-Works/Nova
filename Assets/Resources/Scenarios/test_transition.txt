@@ -74,15 +74,36 @@ anim:vfx(cam, 'lens_blur', {1, 0}, 1, { _Size = 4 })
 
 <|
 -- 先把gaotian和fg的layer设为cam_mask.maskLayer，再给cam_mask加vfx
-gaotian.layer = cam_mask.maskLayer
-fg.layer = cam_mask.maskLayer
+gaotian.layer = cam2_layer
+fg.layer = cam2_layer
 show(xiben, 'normal', pos_l)
 show(bg, 'rain')
 show(gaotian, 'normal', pos_r)
 show(fg, 'moon_halo')
-anim:vfx(cam_mask, 'fade', {0, 0.5}, 1, { _Mask = 'Masks/wipe_left', _Vague = 0.1 })
+cam2.cameraEnabled = true
+anim:vfx(cam_mask, 'fade', {0, 0.5}, 1, { _SubTex = 'RenderTargets/GameCamera2Texture', _Mask = 'Masks/wipe_left', _Vague = 0.1 })
 |>
 测试遮罩
+
+<|
+anim:vfx(cam, 'broken_tv', {0, 0.5}, 1)
+|>
+给摄像机1加特效
+
+<|
+anim:vfx(cam, 'broken_tv', {0.5, 0}, 1)
+|>
+摄像机1特效结束
+
+<|
+anim:vfx(cam2, 'broken_tv', {0, 0.5}, 1)
+|>
+给摄像机2加特效
+
+<|
+anim:vfx(cam2, 'broken_tv', {0.5, 0}, 1)
+|>
+摄像机2特效结束
 
 <|
 -- 把gaotian和fg的layer重置为0，并把cam2的cullingMask设为1，就是拍摄layer 0
@@ -95,14 +116,35 @@ anim:move(cam2, {-3, 0})
 也可以让两个摄像机拍同一个图层
 
 <|
-anim:vfx(cam_mask, 'fade', {0.5, 0}, 1, { _Mask = 'Masks/wipe_left', _Vague = 0.1 })
+anim:vfx(cam, 'broken_tv', {0, 0.5}, 1)
+|>
+给摄像机1加特效
+
+<|
+anim:vfx(cam, 'broken_tv', {0.5, 0}, 1)
+|>
+摄像机1特效结束
+
+<|
+anim:vfx(cam2, 'broken_tv', {0, 0.5}, 1)
+|>
+给摄像机2加特效
+
+<|
+anim:vfx(cam2, 'broken_tv', {0.5, 0}, 1)
+|>
+摄像机2特效结束
+
+<|
+anim:vfx(cam_mask, 'fade', {0.5, 0}, 1, { _SubTex = 'RenderTargets/GameCamera2Texture', _Mask = 'Masks/wipe_left', _Vague = 0.1 })
 |>
 遮罩结束
 
 <|
-cam2.cullingMask = 2^cam_mask.maskLayer
+cam2.cullingMask = 2^cam2_layer
+cam2.cameraEnabled = false
 |>
-重置cam2的cullingMask
+重置cam2的cullingMask，关闭cam2
 
 测试结束
 @<| is_end() |>

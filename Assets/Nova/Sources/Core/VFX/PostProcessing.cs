@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Nova.URP;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace Nova
 {
     [ExportCustomType]
-    public class PostProcessing : MonoBehaviour, IRestorable
+    public class PostProcessing : OnPostRenderBehaviour, IRestorable
     {
         public string luaName;
-        public PostProcessing asProxyOf;
-
         private GameState gameState;
 
         private void Awake()
@@ -36,8 +37,6 @@ namespace Nova
 
         public void SetLayer(int layerID, Material material)
         {
-            this.RuntimeAssert(asProxyOf == null, "SetLayer cannot be called on a proxy.");
-
             while (layers.Count <= layerID)
             {
                 layers.Add(null);
@@ -48,8 +47,6 @@ namespace Nova
 
         public void ClearLayer(int layerID)
         {
-            this.RuntimeAssert(asProxyOf == null, "ClearLayer cannot be called on a proxy.");
-
             if (layers.Count > layerID)
             {
                 layers[layerID] = null;
@@ -78,62 +75,37 @@ namespace Nova
             }
         }
 
-        private void OnRenderImage(RenderTexture src, RenderTexture dest)
+        private static readonly int TempTargetId = Shader.PropertyToID("_NovaTempBlit");
+
+        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            if (asProxyOf != null)
+            if (!EnabledMaterials().Any())
             {
-                asProxyOf.OnRenderImage(src, dest);
                 return;
             }
 
-            var matCnt = EnabledMaterials().Count();
-            if (matCnt == 0)
-            {
-                Graphics.Blit(src, dest);
-                return;
-            }
+            var cmd = CommandBufferPool.Get("Nova Post Processing");
+            var cam = renderingData.cameraData.camera;
 
-            if (matCnt == 1)
-            {
-                var mat = EnabledMaterials().First();
-                Graphics.Blit(src, dest, mat);
-                return;
-            }
+            cmd.GetTemporaryRT(TempTargetId, cam.scaledPixelWidth, cam.scaledPixelHeight, 0);
+            RenderTargetIdentifier[] buffers = { TempTargetId, OnRenderImageFeature.DefaultCameraTarget };
+            var from = 1;
 
-            // double buffer pattern
-            RenderTexture[] buffers = {RenderTexture.GetTemporary(src.descriptor), dest};
-            // dest might be null
-            // for matCnt == 2, src -> buffers[0] -> dest, fine
-            // issue will occur when matCnt >= 3
-            var destUseTmp = dest == null && matCnt >= 3;
-            if (destUseTmp)
-            {
-                buffers[1] = RenderTexture.GetTemporary(src.descriptor);
-            }
-
-            // the final result is in buffers[1]
-            var from = matCnt % 2;
-            var first = true;
             foreach (var mat in EnabledMaterials())
             {
-                if (first)
-                {
-                    Graphics.Blit(src, buffers[from], mat);
-                    first = false;
-                    continue;
-                }
-
-                Graphics.Blit(buffers[from], buffers[1 - from], mat);
+                cmd.Blit(buffers[from], buffers[1 - from], mat);
                 from = 1 - from;
             }
 
-            if (destUseTmp)
+            if (from == 0)
             {
-                Graphics.Blit(buffers[1], dest);
-                RenderTexture.ReleaseTemporary(buffers[1]);
+                cmd.Blit(buffers[0], buffers[1]);
             }
 
-            RenderTexture.ReleaseTemporary(buffers[0]);
+            cmd.ReleaseTemporaryRT(TempTargetId);
+
+            context.ExecuteCommandBuffer(cmd);
+            CommandBufferPool.Release(cmd);
         }
 
         #region Restoration

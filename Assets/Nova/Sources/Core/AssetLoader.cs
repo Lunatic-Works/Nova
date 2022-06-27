@@ -24,6 +24,8 @@ namespace Nova
     [ExportCustomType]
     public class AssetLoader : MonoBehaviour, IPrioritizedRestorable
     {
+        public static readonly string RenderTargetPrefix = "RenderTargets/";
+
         private static AssetLoader Current;
 
         private static readonly HashSet<string> LocalizedResourcePaths = new HashSet<string>();
@@ -45,7 +47,7 @@ namespace Nova
             var text = Resources.Load<TextAsset>("LocalizedResourcePaths");
             if (text)
             {
-                LocalizedResourcePaths.UnionWith(text.text.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries));
+                LocalizedResourcePaths.UnionWith(text.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
             }
 
             cachedAssets = new Dictionary<AssetCacheType, LRUCache<string, CachedAssetEntry>>

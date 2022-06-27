@@ -91,7 +91,7 @@ public static class CustomSettings
         // _GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
 #else
         // _GT(typeof(AudioSource)),
-        // _GT(typeof(Camera)),
+        _GT(typeof(Camera)),
         // _GT(typeof(Component)),
         // _GT(typeof(Light)),
         // _GT(typeof(Material)),
@@ -166,6 +166,7 @@ public static class CustomSettings
 
         _GT(typeof(Image)),
         _GT(typeof(PlayableDirector)),
+        _GT(typeof(RawImage)),
         _GT(typeof(RectTransform)),
         // _GT(typeof(Sprite)),
         _GT(typeof(SpriteRenderer)),

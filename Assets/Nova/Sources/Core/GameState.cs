@@ -75,7 +75,8 @@ namespace Nova
                 : this(new Dictionary<SystemLanguage, string>
                 {
                     [I18n.DefaultLocale] = text
-                }, imageInfo, active) { }
+                }, imageInfo, active)
+            { }
         }
 
         public readonly IReadOnlyList<Selection> selections;
