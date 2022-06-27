@@ -73,10 +73,5 @@ namespace Nova
         {
             SetRenderQueue(renderQueue);
         }
-
-        public static RenderQueueOverrider Ensure(GameObject gameObject)
-        {
-            return gameObject.Ensure<RenderQueueOverrider>();
-        }
     }
 }

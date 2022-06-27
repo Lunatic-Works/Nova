@@ -27,7 +27,7 @@ namespace Nova
         protected RenderTexture _targetTexture;
         // these binding are not persist
         // need extra mechanism (e.g. RestorableMaterial or RawImageController to be restorable)
-        protected List<ITextureReceiver> receivers = new List<ITextureReceiver>();
+        protected readonly List<ITextureReceiver> receivers = new List<ITextureReceiver>();
 
         public abstract string textureName { get; }
         public virtual RenderTextureFormat textureFormat => RenderTextureFormat.ARGB32;

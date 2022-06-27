@@ -61,7 +61,7 @@ namespace Nova
 
         private class MyTarget : RenderTarget
         {
-            private CameraRenderTarget parent;
+            private readonly CameraRenderTarget parent;
             public override bool isActive => parent.renderCamera != null && parent.renderCamera.isActiveAndEnabled;
             public override bool isFinal => parent.isFinalTarget;
             public override string textureName => parent == null ? oldConfig.name : parent.renderCamera.name + SUFFIX;
