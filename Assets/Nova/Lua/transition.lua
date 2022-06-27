@@ -158,20 +158,21 @@ end
 
 -- render targets can be used in this function
 local function set_texture_by_path(mat, name, path)
-    local rtStarts = Nova.AssetLoader.RenderTargetPrefix
     if mat:GetType() == typeof(Nova.RestorableMaterial) then
         mat:SetTexturePath(name, path)
-    elseif string.sub(path, 1, string.len(rtStarts)) == rtStarts then
-        local rtName = string.sub(path, string.len(rtStarts) + 1, string.len(path))
-        local rt = Nova.AssetLoader.LoadRenderTarget(rtName)
-        rt:Bind(mat, name)
     else
-        local tex
-        -- we cannot set value = nil in table, so we use ''
-        if path and path ~= '' then
-            tex = Nova.AssetLoader.LoadTexture(path)
+        local prefix, rt_name = pop_prefix(path, Nova.AssetLoader.RenderTargetPrefix)
+        if prefix then
+            local rt = Nova.AssetLoader.LoadRenderTarget(rt_name)
+            rt:Bind(mat, name)
+        else
+            local tex
+            -- we cannot set value = nil in table, so we use ''
+            if path and path ~= '' then
+                tex = Nova.AssetLoader.LoadTexture(path)
+            end
+            mat:SetTexture(name, tex)
         end
-        mat:SetTexture(name, tex)
     end
 end
 
@@ -203,8 +204,7 @@ local function parse_shader_layer(shader_layer, default_layer_id)
         return nil, default_layer_id
     elseif type(shader_layer) == 'string' then
         return shader_layer, default_layer_id
-    else
-        -- type(shader_layer) == 'table'
+    else -- type(shader_layer) == 'table'
         return shader_layer[1], shader_layer[2]
     end
 end
@@ -216,8 +216,7 @@ local function parse_times(times)
         return 1, Nova.AnimationEntry.LinearEasing()
     elseif type(times) == 'number' then
         return times, Nova.AnimationEntry.LinearEasing()
-    else
-        -- type(times) == 'table'
+    else -- type(times) == 'table'
         return times[1], parse_easing(times[2])
     end
 end

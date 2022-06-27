@@ -57,7 +57,7 @@ namespace Nova
         private int lastScreenHeight, lastScreenWidth;
         private int lastRealHeight, lastRealWidth;
         private int shouldUpdateUIAfter = -1;
-        private List<IRenderTargetConfig> renderTargets = new List<IRenderTargetConfig>();
+        private readonly List<IRenderTargetConfig> renderTargets = new List<IRenderTargetConfig>();
         private IRenderTargetConfig finalTarget => renderTargets.Find(rt => rt.isActive && rt.isFinal);
 
         private void Awake()

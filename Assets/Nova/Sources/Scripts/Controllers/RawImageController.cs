@@ -45,11 +45,11 @@ namespace Nova
         public string restorableName => luaGlobalName;
 
         [Serializable]
-        private class SpriteRestoreData : IRestoreData
+        private class RawImageControllerRestoreData : IRestoreData
         {
             public readonly MaterialData materialData;
 
-            public SpriteRestoreData(MaterialData materialData)
+            public RawImageControllerRestoreData(MaterialData materialData)
             {
                 this.materialData = materialData;
             }
@@ -68,12 +68,12 @@ namespace Nova
                 materialData = null;
             }
 
-            return new SpriteRestoreData(materialData);
+            return new RawImageControllerRestoreData(materialData);
         }
 
         public void Restore(IRestoreData restoreData)
         {
-            var data = restoreData as SpriteRestoreData;
+            var data = restoreData as RawImageControllerRestoreData;
 
             // Material must be RestorableMaterial or DefaultMaterial
             if (data.materialData != null)
