@@ -23,7 +23,7 @@
 
 * **支持什么版本的Unity、什么操作系统/平台？**
 
-    支持Unity 2019及更高版本，Windows/Linux/macOS/Android/iOS平台。WebGL目前不支持，不过似乎已经有人成功让我们的依赖（tolua#）支持WebGL了，我们真要做的话应该也可以。
+    支持Unity 2020及更高版本，Windows/Linux/macOS/Android/iOS平台。WebGL目前不支持，不过似乎已经有人成功让我们的依赖（tolua#）支持WebGL了，我们真要做的话应该也可以。
 
 * **我可以把解谜/战棋等游戏加到Nova里吗？我可以把Nova作为对话系统加到解谜/战棋等游戏里吗？**
 
@@ -35,9 +35,9 @@
 
 ## 版本说明
 
-* v0.1：与《青箱》完全兼容的版本
-* v0.2：重要的新功能包括新的脚本parser、新的存档系统、异步的`GameState`，这些新功能不会影响游戏制作者的工作流程
-* v0.3：`master` branch上滚动更新的版本，预计的新功能包括Input System、URP、Addressables
+* v0.1：兼容《青箱》v1.1.0的版本
+* v0.2：兼容Unity 2019的版本，重要的新功能包括新的脚本parser、新的存档系统、异步的`GameState`
+* v0.3：`master` branch上滚动更新的版本，重要的新功能包括Input System、URP，预计的新功能包括Addressables
 
 ## 友情链接
 
