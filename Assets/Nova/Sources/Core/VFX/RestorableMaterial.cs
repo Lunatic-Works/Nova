@@ -65,7 +65,7 @@ namespace Nova
                 texturePath = "";
             }
 
-            if (texturePath.StartsWith(AssetLoader.RenderTargetPrefix))
+            if (texturePath.StartsWith(AssetLoader.RenderTargetPrefix, StringComparison.Ordinal))
             {
                 var rtName = texturePath.Substring(AssetLoader.RenderTargetPrefix.Length);
                 var rt = Utils.FindGameRenderManager().GetRenderTarget(rtName) as RenderTarget;

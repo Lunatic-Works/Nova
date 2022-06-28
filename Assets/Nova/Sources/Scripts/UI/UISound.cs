@@ -4,8 +4,8 @@ using UnityEngine.InputSystem.UI;
 
 namespace Nova
 {
-    public class UISound : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler,
-        IPointerEnterHandler
+    public class UISound : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler,
+        IPointerExitHandler
     {
         public AudioClip mouseDown;
         public AudioClip mouseUp;

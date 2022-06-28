@@ -9,7 +9,7 @@ using UnityEngine.InputSystem.Controls;
 namespace Nova
 {
     /// <summary>
-    /// Hides the cursor and unsets the selection of selectables.
+    /// Hides cursor and clears selection.
     /// </summary>
     public class CursorManager : MonoBehaviour
     {
@@ -27,14 +27,14 @@ namespace Nova
         {
             var eventSystem = EventSystem.current;
 
-            // Disable keyboard navigation on mobile platforms
+            // Clear selection on mobile platforms
             if (Application.isMobilePlatform)
             {
                 eventSystem.SetSelectedGameObject(null);
                 return;
             }
 
-            // Show cursor and disable keyboard navigation when mouse moves or clicks
+            // Show cursor and clear selection when mouse moves or clicks
             var cursorPosition = RealInput.mousePosition;
             if (cursorPosition != lastCursorPosition ||
                 Mouse.current?.allControls.OfType<ButtonControl>().Any(control => control.isPressed) == true)

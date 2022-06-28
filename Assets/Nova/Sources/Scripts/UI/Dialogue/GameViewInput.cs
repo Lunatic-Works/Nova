@@ -51,11 +51,7 @@ namespace Nova
         private void Update()
         {
             HandleShortcut();
-
-            if (inputManager.inputEnabled)
-            {
-                HandleInput();
-            }
+            HandleInput();
         }
 
         private void HandleShortcutWhenDialogueShown()
@@ -281,6 +277,11 @@ namespace Nova
 
         private void HandleInput()
         {
+            if (!inputManager.inputEnabled)
+            {
+                return;
+            }
+
             if (Mouse.current != null && (
                     RealInput.mousePosition.x < 0 || RealInput.mousePosition.x > RealScreen.width ||
                     RealInput.mousePosition.y < 0 || RealInput.mousePosition.y > RealScreen.height))
@@ -297,12 +298,12 @@ namespace Nova
             if (viewManager.currentView == CurrentViewType.Game)
             {
                 float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
-                if (scroll > 0)
+                if (scroll > float.Epsilon)
                 {
                     dialogueState.state = DialogueState.State.Normal;
                     logController.Show();
                 }
-                else if (scroll < 0)
+                else if (scroll < -float.Epsilon)
                 {
                     ClickForward();
                 }

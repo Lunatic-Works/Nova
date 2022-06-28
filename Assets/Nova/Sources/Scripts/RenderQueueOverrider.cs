@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
@@ -72,6 +72,11 @@ namespace Nova
         public void LateUpdate()
         {
             SetRenderQueue(renderQueue);
+        }
+
+        public static RenderQueueOverrider Ensure(GameObject gameObject)
+        {
+            return gameObject.Ensure<RenderQueueOverrider>();
         }
     }
 }
