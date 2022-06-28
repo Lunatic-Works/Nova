@@ -6,7 +6,7 @@
 
 ## 使用说明
 
-1. `git clone`，为了节约时间可以加上`--depth 1`
+1. `git clone`，为了节约时间可以加上`--filter=blob:none`
 2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 在Unity Editor中打开`Assets/Scenes/Main.unity`，运行游戏，把示例作品《Colorless》看一遍
 4. 把游戏中的教程看一遍，同时可以试着改一改脚本，脚本是`Assets/Resources/Scenarios/`文件夹下的`tut01.txt`等文件
