@@ -138,7 +138,7 @@ namespace Nova
                 return;
             }
 
-            // // Debug.Log($"Change full screen status from {Screen.fullScreen} (logical {isLogicalFullScreen}) to {to}");
+            // Debug.Log($"Change full screen status from {Screen.fullScreen} (logical {isLogicalFullScreen}) to {to}");
             if (isLogicalFullScreen == to)
             {
                 return;
@@ -268,6 +268,9 @@ namespace Nova
             lastRealWidth = RealScreen.width;
             lastRealHeight = RealScreen.height;
             RealScreen.isScreenInitialized = true;
+            Shader.SetGlobalFloat(GlobalRealScreenHeightID, RealScreen.fHeight);
+            Shader.SetGlobalFloat(GlobalRealScreenWidthID, RealScreen.fWidth);
+            Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.fWidth / 1920);
             // Debug.Log($"Update Screen {lastScreenWidth}x{lastScreenHeight} => {RealScreen.width}x{RealScreen.height}");
         }
 
@@ -304,9 +307,6 @@ namespace Nova
                 {
                     shouldUpdateUIAfter = 2;
                 }
-                Shader.SetGlobalFloat(GlobalRealScreenHeightID, RealScreen.fHeight);
-                Shader.SetGlobalFloat(GlobalRealScreenWidthID, RealScreen.fWidth);
-                Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.fWidth / 1920);
             }
 
             foreach (var rt in renderTargets)
