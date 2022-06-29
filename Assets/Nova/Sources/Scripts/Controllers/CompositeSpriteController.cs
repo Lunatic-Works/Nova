@@ -4,14 +4,21 @@ using UnityEngine;
 
 namespace Nova
 {
+    [RequireComponent(typeof(CompositeSpriteRenderTarget))]
     public class CompositeSpriteController : OverlayTextureChangerBase
     {
+        public const int overlayLayer = 15;
+        public const int mergerLayer = 16;
+        public GameObject overlay;
+        public GameObject merger;
         public string imageFolder;
         public string currentImageName { get; protected set; }
         private static Mesh quad;
         private MeshRenderer meshRenderer;
         private MeshFilter meshFilter;
-        // public 
+        private CompositeSpriteRenderTarget renderTarget;
+
+        protected override string fadeShader => "Nova/VFX/Change Overlay With Fade";
 
         protected override void Awake()
         {
@@ -39,6 +46,13 @@ namespace Nova
                     2, 3, 1
                 };
             }
+            renderTarget = GetComponent<CompositeSpriteRenderTarget>();
+            meshFilter = overlay.Ensure<MeshFilter>();
+            meshFilter.mesh = quad;
+            meshRenderer = overlay.Ensure<MeshRenderer>();
+            base.Awake();
+            meshRenderer.material = material;
         }
+
     }
 }
