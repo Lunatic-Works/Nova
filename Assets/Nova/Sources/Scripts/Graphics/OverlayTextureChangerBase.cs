@@ -3,6 +3,11 @@ using UnityEngine;
 
 namespace Nova
 {
+    public interface IOverlayRenderer
+    {
+        public GameObject overlayObject { get; }
+    }
+
     public class OverlayTextureChangerBase : MonoBehaviour
     {
         private const string TIME = "_T";
