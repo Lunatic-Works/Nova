@@ -33,7 +33,7 @@ namespace Nova
         {
             private CompositeSpriteRenderTarget parent;
             private string suffix;
-            public override string textureName => parent.gameObject.name + suffix;
+            public override string textureName => parent == null ? oldConfig.name : parent.gameObject.name + suffix;
             public override bool isFinal => false;
             public override bool isActive => !string.IsNullOrEmpty(parent.controller.currentImageName);
 
@@ -42,12 +42,6 @@ namespace Nova
                 this.parent = parent;
                 this.suffix = suffix;
             }
-
-            // protected override void Awake()
-            // {
-                // compositeRenderer = GetComponent<CompositeSpriteRenderer>();
-                // base.Awake();
-            // }
         }
     }
 }
