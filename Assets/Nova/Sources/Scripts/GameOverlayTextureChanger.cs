@@ -2,9 +2,10 @@
 
 namespace Nova
 {
-    public class GameOverlayTextureChanger : OverlayTextureChangerBase
+    public class GameOverlayTextureChanger : OverlayTextureChangerBase, IOverlayRenderer
     {
         public GameObject actualImageObject;
+        public GameObject overlayObject => actualImageObject;
 
         private Mesh plane;
         private MeshFilter filter;

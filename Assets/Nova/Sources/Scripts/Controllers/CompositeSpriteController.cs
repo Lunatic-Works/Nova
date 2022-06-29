@@ -7,14 +7,17 @@ using UnityEngine;
 namespace Nova
 {
     [ExportCustomType]
-    public class CompositeSpriteController : OverlayTextureChangerBase
+    public class CompositeSpriteController : OverlayTextureChangerBase, IRestorable, IOverlayRenderer
     {
         public const int mergerLayer = 16;
         public GameObject overlay;
+        public GameObject overlayObject => overlay;
         public CompositeSpriteRenderTarget mergerPrimary;
         public CompositeSpriteRenderTarget mergerSub;
         public string imageFolder;
         public string luaGlobalName;
+
+        private List<string> curPose = new List<string>();
         private static Mesh quad;
         private MeshRenderer meshRenderer;
         private MeshFilter meshFilter;
@@ -22,6 +25,7 @@ namespace Nova
         private DialogueBoxController dialogueBoxController;
 
         protected override string fadeShader => "Nova/VFX/Change Overlay With Fade";
+        public virtual string restorableObjectName => luaGlobalName;
 
         protected override void Awake()
         {
@@ -50,9 +54,9 @@ namespace Nova
                 // some very large bound to disable culling
                 quad.bounds = new Bounds(Vector3.zero, 1e6f * Vector3.one);
             }
-            meshFilter = overlay.Ensure<MeshFilter>();
+            meshFilter = overlayObject.Ensure<MeshFilter>();
             meshFilter.mesh = quad;
-            meshRenderer = overlay.Ensure<MeshRenderer>();
+            meshRenderer = overlayObject.Ensure<MeshRenderer>();
             base.Awake();
             meshRenderer.material = material;
 
@@ -62,7 +66,15 @@ namespace Nova
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
                 LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
-                // gameState.AddRestorable(this);
+                gameState.AddRestorable(this);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (!string.IsNullOrEmpty(luaGlobalName))
+            {
+                gameState.RemoveRestorable(this);
             }
         }
 
@@ -80,6 +92,8 @@ namespace Nova
             {
                 FadeAnimation(fadeDuration);
             }
+            curPose.Clear();
+            curPose.AddRange(pose);
         }
 
         public void SetPose(LuaInterface.LuaTable pose, bool fade = true)
@@ -90,6 +104,45 @@ namespace Nova
         public void ClearImage(bool fade = true)
         {
             SetPose(Enumerable.Empty<string>(), fade);
+        }
+
+        [Serializable]
+        protected class CompositeSpriteControllerRestoreData : IRestoreData
+        {
+            public readonly TransformRestoreData transform;
+            public readonly List<string> poseArray;
+            public readonly Vector4Data color;
+            public readonly int renderQueue;
+
+            public CompositeSpriteControllerRestoreData(CompositeSpriteController parent)
+            {
+                this.transform = new TransformRestoreData(parent.transform);
+                this.poseArray = new List<string>(parent.curPose);
+                this.color = parent.color;
+                this.renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
+            }
+
+            public CompositeSpriteControllerRestoreData(CompositeSpriteControllerRestoreData other)
+            {
+                this.transform = other.transform;
+                this.poseArray = other.poseArray;
+                this.color = other.color;
+                this.renderQueue = other.renderQueue;
+            }
+        }
+
+        public virtual IRestoreData GetRestoreData()
+        {
+            return new CompositeSpriteControllerRestoreData(this);
+        }
+
+        public virtual void Restore(IRestoreData restoreData)
+        {
+            var data = restoreData as CompositeSpriteControllerRestoreData;
+            data.transform.Restore(this.transform);
+            color = data.color;
+            gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
+            SetPose(data.poseArray, false);
         }
     }
 }

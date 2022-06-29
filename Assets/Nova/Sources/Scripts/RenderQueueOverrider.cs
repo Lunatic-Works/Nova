@@ -16,17 +16,25 @@ namespace Nova
             renderer = GetComponent<Renderer>();
             if (renderer == null)
             {
-                var textureChanger = GetComponent<GameOverlayTextureChanger>();
+                var textureChanger = GetComponent<IOverlayRenderer>();
                 if (textureChanger != null)
                 {
-                    renderer = textureChanger.actualImageObject.GetComponent<Renderer>();
+                    renderer = textureChanger.overlayObject.GetComponent<Renderer>();
                 }
             }
 
             image = GetComponent<Image>();
 
             // Create MaterialPool to keep an instance of defaultMaterial
-            gameObject.Ensure<MaterialPool>();
+            // if (renderer != null)
+            // {
+            //     renderer.gameObject.Ensure<MaterialPool>();
+            // }
+            // else
+            // {
+                gameObject.Ensure<MaterialPool>();
+            // }
+            
 
             renderQueue = GetRenderQueue();
         }
