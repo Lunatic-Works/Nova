@@ -218,12 +218,12 @@ namespace Nova
         #region Restoration
 
         [Serializable]
-        private class CharacterRestoreData : CompositeSpriteControllerRestoreData
+        private class GameCharacterControllerRestoreData : CompositeSpriteControllerRestoreData
         {
             public readonly Vector4Data environmentColor;
             public readonly int layer;
 
-            public CharacterRestoreData(CompositeSpriteControllerRestoreData baseData, Color environmentColor, int layer) : base(baseData)
+            public GameCharacterControllerRestoreData(CompositeSpriteControllerRestoreData baseData, Color environmentColor, int layer) : base(baseData)
             {
                 this.environmentColor = environmentColor;
                 this.layer = layer;
@@ -232,13 +232,13 @@ namespace Nova
 
         public override IRestoreData GetRestoreData()
         {
-            return new CharacterRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData, environmentColor, layer);
+            return new GameCharacterControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData, environmentColor, layer);
         }
 
         public override void Restore(IRestoreData restoreData)
         {
             base.Restore(restoreData);
-            var data = restoreData as CharacterRestoreData;
+            var data = restoreData as GameCharacterControllerRestoreData;
             environmentColor = data.environmentColor;
             layer = data.layer;
         }
