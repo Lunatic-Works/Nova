@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e86e2a28eac4229bc517299f864191b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configKeyName: AudioVolume
+  configKeyName: VoiceVolume
   secondaryConfigKeyName: 
   multiplier: 1
   gamma: 1
