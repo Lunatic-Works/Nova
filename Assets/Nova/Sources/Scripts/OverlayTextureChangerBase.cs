@@ -3,9 +3,8 @@ using UnityEngine;
 
 namespace Nova
 {
-    public abstract class OverlayTextureChangerBase : MonoBehaviour
+    public class OverlayTextureChangerBase : MonoBehaviour
     {
-        private const string SHADER = "Nova/VFX/Change Texture With Fade";
         private const string TIME = "_T";
 
         private static readonly int PrimaryTextureID = Shader.PropertyToID("_PrimaryTex");
@@ -14,6 +13,8 @@ namespace Nova
         private static readonly int ColorID = Shader.PropertyToID("_Color");
         private static readonly int SubColorID = Shader.PropertyToID("_SubColor");
         private static readonly int TimeID = Shader.PropertyToID(TIME);
+
+        protected virtual string fadeShader => "Nova/VFX/Change Texture With Fade";
 
         public float fadeDuration = 0.1f;
 
@@ -32,13 +33,16 @@ namespace Nova
             ResetSize(float.NaN, float.NaN, Vector2.zero);
 
             var pool = gameObject.Ensure<MaterialPool>();
-            material = pool.Get(SHADER);
+            material = pool.Get(fadeShader);
             pool.defaultMaterial = material;
 
             novaAnimation = Utils.FindNovaGameController().PerDialogueAnimation;
         }
 
-        protected abstract void ResetSize(float width, float height, Vector2 pivot);
+        protected virtual void ResetSize(float width, float height, Vector2 pivot)
+        {
+            // Do Nothing
+        }
 
         private void SetTexture(Texture to, float delay)
         {
