@@ -21,11 +21,11 @@ function preload(obj, resource_name)
         obj:Preload(resource_name)
     else
         if type(resource_name) == 'table' then
-            obj:PreloadPose(resource_name)
+            -- dont preload pose
         else
             local pose = get_pose(obj, resource_name)
             if pose then
-                obj:PreloadPose(pose)
+                -- dont preload pose
             else
                 Nova.AssetLoader.Preload(Nova.AssetCacheType.Image, obj.imageFolder .. '/' .. resource_name)
             end
@@ -50,11 +50,11 @@ function unpreload(obj, resource_name)
         obj:Unpreload(resource_name)
     else
         if type(resource_name) == 'table' then
-            obj:UnpreloadPose(resource_name)
+            -- dont preload pose
         else
             local pose = get_pose(obj, resource_name)
             if pose then
-                obj:UnpreloadPose(pose)
+                -- dont preload pose
             else
                 Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Image, obj.imageFolder .. '/' .. resource_name)
             end

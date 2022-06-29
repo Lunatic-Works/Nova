@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
@@ -28,10 +29,10 @@ namespace Nova
             Environment
         }
 
-        private readonly CharacterController character;
+        private readonly GameCharacterController character;
         private readonly Type type;
 
-        public CharacterColor(CharacterController character, Type type)
+        public CharacterColor(GameCharacterController character, Type type)
         {
             this.character = character;
             this.type = type;
@@ -70,53 +71,16 @@ namespace Nova
 
     [ExportCustomType]
     [RequireComponent(typeof(AudioSource))]
-    public class CharacterController : CompositeSpriteControllerBase
+    public class GameCharacterController : CompositeSpriteController
     {
-        public string luaGlobalName;
         public string voiceFolder;
 
         private AudioSource audioSource;
 
         public int layer
         {
-            get
-            {
-                if (textureChanger != null)
-                {
-                    var gameOverlayTextureChanger = textureChanger as GameOverlayTextureChanger;
-                    if (gameOverlayTextureChanger.actualImageObject != null)
-                    {
-                        return gameOverlayTextureChanger.actualImageObject.layer;
-                    }
-                    else
-                    {
-                        return gameObject.layer;
-                    }
-                }
-                else
-                {
-                    return gameObject.layer;
-                }
-            }
-            set
-            {
-                if (textureChanger != null)
-                {
-                    var gameOverlayTextureChanger = textureChanger as GameOverlayTextureChanger;
-                    if (gameOverlayTextureChanger.actualImageObject != null)
-                    {
-                        gameOverlayTextureChanger.actualImageObject.layer = value;
-                    }
-                    else
-                    {
-                        gameObject.layer = value;
-                    }
-                }
-                else
-                {
-                    gameObject.layer = value;
-                }
-            }
+            get => overlay.layer;
+            set => overlay.layer = value;
         }
 
         protected override void Awake()
@@ -127,32 +91,21 @@ namespace Nova
 
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
-
-            if (!string.IsNullOrEmpty(luaGlobalName))
-            {
-                LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
-                gameState.AddRestorable(this);
-            }
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
-
-            if (!string.IsNullOrEmpty(luaGlobalName))
-            {
-                gameState.RemoveRestorable(this);
-            }
         }
+
 
         #region Voice
 
-        [HideInInspector] public bool stopVoiceWhenDialogueWillChange;
-
+        public bool stopVoiceWhenDialogueWillChange { get; set; }
         private bool willSaySomething = false;
         private float voiceDelay = 0.0f;
-
         private bool dontPlaySound => gameState.isRestoring;
 
         /// <summary>
@@ -199,6 +152,7 @@ namespace Nova
         #region Color
 
         private Color _color = Color.white;
+        private Color _environmentColor = Color.white;
 
         public override Color color
         {
@@ -206,11 +160,9 @@ namespace Nova
             set
             {
                 _color = value;
-                SetColor(_color * _environmentColor);
+                base.color = _color * _environmentColor;
             }
         }
-
-        private Color _environmentColor = Color.white;
 
         public Color environmentColor
         {
@@ -218,7 +170,7 @@ namespace Nova
             set
             {
                 _environmentColor = value;
-                SetColor(_color * _environmentColor);
+                base.color = _color * _environmentColor;
             }
         }
 
@@ -265,16 +217,13 @@ namespace Nova
 
         #region Restoration
 
-        public override string restorableName => luaGlobalName;
-
         [Serializable]
-        private class CharacterControllerRestoreData : CompositeSpriteControllerBaseRestoreData
+        private class CharacterRestoreData : CompositeSpriteControllerRestoreData
         {
             public readonly Vector4Data environmentColor;
             public readonly int layer;
 
-            public CharacterControllerRestoreData(CompositeSpriteControllerBaseRestoreData baseData,
-                Color environmentColor, int layer) : base(baseData)
+            public CharacterRestoreData(CompositeSpriteControllerRestoreData baseData, Color environmentColor, int layer) : base(baseData)
             {
                 this.environmentColor = environmentColor;
                 this.layer = layer;
@@ -283,14 +232,13 @@ namespace Nova
 
         public override IRestoreData GetRestoreData()
         {
-            return new CharacterControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
-                environmentColor, layer);
+            return new CharacterRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData, environmentColor, layer);
         }
 
         public override void Restore(IRestoreData restoreData)
         {
             base.Restore(restoreData);
-            var data = restoreData as CharacterControllerRestoreData;
+            var data = restoreData as CharacterRestoreData;
             environmentColor = data.environmentColor;
             layer = data.layer;
         }
@@ -299,10 +247,10 @@ namespace Nova
 
         #region Static fields and methods
 
-        private static readonly Dictionary<string, CharacterController> Characters =
-            new Dictionary<string, CharacterController>();
+        private static readonly Dictionary<string, GameCharacterController> Characters =
+            new Dictionary<string, GameCharacterController>();
 
-        private static void AddCharacter(string name, CharacterController character)
+        private static void AddCharacter(string name, GameCharacterController character)
         {
             Characters.Add(name, character);
         }

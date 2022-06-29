@@ -23,7 +23,7 @@ namespace Nova
         private static Mesh quad;
         private MeshRenderer meshRenderer;
         private MeshFilter meshFilter;
-        private GameState gameState;
+        protected GameState gameState;
         private DialogueBoxController dialogueBoxController;
         private MyTarget myTarget;
         private Material overlayMaterial;

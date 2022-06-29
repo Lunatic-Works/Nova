@@ -230,7 +230,7 @@ make_anim_method('move', function(self, obj, coord, duration, easing)
 end)
 
 function get_color(obj)
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.CharacterController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
+    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.GameCharacterController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
     if renderer then
         local color = renderer.color
         return color.r, color.g, color.b, color.a
@@ -274,7 +274,7 @@ end
 --- usage:
 ---     tint(obj, {r, g, b, [a]})
 function tint(obj, color)
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.CharacterController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
+    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.GameCharacterController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
     if renderer then
         renderer.color = parse_color(color)
         return
@@ -286,7 +286,7 @@ end
 --- usage:
 ---     tint(obj, {r, g, b, [a]}, [duration, easing])
 make_anim_method('tint', function(self, obj, color, duration, easing)
-    local character = obj:GetComponent(typeof(Nova.CharacterController))
+    local character = obj:GetComponent(typeof(Nova.GameCharacterController))
     local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
     if character == nil and renderer == nil then
         warn('Cannot find SpriteRenderer or CharacterController or Image or RawImage for ' .. dump(obj))
@@ -307,7 +307,7 @@ end)
 --- usage:
 ---     env_tint(obj, {r, g, b, [a]})
 function env_tint(obj, color)
-    local character = obj:GetComponent(typeof(Nova.CharacterController))
+    local character = obj:GetComponent(typeof(Nova.GameCharacterController))
     if character then
         character.environmentColor = parse_color(color)
         return
@@ -319,7 +319,7 @@ end
 --- usage:
 ---     tint(obj, {r, g, b, [a]}, [duration, easing])
 make_anim_method('env_tint', function(self, obj, color, duration, easing)
-    local character = obj:GetComponent(typeof(Nova.CharacterController))
+    local character = obj:GetComponent(typeof(Nova.GameCharacterController))
     if character == nil then
         warn('Cannot find CharacterController for ' .. dump(obj))
         return self
