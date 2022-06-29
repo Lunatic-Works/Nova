@@ -1,11 +1,10 @@
-VARIANTS: Default
-Shader "Nova/$VARIANT_NAME$/Change Overlay With Fade"
+// This file is generated. Do not edit it manually. Please edit .shaderproto files.
+
+Shader "Nova/VFX/Fade Global"
 {
     Properties
     {
         [HideInInspector] _MainTex ("Dummy Texture Providing Size", 2D) = "black" {}
-        [NoScaleOffset] _PrimaryTex ("Primary Texture", 2D) = "black" {}
-        [NoScaleOffset] _SubTex ("Secondary Texture", 2D) = "black" {}
         _Offsets ("Offsets (MainX, MainY, SecX, SecY)", Vector) = (0, 0, 0, 0)
         _Color ("Primary Texture Color", Color) = (1, 1, 1, 1)
         _SubColor ("Secondary Texture Color", Color) = (1, 1, 1, 1)
@@ -13,7 +12,8 @@ Shader "Nova/$VARIANT_NAME$/Change Overlay With Fade"
     }
     SubShader
     {
-        $VARIANT_TAGS$
+        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
             CGPROGRAM
@@ -39,11 +39,8 @@ Shader "Nova/$VARIANT_NAME$/Change Overlay With Fade"
             v2f vert(appdata v)
             {
                 v2f o;
-                // render directly to clip space
-                o.vertex = v.vertex;
+                o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
-                if (_ProjectionParams.x < 0)
-                    o.uv.y = 1 - o.uv.y;
                 return o;
             }
 

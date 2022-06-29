@@ -12,7 +12,7 @@ namespace Nova
         {
             rawImage = GetComponent<RawImage>();
             base.Awake();
-            rawImage.material = material;
+            rawImage.material = fadeMaterial;
         }
 
         protected override void ResetSize(float width, float height, Vector2 pivot)

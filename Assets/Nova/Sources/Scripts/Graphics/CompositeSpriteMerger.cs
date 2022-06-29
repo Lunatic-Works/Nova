@@ -7,32 +7,14 @@ using UnityEngine.Rendering;
 
 namespace Nova
 {
-    public class CompositeSpriteRenderTarget : MonoBehaviour
+    public class CompositeSpriteMerger : MonoBehaviour
     {
         public CompositeSpriteController controller;
         public string textureName;
-        private MyTarget target;
         private readonly List<SpriteRenderer> layers = new List<SpriteRenderer>();
         private string mergerName => controller.gameObject.name + gameObject.name;
 
         public int spriteCount { get; private set; } = 0;
-        public RenderTarget renderTarget => target;
-
-        private void Awake()
-        {
-            target = new MyTarget(this);
-            target.Awake();
-        }
-
-        private void Update()
-        {
-            target.Update();
-        }
-
-        private void OnDestroy()
-        {
-            target.OnDestroy();
-        }
 
         private void EnsureLayers(int count)
         {
@@ -73,7 +55,7 @@ namespace Nova
             }
         }
 
-        public void SetTextures(CompositeSpriteRenderTarget other)
+        public void SetTextures(CompositeSpriteMerger other)
         {
             EnsureLayers(other.spriteCount);
             for (var i = 0; i < other.spriteCount; i++)
@@ -83,13 +65,9 @@ namespace Nova
             }
         }
 
-        public void Render(CommandBuffer cmd)
+        public void Render(CommandBuffer cmd, int rt)
         {
-            if (target == null || target.targetTexture == null)
-            {
-                return;
-            }
-            cmd.SetRenderTarget(target.targetTexture);
+            cmd.SetRenderTarget(rt);
             cmd.ClearRenderTarget(true, true, Color.clear);
             if (!isActiveAndEnabled)
             {
@@ -98,31 +76,6 @@ namespace Nova
             for (var i = 0; i < spriteCount; i++)
             {
                 cmd.DrawRenderer(layers[i], layers[i].sharedMaterial);
-            }
-        }
-
-        private class MyTarget : RenderTarget
-        {
-            private CompositeSpriteRenderTarget parent;
-            public override string textureName => parent == null ? oldConfig.name : parent.mergerName + RenderTarget.SUFFIX;
-            public override bool isFinal => false;
-            public override bool isActive => parent.spriteCount > 0;
-
-            public override RenderTexture targetTexture
-            {
-                set
-                {
-                    base.targetTexture = value;
-                    if (parent != null)
-                    {
-                        parent.controller.material.SetTexture(parent.textureName, value);
-                    }
-                }
-            }
-
-            public MyTarget(CompositeSpriteRenderTarget parent)
-            {
-                this.parent = parent;
             }
         }
     }

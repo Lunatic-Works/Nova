@@ -11,6 +11,9 @@ namespace Nova
 {
     public class CompositeSpriteRenderer : MonoBehaviour, IOnRenderImage
     {
+        private static readonly int PrimaryTexID = Shader.PropertyToID("_PrimaryTex");
+        private static readonly int SubTexID = Shader.PropertyToID("_SubTex");
+
         public string mergerTag = "SpriteMerger1";
 
         public RenderPassEvent renderPassEvent => RenderPassEvent.BeforeRenderingTransparents;
@@ -19,16 +22,28 @@ namespace Nova
         {
             var gos = GameObject.FindGameObjectsWithTag(mergerTag);
 
+            var width = renderingData.cameraData.camera.scaledPixelWidth;
+            var height = renderingData.cameraData.camera.scaledPixelHeight;
+
             var cmd = CommandBufferPool.Get("Render Composite Sprite");
+            cmd.GetTemporaryRT(PrimaryTexID, width, height, 0);
+            cmd.GetTemporaryRT(SubTexID, width, height, 0);
             foreach (var go in gos)
             {
-                var renderTarget = go.GetComponent<CompositeSpriteRenderTarget>();
-                if (renderTarget == null)
+                var controller = go.GetComponent<CompositeSpriteController>();
+                if (controller == null)
                 {
                     continue;
                 }
-                renderTarget.Render(cmd);
+                controller.mergerPrimary.Render(cmd, PrimaryTexID);
+                controller.mergerSub.Render(cmd, SubTexID);
+                if (controller.renderTexture != null)
+                {
+                    cmd.Blit(BuiltinRenderTextureType.None, controller.renderTexture, controller.fadeMaterial);
+                }
             }
+            cmd.ReleaseTemporaryRT(PrimaryTexID);
+            cmd.ReleaseTemporaryRT(SubTexID);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
