@@ -26,7 +26,7 @@ namespace Nova
         private Texture lastTexture;
 
         protected virtual string fadeShader => "Nova/VFX/Change Texture With Fade";
-        public Color color
+        public virtual Color color
         {
             get => fadeMaterial.GetColor(ColorID);
             set => fadeMaterial.SetColor(ColorID, value);

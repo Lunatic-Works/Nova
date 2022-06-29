@@ -39,6 +39,8 @@ namespace Nova
                 controller.mergerSub.Render(cmd, SubTexID);
                 if (controller.renderTexture != null)
                 {
+                    cmd.SetRenderTarget(controller.renderTexture);
+                    cmd.ClearRenderTarget(true, true, Color.clear);
                     cmd.Blit(BuiltinRenderTextureType.None, controller.renderTexture, controller.fadeMaterial);
                 }
             }

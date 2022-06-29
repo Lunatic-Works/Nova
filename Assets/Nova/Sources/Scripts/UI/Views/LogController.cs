@@ -213,7 +213,7 @@ namespace Nova
 
         private static void OnPlayVoiceButtonClicked(IReadOnlyDictionary<string, VoiceEntry> voiceEntries)
         {
-            CharacterController.ReplayVoice(voiceEntries);
+            GameCharacterController.ReplayVoice(voiceEntries);
         }
 
         private void OnPointerExit(int logEntryIndex)
