@@ -24,11 +24,10 @@ namespace Nova
         private MeshRenderer meshRenderer;
         private MeshFilter meshFilter;
         protected GameState gameState;
-        private DialogueBoxController dialogueBoxController;
+        private DialogueState dialogueState;
         private MyTarget myTarget;
         private Material overlayMaterial;
 
-        public virtual string restorableObjectName => luaGlobalName;
         protected override string fadeShader => "Nova/VFX/Fade Global";
         public RenderTexture renderTexture => myTarget == null ? null : myTarget.targetTexture;
 
@@ -67,8 +66,9 @@ namespace Nova
             materialPool.defaultMaterial = null;
             meshRenderer.material = overlayMaterial;
 
-            gameState = Utils.FindNovaGameController().GameState;
-            dialogueBoxController = Utils.FindViewManager().GetController<DialogueBoxController>();
+            var controller = Utils.FindNovaGameController();
+            gameState = controller.GameState;
+            dialogueState = controller.DialogueState;
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -96,7 +96,7 @@ namespace Nova
 
         public void SetPose(IEnumerable<string> pose, bool fade = true)
         {
-            fade = fade && !gameState.isRestoring && dialogueBoxController.state != DialogueBoxState.FastForward;
+            fade = fade && !gameState.isRestoring && !dialogueState.isFastForward;
             if (fade)
             {
                 mergerSub.SetTextures(mergerPrimary);
@@ -122,17 +122,19 @@ namespace Nova
             SetPose(Enumerable.Empty<string>(), fade);
         }
 
+        public virtual string restorableName => luaGlobalName;
+
         [Serializable]
         protected class CompositeSpriteControllerRestoreData : IRestoreData
         {
-            public readonly TransformRestoreData transform;
+            public readonly TransformData transform;
             public readonly List<string> poseArray;
             public readonly Vector4Data color;
             public readonly int renderQueue;
 
             public CompositeSpriteControllerRestoreData(CompositeSpriteController parent)
             {
-                this.transform = new TransformRestoreData(parent.transform);
+                this.transform = new TransformData(parent.transform);
                 this.poseArray = new List<string>(parent.curPose);
                 this.color = parent.color;
                 this.renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
