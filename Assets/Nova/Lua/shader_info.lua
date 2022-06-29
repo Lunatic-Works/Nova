@@ -30,6 +30,14 @@ shader_type_data = {
         _Roll = 'Float',
         _T = 'Float',
     },
+    ['Change Overlay With Fade'] = {
+        _Color = 'Color',
+        _Offsets = 'Vector',
+        _PrimaryTex = '2D',
+        _SubColor = 'Color',
+        _SubTex = '2D',
+        _T = 'Float',
+    },
     ['Change Texture With Fade'] = {
         _Color = 'Color',
         _Offsets = 'Vector',
@@ -240,6 +248,9 @@ shader_float_data = {
         _Roll = 0.07,
         _T = 0,
     },
+    ['Change Overlay With Fade'] = {
+        _T = 0,
+    },
     ['Change Texture With Fade'] = {
         _T = 0,
     },
@@ -402,6 +413,10 @@ shader_color_data = {
     ['Barrel Hyper'] = {
         _BackColor = Color.black,
     },
+    ['Change Overlay With Fade'] = {
+        _Color = Color.white,
+        _SubColor = Color.white,
+    },
     ['Change Texture With Fade'] = {
         _Color = Color.white,
         _SubColor = Color.white,
@@ -431,6 +446,9 @@ shader_color_data = {
 }
 
 shader_vector_data = {
+    ['Change Overlay With Fade'] = {
+        _Offsets = Vector4.zero,
+    },
     ['Change Texture With Fade'] = {
         _Offsets = Vector4.zero,
     },

@@ -56,6 +56,18 @@ namespace Nova.Generate
                 }
             },
             {
+                "Change Overlay With Fade",
+                new Dictionary<string, ShaderPropertyType>
+                {
+                    {"_Color", ShaderPropertyType.Color},
+                    {"_Offsets", ShaderPropertyType.Vector},
+                    {"_PrimaryTex", ShaderPropertyType.TexEnv},
+                    {"_SubColor", ShaderPropertyType.Color},
+                    {"_SubTex", ShaderPropertyType.TexEnv},
+                    {"_T", ShaderPropertyType.Float},
+                }
+            },
+            {
                 "Change Texture With Fade",
                 new Dictionary<string, ShaderPropertyType>
                 {
@@ -410,6 +422,13 @@ namespace Nova.Generate
                 }
             },
             {
+                "Change Overlay With Fade",
+                new Dictionary<string, float>
+                {
+                    {"_T", 0.0f},
+                }
+            },
+            {
                 "Change Texture With Fade",
                 new Dictionary<string, float>
                 {
@@ -694,6 +713,14 @@ namespace Nova.Generate
                 }
             },
             {
+                "Change Overlay With Fade",
+                new Dictionary<string, Color>
+                {
+                    {"_Color", Color.white},
+                    {"_SubColor", Color.white},
+                }
+            },
+            {
                 "Change Texture With Fade",
                 new Dictionary<string, Color>
                 {
@@ -756,6 +783,13 @@ namespace Nova.Generate
         public static readonly Dictionary<string, Dictionary<string, Vector4>> VectorData =
             new Dictionary<string, Dictionary<string, Vector4>>
         {
+            {
+                "Change Overlay With Fade",
+                new Dictionary<string, Vector4>
+                {
+                    {"_Offsets", Vector4.zero},
+                }
+            },
             {
                 "Change Texture With Fade",
                 new Dictionary<string, Vector4>

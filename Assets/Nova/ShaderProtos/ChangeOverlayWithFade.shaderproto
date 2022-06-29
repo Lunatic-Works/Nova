@@ -1,5 +1,5 @@
 VARIANTS: Default
-Shader "Nova/$VARIANT_NAME$/Change Texture With Fade"
+Shader "Nova/$VARIANT_NAME$/Change Overlay With Fade"
 {
     Properties
     {
