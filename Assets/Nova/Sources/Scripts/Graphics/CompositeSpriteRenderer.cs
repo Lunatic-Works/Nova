@@ -31,14 +31,10 @@ namespace Nova
             foreach (var go in gos)
             {
                 var controller = go.GetComponent<CompositeSpriteController>();
-                if (controller == null)
+                if (controller != null && controller.renderTexture != null)
                 {
-                    continue;
-                }
-                controller.mergerPrimary.Render(cmd, PrimaryTexID);
-                controller.mergerSub.Render(cmd, SubTexID);
-                if (controller.renderTexture != null)
-                {
+                    controller.mergerPrimary.Render(cmd, PrimaryTexID);
+                    controller.mergerSub.Render(cmd, SubTexID);
                     cmd.SetRenderTarget(controller.renderTexture);
                     cmd.ClearRenderTarget(true, true, Color.clear);
                     cmd.Blit(BuiltinRenderTextureType.None, controller.renderTexture, controller.fadeMaterial);
