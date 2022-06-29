@@ -1,6 +1,6 @@
 // This file is generated. Do not edit it manually. Please edit .shaderproto files.
 
-Shader "Nova/VFX/Change Texture With Fade"
+Shader "Nova/VFX/Change Overlay With Fade"
 {
     Properties
     {
