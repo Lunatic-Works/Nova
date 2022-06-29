@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 804248022313644100}
   m_Layer: 0
   m_Name: Character1
-  m_TagString: Untagged
+  m_TagString: SpriteMerger1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -67,7 +67,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5834813308582257229
 Transform:
   m_ObjectHideFlags: 0
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 5515146731319326218}
   m_Layer: 16
   m_Name: MergerPrimary
-  m_TagString: SpriteMerger1
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 7746438029934183267}
   m_Layer: 16
   m_Name: MergerSub
-  m_TagString: SpriteMerger1
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -32,7 +32,7 @@ namespace Nova
             base.Awake();
 
             renderer = actualImageObject.AddComponent<MeshRenderer>();
-            renderer.material = material;
+            renderer.material = fadeMaterial;
         }
 
         protected override void ResetSize(float width, float height, Vector2 pivot)

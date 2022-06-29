@@ -10,10 +10,12 @@ namespace Nova
     public class CompositeSpriteController : OverlayTextureChangerBase, IRestorable, IOverlayRenderer
     {
         public const int mergerLayer = 16;
+        private const string overlayShader = "Nova/VFX/Overlay";
+
         public GameObject overlay;
         public GameObject overlayObject => overlay;
-        public CompositeSpriteRenderTarget mergerPrimary;
-        public CompositeSpriteRenderTarget mergerSub;
+        public CompositeSpriteMerger mergerPrimary;
+        public CompositeSpriteMerger mergerSub;
         public string imageFolder;
         public string luaGlobalName;
 
@@ -23,9 +25,12 @@ namespace Nova
         private MeshFilter meshFilter;
         private GameState gameState;
         private DialogueBoxController dialogueBoxController;
+        private MyTarget myTarget;
+        private Material overlayMaterial;
 
-        protected override string fadeShader => "Nova/VFX/Change Overlay With Fade";
         public virtual string restorableObjectName => luaGlobalName;
+        protected override string fadeShader => "Nova/VFX/Fade Global";
+        public RenderTexture renderTexture => myTarget == null ? null : myTarget.targetTexture;
 
         protected override void Awake()
         {
@@ -54,11 +59,13 @@ namespace Nova
                 // some very large bound to disable culling
                 quad.bounds = new Bounds(Vector3.zero, 1e6f * Vector3.one);
             }
-            meshFilter = overlayObject.Ensure<MeshFilter>();
+            meshFilter = overlay.Ensure<MeshFilter>();
             meshFilter.mesh = quad;
-            meshRenderer = overlayObject.Ensure<MeshRenderer>();
+            meshRenderer = overlay.Ensure<MeshRenderer>();
             base.Awake();
-            meshRenderer.material = material;
+            overlayMaterial = materialPool.Get(overlayShader);
+            materialPool.defaultMaterial = null;
+            meshRenderer.material = overlayMaterial;
 
             gameState = Utils.FindNovaGameController().GameState;
             dialogueBoxController = Utils.FindViewManager().GetController<DialogueBoxController>();
@@ -68,14 +75,23 @@ namespace Nova
                 LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
                 gameState.AddRestorable(this);
             }
+
+            myTarget = new MyTarget(this);
+            myTarget.Awake();
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
                 gameState.RemoveRestorable(this);
             }
+            myTarget.OnDestroy();
+        }
+
+        protected virtual void Update()
+        {
+            myTarget.Update();
         }
 
         public void SetPose(IEnumerable<string> pose, bool fade = true)
@@ -143,6 +159,34 @@ namespace Nova
             color = data.color;
             gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
             SetPose(data.poseArray, false);
+        }
+
+        protected class MyTarget : RenderTarget
+        {
+            private new const string SUFFIX = "Composite" + RenderTarget.SUFFIX;
+            private CompositeSpriteController parent;
+            public override string textureName => parent == null ? oldConfig.name : parent.luaGlobalName + SUFFIX;
+            public override bool isFinal => false;
+            public override bool isActive =>
+                parent != null && (parent.mergerPrimary.spriteCount > 0 || (parent.isFading && parent.mergerSub.spriteCount > 0));
+
+            public override RenderTexture targetTexture
+            {
+                set
+                {
+                    base.targetTexture = value;
+                    if (parent != null)
+                    {
+                        parent.overlayMaterial.SetTexture("_MainTex", value);
+                        parent.overlay.SetActive(value != null);
+                    }
+                }
+            }
+
+            public MyTarget(CompositeSpriteController parent)
+            {
+                this.parent = parent;
+            }
         }
     }
 }

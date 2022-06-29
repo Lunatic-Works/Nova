@@ -30,14 +30,6 @@ shader_type_data = {
         _Roll = 'Float',
         _T = 'Float',
     },
-    ['Change Overlay With Fade'] = {
-        _Color = 'Color',
-        _Offsets = 'Vector',
-        _PrimaryTex = '2D',
-        _SubColor = 'Color',
-        _SubTex = '2D',
-        _T = 'Float',
-    },
     ['Change Texture With Fade'] = {
         _Color = 'Color',
         _Offsets = 'Vector',
@@ -62,6 +54,12 @@ shader_type_data = {
         _SubTex = '2D',
         _T = 'Float',
         _Vague = 'Float',
+    },
+    ['Fade Global'] = {
+        _Color = 'Color',
+        _Offsets = 'Vector',
+        _SubColor = 'Color',
+        _T = 'Float',
     },
     ['Fade Radial Blur'] = {
         _Dir = 'Float',
@@ -248,9 +246,6 @@ shader_float_data = {
         _Roll = 0.07,
         _T = 0,
     },
-    ['Change Overlay With Fade'] = {
-        _T = 0,
-    },
     ['Change Texture With Fade'] = {
         _T = 0,
     },
@@ -265,6 +260,9 @@ shader_float_data = {
         _Offset = 0,
         _T = 0,
         _Vague = 0.25,
+    },
+    ['Fade Global'] = {
+        _T = 0,
     },
     ['Fade Radial Blur'] = {
         _Dir = 0,
@@ -413,10 +411,6 @@ shader_color_data = {
     ['Barrel Hyper'] = {
         _BackColor = Color.black,
     },
-    ['Change Overlay With Fade'] = {
-        _Color = Color.white,
-        _SubColor = Color.white,
-    },
     ['Change Texture With Fade'] = {
         _Color = Color.white,
         _SubColor = Color.white,
@@ -425,6 +419,10 @@ shader_color_data = {
         _ColorMul = Color.white,
     },
     ['Fade'] = {
+        _SubColor = Color.white,
+    },
+    ['Fade Global'] = {
+        _Color = Color.white,
         _SubColor = Color.white,
     },
     ['Fade Radial Blur'] = {
@@ -446,14 +444,14 @@ shader_color_data = {
 }
 
 shader_vector_data = {
-    ['Change Overlay With Fade'] = {
-        _Offsets = Vector4.zero,
-    },
     ['Change Texture With Fade'] = {
         _Offsets = Vector4.zero,
     },
     ['Color'] = {
         _ColorAdd = Vector4.zero,
+    },
+    ['Fade Global'] = {
+        _Offsets = Vector4.zero,
     },
     ['Mix Add'] = {
         _ColorAdd = Vector4.zero,

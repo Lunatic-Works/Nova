@@ -56,18 +56,6 @@ namespace Nova.Generate
                 }
             },
             {
-                "Change Overlay With Fade",
-                new Dictionary<string, ShaderPropertyType>
-                {
-                    {"_Color", ShaderPropertyType.Color},
-                    {"_Offsets", ShaderPropertyType.Vector},
-                    {"_PrimaryTex", ShaderPropertyType.TexEnv},
-                    {"_SubColor", ShaderPropertyType.Color},
-                    {"_SubTex", ShaderPropertyType.TexEnv},
-                    {"_T", ShaderPropertyType.Float},
-                }
-            },
-            {
                 "Change Texture With Fade",
                 new Dictionary<string, ShaderPropertyType>
                 {
@@ -112,6 +100,16 @@ namespace Nova.Generate
                     {"_SubTex", ShaderPropertyType.TexEnv},
                     {"_T", ShaderPropertyType.Float},
                     {"_Vague", ShaderPropertyType.Float},
+                }
+            },
+            {
+                "Fade Global",
+                new Dictionary<string, ShaderPropertyType>
+                {
+                    {"_Color", ShaderPropertyType.Color},
+                    {"_Offsets", ShaderPropertyType.Vector},
+                    {"_SubColor", ShaderPropertyType.Color},
+                    {"_T", ShaderPropertyType.Float},
                 }
             },
             {
@@ -247,6 +245,12 @@ namespace Nova.Generate
                     {"_Mul", ShaderPropertyType.Float},
                     {"_T", ShaderPropertyType.Float},
                     {"_Zoom", ShaderPropertyType.Float},
+                }
+            },
+            {
+                "Overlay",
+                new Dictionary<string, ShaderPropertyType>
+                {
                 }
             },
             {
@@ -422,13 +426,6 @@ namespace Nova.Generate
                 }
             },
             {
-                "Change Overlay With Fade",
-                new Dictionary<string, float>
-                {
-                    {"_T", 0.0f},
-                }
-            },
-            {
                 "Change Texture With Fade",
                 new Dictionary<string, float>
                 {
@@ -457,6 +454,13 @@ namespace Nova.Generate
                     {"_Offset", 0.0f},
                     {"_T", 0.0f},
                     {"_Vague", 0.25f},
+                }
+            },
+            {
+                "Fade Global",
+                new Dictionary<string, float>
+                {
+                    {"_T", 0.0f},
                 }
             },
             {
@@ -713,14 +717,6 @@ namespace Nova.Generate
                 }
             },
             {
-                "Change Overlay With Fade",
-                new Dictionary<string, Color>
-                {
-                    {"_Color", Color.white},
-                    {"_SubColor", Color.white},
-                }
-            },
-            {
                 "Change Texture With Fade",
                 new Dictionary<string, Color>
                 {
@@ -739,6 +735,14 @@ namespace Nova.Generate
                 "Fade",
                 new Dictionary<string, Color>
                 {
+                    {"_SubColor", Color.white},
+                }
+            },
+            {
+                "Fade Global",
+                new Dictionary<string, Color>
+                {
+                    {"_Color", Color.white},
                     {"_SubColor", Color.white},
                 }
             },
@@ -784,13 +788,6 @@ namespace Nova.Generate
             new Dictionary<string, Dictionary<string, Vector4>>
         {
             {
-                "Change Overlay With Fade",
-                new Dictionary<string, Vector4>
-                {
-                    {"_Offsets", Vector4.zero},
-                }
-            },
-            {
                 "Change Texture With Fade",
                 new Dictionary<string, Vector4>
                 {
@@ -802,6 +799,13 @@ namespace Nova.Generate
                 new Dictionary<string, Vector4>
                 {
                     {"_ColorAdd", Vector4.zero},
+                }
+            },
+            {
+                "Fade Global",
+                new Dictionary<string, Vector4>
+                {
+                    {"_Offsets", Vector4.zero},
                 }
             },
             {

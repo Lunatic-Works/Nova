@@ -11,7 +11,7 @@ namespace Nova
     public class OverlayTextureChangerBase : MonoBehaviour
     {
         private const string TIME = "_T";
-
+        private const float EPS = 1e-6f;
         private static readonly int PrimaryTextureID = Shader.PropertyToID("_PrimaryTex");
         private static readonly int SubTextureID = Shader.PropertyToID("_SubTex");
         private static readonly int OffsetsID = Shader.PropertyToID("_Offsets");
@@ -19,27 +19,28 @@ namespace Nova
         private static readonly int SubColorID = Shader.PropertyToID("_SubColor");
         private static readonly int TimeID = Shader.PropertyToID(TIME);
 
-        protected virtual string fadeShader => "Nova/VFX/Change Texture With Fade";
-
         public float fadeDuration = 0.1f;
 
+        protected NovaAnimation novaAnimation;
+        protected MaterialPool materialPool;
+        private Texture lastTexture;
+
+        protected virtual string fadeShader => "Nova/VFX/Change Texture With Fade";
         public Color color
         {
-            get => material.GetColor(ColorID);
-            set => material.SetColor(ColorID, value);
+            get => fadeMaterial.GetColor(ColorID);
+            set => fadeMaterial.SetColor(ColorID, value);
         }
-
-        public Material material { get; protected set; }
-        protected NovaAnimation novaAnimation;
-        private Texture lastTexture;
+        public Material fadeMaterial { get; protected set; }
+        public bool isFading => fadeMaterial.GetFloat(TIME) >= EPS;
 
         protected virtual void Awake()
         {
             ResetSize(float.NaN, float.NaN, Vector2.zero);
 
-            var pool = gameObject.Ensure<MaterialPool>();
-            material = pool.Get(fadeShader);
-            pool.defaultMaterial = material;
+            materialPool = gameObject.Ensure<MaterialPool>();
+            fadeMaterial = materialPool.Get(fadeShader);
+            materialPool.defaultMaterial = fadeMaterial;
 
             novaAnimation = Utils.FindNovaGameController().PerDialogueAnimation;
         }
@@ -51,14 +52,15 @@ namespace Nova
 
         protected void FadeAnimation(float delay)
         {
-            if (delay < 1e-6)
+            fadeMaterial.SetColor(SubColorID, fadeMaterial.GetColor(ColorID));
+            if (delay < EPS)
             {
-                material.SetFloat(TimeID, 0.0f);
+                fadeMaterial.SetFloat(TimeID, 0.0f);
             }
             else
             {
-                material.SetFloat(TimeID, 1.0f);
-                novaAnimation.Do(new MaterialFloatAnimationProperty(material, TIME, 0.0f), fadeDuration);
+                fadeMaterial.SetFloat(TimeID, 1.0f);
+                novaAnimation.Do(new MaterialFloatAnimationProperty(fadeMaterial, TIME, 0.0f), fadeDuration);
             }
         }
 
@@ -75,19 +77,18 @@ namespace Nova
             ResetSize(rendererSize.x, rendererSize.y, pivot);
 
             // material is not RestorableMaterial
-            material.SetVector(OffsetsID, new Vector4(offsets[0].x, offsets[0].y, offsets[1].x, offsets[1].y));
-            material.SetTexture(PrimaryTextureID, to);
-            material.SetTextureScale(PrimaryTextureID,
+            fadeMaterial.SetVector(OffsetsID, new Vector4(offsets[0].x, offsets[0].y, offsets[1].x, offsets[1].y));
+            fadeMaterial.SetTexture(PrimaryTextureID, to);
+            fadeMaterial.SetTextureScale(PrimaryTextureID,
                 to != null ? rendererSize.InverseScale(new Vector2(to.width, to.height)) : Vector2.zero);
-            material.SetTexture(SubTextureID, lastTexture);
-            material.SetTextureScale(
+            fadeMaterial.SetTexture(SubTextureID, lastTexture);
+            fadeMaterial.SetTextureScale(
                 SubTextureID,
                 lastTexture != null
                     ? rendererSize.InverseScale(new Vector2(lastTexture.width, lastTexture.height))
                     : Vector2.zero
             );
-            material.SetColor(SubColorID, material.GetColor(ColorID));
-            FadeAnimation(fadeDuration);
+            FadeAnimation(delay);
             lastTexture = to;
         }
 
