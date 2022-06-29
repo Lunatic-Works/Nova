@@ -24,8 +24,8 @@ namespace Nova
             set => material.SetColor(ColorID, value);
         }
 
-        protected Material material;
-        private NovaAnimation novaAnimation;
+        public Material material { get; protected set; }
+        protected NovaAnimation novaAnimation;
         private Texture lastTexture;
 
         protected virtual void Awake()
@@ -42,6 +42,19 @@ namespace Nova
         protected virtual void ResetSize(float width, float height, Vector2 pivot)
         {
             // Do Nothing
+        }
+
+        protected void FadeAnimation(float delay)
+        {
+            if (delay < 1e-6)
+            {
+                material.SetFloat(TimeID, 0.0f);
+            }
+            else
+            {
+                material.SetFloat(TimeID, 1.0f);
+                novaAnimation.Do(new MaterialFloatAnimationProperty(material, TIME, 0.0f), fadeDuration);
+            }
         }
 
         private void SetTexture(Texture to, float delay)
@@ -69,16 +82,7 @@ namespace Nova
                     : Vector2.zero
             );
             material.SetColor(SubColorID, material.GetColor(ColorID));
-            if (delay < 1e-6)
-            {
-                material.SetFloat(TimeID, 0.0f);
-            }
-            else
-            {
-                material.SetFloat(TimeID, 1.0f);
-                novaAnimation.Do(new MaterialFloatAnimationProperty(material, TIME, 0.0f), fadeDuration);
-            }
-
+            FadeAnimation(fadeDuration);
             lastTexture = to;
         }
 
