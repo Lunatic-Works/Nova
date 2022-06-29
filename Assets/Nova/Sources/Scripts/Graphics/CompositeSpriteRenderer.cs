@@ -40,8 +40,12 @@ namespace Nova
                     cmd.Blit(BuiltinRenderTextureType.None, controller.renderTexture, controller.fadeMaterial);
                 }
             }
+
             cmd.ReleaseTemporaryRT(PrimaryTexID);
             cmd.ReleaseTemporaryRT(SubTexID);
+            // Manually reset default render target.
+            // The render target is not automatically restored on some render backend :(
+            cmd.SetRenderTarget(OnRenderImageFeature.DefaultCameraTarget);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
