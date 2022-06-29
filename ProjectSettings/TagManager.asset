@@ -8,6 +8,7 @@ TagManager:
   - UICamera
   - RenderManager
   - UIRoot
+  - SpriteMerger1
   layers:
   - Default
   - TransparentFX
