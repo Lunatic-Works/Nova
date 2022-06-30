@@ -23,16 +23,15 @@ namespace Nova.Editor
 
         private string imageFolder;
         private bool uncropped;
-        private Vector2Int referenceSize = new Vector2Int(2048, 4096);
-        private float pixelsPerUnit = 100.0f;
 
         private readonly List<Layer> layers = new List<Layer>();
         private ReorderableList reorderableList;
         private bool dirty;
 
         private GameObject root;
-        private SpriteMerger merger;
-        private Texture texture;
+        private CompositeSpriteMerger merger;
+        private Camera renderCamera;
+        private RenderTexture renderTexture;
 
         private bool useCaptureBox;
         private RectInt captureBox = new RectInt(0, 0, 400, 400);
@@ -44,10 +43,19 @@ namespace Nova.Editor
             {
                 hideFlags = HideFlags.DontSave
             };
-            merger = root.AddComponent<SpriteMerger>();
+            merger = root.Ensure<CompositeSpriteMerger>();
             merger.runInEditMode = true;
-            merger.referenceSize = referenceSize;
-            merger.pixelsPerUnit = pixelsPerUnit;
+
+            var camera = new GameObject("camera");
+            camera.transform.SetParent(root.transform);
+            renderCamera = camera.Ensure<Camera>();
+            renderCamera.cullingMask = 1 << CompositeSpriteMerger.mergerLayer;
+            renderCamera.orthographic = true;
+            renderCamera.enabled = false;
+            renderCamera.nearClipPlane = -1;
+            renderCamera.farClipPlane = 1;
+            renderCamera.clearFlags = CameraClearFlags.SolidColor;
+            renderCamera.backgroundColor = Color.clear;
 
             reorderableList = new ReorderableList(layers, typeof(Layer), true, true, true, true);
             reorderableList.drawHeaderCallback += DrawHeader;
@@ -65,6 +73,7 @@ namespace Nova.Editor
             reorderableList.onRemoveCallback -= RemoveItem;
             reorderableList.onReorderCallback -= ReorderItem;
 
+            DestroyImmediate(renderTexture);
             DestroyImmediate(root);
         }
 
@@ -76,7 +85,7 @@ namespace Nova.Editor
         private void DrawElement(Rect rect, int index, bool active, bool focused)
         {
             var item = layers[index];
-            var paths = AssetDatabase.FindAssets(uncropped ? "t:Sprite" : "t:SpriteWithOffset", new[] {imageFolder})
+            var paths = AssetDatabase.FindAssets(uncropped ? "t:Sprite" : "t:SpriteWithOffset", new[] { imageFolder })
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .ToList();
 
@@ -184,12 +193,6 @@ namespace Nova.Editor
             uncropped = GUILayout.Toggle(uncropped, "Uncropped");
             GUILayout.EndHorizontal();
 
-            if (!uncropped)
-            {
-                referenceSize = EditorGUILayout.Vector2IntField("Reference Size", referenceSize);
-                pixelsPerUnit = EditorGUILayout.FloatField("Pixels Per Unit", pixelsPerUnit);
-            }
-
             reorderableList.DoLayoutList();
 
             if (GUILayout.Button("Refresh"))
@@ -201,30 +204,34 @@ namespace Nova.Editor
             {
                 dirty = false;
 
+                renderCamera.targetTexture = null;
+                if (renderTexture != null)
+                {
+                    DestroyImmediate(renderTexture);
+                }
+
                 var sprites = layers.Where(p => !string.IsNullOrEmpty(p.name)).Select(p => p.sprite).ToList();
                 if (sprites.Count == 0)
                 {
-                    texture = null;
+                    renderTexture = null;
                 }
                 else
                 {
-                    if (uncropped)
-                    {
-                        var sprite = sprites[0].sprite;
-                        merger.referenceSize = new Vector2Int(sprite.texture.width, sprite.texture.height);
-                        merger.pixelsPerUnit = sprite.pixelsPerUnit;
-                    }
-                    else
-                    {
-                        merger.referenceSize = referenceSize;
-                        merger.pixelsPerUnit = pixelsPerUnit;
-                    }
+                    merger.SetTextures(sprites);
+                    var bounds = CompositeSpriteMerger.GetMergedSize(sprites);
+                    var pixelsPerUnit = sprites[0].sprite.pixelsPerUnit;
+                    var size = bounds.size * pixelsPerUnit;
+                    renderTexture = new RenderTexture((int)size.x, (int)size.y, 0, RenderTextureFormat.ARGB32);
 
-                    texture = merger.GetMergedTexture(name, sprites);
+                    renderCamera.targetTexture = renderTexture;
+                    renderCamera.orthographicSize = bounds.size.y / 2;
+                    renderCamera.transform.localPosition = new Vector3(bounds.center.x, bounds.center.y, 0);
+
+                    renderCamera.Render();
                 }
             }
 
-            if (texture == null)
+            if (renderTexture == null)
             {
                 return;
             }
@@ -253,7 +260,7 @@ namespace Nova.Editor
                 if (GUILayout.Button("Capture"))
                 {
                     Texture2D tex = new Texture2D(captureBox.width, captureBox.height, TextureFormat.ARGB32, false);
-                    RenderTexture.active = texture as RenderTexture;
+                    RenderTexture.active = renderTexture;
                     tex.ReadPixels(new Rect(captureBox.x, captureBox.y, captureBox.width, captureBox.height), 0, 0);
                     RenderTexture.active = null;
                     tex.Apply();
@@ -270,9 +277,9 @@ namespace Nova.Editor
 
             var previewRect =
                 EditorGUILayout.GetControlRect(false, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            previewRect.size = Utils.GetContentSize(previewRect.size, (float)texture.width / texture.height);
-            var scale = previewRect.width / texture.width;
-            EditorGUI.DrawTextureTransparent(previewRect, texture);
+            previewRect.size = Utils.GetContentSize(previewRect.size, (float)renderTexture.width / renderTexture.height);
+            var scale = previewRect.width / renderTexture.width;
+            EditorGUI.DrawTextureTransparent(previewRect, renderTexture);
 
             if (useCaptureBox)
             {
