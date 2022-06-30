@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Nova
 {
+    [Obsolete]
     public class SpriteMerger : MonoBehaviour
     {
         public int layer = 16;

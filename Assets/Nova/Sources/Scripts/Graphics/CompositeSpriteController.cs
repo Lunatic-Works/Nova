@@ -9,8 +9,6 @@ namespace Nova
     [ExportCustomType]
     public abstract class CompositeSpriteController : FadeController, IRestorable
     {
-        public const int mergerLayer = 16;
-
         public CompositeSpriteMerger mergerPrimary;
         public CompositeSpriteMerger mergerSub;
         public string imageFolder;

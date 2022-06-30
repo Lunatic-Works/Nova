@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,8 @@ namespace Nova
 {
     public class CompositeSpriteMerger : MonoBehaviour
     {
+        public const int mergerLayer = 16;
+
         private readonly List<SpriteRenderer> layers = new List<SpriteRenderer>();
 
         public int spriteCount { get; private set; } = 0;
@@ -21,7 +24,7 @@ namespace Nova
                 go.transform.SetParent(transform);
                 go.transform.localPosition = Vector3.zero;
                 go.transform.localScale = Vector3.one;
-                go.layer = CompositeSpriteController.mergerLayer;
+                go.layer = mergerLayer;
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sortingOrder = i;
                 layers.Add(sr);
@@ -74,6 +77,28 @@ namespace Nova
             {
                 cmd.DrawRenderer(layers[i], layers[i].sharedMaterial);
             }
+        }
+
+        public static Rect GetMergedSize(IEnumerable<SpriteWithOffset> sprites)
+        {
+            if (!sprites.Any())
+            {
+                return Rect.zero;
+            }
+            var xmin = float.MaxValue;
+            var ymin = float.MaxValue;
+            var xmax = float.MinValue;
+            var ymax = float.MinValue;
+            foreach (var sprite in sprites)
+            {
+                var b = sprite.sprite.bounds;
+                var o = sprite.offset;
+                xmin = Mathf.Min(xmin, b.min.x + o.x);
+                ymin = Mathf.Min(ymin, b.min.y + o.y);
+                xmax = Mathf.Max(xmax, b.max.x + o.x);
+                ymax = Mathf.Max(xmax, b.max.y + o.y);
+            }
+            return Rect.MinMaxRect(xmin, ymin, xmax, ymax);
         }
     }
 }
