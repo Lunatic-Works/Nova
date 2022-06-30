@@ -1128,7 +1128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 013989a329a0fc843b5153a6d9d5387e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mergerTag: SpriteMerger1
+  mergerTag: Character
 --- !u!114 &628759644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6375,12 +6375,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1123056137}
     - target: {fileID: 390191758, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -108
+      propertyPath: m_LocalPosition.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 390191758, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -54.000008
+      propertyPath: m_LocalPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: spriteMerger
@@ -6389,19 +6389,19 @@ PrefabInstance:
     - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: avatarConfigs.Array.data[0].characterController
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 319595391}
     - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: avatarConfigs.Array.data[1].characterController
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1952131526}
     - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: avatarConfigs.Array.data[2].characterController
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2058258575}
     - target: {fileID: 390191761, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: avatarConfigs.Array.data[3].characterController
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1285618328}
     - target: {fileID: 1515438340287766, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_Name
       value: DialogueView
@@ -6516,3 +6516,41 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+--- !u!1 &8904821941984626519 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2090423106, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+  m_PrefabInstance: {fileID: 8904821941984626518}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8904821941984626520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8904821941984626519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
