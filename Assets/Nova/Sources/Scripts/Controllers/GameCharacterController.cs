@@ -71,7 +71,7 @@ namespace Nova
 
     [ExportCustomType]
     [RequireComponent(typeof(AudioSource))]
-    public class GameCharacterController : CompositeSpriteController
+    public class GameCharacterController : OverlaySpriteController
     {
         public string voiceFolder;
 

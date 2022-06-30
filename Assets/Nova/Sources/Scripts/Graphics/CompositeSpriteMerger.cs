@@ -9,10 +9,7 @@ namespace Nova
 {
     public class CompositeSpriteMerger : MonoBehaviour
     {
-        public CompositeSpriteController controller;
-        public string textureName;
         private readonly List<SpriteRenderer> layers = new List<SpriteRenderer>();
-        private string mergerName => controller.gameObject.name + gameObject.name;
 
         public int spriteCount { get; private set; } = 0;
 

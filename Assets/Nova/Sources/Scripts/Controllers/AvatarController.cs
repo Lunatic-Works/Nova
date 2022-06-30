@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Nova
 {
@@ -14,41 +15,49 @@ namespace Nova
     }
 
     [ExportCustomType]
-    public class AvatarController : CompositeSpriteControllerBase
+    [RequireComponent(typeof(RawImage))]
+    public class AvatarController : CompositeSpriteController
     {
-        public string luaGlobalName;
         public List<AvatarConfig> avatarConfigs;
-        public int textPadding = 200;
+        public int textPadding;
+        public Camera renderCamera;
 
-        public int textPaddingOrZero => string.IsNullOrEmpty(currentImageName) ? 0 : textPadding;
-
+        private RawImage image;
+        private RectTransform rectTransform;
         private readonly Dictionary<string, AvatarConfig> nameToConfig = new Dictionary<string, AvatarConfig>();
-
         private string characterName;
         private Dictionary<string, string> characterToImageName = new Dictionary<string, string>();
+
+        public int textPaddingOrZero => curPose.Any() ? (int)(rectTransform.rect.width) + textPadding : 0;
+        public override bool renderToCamera => true;
+        public override RenderTexture renderTexture => null;
 
         protected override void Awake()
         {
             base.Awake();
-
+            image = GetComponent<RawImage>();
+            rectTransform = GetComponent<RectTransform>();
             foreach (var config in avatarConfigs)
             {
                 nameToConfig[config.characterName] = config;
             }
-
-            if (!string.IsNullOrEmpty(luaGlobalName))
-            {
-                LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
-                gameState.AddRestorable(this);
-            }
         }
 
-        private void OnDestroy()
+        private void Start()
         {
-            if (!string.IsNullOrEmpty(luaGlobalName))
-            {
-                gameState.RemoveRestorable(this);
-            }
+            var referenceWidth = (int)rectTransform.rect.width;
+            var referenceHeight = (int)rectTransform.rect.height;
+            var rt = new RenderTexture(referenceWidth, referenceHeight, 0, RenderTextureFormat.ARGB32);
+            rt.name = "AvatarTexture";
+            renderCamera.targetTexture = rt;
+            image.texture = rt;
+            renderCamera.enabled = true;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            Destroy(renderCamera.targetTexture);
         }
 
         public void SetCharacterName(string name)
@@ -88,13 +97,13 @@ namespace Nova
 
         public void SetPoseDelayed(LuaInterface.LuaTable pose)
         {
-            if (!CheckCharacterName("pose"))
+            if (!CheckCharacterName("<pose>"))
             {
                 return;
             }
 
             var prefix = nameToConfig[characterName].prefix;
-            var poseStr = PoseArrayToString(pose.ToArray().Cast<string>().Select(x => prefix + x).ToArray());
+            var poseStr = PoseToString(pose.ToArray().Cast<string>().Select(x => prefix + x).ToArray());
             characterToImageName[characterName] = poseStr;
         }
 
@@ -110,7 +119,7 @@ namespace Nova
 
         public void ClearImageDelayed()
         {
-            if (!CheckCharacterName(""))
+            if (!CheckCharacterName("<clear>"))
             {
                 return;
             }
@@ -136,25 +145,15 @@ namespace Nova
             characterToImageName.Clear();
         }
 
-        private Color _color = Color.white;
-
-        public override Color color
-        {
-            get => _color;
-            set => SetColor(_color = value);
-        }
-
         #region Restoration
 
-        public override string restorableName => luaGlobalName;
-
         [Serializable]
-        private class AvatarControllerRestoreData : CompositeSpriteControllerBaseRestoreData
+        private class AvatarControllerRestoreData : CompositeSpriteControllerRestoreData
         {
             // No need to save characterName, because it will be set in the action of the dialogue entry
             public readonly Dictionary<string, string> characterToImageName;
 
-            public AvatarControllerRestoreData(CompositeSpriteControllerBaseRestoreData baseData,
+            public AvatarControllerRestoreData(CompositeSpriteControllerRestoreData baseData,
                 Dictionary<string, string> characterToImageName) : base(baseData)
             {
                 this.characterToImageName = characterToImageName;
@@ -163,18 +162,18 @@ namespace Nova
 
         public override IRestoreData GetRestoreData()
         {
-            return new AvatarControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
+            return new AvatarControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData,
                 characterToImageName);
         }
 
         public override void Restore(IRestoreData restoreData)
         {
             // Avoid updating image when restoring base by setting currentImageName = baseData.currentImageName
-            var baseData = restoreData as CompositeSpriteControllerBaseRestoreData;
-            var currentImageNameOld = currentImageName;
-            currentImageName = baseData.currentImageName;
-            base.Restore(baseData);
-            currentImageName = currentImageNameOld;
+            // var baseData = restoreData as CompositeSpriteControllerRestoreData;
+            // var currentImageNameOld = currentImageName;
+            // currentImageName = baseData.currentImageName;
+            base.Restore(restoreData);
+            // currentImageName = currentImageNameOld;
 
             var data = restoreData as AvatarControllerRestoreData;
             characterToImageName = data.characterToImageName;

@@ -19,7 +19,7 @@ namespace Nova
                 var textureChanger = GetComponent<IOverlayRenderer>();
                 if (textureChanger != null)
                 {
-                    renderer = textureChanger.overlayObject.GetComponent<Renderer>();
+                    renderer = textureChanger.overlay.GetComponent<Renderer>();
                 }
             }
 
