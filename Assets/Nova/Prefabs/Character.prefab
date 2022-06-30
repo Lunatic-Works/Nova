@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6614992942171262117}
   - component: {fileID: 5957195980067265388}
   - component: {fileID: 7318139140313027263}
+  - component: {fileID: 1507885517007174357}
   - component: {fileID: 6680205350502265214}
   - component: {fileID: 8173862350008543669}
   m_Layer: 0
@@ -152,6 +153,19 @@ MonoBehaviour:
   luaGlobalName: 
   overlayObject: {fileID: 3232820536423580251}
   voiceFolder: 
+--- !u!114 &1507885517007174357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2287245574524170700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cde4c855540c35498c69bf078fe67df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  luaName: 
 --- !u!114 &6680205350502265214
 MonoBehaviour:
   m_ObjectHideFlags: 0

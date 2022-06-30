@@ -75,20 +75,16 @@ namespace Nova
             }
         }
 
-        private static readonly int TempTargetId = Shader.PropertyToID("_NovaTempBlit");
+        public static readonly int TempBlitId = Shader.PropertyToID("_NovaTempBlit");
 
-        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
+        public void Blit(CommandBuffer cmd, RenderTargetIdentifier renderTarget)
         {
             if (!EnabledMaterials().Any())
             {
                 return;
             }
 
-            var cmd = CommandBufferPool.Get("Nova Post Processing");
-            var cam = renderingData.cameraData.camera;
-
-            cmd.GetTemporaryRT(TempTargetId, cam.scaledPixelWidth, cam.scaledPixelHeight, 0);
-            RenderTargetIdentifier[] buffers = { TempTargetId, OnRenderImageFeature.DefaultCameraTarget };
+            RenderTargetIdentifier[] buffers = { TempBlitId, renderTarget };
             var from = 1;
 
             foreach (var mat in EnabledMaterials())
@@ -101,9 +97,22 @@ namespace Nova
             {
                 cmd.Blit(buffers[0], buffers[1]);
             }
+        }
 
-            cmd.ReleaseTemporaryRT(TempTargetId);
+        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
+        {
+            if (!EnabledMaterials().Any())
+            {
+                return;
+            }
 
+            var cmd = CommandBufferPool.Get("Nova Post Processing");
+            var cam = renderingData.cameraData.camera;
+            cmd.GetTemporaryRT(TempBlitId, cam.scaledPixelWidth, cam.scaledPixelHeight, 0);
+
+            Blit(cmd, OnRenderImageFeature.DefaultCameraTarget);
+
+            cmd.ReleaseTemporaryRT(TempBlitId);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }

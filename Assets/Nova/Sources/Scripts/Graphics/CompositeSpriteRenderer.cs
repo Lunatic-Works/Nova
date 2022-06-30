@@ -18,6 +18,21 @@ namespace Nova
 
         public RenderPassEvent renderPassEvent => RenderPassEvent.BeforeRenderingTransparents;
 
+        public void Render(CompositeSpriteController controller, CommandBuffer cmd, RenderTargetIdentifier target)
+        {
+            controller.mergerPrimary.Render(cmd, PrimaryTexID);
+            controller.mergerSub.Render(cmd, SubTexID);
+            cmd.SetRenderTarget(target);
+            cmd.ClearRenderTarget(true, true, Color.clear);
+            cmd.Blit(BuiltinRenderTextureType.None, target, controller.fadeMaterial);
+
+            var postProcessing = controller.GetComponent<PostProcessing>();
+            if (postProcessing != null)
+            {
+                postProcessing.Blit(cmd, target);
+            }
+        }
+
         public void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             var gos = GameObject.FindGameObjectsWithTag(mergerTag);
@@ -28,31 +43,26 @@ namespace Nova
             var cmd = CommandBufferPool.Get("Render Composite Sprite");
             cmd.GetTemporaryRT(PrimaryTexID, width, height, 0);
             cmd.GetTemporaryRT(SubTexID, width, height, 0);
+            cmd.GetTemporaryRT(PostProcessing.TempBlitId, width, height, 0);
             foreach (var go in gos)
             {
                 var controller = go.GetComponent<CompositeSpriteController>();
-                if (controller != null && (controller.renderToCamera || controller.renderTexture != null))
+                if (controller != null)
                 {
-                    controller.mergerPrimary.Render(cmd, PrimaryTexID);
-                    controller.mergerSub.Render(cmd, SubTexID);
                     if (controller.renderToCamera)
                     {
-                        cmd.SetRenderTarget(OnRenderImageFeature.DefaultCameraTarget);
-                        cmd.ClearRenderTarget(true, true, Color.clear);
-                        cmd.Blit(BuiltinRenderTextureType.None, OnRenderImageFeature.DefaultCameraTarget, controller.fadeMaterial);
+                        Render(controller, cmd, OnRenderImageFeature.DefaultCameraTarget);
                     }
-                    else
+                    else if (controller.renderTexture != null)
                     {
-                        cmd.SetRenderTarget(controller.renderTexture);
-                        cmd.ClearRenderTarget(true, true, Color.clear);
-                        cmd.Blit(BuiltinRenderTextureType.None, controller.renderTexture, controller.fadeMaterial);
+                        Render(controller, cmd, controller.renderTexture);
                     }
-
                 }
             }
 
             cmd.ReleaseTemporaryRT(PrimaryTexID);
             cmd.ReleaseTemporaryRT(SubTexID);
+            cmd.ReleaseTemporaryRT(PostProcessing.TempBlitId);
             // Manually reset default render target.
             // The render target is not automatically restored on some render backend :(
             cmd.SetRenderTarget(OnRenderImageFeature.DefaultCameraTarget);

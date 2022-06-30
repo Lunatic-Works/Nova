@@ -1342,6 +1342,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 871599197}
     m_Modifications:
+    - target: {fileID: 1507885517007174357, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
+      propertyPath: luaName
+      value: ppGaotian
+      objectReference: {fileID: 0}
     - target: {fileID: 2287245574524170700, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: m_Name
       value: Gaotian
@@ -2042,6 +2046,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 871599197}
     m_Modifications:
+    - target: {fileID: 1507885517007174357, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
+      propertyPath: luaName
+      value: ppQianye
+      objectReference: {fileID: 0}
     - target: {fileID: 2287245574524170700, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: m_Name
       value: Qianye
@@ -2859,6 +2867,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 871599197}
     m_Modifications:
+    - target: {fileID: 1507885517007174357, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
+      propertyPath: luaName
+      value: ppXiben
+      objectReference: {fileID: 0}
     - target: {fileID: 2287245574524170700, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: m_Name
       value: Xiben
@@ -3135,6 +3147,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 871599197}
     m_Modifications:
+    - target: {fileID: 1507885517007174357, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
+      propertyPath: luaName
+      value: ppErgong
+      objectReference: {fileID: 0}
     - target: {fileID: 2287245574524170700, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: m_Name
       value: Ergong
