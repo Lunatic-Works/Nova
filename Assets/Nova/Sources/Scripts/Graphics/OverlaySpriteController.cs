@@ -6,13 +6,13 @@ namespace Nova
 {
     public interface IOverlayRenderer
     {
-        public GameObject overlay { get; }
+        GameObject overlay { get; }
     }
 
     public class OverlaySpriteController : CompositeSpriteController, IOverlayRenderer
     {
         private const string overlayShader = "Nova/VFX/Overlay";
-        
+
         public GameObject overlayObject;
         public GameObject overlay => overlayObject;
 
@@ -29,21 +29,21 @@ namespace Nova
             if (quad == null)
             {
                 quad = new Mesh();
-                quad.vertices = new []
+                quad.vertices = new[]
                 {
                     new Vector3(-1, -1, 0),
                     new Vector3( 1, -1, 0),
                     new Vector3(-1,  1, 0),
                     new Vector3( 1,  1, 0),
                 };
-                quad.uv = new []
+                quad.uv = new[]
                 {
                     new Vector2(0, 0),
                     new Vector2(1, 0),
                     new Vector2(0, 1),
                     new Vector2(1, 1),
                 };
-                quad.triangles = new []
+                quad.triangles = new[]
                 {
                     0, 2, 1,
                     2, 3, 1
@@ -81,7 +81,7 @@ namespace Nova
             public override string textureName => parent == null ? oldConfig.name : parent.luaGlobalName + SUFFIX;
             public override bool isFinal => false;
             public override bool isActive => parent != null && parent.needRender;
-            
+
             public override RenderTexture targetTexture
             {
                 set
