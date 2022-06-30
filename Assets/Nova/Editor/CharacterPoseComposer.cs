@@ -46,7 +46,7 @@ namespace Nova.Editor
             merger = root.Ensure<CompositeSpriteMerger>();
             merger.runInEditMode = true;
 
-            var camera = new GameObject("camera");
+            var camera = new GameObject("Camera");
             camera.transform.SetParent(root.transform);
             renderCamera = camera.Ensure<Camera>();
             renderCamera.cullingMask = 1 << CompositeSpriteMerger.mergerLayer;
