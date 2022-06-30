@@ -1064,7 +1064,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 32791
+    m_Bits: 32769
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -4116,6 +4116,7 @@ GameObject:
   - component: {fileID: 1663381253}
   - component: {fileID: 1663381252}
   - component: {fileID: 1663381251}
+  - component: {fileID: 1663381257}
   - component: {fileID: 1663381256}
   - component: {fileID: 1663381255}
   - component: {fileID: 1663381254}
@@ -4170,7 +4171,7 @@ Camera:
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 131072
+    m_Bits: 393216
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -4256,6 +4257,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaName: postProcessing2
+--- !u!114 &1663381257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663381250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 013989a329a0fc843b5153a6d9d5387e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mergerTag: Character
 --- !u!1 &1695720055
 GameObject:
   m_ObjectHideFlags: 0

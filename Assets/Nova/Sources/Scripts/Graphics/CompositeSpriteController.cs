@@ -22,6 +22,9 @@ namespace Nova
         protected override string fadeShader => "Nova/Premul/Fade Global";
         public abstract bool renderToCamera { get; }
         public abstract RenderTexture renderTexture { get; }
+        // the actually layer of this object
+        // if layer = -1, render without considering camera's culling mask
+        public virtual int layer => -1;
 
         protected override void Awake()
         {

@@ -22,20 +22,9 @@ namespace Nova
                     renderer = textureChanger.overlay.GetComponent<Renderer>();
                 }
             }
-
             image = GetComponent<Image>();
 
-            // Create MaterialPool to keep an instance of defaultMaterial
-            // if (renderer != null)
-            // {
-            //     renderer.gameObject.Ensure<MaterialPool>();
-            // }
-            // else
-            // {
-                gameObject.Ensure<MaterialPool>();
-            // }
-            
-
+            gameObject.Ensure<MaterialPool>();
             renderQueue = GetRenderQueue();
         }
 
