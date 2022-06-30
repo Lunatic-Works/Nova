@@ -77,7 +77,8 @@ namespace Nova
 
         private AudioSource audioSource;
 
-        public int layer
+        // C# prevents override property add setter, so need to hide base property
+        public new int layer
         {
             get => overlay.layer;
             set => overlay.layer = value;

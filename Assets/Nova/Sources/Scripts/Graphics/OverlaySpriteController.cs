@@ -23,6 +23,7 @@ namespace Nova
         private Material overlayMaterial;
         public override bool renderToCamera => false;
         public override RenderTexture renderTexture => myTarget == null ? null : myTarget.targetTexture;
+        public override int layer => overlay.layer;
 
         protected override void Awake()
         {

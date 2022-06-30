@@ -10,6 +10,7 @@ Shader "Nova/Premul/Overlay"
     {
         Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
+        ZTest Always
         Pass
         {
             CGPROGRAM

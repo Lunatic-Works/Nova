@@ -29,7 +29,7 @@ TagManager:
   - CompositeOverlay
   - SpriteMerger
   - Mask
-  - 
+  - MaskCompositeOverlay
   - 
   - 
   - 

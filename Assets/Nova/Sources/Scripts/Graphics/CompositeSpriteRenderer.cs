@@ -36,7 +36,7 @@ namespace Nova
         public void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             var gos = GameObject.FindGameObjectsWithTag(mergerTag);
-
+            var camera = renderingData.cameraData.camera;
             var width = renderingData.cameraData.camera.scaledPixelWidth;
             var height = renderingData.cameraData.camera.scaledPixelHeight;
 
@@ -47,7 +47,7 @@ namespace Nova
             foreach (var go in gos)
             {
                 var controller = go.GetComponent<CompositeSpriteController>();
-                if (controller != null)
+                if (controller != null && (controller.layer == -1 || (((1 << controller.layer) & camera.cullingMask) != 0)))
                 {
                     if (controller.renderToCamera)
                     {

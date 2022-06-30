@@ -8,6 +8,7 @@ Shader "Nova/$VARIANT_NAME$/Overlay"
     SubShader
     {
         $VARIANT_TAGS$
+        ZTest Always
         Pass
         {
             CGPROGRAM
