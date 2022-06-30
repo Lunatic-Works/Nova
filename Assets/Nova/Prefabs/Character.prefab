@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8173862350008543669}
   m_Layer: 0
   m_Name: Character
-  m_TagString: SpriteMerger1
+  m_TagString: Character
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -146,11 +146,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeDuration: 0.1
-  overlay: {fileID: 3232820536423580251}
   mergerPrimary: {fileID: 5515146731319326218}
   mergerSub: {fileID: 7746438029934183267}
   imageFolder: 
   luaGlobalName: 
+  overlayObject: {fileID: 3232820536423580251}
   voiceFolder: 
 --- !u!114 &6680205350502265214
 MonoBehaviour:
@@ -254,8 +254,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 247158b1c9b6d4c4d8138b039fda394a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 0}
-  textureName: _PrimaryTex
 --- !u!1 &7932887947000016290
 GameObject:
   m_ObjectHideFlags: 0
@@ -299,5 +297,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 247158b1c9b6d4c4d8138b039fda394a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 0}
-  textureName: _SubTex

@@ -1,70 +1,22 @@
-﻿using System.Collections.Generic;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
 {
-    public interface IOverlayRenderer
+    public abstract class TextureFadeController : FadeController
     {
-        public GameObject overlayObject { get; }
-    }
-
-    public class OverlayTextureChangerBase : MonoBehaviour
-    {
-        private const string TIME = "_T";
-        private const float EPS = 1e-6f;
         private static readonly int PrimaryTextureID = Shader.PropertyToID("_PrimaryTex");
         private static readonly int SubTextureID = Shader.PropertyToID("_SubTex");
         private static readonly int OffsetsID = Shader.PropertyToID("_Offsets");
-        private static readonly int ColorID = Shader.PropertyToID("_Color");
-        private static readonly int SubColorID = Shader.PropertyToID("_SubColor");
-        private static readonly int TimeID = Shader.PropertyToID(TIME);
-
-        public float fadeDuration = 0.1f;
-
-        protected NovaAnimation novaAnimation;
-        protected MaterialPool materialPool;
+        
         private Texture lastTexture;
 
-        protected virtual string fadeShader => "Nova/VFX/Change Texture With Fade";
-        public virtual Color color
-        {
-            get => fadeMaterial.GetColor(ColorID);
-            set => fadeMaterial.SetColor(ColorID, value);
-        }
-        public Material fadeMaterial { get; protected set; }
-        public bool isFading => fadeMaterial.GetFloat(TIME) >= EPS;
+        protected override string fadeShader => "Nova/VFX/Change Texture With Fade";
 
-        protected virtual void Awake()
-        {
-            ResetSize(float.NaN, float.NaN, Vector2.zero);
+        protected abstract void ResetSize(float width, float height, Vector2 pivot);
 
-            materialPool = gameObject.Ensure<MaterialPool>();
-            fadeMaterial = materialPool.Get(fadeShader);
-            materialPool.defaultMaterial = fadeMaterial;
-
-            novaAnimation = Utils.FindNovaGameController().PerDialogueAnimation;
-        }
-
-        protected virtual void ResetSize(float width, float height, Vector2 pivot)
-        {
-            // Do Nothing
-        }
-
-        protected void FadeAnimation(float delay)
-        {
-            fadeMaterial.SetColor(SubColorID, fadeMaterial.GetColor(ColorID));
-            if (delay < EPS)
-            {
-                fadeMaterial.SetFloat(TimeID, 0.0f);
-            }
-            else
-            {
-                fadeMaterial.SetFloat(TimeID, 1.0f);
-                novaAnimation.Do(new MaterialFloatAnimationProperty(fadeMaterial, TIME, 0.0f), fadeDuration);
-            }
-        }
-
-        private void SetTexture(Texture to, float delay)
+        protected void SetTexture(Texture to, float delay)
         {
             if (lastTexture == to)
             {

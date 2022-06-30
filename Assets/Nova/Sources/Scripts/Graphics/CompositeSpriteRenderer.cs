@@ -14,7 +14,7 @@ namespace Nova
         private static readonly int PrimaryTexID = Shader.PropertyToID("_PrimaryTex");
         private static readonly int SubTexID = Shader.PropertyToID("_SubTex");
 
-        public string mergerTag = "SpriteMerger1";
+        public string mergerTag = "";
 
         public RenderPassEvent renderPassEvent => RenderPassEvent.BeforeRenderingTransparents;
 
@@ -31,13 +31,23 @@ namespace Nova
             foreach (var go in gos)
             {
                 var controller = go.GetComponent<CompositeSpriteController>();
-                if (controller != null && controller.renderTexture != null)
+                if (controller != null && (controller.renderToCamera || controller.renderTexture != null))
                 {
                     controller.mergerPrimary.Render(cmd, PrimaryTexID);
                     controller.mergerSub.Render(cmd, SubTexID);
-                    cmd.SetRenderTarget(controller.renderTexture);
-                    cmd.ClearRenderTarget(true, true, Color.clear);
-                    cmd.Blit(BuiltinRenderTextureType.None, controller.renderTexture, controller.fadeMaterial);
+                    if (controller.renderToCamera)
+                    {
+                        cmd.SetRenderTarget(OnRenderImageFeature.DefaultCameraTarget);
+                        cmd.ClearRenderTarget(true, true, Color.clear);
+                        cmd.Blit(BuiltinRenderTextureType.None, OnRenderImageFeature.DefaultCameraTarget, controller.fadeMaterial);
+                    }
+                    else
+                    {
+                        cmd.SetRenderTarget(controller.renderTexture);
+                        cmd.ClearRenderTarget(true, true, Color.clear);
+                        cmd.Blit(BuiltinRenderTextureType.None, controller.renderTexture, controller.fadeMaterial);
+                    }
+
                 }
             }
 
