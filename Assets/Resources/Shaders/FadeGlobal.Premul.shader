@@ -1,6 +1,6 @@
 // This file is generated. Do not edit it manually. Please edit .shaderproto files.
 
-Shader "Nova/VFX/Fade Global"
+Shader "Nova/Premul/Fade Global"
 {
     Properties
     {
@@ -12,7 +12,7 @@ Shader "Nova/VFX/Fade Global"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {

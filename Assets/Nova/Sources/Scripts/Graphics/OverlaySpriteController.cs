@@ -11,7 +11,7 @@ namespace Nova
 
     public class OverlaySpriteController : CompositeSpriteController, IOverlayRenderer
     {
-        private const string overlayShader = "Nova/VFX/Overlay";
+        private const string overlayShader = "Nova/Premul/Overlay";
 
         public GameObject overlayObject;
         public GameObject overlay => overlayObject;

@@ -19,7 +19,7 @@ namespace Nova
         protected GameState gameState;
 
         public bool needRender => mergerPrimary.spriteCount > 0 || (isFading && mergerSub.spriteCount > 0);
-        protected override string fadeShader => "Nova/VFX/Fade Global";
+        protected override string fadeShader => "Nova/Premul/Fade Global";
         public abstract bool renderToCamera { get; }
         public abstract RenderTexture renderTexture { get; }
 
