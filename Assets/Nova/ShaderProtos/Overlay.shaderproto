@@ -1,4 +1,4 @@
-VARIANTS: Default
+VARIANTS: Premul
 Shader "Nova/$VARIANT_NAME$/Overlay"
 {
     Properties

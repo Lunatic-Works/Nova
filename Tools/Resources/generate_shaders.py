@@ -110,6 +110,20 @@ Cull Off ZWrite Off ZTest Always
             def_gscale='float _GScale;',
             gscale='_GScale',
         )
+    elif variant == 'Premul':
+        write_shader(
+            filename,
+            text,
+            ext_name='.Premul.shader',
+            variant_name='Premul',
+            variant_tags="""
+Cull Off ZWrite Off Blend One OneMinusSrcAlpha
+Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
+""",
+            variant_rgb='',
+            def_gscale='',
+            gscale='1.0',
+        )
     else:
         raise ValueError(f'Unknown variant: {variant}')
 

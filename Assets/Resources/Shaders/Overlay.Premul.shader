@@ -1,6 +1,6 @@
 // This file is generated. Do not edit it manually. Please edit .shaderproto files.
 
-Shader "Nova/VFX/Overlay"
+Shader "Nova/Premul/Overlay"
 {
     Properties
     {
@@ -8,7 +8,7 @@ Shader "Nova/VFX/Overlay"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
