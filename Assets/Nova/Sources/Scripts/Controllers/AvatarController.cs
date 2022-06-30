@@ -145,6 +145,12 @@ namespace Nova
             characterToImageName.Clear();
         }
 
+        private void Update()
+        {
+            // TODO: optimize this by implementing SetPose callbacks
+            renderCamera.enabled = needRender;
+        }
+
         #region Restoration
 
         [Serializable]
