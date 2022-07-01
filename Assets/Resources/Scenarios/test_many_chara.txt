@@ -10,22 +10,22 @@ set_box()
 测试很多角色
 
 <|
-show(ergong, 'normal', {-6, 0, 0.4})
+show(ergong, 'normal', {-6, 0, 0.5})
 |>
 111
 
 <|
-show(qianye, 'normal', {-2, 0, 0.4})
+show(qianye, 'normal', {-2, 0, 0.5})
 |>
 222
 
 <|
-show(xiben, 'normal', {2, 0, 0.4})
+show(xiben, 'normal', {2, 0, 0.5})
 |>
 333
 
 <|
-show(gaotian, 'normal', {6, 0, 0.4})
+show(gaotian, 'normal', {6, 0, 0.5})
 |>
 444
 

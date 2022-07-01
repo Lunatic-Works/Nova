@@ -176,7 +176,7 @@ anim_hold:move(gaotian, pos_r, 10)
 
 持续动画开始时要写`anim_hold_begin()`，它会处理动画系统和存档系统的一些状态
 
-顺便说一句：：`anim_hold`当中封装了Hierarchy中的`DontDestroyOnLoad/​NovaGameController/​NovaAnimation/​holdent`
+顺便说一句：：`anim_hold`当中封装了Hierarchy中的`DontDestroyOnLoad/​NovaGameController/​NovaAnimation/​Holding`
 
 顺便说一句：：如果担心忘了写`anim_hold_begin`和`anim_hold_end`，可以用`Tools/Scenarios/lint.py`来检查
 
