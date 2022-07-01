@@ -49,7 +49,7 @@ namespace Nova.Editor
             var camera = new GameObject("Camera");
             camera.transform.SetParent(root.transform);
             renderCamera = camera.Ensure<Camera>();
-            renderCamera.cullingMask = 1 << CompositeSpriteMerger.mergerLayer;
+            renderCamera.cullingMask = 1 << CompositeSpriteMerger.MergerLayer;
             renderCamera.orthographic = true;
             renderCamera.enabled = false;
             renderCamera.nearClipPlane = -1;

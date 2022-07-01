@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,7 +32,7 @@ namespace Nova
 
         public abstract float enterDuration { get; }
         public abstract float exitDuration { get; }
-        public bool inAnimation { get; protected set; } = false;
+        public bool inAnimation { get; protected set; }
 
         private bool inited;
         private bool targetInited;
@@ -73,7 +73,8 @@ namespace Nova
 
         private void CaptureToGhost()
         {
-            viewManager.transitionGhost.texture = ScreenCapturer.GetGameTexture(viewManager.transitionGhost.texture as RenderTexture);
+            viewManager.transitionGhost.texture =
+                ScreenCapturer.GetGameTexture(viewManager.transitionGhost.texture as RenderTexture);
             viewManager.transitionGhost.gameObject.SetActive(true);
             gameObject.SetActive(false);
         }
@@ -101,7 +102,7 @@ namespace Nova
             targetInited = true;
         }
 
-        public void SetToTransitionTarget()
+        protected void SetToTransitionTarget()
         {
             rectTransform.position = pos0;
             Vector3 scale = size0.InverseScale(rectTransform.rect.size);
@@ -111,7 +112,7 @@ namespace Nova
             rectTransform.localScale = scale;
         }
 
-        public OpacityAnimationProperty GetOpacityAnimationProperty(float startValue, float targetValue)
+        protected OpacityAnimationProperty GetOpacityAnimationProperty(float startValue, float targetValue)
         {
             if (useGhost)
             {
@@ -131,6 +132,7 @@ namespace Nova
             {
                 ResetTransitionTarget();
             }
+
             inAnimation = true;
         }
 
@@ -185,6 +187,7 @@ namespace Nova
                 {
                     canvasGroup.alpha = 1f;
                 }
+
                 inAnimation = false;
                 onFinish?.Invoke();
             });

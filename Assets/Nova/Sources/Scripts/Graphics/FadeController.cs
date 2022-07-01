@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
@@ -8,6 +6,7 @@ namespace Nova
     {
         private const string TIME = "_T";
         private const float EPS = 1e-6f;
+
         private static readonly int TimeID = Shader.PropertyToID(TIME);
         private static readonly int ColorID = Shader.PropertyToID("_Color");
         private static readonly int SubColorID = Shader.PropertyToID("_SubColor");
@@ -16,16 +15,17 @@ namespace Nova
 
         protected MaterialPool materialPool;
         protected NovaAnimation novaAnimation;
-        
+
         public Material fadeMaterial { get; protected set; }
-        public bool isFading => fadeMaterial.GetFloat(TIME) >= EPS;
+        protected bool isFading => fadeMaterial.GetFloat(TimeID) >= EPS;
         protected abstract string fadeShader { get; }
+
         public virtual Color color
         {
             get => fadeMaterial.GetColor(ColorID);
             set => fadeMaterial.SetColor(ColorID, value);
         }
-        
+
         protected virtual void Awake()
         {
             materialPool = gameObject.Ensure<MaterialPool>();

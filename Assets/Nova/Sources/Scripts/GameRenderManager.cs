@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Nova.URP;
 using UnityEngine;
@@ -94,6 +94,7 @@ namespace Nova
             {
                 UpdateTexture(rt, null);
             }
+
             renderTargets.Clear();
             fullScreenToggle.onValueChanged.RemoveListener(UpdateFullScreenStatus);
         }
@@ -115,6 +116,7 @@ namespace Nova
             {
                 trans.ResetTransitionTarget();
             }
+
             // Debug.Log($"Update UI {RealScreen.uiSize}");
         }
 
@@ -184,17 +186,20 @@ namespace Nova
             }
         }
 
-        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context,
+            ref RenderingData renderingData)
         {
             if (finalTarget == null)
             {
                 return;
             }
+
             var cmd = CommandBufferPool.Get("Composition");
             if (finalTarget.targetTexture != null)
             {
                 cmd.Blit(finalTarget.targetTexture, BuiltinRenderTextureType.CurrentActive, material);
             }
+
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
@@ -205,11 +210,13 @@ namespace Nova
             {
                 return false;
             }
+
             UpdateScreen();
             if (target.isActive && RealScreen.isScreenInitialized)
             {
                 UpdateTexture(target);
             }
+
             renderTargets.Add(target);
             return true;
         }
@@ -221,6 +228,7 @@ namespace Nova
             {
                 return;
             }
+
             renderTargets.Remove(target);
             UpdateTexture(target, null);
         }
@@ -237,10 +245,12 @@ namespace Nova
             {
                 return;
             }
+
             if (Screen.height <= 0 || Screen.width <= 0)
             {
                 return;
             }
+
             lastScreenHeight = Screen.height;
             lastScreenWidth = Screen.width;
             RealScreen.aspectRatio = desiredAspectRatio;
@@ -261,10 +271,13 @@ namespace Nova
 
                 var delta = 1 - RealScreen.aspectRatio / aspectRatio;
             }
-            if (RealScreen.isScreenInitialized && (lastRealWidth != RealScreen.width || lastRealHeight != RealScreen.height))
+
+            if (RealScreen.isScreenInitialized &&
+                (lastRealWidth != RealScreen.width || lastRealHeight != RealScreen.height))
             {
                 needUpdateTexture = true;
             }
+
             lastRealWidth = RealScreen.width;
             lastRealHeight = RealScreen.height;
             RealScreen.isScreenInitialized = true;
@@ -289,7 +302,8 @@ namespace Nova
             {
                 RenderTexture.ReleaseTemporary(oldTexture);
             }
-            var verb = texture == null ? "Destroy" : "Update";
+
+            // var verb = texture == null ? "Destroy" : "Update";
             // Debug.Log($"{verb} renderTexture {rt.textureName}");
         }
 
@@ -320,6 +334,7 @@ namespace Nova
                     UpdateTexture(rt);
                 }
             }
+
             needUpdateTexture = false;
         }
 

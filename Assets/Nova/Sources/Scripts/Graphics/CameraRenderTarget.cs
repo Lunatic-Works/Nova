@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
     public class CameraRenderTarget : MonoBehaviour
@@ -38,9 +37,11 @@ namespace Nova
             {
                 renderCamera = GetComponent<Camera>();
             }
+
             if (target == null)
             {
-                target = Utils.FindGameRenderManager().GetRenderTarget(renderCamera.name + RenderTarget.SUFFIX) as MyTarget;
+                target =
+                    Utils.FindGameRenderManager().GetRenderTarget(renderCamera.name + RenderTarget.SUFFIX) as MyTarget;
                 if (target == null)
                 {
                     target = new MyTarget(this);
@@ -63,6 +64,7 @@ namespace Nova
             public override bool isActive => parent.renderCamera != null && parent.renderCamera.isActiveAndEnabled;
             public override bool isFinal => parent.isFinalTarget;
             public override string textureName => parent == null ? oldConfig.name : parent.renderCamera.name + SUFFIX;
+
             public override RenderTexture targetTexture
             {
                 get => _targetTexture;
@@ -73,12 +75,14 @@ namespace Nova
                     {
                         img.texture = _targetTexture;
                     }
+
                     if (parent.renderCamera != null)
                     {
                         parent.renderCamera.targetTexture = _targetTexture;
                     }
                 }
             }
+
             public MyTarget(CameraRenderTarget parent)
             {
                 this.parent = parent;

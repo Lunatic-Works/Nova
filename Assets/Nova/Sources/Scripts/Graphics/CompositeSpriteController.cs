@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,10 +17,11 @@ namespace Nova
         private DialogueState dialogueState;
         protected GameState gameState;
 
-        public bool needRender => mergerPrimary.spriteCount > 0 || (isFading && mergerSub.spriteCount > 0);
+        protected bool needRender => mergerPrimary.spriteCount > 0 || (isFading && mergerSub.spriteCount > 0);
         protected override string fadeShader => "Nova/Premul/Fade Global";
         public abstract bool renderToCamera { get; }
         public abstract RenderTexture renderTexture { get; }
+
         // the actually layer of this object
         // if layer = -1, render without considering camera's culling mask
         public virtual int layer => -1;
@@ -54,11 +54,13 @@ namespace Nova
             {
                 return;
             }
+
             fade = fade && !gameState.isRestoring && !dialogueState.isFastForward;
             if (fade)
             {
                 mergerSub.SetTextures(mergerPrimary);
             }
+
             var sprites = pose.Select(x =>
                 AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x))).ToList();
             mergerPrimary.SetTextures(sprites);
@@ -66,6 +68,7 @@ namespace Nova
             {
                 FadeAnimation(fadeDuration);
             }
+
             curPose.Clear();
             curPose.AddRange(pose);
         }

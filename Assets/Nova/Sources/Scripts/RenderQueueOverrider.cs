@@ -22,6 +22,7 @@ namespace Nova
                     renderer = textureChanger.overlay.GetComponent<Renderer>();
                 }
             }
+
             image = GetComponent<Image>();
 
             gameObject.Ensure<MaterialPool>();

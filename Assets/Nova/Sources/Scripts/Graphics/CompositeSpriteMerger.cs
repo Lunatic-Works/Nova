@@ -1,20 +1,17 @@
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
-using Nova.URP;
 using UnityEngine.Rendering;
 
 namespace Nova
 {
     public class CompositeSpriteMerger : MonoBehaviour
     {
-        public const int mergerLayer = 16;
+        public const int MergerLayer = 16;
 
         private readonly List<SpriteRenderer> layers = new List<SpriteRenderer>();
 
-        public int spriteCount { get; private set; } = 0;
+        public int spriteCount { get; private set; }
 
         private void EnsureLayers(int count)
         {
@@ -24,11 +21,12 @@ namespace Nova
                 go.transform.SetParent(transform);
                 go.transform.localPosition = Vector3.zero;
                 go.transform.localScale = Vector3.one;
-                go.layer = mergerLayer;
+                go.layer = MergerLayer;
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sortingOrder = i;
                 layers.Add(sr);
             }
+
             for (var i = 0; i < layers.Count; i++)
             {
                 layers[i].gameObject.SetActive(i < count);
@@ -37,6 +35,7 @@ namespace Nova
                     layers[i].sprite = null;
                 }
             }
+
             spriteCount = count;
         }
 
@@ -47,6 +46,7 @@ namespace Nova
                 EnsureLayers(0);
                 return;
             }
+
             EnsureLayers(sprites.Count);
             for (var i = 0; i < sprites.Count; i++)
             {
@@ -73,18 +73,20 @@ namespace Nova
             {
                 return;
             }
+
             for (var i = 0; i < spriteCount; i++)
             {
                 cmd.DrawRenderer(layers[i], layers[i].sharedMaterial);
             }
         }
 
-        public static Rect GetMergedSize(IEnumerable<SpriteWithOffset> sprites)
+        public static Rect GetMergedSize(IReadOnlyList<SpriteWithOffset> sprites)
         {
             if (!sprites.Any())
             {
                 return Rect.zero;
             }
+
             var xmin = float.MaxValue;
             var ymin = float.MaxValue;
             var xmax = float.MinValue;
@@ -98,6 +100,7 @@ namespace Nova
                 xmax = Mathf.Max(xmax, b.max.x + o.x);
                 ymax = Mathf.Max(xmax, b.max.y + o.y);
             }
+
             return Rect.MinMaxRect(xmin, ymin, xmax, ymax);
         }
     }

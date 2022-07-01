@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -198,6 +198,7 @@ namespace Nova
             {
                 return;
             }
+
             if (distance < innerRatio * _sectorRadius)
             {
                 selectedSectorIndex = -1;

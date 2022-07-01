@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -100,7 +99,6 @@ namespace Nova
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
         }
-
 
         #region Voice
 
@@ -224,7 +222,8 @@ namespace Nova
             public readonly Vector4Data environmentColor;
             public readonly int layer;
 
-            public GameCharacterControllerRestoreData(CompositeSpriteControllerRestoreData baseData, Color environmentColor, int layer) : base(baseData)
+            public GameCharacterControllerRestoreData(CompositeSpriteControllerRestoreData baseData,
+                Color environmentColor, int layer) : base(baseData)
             {
                 this.environmentColor = environmentColor;
                 this.layer = layer;
@@ -233,7 +232,8 @@ namespace Nova
 
         public override IRestoreData GetRestoreData()
         {
-            return new GameCharacterControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData, environmentColor, layer);
+            return new GameCharacterControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData,
+                environmentColor, layer);
         }
 
         public override void Restore(IRestoreData restoreData)

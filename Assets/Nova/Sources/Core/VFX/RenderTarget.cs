@@ -18,11 +18,13 @@ namespace Nova
     public abstract class RenderTarget : IRenderTargetConfig
     {
         public const string SUFFIX = "Texture";
+
         protected TextureRendererConfig oldConfig;
         protected GameRenderManager renderManager;
         protected bool _needUpdate = true;
         protected bool registered = false;
         protected RenderTexture _targetTexture;
+
         // these binding are not persist
         // need extra mechanism (e.g. RestorableMaterial or RawImageController to be restorable)
         protected readonly List<ITextureReceiver> receivers = new List<ITextureReceiver>();
@@ -32,6 +34,7 @@ namespace Nova
         public abstract bool isFinal { get; }
         public bool needUpdate => _needUpdate;
         public abstract bool isActive { get; }
+
         public virtual RenderTexture targetTexture
         {
             get => _targetTexture;
@@ -77,10 +80,10 @@ namespace Nova
 
         private class MaterialBinder : ITextureReceiver
         {
-            public RenderTarget renderTarget;
-            public Material mat;
-            public string texName;
-            public bool bound = false;
+            private readonly RenderTarget renderTarget;
+            public readonly Material mat;
+            public readonly string texName;
+            private bool bound;
 
             public MaterialBinder(RenderTarget renderTarget, Material mat, string texName)
             {
@@ -108,6 +111,7 @@ namespace Nova
                         {
                             SetMatTexture(null);
                         }
+
                         renderTarget.Unbind(this);
                     }
                     else if (bound && !matchOld)
@@ -162,6 +166,7 @@ namespace Nova
                 {
                     binder.SetTexture(_targetTexture);
                 }
+
                 receivers.Add(binder);
             }
         }
@@ -173,11 +178,11 @@ namespace Nova
     }
 
     [Serializable]
-    public struct TextureRendererConfig
+    public class TextureRendererConfig
     {
-        public string name;
-        public bool final;
-        public RenderTextureFormat format;
+        public readonly string name;
+        public readonly bool final;
+        public readonly RenderTextureFormat format;
 
         public TextureRendererConfig(string name, RenderTextureFormat format, bool final)
         {

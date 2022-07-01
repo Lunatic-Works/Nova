@@ -15,6 +15,7 @@ namespace Nova.URP
             {
                 this.renderPassEvent = renderPassEvent;
             }
+
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
             {
                 var camera = renderingData.cameraData.camera;
@@ -30,7 +31,9 @@ namespace Nova.URP
         }
 
         private CustomRenderPass[] allPasses;
-        private static readonly RenderPassEvent[] allEvents = {
+
+        private static readonly RenderPassEvent[] allEvents =
+        {
             RenderPassEvent.AfterRendering,
             RenderPassEvent.BeforeRenderingTransparents,
         };

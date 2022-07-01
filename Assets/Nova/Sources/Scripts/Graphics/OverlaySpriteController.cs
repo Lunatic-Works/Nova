@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
@@ -11,7 +9,9 @@ namespace Nova
 
     public class OverlaySpriteController : CompositeSpriteController, IOverlayRenderer
     {
-        private const string overlayShader = "Nova/Premul/Overlay";
+        private const string OverlayShader = "Nova/Premul/Overlay";
+
+        private static readonly int MainTexID = Shader.PropertyToID("_MainTex");
 
         public GameObject overlayObject;
         public GameObject overlay => overlayObject;
@@ -21,42 +21,46 @@ namespace Nova
         private MeshFilter meshFilter;
         private MyTarget myTarget;
         private Material overlayMaterial;
+
         public override bool renderToCamera => false;
-        public override RenderTexture renderTexture => myTarget == null ? null : myTarget.targetTexture;
+        public override RenderTexture renderTexture => myTarget?.targetTexture;
         public override int layer => overlay.layer;
 
         protected override void Awake()
         {
             if (quad == null)
             {
-                quad = new Mesh();
-                quad.vertices = new[]
+                quad = new Mesh
                 {
-                    new Vector3(-1, -1, 0),
-                    new Vector3( 1, -1, 0),
-                    new Vector3(-1,  1, 0),
-                    new Vector3( 1,  1, 0),
+                    vertices = new[]
+                    {
+                        new Vector3(-1, -1, 0),
+                        new Vector3(1, -1, 0),
+                        new Vector3(-1, 1, 0),
+                        new Vector3(1, 1, 0),
+                    },
+                    uv = new[]
+                    {
+                        new Vector2(0, 0),
+                        new Vector2(1, 0),
+                        new Vector2(0, 1),
+                        new Vector2(1, 1),
+                    },
+                    triangles = new[]
+                    {
+                        0, 2, 1,
+                        2, 3, 1
+                    },
+                    // some very large bound to disable culling
+                    bounds = new Bounds(Vector3.zero, 1e6f * Vector3.one)
                 };
-                quad.uv = new[]
-                {
-                    new Vector2(0, 0),
-                    new Vector2(1, 0),
-                    new Vector2(0, 1),
-                    new Vector2(1, 1),
-                };
-                quad.triangles = new[]
-                {
-                    0, 2, 1,
-                    2, 3, 1
-                };
-                // some very large bound to disable culling
-                quad.bounds = new Bounds(Vector3.zero, 1e6f * Vector3.one);
             }
+
             meshFilter = overlay.Ensure<MeshFilter>();
             meshFilter.mesh = quad;
             meshRenderer = overlay.Ensure<MeshRenderer>();
             base.Awake();
-            overlayMaterial = materialPool.Get(overlayShader);
+            overlayMaterial = materialPool.Get(OverlayShader);
             materialPool.defaultMaterial = null;
             meshRenderer.material = overlayMaterial;
 
@@ -78,7 +82,8 @@ namespace Nova
         protected class MyTarget : RenderTarget
         {
             private new const string SUFFIX = "Composite" + RenderTarget.SUFFIX;
-            private OverlaySpriteController parent;
+
+            private readonly OverlaySpriteController parent;
             public override string textureName => parent == null ? oldConfig.name : parent.luaGlobalName + SUFFIX;
             public override bool isFinal => false;
             public override bool isActive => parent != null && parent.needRender;
@@ -90,7 +95,7 @@ namespace Nova
                     base.targetTexture = value;
                     if (parent != null)
                     {
-                        parent.overlayMaterial.SetTexture("_MainTex", value);
+                        parent.overlayMaterial.SetTexture(MainTexID, value);
                         parent.overlay.SetActive(value != null);
                     }
                 }
