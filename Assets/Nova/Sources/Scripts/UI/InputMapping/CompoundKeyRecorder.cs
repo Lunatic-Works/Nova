@@ -88,7 +88,7 @@ namespace Nova
         private readonly KeyStatus enabledState = new KeyStatus();
 
         /// <summary>
-        /// Gets general paths from input control.<br/>
+        /// Gets general paths from input control.
         /// The specific path associated with the input control cannot be used to determine
         /// duplicate shortcuts or easily generate display strings.
         /// </summary>

@@ -82,7 +82,7 @@ namespace Nova
         }
 
         /// <summary>
-        /// Checks whether an abstract key is triggered.<br/>
+        /// Checks whether an abstract key is triggered.
         /// Only activates once. To check whether a key is held, use <see cref="IsPressed"/>.
         /// </summary>
         public bool IsTriggered(AbstractKey key)
