@@ -41,6 +41,8 @@ namespace Nova
                 LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
                 gameState.AddRestorable(this);
             }
+
+            gameState.nodeChanged.AddListener(OnNodeChanged);
         }
 
         private void OnDestroy()
@@ -49,6 +51,8 @@ namespace Nova
             {
                 gameState.RemoveRestorable(this);
             }
+
+            gameState.nodeChanged.RemoveListener(OnNodeChanged);
         }
 
         public void SetCharacterName(string name)
@@ -134,6 +138,11 @@ namespace Nova
         public void ResetAll()
         {
             characterToImageName.Clear();
+        }
+
+        private void OnNodeChanged(NodeChangedData nodeChangedData)
+        {
+            ResetAll();
         }
 
         private Color _color = Color.white;
