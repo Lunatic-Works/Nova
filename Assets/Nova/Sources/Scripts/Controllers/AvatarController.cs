@@ -35,12 +35,15 @@ namespace Nova
         protected override void Awake()
         {
             base.Awake();
+
             image = GetComponent<RawImage>();
             rectTransform = GetComponent<RectTransform>();
             foreach (var config in avatarConfigs)
             {
                 nameToConfig[config.characterName] = config;
             }
+
+            gameState.nodeChanged.AddListener(OnNodeChanged);
         }
 
         private void Start()
@@ -57,7 +60,9 @@ namespace Nova
         protected override void OnDestroy()
         {
             base.OnDestroy();
+
             Destroy(renderCamera.targetTexture);
+            gameState.nodeChanged.RemoveListener(OnNodeChanged);
         }
 
         public void SetCharacterName(string name)
@@ -143,6 +148,11 @@ namespace Nova
         public void ResetAll()
         {
             characterToImageName.Clear();
+        }
+
+        private void OnNodeChanged(NodeChangedData nodeChangedData)
+        {
+            ResetAll();
         }
 
         private void Update()
