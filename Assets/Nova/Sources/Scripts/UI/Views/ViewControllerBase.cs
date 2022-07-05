@@ -55,9 +55,12 @@ namespace Nova
                 LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>());
             }
 
-            foreach (var transition in GetComponentsInChildren<UIViewTransitionBase>())
+            if (RealScreen.isUIInitialized)
             {
-                transition.ResetTransitionTarget();
+                foreach (var transition in GetComponentsInChildren<UIViewTransitionBase>())
+                {
+                    transition.ResetTransitionTarget();
+                }
             }
         }
 

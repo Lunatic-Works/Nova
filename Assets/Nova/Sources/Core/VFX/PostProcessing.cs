@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Nova.URP;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -12,6 +12,7 @@ namespace Nova
     public class PostProcessing : OnPostRenderBehaviour, IRestorable
     {
         public string luaName;
+
         private GameState gameState;
 
         private void Awake()

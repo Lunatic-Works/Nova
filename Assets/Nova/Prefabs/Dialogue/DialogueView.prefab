@@ -1128,7 +1128,6 @@ GameObject:
   - component: {fileID: 1736227319366896007}
   - component: {fileID: 387142937}
   - component: {fileID: 387142934}
-  - component: {fileID: 387142935}
   - component: {fileID: 387142933}
   - component: {fileID: 387142929}
   - component: {fileID: 387142936}
@@ -1292,19 +1291,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configKeyName: AutoSpeed
---- !u!114 &387142935
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1515438340287766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b55bc709342695c4585a171396005580, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  configKeyName: OnlyFastForwardRead
 --- !u!114 &387142933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1622,14 +1608,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b1b24753b4d7cb44bad11d51e1b8f5d0, type: 3}
---- !u!224 &5788387325920053437 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7190768443177373967, guid: b1b24753b4d7cb44bad11d51e1b8f5d0, type: 3}
-  m_PrefabInstance: {fileID: 3719628415771056562}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5788387325920053426 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7190768443177373952, guid: b1b24753b4d7cb44bad11d51e1b8f5d0, type: 3}
+  m_PrefabInstance: {fileID: 3719628415771056562}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &5788387325920053437 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7190768443177373967, guid: b1b24753b4d7cb44bad11d51e1b8f5d0, type: 3}
   m_PrefabInstance: {fileID: 3719628415771056562}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5655490265359441721

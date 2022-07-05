@@ -72,6 +72,7 @@ namespace Nova
             SetRenderQueue(renderQueue);
         }
 
+        // Export to Lua
         public static RenderQueueOverrider Ensure(GameObject gameObject)
         {
             return gameObject.Ensure<RenderQueueOverrider>();

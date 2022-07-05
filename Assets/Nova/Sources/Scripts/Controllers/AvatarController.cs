@@ -184,12 +184,7 @@ namespace Nova
 
         public override void Restore(IRestoreData restoreData)
         {
-            // Avoid updating image when restoring base by setting currentImageName = baseData.currentImageName
-            // var baseData = restoreData as CompositeSpriteControllerRestoreData;
-            // var currentImageNameOld = currentImageName;
-            // currentImageName = baseData.currentImageName;
             base.Restore(restoreData);
-            // currentImageName = currentImageNameOld;
 
             var data = restoreData as AvatarControllerRestoreData;
             characterToImageName = data.characterToImageName;

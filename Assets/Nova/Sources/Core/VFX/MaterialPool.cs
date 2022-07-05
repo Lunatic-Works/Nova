@@ -51,6 +51,7 @@ namespace Nova
             return factory.GetRestorableMaterial(shaderName);
         }
 
+        // Export to Lua
         public static MaterialPool Ensure(GameObject gameObject)
         {
             return gameObject.Ensure<MaterialPool>();

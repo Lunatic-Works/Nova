@@ -20,17 +20,17 @@ public static class CustomSettings
     // Unity有些类作为sealed class，其实完全等价于静态类
     public static List<Type> staticClassTypes = new List<Type>
     {
-        typeof(Application),
-        typeof(GL),
-        typeof(Graphics),
-        typeof(Input),
-        typeof(Physics),
-        typeof(QualitySettings),
-        typeof(RenderSettings),
-        typeof(Resources),
-        typeof(Screen),
-        typeof(SleepTimeout),
-        typeof(Time),
+        // typeof(Application),
+        // typeof(GL),
+        // typeof(Graphics),
+        // typeof(Input),
+        // typeof(Physics),
+        // typeof(QualitySettings),
+        // typeof(RenderSettings),
+        // typeof(Resources),
+        // typeof(Screen),
+        // typeof(SleepTimeout),
+        // typeof(Time),
     };
 
     // 附加导出委托类型（在导出委托时，customTypeList中牵扯的委托类型都会导出，无需写在这里）

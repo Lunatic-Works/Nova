@@ -49,7 +49,7 @@ Shader "Nova/VFX/Final Blit"
                 float2 uv = (i.uv - pivot) / float2(_GW, _GH) * _ScreenParams.xy + pivot;
                 float eps = 1e-6;
                 float4 col;
-                
+
                 if (uv.x > -eps && uv.x < 1 + eps && uv.y > -eps && uv.y < 1 + eps)
                 {
                     col = tex2D(_MainTex, clamp(uv, 0, 1));
