@@ -16,6 +16,7 @@
 /Assets/Nova/Sources/ThirdParty/ToLua/Source/Generate/*
 /Assets/Resources/Lua*
 /Tools/Resources/shader_timestamps.json
+/Tools/Scenarios/scenario*.txt
 
 # Visual Studio cache directory
 .vs/
@@ -69,6 +70,9 @@ crashlytics-build.properties
 # VS packages
 /Packages/Microsoft*/
 packages.config
+
+# VS Code
+.vscode/
 
 # NDepend
 *.ndproj
