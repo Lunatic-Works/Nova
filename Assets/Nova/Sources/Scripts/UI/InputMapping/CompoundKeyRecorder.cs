@@ -77,9 +77,9 @@ namespace Nova
         }
 
         private bool isPressing = false;
-        private InputMappingListEntry entry;
+        private InputMappingEntry entry;
 
-        public void BeginRecording(InputMappingListEntry entry)
+        public void BeginRecording(InputMappingEntry entry)
         {
             isPressing = false;
             this.entry = entry;

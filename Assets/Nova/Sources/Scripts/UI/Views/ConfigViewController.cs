@@ -83,7 +83,7 @@ namespace Nova
         {
             Alert.Show(null, I18n.__("config.alert.resetdefault"), () =>
             {
-                configManager.ResetToDefault();
+                configManager.ResetDefault();
                 inputMappingController.ResetDefault();
                 configManager.Apply();
                 inputMappingController.Apply();

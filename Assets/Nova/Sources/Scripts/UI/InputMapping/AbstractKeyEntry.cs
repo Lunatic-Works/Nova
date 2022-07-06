@@ -14,14 +14,14 @@ namespace Nova
         private InputMappingController controller;
         private AbstractKey key;
 
-        private bool selected => controller != null && key == controller.currentSelectedKey;
+        private bool selected => controller != null && key == controller.currentAbstractKey;
 
         private void UpdateText()
         {
             label.text = I18n.__($"config.key.{Enum.GetName(typeof(AbstractKey), key)}");
         }
 
-        public void RefreshColor()
+        public void Refresh()
         {
             background.color = selected ? selectedColor : defaultColor;
         }
@@ -31,13 +31,13 @@ namespace Nova
             this.controller = controller;
             this.key = key;
             UpdateText();
-            RefreshColor();
+            Refresh();
         }
 
         private void OnEnable()
         {
             UpdateText();
-            RefreshColor();
+            Refresh();
             I18n.LocaleChanged.AddListener(UpdateText);
         }
 
@@ -46,9 +46,9 @@ namespace Nova
             I18n.LocaleChanged.RemoveListener(UpdateText);
         }
 
-        public void SelectCurrentKey()
+        public void Select()
         {
-            controller.currentSelectedKey = key;
+            controller.currentAbstractKey = key;
         }
     }
 }

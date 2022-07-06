@@ -11,10 +11,10 @@ namespace Nova
 
         private void Awake()
         {
-            var gameController = Utils.FindNovaGameController();
-            gameState = gameController.GameState;
-            dialogueState = gameController.DialogueState;
-            inputMapper = gameController.InputMapper;
+            var controller = Utils.FindNovaGameController();
+            gameState = controller.GameState;
+            dialogueState = controller.DialogueState;
+            inputMapper = controller.InputMapper;
             viewManager = Utils.FindViewManager();
         }
 

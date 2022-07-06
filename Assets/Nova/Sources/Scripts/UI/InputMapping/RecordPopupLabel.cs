@@ -6,7 +6,7 @@ namespace Nova
     [RequireComponent(typeof(Text))]
     public class RecordPopupLabel : MonoBehaviour
     {
-        public InputMappingListEntry entry;
+        public InputMappingEntry entry;
 
         private Text label;
 

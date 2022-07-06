@@ -1,4 +1,8 @@
+using System;
+
 namespace Nova
 {
-    public class ExportCustomType : System.Attribute { }
+    // prevent subclass from being exported
+    [AttributeUsage(AttributeTargets.All, Inherited = false)]
+    public class ExportCustomType : Attribute { }
 }

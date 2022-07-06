@@ -1,10 +1,12 @@
+using UnityEngine;
+
 namespace Nova
 {
     public class RecordPopupController : ViewControllerBase
     {
-        public RecordPopupLabel label;
+        [SerializeField] private RecordPopupLabel label;
 
-        public InputMappingListEntry entry
+        public InputMappingEntry entry
         {
             set => label.entry = value;
         }

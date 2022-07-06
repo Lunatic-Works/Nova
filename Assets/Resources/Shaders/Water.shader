@@ -24,7 +24,7 @@ Shader "Nova/VFX/Water"
             #include "UnityCG.cginc"
             #include "Assets/Nova/CGInc/Rand.cginc"
 
-            #define PI 3.1415926
+            #define PI 3.1415927
 
             struct appdata
             {

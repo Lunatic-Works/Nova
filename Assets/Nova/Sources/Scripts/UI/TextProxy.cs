@@ -231,7 +231,7 @@ namespace Nova
             // TODO: skip animation for invisible characters?
             if (!characterInfo[index].isVisible) return;
 
-            // Characters at different indexes may have different materials
+            // Characters at different indices may have different materials
             var meshInfo = textBox.textInfo.meshInfo;
             var materialIndex = characterInfo[index].materialReferenceIndex;
             var newVertexColors = meshInfo[materialIndex].colors32;

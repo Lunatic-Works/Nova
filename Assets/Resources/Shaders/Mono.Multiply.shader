@@ -7,7 +7,7 @@ Shader "Nova/VFX Multiply/Mono"
         [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
         _T ("Time", Range(0.0, 1.0)) = 0.0
         _ColorMul ("Color Multiplier", Color) = (1, 1, 1, 1)
-        _ColorAdd ("Color Offset", Color) = (0, 0, 0, 0)
+        _ColorAdd ("Color Offset", Vector) = (0, 0, 0, 0)
     }
     SubShader
     {

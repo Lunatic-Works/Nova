@@ -5,7 +5,7 @@ namespace Nova
     public class InputMappingList : MonoBehaviour
     {
         public Transform content;
-        public InputMappingListEntry entryPrefab;
+        public InputMappingEntry entryPrefab;
         public InputMappingController controller;
 
         private void ClearContent()
@@ -31,11 +31,11 @@ namespace Nova
             controller.ResetCurrentKeyMappingDefault();
         }
 
-        public InputMappingListEntry Refresh()
+        public InputMappingEntry Refresh()
         {
             ClearContent();
             var cnt = controller.currentCompoundKeys.Count;
-            InputMappingListEntry entry = null;
+            InputMappingEntry entry = null;
             for (var i = 0; i < cnt; i++)
             {
                 entry = Instantiate(entryPrefab, content);
