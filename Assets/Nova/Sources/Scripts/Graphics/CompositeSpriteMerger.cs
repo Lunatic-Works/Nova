@@ -98,7 +98,7 @@ namespace Nova
                 xmin = Mathf.Min(xmin, b.min.x + o.x);
                 ymin = Mathf.Min(ymin, b.min.y + o.y);
                 xmax = Mathf.Max(xmax, b.max.x + o.x);
-                ymax = Mathf.Max(xmax, b.max.y + o.y);
+                ymax = Mathf.Max(ymax, b.max.y + o.y);
             }
 
             return Rect.MinMaxRect(xmin, ymin, xmax, ymax);
