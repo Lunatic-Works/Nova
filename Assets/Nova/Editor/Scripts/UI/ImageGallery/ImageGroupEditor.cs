@@ -15,25 +15,7 @@ namespace Nova.Editor
         public const int SnapshotHeight = 180;
         public const float SnapshotAspectRatio = (float)SnapshotHeight / SnapshotWidth;
 
-        private static string GetAssetFullPath(UnityEngine.Object asset)
-        {
-            return Path.Combine(Path.GetDirectoryName(Application.dataPath), AssetDatabase.GetAssetPath(asset));
-        }
-
         private const string ResourcesFolderName = "/Resources/";
-
-        private static string GetResourcesFolder(string path)
-        {
-            path = Utils.ConvertPathSeparator(path);
-
-            var index = path.IndexOf(ResourcesFolderName, StringComparison.Ordinal);
-            if (index == -1)
-            {
-                throw new ArgumentException();
-            }
-
-            return path.Substring(0, index + ResourcesFolderName.Length);
-        }
 
         private static string GetResourcePath(string path)
         {
@@ -114,11 +96,7 @@ namespace Nova.Editor
             return AssetDatabase.GetMainAssetTypeAtPath(path) == typeof(Texture2D);
         }
 
-        private GameObject root;
-        private CompositeSpriteMerger merger;
-        private Camera renderCamera;
-        private RenderTexture renderTexture;
-
+        private ImageGroupCapturer capturer;
         private ReorderableList reorderableList;
         private SerializedProperty entries;
         private string previewEntryKey;
@@ -145,17 +123,14 @@ namespace Nova.Editor
                 serializedObject.ApplyModifiedProperties();
             };
 
-            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("ImageGroupEditor", out renderCamera, out merger);
+            capturer = new ImageGroupCapturer();
             previewEntryKey = "";
         }
 
         private void OnDisable()
         {
-            DestroyImmediate(root);
-            if (renderTexture != null)
-            {
-                DestroyImmediate(renderTexture);
-            }
+            capturer.OnDestroy();
+            capturer = null;
         }
 
         private bool previewDrawSnapshotFrame = true;
@@ -185,34 +160,23 @@ namespace Nova.Editor
 
         private void DrawPreview(ImageEntry entry, SerializedProperty entryProperty)
         {
-            var path = entryProperty.FindPropertyRelative("resourcePath").stringValue;
-            var composite = entryProperty.FindPropertyRelative("composite").boolValue;
-
             Texture previewTexture = null;
-            if (composite)
+            if (entry.composite)
             {
-                var poseString = entryProperty.FindPropertyRelative("poseString").stringValue;
-                var entryKey = ImageEntry.CompositeUnlockKey(path, poseString);
-                if (renderTexture == null || previewEntryKey != entryKey)
+                if (capturer.renderTexture == null || previewEntryKey != entry.unlockKey)
                 {
-                    var sprites = CompositeSpriteController.LoadPoseSprites(path, poseString);
-                    if (!sprites.Any() || sprites.Contains(null))
+                    if (!capturer.DrawComposite(entry))
                     {
                         EditorGUILayout.HelpBox("Invalid image resource path or pose string!", MessageType.Error);
                         return;
                     }
-                    if (renderTexture != null)
-                    {
-                        DestroyImmediate(renderTexture);
-                    }
-                    renderTexture = merger.RenderToTexture(sprites, renderCamera);
-                    previewEntryKey = entryKey;
+                    previewEntryKey = entry.unlockKey;
                 }
-                previewTexture = renderTexture;
+                previewTexture = capturer.renderTexture;
             }
             else
             {
-                var sprite = Resources.Load<Sprite>(path);
+                var sprite = Resources.Load<Sprite>(entry.resourcePath);
                 if (sprite == null)
                 {
                     EditorGUILayout.HelpBox("Invalid image resource path!", MessageType.Error);
@@ -307,29 +271,7 @@ namespace Nova.Editor
             return SnapshotTexture.EncodeToPNG();
         }
 
-        private static void GenerateSnapshot(ImageEntry entry)
-        {
-            if (entry == null) return;
-            var sprite = Resources.Load<Sprite>(entry.resourcePath);
-            if (sprite == null) return;
-            var tex = sprite.texture;
-            Graphics.Blit(tex, SnapshotRenderTexture, entry.snapshotScale, entry.snapshotOffset);
-            var data = GetSnapshotPNGData();
-
-            var assetFullPath = GetAssetFullPath(sprite);
-            var snapshotFullPath =
-                Path.Combine(GetResourcesFolder(assetFullPath), entry.snapshotResourcePath + ".png");
-            Directory.CreateDirectory(Path.GetDirectoryName(snapshotFullPath));
-            File.WriteAllBytes(snapshotFullPath, data);
-        }
-
         private ImageGroup Target => target as ImageGroup;
-
-        public static void GenerateSnapshot(ImageGroup group)
-        {
-            if (group == null || group.entries.Count <= 0) return;
-            GenerateSnapshot(group.entries[0]);
-        }
 
         public override void OnInspectorGUI()
         {
@@ -337,8 +279,9 @@ namespace Nova.Editor
 
             if (GUILayout.Button("Generate Snapshot"))
             {
-                GenerateSnapshot(Target);
+                capturer.GenerateSnapshot(Target);
                 AssetDatabase.Refresh();
+                previewEntryKey = "";
             }
 
             EditorGUILayout.HelpBox("The first image entry will be selected as the snapshot", MessageType.Info);

@@ -32,7 +32,7 @@ namespace Nova.Editor
         public static void CreateListForAllImageGroups()
         {
             var path = EditorUtils.GetSelectedDirectory();
-            var listPaths = AssetDatabase.FindAssets("t:ImageGroupList", new[] {path});
+            var listPaths = AssetDatabase.FindAssets("t:ImageGroupList", new[] { path });
             ImageGroupList list;
             if (listPaths.Length == 0)
             {
@@ -46,7 +46,7 @@ namespace Nova.Editor
                     AssetDatabase.GUIDToAssetPath(listPaths.First()));
             }
 
-            list.groups = AssetDatabase.FindAssets("t:ImageGroup", new[] {path})
+            list.groups = AssetDatabase.FindAssets("t:ImageGroup", new[] { path })
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Select(AssetDatabase.LoadAssetAtPath<ImageGroup>)
                 .ToList();
@@ -96,22 +96,42 @@ namespace Nova.Editor
 
         private bool validated = false;
 
+        private ImageGroupCapturer capturer;
+
         protected override void Init()
         {
             validated = false;
             badReferenceGroupList.Init(GetEntriesProperty(), "Has Bad Resources Reference");
             badSnapshotAspectRatioGroupList.Init(GetEntriesProperty(), "Bad Snapshot Aspect Ratio");
             emptyGroupList.Init(GetEntriesProperty(), "Empty Groups");
+            capturer = new ImageGroupCapturer();
+        }
+
+        private void OnDisable()
+        {
+            capturer.OnDestroy();
+            capturer = null;
         }
 
         private static bool GroupResourcesReferenceIsCorrect(ImageGroup group)
         {
             foreach (var entry in group.entries)
             {
-                var path = entry.resourcePath;
-                if (Resources.Load<Sprite>(path) == null)
+                if (entry.composite)
                 {
-                    return false;
+                    var sprites = CompositeSpriteController.LoadPoseSprites(entry.resourcePath, entry.poseString);
+                    if (!sprites.Any() || sprites.Contains(null))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    var path = entry.resourcePath;
+                    if (Resources.Load<Sprite>(path) == null)
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -177,7 +197,7 @@ namespace Nova.Editor
         {
             foreach (var group in Target.groups)
             {
-                ImageGroupEditor.GenerateSnapshot(group);
+                capturer.GenerateSnapshot(group);
             }
 
             AssetDatabase.Refresh();
