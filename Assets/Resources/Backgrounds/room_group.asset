@@ -17,6 +17,8 @@ MonoBehaviour:
     displayNames:
     - locale: 40
       value: corridor
+    composite: 0
+    poseString: 
     resourcePath: Backgrounds/corridor
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}
@@ -24,6 +26,8 @@ MonoBehaviour:
     displayNames:
     - locale: 40
       value: room
+    composite: 0
+    poseString: 
     resourcePath: Backgrounds/room
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}
@@ -31,6 +35,8 @@ MonoBehaviour:
     displayNames:
     - locale: 40
       value: toilet
+    composite: 0
+    poseString: 
     resourcePath: Backgrounds/toilet
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}

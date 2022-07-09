@@ -39,23 +39,7 @@ namespace Nova.Editor
 
         private void OnEnable()
         {
-            root = new GameObject("CharacterPoseComposer")
-            {
-                hideFlags = HideFlags.DontSave
-            };
-            merger = root.Ensure<CompositeSpriteMerger>();
-            merger.runInEditMode = true;
-
-            var camera = new GameObject("Camera");
-            camera.transform.SetParent(root.transform);
-            renderCamera = camera.Ensure<Camera>();
-            renderCamera.cullingMask = 1 << CompositeSpriteMerger.MergerLayer;
-            renderCamera.orthographic = true;
-            renderCamera.enabled = false;
-            renderCamera.nearClipPlane = -1;
-            renderCamera.farClipPlane = 1;
-            renderCamera.clearFlags = CameraClearFlags.SolidColor;
-            renderCamera.backgroundColor = Color.clear;
+            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("CharacterPoseComposer", out renderCamera, out merger);
 
             reorderableList = new ReorderableList(layers, typeof(Layer), true, true, true, true);
             reorderableList.drawHeaderCallback += DrawHeader;
@@ -73,8 +57,11 @@ namespace Nova.Editor
             reorderableList.onRemoveCallback -= RemoveItem;
             reorderableList.onReorderCallback -= ReorderItem;
 
-            DestroyImmediate(renderTexture);
             DestroyImmediate(root);
+            if (renderTexture != null)
+            {
+                DestroyImmediate(renderTexture);
+            }
         }
 
         private static void DrawHeader(Rect rect)
@@ -217,17 +204,7 @@ namespace Nova.Editor
                 }
                 else
                 {
-                    merger.SetTextures(sprites);
-                    var bounds = CompositeSpriteMerger.GetMergedSize(sprites);
-                    var pixelsPerUnit = sprites[0].sprite.pixelsPerUnit;
-                    var size = bounds.size * pixelsPerUnit;
-                    renderTexture = new RenderTexture((int)size.x, (int)size.y, 0, RenderTextureFormat.ARGB32);
-
-                    renderCamera.targetTexture = renderTexture;
-                    renderCamera.orthographicSize = bounds.size.y / 2;
-                    renderCamera.transform.localPosition = new Vector3(bounds.center.x, bounds.center.y, 0);
-
-                    renderCamera.Render();
+                    renderTexture = merger.RenderToTexture(sprites, renderCamera);
                 }
             }
 
@@ -236,13 +213,33 @@ namespace Nova.Editor
                 return;
             }
 
-            GUILayout.Label("Composed Pose Lua Table", EditorStyles.boldLabel);
+            GUILayout.BeginHorizontal();
+
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
             var luaTable = LayersToLuaTable(layers);
-            EditorGUILayout.SelectableLabel(luaTable);
+            GUILayout.Label("Pose Lua Table", EditorStyles.boldLabel);
             if (GUILayout.Button("Copy"))
             {
                 EditorGUIUtility.systemCopyBuffer = luaTable;
             }
+            GUILayout.EndHorizontal();
+            EditorGUILayout.SelectableLabel(luaTable);
+            GUILayout.EndVertical();
+
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+            var poseString = CompositeSpriteController.PoseToString(layers.Select(x => x.name));
+            GUILayout.Label("Pose String", EditorStyles.boldLabel);
+            if (GUILayout.Button("Copy"))
+            {
+                EditorGUIUtility.systemCopyBuffer = poseString;
+            }
+            GUILayout.EndHorizontal();
+            EditorGUILayout.SelectableLabel(poseString);
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
 
             GUILayout.Label("Preview", EditorStyles.boldLabel);
 

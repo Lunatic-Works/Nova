@@ -17,6 +17,8 @@ MonoBehaviour:
     displayNames:
     - locale: 40
       value: rain
+    composite: 0
+    poseString: 
     resourcePath: Backgrounds/rain
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}

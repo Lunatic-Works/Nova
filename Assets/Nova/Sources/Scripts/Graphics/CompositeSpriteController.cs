@@ -8,6 +8,8 @@ namespace Nova
     [ExportCustomType]
     public abstract class CompositeSpriteController : FadeController, IRestorable
     {
+        private const char poseStringSeparator = ':';
+
         public CompositeSpriteMerger mergerPrimary;
         public CompositeSpriteMerger mergerSub;
         public string imageFolder;
@@ -61,8 +63,7 @@ namespace Nova
                 mergerSub.SetTextures(mergerPrimary);
             }
 
-            var sprites = pose.Select(x =>
-                AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x))).ToList();
+            var sprites = LoadPoseSprites(imageFolder, pose);
             mergerPrimary.SetTextures(sprites);
             if (fade)
             {
@@ -75,7 +76,7 @@ namespace Nova
 
         public void SetPose(string pose, bool fade = true)
         {
-            SetPose(pose.Split(':'), fade);
+            SetPose(pose.Split(poseStringSeparator), fade);
         }
 
         public void SetPose(LuaInterface.LuaTable pose, bool fade = true)
@@ -90,7 +91,17 @@ namespace Nova
 
         public static string PoseToString(IEnumerable<string> pose)
         {
-            return string.Join(":", pose);
+            return string.Join(poseStringSeparator.ToString(), pose);
+        }
+
+        public static IReadOnlyList<SpriteWithOffset> LoadPoseSprites(string imageFolder, IEnumerable<string> pose)
+        {
+            return pose.Select(x => AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x))).ToList();
+        }
+
+        public static IReadOnlyList<SpriteWithOffset> LoadPoseSprites(string imageFolder, string pose)
+        {
+            return LoadPoseSprites(imageFolder, pose.Split(poseStringSeparator));
         }
 
         public virtual string restorableName => luaGlobalName;
