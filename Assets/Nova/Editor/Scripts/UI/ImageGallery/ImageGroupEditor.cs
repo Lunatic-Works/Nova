@@ -231,46 +231,6 @@ namespace Nova.Editor
             DrawPreview(Target.entries[index], entry);
         }
 
-        private static RenderTexture _snapshotRenderTexture;
-
-        public static RenderTexture SnapshotRenderTexture
-        {
-            get
-            {
-                if (_snapshotRenderTexture == null)
-                {
-                    _snapshotRenderTexture = new RenderTexture(SnapshotWidth, SnapshotHeight, 0);
-                }
-
-                return _snapshotRenderTexture;
-            }
-        }
-
-        private static Texture2D _snapshotTexture;
-
-        public static Texture2D SnapshotTexture
-        {
-            get
-            {
-                if (_snapshotTexture == null)
-                {
-                    _snapshotTexture = new Texture2D(SnapshotWidth, SnapshotHeight);
-                }
-
-                return _snapshotTexture;
-            }
-        }
-
-        private static byte[] GetSnapshotPNGData()
-        {
-            var oldRt = RenderTexture.active;
-            RenderTexture.active = SnapshotRenderTexture;
-            SnapshotTexture.ReadPixels(new Rect(0, 0, SnapshotWidth, SnapshotHeight), 0, 0);
-            SnapshotTexture.Apply();
-            RenderTexture.active = oldRt;
-            return SnapshotTexture.EncodeToPNG();
-        }
-
         private ImageGroup Target => target as ImageGroup;
 
         public override void OnInspectorGUI()

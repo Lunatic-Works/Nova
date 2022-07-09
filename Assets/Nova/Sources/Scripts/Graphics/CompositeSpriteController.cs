@@ -94,6 +94,11 @@ namespace Nova
             return string.Join(poseStringSeparator.ToString(), pose);
         }
 
+        public static string PoseToString(LuaInterface.LuaTable pose)
+        {
+            return PoseToString(pose.ToArray().Cast<string>());
+        }
+
         public static IReadOnlyList<SpriteWithOffset> LoadPoseSprites(string imageFolder, IEnumerable<string> pose)
         {
             return pose.Select(x => AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x))).ToList();

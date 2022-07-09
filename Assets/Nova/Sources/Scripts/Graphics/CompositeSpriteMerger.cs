@@ -105,7 +105,7 @@ namespace Nova
             var renderTexture = new RenderTexture((int)size.x, (int)size.y, 0, RenderTextureFormat.ARGB32);
 
             renderCamera.targetTexture = renderTexture;
-            renderCamera.orthographicSize = bounds.size.y / 2;
+            renderCamera.orthographicSize = bounds.size.y / 2 * renderCamera.transform.lossyScale.y;
             renderCamera.transform.localPosition = new Vector3(bounds.center.x, bounds.center.y, 0);
 
             renderCamera.Render();
