@@ -129,14 +129,14 @@ namespace Nova
 
         public static int GetUnlockedImageCount(ImageGroup group, ImageUnlockInfo unlockInfo)
         {
-            return group.entries.Count(entry => unlockInfo.Contains(Utils.ConvertPathSeparator(entry.resourcePath)));
+            return group.entries.Count(entry => unlockInfo.Contains(entry.unlockKey));
         }
 
         public static int GetPreviousUnlockedImage(ImageGroup group, ImageUnlockInfo unlockInfo, int start)
         {
             for (int i = start - 1; i >= 0; --i)
             {
-                if (unlockInfo.Contains(Utils.ConvertPathSeparator(group.entries[i].resourcePath)))
+                if (unlockInfo.Contains(group.entries[i].unlockKey))
                 {
                     return i;
                 }
@@ -149,7 +149,7 @@ namespace Nova
         {
             for (int i = start + 1; i < group.entries.Count; ++i)
             {
-                if (unlockInfo.Contains(Utils.ConvertPathSeparator(group.entries[i].resourcePath)))
+                if (unlockInfo.Contains(group.entries[i].unlockKey))
                 {
                     return i;
                 }
@@ -204,7 +204,7 @@ namespace Nova
             {
                 foreach (var entry in group.entries)
                 {
-                    unlockInfo.Add(Utils.ConvertPathSeparator(entry.resourcePath));
+                    unlockInfo.Add(entry.unlockKey);
                 }
             }
 

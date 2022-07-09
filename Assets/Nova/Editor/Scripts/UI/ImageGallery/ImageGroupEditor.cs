@@ -114,8 +114,14 @@ namespace Nova.Editor
             return AssetDatabase.GetMainAssetTypeAtPath(path) == typeof(Texture2D);
         }
 
+        private GameObject root;
+        private CompositeSpriteMerger merger;
+        private Camera renderCamera;
+        private RenderTexture renderTexture;
+
         private ReorderableList reorderableList;
         private SerializedProperty entries;
+        private string previewEntryKey;
 
         private void OnEnable()
         {
@@ -138,22 +144,34 @@ namespace Nova.Editor
                 entries.DeleteArrayElementAtIndex(list.index);
                 serializedObject.ApplyModifiedProperties();
             };
+
+            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("ImageGroupEditor", out renderCamera, out merger);
+            previewEntryKey = "";
+        }
+
+        private void OnDisable()
+        {
+            DestroyImmediate(root);
+            if (renderTexture != null)
+            {
+                DestroyImmediate(renderTexture);
+            }
         }
 
         private bool previewDrawSnapshotFrame = true;
         private Color previewSnapshotFrameColor = Color.red;
         private float previewSnapshotFrameLineWidth = 1.0f;
 
-        private static void CorrectSnapshotScaleY(ImageEntry entry, Texture tex, SerializedProperty entryProperty)
+        private static void CorrectSnapshotScaleY(Vector2 size, SerializedProperty entryProperty)
         {
-            var size = entry.snapshotScale * new Vector2(tex.width, tex.height);
+            size.Scale(entryProperty.FindPropertyRelative("snapshotScale").vector2Value);
             var fix = Mathf.Abs(SnapshotAspectRatio / (size.y / size.x));
             entryProperty.FindPropertyRelative("snapshotScale.y").floatValue *= fix;
         }
 
-        private static void CorrectSnapshotScaleX(ImageEntry entry, Texture tex, SerializedProperty entryProperty)
+        private static void CorrectSnapshotScaleX(Vector2 size, SerializedProperty entryProperty)
         {
-            var size = entry.snapshotScale * new Vector2(tex.width, tex.height);
+            size.Scale(entryProperty.FindPropertyRelative("snapshotScale").vector2Value);
             var fix = Mathf.Abs((1.0f / SnapshotAspectRatio) / (size.x / size.y));
             entryProperty.FindPropertyRelative("snapshotScale.x").floatValue *= fix;
         }
@@ -161,29 +179,57 @@ namespace Nova.Editor
         private static void ResetSnapshotScaleOffset(SerializedProperty entryProperty)
         {
             // use serialized property for proper save & undo
-            entryProperty.FindPropertyRelative("snapshotOffset.x").floatValue = 0.0f;
-            entryProperty.FindPropertyRelative("snapshotOffset.y").floatValue = 0.0f;
-            entryProperty.FindPropertyRelative("snapshotScale.x").floatValue = 1.0f;
-            entryProperty.FindPropertyRelative("snapshotScale.y").floatValue = 1.0f;
+            entryProperty.FindPropertyRelative("snapshotOffset").vector2Value = Vector2.zero;
+            entryProperty.FindPropertyRelative("snapshotScale").vector2Value = Vector2.one;
         }
 
-        private void DrawPreview(string path, ImageEntry entry, SerializedProperty entryProperty)
+        private void DrawPreview(ImageEntry entry, SerializedProperty entryProperty)
         {
-            var sprite = Resources.Load<Sprite>(path);
-            if (sprite == null)
+            var path = entryProperty.FindPropertyRelative("resourcePath").stringValue;
+            var composite = entryProperty.FindPropertyRelative("composite").boolValue;
+
+            Texture previewTexture = null;
+            if (composite)
             {
-                EditorGUILayout.HelpBox("Invalid image resource path!", MessageType.Error);
-                return;
+                var poseString = entryProperty.FindPropertyRelative("poseString").stringValue;
+                var entryKey = ImageEntry.CompositeUnlockKey(path, poseString);
+                if (renderTexture == null || previewEntryKey != entryKey)
+                {
+                    var sprites = CompositeSpriteController.LoadPoseSprites(path, poseString);
+                    if (!sprites.Any() || sprites.Contains(null))
+                    {
+                        EditorGUILayout.HelpBox("Invalid image resource path or pose string!", MessageType.Error);
+                        return;
+                    }
+                    if (renderTexture != null)
+                    {
+                        DestroyImmediate(renderTexture);
+                    }
+                    renderTexture = merger.RenderToTexture(sprites, renderCamera);
+                    previewEntryKey = entryKey;
+                }
+                previewTexture = renderTexture;
             }
+            else
+            {
+                var sprite = Resources.Load<Sprite>(path);
+                if (sprite == null)
+                {
+                    EditorGUILayout.HelpBox("Invalid image resource path!", MessageType.Error);
+                    return;
+                }
+                previewTexture = sprite.texture;
+            }
+            var size = new Vector2(previewTexture.width, previewTexture.height);
 
             if (GUILayout.Button("Correct Snapshot Scale Y for Aspect Ratio"))
             {
-                CorrectSnapshotScaleY(entry, sprite.texture, entryProperty);
+                CorrectSnapshotScaleY(size, entryProperty);
             }
 
             if (GUILayout.Button("Correct Snapshot Scale X for Aspect Ratio"))
             {
-                CorrectSnapshotScaleX(entry, sprite.texture, entryProperty);
+                CorrectSnapshotScaleX(size, entryProperty);
             }
 
             if (GUILayout.Button("Reset Snapshot Scale Offset"))
@@ -191,9 +237,9 @@ namespace Nova.Editor
                 ResetSnapshotScaleOffset(entryProperty);
             }
 
-            var height = EditorGUIUtility.currentViewWidth / sprite.texture.width * sprite.texture.height;
+            var height = EditorGUIUtility.currentViewWidth / previewTexture.width * previewTexture.height;
             var rect = EditorGUILayout.GetControlRect(false, height);
-            EditorGUI.DrawPreviewTexture(rect, sprite.texture);
+            EditorGUI.DrawPreviewTexture(rect, previewTexture);
             if (previewDrawSnapshotFrame)
             {
                 DrawPreviewSnapshotFrame(entry, rect);
@@ -210,7 +256,6 @@ namespace Nova.Editor
         {
             var entry = entries.GetArrayElementAtIndex(index);
             EditorGUILayout.PropertyField(entry, true);
-            var path = entry.FindPropertyRelative("resourcePath").stringValue;
             EditorGUILayout.Space();
 
             // preview snapshot frame options
@@ -219,7 +264,7 @@ namespace Nova.Editor
             previewSnapshotFrameLineWidth = EditorGUILayout.Slider("Snapshot Frame Line Width",
                 previewSnapshotFrameLineWidth, 0.5f, 4.0f);
 
-            DrawPreview(path, Target.entries[index], entry);
+            DrawPreview(Target.entries[index], entry);
         }
 
         private static RenderTexture _snapshotRenderTexture;

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace Nova
     public class CompositeSpriteMerger : MonoBehaviour
     {
         public const int MergerLayer = 16;
+        // public const
 
         private readonly List<SpriteRenderer> layers = new List<SpriteRenderer>();
 
@@ -50,8 +52,16 @@ namespace Nova
             EnsureLayers(sprites.Count);
             for (var i = 0; i < sprites.Count; i++)
             {
-                layers[i].sprite = sprites[i].sprite;
-                layers[i].transform.localPosition = sprites[i].offset;
+                if (sprites[i] != null)
+                {
+                    layers[i].sprite = sprites[i].sprite;
+                    layers[i].transform.localPosition = sprites[i].offset;
+                    layers[i].enabled = true;
+                }
+                else
+                {
+                    layers[i].enabled = false;
+                }
             }
         }
 
@@ -63,6 +73,11 @@ namespace Nova
                 layers[i].sprite = other.layers[i].sprite;
                 layers[i].transform.localPosition = other.layers[i].transform.localPosition;
             }
+        }
+
+        public void ClearTextures()
+        {
+            SetTextures(Array.Empty<SpriteWithOffset>());
         }
 
         public void Render(CommandBuffer cmd, int rt)
@@ -80,8 +95,28 @@ namespace Nova
             }
         }
 
-        public static Rect GetMergedSize(IReadOnlyList<SpriteWithOffset> sprites)
+        public RenderTexture RenderToTexture(IReadOnlyList<SpriteWithOffset> sprites, Camera renderCamera)
         {
+            Debug.Log("render to texture");
+            SetTextures(sprites);
+            var bounds = CompositeSpriteMerger.GetMergedSize(sprites);
+            var pixelsPerUnit = sprites[0].sprite.pixelsPerUnit;
+            var size = bounds.size * pixelsPerUnit;
+            var renderTexture = new RenderTexture((int)size.x, (int)size.y, 0, RenderTextureFormat.ARGB32);
+
+            renderCamera.targetTexture = renderTexture;
+            renderCamera.orthographicSize = bounds.size.y / 2;
+            renderCamera.transform.localPosition = new Vector3(bounds.center.x, bounds.center.y, 0);
+
+            renderCamera.Render();
+            ClearTextures();
+
+            return renderTexture;
+        }
+
+        public static Rect GetMergedSize(IReadOnlyList<SpriteWithOffset> spriteList)
+        {
+            var sprites = spriteList.Where(x => x != null);
             if (!sprites.Any())
             {
                 return Rect.zero;
@@ -102,6 +137,30 @@ namespace Nova
             }
 
             return Rect.MinMaxRect(xmin, ymin, xmax, ymax);
+        }
+
+        // used in editor
+        public static GameObject InstantiateSimpleSpriteMerger(string name, out Camera renderCamera, out CompositeSpriteMerger merger)
+        {
+            var root = new GameObject(name)
+            {
+                hideFlags = HideFlags.DontSave
+            };
+            merger = root.Ensure<CompositeSpriteMerger>();
+            merger.runInEditMode = true;
+
+            var camera = new GameObject("Camera");
+            camera.transform.SetParent(root.transform);
+            renderCamera = camera.Ensure<Camera>();
+            renderCamera.cullingMask = 1 << CompositeSpriteMerger.MergerLayer;
+            renderCamera.orthographic = true;
+            renderCamera.enabled = false;
+            renderCamera.nearClipPlane = -1;
+            renderCamera.farClipPlane = 1;
+            renderCamera.clearFlags = CameraClearFlags.SolidColor;
+            renderCamera.backgroundColor = Color.clear;
+
+            return root;
         }
     }
 }
