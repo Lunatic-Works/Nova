@@ -30,16 +30,11 @@ namespace Nova
         }
 
         public string snapshotResourcePath => Path.Combine(
-            Path.GetDirectoryName(resourcePath),
+            composite ? resourcePath : Path.GetDirectoryName(resourcePath),
             "Snapshots",
-            Path.GetFileNameWithoutExtension(resourcePath) + ".__snapshot"
+            (composite ? id : Path.GetFileNameWithoutExtension(resourcePath)) + ".__snapshot"
         );
 
-        public static string CompositeUnlockKey(string path, string poseString)
-        {
-            return Utils.ConvertPathSeparator(Path.Combine(path, poseString));
-        }
-
-        public string unlockKey => composite ? CompositeUnlockKey(resourcePath, poseString) : Utils.ConvertPathSeparator(resourcePath);
+        public string unlockKey => Utils.ConvertPathSeparator(composite ? Path.Combine(resourcePath, poseString) : resourcePath);
     }
 }
