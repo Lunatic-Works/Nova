@@ -12,6 +12,8 @@ namespace Nova
 
     public class CompoundKeyRecorder : MonoBehaviour, IPointerClickHandler
     {
+        private static readonly Regex PathPattern = new Regex(@"^\/?[^\/]*\/", RegexOptions.Compiled);
+
         private static readonly Key[] AllowedKeys =
         {
             Key.A, Key.B, Key.C, Key.D, Key.E, Key.F, Key.G, Key.H, Key.I, Key.J, Key.K, Key.L, Key.M,
@@ -93,18 +95,17 @@ namespace Nova
         private static string GetGeneralPath(InputControl control)
         {
             var path = control.path;
-            var regex = new Regex(@"^\/?[^\/]*\/");
             if (control.device is Mouse)
             {
-                path = regex.Replace(path, "<Mouse>/");
+                path = PathPattern.Replace(path, "<Mouse>/");
             }
             else if (control.device is Gamepad)
             {
-                path = regex.Replace(path, "<Gamepad>/");
+                path = PathPattern.Replace(path, "<Gamepad>/");
             }
             else if (control.device is Keyboard)
             {
-                path = regex.Replace(path, "<Keyboard>/");
+                path = PathPattern.Replace(path, "<Keyboard>/");
             }
 
             return path;

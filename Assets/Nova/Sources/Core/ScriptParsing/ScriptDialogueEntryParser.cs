@@ -1,4 +1,4 @@
-﻿using LuaInterface;
+using LuaInterface;
 using Nova.Script;
 using System;
 using System.Collections.Generic;
@@ -12,12 +12,23 @@ namespace Nova
     public static class ScriptDialogueEntryParser
     {
         private const int PreloadDialogueSteps = 5;
-        private const string LuaCommentPattern = @"--.*";
-        private static Regex LuaCommentPatternRegex = new Regex(LuaCommentPattern, RegexOptions.Compiled);
-        private const string LuaMultilineCommentPattern = @"--\[(=*)\[(.|\n)*?\]\1\]";
-        private static Regex LuaMultilineCommentPatternRegex = new Regex(LuaMultilineCommentPattern, RegexOptions.Compiled);
-        private const string NameDialoguePattern = @"(?<name>.*?)(//(?<hidden>.*?))?(：：|::)(?<dialogue>(.|\n)*)";
-        private static Regex NameDialoguePatternRegex = new Regex(NameDialoguePattern, RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+
+        private static readonly Regex LuaCommentPattern =
+            new Regex(@"--.*", RegexOptions.Compiled);
+
+        private static readonly Regex LuaMultilineCommentPattern =
+            new Regex(@"--\[(=*)\[[^\]]*\]\1\]", RegexOptions.Compiled);
+
+        private static readonly Regex NameDialoguePattern =
+            new Regex(@"(?<name>[^/：:]*)(//(?<hidden>[^：:]*))?(：：|::)(?<dialogue>(.|\n)*)",
+                RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+
+        private static readonly Regex MarkdownCodePattern =
+            new Regex(@"`([^`]*)`", RegexOptions.Compiled);
+
+        private static readonly Regex MarkdownLinkPattern =
+            new Regex(@"\[([^\]]*)\]\(([^\)]*)\)", RegexOptions.Compiled);
+
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
 
@@ -128,16 +139,21 @@ namespace Nova
             unpreloadActions = null;
             checkpointActions = null;
 
-            code = LuaMultilineCommentPatternRegex.Replace(code, "");
-            code = LuaCommentPatternRegex.Replace(code, "");
+            // If you don't use Lua multiline comment, or any Lua comment at all,
+            // you can commit out the following for better performance
+            code = LuaMultilineCommentPattern.Replace(code, "");
+            code = LuaCommentPattern.Replace(code, "");
 
             foreach (var pair in PatternToActionGenerator)
             {
                 if (!string.IsNullOrEmpty(pair.Value.func))
                 {
-                    if (code.IndexOf(pair.Value.func) < 0)
+                    if (code.IndexOf(pair.Value.func, StringComparison.Ordinal) < 0)
+                    {
                         continue;
+                    }
                 }
+
                 var matches = Regex.Matches(code, pair.Key, RegexOptions.ExplicitCapture | RegexOptions.Multiline);
                 foreach (Match match in matches)
                 {
@@ -201,7 +217,7 @@ namespace Nova
         private static void ParseNameDialogue(string text, out string displayName, out string hiddenName,
             out string dialogue)
         {
-            if (text.IndexOf("：：") < 0 && text.IndexOf("::") < 0)
+            if (text.IndexOf("：：", StringComparison.Ordinal) < 0 && text.IndexOf("::", StringComparison.Ordinal) < 0)
             {
                 displayName = "";
                 hiddenName = "";
@@ -209,7 +225,7 @@ namespace Nova
                 return;
             }
 
-            var m = NameDialoguePatternRegex.Match(text);
+            var m = NameDialoguePattern.Match(text);
             if (m.Success)
             {
                 displayName = m.Groups["name"].Value;
@@ -256,8 +272,8 @@ namespace Nova
             // Markdown syntaxes used in tutorials
             // They are not in the NovaScript spec. If they interfere with your scenarios or you have performance concern,
             // you can comment out them.
-            text = Regex.Replace(text, @"`([^`]*)`", @"<style=Code>$1</style>");
-            text = Regex.Replace(text, @"\[([^\]]*)\]\(([^\)]*)\)", @"<link=""$2""><style=Link>$1</style></link>");
+            text = MarkdownCodePattern.Replace(text, @"<style=Code>$1</style>");
+            text = MarkdownLinkPattern.Replace(text, @"<link=""$2""><style=Link>$1</style></link>");
 
             // Debug.Log($"text: <color=green>{text}</color>");
             return text;
