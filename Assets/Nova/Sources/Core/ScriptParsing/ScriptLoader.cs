@@ -79,7 +79,8 @@ namespace Nova
             stateLocale = I18n.DefaultLocale;
             lazyBindingLinks = new List<LazyBindingEntry>();
 
-            // requires.lua is executed and ScriptDialogueEntryParser.PatternToActionGenerator is filled before calling ParseScript()
+            ScriptDialogueEntryParser.ClearPatterns();
+            // requires.lua is executed and ScriptDialogueEntryParser.ActionGenerators is filled before calling ParseScript()
             LuaRuntime.Instance.BindObject("scriptLoader", this);
             LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Eager, DialogueActionStage.Default, false));
             InitOnlyIncludedNames();
