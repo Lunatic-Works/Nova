@@ -62,14 +62,15 @@ namespace Nova
             }
         }
 
-        private List<LazyBindingEntry> lazyBindingLinks;
+        private readonly List<LazyBindingEntry> lazyBindingLinks = new List<LazyBindingEntry>();
 
-        private HashSet<string> onlyIncludedNames;
+        private readonly HashSet<string> onlyIncludedNames = new HashSet<string>();
 
         private void InitOnlyIncludedNames()
         {
             var table = LuaRuntime.Instance.GetTable("only_included_scenario_names");
-            onlyIncludedNames = new HashSet<string>(table.ToArray().Cast<string>());
+            onlyIncludedNames.Clear();
+            onlyIncludedNames.UnionWith(table.ToArray().Cast<string>());
             table.Dispose();
         }
 
@@ -77,7 +78,7 @@ namespace Nova
         {
             currentNode = null;
             stateLocale = I18n.DefaultLocale;
-            lazyBindingLinks = new List<LazyBindingEntry>();
+            lazyBindingLinks.Clear();
 
             ScriptDialogueEntryParser.ClearPatterns();
             // requires.lua is executed and ScriptDialogueEntryParser.ActionGenerators is filled before calling ParseScript()
@@ -264,7 +265,7 @@ namespace Nova
             }
 
             // Remove unnecessary reference
-            lazyBindingLinks = null;
+            lazyBindingLinks.Clear();
         }
 
         /// <summary>

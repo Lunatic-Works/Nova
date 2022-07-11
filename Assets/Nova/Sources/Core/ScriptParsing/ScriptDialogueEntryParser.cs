@@ -123,8 +123,8 @@ namespace Nova
             ActionGenerators.Add(new ActionGenerator(
                 funcName,
                 $@"(^|[\s\(:]){funcName}(\(|\s*,)",
-                groups => $"preload({objName}, '{resource}')\n",
-                groups => $"unpreload({objName}, '{resource}')\n"
+                _ => $"preload({objName}, '{resource}')\n",
+                _ => $"unpreload({objName}, '{resource}')\n"
             ));
         }
 
@@ -149,12 +149,12 @@ namespace Nova
             ));
         }
 
-        private static void GenerateActions(string code, out StringBuilder preloadActions,
-            out StringBuilder unpreloadActions, out StringBuilder checkpointActions)
+        private static void GenerateActions(string code, StringBuilder preloadActions, StringBuilder unpreloadActions,
+            StringBuilder checkpointActions)
         {
-            preloadActions = null;
-            unpreloadActions = null;
-            checkpointActions = null;
+            preloadActions.Clear();
+            unpreloadActions.Clear();
+            checkpointActions.Clear();
 
             // If you don't use Lua multiline comment, or any Lua comment at all,
             // you can commit out the following for better performance
@@ -173,31 +173,16 @@ namespace Nova
                 {
                     if (generator.preload != null)
                     {
-                        if (preloadActions == null)
-                        {
-                            preloadActions = new StringBuilder();
-                        }
-
                         preloadActions.Append(generator.preload.Invoke(match.Groups));
                     }
 
                     if (generator.unpreload != null)
                     {
-                        if (unpreloadActions == null)
-                        {
-                            unpreloadActions = new StringBuilder();
-                        }
-
                         unpreloadActions.Append(generator.unpreload.Invoke(match.Groups));
                     }
 
                     if (generator.checkpoint != null)
                     {
-                        if (checkpointActions == null)
-                        {
-                            checkpointActions = new StringBuilder();
-                        }
-
                         checkpointActions.Append(generator.checkpoint.Invoke(match.Groups));
                     }
                 }
@@ -215,15 +200,13 @@ namespace Nova
                 return;
             }
 
-            var old = codeBuilders[index];
-            if (old == null || old.Length == 0)
+            var codeBuilder = codeBuilders[index];
+            if (codeBuilder == null)
             {
-                codeBuilders[index] = actions;
+                codeBuilders[index] = codeBuilder = new StringBuilder();
             }
-            else
-            {
-                codeBuilders[index] = old.Append(actions);
-            }
+
+            codeBuilder.Append(actions);
         }
 
         private static void ParseNameDialogue(string text, out string displayName, out string hiddenName,
@@ -343,6 +326,10 @@ namespace Nova
         private static void PatchDefaultActionCode(IReadOnlyDictionary<DialogueActionStage, string[]> codes,
             IReadOnlyList<string> characterNames)
         {
+            var preloadActions = new StringBuilder();
+            var unpreloadActions = new StringBuilder();
+            var checkpointActions = new StringBuilder();
+
             var codeBuilders = new StringBuilder[characterNames.Count];
             for (var i = 0; i < characterNames.Count; ++i)
             {
@@ -360,8 +347,7 @@ namespace Nova
                     codeBuilder.Append("\n-- End original code block\n");
                     codeBuilders[i] = codeBuilder;
 
-                    GenerateActions(code, out StringBuilder preloadActions, out StringBuilder unpreloadActions,
-                        out StringBuilder checkpointActions);
+                    GenerateActions(code, preloadActions, unpreloadActions, checkpointActions);
                     AppendActions(codeBuilders, Math.Max(i - PreloadDialogueSteps, 0), preloadActions);
                     AppendActions(codeBuilders, i, unpreloadActions);
 
@@ -389,7 +375,7 @@ namespace Nova
                 patchBuilder.AppendFormat(ActionAfterLazyBlock, characterName);
 
                 var patchedCode = patchBuilder.ToString().Trim();
-                // Debug.Log($"patchBuilder: <color=orange>{patchedCode}</color>");
+                // Debug.Log($"patchedCode: <color=orange>{patchedCode}</color>");
                 codes[DialogueActionStage.Default][i] = patchedCode;
             }
         }
