@@ -57,6 +57,11 @@ namespace Nova
 
         private static readonly List<ActionGenerator> ActionGenerators = new List<ActionGenerator>();
 
+        public static void ClearPatterns()
+        {
+            ActionGenerators.Clear();
+        }
+
         // Generate `preload(obj, 'resource')` when matching `func(obj, 'resource', ...)` or `...(func, obj, 'resource', ...)`
         // TODO: handle line break in patterns
         public static void AddPattern(string funcName)
