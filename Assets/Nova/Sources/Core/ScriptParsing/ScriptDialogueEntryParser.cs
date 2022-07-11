@@ -8,6 +8,8 @@ using System.Text.RegularExpressions;
 
 namespace Nova
 {
+    using ActionGeneratorEntry = Func<GroupCollection, string>;
+
     [ExportCustomType]
     public static class ScriptDialogueEntryParser
     {
@@ -32,104 +34,114 @@ namespace Nova
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
 
-        private class ActionGenerators
+        private class ActionGenerator
         {
-            public string func;
-            public Func<GroupCollection, string> preload;
-            public Func<GroupCollection, string> unpreload;
-            public Func<GroupCollection, string> checkpoint;
+            public readonly string func;
+            public readonly Regex pattern;
+            public readonly ActionGeneratorEntry preload;
+            public readonly ActionGeneratorEntry unpreload;
+            public readonly ActionGeneratorEntry checkpoint;
+
+            public ActionGenerator(string func, string pattern, ActionGeneratorEntry preload,
+                ActionGeneratorEntry unpreload, ActionGeneratorEntry checkpoint = null)
+
+            {
+                this.func = func;
+                this.pattern = new Regex(pattern,
+                    RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Multiline);
+                this.preload = preload;
+                this.unpreload = unpreload;
+                this.checkpoint = checkpoint;
+            }
         }
 
-        private static readonly Dictionary<string, ActionGenerators> PatternToActionGenerator =
-            new Dictionary<string, ActionGenerators>();
+        private static readonly List<ActionGenerator> ActionGenerators = new List<ActionGenerator>();
 
         // Generate `preload(obj, 'resource')` when matching `func(obj, 'resource', ...)` or `...(func, obj, 'resource', ...)`
         // TODO: handle line break in patterns
         public static void AddPattern(string funcName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*(?<res>['""][^'""]+['""])";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                func = funcName,
-                preload = groups => $"preload({groups["obj"].Value}, {groups["res"].Value})\n",
-                unpreload = groups => $"unpreload({groups["obj"].Value}, {groups["res"].Value})\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*(?<res>['""][^'""]+['""])",
+                groups => $"preload({groups["obj"].Value}, {groups["res"].Value})\n",
+                groups => $"unpreload({groups["obj"].Value}, {groups["res"].Value})\n"
+            ));
         }
 
         // Generate `preload(obj, 'resource')` when matching `func('resource', ...)` or `...(func, 'resource', ...)`
         public static void AddPatternWithObject(string funcName, string objName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<res>['""][^'""]+['""])";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                func = funcName,
-                preload = groups => $"preload({objName}, {groups["res"].Value})\n",
-                unpreload = groups => $"unpreload({objName}, {groups["res"].Value})\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<res>['""][^'""]+['""])",
+                groups => $"preload({objName}, {groups["res"].Value})\n",
+                groups => $"unpreload({objName}, {groups["res"].Value})\n"
+            ));
         }
 
         // Generate `preload(obj, 'resource_1')\npreload(obj, 'resource_2')\n...`
         // when matching `func(obj, {'resource_1', 'resource_2', ...}, ...)` or `...(func, obj, {'resource_1', 'resource_2', ...}, ...)`
         public static void AddPatternForTable(string funcName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*\{{(?<res>[^\}}]+)\}}";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                func = funcName,
-                preload = groups => string.Concat(
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*\{{(?<res>[^\}}]+)\}}",
+                groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"preload({groups["obj"].Value}, {res})\n")
                 ),
-                unpreload = groups => string.Concat(
+                groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"unpreload({groups["obj"].Value}, {res})\n")
                 )
-            };
+            ));
         }
 
         // Generate `preload(obj, 'resource_1')\npreload(obj, 'resource_2')\n...`
         // when matching `func({'resource_1', 'resource_2', ...}, ...)` or `...(func, {'resource_1', 'resource_2', ...}, ...)`
         public static void AddPatternWithObjectForTable(string funcName, string objName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*\{{(?<res>[^\}}]+)\}}";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                func = funcName,
-                preload = groups => string.Concat(
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*\{{(?<res>[^\}}]+)\}}",
+                groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"preload({objName}, {res})\n")
                 ),
-                unpreload = groups => string.Concat(
+                groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"unpreload({objName}, {res})\n")
                 )
-            };
+            ));
         }
 
         // Generate `preload(obj, 'resource')` when matching `func(...)` or `...(func, ...)`
         public static void AddPatternWithObjectAndResource(string funcName, string objName, string resource)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                func = funcName,
-                preload = groups => $"preload({objName}, '{resource}')\n",
-                unpreload = groups => $"unpreload({objName}, '{resource}')\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)",
+                groups => $"preload({objName}, '{resource}')\n",
+                groups => $"unpreload({objName}, '{resource}')\n"
+            ));
         }
 
         public static void AddCheckpointPattern(string triggeringFuncName, string yieldingFuncName)
         {
-            string pattern = $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                checkpoint = _ => $"{yieldingFuncName}()\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                triggeringFuncName,
+                $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)",
+                null,
+                null,
+                _ => $"{yieldingFuncName}()\n"
+            ));
         }
 
         public static void AddCheckpointNextPattern(string triggeringFuncName, string yieldingFuncName)
         {
-            string pattern = $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                unpreload = _ => $"{yieldingFuncName}()\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                triggeringFuncName,
+                $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)",
+                null,
+                _ => $"{yieldingFuncName}()\n"
+            ));
         }
 
         private static void GenerateActions(string code, out StringBuilder preloadActions,
@@ -144,49 +156,44 @@ namespace Nova
             code = LuaMultilineCommentPattern.Replace(code, "");
             code = LuaCommentPattern.Replace(code, "");
 
-            foreach (var pair in PatternToActionGenerator)
+            foreach (var generator in ActionGenerators)
             {
-                if (!string.IsNullOrEmpty(pair.Value.func))
+                if (code.IndexOf(generator.func, StringComparison.Ordinal) < 0)
                 {
-                    if (code.IndexOf(pair.Value.func, StringComparison.Ordinal) < 0)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
-                var matches = Regex.Matches(code, pair.Key, RegexOptions.ExplicitCapture | RegexOptions.Multiline);
+                var matches = generator.pattern.Matches(code);
                 foreach (Match match in matches)
                 {
-                    var generators = pair.Value;
-
-                    if (generators.preload != null)
+                    if (generator.preload != null)
                     {
                         if (preloadActions == null)
                         {
                             preloadActions = new StringBuilder();
                         }
 
-                        preloadActions.Append(generators.preload.Invoke(match.Groups));
+                        preloadActions.Append(generator.preload.Invoke(match.Groups));
                     }
 
-                    if (generators.unpreload != null)
+                    if (generator.unpreload != null)
                     {
                         if (unpreloadActions == null)
                         {
                             unpreloadActions = new StringBuilder();
                         }
 
-                        unpreloadActions.Append(generators.unpreload.Invoke(match.Groups));
+                        unpreloadActions.Append(generator.unpreload.Invoke(match.Groups));
                     }
 
-                    if (generators.checkpoint != null)
+                    if (generator.checkpoint != null)
                     {
                         if (checkpointActions == null)
                         {
                             checkpointActions = new StringBuilder();
                         }
 
-                        checkpointActions.Append(generators.checkpoint.Invoke(match.Groups));
+                        checkpointActions.Append(generator.checkpoint.Invoke(match.Groups));
                     }
                 }
             }
