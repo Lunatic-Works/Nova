@@ -13,13 +13,17 @@ namespace Nova
     {
         private const int PreloadDialogueSteps = 5;
         private const string LuaCommentPattern = @"--.*";
+        private static Regex LuaCommentPatternRegex = new Regex(LuaCommentPattern, RegexOptions.Compiled);
         private const string LuaMultilineCommentPattern = @"--\[(=*)\[(.|\n)*?\]\1\]";
+        private static Regex LuaMultilineCommentPatternRegex = new Regex(LuaMultilineCommentPattern, RegexOptions.Compiled);
         private const string NameDialoguePattern = @"(?<name>.*?)(//(?<hidden>.*?))?(：：|::)(?<dialogue>(.|\n)*)";
+        private static Regex NameDialoguePatternRegex = new Regex(NameDialoguePattern, RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
 
         private class ActionGenerators
         {
+            public string func;
             public Func<GroupCollection, string> preload;
             public Func<GroupCollection, string> unpreload;
             public Func<GroupCollection, string> checkpoint;
@@ -35,6 +39,7 @@ namespace Nova
             string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*(?<res>['""][^'""]+['""])";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
+                func = funcName,
                 preload = groups => $"preload({groups["obj"].Value}, {groups["res"].Value})\n",
                 unpreload = groups => $"unpreload({groups["obj"].Value}, {groups["res"].Value})\n"
             };
@@ -46,6 +51,7 @@ namespace Nova
             string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<res>['""][^'""]+['""])";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
+                func = funcName,
                 preload = groups => $"preload({objName}, {groups["res"].Value})\n",
                 unpreload = groups => $"unpreload({objName}, {groups["res"].Value})\n"
             };
@@ -58,6 +64,7 @@ namespace Nova
             string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*\{{(?<res>[^\}}]+)\}}";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
+                func = funcName,
                 preload = groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"preload({groups["obj"].Value}, {res})\n")
                 ),
@@ -74,6 +81,7 @@ namespace Nova
             string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*\{{(?<res>[^\}}]+)\}}";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
+                func = funcName,
                 preload = groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"preload({objName}, {res})\n")
                 ),
@@ -89,6 +97,7 @@ namespace Nova
             string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)";
             PatternToActionGenerator[pattern] = new ActionGenerators
             {
+                func = funcName,
                 preload = groups => $"preload({objName}, '{resource}')\n",
                 unpreload = groups => $"unpreload({objName}, '{resource}')\n"
             };
@@ -119,11 +128,16 @@ namespace Nova
             unpreloadActions = null;
             checkpointActions = null;
 
-            code = Regex.Replace(code, LuaMultilineCommentPattern, "");
-            code = Regex.Replace(code, LuaCommentPattern, "");
+            code = LuaMultilineCommentPatternRegex.Replace(code, "");
+            code = LuaCommentPatternRegex.Replace(code, "");
 
             foreach (var pair in PatternToActionGenerator)
             {
+                if (!string.IsNullOrEmpty(pair.Value.func))
+                {
+                    if (code.IndexOf(pair.Value.func) < 0)
+                        continue;
+                }
                 var matches = Regex.Matches(code, pair.Key, RegexOptions.ExplicitCapture | RegexOptions.Multiline);
                 foreach (Match match in matches)
                 {
@@ -187,7 +201,15 @@ namespace Nova
         private static void ParseNameDialogue(string text, out string displayName, out string hiddenName,
             out string dialogue)
         {
-            var m = Regex.Match(text, NameDialoguePattern, RegexOptions.ExplicitCapture);
+            if (text.IndexOf("：：") < 0 && text.IndexOf("::") < 0)
+            {
+                displayName = "";
+                hiddenName = "";
+                dialogue = text;
+                return;
+            }
+
+            var m = NameDialoguePatternRegex.Match(text);
             if (m.Success)
             {
                 displayName = m.Groups["name"].Value;
