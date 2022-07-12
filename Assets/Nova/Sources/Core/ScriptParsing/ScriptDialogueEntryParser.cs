@@ -1,4 +1,4 @@
-﻿using LuaInterface;
+using LuaInterface;
 using Nova.Script;
 using System;
 using System.Collections.Generic;
@@ -8,155 +8,182 @@ using System.Text.RegularExpressions;
 
 namespace Nova
 {
+    using ActionGeneratorEntry = Func<GroupCollection, string>;
+
     [ExportCustomType]
     public static class ScriptDialogueEntryParser
     {
         private const int PreloadDialogueSteps = 5;
-        private const string LuaCommentPattern = @"--.*";
-        private const string LuaMultilineCommentPattern = @"--\[(=*)\[(.|\n)*?\]\1\]";
-        private const string NameDialoguePattern = @"(?<name>.*?)(//(?<hidden>.*?))?(：：|::)(?<dialogue>(.|\n)*)";
+
+        private static readonly Regex LuaCommentPattern =
+            new Regex(@"--.*", RegexOptions.Compiled);
+
+        private static readonly Regex LuaMultilineCommentPattern =
+            new Regex(@"--\[(=*)\[[^\]]*\]\1\]", RegexOptions.Compiled);
+
+        private static readonly Regex NameDialoguePattern =
+            new Regex(@"(?<name>[^/：:]*)(//(?<hidden>[^：:]*))?(：：|::)(?<dialogue>(.|\n)*)",
+                RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+
+        private static readonly Regex MarkdownCodePattern =
+            new Regex(@"`([^`]*)`", RegexOptions.Compiled);
+
+        private static readonly Regex MarkdownLinkPattern =
+            new Regex(@"\[([^\]]*)\]\(([^\)]*)\)", RegexOptions.Compiled);
+
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
 
-        private class ActionGenerators
+        private class ActionGenerator
         {
-            public Func<GroupCollection, string> preload;
-            public Func<GroupCollection, string> unpreload;
-            public Func<GroupCollection, string> checkpoint;
+            public readonly string func;
+            public readonly Regex pattern;
+            public readonly ActionGeneratorEntry preload;
+            public readonly ActionGeneratorEntry unpreload;
+            public readonly ActionGeneratorEntry checkpoint;
+
+            public ActionGenerator(string func, string pattern, ActionGeneratorEntry preload,
+                ActionGeneratorEntry unpreload, ActionGeneratorEntry checkpoint = null)
+
+            {
+                this.func = func;
+                this.pattern = new Regex(pattern,
+                    RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Multiline);
+                this.preload = preload;
+                this.unpreload = unpreload;
+                this.checkpoint = checkpoint;
+            }
         }
 
-        private static readonly Dictionary<string, ActionGenerators> PatternToActionGenerator =
-            new Dictionary<string, ActionGenerators>();
+        private static readonly List<ActionGenerator> ActionGenerators = new List<ActionGenerator>();
+
+        public static void ClearPatterns()
+        {
+            ActionGenerators.Clear();
+        }
 
         // Generate `preload(obj, 'resource')` when matching `func(obj, 'resource', ...)` or `...(func, obj, 'resource', ...)`
         // TODO: handle line break in patterns
         public static void AddPattern(string funcName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*(?<res>['""][^'""]+['""])";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                preload = groups => $"preload({groups["obj"].Value}, {groups["res"].Value})\n",
-                unpreload = groups => $"unpreload({groups["obj"].Value}, {groups["res"].Value})\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*(?<res>['""][^'""]+['""])",
+                groups => $"preload({groups["obj"].Value}, {groups["res"].Value})\n",
+                groups => $"unpreload({groups["obj"].Value}, {groups["res"].Value})\n"
+            ));
         }
 
         // Generate `preload(obj, 'resource')` when matching `func('resource', ...)` or `...(func, 'resource', ...)`
         public static void AddPatternWithObject(string funcName, string objName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<res>['""][^'""]+['""])";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                preload = groups => $"preload({objName}, {groups["res"].Value})\n",
-                unpreload = groups => $"unpreload({objName}, {groups["res"].Value})\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<res>['""][^'""]+['""])",
+                groups => $"preload({objName}, {groups["res"].Value})\n",
+                groups => $"unpreload({objName}, {groups["res"].Value})\n"
+            ));
         }
 
         // Generate `preload(obj, 'resource_1')\npreload(obj, 'resource_2')\n...`
         // when matching `func(obj, {'resource_1', 'resource_2', ...}, ...)` or `...(func, obj, {'resource_1', 'resource_2', ...}, ...)`
         public static void AddPatternForTable(string funcName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*\{{(?<res>[^\}}]+)\}}";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                preload = groups => string.Concat(
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*(?<obj>[^\s,]+)\s*,\s*\{{(?<res>[^\}}]+)\}}",
+                groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"preload({groups["obj"].Value}, {res})\n")
                 ),
-                unpreload = groups => string.Concat(
+                groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"unpreload({groups["obj"].Value}, {res})\n")
                 )
-            };
+            ));
         }
 
         // Generate `preload(obj, 'resource_1')\npreload(obj, 'resource_2')\n...`
         // when matching `func({'resource_1', 'resource_2', ...}, ...)` or `...(func, {'resource_1', 'resource_2', ...}, ...)`
         public static void AddPatternWithObjectForTable(string funcName, string objName)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*\{{(?<res>[^\}}]+)\}}";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                preload = groups => string.Concat(
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)\s*\{{(?<res>[^\}}]+)\}}",
+                groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"preload({objName}, {res})\n")
                 ),
-                unpreload = groups => string.Concat(
+                groups => string.Concat(
                     groups["res"].Value.Split(',').Select(res => $"unpreload({objName}, {res})\n")
                 )
-            };
+            ));
         }
 
         // Generate `preload(obj, 'resource')` when matching `func(...)` or `...(func, ...)`
         public static void AddPatternWithObjectAndResource(string funcName, string objName, string resource)
         {
-            string pattern = $@"(^|[\s\(:]){funcName}(\(|\s*,)";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                preload = groups => $"preload({objName}, '{resource}')\n",
-                unpreload = groups => $"unpreload({objName}, '{resource}')\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                funcName,
+                $@"(^|[\s\(:]){funcName}(\(|\s*,)",
+                _ => $"preload({objName}, '{resource}')\n",
+                _ => $"unpreload({objName}, '{resource}')\n"
+            ));
         }
 
         public static void AddCheckpointPattern(string triggeringFuncName, string yieldingFuncName)
         {
-            string pattern = $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                checkpoint = _ => $"{yieldingFuncName}()\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                triggeringFuncName,
+                $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)",
+                null,
+                null,
+                _ => $"{yieldingFuncName}()\n"
+            ));
         }
 
         public static void AddCheckpointNextPattern(string triggeringFuncName, string yieldingFuncName)
         {
-            string pattern = $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)";
-            PatternToActionGenerator[pattern] = new ActionGenerators
-            {
-                unpreload = _ => $"{yieldingFuncName}()\n"
-            };
+            ActionGenerators.Add(new ActionGenerator(
+                triggeringFuncName,
+                $@"(^|[\s\(:]){triggeringFuncName}(\(|\s*,)",
+                null,
+                _ => $"{yieldingFuncName}()\n"
+            ));
         }
 
-        private static void GenerateActions(string code, out StringBuilder preloadActions,
-            out StringBuilder unpreloadActions, out StringBuilder checkpointActions)
+        private static void GenerateActions(string code, StringBuilder preloadActions, StringBuilder unpreloadActions,
+            StringBuilder checkpointActions)
         {
-            preloadActions = null;
-            unpreloadActions = null;
-            checkpointActions = null;
+            preloadActions.Clear();
+            unpreloadActions.Clear();
+            checkpointActions.Clear();
 
-            code = Regex.Replace(code, LuaMultilineCommentPattern, "");
-            code = Regex.Replace(code, LuaCommentPattern, "");
+            // If you don't use Lua multiline comment, or any Lua comment at all,
+            // you can commit out the following for better performance
+            code = LuaMultilineCommentPattern.Replace(code, "");
+            code = LuaCommentPattern.Replace(code, "");
 
-            foreach (var pair in PatternToActionGenerator)
+            foreach (var generator in ActionGenerators)
             {
-                var matches = Regex.Matches(code, pair.Key, RegexOptions.ExplicitCapture | RegexOptions.Multiline);
+                if (code.IndexOf(generator.func, StringComparison.Ordinal) < 0)
+                {
+                    continue;
+                }
+
+                var matches = generator.pattern.Matches(code);
                 foreach (Match match in matches)
                 {
-                    var generators = pair.Value;
-
-                    if (generators.preload != null)
+                    if (generator.preload != null)
                     {
-                        if (preloadActions == null)
-                        {
-                            preloadActions = new StringBuilder();
-                        }
-
-                        preloadActions.Append(generators.preload.Invoke(match.Groups));
+                        preloadActions.Append(generator.preload.Invoke(match.Groups));
                     }
 
-                    if (generators.unpreload != null)
+                    if (generator.unpreload != null)
                     {
-                        if (unpreloadActions == null)
-                        {
-                            unpreloadActions = new StringBuilder();
-                        }
-
-                        unpreloadActions.Append(generators.unpreload.Invoke(match.Groups));
+                        unpreloadActions.Append(generator.unpreload.Invoke(match.Groups));
                     }
 
-                    if (generators.checkpoint != null)
+                    if (generator.checkpoint != null)
                     {
-                        if (checkpointActions == null)
-                        {
-                            checkpointActions = new StringBuilder();
-                        }
-
-                        checkpointActions.Append(generators.checkpoint.Invoke(match.Groups));
+                        checkpointActions.Append(generator.checkpoint.Invoke(match.Groups));
                     }
                 }
             }
@@ -173,21 +200,27 @@ namespace Nova
                 return;
             }
 
-            var old = codeBuilders[index];
-            if (old == null || old.Length == 0)
+            var codeBuilder = codeBuilders[index];
+            if (codeBuilder == null)
             {
-                codeBuilders[index] = actions;
+                codeBuilders[index] = codeBuilder = new StringBuilder();
             }
-            else
-            {
-                codeBuilders[index] = old.Append(actions);
-            }
+
+            codeBuilder.Append(actions);
         }
 
         private static void ParseNameDialogue(string text, out string displayName, out string hiddenName,
             out string dialogue)
         {
-            var m = Regex.Match(text, NameDialoguePattern, RegexOptions.ExplicitCapture);
+            if (text.IndexOf("：：", StringComparison.Ordinal) < 0 && text.IndexOf("::", StringComparison.Ordinal) < 0)
+            {
+                displayName = "";
+                hiddenName = "";
+                dialogue = text;
+                return;
+            }
+
+            var m = NameDialoguePattern.Match(text);
             if (m.Success)
             {
                 displayName = m.Groups["name"].Value;
@@ -234,8 +267,8 @@ namespace Nova
             // Markdown syntaxes used in tutorials
             // They are not in the NovaScript spec. If they interfere with your scenarios or you have performance concern,
             // you can comment out them.
-            text = Regex.Replace(text, @"`([^`]*)`", @"<style=Code>$1</style>");
-            text = Regex.Replace(text, @"\[([^\]]*)\]\(([^\)]*)\)", @"<link=""$2""><style=Link>$1</style></link>");
+            text = MarkdownCodePattern.Replace(text, @"<style=Code>$1</style>");
+            text = MarkdownLinkPattern.Replace(text, @"<link=""$2""><style=Link>$1</style></link>");
 
             // Debug.Log($"text: <color=green>{text}</color>");
             return text;
@@ -293,6 +326,10 @@ namespace Nova
         private static void PatchDefaultActionCode(IReadOnlyDictionary<DialogueActionStage, string[]> codes,
             IReadOnlyList<string> characterNames)
         {
+            var preloadActions = new StringBuilder();
+            var unpreloadActions = new StringBuilder();
+            var checkpointActions = new StringBuilder();
+
             var codeBuilders = new StringBuilder[characterNames.Count];
             for (var i = 0; i < characterNames.Count; ++i)
             {
@@ -310,8 +347,7 @@ namespace Nova
                     codeBuilder.Append("\n-- End original code block\n");
                     codeBuilders[i] = codeBuilder;
 
-                    GenerateActions(code, out StringBuilder preloadActions, out StringBuilder unpreloadActions,
-                        out StringBuilder checkpointActions);
+                    GenerateActions(code, preloadActions, unpreloadActions, checkpointActions);
                     AppendActions(codeBuilders, Math.Max(i - PreloadDialogueSteps, 0), preloadActions);
                     AppendActions(codeBuilders, i, unpreloadActions);
 
@@ -339,7 +375,7 @@ namespace Nova
                 patchBuilder.AppendFormat(ActionAfterLazyBlock, characterName);
 
                 var patchedCode = patchBuilder.ToString().Trim();
-                // Debug.Log($"patchBuilder: <color=orange>{patchedCode}</color>");
+                // Debug.Log($"patchedCode: <color=orange>{patchedCode}</color>");
                 codes[DialogueActionStage.Default][i] = patchedCode;
             }
         }
