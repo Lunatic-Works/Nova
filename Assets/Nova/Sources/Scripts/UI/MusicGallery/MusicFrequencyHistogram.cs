@@ -35,7 +35,7 @@ namespace Nova
             currentSpeed = new float[logSegments];
             frequencyBase = Mathf.Pow(frequencySampleCount, 1.0f / logSegments);
             image = GetComponent<Image>();
-            image.material = material = new Material(Shader.Find("Nova/UI/Histogram"));
+            material = image.material;
             audioSource = GetComponentInParent<MusicGalleryPlayer>().audioSource;
         }
 

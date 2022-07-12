@@ -128,7 +128,6 @@ namespace Nova
         {
             UpdateUnlockedMusics();
             RefreshMusicListView();
-            RefreshMusicPlayer();
         }
 
         private static bool IsUnlocked(MusicListEntry entry)
@@ -145,12 +144,17 @@ namespace Nova
         {
             var unlockInfo = checkpointManager.Get(MusicUnlockStatusKey, new MusicUnlockInfo());
             unlockedMusics = new List<MusicListEntry>();
+            musicPlayer.musicList = null;
             foreach (var music in allMusics)
             {
                 if (IsUnlocked(unlockInfo, music.entry))
                 {
                     music.index = unlockedMusics.Count;
                     unlockedMusics.Add(music);
+                    if (musicPlayer.musicList == null)
+                    {
+                        musicPlayer.musicList = GetMusicList(music);
+                    }
                 }
                 else
                 {
