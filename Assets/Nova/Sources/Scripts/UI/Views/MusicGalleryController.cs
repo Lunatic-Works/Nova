@@ -33,8 +33,8 @@ namespace Nova
         // The indices of locked entries are -1
         private const int LockedIndex = -1;
 
-        private List<MusicListEntry> allMusics;
-        private List<MusicListEntry> unlockedMusics;
+        private readonly List<MusicListEntry> allMusics = new List<MusicListEntry>();
+        private readonly List<MusicListEntry> unlockedMusics = new List<MusicListEntry>();
 
         private MusicListMode _mode = MusicListMode.Sequential;
 
@@ -97,7 +97,7 @@ namespace Nova
             base.Awake();
 
             checkpointManager = Utils.FindNovaGameController().CheckpointManager;
-            allMusics = musicList.entries.Select(entry => new MusicListEntry(LockedIndex, entry)).ToList();
+            allMusics.AddRange(musicList.entries.Select(entry => new MusicListEntry(LockedIndex, entry)));
         }
 
         protected override void Start()
@@ -144,8 +144,7 @@ namespace Nova
         private void UpdateUnlockedMusics()
         {
             var unlockInfo = checkpointManager.Get(MusicUnlockStatusKey, new MusicUnlockInfo());
-            unlockedMusics = new List<MusicListEntry>();
-            musicPlayer.musicList = null;
+            unlockedMusics.Clear();
             foreach (var music in allMusics)
             {
                 if (IsUnlocked(unlockInfo, music.entry))
@@ -162,6 +161,8 @@ namespace Nova
                     music.index = LockedIndex;
                 }
             }
+
+            RefreshMusicPlayer();
         }
 
         private void ClearMusicListView()

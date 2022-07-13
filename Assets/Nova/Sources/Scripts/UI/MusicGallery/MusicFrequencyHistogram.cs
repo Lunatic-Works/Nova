@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
+    [RequireComponent(typeof(Image))]
     public class MusicFrequencyHistogram : MonoBehaviour
     {
         [Range(6, 10)] public int sampleResolution = 8;
@@ -39,6 +40,13 @@ namespace Nova
             audioSource = GetComponentInParent<MusicGalleryPlayer>().audioSource;
         }
 
+        private void OnDisable()
+        {
+            Array.Clear(accLogFrequencies, 0, accLogFrequencies.Length);
+            Array.Clear(currentSpeed, 0, currentSpeed.Length);
+            material.SetFloatArray(SegmentsID, accLogFrequencies);
+        }
+
         private float GetInterpolatedFrequency(float index)
         {
             Assert.IsTrue(index >= 0);
@@ -50,7 +58,7 @@ namespace Nova
 
         private void UpdateLogFrequencies()
         {
-            var rangeA = 0f;
+            var rangeA = 0.0f;
             var rangeB = frequencyBase - 1;
             Array.Clear(logFrequencies, 0, logFrequencies.Length);
             for (var i = 0; i < logFrequencies.Length; i++)
@@ -106,9 +114,8 @@ namespace Nova
 
             for (var i = 0; i < accLogFrequencies.Length; i++)
             {
-                accLogFrequencies[i] = Mathf.SmoothDamp(
-                    accLogFrequencies[i],
-                    logFrequencies[i], ref currentSpeed[i], smoothTime);
+                accLogFrequencies[i] = Mathf.SmoothDamp(accLogFrequencies[i], logFrequencies[i], ref currentSpeed[i],
+                    smoothTime);
             }
 
             material.SetInt(SegmentCountID, accLogFrequencies.Length - 1);
