@@ -19,7 +19,14 @@ namespace Nova.Script
             line = 1;
             column = 1;
             index = 0;
+            
+            next = new Token();
             ParseNext();
+        }
+
+        public string SubString(int start, int length)
+        {
+            return text.Substring(start, length);
         }
 
         private string TakeString(int length)
@@ -32,6 +39,40 @@ namespace Nova.Script
 
             return str;
         }
+        
+        private void AdvanceString(int length)
+        {
+            for (var i = 0; i < length; i++)
+            {
+                // Advance counters
+                index += 1;
+                column += 1;
+                if (index >= text.Length)
+                    break;
+                if (text[index] == '\n')
+                {
+                    column = 1;
+                    line += 1;
+                }
+            }
+        }
+        
+        private void AdvanceStringTill(char c)
+        {
+            while (text[index] != c)
+            {
+                // Advance counters
+                index += 1;
+                column += 1;
+                if (index >= text.Length)
+                    break;
+                if (text[index] == '\n')
+                {
+                    column = 1;
+                    line += 1;
+                }
+            }
+        }
 
         private char TakeChar()
         {
@@ -42,12 +83,12 @@ namespace Nova.Script
             }
 
             // Advance counters
-            ++index;
-            ++column;
+            index += 1;
+            column += 1;
             if (c == '\n')
             {
                 column = 1;
-                ++line;
+                line += 1;
             }
 
             return c;
@@ -68,24 +109,21 @@ namespace Nova.Script
         {
             while (Peek().type == TokenType.WhiteSpace)
             {
-                Take();
+                ParseNext();
             }
         }
 
-        public string TakeIdentifier()
+        public void AdvanceIdentifier()
         {
-            var sb = new StringBuilder();
             while (Peek().type == TokenType.Character)
             {
-                sb.Append(Take().text);
+                ParseNext();
             }
-
-            return sb.ToString();
         }
 
-        private string TakeQuotedSingleLine()
+        private void AdvanceQuotedSingleLine()
         {
-            var quoteChar = Peek().text[0];
+            var quoteChar = text[Peek().index];
             var escaped = false;
             var i = 0;
             for (; PeekChar(i) != '\0' && PeekChar(i) != '\n'; i++)
@@ -104,7 +142,7 @@ namespace Nova.Script
                 throw new ParseException(Peek(), "Unpaired quote");
             }
 
-            return TakeString(i + 1);
+            AdvanceString(i + 1);
         }
 
         private int TakeQuotedMultiline(int offset)
@@ -139,24 +177,23 @@ namespace Nova.Script
             return len + 1;
         }
 
-        private string TakeQuotedMultiline()
+        private void AdvanceQuotedMultiline()
         {
-            return TakeString(TakeQuotedMultiline(0));
+            AdvanceString(TakeQuotedMultiline(0));
         }
 
-        public string TakeQuoted(bool allowMultiline = true)
+        public void AdvanceQuoted(bool allowMultiline = true)
         {
             Assert.IsTrue(Peek().type == TokenType.Quote);
-            var quoteSeq = Peek().text;
+            var quoteChar = text[Peek().index];
 
-            var str = "";
-            if (quoteSeq == "'" || quoteSeq == "\"")
+            if (Peek().length == 1 && quoteChar == '\'' || quoteChar == '\"')
             {
-                str = TakeQuotedSingleLine();
+                AdvanceQuotedSingleLine();
             }
-            else if (allowMultiline && quoteSeq == "[[")
+            else if (allowMultiline && Peek().length == 2 && quoteChar == '[' && text[Peek().index + 1] == '[')
             {
-                str = TakeQuotedMultiline();
+                AdvanceQuotedMultiline();
             }
             else
             {
@@ -164,8 +201,6 @@ namespace Nova.Script
             }
 
             ParseNext();
-
-            return quoteSeq + str;
         }
 
         private int IsBlockComment()
@@ -199,24 +234,15 @@ namespace Nova.Script
             return sb.ToString();
         }
 
-        private string TakeStringAndParseNext(int len)
-        {
-            var str = TakeString(len);
-            ParseNext();
-            return str;
-        }
-
-        public string TakeComment()
+        public void AdvanceComment()
         {
             Assert.IsTrue(Peek().type == TokenType.CommentStart);
-            var commentStart = Peek().text;
             var blockCommentPattern = IsBlockComment();
             if (blockCommentPattern < 0)
             {
-                var len = 0;
-                for (; PeekChar(len) != '\n' && PeekChar(len) != '\0'; len++) { }
-
-                return commentStart + TakeStringAndParseNext(len);
+                AdvanceStringTill('\n');
+                ParseNext();
+                return;
             }
 
             var endPattern = BlockCommentEndPattern(blockCommentPattern);
@@ -226,7 +252,8 @@ namespace Nova.Script
                 throw new ParseException(Peek(), "Unpaired block comment");
             }
 
-            return commentStart + TakeStringAndParseNext(endPatternIndex - index + endPattern.Length);
+            AdvanceString(endPatternIndex - index + endPattern.Length);
+            ParseNext();
         }
 
         private void PeekTokenType(out TokenType type, out int length, int offset = 0)
@@ -284,7 +311,8 @@ namespace Nova.Script
             }
 
             // Lua multiline text
-            if (c == '[' && PeekChar(offset + 1) == '[')
+            char c2 = PeekChar(offset + 1);
+            if (c == '[' && c2 == '[')
             {
                 type = TokenType.Quote;
                 length = 2;
@@ -305,14 +333,14 @@ namespace Nova.Script
                 return;
             }
 
-            if (c == '<' && PeekChar(offset + 1) == '|')
+            if (c == '<' && c2 == '|')
             {
                 type = TokenType.BlockStart;
                 length = 2;
                 return;
             }
 
-            if (c == '|' && PeekChar(offset + 1) == '>')
+            if (c == '|' && c2 == '>')
             {
                 type = TokenType.BlockEnd;
                 length = 2;
@@ -333,7 +361,7 @@ namespace Nova.Script
                 return;
             }
 
-            if (c == '-' && PeekChar(offset + 1) == '-')
+            if (c == '-' && c2 == '-')
             {
                 type = TokenType.CommentStart;
                 length = 2;
@@ -344,44 +372,32 @@ namespace Nova.Script
             type = TokenType.Character;
         }
 
-        private Token ParseNextImpl()
+        private void ParseNextImpl()
         {
+            var tokenStartIndex = index;
             var tokenStartLine = line;
             var tokenStartColumn = column;
 
-            Token Token(TokenType type, string s)
-            {
-                return new Token
-                {
-                    text = s,
-                    column = tokenStartColumn,
-                    line = tokenStartLine,
-                    type = type
-                };
-            }
-
             PeekTokenType(out var tokenType, out var length);
-            return Token(tokenType, TakeString(length));
+            // in place
+            next.index = tokenStartIndex;
+            next.length = length;
+            AdvanceString(length);
+            next.column = tokenStartColumn;
+            next.line = tokenStartLine;
+            next.type = tokenType;
         }
-
-        private void ParseNext()
-        {
-            next = ParseNextImpl();
-        }
-
+        
         /// <returns>null if no more tokens</returns>
-        public Token Take()
+        public void ParseNext()
         {
-            Assert.IsNotNull(next);
-            var token = next;
-            ParseNext();
-            return token;
+            ParseNextImpl();
         }
 
         /// <returns>null if no more tokens</returns>
         public Token Peek()
         {
-            Assert.IsNotNull(next);
+            // Assert.IsNotNull(next);
             return next;
         }
     }
