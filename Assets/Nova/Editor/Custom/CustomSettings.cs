@@ -1,4 +1,3 @@
-﻿using BindType = ToLuaMenu.BindType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using BindType = ToLuaMenu.BindType;
 
 public static class CustomSettings
 {
@@ -20,17 +20,17 @@ public static class CustomSettings
     // Unity有些类作为sealed class，其实完全等价于静态类
     public static List<Type> staticClassTypes = new List<Type>
     {
-        typeof(Application),
-        typeof(GL),
-        typeof(Graphics),
-        typeof(Input),
-        typeof(Physics),
-        typeof(QualitySettings),
-        typeof(RenderSettings),
-        typeof(Resources),
-        typeof(Screen),
-        typeof(SleepTimeout),
-        typeof(Time),
+        // typeof(Application),
+        // typeof(GL),
+        // typeof(Graphics),
+        // typeof(Input),
+        // typeof(Physics),
+        // typeof(QualitySettings),
+        // typeof(RenderSettings),
+        // typeof(Resources),
+        // typeof(Screen),
+        // typeof(SleepTimeout),
+        // typeof(Time),
     };
 
     // 附加导出委托类型（在导出委托时，customTypeList中牵扯的委托类型都会导出，无需写在这里）
@@ -43,13 +43,6 @@ public static class CustomSettings
         // _DT(typeof(Predicate<int>)),
         // _DT(typeof(UnityEngine.Events.UnityAction)),
     };
-
-    public static BindType[] customTypeList =>
-        _customTypeList.Concat(
-            AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(t => t.GetTypes())
-                .Where(t => t.GetCustomAttribute<Nova.ExportCustomType>() != null)
-                .Select(_GT).ToArray()).ToArray();
 
     // 在这里添加你要导出注册到Lua的类型列表
     private static readonly BindType[] _customTypeList =
@@ -176,6 +169,15 @@ public static class CustomSettings
 
         #endregion
     };
+
+    public static readonly BindType[] customTypeList =
+        _customTypeList.Concat(
+            AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                .Where(t => t.GetCustomAttribute<Nova.ExportCustomType>() != null)
+                .Select(_GT)
+                .ToArray()
+        ).ToArray();
 
     public static readonly List<Type> dynamicList = new List<Type>()
     {
