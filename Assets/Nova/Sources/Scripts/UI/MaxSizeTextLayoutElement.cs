@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -9,10 +9,11 @@ namespace Nova
     public class MaxSizeTextLayoutElement : UIBehaviour, ILayoutElement
     {
         private Text text;
+
         [SerializeField] private float _maxWidth = -1f;
         [SerializeField] private float _maxHeight = -1f;
 
-        private new void Awake()
+        protected override void Awake()
         {
             text = GetComponent<Text>();
         }
@@ -65,7 +66,11 @@ namespace Nova
 
         protected override void OnEnable()
         {
-            base.OnEnable();
+            SetDirty();
+        }
+
+        protected override void OnDisable()
+        {
             SetDirty();
         }
 
@@ -74,38 +79,26 @@ namespace Nova
             SetDirty();
         }
 
-        /// <summary>
-        ///   <para>See MonoBehaviour.OnDisable.</para>
-        /// </summary>
-        protected override void OnDisable()
-        {
-            SetDirty();
-            base.OnDisable();
-        }
-
         protected override void OnDidApplyAnimationProperties()
         {
             SetDirty();
         }
 
-        protected override void OnBeforeTransformParentChanged()
-        {
-            SetDirty();
-        }
-
-        /// <summary>
-        ///   <para>Mark the LayoutElement as dirty.</para>
-        /// </summary>
         private void SetDirty()
         {
             if (!IsActive())
+            {
                 return;
+            }
+
             LayoutRebuilder.MarkLayoutForRebuild(transform as RectTransform);
         }
 
-        protected new void OnValidate()
+#if UNITY_EDITOR
+        protected override void OnValidate()
         {
             SetDirty();
         }
+#endif
     }
 }

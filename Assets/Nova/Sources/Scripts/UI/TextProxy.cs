@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Nova
 {
     [RequireComponent(typeof(TMP_Text))]
-    public class TextProxy : MonoBehaviour
+    public class TextProxy : UIBehaviour
     {
         private static readonly HashSet<char> ChineseFollowingPunctuations = new HashSet<char>("，。、；：？！…—‘’“”（）【】《》");
 
@@ -14,14 +15,16 @@ namespace Nova
             return c >= 0x4e00 && c <= 0x9fff;
         }
 
-        public TMP_Text textBox { get; private set; }
+        private TMP_Text textBox;
+        private RectTransform rectTransform;
 
         private bool inited;
         private bool needRefreshLineBreak;
         private bool needRefreshFade;
-        private bool needRefreshAtNextFrame;
 
-        private void Awake()
+        [HideInInspector] public bool canRefreshLineBreak = true;
+
+        protected override void Awake()
         {
             Init();
         }
@@ -31,14 +34,8 @@ namespace Nova
         {
             if (inited) return;
             textBox = GetComponent<TMP_Text>();
+            rectTransform = GetComponent<RectTransform>();
             inited = true;
-        }
-
-        // When calling ScheduleRefresh(), the transform size may change in
-        // LateUpdate() of the current frame
-        public void ScheduleRefresh()
-        {
-            needRefreshAtNextFrame = true;
         }
 
         private string _text;
@@ -78,7 +75,7 @@ namespace Nova
                 }
             }
 
-            Debug.LogWarning($"Nova：Font asset {textBox.font} is not in I18nFontConfig.");
+            Debug.LogWarning($"Nova：Font asset {textBox.font} not in I18nFontConfig, found in {Utils.GetPath(this)}");
         }
 
         public void UpdateFont()
@@ -127,25 +124,32 @@ namespace Nova
             needRefreshFade = true;
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             needRefreshLineBreak = true;
             needRefreshFade = true;
         }
 
-        private void LateUpdate()
+        private float lastWidth;
+        private float lastHeight;
+
+        protected override void OnRectTransformDimensionsChange()
         {
-            if (needRefreshLineBreak || needRefreshFade)
+            Init();
+            var rect = rectTransform.rect;
+            if (Mathf.Abs(rect.width - lastWidth) < 0.01f && Mathf.Abs(rect.height - lastHeight) < 0.01f)
             {
-                Refresh();
+                return;
             }
 
-            if (needRefreshAtNextFrame)
-            {
-                needRefreshAtNextFrame = false;
-                needRefreshLineBreak = true;
-                needRefreshFade = true;
-            }
+            lastWidth = rect.width;
+            lastHeight = rect.height;
+            needRefreshLineBreak = true;
+        }
+
+        private void LateUpdate()
+        {
+            Refresh();
         }
 
         // If the last line is one Chinese character and some (or zero) Chinese punctuations,
@@ -275,6 +279,11 @@ namespace Nova
 
         private void Refresh()
         {
+            if (!needRefreshLineBreak && !needRefreshFade)
+            {
+                return;
+            }
+
             if (!gameObject.activeInHierarchy)
             {
                 textBox.text = text;
