@@ -50,12 +50,12 @@ namespace Nova
         }
 
         // On Windows and maybe other platforms, Application.systemLanguage returns the region rather than the language,
-        // so we use CultureInfo.CurrentCulture if possible
+        // so we use CultureInfo.CurrentUICulture if possible
         private static SystemLanguage GetSystemLocale()
         {
             try
             {
-                var cultureInfo = CultureInfo.CurrentCulture;
+                var cultureInfo = CultureInfo.CurrentUICulture;
                 if (cultureInfo.Name.StartsWith("zh-", StringComparison.Ordinal))
                 {
                     return SystemLanguage.ChineseSimplified;
