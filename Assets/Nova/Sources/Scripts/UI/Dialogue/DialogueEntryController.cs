@@ -1,4 +1,4 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +17,7 @@ namespace Nova
     public class DialogueEntryController : MonoBehaviour
     {
         private Text nameBox;
-        public TMP_Text contentBox { get; private set; }
+        private TMP_Text contentBox;
         public TextProxy contentProxy { get; private set; }
 
         public DialogueDisplayData displayData { get; private set; }
@@ -162,15 +162,16 @@ namespace Nova
             }
         }
 
+        public bool canRefreshTextProxy
+        {
+            get => contentProxy.canRefreshLineBreak;
+            set => contentProxy.canRefreshLineBreak = value;
+        }
+
         public string FindIntersectingLink(Vector3 position, Camera camera)
         {
             int linkIndex = TMP_TextUtilities.FindIntersectingLink(contentBox, position, camera);
             return linkIndex == -1 ? null : contentBox.textInfo.linkInfo[linkIndex].GetLinkID();
-        }
-
-        public void ScheduleRefresh()
-        {
-            contentProxy.ScheduleRefresh();
         }
     }
 }

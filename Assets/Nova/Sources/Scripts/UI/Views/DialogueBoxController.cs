@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -268,9 +268,6 @@ namespace Nova
             ShowDialogueFinishIcon(false);
         }
 
-        // Avoid refreshing text proxy when changing size in animation
-        [HideInInspector] public bool canRefreshTextProxy = true;
-
         protected override void Update()
         {
             if (viewManager.currentView == CurrentViewType.Game && dialogueAvailable)
@@ -282,19 +279,6 @@ namespace Nova
                 {
                     ShowDialogueFinishIcon(true);
                 }
-            }
-
-            // Refresh text when size changes
-            if (canRefreshTextProxy && rect.hasChanged)
-            {
-                // Debug.Log("Dialogue box size changed");
-
-                foreach (var dec in dialogueText.dialogueEntryControllers)
-                {
-                    dec.ScheduleRefresh();
-                }
-
-                rect.hasChanged = false;
             }
         }
 
@@ -620,7 +604,7 @@ namespace Nova
         [SerializeField] private Color readColor;
         [SerializeField] private Color unreadColor;
 
-        [HideInInspector] public bool textColorHasSet = false;
+        [HideInInspector] public bool textColorHasSet;
 
         private Color _textColor;
 
@@ -680,6 +664,22 @@ namespace Nova
                 foreach (var dec in dialogueText.dialogueEntryControllers)
                 {
                     dec.textLeftExtraPadding = value;
+                }
+            }
+        }
+
+        // Avoid refreshing text proxy when changing size in animation
+        private bool _canRefreshTextProxy = true;
+
+        public bool canRefreshTextProxy
+        {
+            get => _canRefreshTextProxy;
+            set
+            {
+                _canRefreshTextProxy = value;
+                foreach (var dec in dialogueText.dialogueEntryControllers)
+                {
+                    dec.canRefreshTextProxy = value;
                 }
             }
         }
