@@ -1,4 +1,3 @@
-﻿using BindType = ToLuaMenu.BindType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using BindType = ToLuaMenu.BindType;
 
 public static class CustomSettings
 {
@@ -43,13 +43,6 @@ public static class CustomSettings
         // _DT(typeof(Predicate<int>)),
         // _DT(typeof(UnityEngine.Events.UnityAction)),
     };
-
-    public static BindType[] customTypeList =>
-        _customTypeList.Concat(
-            AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(t => t.GetTypes())
-                .Where(t => t.GetCustomAttribute<Nova.ExportCustomType>() != null)
-                .Select(_GT).ToArray()).ToArray();
 
     // 在这里添加你要导出注册到Lua的类型列表
     private static readonly BindType[] _customTypeList =
@@ -91,7 +84,7 @@ public static class CustomSettings
         // _GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
 #else
         // _GT(typeof(AudioSource)),
-        _GT(typeof(Camera)),
+        // _GT(typeof(Camera)),
         // _GT(typeof(Component)),
         // _GT(typeof(Light)),
         // _GT(typeof(Material)),
@@ -177,6 +170,15 @@ public static class CustomSettings
 
         #endregion
     };
+
+    public static readonly BindType[] customTypeList =
+        _customTypeList.Concat(
+            AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                .Where(t => t.GetCustomAttribute<Nova.ExportCustomType>() != null)
+                .Select(_GT)
+                .ToArray()
+        ).ToArray();
 
     public static readonly List<Type> dynamicList = new List<Type>()
     {
