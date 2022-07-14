@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -203,7 +203,7 @@ namespace Nova.Script
                 }
 
                 tokenizer.SkipWhiteSpace();
-                token = tokenizer.Peek();
+                token = tokenizer.Peek().Duplicate();
                 if (token.type == TokenType.Comma || token.type == TokenType.AttrEnd)
                 {
                     tokenizer.ParseNext();
