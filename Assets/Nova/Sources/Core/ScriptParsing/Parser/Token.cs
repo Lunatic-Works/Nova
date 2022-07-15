@@ -1,4 +1,4 @@
-﻿namespace Nova.Script
+namespace Nova.Script
 {
     public enum TokenType
     {
@@ -27,7 +27,7 @@
         public int column;
         public TokenType type;
 
-        public Token Duplicate()
+        public Token Clone()
         {
             return new Token()
             {

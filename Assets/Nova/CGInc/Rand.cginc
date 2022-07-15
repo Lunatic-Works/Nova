@@ -26,35 +26,35 @@ float rand(float p)
 
 float rand(float2 p2)
 {
-	float3 p3 = frac(p2.xyx * MAGIC1);
+    float3 p3 = frac(p2.xyx * MAGIC1);
     p3 += dot(p3, p3.yzx + MAGIC5);
     return frac((p3.x + p3.y) * p3.z);
 }
 
 float rand(float3 p3)
 {
-	p3 = frac(p3 * MAGIC1);
+    p3 = frac(p3 * MAGIC1);
     p3 += dot(p3, p3.yzx + MAGIC5);
     return frac((p3.x + p3.y) * p3.z);
 }
 
 float2 rand2(float p)
 {
-	float3 p3 = frac(float3(p, p, p) * float3(MAGIC1, MAGIC2, MAGIC3));
-	p3 += dot(p3, p3.yzx + MAGIC5);
+    float3 p3 = frac(float3(p, p, p) * float3(MAGIC1, MAGIC2, MAGIC3));
+    p3 += dot(p3, p3.yzx + MAGIC5);
     return frac((p3.xx + p3.yz) * p3.zy);
 }
 
 float2 rand2(float2 p2)
 {
-	float3 p3 = frac(p2.xyx * float3(MAGIC1, MAGIC2, MAGIC3));
+    float3 p3 = frac(p2.xyx * float3(MAGIC1, MAGIC2, MAGIC3));
     p3 += dot(p3, p3.yzx + MAGIC5);
     return frac((p3.xx + p3.yz) * p3.zy);
 }
 
 float2 rand2(float3 p3)
 {
-	p3 = frac(p3 * float3(MAGIC1, MAGIC2, MAGIC3));
+    p3 = frac(p3 * float3(MAGIC1, MAGIC2, MAGIC3));
     p3 += dot(p3, p3.yzx + MAGIC5);
     return frac((p3.xx + p3.yz) * p3.zy);
 }
@@ -68,42 +68,42 @@ float3 rand3(float p)
 
 float3 rand3(float2 p2)
 {
-	float3 p3 = frac(p2.xyx * float3(MAGIC1, MAGIC2, MAGIC3));
+    float3 p3 = frac(p2.xyx * float3(MAGIC1, MAGIC2, MAGIC3));
     p3 += dot(p3, p3.yzx + MAGIC5);
     return frac((p3.xxy + p3.yzz) * p3.zyx);
 }
 
 float3 rand3(float3 p3)
 {
-	p3 = frac(p3 * float3(MAGIC1, MAGIC2, MAGIC3));
+    p3 = frac(p3 * float3(MAGIC1, MAGIC2, MAGIC3));
     p3 += dot(p3, p3.yzx + MAGIC5);
     return frac((p3.xxy + p3.yzz) * p3.zyx);
 }
 
 float4 rand4(float p)
 {
-	float4 p4 = frac(float4(p, p, p, p) * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
+    float4 p4 = frac(float4(p, p, p, p) * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
     p4 += dot(p4, p4.wzxy + MAGIC5);
     return frac((p4.xxyz + p4.yzzw) * p4.zywx);
 }
 
 float4 rand4(float2 p2)
 {
-	float4 p4 = frac(p2.xyxy * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
+    float4 p4 = frac(p2.xyxy * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
     p4 += dot(p4, p4.wzxy + MAGIC5);
     return frac((p4.xxyz + p4.yzzw) * p4.zywx);
 }
 
 float4 rand4(float3 p3)
 {
-	float4 p4 = frac(p3.xyzx * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
+    float4 p4 = frac(p3.xyzx * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
     p4 += dot(p4, p4.wzxy + MAGIC5);
     return frac((p4.xxyz + p4.yzzw) * p4.zywx);
 }
 
 float4 rand4(float4 p4)
 {
-	p4 = frac(p4 * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
+    p4 = frac(p4 * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
     p4 += dot(p4, p4.wzxy + MAGIC5);
     return frac((p4.xxyz + p4.yzzw) * p4.zywx);
 }

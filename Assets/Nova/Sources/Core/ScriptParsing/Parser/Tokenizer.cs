@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using UnityEngine.Assertions;
 
@@ -7,11 +7,10 @@ namespace Nova.Script
     public class Tokenizer
     {
         private readonly string text;
-
         private int column;
         private int line;
         private int index;
-        private Token next;
+        private readonly Token next;
 
         public Tokenizer(string text)
         {
@@ -19,7 +18,7 @@ namespace Nova.Script
             line = 1;
             column = 1;
             index = 0;
-            
+
             next = new Token();
             ParseNext();
         }
@@ -29,17 +28,6 @@ namespace Nova.Script
             return text.Substring(start, length);
         }
 
-        private string TakeString(int length)
-        {
-            var str = text.Substring(index, length);
-            for (var i = 0; i < length; i++)
-            {
-                TakeChar();
-            }
-
-            return str;
-        }
-        
         private void AdvanceString(int length)
         {
             for (var i = 0; i < length; i++)
@@ -56,7 +44,7 @@ namespace Nova.Script
                 }
             }
         }
-        
+
         private void AdvanceStringTill(char c)
         {
             while (text[index] != c)
@@ -72,26 +60,6 @@ namespace Nova.Script
                     line += 1;
                 }
             }
-        }
-
-        private char TakeChar()
-        {
-            var c = PeekChar();
-            if (c == '\0')
-            {
-                return c;
-            }
-
-            // Advance counters
-            index += 1;
-            column += 1;
-            if (c == '\n')
-            {
-                column = 1;
-                line += 1;
-            }
-
-            return c;
         }
 
         private char PeekChar(int offset = 0)
@@ -387,7 +355,7 @@ namespace Nova.Script
             next.line = tokenStartLine;
             next.type = tokenType;
         }
-        
+
         /// <returns>null if no more tokens</returns>
         public void ParseNext()
         {

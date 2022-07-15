@@ -31,7 +31,7 @@ namespace Nova.Script
         private static ParsedBlock ParseCodeBlock(Tokenizer tokenizer, BlockType type, AttributeDict attributes)
         {
             ParseException.ExpectToken(tokenizer.Peek(), TokenType.BlockStart, "<|");
-            var startToken = tokenizer.Peek().Duplicate();
+            var startToken = tokenizer.Peek().Clone();
             tokenizer.ParseNext();
             var matchFound = false;
             int startIndex = tokenizer.Peek().index;
@@ -64,6 +64,7 @@ namespace Nova.Script
 
                 endIndex = tokenIndex + tokenLength;
             }
+
             string content = tokenizer.SubString(startIndex, endIndex - startIndex);
 
             if (!matchFound)
@@ -73,7 +74,8 @@ namespace Nova.Script
 
             tokenizer.SkipWhiteSpace();
 
-            ParseException.ExpectToken(tokenizer.Peek(), TokenType.NewLine,TokenType.EndOfFile, "new line or end of file after |>");
+            ParseException.ExpectToken(tokenizer.Peek(), TokenType.NewLine, TokenType.EndOfFile,
+                "new line or end of file after |>");
             tokenizer.ParseNext();
 
             return new ParsedBlock
@@ -203,7 +205,7 @@ namespace Nova.Script
                 }
 
                 tokenizer.SkipWhiteSpace();
-                token = tokenizer.Peek().Duplicate();
+                token = tokenizer.Peek().Clone();
                 if (token.type == TokenType.Comma || token.type == TokenType.AttrEnd)
                 {
                     tokenizer.ParseNext();
@@ -230,6 +232,7 @@ namespace Nova.Script
             {
                 tokenizer.ParseNext();
             }
+
             int endIndex = tokenizer.Peek().index;
             string content = tokenizer.SubString(startIndex, endIndex - startIndex);
 
@@ -253,6 +256,7 @@ namespace Nova.Script
                 tokenizer.ParseNext();
                 token = tokenizer.Peek();
             }
+
             int endIndex = token.index;
 
             if (token.type == TokenType.NewLine || token.type == TokenType.EndOfFile)
