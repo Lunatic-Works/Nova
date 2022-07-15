@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+using System;
 using System.Runtime.Serialization;
 
 namespace Nova.Script
@@ -25,12 +24,16 @@ namespace Nova.Script
 
         public static void ExpectToken(Token token, TokenType type, string display)
         {
-            ExpectToken(token, new[] {type}, display);
+            if (token.type != type)
+            {
+                throw new ParseException(ErrorMessage(token, $"Expect {display}"));
+            }
         }
 
-        public static void ExpectToken(Token token, TokenType[] types, string display)
+        // TODO: params?
+        public static void ExpectToken(Token token, TokenType typeA, TokenType typeB, string display)
         {
-            if (types.All(t => token.type != t))
+            if (token.type != typeA && token.type != typeB)
             {
                 throw new ParseException(ErrorMessage(token, $"Expect {display}"));
             }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -31,34 +31,41 @@ namespace Nova.Script
         private static ParsedBlock ParseCodeBlock(Tokenizer tokenizer, BlockType type, AttributeDict attributes)
         {
             ParseException.ExpectToken(tokenizer.Peek(), TokenType.BlockStart, "<|");
-            var startToken = tokenizer.Take();
-            var sb = new StringBuilder();
+            var startToken = tokenizer.Peek().Clone();
+            tokenizer.ParseNext();
             var matchFound = false;
+            int startIndex = tokenizer.Peek().index;
+            int endIndex = startIndex;
             while (tokenizer.Peek().type != TokenType.EndOfFile)
             {
                 var token = tokenizer.Peek();
-                if (token.type == TokenType.CommentStart)
+                var tokenType = token.type;
+                var tokenIndex = token.index;
+                var tokenLength = token.length;
+                if (tokenType == TokenType.CommentStart)
                 {
-                    sb.Append(tokenizer.TakeComment());
+                    tokenizer.AdvanceComment();
                     continue;
                 }
 
-                if (token.type == TokenType.Quote)
+                if (tokenType == TokenType.Quote)
                 {
-                    sb.Append(tokenizer.TakeQuoted());
+                    tokenizer.AdvanceQuoted();
                     continue;
                 }
 
-                tokenizer.Take();
+                tokenizer.ParseNext();
 
-                if (token.type == TokenType.BlockEnd)
+                if (tokenType == TokenType.BlockEnd)
                 {
                     matchFound = true;
                     break;
                 }
 
-                sb.Append(token.text);
+                endIndex = tokenIndex + tokenLength;
             }
+
+            string content = tokenizer.SubString(startIndex, endIndex - startIndex);
 
             if (!matchFound)
             {
@@ -67,24 +74,23 @@ namespace Nova.Script
 
             tokenizer.SkipWhiteSpace();
 
-            ParseException.ExpectToken(tokenizer.Peek(), new[]
-            {
-                TokenType.NewLine, TokenType.EndOfFile
-            }, "new line or end of file after |>");
-            tokenizer.Take();
+            ParseException.ExpectToken(tokenizer.Peek(), TokenType.NewLine, TokenType.EndOfFile,
+                "new line or end of file after |>");
+            tokenizer.ParseNext();
 
             return new ParsedBlock
             {
                 type = type,
                 attributes = attributes,
-                content = sb.ToString()
+                content = content
             };
         }
 
         private static ParsedBlock ParseEagerExecutionBlock(Tokenizer tokenizer)
         {
-            var at = tokenizer.Take();
+            var at = tokenizer.Peek();
             ParseException.ExpectToken(at, TokenType.At, "@");
+            tokenizer.ParseNext();
             var token = tokenizer.Peek();
             if (token.type == TokenType.AttrStart)
             {
@@ -96,22 +102,28 @@ namespace Nova.Script
                 return ParseCodeBlock(tokenizer, BlockType.EagerExecution, new AttributeDict());
             }
 
-            throw new ParseException(token, $"Except [ or <| after @, found {token.text}");
+            throw new ParseException(token, $"Except [ or <| after @, found {token.type}");
         }
 
         private static string ExpectIdentifierOrString(Tokenizer tokenizer)
         {
             if (tokenizer.Peek().type == TokenType.Character)
             {
-                return tokenizer.TakeIdentifier();
+                int startIndex = tokenizer.Peek().index;
+                tokenizer.AdvanceIdentifier();
+                int endIndex = tokenizer.Peek().index;
+                return tokenizer.SubString(startIndex, endIndex - startIndex);
             }
 
             if (tokenizer.Peek().type == TokenType.Quote)
             {
-                return tokenizer.TakeQuoted(false);
+                int startIndex = tokenizer.Peek().index;
+                tokenizer.AdvanceQuoted(false);
+                int endIndex = tokenizer.Peek().index;
+                return tokenizer.SubString(startIndex, endIndex - startIndex);
             }
 
-            throw new ParseException(tokenizer.Peek(), $"Expect identifier or string, found {tokenizer.Peek().text}");
+            throw new ParseException(tokenizer.Peek(), $"Expect identifier or string, found {tokenizer.Peek().type}");
         }
 
         private static char EscapeChar(char c)
@@ -167,7 +179,7 @@ namespace Nova.Script
         private static ParsedBlock ParseCodeBlockWithAttributes(Tokenizer tokenizer, BlockType type)
         {
             ParseException.ExpectToken(tokenizer.Peek(), TokenType.AttrStart, "[");
-            tokenizer.Take();
+            tokenizer.ParseNext();
             var attrs = new AttributeDict();
 
             while (tokenizer.Peek().type != TokenType.EndOfFile)
@@ -176,7 +188,7 @@ namespace Nova.Script
                 var token = tokenizer.Peek();
                 if (token.type == TokenType.AttrEnd)
                 {
-                    tokenizer.Take();
+                    tokenizer.ParseNext();
                     break;
                 }
 
@@ -187,16 +199,16 @@ namespace Nova.Script
                 token = tokenizer.Peek();
                 if (token.type == TokenType.Equal)
                 {
-                    tokenizer.Take();
+                    tokenizer.ParseNext();
                     tokenizer.SkipWhiteSpace();
                     value = ExpectIdentifierOrString(tokenizer);
                 }
 
                 tokenizer.SkipWhiteSpace();
-                token = tokenizer.Peek();
+                token = tokenizer.Peek().Clone();
                 if (token.type == TokenType.Comma || token.type == TokenType.AttrEnd)
                 {
-                    tokenizer.Take();
+                    tokenizer.ParseNext();
                 }
                 else
                 {
@@ -214,42 +226,47 @@ namespace Nova.Script
             return ParseCodeBlock(tokenizer, type, attrs);
         }
 
-        private static ParsedBlock ParseTextBlock(Tokenizer tokenizer, StringBuilder sb)
+        private static ParsedBlock ParseTextBlock(Tokenizer tokenizer, int startIndex)
         {
             while (tokenizer.Peek().type != TokenType.EndOfFile && tokenizer.Peek().type != TokenType.NewLine)
             {
-                sb.Append(tokenizer.Take().text);
+                tokenizer.ParseNext();
             }
 
+            int endIndex = tokenizer.Peek().index;
+            string content = tokenizer.SubString(startIndex, endIndex - startIndex);
+
             // eat up the last newline
-            tokenizer.Take();
+            tokenizer.ParseNext();
 
             return new ParsedBlock
             {
                 type = BlockType.Text,
-                content = sb.ToString(),
+                content = content,
                 attributes = new AttributeDict()
             };
         }
 
         private static ParsedBlock ParseBlock(Tokenizer tokenizer)
         {
-            var sb = new StringBuilder();
             var token = tokenizer.Peek();
+            int startIndex = token.index;
             while (token.type == TokenType.WhiteSpace)
             {
-                sb.Append(token.text);
-                tokenizer.Take();
+                tokenizer.ParseNext();
                 token = tokenizer.Peek();
             }
 
+            int endIndex = token.index;
+
             if (token.type == TokenType.NewLine || token.type == TokenType.EndOfFile)
             {
-                tokenizer.Take();
+                string content = tokenizer.SubString(startIndex, endIndex - startIndex);
+                tokenizer.ParseNext();
                 return new ParsedBlock()
                 {
                     type = BlockType.Separator,
-                    content = sb.ToString(),
+                    content = content,
                     attributes = new AttributeDict()
                 };
             }
@@ -269,7 +286,7 @@ namespace Nova.Script
                 return ParseCodeBlock(tokenizer, BlockType.LazyExecution, new AttributeDict());
             }
 
-            return ParseTextBlock(tokenizer, sb);
+            return ParseTextBlock(tokenizer, startIndex);
         }
 
         private static IReadOnlyList<ParsedBlock> MergeConsecutiveSeparators(IReadOnlyList<ParsedBlock> oldBlocks)
