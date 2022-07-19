@@ -1,5 +1,3 @@
-// TODO: use circular buffer for log entries
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +11,8 @@ namespace Nova
 {
     using NodeHistoryEntry = KeyValuePair<string, int>;
 
-    public class LogController : ViewControllerBase, IRestorable, LoopScrollPrefabSource, LoopScrollDataSource, LoopScrollSizeHelper
+    public class LogController : ViewControllerBase, IRestorable, LoopScrollPrefabSource, LoopScrollDataSource,
+        LoopScrollSizeHelper
     {
         [Serializable]
         private class LogParam
@@ -47,8 +46,11 @@ namespace Nova
         private ConfigManager configManager;
 
         private LoopScrollRect scrollRect;
-        private TMP_Text logEntryForTest;
-        private GameObject logContent;
+
+        private LogEntryController logEntryForTest;
+        private TMP_Text contentForTest;
+        private float contentDefaultWidth;
+
         private readonly List<LogParam> logParams = new List<LogParam>();
         private readonly List<float> logHeights = new List<float>();
         private readonly List<float> logPrefixHeights = new List<float>();
@@ -67,10 +69,6 @@ namespace Nova
             scrollRect.prefabSource = this;
             scrollRect.dataSource = this;
             scrollRect.sizeHelper = this;
-            // fake content to test size
-            var logEntry2 = Instantiate(logEntryPrefab, scrollRect.viewport);
-            logEntry2.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -500);
-            logEntryForTest = logEntry2.transform.Find("Text").GetComponent<TMP_Text>();
 
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
@@ -86,6 +84,25 @@ namespace Nova
             base.Start();
 
             checkpointManager.Init();
+        }
+
+        protected override void ForceRebuildLayoutAndResetTransitionTarget()
+        {
+            // fake content to test size
+            if (logEntryForTest == null)
+            {
+                logEntryForTest = Instantiate(logEntryPrefab);
+                contentForTest = logEntryForTest.transform.Find("Text").GetComponent<TMP_Text>();
+            }
+
+            logEntryForTest.transform.SetParent(scrollRect.content, false);
+            logEntryForTest.gameObject.SetActive(true);
+
+            base.ForceRebuildLayoutAndResetTransitionTarget();
+
+            contentDefaultWidth = contentForTest.GetComponent<RectTransform>().rect.width;
+            logEntryForTest.gameObject.SetActive(false);
+            logEntryForTest.transform.SetParent(scrollRect.transform, false);
         }
 
         protected override void OnDestroy()
@@ -139,19 +156,18 @@ namespace Nova
                 lastCheckpointLogParams = logParam;
             }
 
-            if (string.IsNullOrEmpty(logParam.displayData.FormatNameDialogue()))
+            var text = logParam.displayData.FormatNameDialogue();
+            if (string.IsNullOrEmpty(text))
             {
                 return;
             }
 
             logParams.Add(logParam);
-            // TODO: better way to calc size
-            string text = logParam.displayData.FormatNameDialogue();
-            var rect = scrollRect.content.rect;
-            rect.width -= 180 * 2;
-            Vector2 size = logEntryForTest.GetPreferredValues(text, rect.width, rect.height);
-            logHeights.Add(size.y);
-            logPrefixHeights.Add(size.y + (logPrefixHeights.Count > 0 ? logPrefixHeights[logPrefixHeights.Count - 1] : 0));
+
+            var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
+            logHeights.Add(height);
+            logPrefixHeights.Add(height +
+                                 (logPrefixHeights.Count > 0 ? logPrefixHeights[logPrefixHeights.Count - 1] : 0));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
                 scrollRect.totalCount = logParams.Count;
@@ -176,13 +192,14 @@ namespace Nova
                 if (i > 0)
                     logPrefixHeights[i] += logPrefixHeights[i - 1];
             }
+
             // Refine log entry indices
             int cnt = logParams.Count;
             for (int i = index; i < cnt; ++i)
             {
                 logParams[i].logEntryIndex = i;
             }
-            
+
             scrollRect.totalCount = logParams.Count;
             scrollRect.RefillCellsFromEnd();
         }
@@ -191,7 +208,7 @@ namespace Nova
         {
             RemoveRange(0, logParams.Count);
         }
-        
+
         #region LoopScrollRect
 
         public Vector2 GetItemsSize(int itemsCount)
@@ -201,7 +218,8 @@ namespace Nova
             return new Vector2(0, logPrefixHeights[itemsCount - 1]);
         }
 
-        Stack<Transform> pool = new Stack<Transform>();
+        private readonly Stack<Transform> pool = new Stack<Transform>();
+
         public GameObject GetObject(int index)
         {
             if (pool.Count == 0)
@@ -209,10 +227,12 @@ namespace Nova
                 var element = Instantiate(logEntryPrefab, scrollRect.content);
                 return element.gameObject;
             }
+
             Transform candidate = pool.Pop();
             candidate.SetParent(scrollRect.content, false);
-            candidate.gameObject.SetActive(true);
-            return candidate.gameObject;
+            var go = candidate.gameObject;
+            go.SetActive(true);
+            return go;
         }
 
         public void ReturnObject(Transform trans)
@@ -225,7 +245,7 @@ namespace Nova
         public void ProvideData(Transform transform, int idx)
         {
             var logParam = logParams[idx];
-            
+
             UnityAction<int> onGoBackButtonClicked = logEntryIndex =>
                 OnGoBackButtonClicked(logParam.nodeHistoryEntry, logParam.dialogueIndex, logEntryIndex);
 
@@ -241,6 +261,7 @@ namespace Nova
             logEntry.Init(logParam.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked, onPointerExit,
                 logParam.logEntryIndex, logHeights[idx]);
         }
+
         #endregion
 
         private void _onGoBackButtonClicked(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex)
