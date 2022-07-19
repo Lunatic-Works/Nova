@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -47,7 +47,7 @@ namespace Nova
             myPanel.SetActive(false);
         }
 
-        protected void ForceRebuildLayoutAndResetTransitionTarget()
+        protected virtual void ForceRebuildLayoutAndResetTransitionTarget()
         {
             // Rebuild all layouts the hard way
             foreach (var layout in GetComponentsInChildren<LayoutGroup>())
