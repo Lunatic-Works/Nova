@@ -54,7 +54,9 @@ namespace Nova
         private readonly List<LogParam> logParams = new List<LogParam>();
         private readonly List<float> logHeights = new List<float>();
         private readonly List<float> logPrefixHeights = new List<float>();
-        private LogParam lastCheckpointLogParams;
+
+        // The first logParam at or after the last checkpoint
+        private LogParam checkpointLogParam;
 
         protected override void Awake()
         {
@@ -75,8 +77,6 @@ namespace Nova
 
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.AddRestorable(this);
-
-            lastCheckpointLogParams = null;
         }
 
         protected override void Start()
@@ -151,23 +151,29 @@ namespace Nova
 
         private void AddEntry(LogParam logParam)
         {
-            if (TryGetCheckpoint(logParam, true, out _))
-            {
-                lastCheckpointLogParams = logParam;
-            }
-
             var text = logParam.displayData.FormatNameDialogue();
+            var isCheckpoint = TryGetCheckpoint(logParam, true, out _);
             if (string.IsNullOrEmpty(text))
             {
+                if (isCheckpoint)
+                {
+                    checkpointLogParam = null;
+                }
+
                 return;
+            }
+
+            if (isCheckpoint || checkpointLogParam == null)
+            {
+                checkpointLogParam = logParam;
             }
 
             logParams.Add(logParam);
 
             var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
             logHeights.Add(height);
-            logPrefixHeights.Add(height +
-                                 (logPrefixHeights.Count > 0 ? logPrefixHeights[logPrefixHeights.Count - 1] : 0));
+            var cnt = logPrefixHeights.Count;
+            logPrefixHeights.Add(height + (cnt > 0 ? logPrefixHeights[cnt - 1] : 0));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
                 scrollRect.totalCount = logParams.Count;
@@ -184,20 +190,16 @@ namespace Nova
         private void RemoveRange(int index, int count)
         {
             logParams.RemoveRange(index, count);
-            logHeights.RemoveRange(index, count);
-            logPrefixHeights.Clear();
-            for (int i = 0; i < logHeights.Count; i++)
-            {
-                logPrefixHeights[i] = logHeights[i];
-                if (i > 0)
-                    logPrefixHeights[i] += logPrefixHeights[i - 1];
-            }
-
-            // Refine log entry indices
-            int cnt = logParams.Count;
-            for (int i = index; i < cnt; ++i)
+            for (int i = index; i < logParams.Count; ++i)
             {
                 logParams[i].logEntryIndex = i;
+            }
+
+            logHeights.RemoveRange(index, count);
+            logPrefixHeights.RemoveRange(index, count);
+            for (int i = index; i < logHeights.Count; ++i)
+            {
+                logPrefixHeights[i] = logHeights[i] + (i > 0 ? logPrefixHeights[i - 1] : 0);
             }
 
             scrollRect.totalCount = logParams.Count;
@@ -364,19 +366,19 @@ namespace Nova
 
         public IRestoreData GetRestoreData()
         {
-            if (logParams.Count == 0)
+            if (logParams.Count == 0 || checkpointLogParam == null)
             {
                 return new LogControllerRestoreData(new List<LogParam>());
             }
 
-            int lastCheckpointParamsIndex = logParams.IndexOf(lastCheckpointLogParams);
-            if (lastCheckpointParamsIndex < 0)
+            int checkpointIndex = logParams.IndexOf(checkpointLogParam);
+            if (checkpointIndex < 0)
             {
-                lastCheckpointParamsIndex = 0;
+                checkpointIndex = 0;
             }
 
-            return new LogControllerRestoreData(logParams.GetRange(lastCheckpointParamsIndex,
-                logParams.Count - lastCheckpointParamsIndex));
+            return new LogControllerRestoreData(logParams.GetRange(checkpointIndex,
+                logParams.Count - checkpointIndex));
         }
 
         public void Restore(IRestoreData restoreData)
