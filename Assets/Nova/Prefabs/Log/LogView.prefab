@@ -277,7 +277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myPanel: {fileID: 1449025792155100}
-  maxLogEntryNum: 100
+  maxLogEntryNum: 1000
   logEntryPrefab: {fileID: 114923897484395330, guid: dfddb504ea35c40f7911f1fc6e70a265,
     type: 3}
   closeButton: {fileID: 2573426190844929647}

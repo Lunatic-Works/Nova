@@ -34,7 +34,7 @@ namespace Nova
             }
         }
 
-        public int maxLogEntryNum = 100;
+        public int maxLogEntryNum = 1000;
         public LogEntryController logEntryPrefab;
         public Button closeButton;
         public bool hideOnGoBackButtonClicked;
