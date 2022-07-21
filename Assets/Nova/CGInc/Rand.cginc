@@ -1,13 +1,6 @@
 // https://www.shadertoy.com/view/4djSRW
 //
 // The input of rand() is any float, and the output is in (0, 1)
-// Actually we only need those types:
-// 1 -> 1
-// 1 -> 2
-// 2 -> 1
-// 2 -> 3
-// 3 -> 2
-//
 // float works on Android, but half does not work
 
 #define MAGIC1 0.1009
@@ -117,7 +110,7 @@ float4 rand4(float4 p4)
 float noise(float v)
 {
     float a = floor(v);
-    float u = frac(v);
+    float u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(rand(a), rand(a + 1.0), u);
 }
@@ -125,7 +118,7 @@ float noise(float v)
 float noise(float2 v)
 {
     float2 a = floor(v);
-    float2 u = frac(v);
+    float2 u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(
         lerp(rand(a), rand(a + float2(1.0, 0.0)), u.x),
@@ -137,7 +130,7 @@ float noise(float2 v)
 float noise(float3 v)
 {
     float3 a = floor(v);
-    float3 u = frac(v);
+    float3 u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(
         lerp(
@@ -157,7 +150,7 @@ float noise(float3 v)
 float2 noise2(float v)
 {
     float a = floor(v);
-    float u = frac(v);
+    float u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(rand2(a), rand2(a + 1.0), u);
 }
@@ -165,7 +158,7 @@ float2 noise2(float v)
 float2 noise2(float2 v)
 {
     float2 a = floor(v);
-    float2 u = frac(v);
+    float2 u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(
         lerp(rand2(a), rand2(a + float2(1.0, 0.0)), u.x),
@@ -177,7 +170,7 @@ float2 noise2(float2 v)
 float2 noise2(float3 v)
 {
     float3 a = floor(v);
-    float3 u = frac(v);
+    float3 u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(
         lerp(
@@ -197,7 +190,7 @@ float2 noise2(float3 v)
 float3 noise3(float v)
 {
     float a = floor(v);
-    float u = frac(v);
+    float u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(rand3(a), rand3(a + 1.0), u);
 }
@@ -205,7 +198,7 @@ float3 noise3(float v)
 float3 noise3(float2 v)
 {
     float2 a = floor(v);
-    float2 u = frac(v);
+    float2 u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(
         lerp(rand3(a), rand3(a + float2(1.0, 0.0)), u.x),
@@ -217,7 +210,7 @@ float3 noise3(float2 v)
 float3 noise3(float3 v)
 {
     float3 a = floor(v);
-    float3 u = frac(v);
+    float3 u = v - a;
     u = u * u * (3.0 - 2.0 * u);
     return lerp(
         lerp(
