@@ -1155,7 +1155,6 @@ GameObject:
   - component: {fileID: 671619212}
   - component: {fileID: 671619211}
   - component: {fileID: 671619213}
-  - component: {fileID: 671619214}
   m_Layer: 0
   m_Name: DebugUtils
   m_TagString: Untagged
@@ -1201,18 +1200,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d1c3997aa2af914dbe7fcee084ab67c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &671619214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 671619210}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54e005860829a524a8e95b86b4ee74bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &686561424
 GameObject:
   m_ObjectHideFlags: 0
@@ -1224,6 +1211,7 @@ GameObject:
   - component: {fileID: 686561427}
   - component: {fileID: 686561426}
   - component: {fileID: 686561425}
+  - component: {fileID: 686561428}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -1289,6 +1277,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &686561428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 686561424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eafaa8a04f585446953da5981667e0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &702255950
 GameObject:
   m_ObjectHideFlags: 0
@@ -3137,7 +3137,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}
-  m_AnchoredPosition: {x: -5.000122, y: 0}
+  m_AnchoredPosition: {x: -5, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1154972744
@@ -4469,7 +4469,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2914054466736184289, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 127.999985
+      value: 128
       objectReference: {fileID: 0}
     - target: {fileID: 3535619004574509351, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: musicList
@@ -4609,7 +4609,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8733886360927594596, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 163.99998
+      value: 164
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
