@@ -1,4 +1,4 @@
-﻿// TODO: check on all platforms that when a touch is detected, the platform will hide the cursor
+// TODO: check on all platforms that when a touch is detected, the platform will hide the cursor
 
 using System.Linq;
 using UnityEngine;
@@ -15,18 +15,18 @@ namespace Nova
     {
         public float hideAfterSeconds = 5.0f;
 
-        private Vector2 lastCursorPosition;
+        private EventSystem eventSystem;
+        private Vector2 lastMousePosition;
         private float idleTime;
 
-        private void Awake()
+        private void Start()
         {
-            lastCursorPosition = RealInput.mousePosition;
+            eventSystem = EventSystem.current;
+            lastMousePosition = RealInput.mousePosition;
         }
 
         private void Update()
         {
-            var eventSystem = EventSystem.current;
-
             // Clear selection on mobile platforms
             if (Application.isMobilePlatform)
             {
@@ -35,12 +35,12 @@ namespace Nova
             }
 
             // Show cursor and clear selection when mouse moves or clicks
-            var cursorPosition = RealInput.mousePosition;
-            if (cursorPosition != lastCursorPosition ||
-                Mouse.current?.allControls.OfType<ButtonControl>().Any(control => control.isPressed) == true)
+            var mousePosition = RealInput.mousePosition;
+            if (mousePosition != lastMousePosition ||
+                Mouse.current.allControls.OfType<ButtonControl>().Any(control => control.isPressed))
             {
                 Cursor.visible = true;
-                lastCursorPosition = cursorPosition;
+                lastMousePosition = mousePosition;
                 idleTime = 0.0f;
                 eventSystem.SetSelectedGameObject(null);
                 return;
@@ -49,7 +49,7 @@ namespace Nova
             // Hide cursor after an idle time
             if (hideAfterSeconds > 0.0f && Cursor.visible)
             {
-                idleTime += Time.deltaTime;
+                idleTime += Time.unscaledDeltaTime;
                 if (idleTime > hideAfterSeconds)
                 {
                     Cursor.visible = false;
