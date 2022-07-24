@@ -271,8 +271,7 @@ namespace Nova
         {
             if (!isPlaying) return;
 
-            float deltaTime = Time.deltaTime;
-            timeElapsed += deltaTime;
+            timeElapsed += Time.deltaTime;
             if (timeElapsed < duration)
             {
                 Evaluate();
