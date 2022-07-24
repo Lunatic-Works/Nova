@@ -96,7 +96,7 @@ namespace Nova
                     // TODO: When all bindings are erased, action.bindings.Count might be 1,
                     // but accessing action.bindings[0] will throw an exception.
                     // This may be a bug of Unity.
-                    Debug.LogException(e);
+                    Debug.LogWarning(e);
                     continue;
                 }
 
@@ -117,7 +117,7 @@ namespace Nova
                     // TODO: When all bindings are erased, action.bindings.Count might be 1,
                     // but accessing action.bindings[0] will throw an exception.
                     // This may be a bug of Unity.
-                    Debug.LogException(e);
+                    Debug.LogWarning(e);
                     break;
                 }
             }
