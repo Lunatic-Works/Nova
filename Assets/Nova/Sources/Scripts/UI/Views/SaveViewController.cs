@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -86,6 +86,7 @@ namespace Nova
                 else
                 {
                     ShowPreviewBookmark(value);
+                    SaveIDToSaveEntryController(value).ShowDeleteButton();
                 }
             }
         }
@@ -198,11 +199,8 @@ namespace Nova
 
         #region Show and hide
 
-        private void Show(SaveViewMode newSaveViewMode, bool newFromTitle)
+        public override void Show(Action onFinish)
         {
-            saveViewMode = newSaveViewMode;
-            fromTitle = newFromTitle;
-
             // Initialize page
             if (myPanel.activeSelf)
             {
@@ -260,7 +258,7 @@ namespace Nova
 
             ShowPage();
 
-            base.Show();
+            base.Show(onFinish);
         }
 
         public void ShowSave()
@@ -271,17 +269,23 @@ namespace Nova
                 return;
             }
 
-            Show(SaveViewMode.Save, false);
+            saveViewMode = SaveViewMode.Save;
+            fromTitle = false;
+            Show();
         }
 
         public void ShowLoad()
         {
-            Show(SaveViewMode.Load, false);
+            saveViewMode = SaveViewMode.Load;
+            fromTitle = false;
+            Show();
         }
 
         public void ShowLoadFromTitle()
         {
-            Show(SaveViewMode.Load, true);
+            saveViewMode = SaveViewMode.Load;
+            fromTitle = true;
+            Show();
         }
 
         protected override void OnHideComplete()
@@ -660,7 +664,7 @@ namespace Nova
             ShowPage();
         }
 
-        public void ShowPage()
+        private void ShowPage()
         {
             saveButton.interactable = (saveViewMode != SaveViewMode.Save);
             loadButton.interactable = (saveViewMode != SaveViewMode.Load);
@@ -715,8 +719,7 @@ namespace Nova
             rightButtonText.color = (rightButton.interactable ? defaultTextColor : disabledTextColor);
 
             int latestSaveID =
-                checkpointManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue,
-                    SaveIDQueryType.Latest);
+                checkpointManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue, SaveIDQueryType.Latest);
 
             for (int i = 0; i < maxSaveEntry; ++i)
             {
@@ -724,49 +727,41 @@ namespace Nova
                 string newIDText = SaveIDToDisplayID(saveID).ToString();
 
                 // Load properties from bookmark
-                string newHeaderText;
                 string newFooterText;
                 Sprite newThumbnailSprite;
-                UnityAction onEditButtonClicked;
                 UnityAction onDeleteButtonClicked;
-                UnityAction onThumbnailButtonClicked = null;
+                UnityAction onThumbnailButtonClicked;
 
                 if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
                 {
                     try
                     {
-                        Bookmark bookmark = checkpointManager[saveID];
-                        var nodeName = checkpointManager.GetLastNodeName(bookmark.nodeHistoryHash);
-                        newHeaderText = I18n.__(gameState.GetNode(nodeName).displayNames);
-                        newFooterText = bookmark.creationTime.ToString(DateTimeFormat);
+                        newFooterText = checkpointManager[saveID].creationTime.ToString(DateTimeFormat);
                         newThumbnailSprite = GetThumbnailSprite(saveID);
-                        onEditButtonClicked = null;
                         onDeleteButtonClicked = () => DeleteBookmark(saveID);
-
                         onThumbnailButtonClicked = () => OnThumbnailButtonClicked(saveID);
                     }
                     catch (Exception e)
                     {
                         Debug.LogWarning(e);
-                        newHeaderText = "";
                         newFooterText = I18n.__("bookmark.corrupted.title");
                         newThumbnailSprite = corruptedThumbnailSprite;
-                        onEditButtonClicked = null;
                         onDeleteButtonClicked = () => DeleteBookmark(saveID);
                         onThumbnailButtonClicked = null;
                     }
                 }
                 else
                 {
-                    newHeaderText = "";
                     newFooterText = "";
                     newThumbnailSprite = null;
-                    onEditButtonClicked = null;
                     onDeleteButtonClicked = null;
-
                     if (saveViewMode == SaveViewMode.Save)
                     {
                         onThumbnailButtonClicked = () => OnThumbnailButtonClicked(saveID);
+                    }
+                    else
+                    {
+                        onThumbnailButtonClicked = null;
                     }
                 }
 
@@ -776,9 +771,8 @@ namespace Nova
                 // Update UI of saveEntry
                 var saveEntryController = saveEntryControllers[i];
                 saveEntryController.mode = saveViewMode;
-                saveEntryController.Init(newIDText, newHeaderText, newFooterText, saveID == latestSaveID,
-                    newThumbnailSprite, onEditButtonClicked, onDeleteButtonClicked, onThumbnailButtonClicked,
-                    onThumbnailButtonEnter, onThumbnailButtonExit);
+                saveEntryController.Init(newIDText, newFooterText, saveID == latestSaveID, newThumbnailSprite,
+                    onDeleteButtonClicked, onThumbnailButtonClicked, onThumbnailButtonEnter, onThumbnailButtonExit);
             }
 
             previewEntry.mode = saveViewMode;

@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Nova
@@ -9,9 +9,8 @@ namespace Nova
     {
         private Text idText;
         private NovaTextOutline idTextOutline;
-
-        // private Text headerText;
         private Text dateText;
+
         private GameObject latest;
         private Button thumbnailButton;
         private Image thumbnailImage;
@@ -25,8 +24,8 @@ namespace Nova
 
         private bool deleteButtonEnabled;
 
-        private readonly UnityEvent onPointerEnter = new UnityEvent();
-        private readonly UnityEvent onPointerExit = new UnityEvent();
+        private UnityAction onPointerEnter;
+        private UnityAction onPointerExit;
 
         private void Awake()
         {
@@ -34,7 +33,6 @@ namespace Nova
             var header = container.Find("Header");
             idText = header.Find("Id").GetComponent<Text>();
             idTextOutline = header.Find("Id").GetComponent<NovaTextOutline>();
-            // headerText = header.Find("Chapter").GetComponent<Text>();
             dateText = header.Find("Date").GetComponent<Text>();
             latest = container.Find("Latest").gameObject;
             thumbnailButton = container.GetComponent<Button>();
@@ -74,25 +72,24 @@ namespace Nova
         public void InitAsPreview(Sprite newThumbnailSprite, UnityAction onThumbnailButtonClicked)
         {
             idText.text = "--";
-            // headerText.gameObject.SetActive(false);
             dateText.gameObject.SetActive(false);
 
+            latest.SetActive(false);
             deleteButtonEnabled = false;
-            deleteButton.gameObject.SetActive(false);
-
+            HideDeleteButton();
             thumbnailImage.sprite = newThumbnailSprite == null ? defaultThumbnailSprite : newThumbnailSprite;
 
+            InitButton(deleteButton, null);
             InitButton(thumbnailButton, onThumbnailButtonClicked);
+            onPointerEnter = null;
+            onPointerExit = null;
         }
 
-        public void Init(string newIDText, string newHeaderText, string newDateText, bool isLatest,
-            Sprite newThumbnailSprite,
-            UnityAction onEditButtonClicked, UnityAction onDeleteButtonClicked,
-            UnityAction onThumbnailButtonClicked, UnityAction onEnter, UnityAction onExit)
+        public void Init(string newIDText, string newDateText, bool isLatest, Sprite newThumbnailSprite,
+            UnityAction onDeleteButtonClicked, UnityAction onThumbnailButtonClicked, UnityAction onThumbnailButtonEnter,
+            UnityAction onThumbnailButtonExit)
         {
             idText.text = newIDText;
-            // headerText.gameObject.SetActive(true);
-            // headerText.text = newHeaderText;
             dateText.gameObject.SetActive(true);
             dateText.text = newDateText;
 
@@ -100,53 +97,41 @@ namespace Nova
             {
                 latest.SetActive(false);
                 deleteButtonEnabled = false;
-                deleteButton.gameObject.SetActive(false);
+                HideDeleteButton();
                 thumbnailImage.sprite = defaultThumbnailSprite;
             }
             else
             {
                 latest.SetActive(isLatest);
                 deleteButtonEnabled = true;
+                HideDeleteButton();
                 thumbnailImage.sprite = newThumbnailSprite;
             }
 
             InitButton(deleteButton, onDeleteButtonClicked);
             InitButton(thumbnailButton, onThumbnailButtonClicked);
-
-            onPointerEnter.RemoveAllListeners();
-            if (onEnter != null)
-            {
-                onPointerEnter.AddListener(onEnter);
-            }
-
-            onPointerExit.RemoveAllListeners();
-            if (onExit != null)
-            {
-                onPointerExit.AddListener(onExit);
-            }
+            onPointerEnter = onThumbnailButtonEnter;
+            onPointerExit = onThumbnailButtonExit;
         }
 
         public void OnPointerEnter(PointerEventData eventData)
+        {
+            onPointerEnter?.Invoke();
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            onPointerExit?.Invoke();
+        }
+
+        public void ShowDeleteButton()
         {
             if (deleteButtonEnabled)
             {
                 deleteButton.gameObject.SetActive(true);
             }
-
-            onPointerEnter.Invoke();
         }
 
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            if (deleteButtonEnabled)
-            {
-                deleteButton.gameObject.SetActive(false);
-            }
-
-            onPointerExit.Invoke();
-        }
-
-        // TODO: OnPointerExit does not work on Android?
         public void HideDeleteButton()
         {
             deleteButton.gameObject.SetActive(false);
