@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nova.Exceptions;
@@ -88,6 +88,7 @@ namespace Nova
             {
                 x = go.AddComponent<T>();
             }
+
             return x;
         }
 
@@ -343,6 +344,7 @@ namespace Nova
             {
                 return o != null;
             }
+
             return x != null;
         }
 

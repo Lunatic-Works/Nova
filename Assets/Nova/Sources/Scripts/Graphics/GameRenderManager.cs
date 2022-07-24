@@ -283,7 +283,7 @@ namespace Nova
             RealScreen.isScreenInitialized = true;
             Shader.SetGlobalFloat(GlobalRealScreenHeightID, RealScreen.fHeight);
             Shader.SetGlobalFloat(GlobalRealScreenWidthID, RealScreen.fWidth);
-            Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.fWidth / 1920);
+            Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.scale);
             // Debug.Log($"Update Screen {lastScreenWidth}x{lastScreenHeight} => {RealScreen.width}x{RealScreen.height}");
         }
 

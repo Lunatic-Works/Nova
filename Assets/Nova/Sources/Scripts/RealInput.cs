@@ -1,25 +1,47 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 
 namespace Nova
 {
-    public static class RealInput
+    [RequireComponent(typeof(InputSystemUIInputModule))]
+    public class RealInput : MonoBehaviour
     {
+        private static RealInput Current;
+
         // Valid even if the cursor is hidden
         public static Vector2 mousePosition
         {
             get
             {
-                var mouse = Mouse.current;
-                if (mouse != null)
-                {
-                    return mouse.position.ReadValue() - RealScreen.offset;
-                }
-                else
+                if (Mouse.current == null)
                 {
                     return Vector2.positiveInfinity;
                 }
+
+                return Mouse.current.position.ReadValue() - RealScreen.offset;
             }
+        }
+
+        public static Vector2 pointerPosition
+        {
+            get
+            {
+                if (Current?.action == null)
+                {
+                    return Vector2.positiveInfinity;
+                }
+
+                return Current.action.ReadValue<Vector2>();
+            }
+        }
+
+        private InputAction action;
+
+        private void Awake()
+        {
+            Current = this;
+            action = GetComponent<InputSystemUIInputModule>().point.action;
         }
     }
 }
