@@ -152,17 +152,17 @@ namespace Nova
         }
 
         /// <summary>
-        /// return relative angle in deg, range from [0, 360), distance will be the distance from mouse to anchor point
+        /// return relative angle in deg, range from [0, 360), distance will be the distance from pointer to anchor point
         /// </summary>
         /// <returns>return relative angle in deg, range from [0, 360)</returns>
-        private float CalculateMouseRelative(out float distance)
+        private float CalculatePointerRelative(out float distance)
         {
-            Vector2 mousePos = currentCanvas.ScreenToCanvasPosition(RealInput.mousePosition);
+            Vector2 pointerPos = currentCanvas.ScreenToCanvasPosition(RealInput.pointerPosition);
             var anchorPos = preCalculatedAnchorPos;
-            var diff = mousePos - anchorPos;
+            var diff = pointerPos - anchorPos;
             distance = diff.magnitude;
             var angle = Mathf.Atan2(diff.y, diff.x);
-            if (angle < 0)
+            if (angle < 0f)
             {
                 // angle ranges in [0, 2 PI)
                 angle = Mathf.PI * 2f + angle;
@@ -193,8 +193,8 @@ namespace Nova
 
         private void Update()
         {
-            var mouseRelativeAngle = CalculateMouseRelative(out var distance);
-            if (float.IsNaN(mouseRelativeAngle))
+            var pointerRelativeAngle = CalculatePointerRelative(out var distance);
+            if (float.IsNaN(pointerRelativeAngle))
             {
                 return;
             }
@@ -206,7 +206,7 @@ namespace Nova
             }
             else
             {
-                selectedSectorIndex = GetSectorIndexAtAngle(mouseRelativeAngle + angleOffset);
+                selectedSectorIndex = GetSectorIndexAtAngle(pointerRelativeAngle + angleOffset);
                 actionNameText.text = I18n.__(_sectors[selectedSectorIndex].actionI18nName);
             }
 
