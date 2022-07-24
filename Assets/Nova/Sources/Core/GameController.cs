@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Nova
@@ -12,10 +13,8 @@ namespace Nova
         public CheckpointManager CheckpointManager { get; private set; }
         public ConfigManager ConfigManager { get; private set; }
         public InputManager InputManager { get; private set; }
-        public CursorManager CursorManager { get; private set; }
-        public AssetLoader AssetLoader { get; private set; }
         public CheckpointHelper CheckpointHelper { get; private set; }
-        public InputHelper InputHelper { get; private set; }
+
         public NovaAnimation PerDialogueAnimation { get; private set; }
         public NovaAnimation HoldingAnimation { get; private set; }
 
@@ -26,18 +25,18 @@ namespace Nova
             CheckpointManager = FindComponent<CheckpointManager>();
             ConfigManager = FindComponent<ConfigManager>();
             InputManager = FindComponent<InputManager>();
-            CursorManager = FindComponent<CursorManager>();
-            AssetLoader = FindComponent<AssetLoader>();
             CheckpointHelper = FindComponent<CheckpointHelper>();
-            InputHelper = FindComponent<InputHelper>();
-            PerDialogueAnimation = FindComponent<NovaAnimation>("NovaAnimation/PerDialogue");
-            HoldingAnimation = FindComponent<NovaAnimation>("NovaAnimation/Holding");
+
+            var animations = GetComponentsInChildren<NovaAnimation>();
+            PerDialogueAnimation = Array.Find(animations, x => x.type == AnimationType.PerDialogue);
+            AssertNotNull(PerDialogueAnimation, "PerDialogueAnimation");
+            HoldingAnimation = Array.Find(animations, x => x.type == AnimationType.Holding);
+            AssertNotNull(HoldingAnimation, "HoldingAnimation");
         }
 
-        private static T AssertNotNull<T>(T component, string name) where T : MonoBehaviour
+        private static void AssertNotNull(MonoBehaviour component, string name)
         {
             Utils.RuntimeAssert(component != null, $"Cannot find {name}, ill-formed NovaGameController.");
-            return component;
         }
 
         private T FindComponent<T>(string childPath = "") where T : MonoBehaviour
@@ -48,8 +47,9 @@ namespace Nova
                 go = transform.Find(childPath).gameObject;
             }
 
-            var cmp = go.GetComponent<T>();
-            return AssertNotNull(cmp, childPath + "/" + typeof(T).Name);
+            var component = go.GetComponent<T>();
+            AssertNotNull(component, typeof(T).Name);
+            return component;
         }
     }
 }
