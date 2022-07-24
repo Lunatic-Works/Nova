@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 
@@ -24,7 +24,8 @@ namespace Nova
         {
             var eventData = (ExtendedPointerEventData)_eventData;
             // Only mouse left button or touch plays sound
-            if (eventData.touchId == 0 && eventData.button != PointerEventData.InputButton.Left)
+            if (eventData.pointerType == UIPointerType.MouseOrPen &&
+                eventData.button != PointerEventData.InputButton.Left)
             {
                 return;
             }
@@ -36,7 +37,8 @@ namespace Nova
         {
             var eventData = (ExtendedPointerEventData)_eventData;
             // Only mouse left button or touch plays sound
-            if (eventData.touchId == 0 && eventData.button != PointerEventData.InputButton.Left)
+            if (eventData.pointerType == UIPointerType.MouseOrPen &&
+                eventData.button != PointerEventData.InputButton.Left)
             {
                 return;
             }
@@ -51,6 +53,7 @@ namespace Nova
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            // TODO: Is the loop correct?
             if (mouseInsideLoop != null)
             {
                 viewManager.TryPlaySound(mouseInsideLoop);
