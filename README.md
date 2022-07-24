@@ -37,7 +37,7 @@
 
 * v0.1：兼容《青箱》v1.1.0的版本
 * v0.2：兼容Unity 2019的版本，重要的新功能包括新的脚本parser、新的存档系统、异步的`GameState`
-* v0.3：`master` branch上滚动更新的版本，重要的新功能包括Input System、URP，预计的新功能包括Addressables
+* v0.3：`master` branch上滚动更新的版本，重要的新功能包括Input System（目前改了一半，可能要改回去）、URP，预计的新功能包括Addressables
 
 ## 友情链接
 
@@ -70,8 +70,9 @@
 
 本框架的依赖：
 
-* [tolua#](https://github.com/topameng/tolua)
+* [ToLua#](https://github.com/topameng/tolua)
 * [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
+* [Loop Scroll Rect](https://github.com/qiankanglai/LoopScrollRect)
 
 国内镜像（随缘更新）：
 
