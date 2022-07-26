@@ -102,7 +102,7 @@ namespace Nova
 
         public void SetPoseDelayed(string pose)
         {
-            if (!CheckCharacterName("<pose>"))
+            if (!CheckCharacterName(pose))
             {
                 return;
             }
