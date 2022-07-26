@@ -15,7 +15,7 @@ namespace Nova
         public string imageFolder;
         public string luaGlobalName;
 
-        protected readonly List<string> curPose = new List<string>();
+        protected string currentPose;
         private DialogueState dialogueState;
         protected GameState gameState;
 
@@ -50,9 +50,9 @@ namespace Nova
             }
         }
 
-        public void SetPose(IEnumerable<string> pose, bool fade = true)
+        public void SetPose(string pose, bool fade = true)
         {
-            if (curPose.SequenceEqual(pose))
+            if (pose == currentPose)
             {
                 return;
             }
@@ -63,51 +63,36 @@ namespace Nova
                 mergerSub.SetTextures(mergerPrimary);
             }
 
-            var sprites = LoadPoseSprites(imageFolder, pose);
+            var sprites = LoadSprites(imageFolder, pose);
             mergerPrimary.SetTextures(sprites);
             if (fade)
             {
                 FadeAnimation(fadeDuration);
             }
 
-            curPose.Clear();
-            curPose.AddRange(pose);
-        }
-
-        public void SetPose(string pose, bool fade = true)
-        {
-            SetPose(pose.Split(PoseStringSeparator), fade);
-        }
-
-        public void SetPose(LuaInterface.LuaTable pose, bool fade = true)
-        {
-            SetPose(pose.ToArray().Cast<string>(), fade);
+            currentPose = pose;
         }
 
         public void ClearImage(bool fade = true)
         {
-            SetPose(Enumerable.Empty<string>(), fade);
+            SetPose("", fade);
         }
 
-        public static string PoseToString(IEnumerable<string> pose)
+        public static string ArrayToPose(IEnumerable<string> pose)
         {
             return string.Join(PoseStringSeparator.ToString(), pose);
         }
 
-        public static string PoseToString(LuaInterface.LuaTable pose)
+        public static IEnumerable<string> PoseToArray(string pose)
         {
-            return PoseToString(pose.ToArray().Cast<string>());
+            return string.IsNullOrEmpty(pose) ? Enumerable.Empty<string>() : pose.Split(PoseStringSeparator);
         }
 
-        public static IReadOnlyList<SpriteWithOffset> LoadPoseSprites(string imageFolder, IEnumerable<string> pose)
+        public static IReadOnlyList<SpriteWithOffset> LoadSprites(string imageFolder, string pose)
         {
-            return pose.Select(x => AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x)))
+            return PoseToArray(pose)
+                .Select(x => AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x)))
                 .ToList();
-        }
-
-        public static IReadOnlyList<SpriteWithOffset> LoadPoseSprites(string imageFolder, string pose)
-        {
-            return LoadPoseSprites(imageFolder, pose.Split(PoseStringSeparator));
         }
 
         #region Restoration
@@ -118,14 +103,14 @@ namespace Nova
         protected class CompositeSpriteControllerRestoreData : IRestoreData
         {
             public readonly TransformData transform;
-            public readonly List<string> poseArray;
+            public readonly string pose;
             public readonly Vector4Data color;
             public readonly int renderQueue;
 
             public CompositeSpriteControllerRestoreData(CompositeSpriteController parent)
             {
                 transform = new TransformData(parent.transform);
-                poseArray = new List<string>(parent.curPose);
+                pose = parent.currentPose;
                 color = parent.color;
                 renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
             }
@@ -133,7 +118,7 @@ namespace Nova
             public CompositeSpriteControllerRestoreData(CompositeSpriteControllerRestoreData other)
             {
                 transform = other.transform;
-                poseArray = other.poseArray;
+                pose = other.pose;
                 color = other.color;
                 renderQueue = other.renderQueue;
             }
@@ -150,7 +135,7 @@ namespace Nova
             data.transform.Restore(this.transform);
             color = data.color;
             gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
-            SetPose(data.poseArray, false);
+            SetPose(data.pose, false);
         }
 
         #endregion

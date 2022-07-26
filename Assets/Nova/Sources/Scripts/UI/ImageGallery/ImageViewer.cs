@@ -32,7 +32,7 @@ namespace Nova
                     Destroy(renderTexture);
                 }
 
-                var sprites = CompositeSpriteController.LoadPoseSprites(entry.resourcePath, entry.poseString);
+                var sprites = CompositeSpriteController.LoadSprites(entry.resourcePath, entry.poseString);
                 if (!sprites.Any() || sprites.Contains(null))
                 {
                     return;

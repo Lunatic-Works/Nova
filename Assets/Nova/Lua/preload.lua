@@ -19,17 +19,10 @@ function preload(obj, resource_name)
         Nova.AssetLoader.Preload(Nova.AssetCacheType.Prefab, obj.prefabFolder .. '/' .. resource_name)
     elseif _type == typeof(Nova.AudioController) then
         obj:Preload(resource_name)
+    elseif _type == typeof(Nova.SpriteController) then
+        Nova.AssetLoader.Preload(Nova.AssetCacheType.Image, obj.imageFolder .. '/' .. resource_name)
     else
-        if type(resource_name) == 'table' then
-            -- dont preload pose
-        else
-            local pose = get_pose(obj, resource_name)
-            if pose then
-                -- dont preload pose
-            else
-                Nova.AssetLoader.Preload(Nova.AssetCacheType.Image, obj.imageFolder .. '/' .. resource_name)
-            end
-        end
+        -- TODO: preload pose
     end
 end
 
@@ -48,17 +41,10 @@ function unpreload(obj, resource_name)
         Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Prefab, obj.prefabFolder .. '/' .. resource_name)
     elseif _type == typeof(Nova.AudioController) then
         obj:Unpreload(resource_name)
+    elseif _type == typeof(Nova.SpriteController) then
+        Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Image, obj.imageFolder .. '/' .. resource_name)
     else
-        if type(resource_name) == 'table' then
-            -- dont preload pose
-        else
-            local pose = get_pose(obj, resource_name)
-            if pose then
-                -- dont preload pose
-            else
-                Nova.AssetLoader.Unpreload(Nova.AssetCacheType.Image, obj.imageFolder .. '/' .. resource_name)
-            end
-        end
+        -- TODO: unpreload pose
     end
 end
 

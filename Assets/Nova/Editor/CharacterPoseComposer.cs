@@ -231,7 +231,7 @@ namespace Nova.Editor
 
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
-            var poseString = CompositeSpriteController.PoseToString(layers.Select(x => x.name));
+            var poseString = CompositeSpriteController.ArrayToPose(layers.Select(x => x.name));
             GUILayout.Label("Pose String", EditorStyles.boldLabel);
             if (GUILayout.Button("Copy"))
             {

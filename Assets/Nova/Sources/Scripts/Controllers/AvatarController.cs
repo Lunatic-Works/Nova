@@ -28,7 +28,7 @@ namespace Nova
         private string characterName;
         private Dictionary<string, string> characterToImageName = new Dictionary<string, string>();
 
-        public int textPaddingOrZero => curPose.Any() ? textPadding : 0;
+        public int textPaddingOrZero => currentPose.Any() ? textPadding : 0;
         public override bool renderToCamera => true;
         public override RenderTexture renderTexture => null;
 
@@ -100,7 +100,7 @@ namespace Nova
             }
         }
 
-        public void SetPoseDelayed(LuaInterface.LuaTable pose)
+        public void SetPoseDelayed(string pose)
         {
             if (!CheckCharacterName("<pose>"))
             {
@@ -108,8 +108,8 @@ namespace Nova
             }
 
             var prefix = nameToConfig[characterName].prefix;
-            var poseStr = PoseToString(pose.ToArray().Cast<string>().Select(x => prefix + x).ToArray());
-            characterToImageName[characterName] = poseStr;
+            pose = ArrayToPose(PoseToArray(pose).Select(x => prefix + x));
+            characterToImageName[characterName] = pose;
         }
 
         public void SetImageDelayed(string imageName)

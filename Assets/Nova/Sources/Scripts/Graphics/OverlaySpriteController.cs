@@ -84,6 +84,7 @@ namespace Nova
             private new const string SUFFIX = "Composite" + RenderTarget.SUFFIX;
 
             private readonly OverlaySpriteController parent;
+
             public override string textureName => parent == null ? oldConfig.name : parent.luaGlobalName + SUFFIX;
             public override bool isFinal => false;
             public override bool isActive => parent != null && parent.needRender;
