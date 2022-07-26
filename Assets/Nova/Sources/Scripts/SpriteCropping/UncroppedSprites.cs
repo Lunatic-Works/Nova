@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class UncroppedStanding : MonoBehaviour
+    public class UncroppedSprites : MonoBehaviour
     {
         // relative to the project folder, e.g., "Assets/path/to/image"
         public string outputDirectory;

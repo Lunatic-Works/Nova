@@ -70,7 +70,7 @@ namespace Nova.Editor
                 {
                     id = fileName,
                     displayNames = new List<LocaleStringPair>
-                        {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}},
+                        {new LocaleStringPair { locale = I18n.DefaultLocale, value = fileName }},
                     resourcePath = GetResourcePath(imagePath)
                 };
             }).ToList();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,11 +6,12 @@ using UnityObject = UnityEngine.Object;
 
 namespace Nova
 {
+    // We separately control cache sizes for images (BG and CG layers) and standing layers
     [ExportCustomType]
     public enum AssetCacheType
     {
         Image,
-        StandingLayer,
+        Standing,
         Prefab,
         Audio
     }
@@ -53,7 +54,7 @@ namespace Nova
             cachedAssets = new Dictionary<AssetCacheType, LRUCache<string, CachedAssetEntry>>
             {
                 [AssetCacheType.Image] = new LRUCache<string, CachedAssetEntry>(20, true),
-                [AssetCacheType.StandingLayer] = new LRUCache<string, CachedAssetEntry>(20, true),
+                [AssetCacheType.Standing] = new LRUCache<string, CachedAssetEntry>(20, true),
                 [AssetCacheType.Prefab] = new LRUCache<string, CachedAssetEntry>(1, true),
                 [AssetCacheType.Audio] = new LRUCache<string, CachedAssetEntry>(4, true)
             };
