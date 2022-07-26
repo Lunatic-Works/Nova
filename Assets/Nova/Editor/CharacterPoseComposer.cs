@@ -73,11 +73,9 @@ namespace Nova.Editor
         private void DrawElement(Rect rect, int index, bool active, bool focused)
         {
             var item = layers[index];
-            var paths = AssetDatabase.FindAssets(uncropped ? "t:Sprite" : "t:SpriteWithOffset", new[] {imageFolder})
-                .Select(AssetDatabase.GUIDToAssetPath)
-                .ToList();
+            var guids = AssetDatabase.FindAssets(uncropped ? "t:Sprite" : "t:SpriteWithOffset", new[] {imageFolder});
 
-            if (paths.Count == 0)
+            if (guids.Length == 0)
             {
                 GUI.Label(rect, "No sprite found");
                 return;
@@ -91,8 +89,9 @@ namespace Nova.Editor
             {
                 var menu = new GenericMenu();
 
-                foreach (var path in paths)
+                foreach (var guid in guids)
                 {
+                    var path = AssetDatabase.GUIDToAssetPath(guid);
                     var layerName = Path.GetFileNameWithoutExtension(path);
 
                     if (uncropped)

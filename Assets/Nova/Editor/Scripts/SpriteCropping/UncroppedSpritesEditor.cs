@@ -18,10 +18,29 @@ namespace Nova.Editor
         [MenuItem("Assets/Create/Nova/Uncropped Sprites", false)]
         public static void CreateUncroppedSprites()
         {
-            const string assetName = "UncroppedSprites";
-            var parent = new GameObject(assetName);
+            var dir = EditorUtils.GetSelectedDirectory();
+            var guids = AssetDatabase.FindAssets("t:GameObject", new[] {dir});
+            var fileName = "UncroppedSprites.prefab";
+            var outputDirectory = "";
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                var oldSprites = go.GetComponent<UncroppedSprites>();
+                if (oldSprites == null)
+                {
+                    continue;
+                }
+
+                fileName = Path.GetFileName(path);
+                outputDirectory = oldSprites.outputDirectory;
+                break;
+            }
+
+            var parent = new GameObject("UncroppedSprites");
             ResetTransform(parent.transform);
-            parent.AddComponent<UncroppedSprites>();
+            var sprites = parent.AddComponent<UncroppedSprites>();
+            sprites.outputDirectory = outputDirectory;
 
             foreach (var spritePath in EditorUtils.GetSelectedSpritePaths().OrderBy(x => x))
             {
@@ -37,10 +56,7 @@ namespace Nova.Editor
                 cropper.cropRect = new RectInt(0, 0, texture.width, texture.height);
             }
 
-            var currentDir = EditorUtils.GetSelectedDirectory();
-
-            PrefabUtility.SaveAsPrefabAsset(parent,
-                Path.Combine(currentDir, AssetDatabase.GenerateUniqueAssetPath(assetName + ".prefab")));
+            PrefabUtility.SaveAsPrefabAsset(parent, Path.Combine(dir, fileName));
             DestroyImmediate(parent);
         }
 

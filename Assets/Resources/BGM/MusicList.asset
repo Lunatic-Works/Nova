@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d244e9fe1a7a441e9ffa8dbde8ad95e6, type: 3}
-  m_Name: BGMList
+  m_Name: MusicList
   m_EditorClassIdentifier: 
   entries:
   - {fileID: 11400000, guid: 23bdca577d5897444b1ef86ff6d61140, type: 2}

@@ -11,23 +11,21 @@ namespace Nova.Editor
         [MenuItem("Assets/Nova/Create List for All Music Entries", false)]
         public static void CreateListForAllMusicEntries()
         {
-            var path = EditorUtils.GetSelectedDirectory();
-            var listPaths = AssetDatabase.FindAssets("t:MusicEntryList", new[] {path});
+            var dir = EditorUtils.GetSelectedDirectory();
+            var guids = AssetDatabase.FindAssets("t:MusicEntryList", new[] {dir});
             MusicEntryList list;
-            if (listPaths.Length == 0)
+            if (guids.Length == 0)
             {
                 list = CreateInstance<MusicEntryList>();
-                var pathName = Path.GetFileNameWithoutExtension(path);
-                AssetDatabase.CreateAsset(list, Path.Combine(path, pathName + "_music_list.asset"));
+                AssetDatabase.CreateAsset(list, Path.Combine(dir, "MusicList.asset"));
             }
             else
             {
-                list = AssetDatabase.LoadAssetAtPath<MusicEntryList>(AssetDatabase.GUIDToAssetPath(listPaths.First()));
+                list = AssetDatabase.LoadAssetAtPath<MusicEntryList>(AssetDatabase.GUIDToAssetPath(guids.First()));
             }
 
-            list.entries = AssetDatabase.FindAssets("t:MusicEntry", new[] {path})
-                .Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<MusicEntry>)
+            list.entries = AssetDatabase.FindAssets("t:MusicEntry", new[] {dir})
+                .Select(x => AssetDatabase.LoadAssetAtPath<MusicEntry>(AssetDatabase.GUIDToAssetPath(x)))
                 .ToList();
 
             EditorUtility.SetDirty(list);

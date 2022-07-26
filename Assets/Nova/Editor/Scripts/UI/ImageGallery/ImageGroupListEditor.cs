@@ -31,24 +31,21 @@ namespace Nova.Editor
         [MenuItem("Assets/Nova/Create List for All Image Groups", false)]
         public static void CreateListForAllImageGroups()
         {
-            var path = EditorUtils.GetSelectedDirectory();
-            var listPaths = AssetDatabase.FindAssets("t:ImageGroupList", new[] {path});
+            var dir = EditorUtils.GetSelectedDirectory();
+            var guids = AssetDatabase.FindAssets("t:ImageGroupList", new[] {dir});
             ImageGroupList list;
-            if (listPaths.Length == 0)
+            if (guids.Length == 0)
             {
                 list = CreateInstance<ImageGroupList>();
-                var pathName = Path.GetFileNameWithoutExtension(path);
-                AssetDatabase.CreateAsset(list, Path.Combine(path, pathName + "_image_group_list.asset"));
+                AssetDatabase.CreateAsset(list, Path.Combine(dir, "ImageGroupList.asset"));
             }
             else
             {
-                list = AssetDatabase.LoadAssetAtPath<ImageGroupList>(
-                    AssetDatabase.GUIDToAssetPath(listPaths.First()));
+                list = AssetDatabase.LoadAssetAtPath<ImageGroupList>(AssetDatabase.GUIDToAssetPath(guids.First()));
             }
 
-            list.groups = AssetDatabase.FindAssets("t:ImageGroup", new[] {path})
-                .Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<ImageGroup>)
+            list.groups = AssetDatabase.FindAssets("t:ImageGroup", new[] {dir})
+                .Select(x => AssetDatabase.LoadAssetAtPath<ImageGroup>(AssetDatabase.GUIDToAssetPath(x)))
                 .ToList();
 
             EditorUtility.SetDirty(list);
