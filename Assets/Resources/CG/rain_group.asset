@@ -17,8 +17,17 @@ MonoBehaviour:
     displayNames:
     - locale: 40
       value: rain
-    composite: 0
-    poseString: 
-    resourcePath: Backgrounds/rain
+    composite: 1
+    poseString: rain_back
+    resourcePath: CG
+    snapshotOffset: {x: 0, y: 0}
+    snapshotScale: {x: 1, y: 1}
+  - id: rain_text
+    displayNames:
+    - locale: 40
+      value: rain_text
+    composite: 1
+    poseString: rain_back+rain_text
+    resourcePath: CG
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}

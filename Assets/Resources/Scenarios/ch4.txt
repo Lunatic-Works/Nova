@@ -185,7 +185,10 @@ sound('flap')
 
 <|
 anim_hold_begin()
-anim_hold:trans_up(bg, 'rain', 0.5
+anim_hold:trans_up(cam, function()
+        hide(bg)
+        show(cg, 'rain')
+    end, 0.5
     ):vfx(cam, {'color', 1}, {0, 1}, 10, { _ColorMul = 3 })
 |>
 我用尽力气将目光转向窗外。
@@ -195,7 +198,7 @@ anim_hold:trans_up(bg, 'rain', 0.5
 我凝视着无止境般落下的雨点。
 
 <|
-anim:wait_all(anim_hold)
+anim:wait_all(anim_hold):action(show, cg, 'rain_final')
 |>
 在我眼中，本应该是无色的雨点也闪耀着彩虹的光辉。
 
@@ -203,6 +206,7 @@ anim:wait_all(anim_hold)
 anim_hold_end()
 anim:trans_fade(cam, function()
         show(bg, 'black')
+        hide(cg)
         vfx(cam, nil)
         vfx(cam, {nil, 2})
     end, 2

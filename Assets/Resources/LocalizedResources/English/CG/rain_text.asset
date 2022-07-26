@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c810d82e5bf245c0abc5d770e9881d37, type: 3}
-  m_Name: BackgroundGroupList
+  m_Script: {fileID: 11500000, guid: f6a2d3e9d31f448fb15ad69533636ece, type: 3}
+  m_Name: rain_text
   m_EditorClassIdentifier: 
-  groups:
-  - {fileID: 11400000, guid: 4683bc0c91ba57b4c8a9e923d4c1916b, type: 2}
-  - {fileID: 11400000, guid: 67e8f15dd73830e4daabbe58762ef0a3, type: 2}
+  sprite: {fileID: 21300000, guid: d0321ed5c4d15da4e8e7855c607ea483, type: 3}
+  offset: {x: 0, y: 0, z: 0}
