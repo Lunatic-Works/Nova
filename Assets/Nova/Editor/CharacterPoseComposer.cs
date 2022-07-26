@@ -39,7 +39,8 @@ namespace Nova.Editor
 
         private void OnEnable()
         {
-            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("CharacterPoseComposer", out renderCamera, out merger);
+            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("CharacterPoseComposer", out renderCamera,
+                out merger);
 
             reorderableList = new ReorderableList(layers, typeof(Layer), true, true, true, true);
             reorderableList.drawHeaderCallback += DrawHeader;
@@ -72,7 +73,7 @@ namespace Nova.Editor
         private void DrawElement(Rect rect, int index, bool active, bool focused)
         {
             var item = layers[index];
-            var paths = AssetDatabase.FindAssets(uncropped ? "t:Sprite" : "t:SpriteWithOffset", new[] { imageFolder })
+            var paths = AssetDatabase.FindAssets(uncropped ? "t:Sprite" : "t:SpriteWithOffset", new[] {imageFolder})
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .ToList();
 
@@ -83,10 +84,10 @@ namespace Nova.Editor
             }
 
             if (EditorGUI.DropdownButton(
-                new Rect(rect.x + rect.width / 3, rect.y, rect.width * 2 / 3, rect.height),
-                new GUIContent(item.name ?? "Sprite"),
-                FocusType.Keyboard
-            ))
+                    new Rect(rect.x + rect.width / 3, rect.y, rect.width * 2 / 3, rect.height),
+                    new GUIContent(item.name ?? "Sprite"),
+                    FocusType.Keyboard
+                ))
             {
                 var menu = new GenericMenu();
 
@@ -223,6 +224,7 @@ namespace Nova.Editor
             {
                 EditorGUIUtility.systemCopyBuffer = luaTable;
             }
+
             GUILayout.EndHorizontal();
             EditorGUILayout.SelectableLabel(luaTable);
             GUILayout.EndVertical();
@@ -235,6 +237,7 @@ namespace Nova.Editor
             {
                 EditorGUIUtility.systemCopyBuffer = poseString;
             }
+
             GUILayout.EndHorizontal();
             EditorGUILayout.SelectableLabel(poseString);
             GUILayout.EndVertical();
@@ -274,7 +277,8 @@ namespace Nova.Editor
 
             var previewRect =
                 EditorGUILayout.GetControlRect(false, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            previewRect.size = Utils.GetContentSize(previewRect.size, (float)renderTexture.width / renderTexture.height);
+            previewRect.size =
+                Utils.GetContentSize(previewRect.size, (float)renderTexture.width / renderTexture.height);
             var scale = previewRect.width / renderTexture.width;
             EditorGUI.DrawTextureTransparent(previewRect, renderTexture);
 

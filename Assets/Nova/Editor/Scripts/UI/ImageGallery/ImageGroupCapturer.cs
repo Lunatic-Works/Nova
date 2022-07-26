@@ -8,15 +8,14 @@ namespace Nova.Editor
 {
     class ImageGroupCapturer : IDisposable
     {
-        public const int SnapshotWidth = 320;
-        public const int SnapshotHeight = 180;
+        private const int SnapshotWidth = ImageGroupEditor.SnapshotWidth;
+        private const int SnapshotHeight = ImageGroupEditor.SnapshotHeight;
+        private const string ResourcesFolderName = ImageGroupEditor.ResourcesFolderName;
 
         private static string GetAssetFullPath(UnityEngine.Object asset)
         {
             return Path.Combine(Path.GetDirectoryName(Application.dataPath), AssetDatabase.GetAssetPath(asset));
         }
-
-        private const string ResourcesFolderName = "/Resources/";
 
         private static string GetResourcesFolder(string path)
         {
@@ -32,15 +31,17 @@ namespace Nova.Editor
         }
 
         public RenderTexture renderTexture { get; private set; }
-        private RenderTexture snapshotTexture;
-        private Texture2D writeTexture;
-        private GameObject root;
-        private CompositeSpriteMerger merger;
-        private Camera renderCamera;
+
+        private readonly RenderTexture snapshotTexture;
+        private readonly Texture2D writeTexture;
+        private readonly GameObject root;
+        private readonly CompositeSpriteMerger merger;
+        private readonly Camera renderCamera;
 
         public ImageGroupCapturer()
         {
-            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("ImageGroupCapturer", out renderCamera, out merger);
+            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("ImageGroupCapturer", out renderCamera,
+                out merger);
             snapshotTexture = new RenderTexture(SnapshotWidth, SnapshotHeight, 0);
             writeTexture = new Texture2D(SnapshotWidth, SnapshotHeight);
         }
@@ -52,14 +53,17 @@ namespace Nova.Editor
             {
                 UnityEngine.Object.DestroyImmediate(renderTexture);
             }
+
             if (snapshotTexture != null)
             {
-                UnityEngine.Object.DestroyImmediate(renderTexture);
+                UnityEngine.Object.DestroyImmediate(snapshotTexture);
             }
+
             if (writeTexture != null)
             {
                 UnityEngine.Object.DestroyImmediate(writeTexture);
             }
+
             if (root != null)
             {
                 UnityEngine.Object.DestroyImmediate(root);
@@ -90,18 +94,20 @@ namespace Nova.Editor
                 resourcePath = "";
                 return false;
             }
+
             resourcePath = GetResourcesFolder(GetAssetFullPath(sprites[0]));
             if (renderTexture != null)
             {
                 UnityEngine.Object.DestroyImmediate(renderTexture);
             }
+
             renderTexture = merger.RenderToTexture(sprites, renderCamera);
             return true;
         }
 
         public bool DrawComposite(ImageEntry entry)
         {
-            return DrawComposite(entry, out var _);
+            return DrawComposite(entry, out _);
         }
 
         private void GenerateSnapshot(ImageEntry entry)
@@ -121,6 +127,7 @@ namespace Nova.Editor
                 tex = sprite.texture;
                 resourcePath = GetResourcesFolder(GetAssetFullPath(sprite));
             }
+
             Graphics.Blit(tex, snapshotTexture, entry.snapshotScale, entry.snapshotOffset);
             var data = GetSnapshotPNGData();
             var snapshotFullPath = Path.Combine(resourcePath, entry.snapshotResourcePath + ".png");

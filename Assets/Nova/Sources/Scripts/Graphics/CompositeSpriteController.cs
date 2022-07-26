@@ -8,14 +8,14 @@ namespace Nova
     [ExportCustomType]
     public abstract class CompositeSpriteController : FadeController, IRestorable
     {
-        private const char poseStringSeparator = ':';
+        private const char PoseStringSeparator = ':';
 
         public CompositeSpriteMerger mergerPrimary;
         public CompositeSpriteMerger mergerSub;
         public string imageFolder;
         public string luaGlobalName;
 
-        protected List<string> curPose = new List<string>();
+        protected readonly List<string> curPose = new List<string>();
         private DialogueState dialogueState;
         protected GameState gameState;
 
@@ -76,7 +76,7 @@ namespace Nova
 
         public void SetPose(string pose, bool fade = true)
         {
-            SetPose(pose.Split(poseStringSeparator), fade);
+            SetPose(pose.Split(PoseStringSeparator), fade);
         }
 
         public void SetPose(LuaInterface.LuaTable pose, bool fade = true)
@@ -91,7 +91,7 @@ namespace Nova
 
         public static string PoseToString(IEnumerable<string> pose)
         {
-            return string.Join(poseStringSeparator.ToString(), pose);
+            return string.Join(PoseStringSeparator.ToString(), pose);
         }
 
         public static string PoseToString(LuaInterface.LuaTable pose)
@@ -101,13 +101,16 @@ namespace Nova
 
         public static IReadOnlyList<SpriteWithOffset> LoadPoseSprites(string imageFolder, IEnumerable<string> pose)
         {
-            return pose.Select(x => AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x))).ToList();
+            return pose.Select(x => AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x)))
+                .ToList();
         }
 
         public static IReadOnlyList<SpriteWithOffset> LoadPoseSprites(string imageFolder, string pose)
         {
-            return LoadPoseSprites(imageFolder, pose.Split(poseStringSeparator));
+            return LoadPoseSprites(imageFolder, pose.Split(PoseStringSeparator));
         }
+
+        #region Restoration
 
         public virtual string restorableName => luaGlobalName;
 
@@ -121,18 +124,18 @@ namespace Nova
 
             public CompositeSpriteControllerRestoreData(CompositeSpriteController parent)
             {
-                this.transform = new TransformData(parent.transform);
-                this.poseArray = new List<string>(parent.curPose);
-                this.color = parent.color;
-                this.renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
+                transform = new TransformData(parent.transform);
+                poseArray = new List<string>(parent.curPose);
+                color = parent.color;
+                renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
             }
 
             public CompositeSpriteControllerRestoreData(CompositeSpriteControllerRestoreData other)
             {
-                this.transform = other.transform;
-                this.poseArray = other.poseArray;
-                this.color = other.color;
-                this.renderQueue = other.renderQueue;
+                transform = other.transform;
+                poseArray = other.poseArray;
+                color = other.color;
+                renderQueue = other.renderQueue;
             }
         }
 
@@ -149,5 +152,7 @@ namespace Nova
             gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
             SetPose(data.poseArray, false);
         }
+
+        #endregion
     }
 }

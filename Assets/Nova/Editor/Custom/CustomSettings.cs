@@ -177,7 +177,6 @@ public static class CustomSettings
                 .SelectMany(t => t.GetTypes())
                 .Where(t => t.GetCustomAttribute<Nova.ExportCustomType>() != null)
                 .Select(_GT)
-                .ToArray()
         ).ToArray();
 
     public static readonly List<Type> dynamicList = new List<Type>()
