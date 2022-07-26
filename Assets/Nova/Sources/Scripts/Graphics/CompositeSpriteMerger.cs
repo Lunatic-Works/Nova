@@ -8,8 +8,7 @@ namespace Nova
 {
     public class CompositeSpriteMerger : MonoBehaviour
     {
-        public const int MergerLayer = 16;
-        // public const
+        private const int MergerLayer = 16;
 
         private readonly List<SpriteRenderer> layers = new List<SpriteRenderer>();
 
@@ -75,7 +74,7 @@ namespace Nova
             }
         }
 
-        public void ClearTextures()
+        private void ClearTextures()
         {
             SetTextures(Array.Empty<SpriteWithOffset>());
         }
@@ -97,7 +96,7 @@ namespace Nova
 
         public RenderTexture RenderToTexture(IReadOnlyList<SpriteWithOffset> sprites, Camera renderCamera)
         {
-            Debug.Log("render to texture");
+            // Debug.Log("render to texture");
             SetTextures(sprites);
             var bounds = CompositeSpriteMerger.GetMergedSize(sprites);
             var pixelsPerUnit = sprites[0].sprite.pixelsPerUnit;
@@ -114,9 +113,9 @@ namespace Nova
             return renderTexture;
         }
 
-        public static Rect GetMergedSize(IReadOnlyList<SpriteWithOffset> spriteList)
+        private static Rect GetMergedSize(IEnumerable<SpriteWithOffset> spriteList)
         {
-            var sprites = spriteList.Where(x => x != null);
+            var sprites = spriteList.Where(x => x != null).ToList();
             if (!sprites.Any())
             {
                 return Rect.zero;
@@ -140,7 +139,8 @@ namespace Nova
         }
 
         // used in editor
-        public static GameObject InstantiateSimpleSpriteMerger(string name, out Camera renderCamera, out CompositeSpriteMerger merger)
+        public static GameObject InstantiateSimpleSpriteMerger(string name, out Camera renderCamera,
+            out CompositeSpriteMerger merger)
         {
             var root = new GameObject(name)
             {

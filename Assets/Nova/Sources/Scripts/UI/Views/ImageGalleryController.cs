@@ -127,7 +127,7 @@ namespace Nova
             }
         }
 
-        public static int GetUnlockedImageCount(ImageGroup group, ImageUnlockInfo unlockInfo)
+        private static int GetUnlockedImageCount(ImageGroup group, ImageUnlockInfo unlockInfo)
         {
             return group.entries.Count(entry => unlockInfo.Contains(entry.unlockKey));
         }

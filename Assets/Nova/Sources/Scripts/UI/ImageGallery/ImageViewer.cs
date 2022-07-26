@@ -31,11 +31,13 @@ namespace Nova
                 {
                     Destroy(renderTexture);
                 }
+
                 var sprites = CompositeSpriteController.LoadPoseSprites(entry.resourcePath, entry.poseString);
                 if (!sprites.Any() || sprites.Contains(null))
                 {
                     return;
                 }
+
                 renderTexture = merger.RenderToTexture(sprites, renderCamera);
                 image.texture = renderTexture;
             }
@@ -44,6 +46,7 @@ namespace Nova
                 var sprite = AssetLoader.Load<Sprite>(entry.resourcePath);
                 image.texture = sprite.texture;
             }
+
             image.rectTransform.sizeDelta = new Vector2(image.texture.width, image.texture.height);
         }
 

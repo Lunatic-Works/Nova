@@ -14,8 +14,7 @@ namespace Nova.Editor
         public const int SnapshotWidth = 320;
         public const int SnapshotHeight = 180;
         public const float SnapshotAspectRatio = (float)SnapshotHeight / SnapshotWidth;
-
-        private const string ResourcesFolderName = "/Resources/";
+        public const string ResourcesFolderName = "/Resources/";
 
         private static string GetResourcePath(string path)
         {
@@ -38,12 +37,10 @@ namespace Nova.Editor
         private static string GetCommonPrefix(IEnumerable<string> paths)
         {
             var fileNames = paths.Select(Path.GetFileNameWithoutExtension).ToList();
-            var prefix = new string(
-                fileNames.First()
-                    .Substring(0, fileNames.Min(s => s.Length))
-                    .TakeWhile((c, i) => fileNames.All(s => s[i] == c))
-                    .ToArray()
-            );
+            var prefix = fileNames.First()
+                .Substring(0, fileNames.Min(s => s.Length))
+                .TakeWhile((c, i) => fileNames.All(s => s[i] == c))
+                .ToString();
 
             prefix = prefix.TrimEnd('_');
 
@@ -170,8 +167,10 @@ namespace Nova.Editor
                         EditorGUILayout.HelpBox("Invalid image resource path or pose string!", MessageType.Error);
                         return;
                     }
+
                     previewEntryKey = entry.unlockKey;
                 }
+
                 previewTexture = capturer.renderTexture;
             }
             else
@@ -182,8 +181,10 @@ namespace Nova.Editor
                     EditorGUILayout.HelpBox("Invalid image resource path!", MessageType.Error);
                     return;
                 }
+
                 previewTexture = sprite.texture;
             }
+
             var size = new Vector2(previewTexture.width, previewTexture.height);
 
             if (GUILayout.Button("Correct Snapshot Scale Y for Aspect Ratio"))

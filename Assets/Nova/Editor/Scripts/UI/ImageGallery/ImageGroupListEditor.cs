@@ -32,7 +32,7 @@ namespace Nova.Editor
         public static void CreateListForAllImageGroups()
         {
             var path = EditorUtils.GetSelectedDirectory();
-            var listPaths = AssetDatabase.FindAssets("t:ImageGroupList", new[] { path });
+            var listPaths = AssetDatabase.FindAssets("t:ImageGroupList", new[] {path});
             ImageGroupList list;
             if (listPaths.Length == 0)
             {
@@ -46,7 +46,7 @@ namespace Nova.Editor
                     AssetDatabase.GUIDToAssetPath(listPaths.First()));
             }
 
-            list.groups = AssetDatabase.FindAssets("t:ImageGroup", new[] { path })
+            list.groups = AssetDatabase.FindAssets("t:ImageGroup", new[] {path})
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Select(AssetDatabase.LoadAssetAtPath<ImageGroup>)
                 .ToList();
@@ -94,7 +94,7 @@ namespace Nova.Editor
         private readonly ValidationResultList badSnapshotAspectRatioGroupList = new ValidationResultList();
         private readonly ValidationResultList emptyGroupList = new ValidationResultList();
 
-        private bool validated = false;
+        private bool validated;
 
         private ImageGroupCapturer capturer;
 
