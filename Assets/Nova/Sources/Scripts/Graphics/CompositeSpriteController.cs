@@ -26,7 +26,7 @@ namespace Nova
 
         // the actually layer of this object
         // if layer = -1, render without considering camera's culling mask
-        public virtual int layer => -1;
+        public virtual int layer { get; set; } = -1;
 
         protected override void Awake()
         {
@@ -93,6 +93,22 @@ namespace Nova
             return PoseToArray(pose)
                 .Select(x => AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x)))
                 .ToList();
+        }
+
+        public void Preload(AssetCacheType type, string pose)
+        {
+            foreach (var x in PoseToArray(pose))
+            {
+                AssetLoader.Preload(type, System.IO.Path.Combine(imageFolder, x));
+            }
+        }
+
+        public void Unpreload(AssetCacheType type, string pose)
+        {
+            foreach (var x in PoseToArray(pose))
+            {
+                AssetLoader.Unpreload(type, System.IO.Path.Combine(imageFolder, x));
+            }
         }
 
         #region Restoration

@@ -76,13 +76,6 @@ namespace Nova
 
         private AudioSource audioSource;
 
-        // C# prevents override property add setter, so need to hide base property
-        public new int layer
-        {
-            get => overlay.layer;
-            set => overlay.layer = value;
-        }
-
         protected override void Awake()
         {
             base.Awake();
