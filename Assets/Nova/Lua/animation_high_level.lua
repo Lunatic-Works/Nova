@@ -286,9 +286,9 @@ end
 --- usage:
 ---     tint(obj, {r, g, b, [a]}, [duration, easing])
 make_anim_method('tint', function(self, obj, color, duration, easing)
-    local character = obj:GetComponent(typeof(Nova.GameCharacterController))
+    local chara = obj:GetComponent(typeof(Nova.GameCharacterController))
     local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
-    if character == nil and renderer == nil then
+    if chara == nil and renderer == nil then
         warn('Cannot find SpriteRenderer or GameCharacterController or Image or RawImage for ' .. dump(obj))
         return self
     end
@@ -296,8 +296,8 @@ make_anim_method('tint', function(self, obj, color, duration, easing)
     duration = duration or 1
     easing = parse_easing(easing)
     local property
-    if character then
-        property = Nova.ColorAnimationProperty(Nova.CharacterColor(character, Nova.CharacterColor.Type.Base), parse_color(color))
+    if chara then
+        property = Nova.ColorAnimationProperty(Nova.CharacterColor(chara, Nova.CharacterColor.Type.Base), parse_color(color))
     else
         property = Nova.ColorAnimationProperty(renderer, parse_color(color))
     end
@@ -307,9 +307,9 @@ end)
 --- usage:
 ---     env_tint(obj, {r, g, b, [a]})
 function env_tint(obj, color)
-    local character = obj:GetComponent(typeof(Nova.GameCharacterController))
-    if character then
-        character.environmentColor = parse_color(color)
+    local chara = obj:GetComponent(typeof(Nova.GameCharacterController))
+    if chara then
+        chara.environmentColor = parse_color(color)
         return
     end
 
@@ -319,14 +319,14 @@ end
 --- usage:
 ---     tint(obj, {r, g, b, [a]}, [duration, easing])
 make_anim_method('env_tint', function(self, obj, color, duration, easing)
-    local character = obj:GetComponent(typeof(Nova.GameCharacterController))
-    if character == nil then
+    local chara = obj:GetComponent(typeof(Nova.GameCharacterController))
+    if chara == nil then
         warn('Cannot find GameCharacterController for ' .. dump(obj))
         return self
     end
 
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.ColorAnimationProperty(Nova.CharacterColor(character, Nova.CharacterColor.Type.Environment), parse_color(color))
+    local property = Nova.ColorAnimationProperty(Nova.CharacterColor(chara, Nova.CharacterColor.Type.Environment), parse_color(color))
     return self:_then(property):_with(easing):_for(duration)
 end)
