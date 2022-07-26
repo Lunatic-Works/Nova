@@ -89,7 +89,7 @@ namespace Nova
 
             cachesInUse.Add(cacheName);
 
-            var key = sprites.Aggregate("", (r, s) => r + s.GetInstanceID() + ":");
+            var key = sprites.Aggregate("", (r, s) => r + s.GetInstanceID() + "+");
             if (cache.ContainsKey(key))
             {
                 return cache[key];
