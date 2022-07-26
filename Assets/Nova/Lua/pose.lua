@@ -12,6 +12,11 @@ local poses = {
     ['xiben'] = {
         ['normal'] = 'body+mouth_close+eye_normal+eyebrow_normal+hair',
     },
+
+    ['cg'] = {
+        ['rain'] = 'rain_back',
+        ['rain_final'] = 'rain_back+rain_text',
+    },
 }
 
 function get_pose(obj, pose_name)
