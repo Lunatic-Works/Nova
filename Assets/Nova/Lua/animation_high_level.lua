@@ -230,13 +230,13 @@ make_anim_method('move', function(self, obj, coord, duration, easing)
 end)
 
 function get_color(obj)
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.GameCharacterController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
+    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.FadeController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
     if renderer then
         local color = renderer.color
         return color.r, color.g, color.b, color.a
     end
 
-    warn('Cannot find SpriteRenderer or CharacterController or Image or RawImage for ' .. dump(obj))
+    warn('Cannot find SpriteRenderer or FadeController or Image or RawImage for ' .. dump(obj))
     return nil
 end
 
@@ -274,13 +274,13 @@ end
 --- usage:
 ---     tint(obj, {r, g, b, [a]})
 function tint(obj, color)
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.GameCharacterController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
+    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.FadeController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
     if renderer then
         renderer.color = parse_color(color)
         return
     end
 
-    warn('Cannot find SpriteRenderer or CharacterController or Image or RawImage for ' .. dump(obj))
+    warn('Cannot find SpriteRenderer or FadeController or Image or RawImage for ' .. dump(obj))
 end
 
 --- usage:
@@ -289,7 +289,7 @@ make_anim_method('tint', function(self, obj, color, duration, easing)
     local character = obj:GetComponent(typeof(Nova.GameCharacterController))
     local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
     if character == nil and renderer == nil then
-        warn('Cannot find SpriteRenderer or CharacterController or Image or RawImage for ' .. dump(obj))
+        warn('Cannot find SpriteRenderer or GameCharacterController or Image or RawImage for ' .. dump(obj))
         return self
     end
 
@@ -313,7 +313,7 @@ function env_tint(obj, color)
         return
     end
 
-    warn('Cannot find CharacterController for ' .. dump(obj))
+    warn('Cannot find GameCharacterController for ' .. dump(obj))
 end
 
 --- usage:
@@ -321,7 +321,7 @@ end
 make_anim_method('env_tint', function(self, obj, color, duration, easing)
     local character = obj:GetComponent(typeof(Nova.GameCharacterController))
     if character == nil then
-        warn('Cannot find CharacterController for ' .. dump(obj))
+        warn('Cannot find GameCharacterController for ' .. dump(obj))
         return self
     end
 
