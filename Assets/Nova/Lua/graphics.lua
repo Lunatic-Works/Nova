@@ -35,12 +35,8 @@ function show(obj, image_name, coord, color, fade)
         __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. image_name)
     else
         local pose = get_pose(obj, image_name)
-        if pose then
-            obj:SetPose(pose, fade)
-            __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. pose)
-        else
-            warn('Unknown pose ' .. dump(image_name) .. ' for composite sprite ' .. obj.luaGlobalName)
-        end
+        obj:SetPose(pose, fade)
+        __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. pose)
     end
 end
 add_preload_pattern('show')

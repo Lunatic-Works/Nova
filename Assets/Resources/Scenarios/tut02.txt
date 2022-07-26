@@ -162,10 +162,18 @@ show(gaotian, 'cry')
 改变一下立绘的表情
 
 <|
-show(gaotian, 'normal')
+show(gaotian, 'body+mouth_smile+eye_normal+eyebrow_normal+hair')
+|>
+也可以把pose字符串直接写在`show`里，调试完之后再写到`pose.lua`中
+
+<|
+show(gaotian, 'cry')
 |>
 立绘改变的时候默认有零点几秒的淡入淡出
 
+<|
+show(gaotian, 'normal')
+|>
 顺便说一句：：教程5会讲更复杂的动画
 
 <|

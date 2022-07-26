@@ -15,5 +15,15 @@ local poses = {
 }
 
 function get_pose(obj, pose_name)
-    return poses[obj.luaGlobalName] and poses[obj.luaGlobalName][pose_name]
+    if string.find(pose_name, '+') then
+        return pose_name
+    end
+
+    local pose = poses[obj.luaGlobalName] and poses[obj.luaGlobalName][pose_name]
+    if pose then
+        return pose
+    end
+
+    warn('Unknown pose ' .. dump(pose_name) .. ' for composite sprite ' .. obj.luaGlobalName or obj.luaName)
+    return pose_name
 end
