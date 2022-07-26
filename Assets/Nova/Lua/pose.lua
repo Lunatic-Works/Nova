@@ -24,6 +24,6 @@ function get_pose(obj, pose_name)
         return pose
     end
 
-    warn('Unknown pose ' .. dump(pose_name) .. ' for composite sprite ' .. obj.luaGlobalName or obj.luaName)
+    warn('Unknown pose ' .. dump(pose_name) .. ' for composite sprite ' .. dump(obj))
     return pose_name
 end
