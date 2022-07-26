@@ -8,7 +8,7 @@ namespace Nova
     [ExportCustomType]
     public abstract class CompositeSpriteController : FadeController, IRestorable
     {
-        private const char PoseStringSeparator = ':';
+        private const char PoseStringSeparator = '+';
 
         public CompositeSpriteMerger mergerPrimary;
         public CompositeSpriteMerger mergerSub;
