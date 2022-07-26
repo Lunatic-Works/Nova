@@ -34,18 +34,12 @@ function show(obj, image_name, coord, color, fade)
         obj:SetImage(image_name, fade)
         __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. image_name)
     else
-        local pose
-        if type(image_name) == 'table' then
-            pose = image_name
-        else
-            pose = get_pose(obj, image_name)
-        end
+        local pose = get_pose(obj, image_name)
         if pose then
             obj:SetPose(pose, fade)
-            local poseStr = Nova.CompositeSpriteController.PoseToString(pose)
-            __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. poseStr)
+            __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. pose)
         else
-            warn('Unknown pose ' .. dump(image_name) .. ' for character ' .. obj.luaGlobalName)
+            warn('Unknown pose ' .. dump(image_name) .. ' for composite sprite ' .. obj.luaGlobalName)
         end
     end
 end

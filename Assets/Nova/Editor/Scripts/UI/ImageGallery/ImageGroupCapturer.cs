@@ -88,7 +88,7 @@ namespace Nova.Editor
         // return resourcePath to get an output directory
         private bool DrawComposite(ImageEntry entry, out string resourcePath)
         {
-            var sprites = CompositeSpriteController.LoadPoseSprites(entry.resourcePath, entry.poseString);
+            var sprites = CompositeSpriteController.LoadSprites(entry.resourcePath, entry.poseString);
             if (!sprites.Any() || sprites.Contains(null))
             {
                 resourcePath = "";
