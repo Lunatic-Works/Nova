@@ -15,6 +15,7 @@ namespace Nova
         ShowLog,
         ToggleFullScreen,
         LeaveView,
+        ForceLeaveView,
         EditorBackward,
         EditorBeginChapter,
         EditorPreviousChapter,

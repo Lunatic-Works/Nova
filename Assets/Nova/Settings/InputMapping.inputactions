@@ -255,7 +255,7 @@
                 {
                     "name": "",
                     "id": "8c3de28e-b588-42e0-8d28-a985558f3268",
-                    "path": "<Keyboard>/escape",
+                    "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -354,6 +354,15 @@
                     "processors": "",
                     "interactions": "Tap",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ForceLeaveView",
+                    "type": "Button",
+                    "id": "b84ab6bf-3466-44e9-af9f-58fc5d913e56",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -361,10 +370,21 @@
                     "name": "",
                     "id": "4793c7e1-6f36-4028-9194-7eca7a7265c5",
                     "path": "<Keyboard>/escape",
-                    "interactions": "",
+                    "interactions": "Tap",
                     "processors": "",
                     "groups": "",
                     "action": "LeaveView",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "484fb26e-1ed8-42c5-85fe-5db4fa2cb843",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "Hold(duration=0.6)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ForceLeaveView",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

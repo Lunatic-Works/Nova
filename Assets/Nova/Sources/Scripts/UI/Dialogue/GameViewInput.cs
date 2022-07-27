@@ -96,6 +96,16 @@ namespace Nova
                 logController.Show();
             }
 
+            if (inputManager.IsTriggered(AbstractKey.LeaveView))
+            {
+                ReturnTitle();
+            }
+
+            if (inputManager.IsTriggered(AbstractKey.ForceLeaveView))
+            {
+                Utils.QuitWithConfirm();
+            }
+
             dialogueState.fastForwardHotKeyHolding =
                 inputManager.actionAsset.GetAction(AbstractKey.FastForward).IsPressed();
         }
@@ -320,6 +330,22 @@ namespace Nova
                 NovaAnimation.StopAll(AnimationType.PerDialogue);
                 dialogueBoxController.ShowDialogueFinishIcon(true);
             }
+        }
+        private void _returnTitle()
+        {
+            NovaAnimation.StopAll();
+            viewManager.titlePanel.SetActive(true);
+            dialogueBoxController.SwitchView<TitleController>();
+        }
+        private void ReturnTitle()
+        {
+            Alert.Show(
+                    null,
+                    I18n.__("ingame.title.confirm"),
+                    _returnTitle,
+                    null,
+                    "ReturnTitle"
+                );
         }
 
         #region Restoration
