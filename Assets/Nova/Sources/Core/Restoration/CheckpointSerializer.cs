@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -8,13 +9,56 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class CheckpointSerializer
+    public class CheckpointCorruptedException : Exception
     {
-        private const int Version = 2;
 
+    }
+
+    public class CheckpointSerializer : IDisposable
+    {
+        private const int Version = 3;
+        private static readonly TimeSpan BackupTime = TimeSpan.FromMinutes(5);
         private static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
 
         private readonly BinaryFormatter formatter = new BinaryFormatter();
+        private bool disposed = false;
+        private readonly string path;
+        private FileStream file;
+        private string backupPath => path + ".old";
+        private DateTime lastBackup = DateTime.Now;
+
+        public CheckpointSerializer() { }
+
+        public CheckpointSerializer(string path)
+        {
+            this.path = path;
+            file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        }
+
+        public void SafeWrite(byte[] data, long offset, int count)
+        {
+            var now = DateTime.Now;
+            if (now.Subtract(lastBackup) > BackupTime)
+            {
+                File.Copy(path, backupPath);
+                lastBackup = now;
+            }
+            file.Seek(offset, SeekOrigin.Begin);
+            file.Write(data, 0, count);
+            file.Flush();
+        }
+
+        public void SafeRead(byte[] data, long offset, int count)
+        {
+            file.Seek(offset, SeekOrigin.Begin);
+            file.Read(data, 0, count);
+        }
+
+        public void Dispose()
+        {
+            file.Close();
+            file.Dispose();
+        }
 
         public T SafeRead<T>(string path)
         {
