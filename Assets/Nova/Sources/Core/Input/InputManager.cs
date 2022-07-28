@@ -61,7 +61,7 @@ namespace Nova
             foreach (var actionMap in actionAsset.GetActionMaps(group))
                 actionMap.Enable();
 
-            foreach (var actionMap in actionAsset.GetActionMaps(AbstractKeyGroup.All ^ group))
+            foreach (var actionMap in actionAsset.GetActionMaps(AbstractKeyGroup.Always ^ group))
                 actionMap.Disable();
         }
 
@@ -140,14 +140,14 @@ namespace Nova
         public void DisableInput()
         {
             inputEnabled = false;
-            SetEnableGroup(AbstractKeyGroup.Always);
+            SetEnableGroup(AbstractKeyGroup.None);
             SetEnable(AbstractKey.StepForward, true);
         }
 
         public void EnableInput()
         {
             inputEnabled = true;
-            SetEnableGroup(AbstractKeyGroup.All);
+            SetEnableGroup(AbstractKeyGroup.Always);
         }
     }
 }
