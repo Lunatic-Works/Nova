@@ -11,7 +11,7 @@ namespace Nova
         public Button restoreButton;
         public Button backButton;
         public Button returnTitleButton;
-        public Button exitGameButton;
+        public Button quitGameButton;
         public InputMappingController inputMappingController;
 
         private ConfigManager configManager;
@@ -22,7 +22,7 @@ namespace Nova
             base.Awake();
 
             returnTitleButton.onClick.AddListener(ReturnTitle);
-            exitGameButton.onClick.AddListener(Utils.QuitWithConfirm);
+            quitGameButton.onClick.AddListener(Utils.QuitWithConfirm);
 
             configManager = Utils.FindNovaGameController().ConfigManager;
 
@@ -57,7 +57,10 @@ namespace Nova
         private void _returnTitle()
         {
             NovaAnimation.StopAll();
+
+            // TODO: Better transition between any two views
             viewManager.titlePanel.SetActive(true);
+
             this.SwitchView<TitleController>();
         }
 

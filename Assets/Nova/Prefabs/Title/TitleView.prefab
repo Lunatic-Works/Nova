@@ -574,7 +574,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myPanel: {fileID: 4003918090282962751}
-  exitButton: {fileID: 3892653642933507906}
+  quitButton: {fileID: 3892653642933507906}
   bgmController: {fileID: 0}
   bgmName: prelude
   bgmVolume: 0.5
@@ -804,7 +804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inflateTextKey: title.menu.exit
+  inflateTextKey: title.menu.quit
 --- !u!114 &4003918090701651558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -879,7 +879,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1931879755326992, guid: a8d81af0d5879154b9814eeeb6e0293a, type: 3}
       propertyPath: m_Name
-      value: ExitGame
+      value: QuitGame
       objectReference: {fileID: 0}
     - target: {fileID: 224907830076862314, guid: a8d81af0d5879154b9814eeeb6e0293a,
         type: 3}

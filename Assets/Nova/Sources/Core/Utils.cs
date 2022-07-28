@@ -297,7 +297,7 @@ namespace Nova
         {
             Alert.Show(
                 null,
-                I18n.__("ingame.exit.confirm"),
+                I18n.__("ingame.quit.confirm"),
                 Quit,
                 null,
                 "QuitConfirm"

@@ -56,6 +56,11 @@ namespace Nova
 
         private void HandleShortcutWhenDialogueShown()
         {
+            if (inputManager.IsTriggered(AbstractKey.StepForward))
+            {
+                ClickForward();
+            }
+
             if (inputManager.IsTriggered(AbstractKey.Auto))
             {
                 dialogueState.state = DialogueState.State.Auto;
@@ -86,22 +91,17 @@ namespace Nova
                 dialogueBoxController.Hide();
             }
 
-            if (inputManager.IsTriggered(AbstractKey.StepForward))
-            {
-                ClickForward();
-            }
-
             if (inputManager.IsTriggered(AbstractKey.ShowLog))
             {
                 logController.Show();
             }
 
-            if (inputManager.IsTriggered(AbstractKey.LeaveView))
+            if (inputManager.IsTriggered(AbstractKey.ReturnTitle))
             {
                 ReturnTitle();
             }
 
-            if (inputManager.IsTriggered(AbstractKey.ForceLeaveView))
+            if (inputManager.IsTriggered(AbstractKey.QuitGame))
             {
                 Utils.QuitWithConfirm();
             }
@@ -331,21 +331,26 @@ namespace Nova
                 dialogueBoxController.ShowDialogueFinishIcon(true);
             }
         }
+
         private void _returnTitle()
         {
             NovaAnimation.StopAll();
-            viewManager.titlePanel.SetActive(true);
+
+            // TODO: Use a faster transition from game view to title view
+            // viewManager.titlePanel.SetActive(true);
+
             dialogueBoxController.SwitchView<TitleController>();
         }
+
         private void ReturnTitle()
         {
             Alert.Show(
-                    null,
-                    I18n.__("ingame.title.confirm"),
-                    _returnTitle,
-                    null,
-                    "ReturnTitle"
-                );
+                null,
+                I18n.__("ingame.title.confirm"),
+                _returnTitle,
+                null,
+                "ReturnTitle"
+            );
         }
 
         #region Restoration

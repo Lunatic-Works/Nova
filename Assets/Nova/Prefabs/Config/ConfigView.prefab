@@ -1821,7 +1821,7 @@ MonoBehaviour:
   restoreButton: {fileID: 0}
   backButton: {fileID: 5673389508026030318}
   returnTitleButton: {fileID: 3776766838286791202}
-  exitGameButton: {fileID: 6600835561785805185}
+  quitGameButton: {fileID: 6600835561785805185}
   inputMappingController: {fileID: 6508623149409498939}
 --- !u!1 &3113775755298879867
 GameObject:
@@ -7870,7 +7870,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6069479305584713389, guid: 3858caaeb3e4d49cd80155238d21b356, type: 3}
       propertyPath: m_Name
-      value: Exit
+      value: Quit
       objectReference: {fileID: 0}
     - target: {fileID: 9078014224272985368, guid: 3858caaeb3e4d49cd80155238d21b356, type: 3}
       propertyPath: m_Pivot.x
@@ -7991,7 +7991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75ac32f2d9e10bd4aa050331c43d3a75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inflateTextKey: config.exitgame
+  inflateTextKey: config.quitgame
 --- !u!114 &7935938658879650243
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -24,15 +24,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "FastForward",
-                    "type": "Button",
-                    "id": "632fac5c-1011-4127-9d53-2b8462d2d357",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Save",
                     "type": "Button",
                     "id": "85569b9c-0c57-4872-8a36-f99714b4e4fd",
@@ -81,6 +72,15 @@
                     "name": "ShowLog",
                     "type": "Button",
                     "id": "544b3e00-c037-40d4-803e-3494c1bec7f3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ReturnTitle",
+                    "type": "Button",
+                    "id": "c66b99b6-59d8-4203-ac1b-5ca9140e2942",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Tap",
@@ -194,17 +194,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Auto",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "cf7c3290-d63a-4767-9a4c-fc116c9ad206",
-                    "path": "<Keyboard>/ctrl",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "FastForward",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -339,6 +328,73 @@
                     "action": "EditorRerunAction",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "92bf9db5-1b27-40b7-9488-2c562e0888b8",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ReturnTitle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "GameHold",
+            "id": "acfde6a6-59ea-4ffb-831c-700c4aa3b5e1",
+            "actions": [
+                {
+                    "name": "QuitGame",
+                    "type": "Button",
+                    "id": "86e11927-ae0f-4119-9fcf-b4a7f85785be",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "286710f5-7f7a-4e67-9c7e-f8f1445d2060",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "QuitGame",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "GamePress",
+            "id": "98122892-a6f4-4864-847c-cf8f1c4df8a4",
+            "actions": [
+                {
+                    "name": "FastForward",
+                    "type": "Button",
+                    "id": "304a877d-49ab-4190-a7fc-14fcf02aa8ef",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "c8ace76c-8af3-4f56-b44c-90edc44d64dc",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FastForward",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -354,15 +410,6 @@
                     "processors": "",
                     "interactions": "Tap",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "ForceLeaveView",
-                    "type": "Button",
-                    "id": "b84ab6bf-3466-44e9-af9f-58fc5d913e56",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -370,21 +417,10 @@
                     "name": "",
                     "id": "4793c7e1-6f36-4028-9194-7eca7a7265c5",
                     "path": "<Keyboard>/escape",
-                    "interactions": "Tap",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "LeaveView",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "484fb26e-1ed8-42c5-85fe-5db4fa2cb843",
-                    "path": "<Keyboard>/escape",
-                    "interactions": "Hold(duration=0.6)",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ForceLeaveView",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
