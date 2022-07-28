@@ -13,6 +13,7 @@ namespace Nova
         QuickLoad,
         ToggleDialogue,
         ShowLog,
+        ShowConfig,
         ReturnTitle,
         QuitGame,
         ToggleFullScreen,
@@ -21,8 +22,7 @@ namespace Nova
         EditorBeginChapter,
         EditorPreviousChapter,
         EditorNextChapter,
-        EditorReloadScripts,
-        EditorRerunAction
+        EditorReloadScripts
     }
 
     // If groups a & b != 0, actions in a and b can conflict

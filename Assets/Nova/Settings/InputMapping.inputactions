@@ -78,6 +78,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "ShowConfig",
+                    "type": "Button",
+                    "id": "ec8814f7-fe10-4ff6-974d-7c9b1bf05f80",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "ReturnTitle",
                     "type": "Button",
                     "id": "c66b99b6-59d8-4203-ac1b-5ca9140e2942",
@@ -117,15 +126,6 @@
                     "name": "EditorNextChapter",
                     "type": "Button",
                     "id": "daee26a0-50bb-4746-a9de-39ef9517e1a6",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "EditorRerunAction",
-                    "type": "Button",
-                    "id": "5677eb08-3099-4edd-8c3c-c9d20b9ffa96",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Tap",
@@ -320,23 +320,23 @@
                 },
                 {
                     "name": "",
-                    "id": "fc3f895c-86e2-4c01-ba3e-8eb9cad33271",
-                    "path": "<Keyboard>/f",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "EditorRerunAction",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "92bf9db5-1b27-40b7-9488-2c562e0888b8",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ReturnTitle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c479d84e-2332-4a57-a18c-92a66f77fe7e",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShowConfig",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

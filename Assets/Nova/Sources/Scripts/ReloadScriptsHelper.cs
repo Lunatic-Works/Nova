@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace Nova
 {
@@ -29,11 +29,6 @@ namespace Nova
             {
                 ReloadScripts();
             }
-
-            if (inputManager.IsTriggered(AbstractKey.EditorRerunAction))
-            {
-                RerunAction();
-            }
         }
 
         private void ReloadScripts()
@@ -43,15 +38,6 @@ namespace Nova
             gameState.ReloadScripts();
             var nodeHistoryEntry = gameState.nodeHistory.GetCounted(gameState.currentNode.name);
             gameState.MoveBackAndFastForward(nodeHistoryEntry, 0, gameState.currentIndex, true, null);
-        }
-
-        private void RerunAction()
-        {
-            // TODO: how is this useful?
-            // NovaAnimation.StopAll();
-            // dialogueBoxController.state = DialogueBoxState.Normal;
-            // gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex)
-            //     .ExecuteAction(DialogueActionStage.Default, false);
         }
     }
 }

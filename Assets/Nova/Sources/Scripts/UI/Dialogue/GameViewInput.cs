@@ -23,6 +23,7 @@ namespace Nova
         private DialogueBoxController dialogueBoxController;
         private SaveViewController saveViewController;
         private LogController logController;
+        private ConfigViewController configViewController;
 
         private void Awake()
         {
@@ -38,6 +39,7 @@ namespace Nova
             dialogueBoxController = viewManager.GetController<DialogueBoxController>();
             saveViewController = viewManager.GetController<SaveViewController>();
             logController = viewManager.GetController<LogController>();
+            configViewController = viewManager.GetController<ConfigViewController>();
 
             LuaRuntime.Instance.BindObject("gameViewInput", this);
             gameState.AddRestorable(this);
@@ -94,6 +96,11 @@ namespace Nova
             if (inputManager.IsTriggered(AbstractKey.ShowLog))
             {
                 logController.Show();
+            }
+
+            if (inputManager.IsTriggered(AbstractKey.ShowConfig))
+            {
+                configViewController.Show();
             }
 
             if (inputManager.IsTriggered(AbstractKey.ReturnTitle))
