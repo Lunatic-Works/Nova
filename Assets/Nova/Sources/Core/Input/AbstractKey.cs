@@ -22,7 +22,8 @@ namespace Nova
         EditorBeginChapter,
         EditorPreviousChapter,
         EditorNextChapter,
-        EditorReloadScripts
+        EditorReloadScripts,
+        EditorUnlock
     }
 
     // If groups a & b != 0, actions in a and b can conflict

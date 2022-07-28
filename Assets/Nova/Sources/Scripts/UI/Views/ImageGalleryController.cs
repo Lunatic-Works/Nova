@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Nova
@@ -216,7 +215,7 @@ namespace Nova
         {
             base.OnActivatedUpdate();
 
-            if (Utils.GetKeyDownInEditor(Key.LeftShift))
+            if (inputManager.IsTriggered(AbstractKey.EditorUnlock))
             {
                 UnlockAllImages();
             }

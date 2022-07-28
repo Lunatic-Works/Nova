@@ -422,33 +422,6 @@ namespace Nova
             return action != null ? new Action(() => action.Invoke(value)) : null;
         }
 
-        public static bool GetKeyInEditor(Key key)
-        {
-#if UNITY_EDITOR
-            return Keyboard.current?[key].isPressed ?? false;
-#else
-            return false;
-#endif
-        }
-
-        public static bool GetKeyDownInEditor(Key key)
-        {
-#if UNITY_EDITOR
-            return Keyboard.current?[key].wasPressedThisFrame ?? false;
-#else
-            return false;
-#endif
-        }
-
-        public static bool GetKeyUpInEditor(Key key)
-        {
-#if UNITY_EDITOR
-            return Keyboard.current?[key].wasReleasedThisFrame ?? false;
-#else
-            return false;
-#endif
-        }
-
         public static int ConvertSamples(AudioClip source, AudioClip target)
         {
             return Mathf.RoundToInt(1.0f * target.frequency / source.frequency * source.samples);

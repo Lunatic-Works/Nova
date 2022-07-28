@@ -85,7 +85,7 @@ namespace Nova
 
         /// <summary>
         /// Checks whether an abstract key is triggered.<br/>
-        /// Only activates once. To check whether a key is held, use <see cref="InputAction.IsPressed"/>.
+        /// Only activates once. To check whether a key is held, use <see cref="IsPressed"/>.
         /// </summary>
         public bool IsTriggered(AbstractKey key)
         {
@@ -103,6 +103,24 @@ namespace Nova
             }
 
             return action.triggered;
+        }
+
+        public bool IsPressed(AbstractKey key)
+        {
+#if !UNITY_EDITOR
+            if (ActionAssetData.IsEditorOnly(key))
+            {
+                return false;
+            }
+#endif
+
+            if (!actionAsset.TryGetAction(key, out var action))
+            {
+                Debug.LogError($"Nova: Missing action key: {key}");
+                return false;
+            }
+
+            return action.IsPressed();
         }
 
         public void SetActionAsset(ActionAssetData other)

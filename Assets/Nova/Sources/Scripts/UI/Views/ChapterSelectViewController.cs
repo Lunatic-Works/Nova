@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Nova
@@ -62,7 +61,7 @@ namespace Nova
 
         public override void Show(Action onFinish)
         {
-            if (ReachedChapterCount() < 2 && !Utils.GetKeyInEditor(Key.LeftShift))
+            if (ReachedChapterCount() < 2 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
             {
                 BeginChapter();
                 return;
@@ -122,7 +121,7 @@ namespace Nova
         {
             base.OnActivatedUpdate();
 
-            if (Utils.GetKeyDownInEditor(Key.LeftShift))
+            if (inputManager.IsTriggered(AbstractKey.EditorUnlock))
             {
                 foreach (var chapter in buttons)
                 {

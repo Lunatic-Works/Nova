@@ -113,8 +113,7 @@ namespace Nova
                 Utils.QuitWithConfirm();
             }
 
-            dialogueState.fastForwardHotKeyHolding =
-                inputManager.actionAsset.GetAction(AbstractKey.FastForward).IsPressed();
+            dialogueState.fastForwardHotKeyHolding = inputManager.IsPressed(AbstractKey.FastForward);
         }
 
         private void HandleShortcutWhenDialogueHidden()
