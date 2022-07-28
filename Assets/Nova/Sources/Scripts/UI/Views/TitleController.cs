@@ -6,7 +6,7 @@ namespace Nova
 {
     public class TitleController : ViewControllerBase
     {
-        public Button exitButton;
+        public Button quitButton;
         public AudioController bgmController;
         public string bgmName;
         public float bgmVolume = 0.5f;
@@ -26,7 +26,7 @@ namespace Nova
             configManager = controller.ConfigManager;
             checkpointManager = controller.CheckpointManager;
 
-            exitButton.onClick.AddListener(() =>
+            quitButton.onClick.AddListener(() =>
                 Hide(Utils.Quit)
             );
         }
