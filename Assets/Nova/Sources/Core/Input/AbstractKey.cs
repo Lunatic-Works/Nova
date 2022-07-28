@@ -30,7 +30,6 @@ namespace Nova
         None = 0,
         Game = 1 << 0,
         UI = 1 << 1,
-        Always = 1 << 2,
-        All = Game | UI | Always
+        Always = Game | UI
     }
 }
