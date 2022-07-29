@@ -1,4 +1,4 @@
-﻿using Nova.Script;
+using Nova.Script;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -22,7 +22,7 @@ Text3
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
-                Assert.IsNotNull(block.attributes);
+                Assert.IsNull(block.attributes);
             }
 
             Assert.AreEqual(BlockType.Text, blocks[0].type);
@@ -51,7 +51,7 @@ Text3
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
-                Assert.IsNotNull(block.attributes);
+                Assert.IsNull(block.attributes);
             }
 
             Assert.AreEqual(BlockType.LazyExecution, blocks[0].type);
@@ -79,7 +79,7 @@ code1() |>
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
-                Assert.IsNotNull(block.attributes);
+                Assert.IsNull(block.attributes);
             }
 
             Assert.AreEqual(BlockType.LazyExecution, blocks[0].type);
@@ -107,7 +107,7 @@ Text
             Assert.AreEqual(blocks.Count, 4);
             foreach (var block in blocks)
             {
-                Assert.IsNotNull(block.attributes);
+                Assert.IsNull(block.attributes);
             }
 
             Assert.AreEqual(blocks[0].type, BlockType.EagerExecution);
@@ -138,7 +138,7 @@ code2_2() |>
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
-                Assert.IsNotNull(block.attributes);
+                Assert.IsNull(block.attributes);
             }
 
             Assert.AreEqual(BlockType.LazyExecution, blocks[0].type);
@@ -155,7 +155,7 @@ code2_2() |>
         {
             try
             {
-                var parsed =  Parser.Parse("<| code_unpaired");
+                var parsed = Parser.Parse("<| code_unpaired");
             }
             catch (ParseException)
             {
@@ -169,7 +169,7 @@ code2_2() |>
         [Test]
         public void TestString()
         {
-            var parsed =  Parser.Parse(@"
+            var parsed = Parser.Parse(@"
 <| print 'hello\' |>' |>
 <| code2()
 
@@ -189,25 +189,22 @@ code2_2() |>
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
-                Assert.IsNotNull(block.attributes);
+                Assert.IsNull(block.attributes);
             }
 
             Assert.AreEqual(BlockType.LazyExecution, blocks[0].type);
-            Assert.IsTrue(blocks[0].attributes.Count == 0);
             Assert.AreEqual(" print 'hello\\' |>' ", blocks[0].content);
             Assert.AreEqual(BlockType.LazyExecution, blocks[1].type);
-            Assert.IsTrue(blocks[1].attributes.Count == 0);
             Assert.AreEqual(" code2()\n\n[[\nmultiline[[nested |>]]\n]]\n\ncode2_2() ", blocks[1].content);
             Assert.AreEqual(BlockType.Separator, blocks[2].type);
             Assert.AreEqual(BlockType.EagerExecution, blocks[3].type);
-            Assert.IsTrue(blocks[3].attributes.Count == 0);
             Assert.AreEqual(" code3() ", blocks[3].content);
         }
 
         [Test]
         public void TestAttribute()
         {
-            var parsed =  Parser.Parse(@"
+            var parsed = Parser.Parse(@"
 [label = entry, '$name' = 'hello\' world']<|
 print 'hello\' |>' |>
 <| code2()
@@ -226,23 +223,20 @@ code2_2() |>
             Assert.NotNull(parsed);
             var blocks = parsed.blocks;
             Assert.AreEqual(4, blocks.Count);
-            foreach (var block in blocks)
-            {
-                Assert.IsNotNull(block.attributes);
-            }
 
             Assert.AreEqual(BlockType.LazyExecution, blocks[0].type);
             Assert.AreEqual("\nprint 'hello\\' |>' ", blocks[0].content);
             Assert.AreEqual("entry", blocks[0].attributes["label"]);
             Assert.AreEqual("hello\' world", blocks[0].attributes["$name"]);
             Assert.AreEqual(BlockType.LazyExecution, blocks[1].type);
-            Assert.IsTrue(blocks[1].attributes.Count == 0);
             Assert.AreEqual(" code2()\n\n[[\nmultiline[[nested |>]]\n]]\n\ncode2_2() ", blocks[1].content);
+            Assert.IsNull(blocks[1].attributes);
             Assert.AreEqual(BlockType.Separator, blocks[2].type);
+            Assert.IsNull(blocks[2].attributes);
             Assert.AreEqual(BlockType.EagerExecution, blocks[3].type);
+            Assert.AreEqual(" code3() ", blocks[3].content);
             Assert.IsTrue(blocks[3].attributes.ContainsKey("flag"));
             Assert.IsNull(blocks[3].attributes["flag"]);
-            Assert.AreEqual(" code3() ", blocks[3].content);
         }
     }
 }

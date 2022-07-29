@@ -298,7 +298,7 @@ namespace Nova
             {
                 if (block.type == BlockType.LazyExecution)
                 {
-                    if (!block.attributes.TryGetValue(stageKey, out var stageValue))
+                    if (block.attributes == null || !block.attributes.TryGetValue(stageKey, out var stageValue))
                     {
                         stageValue = "";
                     }

@@ -20,7 +20,6 @@ namespace Nova
 
         public void Unlock(string path)
         {
-            // Debug.Log($"unlock {path}");
             path = Utils.ConvertPathSeparator(path);
             var unlockInfo = checkpointManager.Get(ImageUnlockStatusKey, new ImageUnlockInfo());
             if (unlockInfo.Contains(path)) return;

@@ -45,4 +45,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   luaName: timelineController
   prefabFolder: Prefabs
-  mainCamera: {fileID: 0}
+  gameCamera: {fileID: 0}
