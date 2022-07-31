@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Nova
 {
     [Serializable]
-    public class GlobalSave
+    public class OldGlobalSave
     {
         // Node name -> dialogue index -> node history hash -> GameStateRestoreEntry
         // TODO: deduplicate restoreDatas
@@ -34,117 +34,6 @@ namespace Nova
         public readonly Dictionary<string, object> data = new Dictionary<string, object>();
     }
 
-    #region Bookmark classes
-
-    [Serializable]
-    public class Bookmark
-    {
-        public const int ScreenshotWidth = 320;
-        public const int ScreenshotHeight = 180;
-
-        public readonly ulong nodeHistoryHash;
-        public readonly int dialogueIndex;
-        public DialogueDisplayData description;
-        public readonly DateTime creationTime = DateTime.Now;
-        public long globalSaveIdentifier;
-
-        private byte[] screenshotBytes;
-        [NonSerialized] private Texture2D screenshotTexture;
-
-        public Texture2D screenshot
-        {
-            get
-            {
-                if (screenshotBytes == null)
-                {
-                    Utils.RuntimeAssert(screenshotTexture == null, "Screenshot cache is not consistent.");
-                    return null;
-                }
-
-                if (screenshotTexture == null)
-                {
-                    screenshotTexture = new Texture2D(ScreenshotWidth, ScreenshotHeight, TextureFormat.RGB24, false);
-                    screenshotTexture.LoadImage(screenshotBytes);
-                }
-
-                return screenshotTexture;
-            }
-            set
-            {
-                screenshotTexture = value;
-                screenshotBytes = screenshotTexture.EncodeToJPG();
-            }
-        }
-
-        // NOTE: Do not use default parameters in constructor or it will fail to compile silently...
-
-        /// <summary>
-        /// Create a bookmark based on all reached nodes in current gameplay.
-        /// </summary>
-        /// <param name="nodeHistory">List of all reached nodes, including the current node as the last one.</param>
-        /// <param name="dialogueIndex">Index of the current dialogue.</param>
-        public Bookmark(NodeHistory nodeHistory, int dialogueIndex)
-        {
-            nodeHistoryHash = nodeHistory.Hash;
-            this.dialogueIndex = dialogueIndex;
-        }
-
-        public void DestroyTexture()
-        {
-            Utils.DestroyObject(screenshotTexture);
-        }
-    }
-
-    public enum BookmarkType
-    {
-        AutoSave = 101,
-        QuickSave = 201,
-        NormalSave = 301
-    }
-
-    public enum SaveIDQueryType
-    {
-        Latest,
-        Earliest
-    }
-
-    public class BookmarkMetadata
-    {
-        private int _saveID;
-
-        public int saveID
-        {
-            get => _saveID;
-
-            set
-            {
-                type = SaveIDToBookmarkType(value);
-                _saveID = value;
-            }
-        }
-
-        public BookmarkType type { get; private set; }
-
-        public DateTime modifiedTime;
-
-        public static BookmarkType SaveIDToBookmarkType(int saveID)
-        {
-            if (saveID >= (int)BookmarkType.NormalSave)
-            {
-                return BookmarkType.NormalSave;
-            }
-
-            if (saveID >= (int)BookmarkType.QuickSave)
-            {
-                return BookmarkType.QuickSave;
-            }
-
-            return BookmarkType.AutoSave;
-        }
-    }
-
-    #endregion
-
     /// <summary>
     /// Manager component providing ability to manage the game progress and save files.
     /// </summary>
@@ -155,13 +44,43 @@ namespace Nova
         private string globalSavePath;
 
         private GlobalSave globalSave;
+        private readonly SerializableHashSet<ReachedDialogueData> reachedDialogues = new SerializableHashSet<ReachedDialogueData>();
+        private readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
         private readonly Dictionary<int, Bookmark> cachedSaveSlots = new Dictionary<int, Bookmark>();
         public readonly Dictionary<int, BookmarkMetadata> saveSlotsMetadata = new Dictionary<int, BookmarkMetadata>();
 
-        private readonly CheckpointSerializer serializer = new CheckpointSerializer();
+        private CheckpointSerializer serializer;
 
         private bool inited;
+
+        private void InitGlobalSave()
+        {
+            globalSave = serializer.DeserializeRecord<GlobalSave>(0);
+            if (globalSave.version != CheckpointSerializer.Version ||
+                !CheckpointSerializer.FileHeader.SequenceEqual(globalSave.fileHeader))
+            {
+                throw CheckpointCorruptedException.BadHeader;
+            }
+        }
+
+        private void InitReached()
+        {
+            reachedDialogues.Clear();
+            reachedEnds.Clear();
+            for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = serializer.NextRecord(cur))
+            {
+                var record = serializer.DeserializeRecord(cur);
+                if (record is string endName)
+                {
+                    reachedEnds.Add(endName);
+                }
+                else if (record is ReachedDialogueData dialogue)
+                {
+                    reachedDialogues.Add(dialogue);
+                }
+            }
+        }
 
         // Should be called in Start, not in Awake
         public void Init()
@@ -175,21 +94,16 @@ namespace Nova
             globalSavePath = Path.Combine(savePathBase, "global.nsav");
             Directory.CreateDirectory(savePathBase);
 
-            if (File.Exists(globalSavePath))
+            serializer = new CheckpointSerializer(globalSavePath);
+            if (!File.Exists(globalSavePath))
             {
-                try
-                {
-                    globalSave = serializer.SafeRead<GlobalSave>(globalSavePath);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Nova: Cannot load global save file.\n{e.Message}");
-                    Alert.Show(null, "bookmark.load.globalfail", ResetGlobalSave, Utils.Quit);
-                }
+                ResetGlobalSave();
             }
             else
             {
-                ResetGlobalSave();
+                serializer.Open();
+                InitGlobalSave();
+                InitReached();
             }
 
             foreach (string fileName in Directory.GetFiles(savePathBase, "sav*.nsav*"))
@@ -226,31 +140,85 @@ namespace Nova
 
         #region Global save
 
-        public void GetNodeHistory(ulong nodeHistoryHash, NodeHistory nodeHistory)
+        private void NewReached()
         {
-            if (!globalSave.cachedNodeHistories.TryGetValue(nodeHistoryHash, out var data))
-            {
-                throw new ArgumentException("Nova: Node history not found.");
-            }
-
-            nodeHistory.Clear();
-            nodeHistory.AddRange(data.nodeNames);
-            nodeHistory.interrupts.Clear();
-            foreach (var pair in data.interrupts)
-            {
-                nodeHistory.interrupts[pair.Key] =
-                    new SortedDictionary<int, ulong>((IDictionary<int, ulong>)pair.Value);
-            }
+            globalSave.endReached = serializer.NextRecord(globalSave.endReached);
         }
 
-        public string GetLastNodeName(ulong nodeHistoryHash)
+        private void NewCheckpoint()
         {
-            if (!globalSave.cachedNodeHistories.TryGetValue(nodeHistoryHash, out var data))
-            {
-                throw new ArgumentException("Nova: Node history not found.");
-            }
+            globalSave.endCheckpoint = serializer.NextRecord(globalSave.endCheckpoint);
+        }
 
-            return data.nodeNames.Last();
+        public long NextRecord(long offset)
+        {
+            return serializer.NextRecord(offset);
+        }
+
+        public NodeRecord GetNextNode(NodeRecord prevRecord, string name, Variables variables, int beginDialogue)
+        {
+            var variableHash = variables.hash;
+            NodeRecord record = null;
+            var offset = prevRecord == null ? globalSave.beginCheckpoint : prevRecord.child;
+            while (offset != 0 && offset < globalSave.endCheckpoint)
+            {
+                record = serializer.GetNodeRecord(offset);
+                if (record.name == name && record.variableHash == variableHash)
+                {
+                    return record;
+                }
+                offset = record.brother;
+            }
+            offset = globalSave.endCheckpoint;
+            var newRecord = new NodeRecord(offset, name, beginDialogue, variableHash);
+            if (record != null)
+            {
+                record.brother = offset;
+                serializer.UpdateNodeRecord(record);
+            }
+            else if (prevRecord != null)
+            {
+                newRecord.parent = prevRecord.offset;
+                prevRecord.child = offset;
+                serializer.UpdateNodeRecord(prevRecord);
+            }
+            serializer.UpdateNodeRecord(newRecord);
+            NewCheckpoint();
+            return newRecord;
+        }
+
+        public NodeRecord GetNodeRecord(long offset)
+        {
+            return serializer.GetNodeRecord(offset);
+        }
+
+        public void UpdateNodeRecord(NodeRecord record)
+        {
+            serializer.UpdateNodeRecord(record);
+        }
+
+        public bool CanAppendCheckpoint(long checkpointOffset)
+        {
+            return serializer.NextRecord(checkpointOffset) == globalSave.endCheckpoint;
+        }
+
+        public void AppendDialogue(NodeRecord nodeRecord, int dialogueIndex)
+        {
+            nodeRecord.endDialogue = dialogueIndex + 1;
+            serializer.UpdateNodeRecord(nodeRecord);
+        }
+
+        public long AppendCheckpoint(GameStateCheckpoint checkpoint)
+        {
+            var record = globalSave.endCheckpoint;
+            serializer.SerializeRecord(record, checkpoint);
+            NewCheckpoint();
+            return record;
+        }
+
+        public GameStateCheckpoint GetCheckpoint(long offset)
+        {
+            return serializer.DeserializeRecord<GameStateCheckpoint>(offset);
         }
 
         /// <summary>
@@ -259,15 +227,16 @@ namespace Nova
         /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <param name="entry">Restore entry for the dialogue.</param>
-        public void SetReached(NodeHistory nodeHistory, int dialogueIndex, GameStateRestoreEntry entry)
+        public void SetReached(string nodeName, int dialogueIndex)
         {
-            var nodeName = nodeHistory.Last().Key;
-            globalSave.reachedDialogues.Ensure(nodeName).Ensure(dialogueIndex)[nodeHistory.Hash] = entry;
-
-            if (!globalSave.cachedNodeHistories.ContainsKey(nodeHistory.Hash))
+            var data = new ReachedDialogueData(nodeName, dialogueIndex);
+            if (reachedDialogues.Contains(data))
             {
-                globalSave.cachedNodeHistories[nodeHistory.Hash] = new NodeHistoryData(nodeHistory);
+                return;
             }
+            reachedDialogues.Add(data);
+            serializer.SerializeRecord(globalSave.endReached, data);
+            NewReached();
         }
 
         /// <summary>
@@ -275,15 +244,10 @@ namespace Nova
         /// </summary>
         /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="branchName">The name of the branch.</param>
-        public void SetBranchReached(NodeHistory nodeHistory, string branchName)
+        public void SetBranchReached(NodeRecord nodeRecord, string branchName)
         {
-            var nodeName = nodeHistory.Last().Key;
-            globalSave.reachedBranches.Ensure(nodeName).Ensure(branchName).Add(nodeHistory.Hash);
-
-            if (!globalSave.cachedNodeHistories.ContainsKey(nodeHistory.Hash))
-            {
-                globalSave.cachedNodeHistories[nodeHistory.Hash] = new NodeHistoryData(nodeHistory);
-            }
+            // currently we cannot find next node by branchname
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -292,59 +256,18 @@ namespace Nova
         /// <param name="endName">The name of the end point.</param>
         public void SetEndReached(string endName)
         {
-            globalSave.reachedEnds.Add(endName);
-        }
-
-        public void UnsetReached(ulong nodeHistoryHash)
-        {
-            var nodeName = GetLastNodeName(nodeHistoryHash);
-            globalSave.reachedDialogues.Remove(nodeName);
-            globalSave.reachedBranches.Remove(nodeName);
-        }
-
-        public void UnsetReachedAfter(NodeHistory nodeHistory, int dialogueIndex)
-        {
-            var nodeName = nodeHistory.Last().Key;
-            if (globalSave.reachedDialogues.TryGetValue(nodeName, out var dict))
+            if (reachedEnds.Contains(endName))
             {
-                foreach (var key in dict.Keys.Where(key => key > dialogueIndex).ToList())
-                {
-                    dict.Remove(key);
-                }
+                return;
             }
-        }
-
-        public GameStateRestoreEntry GetReached(ulong nodeHistoryHash, string nodeName, int dialogueIndex)
-        {
-            return globalSave.reachedDialogues.TryGetValue(nodeName, out var dict)
-                   && dict.TryGetValue(dialogueIndex, out var dict2)
-                   && dict2.TryGetValue(nodeHistoryHash, out var entry)
-                ? entry
-                : null;
-        }
-
-        /// <summary>
-        /// Get the restore entry for a dialogue.
-        /// </summary>
-        /// <param name="nodeHistory">The list of all reached nodes.</param>
-        /// <param name="dialogueIndex">The index of the dialogue.</param>
-        /// <returns>The restore entry for the dialogue. Null if not reached.</returns>
-        public GameStateRestoreEntry GetReached(NodeHistory nodeHistory, int dialogueIndex)
-        {
-            var nodeName = nodeHistory.Last().Key;
-            return GetReached(nodeHistory.Hash, nodeName, dialogueIndex);
+            reachedEnds.Add(endName);
+            serializer.SerializeRecord(globalSave.endReached, endName);
+            NewReached();
         }
 
         public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
         {
-            return globalSave.reachedDialogues.TryGetValue(nodeName, out var dict) && dict.ContainsKey(dialogueIndex);
-        }
-
-        public bool IsBranchReached(ulong nodeHistoryHash, string nodeName, string branchName)
-        {
-            return globalSave.reachedBranches.TryGetValue(nodeName, out var dict)
-                   && dict.TryGetValue(branchName, out var hashSet)
-                   && hashSet.Contains(nodeHistoryHash);
+            return reachedDialogues.Contains(new ReachedDialogueData(nodeName, dialogueIndex));
         }
 
         /// <summary>
@@ -353,15 +276,15 @@ namespace Nova
         /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="branchName">The name of the branch.</param>
         /// <returns>Whether the branch has been reached.</returns>
-        public bool IsBranchReached(NodeHistory nodeHistory, string branchName)
+        public bool IsBranchReached(NodeRecord nodeRecord, string nextNodeName)
         {
-            var nodeName = nodeHistory.Last().Key;
-            return IsBranchReached(nodeHistory.Hash, nodeName, branchName);
+            throw new NotImplementedException();
         }
 
-        public bool IsBranchReachedAnyHistory(string nodeName, string branchName)
+        public bool IsBranchReachedAnyHistory(string nodeName, string nextNodeName)
         {
-            return globalSave.reachedBranches.TryGetValue(nodeName, out var dict) && dict.ContainsKey(branchName);
+            // currently we don't store this
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -371,7 +294,7 @@ namespace Nova
         /// <returns>Whether the end point has been reached.</returns>
         public bool IsEndReached(string endName)
         {
-            return globalSave.reachedEnds.Contains(endName);
+            return reachedEnds.Contains(endName);
         }
 
         /// <summary>
@@ -380,7 +303,8 @@ namespace Nova
         /// TODO: UpdateGlobalSave() is slow when there are many saved dialogue entries
         public void UpdateGlobalSave()
         {
-            serializer.SafeWrite(globalSave, globalSavePath);
+            serializer.SerializeRecord(0, globalSave);
+            serializer.Flush();
         }
 
         /// <summary>
@@ -391,10 +315,13 @@ namespace Nova
         {
             var saveDir = new DirectoryInfo(savePathBase);
             foreach (var file in saveDir.GetFiles())
+            {
                 file.Delete();
+            }
 
-            globalSave = new GlobalSave();
-            serializer.SafeWrite(globalSave, globalSavePath);
+            globalSave = new GlobalSave(serializer);
+            UpdateGlobalSave();
+            InitReached();
         }
 
         #endregion
@@ -446,7 +373,7 @@ namespace Nova
             bookmark.screenshot = screenshot;
             bookmark.globalSaveIdentifier = globalSave.identifier;
 
-            serializer.SafeWrite(ReplaceCache(saveID, bookmark), GetBookmarkFileName(saveID));
+            serializer.WriteBookmark(GetBookmarkFileName(saveID), ReplaceCache(saveID, bookmark));
             UpdateGlobalSave();
 
             var metadata = saveSlotsMetadata.Ensure(saveID);
@@ -462,7 +389,7 @@ namespace Nova
         /// <returns>The loaded bookmark.</returns>
         public Bookmark LoadBookmark(int saveID)
         {
-            var bookmark = serializer.SafeRead<Bookmark>(GetBookmarkFileName(saveID));
+            var bookmark = serializer.ReadBookmark(GetBookmarkFileName(saveID));
             if (bookmark.globalSaveIdentifier != globalSave.identifier)
             {
                 Debug.LogWarning($"Nova: Save file is incompatible with the global save file. saveID: {saveID}");

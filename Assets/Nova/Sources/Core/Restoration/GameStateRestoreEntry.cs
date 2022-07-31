@@ -36,29 +36,21 @@ namespace Nova
     }
 
     [Serializable]
-    public class GameStateCheckpoint : GameStateRestoreEntry
+    public class GameStateCheckpoint
     {
+        public readonly int dialogueIndex;
+        public readonly int restrainCheckpointNum;
         public readonly IReadOnlyDictionary<string, IRestoreData> restoreDatas;
         public readonly Variables variables;
 
-        public GameStateCheckpoint(IReadOnlyDictionary<string, IRestoreData> restoreDatas, Variables variables,
-            int restrainCheckpointNum)
-            : base(0, restrainCheckpointNum)
+        public GameStateCheckpoint(int dialogueIndex, IReadOnlyDictionary<string, IRestoreData> restoreDatas,
+            Variables variables, int restrainCheckpointNum)
         {
+            this.dialogueIndex = dialogueIndex;
+            this.restrainCheckpointNum = restrainCheckpointNum;
             this.restoreDatas = restoreDatas;
             this.variables = new Variables();
             this.variables.CloneFrom(variables);
-        }
-    }
-
-    [Serializable]
-    public class GameStateSimpleEntry : GameStateRestoreEntry
-    {
-        public GameStateSimpleEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum)
-            : base(stepNumFromLastCheckpoint, restrainCheckpointNum)
-        {
-            Utils.RuntimeAssert(stepNumFromLastCheckpoint > 0,
-                $"Invalid stepNumFromLastCheckpoint for GameStateSimpleEntry: {stepNumFromLastCheckpoint}");
         }
     }
 }

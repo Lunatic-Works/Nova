@@ -51,9 +51,9 @@ namespace Nova
             NovaAnimation.StopAll();
             dialogueState.state = DialogueState.State.Normal;
 
-            if (gameState.SeekBackStep(1, out var nodeName, out var dialogueIndex))
+            if (gameState.SeekBackStep(1, out var nodeRecord, out var checkpointOffset, out var dialogueIndex))
             {
-                gameState.MoveBackTo(nodeName, dialogueIndex);
+                gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
             }
             else
             {

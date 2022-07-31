@@ -36,8 +36,7 @@ namespace Nova
             NovaAnimation.StopAll();
             dialogueState.state = DialogueState.State.Normal;
             gameState.ReloadScripts();
-            var nodeHistoryEntry = gameState.nodeHistory.GetCounted(gameState.currentNode.name);
-            gameState.MoveBackAndFastForward(nodeHistoryEntry, 0, gameState.currentIndex, true, null);
+            gameState.MoveBackToFirstDialogue();
         }
     }
 }

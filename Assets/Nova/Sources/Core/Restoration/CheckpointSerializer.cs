@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using System.IO.MemoryMappedFiles;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
@@ -11,27 +11,51 @@ namespace Nova
 {
     public class CheckpointCorruptedException : Exception
     {
+        public CheckpointCorruptedException(string message) : base(message) { }
 
+        public static readonly CheckpointCorruptedException BadHeader = new CheckpointCorruptedException("file header or version mismatch");
+
+        public static CheckpointCorruptedException BadOffset(long offset)
+        {
+            return new CheckpointCorruptedException($"bad offset @{offset}");
+        }
+
+        public static CheckpointCorruptedException RecordOverflow(long offset)
+        {
+            return new CheckpointCorruptedException($"record @{offset} overflow");
+        }
+
+        public static CheckpointCorruptedException SerializationError(long offset, string reason)
+        {
+            return new CheckpointCorruptedException($"serialization failed @{offset} because {reason}");
+        }
     }
 
     public class CheckpointSerializer : IDisposable
     {
-        private const int Version = 3;
-        private static readonly TimeSpan BackupTime = TimeSpan.FromMinutes(5);
-        private static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
+        public const int Version = 3;
+        public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
 
-        private readonly BinaryFormatter formatter = new BinaryFormatter();
-        private bool disposed = false;
+        private static readonly TimeSpan BackupTime = TimeSpan.FromMinutes(5);
+        // sizeof(int)
+        private const int RecordHeader = 4;
+
+        private readonly IFormatter formatter = new BinaryFormatter();
         private readonly string path;
         private FileStream file;
         private string backupPath => path + ".old";
         private DateTime lastBackup = DateTime.Now;
-
-        public CheckpointSerializer() { }
+        private LRUCache<long, CheckpointBlock> cachedBlock;
 
         public CheckpointSerializer(string path)
         {
             this.path = path;
+            // 1M block cache
+            cachedBlock = new LRUCache<long, CheckpointBlock>(256, true);
+        }
+
+        public void Open()
+        {
             file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
@@ -56,116 +80,206 @@ namespace Nova
 
         public void Dispose()
         {
-            file.Close();
-            file.Dispose();
+            cachedBlock.Clear();
+            if (file != null)
+            {
+                file.Close();
+                file.Dispose();
+            }
         }
 
-        public T SafeRead<T>(string path)
+        public CheckpointBlock GetBlock(long id)
         {
+            CheckpointBlock block;
+            if (!cachedBlock.TryGetValue(id, out block))
+            {
+                block = CheckpointBlock.FromFile(file, id);
+                cachedBlock[id] = block;
+            }
+            return block;
+        }
+
+        public CheckpointBlock GetBlockIndex(long offset, out int index)
+        {
+            return GetBlock(CheckpointBlock.GetBlockIdIndex(offset, out index));
+        }
+
+        public ByteSegment GetRecord(long offset)
+        {
+            var block = GetBlockIndex(offset, out var index);
+            var segment = block.Segment;
+
+            if (segment.count < index + RecordHeader)
+            {
+                throw CheckpointCorruptedException.RecordOverflow(offset);
+            }
+            var size = segment.ReadInt(index);
+            index += RecordHeader;
+
+            if (index + size <= segment.count)
+            {
+                return segment.Slice(index + RecordHeader, size);
+            }
+
+            // need concat multiple blocks
+            var buf = new byte[size];
+            var head = 0;
+            while (head < size)
+            {
+                var count = Math.Min(size - head, segment.count - index);
+                segment.ReadBytes(index, new ByteSegment(buf, head, count));
+                head += count;
+                if (head < size && block.NextBlock == 0)
+                {
+                    throw CheckpointCorruptedException.RecordOverflow(offset);
+                }
+                block = GetBlock(block.NextBlock);
+                segment = block.Segment;
+                index = 0;
+            }
+            return new ByteSegment(buf);
+        }
+
+        public NodeRecord GetNodeRecord(long offset)
+        {
+            return new NodeRecord(offset, GetRecord(offset));
+        }
+
+        public CheckpointBlock AppendBlock()
+        {
+            var id = CheckpointBlock.GetBlockId(file.Length);
+            var block = new CheckpointBlock(file, id);
+            cachedBlock[id] = block;
+            return block;
+        }
+
+        public CheckpointBlock NextBlock(CheckpointBlock block)
+        {
+            if (block.NextBlock == 0)
+            {
+                var newBlock = AppendBlock();
+                block.NextBlock = newBlock.id;
+                return newBlock;
+            }
+            return GetBlock(block.NextBlock);
+        }
+
+        public long BeginRecord()
+        {
+            var block = AppendBlock();
+            return block.DataOffset;
+        }
+
+        public long NextRecord(long offset)
+        {
+            var block = GetBlockIndex(offset, out var index);
+            var size = block.Segment.ReadInt(0);
+            index += RecordHeader + size;
+            while (index + RecordHeader > CheckpointBlock.DataSize)
+            {
+                index -= CheckpointBlock.DataSize;
+                block = NextBlock(block);
+            }
+            index = Math.Max(index, 0);
+            return block.DataOffset + index;
+        }
+
+        public void AppendRecord(long offset, ByteSegment bytes)
+        {
+            var block = GetBlockIndex(offset, out var index);
+            var segment = block.Segment;
+            if (index + RecordHeader > segment.count)
+            {
+                throw CheckpointCorruptedException.RecordOverflow(offset);
+            }
+
+            segment.WriteInt(index, bytes.count);
+            index += RecordHeader;
+
+            var pos = 0;
+            while (pos < bytes.count)
+            {
+                var size = Math.Min(segment.count - index, bytes.count - pos);
+                segment.WriteBytes(index, bytes.Slice(pos, size));
+                block.MarkDirty();
+                pos += size;
+                if (pos < bytes.count)
+                {
+                    block = NextBlock(block);
+                    segment = block.Segment;
+                }
+            }
+        }
+
+        public void UpdateNodeRecord(NodeRecord record)
+        {
+            AppendRecord(record.offset, record.ToByteSegment());
+        }
+
+        public void SerializeRecord(long offset, object data)
+        {
+            var stream = new MemoryStream();
+            formatter.Serialize(stream, data);
+            AppendRecord(offset, new ByteSegment(stream.GetBuffer(), 0, (int)stream.Position));
+        }
+
+        public object DeserializeRecord(long offset)
+        {
+            var stream = GetRecord(offset).ToStream();
             try
             {
-                try
-                {
-                    using (var fs = File.OpenRead(path))
-                    {
-                        var result = Read<T>(fs);
-                        return result;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning($"Nova: {path} is corrupted.\n{e.Message}\nTry to recover...");
-                    var oldPath = path + ".old";
-                    using (var fs = File.OpenRead(oldPath))
-                    {
-                        var result = Read<T>(fs);
-
-                        // Recover only if the old file is good
-                        File.Delete(path); // no exception if not exist
-                        File.Move(oldPath, path); // exception if exists
-
-                        return result;
-                    }
-                }
+                var obj = formatter.Deserialize(stream);
+                return obj;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Nova: Error loading {path}.\n{e.Message}");
-                throw; // Nested exception cannot display full message here
+                throw CheckpointCorruptedException.SerializationError(offset, e.Message);
             }
         }
 
-        private bool alertOnSafeWriteFail = true;
-
-        public void SafeWrite<T>(T obj, string path)
+        public T DeserializeRecord<T>(long offset)
         {
-#if UNITY_EDITOR
-            Debug.Log($"SafeWrite {obj:GetType()} {path}");
-#endif
-
-            try
+            if (DeserializeRecord(offset) is T val)
             {
-                var oldPath = path + ".old";
-                if (File.Exists(path))
-                {
-                    File.Delete(oldPath); // no exception if not exist
-                    File.Move(path, oldPath); // exception if exists
-                }
-
-                using (var fs = File.OpenWrite(path)) // overwrite if needed
-                {
-                    Write(obj, fs); // May be interrupted
-                }
-
-                File.Delete(oldPath);
+                return val;
             }
-            catch (Exception)
-            {
-                // If there is some problem with Alert.Show, we need to avoid infinite recursion
-                if (alertOnSafeWriteFail)
-                {
-                    alertOnSafeWriteFail = false;
-                    Alert.Show(null, "bookmark.save.fail");
-                }
 
-                throw;
+            throw CheckpointCorruptedException.SerializationError(offset, $"type mismatch, need {typeof(T)}");
+        }
+
+        public void Flush()
+        {
+            foreach (var block in cachedBlock)
+            {
+                block.Value.Flush();
+            }
+            file.Flush();
+        }
+
+        public Bookmark ReadBookmark(string path)
+        {
+            using (var fs = File.OpenRead(path))
+            using (var r = new BinaryReader(fs))
+            {
+                var fileHeader = r.ReadBytes(FileHeader.Length);
+                var version = r.ReadInt32();
+
+                if (version != Version || !fileHeader.SequenceEqual(FileHeader))
+                {
+                    throw CheckpointCorruptedException.BadHeader;
+                }
+                return (Bookmark)formatter.Deserialize(fs);
             }
         }
 
-        private T Read<T>(Stream s)
+        public void WriteBookmark(string path, Bookmark obj)
         {
-            using (var bw = new BinaryReader(s))
+            using (var fs = File.OpenWrite(path))
+            using (var r = new BinaryWriter(fs))
             {
-                var fileHeader = bw.ReadBytes(FileHeader.Length);
-                Utils.RuntimeAssert(FileHeader.SequenceEqual(fileHeader), "Invalid save file format.");
-
-                int version = bw.ReadInt32();
-                Utils.RuntimeAssert(Version >= version, "Save file is incompatible with the current version of Nova.");
-
-                using (var compressed = new DeflateStream(s, CompressionMode.Decompress))
-                using (var uncompressed = new MemoryStream())
-                {
-                    compressed.CopyTo(uncompressed);
-                    uncompressed.Position = 0;
-                    return (T)formatter.Deserialize(uncompressed);
-                }
-            }
-        }
-
-        private void Write<T>(T obj, Stream s)
-        {
-            using (var bw = new BinaryWriter(s))
-            {
-                bw.Write(FileHeader);
-                bw.Write(Version);
-
-                using (var compressed = new DeflateStream(s, CompressionMode.Compress))
-                using (var uncompressed = new MemoryStream())
-                {
-                    formatter.Serialize(uncompressed, obj);
-                    uncompressed.Position = 0;
-                    uncompressed.CopyTo(compressed);
-                }
+                r.Write(FileHeader);
+                r.Write(Version);
+                formatter.Serialize(fs, obj);
             }
         }
     }

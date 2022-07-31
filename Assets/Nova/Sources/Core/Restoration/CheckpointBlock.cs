@@ -1,92 +1,201 @@
 using System;
-using System.Runtime.InteropServices;
 using System.IO;
+using System.Text;
 
 namespace Nova
 {
-    public class CheckpointBlock
+    public readonly ref struct ByteSegment
     {
-        public enum BlockType : byte
+        public readonly byte[] array;
+        public readonly int offset;
+        public readonly int count;
+
+        public ByteSegment(byte[] data)
         {
-            Invalid = 0,
-            // global variables, etc.
-            GlobalData,
-            // a quick list to store reached
-            ReachedHistory,
-            // all checkpoints and node history
-            CheckpointHistory,
+            array = data;
+            offset = 0;
+            count = data.Length;
         }
 
-        public enum RecordType : byte
+        public ByteSegment(byte[] data, int offset, int count)
         {
-            Invalid = 0,
-            // the only record in GlobalData
-            GlobalData,
-            ReachedDialogue,
-            // it is unused for now because reached branch needs to compare node history
-            // so use checkpoint history directly
-            ReachedBranch,
-            ReachedEnd,
-            Node,
-            Checkpoint,
+            this.array = data;
+            this.offset = offset;
+            this.count = count;
         }
 
+        /* no check, be careful */
+        public byte this[int index]
+        {
+            get => array[offset + index];
+            set => array[offset + index] = value;
+        }
+
+        public ByteSegment Slice(int offset, int count)
+        {
+            return new ByteSegment(array, this.offset + offset, count);
+        }
+
+        public ByteSegment Slice(int offset)
+        {
+            return new ByteSegment(array, this.offset + offset, count - offset);
+        }
+
+        public MemoryStream ToStream()
+        {
+            return new MemoryStream(array, this.offset, this.count, true, true);
+        }
+
+        public int ReadInt(int offset)
+        {
+            return BitConverter.ToInt32(array, this.offset + offset);
+        }
+
+        public long ReadLong(int offset)
+        {
+            return BitConverter.ToInt64(array, this.offset + offset);
+        }
+
+        public ulong ReadUlong(int offset)
+        {
+            return BitConverter.ToUInt64(array, this.offset + offset);
+        }
+
+        public void WriteInt(int offset, int value)
+        {
+            var d = BitConverter.GetBytes(value);
+            d.CopyTo(array, this.offset + offset);
+        }
+
+        public void WriteLong(int offset, long value)
+        {
+            var d = BitConverter.GetBytes(value);
+            d.CopyTo(array, this.offset + offset);
+        }
+
+        public void WriteUlong(int offset, ulong value)
+        {
+            var d = BitConverter.GetBytes(value);
+            d.CopyTo(array, this.offset + offset);
+        }
+
+        public void ReadBytes(int offset, byte[] bytes)
+        {
+            Buffer.BlockCopy(array, this.offset + offset, bytes, 0, bytes.Length);
+        }
+
+        public void ReadBytes(int offset, ByteSegment bytes)
+        {
+            Buffer.BlockCopy(array, this.offset + offset, bytes.array, bytes.offset, bytes.count);
+        }
+
+        public string ReadString(int offset, int count)
+        {
+            return Encoding.UTF8.GetString(array, this.offset + offset, count);
+        }
+
+        public string ReadString(int offset)
+        {
+            return Encoding.UTF8.GetString(array, this.offset + offset, count - offset);
+        }
+
+        public void WriteBytes(int offset, byte[] bytes)
+        {
+            Buffer.BlockCopy(bytes, 0, array, this.offset + offset, bytes.Length);
+        }
+
+        public void WriteBytes(int offset, ByteSegment bytes)
+        {
+            Buffer.BlockCopy(bytes.array, bytes.offset, array, this.offset + offset, bytes.count);
+        }
+
+        public void WriteString(int offset, string str)
+        {
+            Encoding.UTF8.GetBytes(str, 0, str.Length, array, this.offset + offset);
+        }
+    }
+
+    public class CheckpointBlock : IDisposable
+    {
         public const int BlockSize = 4096;
-        public static readonly int NextBlockOffset;
-        public static readonly int HeaderSize;
-        public static readonly int DataSize;
+        // sizeof(long)
+        public const int HeaderSize = 8;
+        public const int DataSize = BlockSize - HeaderSize;
 
-        static CheckpointBlock()
+        public static long GetBlockId(long offset)
         {
-            NextBlockOffset = Marshal.SizeOf<BlockType>();
-            HeaderSize = NextBlockOffset + Marshal.SizeOf<long>();
-            DataSize = BlockSize - HeaderSize;
+            return offset / BlockSize;
         }
 
-        static long GetBlockId(long id)
+        public static long GetBlockIdIndex(long offset, out int index)
         {
-            return id / BlockSize;
+            var id = offset / BlockSize;
+            index = (int)(offset - id * BlockSize) - HeaderSize;
+            if (index < 0)
+            {
+                throw CheckpointCorruptedException.BadOffset(offset);
+            }
+            return id;
         }
 
         public readonly long id;
-        public readonly BlockType type;
-        public long nextBlock;
-        public readonly MemoryStream dataStream;
+        private long _nextBlock;
+        public long NextBlock
+        {
+            get => _nextBlock;
+            set
+            {
+                _nextBlock = value;
+                MarkDirty();
+            }
+        }
+        public ByteSegment Segment => new ByteSegment(data, HeaderSize, DataSize);
+        public long DataOffset => id * BlockSize + HeaderSize;
+        public bool Dirty { get; private set; } = true;
 
-        private CheckpointSerializer serializer;
+        private Stream stream;
         private byte[] data = new byte[BlockSize];
-        private long offset => id * BlockSize;
+        private long Offset => id * BlockSize;
 
         // initialize existing block from file
-        public CheckpointBlock(CheckpointSerializer serializer, long id)
+        public static CheckpointBlock FromFile(Stream stream, long id)
         {
-            this.serializer = serializer;
-            this.id = id;
-
-            serializer.SafeRead(data, offset, BlockSize);
-
-            type = (BlockType)data[0];
-            nextBlock = BitConverter.ToInt64(data, NextBlockOffset);
-            dataStream = new MemoryStream(data, HeaderSize, DataSize, true);
+            CheckpointBlock block = new CheckpointBlock(stream, id);
+            stream.Seek(block.Offset, SeekOrigin.Begin);
+            stream.Read(block.data, 0, BlockSize);
+            block._nextBlock = BitConverter.ToInt64(block.data, 0);
+            block.Dirty = false;
+            return block;
         }
 
-        public CheckpointBlock(CheckpointSerializer serializer, long id, BlockType type)
+        public CheckpointBlock(Stream stream, long id)
         {
-            this.serializer = serializer;
-            this.type = type;
+            this.stream = stream;
             this.id = id;
-            nextBlock = 0;
-            data[0] = (byte)type;
+            _nextBlock = 0;
+        }
 
-            Flush();
-            dataStream = new MemoryStream(data, HeaderSize, DataSize, true);
+        public void MarkDirty()
+        {
+            Dirty = true;
         }
 
         public void Flush()
         {
-            var x = BitConverter.GetBytes(nextBlock);
-            Buffer.BlockCopy(x, 0, data, NextBlockOffset, Marshal.SizeOf<long>());
-            serializer.SafeWrite(data, offset, BlockSize);
+            if (!Dirty)
+            {
+                return;
+            }
+            var x = BitConverter.GetBytes(_nextBlock);
+            Buffer.BlockCopy(x, 0, data, 0, HeaderSize);
+            stream.Seek(Offset, SeekOrigin.Begin);
+            stream.Write(data, 0, BlockSize);
+            Dirty = false;
+        }
+
+        public void Dispose()
+        {
+            Flush();
         }
     }
 }
