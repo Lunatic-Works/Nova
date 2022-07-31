@@ -9,8 +9,6 @@ using TMPro;
 
 namespace Nova
 {
-    using NodeHistoryEntry = KeyValuePair<string, int>;
-
     public class LogController : ViewControllerBase, IRestorable, LoopScrollPrefabSource, LoopScrollDataSource,
         LoopScrollSizeHelper
     {
@@ -18,18 +16,19 @@ namespace Nova
         private class LogParam
         {
             public readonly DialogueDisplayData displayData;
-            public readonly NodeHistoryEntry nodeHistoryEntry;
+            public readonly long nodeOffset;
+            public readonly long checkpointOffset;
             public readonly int dialogueIndex;
             public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
             public int logEntryIndex;
 
-            public LogParam(DialogueDisplayData displayData, NodeHistoryEntry nodeHistoryEntry, int dialogueIndex,
-                IReadOnlyDictionary<string, VoiceEntry> voices, int logEntryIndex)
+            public LogParam(DialogueChangedData data, int logEntryIndex)
             {
-                this.displayData = displayData;
-                this.nodeHistoryEntry = nodeHistoryEntry;
-                this.dialogueIndex = dialogueIndex;
-                this.voices = voices;
+                this.displayData = data.displayData;
+                this.nodeOffset = data.nodeRecord.offset;
+                this.checkpointOffset = data.checkpointOffset;
+                this.dialogueIndex = data.dialogueIndex;
+                this.voices = data.voicesNextDialogue;
                 this.logEntryIndex = logEntryIndex;
             }
         }
@@ -118,54 +117,15 @@ namespace Nova
 
         private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
-            AddEntry(new LogParam(dialogueChangedData.displayData, dialogueChangedData.nodeHistoryEntry,
-                dialogueChangedData.dialogueIndex, dialogueChangedData.voicesNextDialogue, logParams.Count));
-        }
-
-        private bool TryGetCheckpoint(LogParam logParam, bool isLatest, out GameStateCheckpoint checkpoint)
-        {
-            ulong nodeHistoryHash;
-            if (isLatest)
-            {
-                nodeHistoryHash = gameState.nodeHistory.Hash;
-            }
-            else
-            {
-                var backNodeIndex = gameState.nodeHistory.FindLastIndex(x => x.Equals(logParam.nodeHistoryEntry));
-                nodeHistoryHash = gameState.nodeHistory.GetHashULong(0, backNodeIndex + 1, logParam.dialogueIndex + 1);
-            }
-
-            var entry = checkpointManager.GetReached(nodeHistoryHash, logParam.nodeHistoryEntry.Key,
-                logParam.dialogueIndex);
-            if (entry is GameStateCheckpoint _checkpoint)
-            {
-                checkpoint = _checkpoint;
-                return true;
-            }
-            else
-            {
-                checkpoint = null;
-                return false;
-            }
+            AddEntry(new LogParam(dialogueChangedData, logParams.Count));
         }
 
         private void AddEntry(LogParam logParam)
         {
             var text = logParam.displayData.FormatNameDialogue();
-            var isCheckpoint = TryGetCheckpoint(logParam, true, out _);
             if (string.IsNullOrEmpty(text))
             {
-                if (isCheckpoint)
-                {
-                    checkpointLogParam = null;
-                }
-
                 return;
-            }
-
-            if (isCheckpoint || checkpointLogParam == null)
-            {
-                checkpointLogParam = logParam;
             }
 
             logParams.Add(logParam);
@@ -176,7 +136,9 @@ namespace Nova
             logPrefixHeights.Add(height + (cnt > 0 ? logPrefixHeights[cnt - 1] : 0));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
+            {
                 scrollRect.totalCount = logParams.Count;
+            }
         }
 
         private bool RestrainLogEntryNum(int num)
@@ -247,9 +209,7 @@ namespace Nova
         public void ProvideData(Transform transform, int idx)
         {
             var logParam = logParams[idx];
-
-            UnityAction onGoBackButtonClicked = () =>
-                OnGoBackButtonClicked(logParam.nodeHistoryEntry, logParam.dialogueIndex, logParam.logEntryIndex);
+            UnityAction onGoBackButtonClicked = () => OnGoBackButtonClicked(logParam);
 
             UnityAction onPlayVoiceButtonClicked = null;
             if (logParam.voices.Any())
@@ -263,9 +223,10 @@ namespace Nova
 
         #endregion
 
-        private void _onGoBackButtonClicked(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex)
+        private void _onGoBackButtonClicked(LogParam logParam)
         {
-            gameState.MoveBackTo(nodeHistoryEntry, dialogueIndex);
+            var nodeRecord = checkpointManager.GetNodeRecord(logParam.nodeOffset);
+            gameState.MoveBackTo(nodeRecord, logParam.checkpointOffset, logParam.dialogueIndex);
             // Debug.Log($"Remaining log entries count: {logEntries.Count}");
             if (hideOnGoBackButtonClicked)
             {
@@ -275,22 +236,22 @@ namespace Nova
 
         private int selectedLogEntryIndex = -1;
 
-        private void OnGoBackButtonClicked(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, int logEntryIndex)
+        private void OnGoBackButtonClicked(LogParam logParam)
         {
-            if (logEntryIndex == selectedLogEntryIndex)
+            if (logParam.logEntryIndex == selectedLogEntryIndex)
             {
                 selectedLogEntryIndex = -1;
                 Alert.Show(
                     null,
                     "log.back.confirm",
-                    () => _onGoBackButtonClicked(nodeHistoryEntry, dialogueIndex),
+                    () => _onGoBackButtonClicked(logParam),
                     null,
                     "LogBack"
                 );
             }
             else
             {
-                selectedLogEntryIndex = logEntryIndex;
+                selectedLogEntryIndex = logParam.logEntryIndex;
             }
         }
 
@@ -384,46 +345,16 @@ namespace Nova
 
         public IRestoreData GetRestoreData()
         {
-            if (logParams.Count == 0 || checkpointLogParam == null)
-            {
-                return new LogControllerRestoreData(new List<LogParam>());
-            }
-
-            int checkpointIndex = logParams.IndexOf(checkpointLogParam);
-            if (checkpointIndex < 0)
-            {
-                checkpointIndex = 0;
-            }
-
-            return new LogControllerRestoreData(logParams.GetRange(checkpointIndex,
-                logParams.Count - checkpointIndex));
+            return new LogControllerRestoreData(logParams);
         }
 
         public void Restore(IRestoreData restoreData)
         {
-            var allParams = new List<LogParam>();
-            var data = restoreData as LogControllerRestoreData;
-            while (data.logParams.Count > 0)
-            {
-                for (int i = data.logParams.Count - 1; i >= 0; i--)
-                {
-                    allParams.Add(data.logParams[i]);
-                    if (allParams.Count >= maxLogEntryNum)
-                    {
-                        break;
-                    }
-                }
-
-                this.RuntimeAssert(TryGetCheckpoint(data.logParams[0], false, out var entry),
-                    "The earliest log in each restore data must point at another checkpoint.");
-                data = entry.restoreDatas[restorableName] as LogControllerRestoreData;
-            }
-
             Clear();
-            for (int i = allParams.Count - 1; i >= 0; i--)
+            var data = restoreData as LogControllerRestoreData;
+            foreach (var param in data.logParams)
             {
-                allParams[i].logEntryIndex = i;
-                AddEntry(allParams[i]);
+                AddEntry(param);
             }
         }
 

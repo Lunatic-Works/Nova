@@ -27,7 +27,7 @@ namespace Nova
 
         private void OnNodeChanged(NodeChangedData nodeChangedData)
         {
-            currentNodeName = nodeChangedData.nodeHistoryEntry.Key;
+            currentNodeName = nodeChangedData.newNode;
         }
 
         private void OnSelectionOccurs(SelectionOccursData selectionOccursData)

@@ -193,7 +193,7 @@ namespace Nova
 
         private void OnNodeChanged(NodeChangedData nodeChangedData)
         {
-            currentNode = gameState.GetNode(nodeChangedData.nodeHistoryEntry.Key);
+            currentNode = gameState.GetNode(nodeChangedData.newNode);
         }
 
         private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
@@ -585,7 +585,7 @@ namespace Nova
             try
             {
                 Bookmark bookmark = checkpointManager[saveID];
-                var nodeName = checkpointManager.GetLastNodeName(bookmark.nodeHistoryHash);
+                var nodeName = checkpointManager.GetNodeRecord(bookmark.nodeOffset).name;
                 var displayName = I18n.__(gameState.GetNode(nodeName).displayNames);
                 ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",

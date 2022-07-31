@@ -77,10 +77,13 @@ namespace Nova
                 return;
             }
 
-            var cachedObject = node.Value as UnityObject;
-            if (cachedObject != null)
+            if (node.Value is UnityObject obj)
             {
-                Utils.DestroyObject(cachedObject);
+                Utils.DestroyObject(obj);
+            }
+            else if (node.Value is IDisposable disp)
+            {
+                disp.Dispose();
             }
         }
 
