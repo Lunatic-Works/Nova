@@ -44,6 +44,7 @@ namespace Nova
         private string globalSavePath;
 
         private GlobalSave globalSave;
+        private bool globalSaveDirty = false;
         private readonly SerializableHashSet<ReachedDialogueData> reachedDialogues = new SerializableHashSet<ReachedDialogueData>();
         private readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
@@ -56,7 +57,7 @@ namespace Nova
 
         private void InitGlobalSave()
         {
-            globalSave = serializer.DeserializeRecord<GlobalSave>(0);
+            globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset);
             if (globalSave.version != CheckpointSerializer.Version ||
                 !CheckpointSerializer.FileHeader.SequenceEqual(globalSave.fileHeader))
             {
@@ -136,6 +137,8 @@ namespace Nova
             {
                 bookmark.DestroyTexture();
             }
+
+            serializer.Dispose();
         }
 
         #region Global save
@@ -143,11 +146,15 @@ namespace Nova
         private void NewReached()
         {
             globalSave.endReached = serializer.NextRecord(globalSave.endReached);
+            globalSaveDirty = true;
+            Debug.Log($"next reached {globalSave.endReached}");
         }
 
         private void NewCheckpoint()
         {
             globalSave.endCheckpoint = serializer.NextRecord(globalSave.endCheckpoint);
+            globalSaveDirty = true;
+            Debug.Log($"next checkpoint {globalSave.endCheckpoint}");
         }
 
         public long NextRecord(long offset)
@@ -303,7 +310,11 @@ namespace Nova
         /// TODO: UpdateGlobalSave() is slow when there are many saved dialogue entries
         public void UpdateGlobalSave()
         {
-            serializer.SerializeRecord(0, globalSave);
+            if (globalSaveDirty)
+            {
+                serializer.SerializeRecord(CheckpointSerializer.GlobalSaveOffset, globalSave);
+                globalSaveDirty = false;
+            }
             serializer.Flush();
         }
 
@@ -319,7 +330,9 @@ namespace Nova
                 file.Delete();
             }
 
+            serializer.Open();
             globalSave = new GlobalSave(serializer);
+            globalSaveDirty = true;
             UpdateGlobalSave();
             InitReached();
         }
@@ -515,6 +528,7 @@ namespace Nova
         public void Set(string key, object value)
         {
             globalSave.data[key] = value;
+            globalSaveDirty = true;
         }
 
         #endregion
