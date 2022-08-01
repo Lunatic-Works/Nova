@@ -352,8 +352,10 @@ namespace Nova
         {
             Clear();
             var data = restoreData as LogControllerRestoreData;
-            foreach (var param in data.logParams)
+            for (var i = data.logParams.Count - 1; i >= 0; i--)
             {
+                var param = data.logParams[i];
+                param.logEntryIndex = i;
                 AddEntry(param);
             }
         }
