@@ -35,6 +35,7 @@ namespace Nova
     {
         public const int Version = 3;
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
+        public const long GlobalSaveOffset = CheckpointBlock.HeaderSize;
 
         private static readonly TimeSpan BackupTime = TimeSpan.FromMinutes(5);
         // sizeof(int)
@@ -43,6 +44,7 @@ namespace Nova
         private readonly IFormatter formatter = new BinaryFormatter();
         private readonly string path;
         private FileStream file;
+        private long endBlock;
         private string backupPath => path + ".old";
         private DateTime lastBackup = DateTime.Now;
         private LRUCache<long, CheckpointBlock> cachedBlock;
@@ -57,6 +59,11 @@ namespace Nova
         public void Open()
         {
             file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            endBlock = CheckpointBlock.GetBlockId(file.Length);
+            if (endBlock < 1)
+            {
+                AppendBlock();
+            }
         }
 
         public void SafeWrite(byte[] data, long offset, int count)
@@ -118,7 +125,7 @@ namespace Nova
 
             if (index + size <= segment.count)
             {
-                return segment.Slice(index + RecordHeader, size);
+                return segment.Slice(index, size);
             }
 
             // need concat multiple blocks
@@ -145,15 +152,15 @@ namespace Nova
             return new NodeRecord(offset, GetRecord(offset));
         }
 
-        public CheckpointBlock AppendBlock()
+        private CheckpointBlock AppendBlock()
         {
-            var id = CheckpointBlock.GetBlockId(file.Length);
+            var id = endBlock++;
             var block = new CheckpointBlock(file, id);
             cachedBlock[id] = block;
             return block;
         }
 
-        public CheckpointBlock NextBlock(CheckpointBlock block)
+        private CheckpointBlock NextBlock(CheckpointBlock block)
         {
             if (block.NextBlock == 0)
             {
@@ -173,7 +180,7 @@ namespace Nova
         public long NextRecord(long offset)
         {
             var block = GetBlockIndex(offset, out var index);
-            var size = block.Segment.ReadInt(0);
+            var size = block.Segment.ReadInt(index);
             index += RecordHeader + size;
             while (index + RecordHeader > CheckpointBlock.DataSize)
             {
@@ -186,6 +193,8 @@ namespace Nova
 
         public void AppendRecord(long offset, ByteSegment bytes)
         {
+            Debug.Log($"append record @{offset} {bytes.count} bytes");
+
             var block = GetBlockIndex(offset, out var index);
             var segment = block.Segment;
             if (index + RecordHeader > segment.count)
@@ -207,6 +216,7 @@ namespace Nova
                 {
                     block = NextBlock(block);
                     segment = block.Segment;
+                    index = 0;
                 }
             }
         }

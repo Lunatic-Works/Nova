@@ -511,6 +511,7 @@ namespace Nova
         {
             nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
             checkpointOffset = nodeRecord.offset;
+            forceCheckpoint = true;
         }
 
         private void MoveToNextNode(FlowChartNode nextNode, Action onFinish)
@@ -843,13 +844,16 @@ namespace Nova
 
         private void FastForward(int stepCount, Action onFinish)
         {
-            if (actionPauseLock.isLocked)
+            if (stepCount <= 0 || actionPauseLock.isLocked)
             {
-                Debug.LogWarning("Nova: GameState paused by action when restoring.");
-                isRestoring = false;
+                if (actionPauseLock.isLocked)
+                {
+                    Debug.LogWarning("Nova: GameState paused by action when restoring.");
+                }
                 return;
             }
 
+            isRestoring = true;
             for (var i = 0; i < stepCount; ++i)
             {
                 var isLast = i == stepCount - 1;
@@ -887,8 +891,6 @@ namespace Nova
         public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointRecord, int dialogueIndex, Action onFinish = null)
         {
             // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
-
-            isRestoring = true;
             CancelAction();
 
             // Animation should stop
