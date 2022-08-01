@@ -450,7 +450,7 @@ namespace Nova
                     var action = LuaRuntime.Instance.WrapClosure(code);
                     if (action == null)
                     {
-                        throw new ParseException(
+                        throw new ParserException(
                             "Syntax error while parsing lazy execution block\n" +
                             $"characterName: {characterName}, displayName: {displayName}, dialogue: {dialogue}\n" +
                             $"stage: {stage}, code: {code}");

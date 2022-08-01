@@ -157,7 +157,7 @@ code2_2() |>
             {
                 var parsed = Parser.Parse("<| code_unpaired");
             }
-            catch (ParseException)
+            catch (ParserException)
             {
                 Assert.IsTrue(true);
                 return;

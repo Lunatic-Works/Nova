@@ -118,9 +118,9 @@ namespace Nova
                         // If deferChunks == false, dialogues and lazy execution blocks are also parsed
                         ParseScript(script, true);
                     }
-                    catch (ParseException e)
+                    catch (ParserException e)
                     {
-                        throw new ParseException($"Failed to parse {script.name}", e);
+                        throw new ParserException($"Failed to parse {script.name}", e);
                     }
                 }
             }

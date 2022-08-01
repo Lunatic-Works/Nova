@@ -4,13 +4,13 @@ using System.Runtime.Serialization;
 namespace Nova.Script
 {
     [Serializable]
-    public class ParseException : Exception
+    public class ParserException : Exception
     {
-        public ParseException() { }
-        public ParseException(string message) : base(message) { }
-        public ParseException(string message, Exception inner) : base(message, inner) { }
-        protected ParseException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-        public ParseException(Token token, string msg) : this(ErrorMessage(token, msg)) { }
+        public ParserException() { }
+        public ParserException(string message) : base(message) { }
+        public ParserException(string message, Exception inner) : base(message, inner) { }
+        protected ParserException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        public ParserException(Token token, string msg) : this(ErrorMessage(token, msg)) { }
 
         public static string ErrorMessage(Token token, string msg)
         {
@@ -26,7 +26,7 @@ namespace Nova.Script
         {
             if (token.type != type)
             {
-                throw new ParseException(ErrorMessage(token, $"Expect {display}"));
+                throw new ParserException(token, $"Expect {display}");
             }
         }
 
@@ -35,7 +35,7 @@ namespace Nova.Script
         {
             if (token.type != typeA && token.type != typeB)
             {
-                throw new ParseException(ErrorMessage(token, $"Expect {display}"));
+                throw new ParserException(token, $"Expect {display}");
             }
         }
     }

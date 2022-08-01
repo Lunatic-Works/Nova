@@ -42,7 +42,7 @@ namespace Nova.Script
     {
         private static ParsedBlock ParseCodeBlock(Tokenizer tokenizer, BlockType type, AttributeDict attributes)
         {
-            ParseException.ExpectToken(tokenizer.Peek(), TokenType.BlockStart, "<|");
+            ParserException.ExpectToken(tokenizer.Peek(), TokenType.BlockStart, "<|");
             var startToken = tokenizer.Peek().Clone();
             tokenizer.ParseNext();
             var matchFound = false;
@@ -81,12 +81,12 @@ namespace Nova.Script
 
             if (!matchFound)
             {
-                throw new ParseException(startToken, "Unpaired block start <|");
+                throw new ParserException(startToken, "Unpaired block start <|");
             }
 
             tokenizer.SkipWhiteSpace();
 
-            ParseException.ExpectToken(tokenizer.Peek(), TokenType.NewLine, TokenType.EndOfFile,
+            ParserException.ExpectToken(tokenizer.Peek(), TokenType.NewLine, TokenType.EndOfFile,
                 "new line or end of file after |>");
             tokenizer.ParseNext();
 
@@ -96,7 +96,7 @@ namespace Nova.Script
         private static ParsedBlock ParseEagerExecutionBlock(Tokenizer tokenizer)
         {
             var at = tokenizer.Peek();
-            ParseException.ExpectToken(at, TokenType.At, "@");
+            ParserException.ExpectToken(at, TokenType.At, "@");
             tokenizer.ParseNext();
             var token = tokenizer.Peek();
             if (token.type == TokenType.AttrStart)
@@ -109,7 +109,7 @@ namespace Nova.Script
                 return ParseCodeBlock(tokenizer, BlockType.EagerExecution, null);
             }
 
-            throw new ParseException(token, $"Except [ or <| after @, found {token.type}");
+            throw new ParserException(token, $"Except [ or <| after @, found {token.type}");
         }
 
         private static string ExpectIdentifierOrString(Tokenizer tokenizer)
@@ -130,7 +130,7 @@ namespace Nova.Script
                 return tokenizer.SubString(startIndex, endIndex - startIndex);
             }
 
-            throw new ParseException(tokenizer.Peek(), $"Expect identifier or string, found {tokenizer.Peek().type}");
+            throw new ParserException(tokenizer.Peek(), $"Expect identifier or string, found {tokenizer.Peek().type}");
         }
 
         private static char EscapeChar(char c)
@@ -185,7 +185,7 @@ namespace Nova.Script
 
         private static ParsedBlock ParseCodeBlockWithAttributes(Tokenizer tokenizer, BlockType type)
         {
-            ParseException.ExpectToken(tokenizer.Peek(), TokenType.AttrStart, "[");
+            ParserException.ExpectToken(tokenizer.Peek(), TokenType.AttrStart, "[");
             tokenizer.ParseNext();
             var attrs = new AttributeDict();
 
@@ -219,7 +219,7 @@ namespace Nova.Script
                 }
                 else
                 {
-                    throw new ParseException(token, "Expect , or ]");
+                    throw new ParserException(token, "Expect , or ]");
                 }
 
                 attrs.Add(UnQuote(key.Trim()), value == null ? null : UnQuote(value.Trim()));
