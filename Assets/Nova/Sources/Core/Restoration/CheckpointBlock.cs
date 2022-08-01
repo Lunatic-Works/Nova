@@ -7,8 +7,7 @@ namespace Nova
     public class CheckpointBlock : IDisposable
     {
         public const int BlockSize = 4096;
-        // sizeof(long)
-        public const int HeaderSize = 8;
+        public const int HeaderSize = 8; // sizeof(long)
         public const int DataSize = BlockSize - HeaderSize;
 
         public static long GetBlockId(long offset)
@@ -24,12 +23,17 @@ namespace Nova
             {
                 throw CheckpointCorruptedException.BadOffset(offset);
             }
+
             return id;
         }
 
         public readonly long id;
+        private long offset => id * BlockSize;
+        public long dataOffset => id * BlockSize + HeaderSize;
+
         private long _nextBlock;
-        public long NextBlock
+
+        public long nextBlock
         {
             get => _nextBlock;
             set
@@ -38,22 +42,22 @@ namespace Nova
                 MarkDirty();
             }
         }
-        public ByteSegment Segment => new ByteSegment(data, HeaderSize, DataSize);
-        public long DataOffset => id * BlockSize + HeaderSize;
-        public bool Dirty { get; private set; } = true;
 
-        private Stream stream;
-        private byte[] data = new byte[BlockSize];
-        private long Offset => id * BlockSize;
+        public ByteSegment segment => new ByteSegment(data, HeaderSize, DataSize);
+
+        private bool dirty = true;
+
+        private readonly Stream stream;
+        private readonly byte[] data = new byte[BlockSize];
 
         // initialize existing block from file
         public static CheckpointBlock FromFile(Stream stream, long id)
         {
-            CheckpointBlock block = new CheckpointBlock(stream, id);
-            stream.Seek(block.Offset, SeekOrigin.Begin);
+            var block = new CheckpointBlock(stream, id);
+            stream.Seek(block.offset, SeekOrigin.Begin);
             stream.Read(block.data, 0, BlockSize);
             block._nextBlock = BitConverter.ToInt64(block.data, 0);
-            block.Dirty = false;
+            block.dirty = false;
             return block;
         }
 
@@ -66,21 +70,22 @@ namespace Nova
 
         public void MarkDirty()
         {
-            Dirty = true;
+            dirty = true;
         }
 
         public void Flush()
         {
-            if (!Dirty)
+            if (!dirty)
             {
                 return;
             }
+
             Debug.Log($"flush block {id}");
             var x = BitConverter.GetBytes(_nextBlock);
             Buffer.BlockCopy(x, 0, data, 0, HeaderSize);
-            stream.Seek(Offset, SeekOrigin.Begin);
+            stream.Seek(offset, SeekOrigin.Begin);
             stream.Write(data, 0, BlockSize);
-            Dirty = false;
+            dirty = false;
         }
 
         public void Dispose()

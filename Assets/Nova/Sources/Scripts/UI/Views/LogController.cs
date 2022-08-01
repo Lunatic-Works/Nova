@@ -23,11 +23,11 @@ namespace Nova
 
             public LogParam(DialogueChangedData data, int index)
             {
-                this.nodeOffset = data.nodeRecord.offset;
-                this.dialogueIndex = data.dialogueData.dialogueIndex;
-                this.displayData = data.displayData;
-                this.voices = data.dialogueData.voices;
-                this.logEntryIndex = index;
+                nodeOffset = data.nodeRecord.offset;
+                dialogueIndex = data.dialogueData.dialogueIndex;
+                displayData = data.displayData;
+                voices = data.dialogueData.voices;
+                logEntryIndex = index;
             }
         }
 
@@ -139,11 +139,12 @@ namespace Nova
             {
                 logParams.Add(new LogParam(data, logEntries.Count));
             }
+
             AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
         }
 
-        private void AddEntry(NodeRecord nodeRecord, long checkpointOffset,
-            ReachedDialogueData dialogueData, DialogueDisplayData displayData)
+        private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
+            DialogueDisplayData displayData)
         {
             var text = displayData.FormatNameDialogue();
             if (string.IsNullOrEmpty(text))
@@ -154,7 +155,8 @@ namespace Nova
             var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
             var cnt = logEntries.Count;
             var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
-            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData, displayData));
+            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData,
+                displayData));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
             {
@@ -179,7 +181,10 @@ namespace Nova
             }
 
             logParams.RemoveAll(logParam => logParam.logEntryIndex >= index && logParam.logEntryIndex < index + count);
-            logParams.ForEach(logParam => { if (logParam.logEntryIndex >= index) logParam.logEntryIndex -= count; });
+            logParams.ForEach(logParam =>
+            {
+                if (logParam.logEntryIndex >= index) logParam.logEntryIndex -= count;
+            });
 
             scrollRect.totalCount = logEntries.Count;
             scrollRect.RefillCellsFromEnd();
@@ -238,7 +243,8 @@ namespace Nova
             }
 
             var logEntryController = transform.GetComponent<LogEntryController>();
-            logEntryController.Init(logEntry.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked, logEntry.height);
+            logEntryController.Init(logEntry.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked,
+                logEntry.height);
         }
 
         #endregion
@@ -390,6 +396,7 @@ namespace Nova
                     var entry = node.GetDialogueEntryAt(pos.dialogueIndex);
                     displayData = entry.GetDisplayData();
                 }
+
                 AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData, displayData);
             }
         }

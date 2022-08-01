@@ -6,25 +6,26 @@ namespace Nova
 {
     public readonly ref struct ByteSegment
     {
-        public readonly byte[] array;
-        public readonly int offset;
-        public readonly int count;
+        private readonly byte[] array;
+        private readonly int offset;
+
+        public readonly int Count;
 
         public ByteSegment(byte[] data)
         {
             array = data;
             offset = 0;
-            count = data.Length;
+            Count = data.Length;
         }
 
         public ByteSegment(byte[] data, int offset, int count)
         {
-            this.array = data;
+            array = data;
             this.offset = offset;
-            this.count = count;
+            Count = count;
         }
 
-        /* no check, be careful */
+        // no check, be careful
         public byte this[int index]
         {
             get => array[offset + index];
@@ -38,12 +39,12 @@ namespace Nova
 
         public ByteSegment Slice(int offset)
         {
-            return new ByteSegment(array, this.offset + offset, count - offset);
+            return new ByteSegment(array, this.offset + offset, Count - offset);
         }
 
         public MemoryStream ToStream()
         {
-            return new MemoryStream(array, this.offset, this.count, true, true);
+            return new MemoryStream(array, this.offset, this.Count, true, true);
         }
 
         public int ReadInt(int offset)
@@ -86,7 +87,7 @@ namespace Nova
 
         public void ReadBytes(int offset, ByteSegment bytes)
         {
-            Buffer.BlockCopy(array, this.offset + offset, bytes.array, bytes.offset, bytes.count);
+            Buffer.BlockCopy(array, this.offset + offset, bytes.array, bytes.offset, bytes.Count);
         }
 
         public string ReadString(int offset, int count)
@@ -96,7 +97,7 @@ namespace Nova
 
         public string ReadString(int offset)
         {
-            return Encoding.UTF8.GetString(array, this.offset + offset, count - offset);
+            return Encoding.UTF8.GetString(array, this.offset + offset, Count - offset);
         }
 
         public void WriteBytes(int offset, byte[] bytes)
@@ -106,7 +107,7 @@ namespace Nova
 
         public void WriteBytes(int offset, ByteSegment bytes)
         {
-            Buffer.BlockCopy(bytes.array, bytes.offset, array, this.offset + offset, bytes.count);
+            Buffer.BlockCopy(bytes.array, bytes.offset, array, this.offset + offset, bytes.Count);
         }
 
         public void WriteString(int offset, string str)

@@ -1,4 +1,4 @@
-﻿using LuaInterface;
+using LuaInterface;
 using Nova.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -73,8 +73,8 @@ namespace Nova
             Dictionary<DialogueActionStage, LuaFunction> actions)
         {
             this.characterName = characterName;
-            displayNames = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = displayName };
-            dialogues = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = dialogue };
+            displayNames = new Dictionary<SystemLanguage, string> {[I18n.DefaultLocale] = displayName};
+            dialogues = new Dictionary<SystemLanguage, string> {[I18n.DefaultLocale] = dialogue};
             this.actions = actions;
         }
 
@@ -86,7 +86,7 @@ namespace Nova
 
         // DialogueDisplayData is cached only if there is no need to interpolate
         private DialogueDisplayData cachedDisplayData;
-        private bool needInterpolate = false;
+        private bool needInterpolate;
 
         public bool NeedInterpolate()
         {
@@ -94,12 +94,13 @@ namespace Nova
             {
                 var func = LuaRuntime.Instance.GetFunction("text_need_interpolate");
                 needInterpolate = displayNames.Any(x => func.Invoke<string, bool>(x.Value))
-                    || dialogues.Any(x => func.Invoke<string, bool>(x.Value));
+                                  || dialogues.Any(x => func.Invoke<string, bool>(x.Value));
                 if (!needInterpolate)
                 {
                     cachedDisplayData = new DialogueDisplayData(displayNames, dialogues);
                 }
             }
+
             return needInterpolate;
         }
 
@@ -111,6 +112,7 @@ namespace Nova
                 var interpolatedDialogues = dialogues.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
                 return new DialogueDisplayData(interpolatedDisplayNames, interpolatedDialogues);
             }
+
             return cachedDisplayData;
         }
 
@@ -121,7 +123,8 @@ namespace Nova
         {
             if (actions.TryGetValue(stage, out var action))
             {
-                LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Lazy, stage, isRestoring));
+                LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Lazy, stage,
+                    isRestoring));
                 try
                 {
                     action.Call();
@@ -152,7 +155,7 @@ end)";
             LuaRuntime.Instance.GetFunction("coroutine.stop").Call(ActionCoroutineName);
         }
 
-        public static string InterpolateText(string s)
+        private static string InterpolateText(string s)
         {
             if (string.IsNullOrEmpty(s))
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Nova
@@ -13,28 +13,6 @@ namespace Nova
     /// each step to perform a back step. To make the back step functionality still work after loading from
     /// a checkpoint, the CheckpointManager should store all the GameStateRestoreEntry for walked passed dialogues.
     /// </remarks>
-    [Serializable]
-    public abstract class GameStateRestoreEntry
-    {
-        /// <summary>
-        /// this value is guaranteed to be non-negative.
-        /// if StepNumFromLastCheckpoint == 0, restoreDatas is valid
-        /// otherwise restoreDatas == null
-        /// </summary>
-        public readonly int stepNumFromLastCheckpoint;
-
-        /// <summary>
-        /// the steps to restrain checkpoints should also be saved
-        /// </summary>
-        public readonly int restrainCheckpointNum;
-
-        protected GameStateRestoreEntry(int stepNumFromLastCheckpoint, int restrainCheckpointNum)
-        {
-            this.stepNumFromLastCheckpoint = stepNumFromLastCheckpoint;
-            this.restrainCheckpointNum = restrainCheckpointNum;
-        }
-    }
-
     [Serializable]
     public class GameStateCheckpoint
     {

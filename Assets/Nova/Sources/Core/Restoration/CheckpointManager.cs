@@ -7,36 +7,6 @@ using UnityEngine;
 
 namespace Nova
 {
-    [Serializable]
-    public class OldGlobalSave
-    {
-        // Node name -> dialogue index -> node history hash -> GameStateRestoreEntry
-        // TODO: deduplicate restoreDatas
-        public readonly Dictionary<string, Dictionary<int, Dictionary<ulong, GameStateRestoreEntry>>> reachedDialogues =
-            new Dictionary<string, Dictionary<int, Dictionary<ulong, GameStateRestoreEntry>>>();
-
-        // Node name -> branch name -> node history hash -> bool
-        public readonly Dictionary<string, Dictionary<string, SerializableHashSet<ulong>>> reachedBranches =
-            new Dictionary<string, Dictionary<string, SerializableHashSet<ulong>>>();
-
-        // End name -> bool
-        public readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
-
-        // Node history hash -> NodeHistory
-        // TODO: use a radix tree to store node histories
-        public readonly Dictionary<ulong, NodeHistoryData> cachedNodeHistories =
-            new Dictionary<ulong, NodeHistoryData>();
-
-        public readonly long identifier = DateTime.Now.ToBinary();
-
-        /// The global data of the game. For example, the global variables and the unlock status of images and musics.
-        /// It is the game author's job to make sure all values are serializable.
-        public readonly Dictionary<string, object> data = new Dictionary<string, object>();
-    }
-
-    /// <summary>
-    /// Manager component providing ability to manage the game progress and save files.
-    /// </summary>
     public class CheckpointManager : MonoBehaviour
     {
         public string saveFolder;
@@ -44,8 +14,11 @@ namespace Nova
         private string globalSavePath;
 
         private GlobalSave globalSave;
-        private bool globalSaveDirty = false;
-        private readonly Dictionary<ReachedDialogueKey, ReachedDialogueData> reachedDialogues = new Dictionary<ReachedDialogueKey, ReachedDialogueData>();
+        private bool globalSaveDirty;
+
+        private readonly Dictionary<ReachedDialogueKey, ReachedDialogueData> reachedDialogues =
+            new Dictionary<ReachedDialogueKey, ReachedDialogueData>();
+
         private readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
         private readonly Dictionary<int, Bookmark> cachedSaveSlots = new Dictionary<int, Bookmark>();
@@ -171,7 +144,7 @@ namespace Nova
         {
             var variableHash = variables.hash;
             NodeRecord record = null;
-            var offset = prevRecord == null ? globalSave.beginCheckpoint : prevRecord.child;
+            var offset = prevRecord?.child ?? globalSave.beginCheckpoint;
             while (offset != 0 && offset < globalSave.endCheckpoint)
             {
                 record = serializer.GetNodeRecord(offset);
@@ -179,8 +152,10 @@ namespace Nova
                 {
                     return record;
                 }
+
                 offset = record.brother;
             }
+
             offset = globalSave.endCheckpoint;
             var newRecord = new NodeRecord(offset, name, beginDialogue, variableHash);
             if (record != null)
@@ -193,10 +168,12 @@ namespace Nova
                 prevRecord.child = offset;
                 serializer.UpdateNodeRecord(prevRecord);
             }
+
             if (prevRecord != null)
             {
                 newRecord.parent = prevRecord.offset;
             }
+
             serializer.UpdateNodeRecord(newRecord);
             NewCheckpoint();
             return newRecord;
@@ -210,7 +187,7 @@ namespace Nova
         public bool CanAppendCheckpoint(long checkpointOffset)
         {
             return NextRecord(checkpointOffset) >= globalSave.endCheckpoint ||
-                NextCheckpoint(checkpointOffset) >= globalSave.endCheckpoint;
+                   NextCheckpoint(checkpointOffset) >= globalSave.endCheckpoint;
         }
 
         public void AppendDialogue(NodeRecord nodeRecord, int dialogueIndex, bool shouldSaveCheckpoint)
@@ -220,6 +197,7 @@ namespace Nova
             {
                 nodeRecord.lastCheckpointDialogue = dialogueIndex;
             }
+
             serializer.UpdateNodeRecord(nodeRecord);
         }
 
@@ -247,12 +225,6 @@ namespace Nova
             return serializer.DeserializeRecord<GameStateCheckpoint>(serializer.NextRecord(offset), true);
         }
 
-        /// <summary>
-        /// Set a dialogue to "reached" state and save the restore entry for the dialogue.
-        /// </summary>
-        /// <param name="nodeHistory">The list of all reached nodes.</param>
-        /// <param name="dialogueIndex">The index of the dialogue.</param>
-        /// <param name="entry">Restore entry for the dialogue.</param>
         public void SetReached(ReachedDialogueData data)
         {
             var key = new ReachedDialogueKey(data);
@@ -260,32 +232,25 @@ namespace Nova
             {
                 return;
             }
+
             reachedDialogues.Add(key, data);
             serializer.SerializeRecord(globalSave.endReached, data, true);
             NewReached();
         }
 
-        /// <summary>
-        /// Set a branch to "reached" state.
-        /// </summary>
-        /// <param name="nodeHistory">The list of all reached nodes.</param>
-        /// <param name="branchName">The name of the branch.</param>
         public void SetBranchReached(NodeRecord nodeRecord, string branchName)
         {
-            // currently we cannot find next node by branchname
+            // currently we cannot find next node by branchName
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Set an end point to "reached" state.
-        /// </summary>
-        /// <param name="endName">The name of the end point.</param>
         public void SetEndReached(string endName)
         {
             if (reachedEnds.Contains(endName))
             {
                 return;
             }
+
             reachedEnds.Add(endName);
             serializer.SerializeRecord(globalSave.endReached, endName, true);
             NewReached();
@@ -301,12 +266,6 @@ namespace Nova
             return reachedDialogues[new ReachedDialogueKey(nodeName, dialogueIndex)];
         }
 
-        /// <summary>
-        /// Check if the branch has been reached.
-        /// </summary>
-        /// <param name="nodeHistory">The list of all reached nodes.</param>
-        /// <param name="branchName">The name of the branch.</param>
-        /// <returns>Whether the branch has been reached.</returns>
         public bool IsBranchReached(NodeRecord nodeRecord, string nextNodeName)
         {
             throw new NotImplementedException();
@@ -318,19 +277,11 @@ namespace Nova
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Check if the end point has been reached.
-        /// </summary>
-        /// <param name="endName">The name of the end point.</param>
-        /// <returns>Whether the end point has been reached.</returns>
         public bool IsEndReached(string endName)
         {
             return reachedEnds.Contains(endName);
         }
 
-        /// <summary>
-        /// Update the global save file.
-        /// </summary>
         /// TODO: UpdateGlobalSave() is slow when there are many saved dialogue entries
         public void UpdateGlobalSave()
         {
@@ -339,6 +290,7 @@ namespace Nova
                 serializer.SerializeRecord(CheckpointSerializer.GlobalSaveOffset, globalSave, true);
                 globalSaveDirty = false;
             }
+
             serializer.Flush();
         }
 
@@ -346,7 +298,7 @@ namespace Nova
         /// Reset the global save file to clear all progress.
         /// Note that all bookmarks will be invalid.
         /// </summary>
-        public void ResetGlobalSave()
+        private void ResetGlobalSave()
         {
             var saveDir = new DirectoryInfo(savePathBase);
             foreach (var file in saveDir.GetFiles())

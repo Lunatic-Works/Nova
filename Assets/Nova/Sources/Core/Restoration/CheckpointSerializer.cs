@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -13,21 +13,22 @@ namespace Nova
     {
         public CheckpointCorruptedException(string message) : base(message) { }
 
-        public static readonly CheckpointCorruptedException BadHeader = new CheckpointCorruptedException("file header or version mismatch");
+        public static readonly CheckpointCorruptedException BadHeader =
+            new CheckpointCorruptedException("File header or version mismatch.");
 
         public static CheckpointCorruptedException BadOffset(long offset)
         {
-            return new CheckpointCorruptedException($"bad offset @{offset}");
+            return new CheckpointCorruptedException($"Bad offset @{offset}");
         }
 
         public static CheckpointCorruptedException RecordOverflow(long offset)
         {
-            return new CheckpointCorruptedException($"record @{offset} overflow");
+            return new CheckpointCorruptedException($"Record @{offset} overflow.");
         }
 
         public static CheckpointCorruptedException SerializationError(long offset, string reason)
         {
-            return new CheckpointCorruptedException($"serialization failed @{offset} because {reason}");
+            return new CheckpointCorruptedException($"Serialization failed @{offset}: {reason}");
         }
     }
 
@@ -37,17 +38,13 @@ namespace Nova
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
         public const long GlobalSaveOffset = CheckpointBlock.HeaderSize;
 
-        private static readonly TimeSpan BackupTime = TimeSpan.FromMinutes(5);
-        // sizeof(int)
-        private const int RecordHeader = 4;
+        private const int RecordHeader = 4; // sizeof(int)
 
         private readonly IFormatter formatter = new BinaryFormatter();
         private readonly string path;
         private FileStream file;
         private long endBlock;
-        private string backupPath => path + ".old";
-        private DateTime lastBackup = DateTime.Now;
-        private LRUCache<long, CheckpointBlock> cachedBlock;
+        private readonly LRUCache<long, CheckpointBlock> cachedBlock;
 
         public CheckpointSerializer(string path)
         {
@@ -66,25 +63,6 @@ namespace Nova
             }
         }
 
-        public void SafeWrite(byte[] data, long offset, int count)
-        {
-            var now = DateTime.Now;
-            if (now.Subtract(lastBackup) > BackupTime)
-            {
-                File.Copy(path, backupPath);
-                lastBackup = now;
-            }
-            file.Seek(offset, SeekOrigin.Begin);
-            file.Write(data, 0, count);
-            file.Flush();
-        }
-
-        public void SafeRead(byte[] data, long offset, int count)
-        {
-            file.Seek(offset, SeekOrigin.Begin);
-            file.Read(data, 0, count);
-        }
-
         public void Dispose()
         {
             cachedBlock.Clear();
@@ -95,18 +73,18 @@ namespace Nova
             }
         }
 
-        public CheckpointBlock GetBlock(long id)
+        private CheckpointBlock GetBlock(long id)
         {
-            CheckpointBlock block;
-            if (!cachedBlock.TryGetValue(id, out block))
+            if (!cachedBlock.TryGetValue(id, out var block))
             {
                 block = CheckpointBlock.FromFile(file, id);
                 cachedBlock[id] = block;
             }
+
             return block;
         }
 
-        public CheckpointBlock GetBlockIndex(long offset, out int index)
+        private CheckpointBlock GetBlockIndex(long offset, out int index)
         {
             return GetBlock(CheckpointBlock.GetBlockIdIndex(offset, out index));
         }
@@ -114,16 +92,17 @@ namespace Nova
         public ByteSegment GetRecord(long offset)
         {
             var block = GetBlockIndex(offset, out var index);
-            var segment = block.Segment;
+            var segment = block.segment;
 
-            if (segment.count < index + RecordHeader)
+            if (segment.Count < index + RecordHeader)
             {
                 throw CheckpointCorruptedException.RecordOverflow(offset);
             }
+
             var size = segment.ReadInt(index);
             index += RecordHeader;
 
-            if (index + size <= segment.count)
+            if (index + size <= segment.Count)
             {
                 return segment.Slice(index, size);
             }
@@ -133,17 +112,19 @@ namespace Nova
             var head = 0;
             while (head < size)
             {
-                var count = Math.Min(size - head, segment.count - index);
+                var count = Math.Min(size - head, segment.Count - index);
                 segment.ReadBytes(index, new ByteSegment(buf, head, count));
                 head += count;
-                if (head < size && block.NextBlock == 0)
+                if (head < size && block.nextBlock == 0)
                 {
                     throw CheckpointCorruptedException.RecordOverflow(offset);
                 }
-                block = GetBlock(block.NextBlock);
-                segment = block.Segment;
+
+                block = GetBlock(block.nextBlock);
+                segment = block.segment;
                 index = 0;
             }
+
             return new ByteSegment(buf);
         }
 
@@ -162,60 +143,62 @@ namespace Nova
 
         private CheckpointBlock NextBlock(CheckpointBlock block)
         {
-            if (block.NextBlock == 0)
+            if (block.nextBlock == 0)
             {
                 var newBlock = AppendBlock();
-                block.NextBlock = newBlock.id;
+                block.nextBlock = newBlock.id;
                 return newBlock;
             }
-            return GetBlock(block.NextBlock);
+
+            return GetBlock(block.nextBlock);
         }
 
         public long BeginRecord()
         {
             var block = AppendBlock();
-            return block.DataOffset;
+            return block.dataOffset;
         }
 
         public long NextRecord(long offset)
         {
             var block = GetBlockIndex(offset, out var index);
-            var size = block.Segment.ReadInt(index);
+            var size = block.segment.ReadInt(index);
             index += RecordHeader + size;
             while (index + RecordHeader > CheckpointBlock.DataSize)
             {
                 index -= CheckpointBlock.DataSize;
                 block = NextBlock(block);
             }
+
             index = Math.Max(index, 0);
-            return block.DataOffset + index;
+            return block.dataOffset + index;
         }
 
         public void AppendRecord(long offset, ByteSegment bytes)
         {
-            Debug.Log($"append record @{offset} size={bytes.count}");
+            Debug.Log($"append record @{offset} size={bytes.Count}");
 
             var block = GetBlockIndex(offset, out var index);
-            var segment = block.Segment;
-            if (index + RecordHeader > segment.count)
+            var segment = block.segment;
+            if (index + RecordHeader > segment.Count)
             {
                 throw CheckpointCorruptedException.RecordOverflow(offset);
             }
 
-            segment.WriteInt(index, bytes.count);
+            segment.WriteInt(index, bytes.Count);
             index += RecordHeader;
 
             var pos = 0;
-            while (pos < bytes.count)
+            while (pos < bytes.Count)
             {
-                var size = Math.Min(segment.count - index, bytes.count - pos);
+                var size = Math.Min(segment.Count - index, bytes.Count - pos);
                 segment.WriteBytes(index, bytes.Slice(pos, size));
                 block.MarkDirty();
                 pos += size;
-                if (pos < bytes.count)
+                if (pos < bytes.Count)
                 {
                     block = NextBlock(block);
-                    segment = block.Segment;
+                    segment = block.segment;
                     index = 0;
                 }
             }
@@ -238,6 +221,7 @@ namespace Nova
             {
                 formatter.Serialize(mem, data);
             }
+
             AppendRecord(offset, new ByteSegment(mem.GetBuffer(), 0, (int)mem.Position));
         }
 
@@ -256,6 +240,7 @@ namespace Nova
                 {
                     obj = formatter.Deserialize(mem);
                 }
+
                 return obj;
             }
             catch (Exception e)
@@ -271,7 +256,7 @@ namespace Nova
                 return val;
             }
 
-            throw CheckpointCorruptedException.SerializationError(offset, $"type mismatch, need {typeof(T)}");
+            throw CheckpointCorruptedException.SerializationError(offset, $"Type mismatch, need {typeof(T)}");
         }
 
         public void Flush()
@@ -280,34 +265,32 @@ namespace Nova
             {
                 block.Value.Flush();
             }
+
             file.Flush();
         }
 
         public Bookmark ReadBookmark(string path)
         {
-            using (var fs = File.OpenRead(path))
-            using (var r = new BinaryReader(fs))
-            {
-                var fileHeader = r.ReadBytes(FileHeader.Length);
-                var version = r.ReadInt32();
+            using var fs = File.OpenRead(path);
+            using var r = new BinaryReader(fs);
+            var fileHeader = r.ReadBytes(FileHeader.Length);
+            var version = r.ReadInt32();
 
-                if (version != Version || !fileHeader.SequenceEqual(FileHeader))
-                {
-                    throw CheckpointCorruptedException.BadHeader;
-                }
-                return (Bookmark)formatter.Deserialize(fs);
+            if (version != Version || !fileHeader.SequenceEqual(FileHeader))
+            {
+                throw CheckpointCorruptedException.BadHeader;
             }
+
+            return (Bookmark)formatter.Deserialize(fs);
         }
 
         public void WriteBookmark(string path, Bookmark obj)
         {
-            using (var fs = File.OpenWrite(path))
-            using (var r = new BinaryWriter(fs))
-            {
-                r.Write(FileHeader);
-                r.Write(Version);
-                formatter.Serialize(fs, obj);
-            }
+            using var fs = File.OpenWrite(path);
+            using var r = new BinaryWriter(fs);
+            r.Write(FileHeader);
+            r.Write(Version);
+            formatter.Serialize(fs, obj);
         }
     }
 }
