@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 
 namespace Nova
@@ -8,7 +7,6 @@ namespace Nova
         // 4 * sizeof(long) + 3 * sizeof(int)
         private const int HeaderSize = 4 * 8 + 3 * 4;
 
-        public readonly string name;
         public readonly long offset;
         public long parent;
         public long child;
@@ -17,6 +15,7 @@ namespace Nova
         public int endDialogue;
         public int lastCheckpointDialogue;
         public readonly ulong variableHash;
+        public readonly string name;
 
         // we need a fixed length serialization
         // maybe using a code generator?
@@ -39,8 +38,9 @@ namespace Nova
         {
             this.offset = offset;
             this.name = name;
-            this.beginDialogue = this.endDialogue = beginDialogue;
-            this.lastCheckpointDialogue = -1;
+            this.beginDialogue = beginDialogue;
+            endDialogue = beginDialogue;
+            lastCheckpointDialogue = -1;
             this.variableHash = variableHash;
         }
 

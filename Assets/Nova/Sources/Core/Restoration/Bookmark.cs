@@ -46,14 +46,9 @@ namespace Nova
 
         // NOTE: Do not use default parameters in constructor or it will fail to compile silently...
 
-        /// <summary>
-        /// Create a bookmark based on all reached nodes in current gameplay.
-        /// </summary>
-        /// <param name="nodeHistory">List of all reached nodes, including the current node as the last one.</param>
-        /// <param name="dialogueIndex">Index of the current dialogue.</param>
         public Bookmark(NodeRecord nodeRecord, long checkpointOffset, int dialogueIndex)
         {
-            this.nodeOffset = nodeRecord.offset;
+            nodeOffset = nodeRecord.offset;
             this.checkpointOffset = checkpointOffset;
             this.dialogueIndex = dialogueIndex;
         }

@@ -6,19 +6,21 @@ namespace Nova
     [Serializable]
     public class GlobalSave
     {
-        public readonly byte[] fileHeader;
         public readonly int version;
+        public readonly byte[] fileHeader;
         public readonly long identifier = DateTime.Now.ToBinary();
+
         public long beginReached;
         public long endReached;
         public long beginCheckpoint;
         public long endCheckpoint;
+
         public readonly Dictionary<string, object> data = new Dictionary<string, object>();
 
         public GlobalSave(CheckpointSerializer serializer)
         {
-            this.fileHeader = CheckpointSerializer.FileHeader;
-            this.version = CheckpointSerializer.Version;
+            version = CheckpointSerializer.Version;
+            fileHeader = CheckpointSerializer.FileHeader;
             beginReached = endReached = serializer.BeginRecord();
             beginCheckpoint = endCheckpoint = serializer.BeginRecord();
         }
@@ -52,7 +54,6 @@ namespace Nova
         public ReachedDialogueKey(ReachedDialogueData data) : this(data.nodeName, data.dialogueIndex) { }
     }
 
-
     [Serializable]
     public class ReachedDialogueData
     {
@@ -61,7 +62,8 @@ namespace Nova
         public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
         public readonly bool needInterpolate;
 
-        public ReachedDialogueData(string nodeName, int dialogueIndex, IReadOnlyDictionary<string, VoiceEntry> voices, bool needInterpolate)
+        public ReachedDialogueData(string nodeName, int dialogueIndex, IReadOnlyDictionary<string, VoiceEntry> voices,
+            bool needInterpolate)
         {
             this.nodeName = nodeName;
             this.dialogueIndex = dialogueIndex;
