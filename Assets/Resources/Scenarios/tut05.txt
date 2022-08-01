@@ -3,7 +3,7 @@ label('tut05', '教程5 动画')
 is_start()
 |>
 <|
-show(bg, 'rain')
+show(bg, 'room')
 stop(bgm)
 set_box()
 |>

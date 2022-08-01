@@ -3,7 +3,7 @@ label 'test_anim_hold'
 -- is_unlocked_start()
 |>
 <|
-show(bg, 'rain')
+show(bg, 'room')
 stop(bgm)
 set_box()
 |>

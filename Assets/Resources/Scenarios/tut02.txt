@@ -9,7 +9,7 @@ set_box()
 教程2 图像
 
 <|
-show(bg, 'rain')
+show(bg, 'room')
 |>
 `show`函数用来显示图片
 
@@ -19,7 +19,7 @@ show(bg, 'rain')
 
 图片所在的文件夹由`SpriteController`的`imageFolder`设置
 
-`rain`是这个文件夹中的图片文件名（这里不需要`.png`等后缀名）
+`room`是这个文件夹中的图片文件名（这里不需要`.png`等后缀名）
 
 顺便说一句：：把图片素材导入到Nova的方法详见[Wiki：背景图片导入](https://github.com/Lunatic-Works/Nova/wiki/Image-Import)
 
@@ -33,7 +33,7 @@ show(fg, 'moon_halo', {2, 2, 0.5})
 顺便说一句：：图层的顺序一般由z坐标决定。上面的`{2, 2}`是x、y坐标，马上就会讲到
 
 <|
-show(bg, 'room')
+show(bg, 'corridor')
 |>
 对同一个图层再次使用`show`，则会替换当前的图片
 
@@ -131,17 +131,17 @@ tint(fg, 1)
 好了，隐藏`fg`。如果接下来长时间用不到一个图层，最好把坐标和颜色恢复原状，以免下次用到的时候忘了
 
 <|
-show(bg, 'rain', {1, 1}, {1, 0.5, 0})
+show(bg, 'room', {1, 1}, {1, 0.5, 0})
 |>
 坐标和颜色也可以在`show`当中设置
 
 <|
-show(bg, 'room', nil, {0, 0.5, 1})
+show(bg, 'corridor', nil, {0, 0.5, 1})
 |>
 如果省略则是保持之前的值
 
 <|
-show(bg, 'rain', {0, 0}, 1)
+show(bg, 'room', {0, 0}, 1)
 |>
 好了，把背景恢复正常
 

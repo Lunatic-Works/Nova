@@ -3,7 +3,7 @@ label('tut04', '教程4 对话框')
 is_start()
 |>
 <|
-show(bg, 'rain')
+show(bg, 'room')
 stop(bgm)
 set_box()
 |>
