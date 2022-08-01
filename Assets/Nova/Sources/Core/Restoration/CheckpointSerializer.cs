@@ -226,19 +226,36 @@ namespace Nova
             AppendRecord(record.offset, record.ToByteSegment());
         }
 
-        public void SerializeRecord(long offset, object data)
+        public void SerializeRecord(long offset, object data, bool compress = false)
         {
-            var stream = new MemoryStream();
-            formatter.Serialize(stream, data);
-            AppendRecord(offset, new ByteSegment(stream.GetBuffer(), 0, (int)stream.Position));
+            using var mem = new MemoryStream();
+            if (compress)
+            {
+                using var compressor = new DeflateStream(mem, CompressionMode.Compress, true);
+                formatter.Serialize(compressor, data);
+            }
+            else
+            {
+                formatter.Serialize(mem, data);
+            }
+            AppendRecord(offset, new ByteSegment(mem.GetBuffer(), 0, (int)mem.Position));
         }
 
-        public object DeserializeRecord(long offset)
+        public object DeserializeRecord(long offset, bool compress = false)
         {
-            var stream = GetRecord(offset).ToStream();
+            using var mem = GetRecord(offset).ToStream();
             try
             {
-                var obj = formatter.Deserialize(stream);
+                object obj;
+                if (compress)
+                {
+                    using var decompressor = new DeflateStream(mem, CompressionMode.Decompress);
+                    obj = formatter.Deserialize(decompressor);
+                }
+                else
+                {
+                    obj = formatter.Deserialize(mem);
+                }
                 return obj;
             }
             catch (Exception e)
@@ -247,9 +264,9 @@ namespace Nova
             }
         }
 
-        public T DeserializeRecord<T>(long offset)
+        public T DeserializeRecord<T>(long offset, bool compress = false)
         {
-            if (DeserializeRecord(offset) is T val)
+            if (DeserializeRecord(offset, compress) is T val)
             {
                 return val;
             }
