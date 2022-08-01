@@ -218,14 +218,14 @@ namespace Nova
         public long AppendCheckpoint(GameStateCheckpoint checkpoint)
         {
             var record = globalSave.endCheckpoint;
-            serializer.SerializeRecord(record, checkpoint);
+            serializer.SerializeRecord(record, checkpoint, true);
             NewCheckpoint();
             return record;
         }
 
         public GameStateCheckpoint GetCheckpoint(long offset)
         {
-            return serializer.DeserializeRecord<GameStateCheckpoint>(offset);
+            return serializer.DeserializeRecord<GameStateCheckpoint>(offset, true);
         }
 
         /// <summary>
