@@ -87,8 +87,9 @@ namespace Nova
         // DialogueDisplayData is cached only if there is no need to interpolate
         private DialogueDisplayData cachedDisplayData;
 
-        public DialogueDisplayData GetDisplayData()
+        public DialogueDisplayData GetDisplayData(out bool needInterpolate)
         {
+            needInterpolate = false;
             if (cachedDisplayData != null)
             {
                 return cachedDisplayData;
@@ -102,6 +103,7 @@ namespace Nova
             DialogueDisplayData displayData;
             if (LuaRuntime.Instance.GetFunction("get_text_need_interpolate").Invoke<bool>())
             {
+                needInterpolate = true;
                 displayData = new DialogueDisplayData(interpolatedDisplayNames, interpolatedDialogues);
             }
             else

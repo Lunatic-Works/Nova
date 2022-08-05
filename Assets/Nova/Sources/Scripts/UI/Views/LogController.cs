@@ -15,21 +15,37 @@ namespace Nova
         [Serializable]
         private class LogParam
         {
-            public readonly DialogueDisplayData displayData;
             public readonly long nodeOffset;
-            public readonly long checkpointOffset;
             public readonly int dialogueIndex;
+            public readonly DialogueDisplayData displayData;
             public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
             public int logEntryIndex;
 
-            public LogParam(DialogueChangedData data, int logEntryIndex)
+            public LogParam(DialogueChangedData data, int index)
             {
-                this.displayData = data.displayData;
                 this.nodeOffset = data.nodeRecord.offset;
-                this.checkpointOffset = data.checkpointOffset;
-                this.dialogueIndex = data.dialogueIndex;
-                this.voices = data.voicesNextDialogue;
-                this.logEntryIndex = logEntryIndex;
+                this.dialogueIndex = data.dialogueData.dialogueIndex;
+                this.displayData = data.dialogueData.displayData;
+                this.voices = data.dialogueData.voices;
+                this.logEntryIndex = index;
+            }
+        }
+
+        private class LogEntry
+        {
+            public float height;
+            public float prefixHeight;
+            public readonly long nodeOffset;
+            public readonly long checkpointOffset;
+            public readonly ReachedDialogueData dialogueData;
+
+            public LogEntry(float height, float prefixHeight, long nodeOffset, long checkpointOffset, ReachedDialogueData dialogueData)
+            {
+                this.height = height;
+                this.prefixHeight = prefixHeight;
+                this.nodeOffset = nodeOffset;
+                this.checkpointOffset = checkpointOffset;
+                this.dialogueData = dialogueData;
             }
         }
 
@@ -51,8 +67,7 @@ namespace Nova
         private float contentDefaultWidth;
 
         private readonly List<LogParam> logParams = new List<LogParam>();
-        private readonly List<float> logHeights = new List<float>();
-        private readonly List<float> logPrefixHeights = new List<float>();
+        private readonly List<LogEntry> logEntries = new List<LogEntry>();
 
         // The first logParam at or after the last checkpoint
         private LogParam checkpointLogParam;
@@ -117,23 +132,26 @@ namespace Nova
 
         private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
-            AddEntry(new LogParam(dialogueChangedData, logParams.Count));
+            if (dialogueChangedData.dialogueData.needInterpolate)
+            {
+                logParams.Add(new LogParam(dialogueChangedData, logEntries.Count));
+            }
+            AddEntry(dialogueChangedData.nodeRecord, dialogueChangedData.checkpointOffset,
+                dialogueChangedData.dialogueData);
         }
 
-        private void AddEntry(LogParam logParam)
+        private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData)
         {
-            var text = logParam.displayData.FormatNameDialogue();
+            var text = dialogueData.displayData.FormatNameDialogue();
             if (string.IsNullOrEmpty(text))
             {
                 return;
             }
 
-            logParams.Add(logParam);
-
             var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
-            logHeights.Add(height);
-            var cnt = logPrefixHeights.Count;
-            logPrefixHeights.Add(height + (cnt > 0 ? logPrefixHeights[cnt - 1] : 0));
+            var cnt = logEntries.Count;
+            var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
+            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
             {
@@ -157,11 +175,10 @@ namespace Nova
                 logParams[i].logEntryIndex = i;
             }
 
-            logHeights.RemoveRange(index, count);
-            logPrefixHeights.RemoveRange(index, count);
-            for (int i = index; i < logHeights.Count; ++i)
+            logEntries.RemoveRange(index, count);
+            for (int i = index; i < logEntries.Count; ++i)
             {
-                logPrefixHeights[i] = logHeights[i] + (i > 0 ? logPrefixHeights[i - 1] : 0);
+                logEntries[i].prefixHeight = logEntries[i].height + (i > 0 ? logEntries[i - 1].prefixHeight : 0);
             }
 
             scrollRect.totalCount = logParams.Count;
@@ -178,8 +195,8 @@ namespace Nova
         public Vector2 GetItemsSize(int itemsCount)
         {
             if (itemsCount <= 0) return new Vector2(0, 0);
-            itemsCount = Mathf.Min(itemsCount, logPrefixHeights.Count);
-            return new Vector2(0, logPrefixHeights[itemsCount - 1]);
+            itemsCount = Mathf.Min(itemsCount, logEntries.Count);
+            return new Vector2(0, logEntries[itemsCount - 1].prefixHeight);
         }
 
         private readonly Stack<Transform> pool = new Stack<Transform>();
@@ -208,25 +225,28 @@ namespace Nova
 
         public void ProvideData(Transform transform, int idx)
         {
-            var logParam = logParams[idx];
-            UnityAction onGoBackButtonClicked = () => OnGoBackButtonClicked(logParam);
+            var logEntry = logEntries[idx];
+            var dialogueData = logEntry.dialogueData;
+            // var logParam = logParams[idx];
+            UnityAction onGoBackButtonClicked = () =>
+                OnGoBackButtonClicked(logEntry.nodeOffset, logEntry.checkpointOffset, dialogueData.dialogueIndex, idx);
 
             UnityAction onPlayVoiceButtonClicked = null;
-            if (logParam.voices.Any())
+            if (dialogueData.voices.Any())
             {
-                onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(logParam.voices);
+                onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(dialogueData.voices);
             }
 
-            var logEntry = transform.GetComponent<LogEntryController>();
-            logEntry.Init(logParam.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked, logHeights[idx]);
+            var logEntryController = transform.GetComponent<LogEntryController>();
+            logEntryController.Init(dialogueData.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked, logEntry.height);
         }
 
         #endregion
 
-        private void _onGoBackButtonClicked(LogParam logParam)
+        private void _onGoBackButtonClicked(long nodeOffset, long checkpointOffset, int dialogueIndex)
         {
-            var nodeRecord = checkpointManager.GetNodeRecord(logParam.nodeOffset);
-            gameState.MoveBackTo(nodeRecord, logParam.checkpointOffset, logParam.dialogueIndex);
+            var nodeRecord = checkpointManager.GetNodeRecord(nodeOffset);
+            gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
             // Debug.Log($"Remaining log entries count: {logEntries.Count}");
             if (hideOnGoBackButtonClicked)
             {
@@ -236,22 +256,22 @@ namespace Nova
 
         private int selectedLogEntryIndex = -1;
 
-        private void OnGoBackButtonClicked(LogParam logParam)
+        private void OnGoBackButtonClicked(long nodeOffset, long checkpointOffset, int dialogueIndex, int index)
         {
-            if (logParam.logEntryIndex == selectedLogEntryIndex)
+            if (index == selectedLogEntryIndex)
             {
                 selectedLogEntryIndex = -1;
                 Alert.Show(
                     null,
                     "log.back.confirm",
-                    () => _onGoBackButtonClicked(logParam),
+                    () => _onGoBackButtonClicked(nodeOffset, checkpointOffset, dialogueIndex),
                     null,
                     "LogBack"
                 );
             }
             else
             {
-                selectedLogEntryIndex = logParam.logEntryIndex;
+                selectedLogEntryIndex = index;
             }
         }
 
@@ -335,9 +355,9 @@ namespace Nova
         [Serializable]
         private class LogControllerRestoreData : IRestoreData
         {
-            public readonly List<LogParam> logParams;
+            public readonly IReadOnlyList<LogParam> logParams;
 
-            public LogControllerRestoreData(List<LogParam> logParams)
+            public LogControllerRestoreData(IReadOnlyList<LogParam> logParams)
             {
                 this.logParams = logParams;
             }
@@ -351,12 +371,20 @@ namespace Nova
         public void Restore(IRestoreData restoreData)
         {
             Clear();
+            logParams.Clear();
             var data = restoreData as LogControllerRestoreData;
-            for (var i = data.logParams.Count - 1; i >= 0; i--)
+            logParams.AddRange(data.logParams);
+            var i = 0;
+            foreach (var pos in gameState.GetDialogueHistory(maxLogEntryNum))
             {
-                var param = data.logParams[i];
-                param.logEntryIndex = i;
-                AddEntry(param);
+                var dialogueData = checkpointManager.GetReachedDialogueData(pos.nodeRecord.name, pos.dialogueIndex);
+                if (dialogueData.needInterpolate)
+                {
+                    dialogueData = new ReachedDialogueData(dialogueData.nodeName, dialogueData.dialogueIndex,
+                        logParams[i].displayData, logParams[i].voices, true);
+                    i++;
+                }
+                AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData);
             }
         }
 

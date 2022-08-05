@@ -297,18 +297,18 @@ namespace Nova
         /// <summary>
         /// The content of the dialogue box needs to be changed
         /// </summary>
-        /// <param name="dialogueData"></param>
-        private void OnDialogueChanged(DialogueChangedData dialogueData)
+        /// <param name="data"></param>
+        private void OnDialogueChanged(DialogueChangedData data)
         {
             RestartTimer();
 
             switch (dialogueUpdateMode)
             {
                 case DialogueUpdateMode.Overwrite:
-                    OverwriteDialogue(dialogueData.displayData);
+                    OverwriteDialogue(data.dialogueData.displayData);
                     break;
                 case DialogueUpdateMode.Append:
-                    AppendDialogue(dialogueData.displayData);
+                    AppendDialogue(data.dialogueData.displayData);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
