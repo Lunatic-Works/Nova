@@ -209,7 +209,8 @@ namespace Nova
 
         public bool CanAppendCheckpoint(long checkpointOffset)
         {
-            return serializer.NextRecord(checkpointOffset) == globalSave.endCheckpoint;
+            return NextRecord(checkpointOffset) >= globalSave.endCheckpoint ||
+                NextCheckpoint(checkpointOffset) >= globalSave.endCheckpoint;
         }
 
         public void AppendDialogue(NodeRecord nodeRecord, int dialogueIndex, bool shouldSaveCheckpoint)
