@@ -193,7 +193,7 @@ namespace Nova
 
         public void AppendRecord(long offset, ByteSegment bytes)
         {
-            Debug.Log($"append record @{offset} {bytes.count} bytes");
+            Debug.Log($"append record @{offset} size={bytes.count}");
 
             var block = GetBlockIndex(offset, out var index);
             var segment = block.Segment;

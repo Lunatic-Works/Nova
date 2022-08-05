@@ -196,9 +196,9 @@ namespace Nova
             currentNode = gameState.GetNode(nodeChangedData.newNode);
         }
 
-        private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
+        private void OnDialogueChanged(DialogueChangedData data)
         {
-            currentDialogue = dialogueChangedData.displayData;
+            currentDialogue = data.dialogueData.displayData;
         }
 
         #region Show and hide

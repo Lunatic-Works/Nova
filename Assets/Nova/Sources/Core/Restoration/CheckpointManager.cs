@@ -45,7 +45,7 @@ namespace Nova
 
         private GlobalSave globalSave;
         private bool globalSaveDirty = false;
-        private readonly SerializableHashSet<ReachedDialogueData> reachedDialogues = new SerializableHashSet<ReachedDialogueData>();
+        private readonly Dictionary<ReachedDialogueKey, ReachedDialogueData> reachedDialogues = new Dictionary<ReachedDialogueKey, ReachedDialogueData>();
         private readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
         private readonly Dictionary<int, Bookmark> cachedSaveSlots = new Dictionary<int, Bookmark>();
@@ -78,7 +78,7 @@ namespace Nova
                 }
                 else if (record is ReachedDialogueData dialogue)
                 {
-                    reachedDialogues.Add(dialogue);
+                    reachedDialogues.Add(new ReachedDialogueKey(dialogue), dialogue);
                 }
             }
         }
@@ -162,6 +162,11 @@ namespace Nova
             return serializer.NextRecord(offset);
         }
 
+        public long NextCheckpoint(long offset)
+        {
+            return NextRecord(NextRecord(offset));
+        }
+
         public NodeRecord GetNextNode(NodeRecord prevRecord, string name, Variables variables, int beginDialogue)
         {
             var variableHash = variables.hash;
@@ -185,9 +190,12 @@ namespace Nova
             }
             else if (prevRecord != null)
             {
-                newRecord.parent = prevRecord.offset;
                 prevRecord.child = offset;
                 serializer.UpdateNodeRecord(prevRecord);
+            }
+            if (prevRecord != null)
+            {
+                newRecord.parent = prevRecord.offset;
             }
             serializer.UpdateNodeRecord(newRecord);
             NewCheckpoint();
@@ -199,33 +207,43 @@ namespace Nova
             return serializer.GetNodeRecord(offset);
         }
 
-        public void UpdateNodeRecord(NodeRecord record)
-        {
-            serializer.UpdateNodeRecord(record);
-        }
-
         public bool CanAppendCheckpoint(long checkpointOffset)
         {
             return serializer.NextRecord(checkpointOffset) == globalSave.endCheckpoint;
         }
 
-        public void AppendDialogue(NodeRecord nodeRecord, int dialogueIndex)
+        public void AppendDialogue(NodeRecord nodeRecord, int dialogueIndex, bool shouldSaveCheckpoint)
         {
             nodeRecord.endDialogue = dialogueIndex + 1;
+            if (shouldSaveCheckpoint)
+            {
+                nodeRecord.lastCheckpointDialogue = dialogueIndex;
+            }
             serializer.UpdateNodeRecord(nodeRecord);
         }
 
-        public long AppendCheckpoint(GameStateCheckpoint checkpoint)
+        public long AppendCheckpoint(int dialogueIndex, GameStateCheckpoint checkpoint)
         {
             var record = globalSave.endCheckpoint;
-            serializer.SerializeRecord(record, checkpoint, true);
+
+            var buf = new ByteSegment(new byte[4]);
+            buf.WriteInt(0, dialogueIndex);
+            serializer.AppendRecord(record, buf);
+            NewCheckpoint();
+
+            serializer.SerializeRecord(globalSave.endCheckpoint, checkpoint, true);
             NewCheckpoint();
             return record;
         }
 
+        public int GetCheckpointDialogue(long offset)
+        {
+            return serializer.GetRecord(offset).ReadInt(0);
+        }
+
         public GameStateCheckpoint GetCheckpoint(long offset)
         {
-            return serializer.DeserializeRecord<GameStateCheckpoint>(offset, true);
+            return serializer.DeserializeRecord<GameStateCheckpoint>(serializer.NextRecord(offset), true);
         }
 
         /// <summary>
@@ -234,14 +252,14 @@ namespace Nova
         /// <param name="nodeHistory">The list of all reached nodes.</param>
         /// <param name="dialogueIndex">The index of the dialogue.</param>
         /// <param name="entry">Restore entry for the dialogue.</param>
-        public void SetReached(string nodeName, int dialogueIndex)
+        public void SetReached(ReachedDialogueData data)
         {
-            var data = new ReachedDialogueData(nodeName, dialogueIndex);
-            if (reachedDialogues.Contains(data))
+            var key = new ReachedDialogueKey(data);
+            if (reachedDialogues.ContainsKey(key))
             {
                 return;
             }
-            reachedDialogues.Add(data);
+            reachedDialogues.Add(key, data);
             serializer.SerializeRecord(globalSave.endReached, data);
             NewReached();
         }
@@ -274,7 +292,12 @@ namespace Nova
 
         public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
         {
-            return reachedDialogues.Contains(new ReachedDialogueData(nodeName, dialogueIndex));
+            return reachedDialogues.ContainsKey(new ReachedDialogueKey(nodeName, dialogueIndex));
+        }
+
+        public ReachedDialogueData GetReachedDialogueData(string nodeName, int dialogueIndex)
+        {
+            return reachedDialogues[new ReachedDialogueKey(nodeName, dialogueIndex)];
         }
 
         /// <summary>
