@@ -158,13 +158,13 @@ namespace Nova
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
             {
-                scrollRect.totalCount = logParams.Count;
+                scrollRect.totalCount = logEntries.Count;
             }
         }
 
         private bool RestrainLogEntryNum(int num)
         {
-            int cnt = logParams.Count;
+            int cnt = logEntries.Count;
             if (cnt <= num) return false;
             RemoveRange(0, cnt - num);
             return true;
@@ -172,25 +172,22 @@ namespace Nova
 
         private void RemoveRange(int index, int count)
         {
-            logParams.RemoveRange(index, count);
-            for (int i = index; i < logParams.Count; ++i)
-            {
-                logParams[i].logEntryIndex = i;
-            }
-
             logEntries.RemoveRange(index, count);
             for (int i = index; i < logEntries.Count; ++i)
             {
                 logEntries[i].prefixHeight = logEntries[i].height + (i > 0 ? logEntries[i - 1].prefixHeight : 0);
             }
 
-            scrollRect.totalCount = logParams.Count;
+            logParams.RemoveAll(logParam => logParam.logEntryIndex >= index && logParam.logEntryIndex < index + count);
+            logParams.ForEach(logParam => { if (logParam.logEntryIndex >= index) logParam.logEntryIndex -= count; });
+
+            scrollRect.totalCount = logEntries.Count;
             scrollRect.RefillCellsFromEnd();
         }
 
         public void Clear()
         {
-            RemoveRange(0, logParams.Count);
+            RemoveRange(0, logEntries.Count);
         }
 
         #region LoopScrollRect
