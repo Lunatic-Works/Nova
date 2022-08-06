@@ -19,15 +19,17 @@ namespace Nova
         public readonly NodeRecord nodeRecord;
         public readonly long checkpointOffset;
         public readonly ReachedDialogueData dialogueData;
+        public readonly DialogueDisplayData displayData;
         public readonly bool isReached;
         public readonly bool isReachedAnyHistory;
 
         public DialogueChangedData(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
-            bool isReached, bool isReachedAnyHistory)
+            DialogueDisplayData displayData, bool isReached, bool isReachedAnyHistory)
         {
             this.nodeRecord = nodeRecord;
             this.checkpointOffset = checkpointOffset;
             this.dialogueData = dialogueData;
+            this.displayData = displayData;
             this.isReached = isReached;
             this.isReachedAnyHistory = isReachedAnyHistory;
         }
@@ -107,7 +109,7 @@ namespace Nova
         private CheckpointManager checkpointManager;
         private GameStateCheckpoint initialCheckpoint;
         private readonly ScriptLoader scriptLoader = new ScriptLoader();
-        private FlowChartTree flowChartTree;
+        public FlowChartTree flowChartTree { get; private set; }
 
         private AdvancedDialogueHelper advancedDialogueHelper;
         private CoroutineHelper coroutineHelper;
@@ -413,7 +415,7 @@ namespace Nova
             while (actionPauseLock.isLocked) yield return null;
 
             var dialogueChangedData = new DialogueChangedData(nodeRecord, checkpointOffset, dialogueData,
-                isReached, isReachedAnyHistory);
+                currentDialogueEntry.GetDisplayData(), isReached, isReachedAnyHistory);
             dialogueChangedEarly.Invoke(dialogueChangedData);
             dialogueChanged.Invoke(dialogueChangedData);
 
@@ -473,19 +475,13 @@ namespace Nova
 
             if (!isReachedAnyHistory)
             {
-                var displayData = currentDialogueEntry.GetDisplayData(out var needInterpolate);
                 var voices = new Dictionary<string, VoiceEntry>(voicesNextDialogue);
-                dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, displayData, voices, needInterpolate);
+                dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, voices, currentDialogueEntry.NeedInterpolate());
                 checkpointManager.SetReached(dialogueData);
             }
             else
             {
                 dialogueData = checkpointManager.GetReachedDialogueData(currentNode.name, currentIndex);
-                if (dialogueData.needInterpolate)
-                {
-                    dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, currentDialogueEntry.GetDisplayData(out _),
-                        new Dictionary<string, VoiceEntry>(voicesNextDialogue), true);
-                }
             }
             voicesNextDialogue.Clear();
 

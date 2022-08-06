@@ -86,34 +86,32 @@ namespace Nova
 
         // DialogueDisplayData is cached only if there is no need to interpolate
         private DialogueDisplayData cachedDisplayData;
+        private bool needInterpolate = false;
 
-        public DialogueDisplayData GetDisplayData(out bool needInterpolate)
+        public bool NeedInterpolate()
         {
-            needInterpolate = false;
-            if (cachedDisplayData != null)
+            if (cachedDisplayData == null && !needInterpolate)
             {
-                return cachedDisplayData;
+                var func = LuaRuntime.Instance.GetFunction("text_need_interpolate");
+                needInterpolate = displayNames.Any(x => func.Invoke<string, bool>(x.Value))
+                    || dialogues.Any(x => func.Invoke<string, bool>(x.Value));
+                if (!needInterpolate)
+                {
+                    cachedDisplayData = new DialogueDisplayData(displayNames, dialogues);
+                }
             }
+            return needInterpolate;
+        }
 
-            LuaRuntime.Instance.GetFunction("reset_text_need_interpolate").Call();
-
-            var interpolatedDisplayNames = displayNames.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
-            var interpolatedDialogues = dialogues.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
-
-            DialogueDisplayData displayData;
-            if (LuaRuntime.Instance.GetFunction("get_text_need_interpolate").Invoke<bool>())
+        public DialogueDisplayData GetDisplayData()
+        {
+            if (NeedInterpolate())
             {
-                needInterpolate = true;
-                displayData = new DialogueDisplayData(interpolatedDisplayNames, interpolatedDialogues);
+                var interpolatedDisplayNames = displayNames.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
+                var interpolatedDialogues = dialogues.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
+                return new DialogueDisplayData(interpolatedDisplayNames, interpolatedDialogues);
             }
-            else
-            {
-                // Release references of interpolatedDisplayNames and interpolatedDialogues
-                displayData = new DialogueDisplayData(displayNames, dialogues);
-                cachedDisplayData = displayData;
-            }
-
-            return displayData;
+            return cachedDisplayData;
         }
 
         /// <summary>

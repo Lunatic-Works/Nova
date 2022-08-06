@@ -57,7 +57,7 @@ namespace Nova
 
         private void InitGlobalSave()
         {
-            globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset);
+            globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset, true);
             if (globalSave.version != CheckpointSerializer.Version ||
                 !CheckpointSerializer.FileHeader.SequenceEqual(globalSave.fileHeader))
             {
@@ -71,7 +71,7 @@ namespace Nova
             reachedEnds.Clear();
             for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = serializer.NextRecord(cur))
             {
-                var record = serializer.DeserializeRecord(cur);
+                var record = serializer.DeserializeRecord(cur, true);
                 if (record is string endName)
                 {
                     reachedEnds.Add(endName);
@@ -261,7 +261,7 @@ namespace Nova
                 return;
             }
             reachedDialogues.Add(key, data);
-            serializer.SerializeRecord(globalSave.endReached, data);
+            serializer.SerializeRecord(globalSave.endReached, data, true);
             NewReached();
         }
 
@@ -287,7 +287,7 @@ namespace Nova
                 return;
             }
             reachedEnds.Add(endName);
-            serializer.SerializeRecord(globalSave.endReached, endName);
+            serializer.SerializeRecord(globalSave.endReached, endName, true);
             NewReached();
         }
 
@@ -336,7 +336,7 @@ namespace Nova
         {
             if (globalSaveDirty)
             {
-                serializer.SerializeRecord(CheckpointSerializer.GlobalSaveOffset, globalSave);
+                serializer.SerializeRecord(CheckpointSerializer.GlobalSaveOffset, globalSave, true);
                 globalSaveDirty = false;
             }
             serializer.Flush();
