@@ -198,7 +198,7 @@ namespace Nova
 
         private void OnDialogueChanged(DialogueChangedData data)
         {
-            currentDialogue = data.dialogueData.displayData;
+            currentDialogue = data.displayData;
         }
 
         #region Show and hide

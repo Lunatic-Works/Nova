@@ -174,19 +174,12 @@ function is_end(name)
     __Nova.scriptLoader:SetCurrentAsEnd(name)
 end
 
-local text_need_interpolate = false
-
-function get_text_need_interpolate()
-    return text_need_interpolate
-end
-
-function reset_text_need_interpolate()
-    text_need_interpolate = false
+function text_need_interpolate(s)
+    return string.find(s, '{{([^}]+)}}') ~= nil
 end
 
 function interpolate_text(s)
     return string.gsub(s, '{{([^}]+)}}', function(x)
-            text_need_interpolate = true
             return _G[x]
         end)
 end

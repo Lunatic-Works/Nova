@@ -305,10 +305,10 @@ namespace Nova
             switch (dialogueUpdateMode)
             {
                 case DialogueUpdateMode.Overwrite:
-                    OverwriteDialogue(data.dialogueData.displayData);
+                    OverwriteDialogue(data.displayData);
                     break;
                 case DialogueUpdateMode.Append:
-                    AppendDialogue(data.dialogueData.displayData);
+                    AppendDialogue(data.displayData);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

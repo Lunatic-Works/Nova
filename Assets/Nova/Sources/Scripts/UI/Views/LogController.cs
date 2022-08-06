@@ -25,7 +25,7 @@ namespace Nova
             {
                 this.nodeOffset = data.nodeRecord.offset;
                 this.dialogueIndex = data.dialogueData.dialogueIndex;
-                this.displayData = data.dialogueData.displayData;
+                this.displayData = data.displayData;
                 this.voices = data.dialogueData.voices;
                 this.logEntryIndex = index;
             }
@@ -38,14 +38,17 @@ namespace Nova
             public readonly long nodeOffset;
             public readonly long checkpointOffset;
             public readonly ReachedDialogueData dialogueData;
+            public readonly DialogueDisplayData displayData;
 
-            public LogEntry(float height, float prefixHeight, long nodeOffset, long checkpointOffset, ReachedDialogueData dialogueData)
+            public LogEntry(float height, float prefixHeight, long nodeOffset, long checkpointOffset,
+                ReachedDialogueData dialogueData, DialogueDisplayData displayData)
             {
                 this.height = height;
                 this.prefixHeight = prefixHeight;
                 this.nodeOffset = nodeOffset;
                 this.checkpointOffset = checkpointOffset;
                 this.dialogueData = dialogueData;
+                this.displayData = displayData;
             }
         }
 
@@ -130,19 +133,19 @@ namespace Nova
             gameState.RemoveRestorable(this);
         }
 
-        private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
+        private void OnDialogueChanged(DialogueChangedData data)
         {
-            if (dialogueChangedData.dialogueData.needInterpolate)
+            if (data.dialogueData.needInterpolate)
             {
-                logParams.Add(new LogParam(dialogueChangedData, logEntries.Count));
+                logParams.Add(new LogParam(data, logEntries.Count));
             }
-            AddEntry(dialogueChangedData.nodeRecord, dialogueChangedData.checkpointOffset,
-                dialogueChangedData.dialogueData);
+            AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
         }
 
-        private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData)
+        private void AddEntry(NodeRecord nodeRecord, long checkpointOffset,
+            ReachedDialogueData dialogueData, DialogueDisplayData displayData)
         {
-            var text = dialogueData.displayData.FormatNameDialogue();
+            var text = displayData.FormatNameDialogue();
             if (string.IsNullOrEmpty(text))
             {
                 return;
@@ -151,7 +154,7 @@ namespace Nova
             var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
             var cnt = logEntries.Count;
             var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
-            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData));
+            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData, displayData));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
             {
@@ -238,7 +241,7 @@ namespace Nova
             }
 
             var logEntryController = transform.GetComponent<LogEntryController>();
-            logEntryController.Init(dialogueData.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked, logEntry.height);
+            logEntryController.Init(logEntry.displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked, logEntry.height);
         }
 
         #endregion
@@ -378,13 +381,19 @@ namespace Nova
             foreach (var pos in gameState.GetDialogueHistory(maxLogEntryNum))
             {
                 var dialogueData = checkpointManager.GetReachedDialogueData(pos.nodeRecord.name, pos.dialogueIndex);
+                DialogueDisplayData displayData;
                 if (dialogueData.needInterpolate)
                 {
-                    dialogueData = new ReachedDialogueData(dialogueData.nodeName, dialogueData.dialogueIndex,
-                        logParams[i].displayData, logParams[i].voices, true);
+                    displayData = logParams[i].displayData;
                     i++;
                 }
-                AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData);
+                else
+                {
+                    var node = gameState.flowChartTree.GetNode(pos.nodeRecord.name);
+                    var entry = node.GetDialogueEntryAt(pos.dialogueIndex);
+                    displayData = entry.GetDisplayData();
+                }
+                AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData, displayData);
             }
         }
 

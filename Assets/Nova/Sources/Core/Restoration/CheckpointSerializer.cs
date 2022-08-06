@@ -226,7 +226,7 @@ namespace Nova
             AppendRecord(record.offset, record.ToByteSegment());
         }
 
-        public void SerializeRecord(long offset, object data, bool compress = false)
+        public void SerializeRecord(long offset, object data, bool compress)
         {
             using var mem = new MemoryStream();
             if (compress)
@@ -241,7 +241,7 @@ namespace Nova
             AppendRecord(offset, new ByteSegment(mem.GetBuffer(), 0, (int)mem.Position));
         }
 
-        public object DeserializeRecord(long offset, bool compress = false)
+        public object DeserializeRecord(long offset, bool compress)
         {
             using var mem = GetRecord(offset).ToStream();
             try
@@ -264,7 +264,7 @@ namespace Nova
             }
         }
 
-        public T DeserializeRecord<T>(long offset, bool compress = false)
+        public T DeserializeRecord<T>(long offset, bool compress)
         {
             if (DeserializeRecord(offset, compress) is T val)
             {
