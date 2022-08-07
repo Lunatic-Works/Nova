@@ -113,7 +113,7 @@ namespace Nova
 
                     try
                     {
-                        ParseScript(script);
+                        ParseScript(script, true);
                     }
                     catch (ParseException e)
                     {
@@ -198,7 +198,7 @@ namespace Nova
         /// <summary>
         /// Parse the given TextAsset to chunks and add them to currentNode.
         /// </summary>
-        private void ParseScript(TextAsset script)
+        private void ParseScript(TextAsset script, bool defer_chunks = false)
         {
             hiddenCharacterNames.Clear();
             LuaRuntime.Instance.GetFunction("action_new_file").Call(script.name);
@@ -221,7 +221,14 @@ namespace Nova
                 {
                     if (nodeChunks.Count > 0)
                     {
-                        AddDialogueChunks(nodeChunks);
+                        if (defer_chunks)
+                        {
+                            currentNode.deferredChunks = chunks;
+                        }
+                        else
+                        {
+                            AddDialogueChunks(nodeChunks);
+                        }
                         nodeChunks = new List<Chunk>();
                     }
 
@@ -251,6 +258,45 @@ namespace Nova
                 var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
                 currentNode.AddLocalizedDialogueEntries(stateLocale, entries);
             }
+        }
+        
+        public void DeferredAddDialogueChunks(FlowChartNode node)
+        {
+            if (node.deferredChunks == null)
+            {
+                return;
+            }
+            
+            currentNode = node;
+
+            flowChartTree.Unfreeze();
+            
+            foreach (var locale in I18n.SupportedLocales)
+            {
+                stateLocale = locale;
+
+                if (stateLocale == I18n.DefaultLocale)
+                {
+                    var entries = ScriptDialogueEntryParser.ParseDialogueEntries(node.deferredChunks, hiddenCharacterNames);
+                    currentNode.SetDialogueEntries(entries);
+                }
+                else
+                {
+                    var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(node.deferredChunks);
+                    currentNode.AddLocalizedDialogueEntries(stateLocale, entries);
+                }
+            }
+
+            node.deferredChunks = null;
+            
+            // Bind all lazy binding entries
+            BindAllLazyBindingEntries();
+
+            // Perform sanity check
+            flowChartTree.SanityCheck();
+
+            // Construction finished, freeze the tree status
+            flowChartTree.Freeze();
         }
 
         /// <summary>
