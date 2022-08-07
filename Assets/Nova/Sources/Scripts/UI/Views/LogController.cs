@@ -13,27 +13,21 @@ namespace Nova
         LoopScrollSizeHelper
     {
         [Serializable]
-        private class LogParam
+        private class LogEntryRestoreData
         {
-            public readonly long nodeOffset;
-            public readonly int dialogueIndex;
             public readonly DialogueDisplayData displayData;
-            public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
-            public int logEntryIndex;
+            public int index;
 
-            public LogParam(DialogueChangedData data, int index)
+            public LogEntryRestoreData(DialogueDisplayData displayData, int index)
             {
-                nodeOffset = data.nodeRecord.offset;
-                dialogueIndex = data.dialogueData.dialogueIndex;
-                displayData = data.displayData;
-                voices = data.dialogueData.voices;
-                logEntryIndex = index;
+                this.displayData = displayData;
+                this.index = index;
             }
         }
 
         private class LogEntry
         {
-            public float height;
+            public readonly float height;
             public float prefixHeight;
             public readonly long nodeOffset;
             public readonly long checkpointOffset;
@@ -69,11 +63,8 @@ namespace Nova
         private TMP_Text contentForTest;
         private float contentDefaultWidth;
 
-        private readonly List<LogParam> logParams = new List<LogParam>();
         private readonly List<LogEntry> logEntries = new List<LogEntry>();
-
-        // The first logParam at or after the last checkpoint
-        private LogParam checkpointLogParam;
+        private readonly List<LogEntryRestoreData> logEntriesRestoreData = new List<LogEntryRestoreData>();
 
         protected override void Awake()
         {
@@ -137,7 +128,7 @@ namespace Nova
         {
             if (data.dialogueData.needInterpolate)
             {
-                logParams.Add(new LogParam(data, logEntries.Count));
+                logEntriesRestoreData.Add(new LogEntryRestoreData(data.displayData, logEntries.Count));
             }
 
             AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
@@ -152,6 +143,7 @@ namespace Nova
                 return;
             }
 
+            // TODO: Refresh heights when locale changes
             var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
             var cnt = logEntries.Count;
             var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
@@ -180,10 +172,10 @@ namespace Nova
                 logEntries[i].prefixHeight = logEntries[i].height + (i > 0 ? logEntries[i - 1].prefixHeight : 0);
             }
 
-            logParams.RemoveAll(logParam => logParam.logEntryIndex >= index && logParam.logEntryIndex < index + count);
-            logParams.ForEach(logParam =>
+            logEntriesRestoreData.RemoveAll(x => x.index >= index && x.index < index + count);
+            logEntriesRestoreData.ForEach(x =>
             {
-                if (logParam.logEntryIndex >= index) logParam.logEntryIndex -= count;
+                if (x.index >= index) x.index -= count;
             });
 
             scrollRect.totalCount = logEntries.Count;
@@ -232,7 +224,6 @@ namespace Nova
         {
             var logEntry = logEntries[idx];
             var dialogueData = logEntry.dialogueData;
-            // var logParam = logParams[idx];
             UnityAction onGoBackButtonClicked = () =>
                 OnGoBackButtonClicked(logEntry.nodeOffset, logEntry.checkpointOffset, dialogueData.dialogueIndex, idx);
 
@@ -361,25 +352,27 @@ namespace Nova
         [Serializable]
         private class LogControllerRestoreData : IRestoreData
         {
-            public readonly IReadOnlyList<LogParam> logParams;
+            public readonly IReadOnlyList<LogEntryRestoreData> logEntriesRestoreData;
 
-            public LogControllerRestoreData(IReadOnlyList<LogParam> logParams)
+            public LogControllerRestoreData(IReadOnlyList<LogEntryRestoreData> logEntriesRestoreData)
             {
-                this.logParams = logParams;
+                this.logEntriesRestoreData = logEntriesRestoreData;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new LogControllerRestoreData(logParams);
+            return new LogControllerRestoreData(logEntriesRestoreData);
         }
 
         public void Restore(IRestoreData restoreData)
         {
+            logEntriesRestoreData.Clear();
             Clear();
-            logParams.Clear();
+            // TODO: In each checkpoint, only save logEntriesRestoreData from the last checkpoint
             var data = restoreData as LogControllerRestoreData;
-            logParams.AddRange(data.logParams);
+            logEntriesRestoreData.AddRange(data.logEntriesRestoreData);
+
             var i = 0;
             foreach (var pos in gameState.GetDialogueHistory(maxLogEntryNum))
             {
@@ -387,7 +380,7 @@ namespace Nova
                 DialogueDisplayData displayData;
                 if (dialogueData.needInterpolate)
                 {
-                    displayData = logParams[i].displayData;
+                    displayData = logEntriesRestoreData[i].displayData;
                     i++;
                 }
                 else
