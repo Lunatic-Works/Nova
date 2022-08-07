@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -602,6 +602,7 @@ namespace Nova
         private void GameStart(FlowChartNode startNode)
         {
             ResetGameState();
+            scriptLoader.DeferredAddDialogueChunks(startNode);
             MoveToNextNode(startNode, null);
         }
 

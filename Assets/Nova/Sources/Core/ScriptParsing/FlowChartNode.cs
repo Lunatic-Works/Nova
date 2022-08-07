@@ -95,6 +95,8 @@ namespace Nova
 
         public int dialogueEntryCount => dialogueEntries.Count;
 
+        public IReadOnlyList<ScriptLoader.Chunk> deferredChunks = null;
+
         public void SetDialogueEntries(IReadOnlyList<DialogueEntry> entries)
         {
             CheckFreeze();
