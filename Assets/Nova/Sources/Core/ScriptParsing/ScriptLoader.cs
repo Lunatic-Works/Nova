@@ -268,37 +268,25 @@ namespace Nova
                 return;
             }
 
-            currentNode = node;
+            node.Unfreeze();
 
-            flowChartTree.Unfreeze();
-
-            foreach (var locale in currentNode.deferredChunks.Keys)
+            foreach (var locale in node.deferredChunks.Keys)
             {
-                stateLocale = locale;
-                var chunks = currentNode.deferredChunks[stateLocale];
-
-                if (stateLocale == I18n.DefaultLocale)
+                var chunks = node.deferredChunks[locale];
+                if (locale == I18n.DefaultLocale)
                 {
                     var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks, hiddenCharacterNames);
-                    currentNode.SetDialogueEntries(entries);
+                    node.SetDialogueEntries(entries);
                 }
                 else
                 {
                     var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
-                    currentNode.AddLocalizedDialogueEntries(stateLocale, entries);
+                    node.AddLocalizedDialogueEntries(locale, entries);
                 }
             }
 
-            currentNode.deferredChunks.Clear();
-
-            // Bind all lazy binding entries
-            BindAllLazyBindingEntries();
-
-            // Perform sanity check
-            flowChartTree.SanityCheck();
-
-            // Construction finished, freeze the tree status
-            flowChartTree.Freeze();
+            node.deferredChunks.Clear();
+            node.Freeze();
         }
 
         /// <summary>
