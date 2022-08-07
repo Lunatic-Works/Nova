@@ -138,7 +138,7 @@ namespace Nova
             return Rect.MinMaxRect(xmin, ymin, xmax, ymax);
         }
 
-        // used in editor
+#if UNITY_EDITOR
         public static GameObject InstantiateSimpleSpriteMerger(string name, out Camera renderCamera,
             out CompositeSpriteMerger merger)
         {
@@ -162,5 +162,6 @@ namespace Nova
 
             return root;
         }
+#endif
     }
 }
