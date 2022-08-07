@@ -539,9 +539,14 @@ namespace Nova
             forceCheckpoint = true;
         }
 
+        public void AddDeferredDialogueChunks(FlowChartNode node)
+        {
+            scriptLoader.AddDeferredDialogueChunks(node);
+        }
+
         private void MoveToNextNode(FlowChartNode nextNode, Action onFinish)
         {
-            scriptLoader.AddDeferredDialogueChunks(nextNode);
+            AddDeferredDialogueChunks(nextNode);
             nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
             currentNode = nextNode;
             currentIndex = 0;
