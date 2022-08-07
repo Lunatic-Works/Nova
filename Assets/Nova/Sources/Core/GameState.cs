@@ -71,12 +71,8 @@ namespace Nova
                 this.active = active;
             }
 
-            public Selection(string text, BranchImageInformation imageInfo, bool active)
-                : this(new Dictionary<SystemLanguage, string>
-                {
-                    [I18n.DefaultLocale] = text
-                }, imageInfo, active)
-            { }
+            public Selection(string text, BranchImageInformation imageInfo, bool active) : this(
+                new Dictionary<SystemLanguage, string> {[I18n.DefaultLocale] = text}, imageInfo, active) { }
         }
 
         public readonly IReadOnlyList<Selection> selections;
@@ -516,6 +512,7 @@ namespace Nova
 
         private void MoveToNextNode(FlowChartNode nextNode, Action onFinish)
         {
+            scriptLoader.AddDeferredDialogueChunks(nextNode);
             nodeHistory.Add(nextNode.name);
             currentNode = nextNode;
             currentIndex = 0;
@@ -602,7 +599,6 @@ namespace Nova
         private void GameStart(FlowChartNode startNode)
         {
             ResetGameState();
-            scriptLoader.DeferredAddDialogueChunks(startNode);
             MoveToNextNode(startNode, null);
         }
 
