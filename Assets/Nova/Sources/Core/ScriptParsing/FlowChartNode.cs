@@ -95,7 +95,8 @@ namespace Nova
 
         public int dialogueEntryCount => dialogueEntries.Count;
 
-        public IReadOnlyList<ScriptLoader.Chunk> deferredChunks = null;
+        public readonly Dictionary<SystemLanguage, IReadOnlyList<ScriptLoader.Chunk>> deferredChunks =
+            new Dictionary<SystemLanguage, IReadOnlyList<ScriptLoader.Chunk>>();
 
         public void SetDialogueEntries(IReadOnlyList<DialogueEntry> entries)
         {
