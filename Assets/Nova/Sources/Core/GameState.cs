@@ -20,16 +20,19 @@ namespace Nova
         public readonly long checkpointOffset;
         public readonly ReachedDialogueData dialogueData;
         public readonly DialogueDisplayData displayData;
+        public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
         public readonly bool isReached;
         public readonly bool isReachedAnyHistory;
 
         public DialogueChangedData(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
-            DialogueDisplayData displayData, bool isReached, bool isReachedAnyHistory)
+            DialogueDisplayData displayData, IReadOnlyDictionary<string, VoiceEntry> voices, bool isReached,
+            bool isReachedAnyHistory)
         {
             this.nodeRecord = nodeRecord;
             this.checkpointOffset = checkpointOffset;
             this.dialogueData = dialogueData;
             this.displayData = displayData;
+            this.voices = voices;
             this.isReached = isReached;
             this.isReachedAnyHistory = isReachedAnyHistory;
         }
@@ -258,17 +261,17 @@ namespace Nova
 
         #region Voice
 
-        private readonly Dictionary<string, VoiceEntry> voicesNextDialogue = new Dictionary<string, VoiceEntry>();
+        private readonly Dictionary<string, VoiceEntry> currentVoices = new Dictionary<string, VoiceEntry>();
 
         /// <summary>
-        /// Add a voice clip to be played on the next dialogue
+        /// Add a voice clip to be played in the current dialogue
         /// </summary>
         /// <remarks>
-        /// This method is called by CharacterController
+        /// This method is called by GameCharacterController
         /// </remarks>
-        public void AddVoiceNextDialogue(string characterName, VoiceEntry voiceEntry)
+        public void AddVoice(string characterName, VoiceEntry voiceEntry)
         {
-            voicesNextDialogue.Add(characterName, voiceEntry);
+            currentVoices.Add(characterName, voiceEntry);
         }
 
         #endregion
@@ -298,7 +301,7 @@ namespace Nova
 
         private void ResetActionContext()
         {
-            voicesNextDialogue.Clear();
+            currentVoices.Clear();
             advancedDialogueHelper.Reset();
             coroutineHelper.Reset();
             actionPauseLock.Reset();
@@ -415,12 +418,11 @@ namespace Nova
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
+            var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
             var dialogueChangedData = new DialogueChangedData(nodeRecord, checkpointOffset, dialogueData,
-                currentDialogueEntry.GetDisplayData(), isReached, isReachedAnyHistory);
+                currentDialogueEntry.GetDisplayData(), voices, isReached, isReachedAnyHistory);
             dialogueChangedEarly.Invoke(dialogueChangedData);
             dialogueChanged.Invoke(dialogueChangedData);
-
-            voicesNextDialogue.Clear();
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.AfterDialogue, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
@@ -476,8 +478,7 @@ namespace Nova
 
             if (!isReachedAnyHistory)
             {
-                var voices = new Dictionary<string, VoiceEntry>(voicesNextDialogue);
-                dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, voices,
+                dialogueData = new ReachedDialogueData(currentNode.name, currentIndex,
                     currentDialogueEntry.NeedInterpolate());
                 checkpointManager.SetReached(dialogueData);
             }
@@ -485,8 +486,6 @@ namespace Nova
             {
                 dialogueData = checkpointManager.GetReachedDialogueData(currentNode.name, currentIndex);
             }
-
-            voicesNextDialogue.Clear();
 
             isReached = currentIndex < nodeRecord.endDialogue;
             if (shouldSaveCheckpoint)

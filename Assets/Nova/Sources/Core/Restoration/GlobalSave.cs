@@ -59,15 +59,12 @@ namespace Nova
     {
         public readonly string nodeName;
         public readonly int dialogueIndex;
-        public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
         public readonly bool needInterpolate;
 
-        public ReachedDialogueData(string nodeName, int dialogueIndex, IReadOnlyDictionary<string, VoiceEntry> voices,
-            bool needInterpolate)
+        public ReachedDialogueData(string nodeName, int dialogueIndex, bool needInterpolate)
         {
             this.nodeName = nodeName;
             this.dialogueIndex = dialogueIndex;
-            this.voices = voices;
             this.needInterpolate = needInterpolate;
         }
     }

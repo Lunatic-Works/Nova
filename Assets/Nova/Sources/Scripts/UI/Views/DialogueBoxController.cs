@@ -778,6 +778,7 @@ namespace Nova
             materialName = data.materialName;
 
             NewPage();
+            // TODO: Restore displayDatas from FlowChartTree, like in LogController
             foreach (var displayData in data.displayDatas)
             {
                 AppendDialogue(displayData, needAnimation: false);
