@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+// using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Nova
 {
@@ -53,11 +54,17 @@ namespace Nova
         // initialize existing block from file
         public static CheckpointBlock FromFile(Stream stream, long id)
         {
+            // var start = Stopwatch.GetTimestamp();
+
             var block = new CheckpointBlock(stream, id);
             stream.Seek(block.offset, SeekOrigin.Begin);
             stream.Read(block.data, 0, BlockSize);
             block._nextBlock = BitConverter.ToInt64(block.data, 0);
             block.dirty = false;
+
+            // var end = Stopwatch.GetTimestamp();
+            // Debug.Log($"read {start}->{end}");
+
             return block;
         }
 
@@ -81,11 +88,16 @@ namespace Nova
             }
 
             // Debug.Log($"flush block {id}");
+            // var start = Stopwatch.GetTimestamp();
+
             var x = BitConverter.GetBytes(_nextBlock);
             Buffer.BlockCopy(x, 0, data, 0, HeaderSize);
             stream.Seek(offset, SeekOrigin.Begin);
             stream.Write(data, 0, BlockSize);
             dirty = false;
+
+            // var end = Stopwatch.GetTimestamp();
+            // Debug.Log($"write {start}->{end}");
         }
 
         public void Dispose()

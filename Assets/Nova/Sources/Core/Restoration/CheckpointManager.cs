@@ -282,7 +282,6 @@ namespace Nova
             return reachedEnds.Contains(endName);
         }
 
-        /// TODO: UpdateGlobalSave() is slow when there are many saved dialogue entries
         public void UpdateGlobalSave()
         {
             if (globalSaveDirty)

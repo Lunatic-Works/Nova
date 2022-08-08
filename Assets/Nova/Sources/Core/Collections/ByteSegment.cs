@@ -44,7 +44,7 @@ namespace Nova
 
         public MemoryStream ToStream()
         {
-            return new MemoryStream(array, this.offset, this.Count, true, true);
+            return new MemoryStream(array, offset, Count, true, true);
         }
 
         public int ReadInt(int offset)

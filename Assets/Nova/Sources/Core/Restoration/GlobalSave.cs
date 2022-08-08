@@ -6,6 +6,7 @@ namespace Nova
     [Serializable]
     public class GlobalSave
     {
+        // Cannot be static, because they need to be serialized into the file
         public readonly int version;
         public readonly byte[] fileHeader;
         public readonly long identifier = DateTime.Now.ToBinary();

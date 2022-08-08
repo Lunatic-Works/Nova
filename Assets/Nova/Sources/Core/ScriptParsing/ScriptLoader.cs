@@ -108,8 +108,8 @@ namespace Nova
                     }
 
 #if UNITY_EDITOR
-                    var scriptPath = AssetDatabase.GetAssetPath(script);
-                    Debug.Log($"Nova: Parse script {scriptPath}");
+                    // var scriptPath = AssetDatabase.GetAssetPath(script);
+                    // Debug.Log($"Nova: Parse script {scriptPath}");
 #endif
 
                     try

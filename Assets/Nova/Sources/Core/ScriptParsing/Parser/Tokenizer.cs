@@ -235,7 +235,7 @@ namespace Nova.Script
                 return;
             }
 
-            // char.IsWhiteSpace('\n') == true
+            // char.IsWhiteSpace('\n')
             if (c == '\n')
             {
                 type = TokenType.NewLine;

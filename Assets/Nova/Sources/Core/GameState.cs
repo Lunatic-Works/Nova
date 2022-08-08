@@ -903,8 +903,7 @@ namespace Nova
                 newCheckpointOffset = nextCheckpoint;
             }
 
-            // Debug.Log(
-            //     $"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
+            // Debug.Log($"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
         }
 
         public bool SeekBackStep(int steps, out NodeRecord nodeRecord, out long newCheckpointOffset,
@@ -970,6 +969,7 @@ namespace Nova
             Action onFinish = null)
         {
             // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
+
             CancelAction();
 
             // Animation should stop
@@ -1072,7 +1072,6 @@ namespace Nova
 
         #endregion
 
-        private string debugState =>
-            $"{currentNode?.name} {currentIndex} {variables.hash} | {stepNumFromLastCheckpoint} {restrainCheckpointNum} {forceCheckpoint} {shouldSaveCheckpoint}";
+        // private string debugState => $"{currentNode?.name} {currentIndex} {variables.hash} | {stepNumFromLastCheckpoint} {restrainCheckpointNum} {forceCheckpoint} {shouldSaveCheckpoint}";
     }
 }

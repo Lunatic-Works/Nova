@@ -25,7 +25,9 @@ namespace Nova
 
             image = GetComponent<Image>();
 
+            // Create MaterialPool to keep an instance of defaultMaterial
             gameObject.Ensure<MaterialPool>();
+
             renderQueue = GetRenderQueue();
         }
 

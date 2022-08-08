@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using UnityEngine;
+// using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Nova
 {
@@ -261,12 +262,17 @@ namespace Nova
 
         public void Flush()
         {
+            // var start = Stopwatch.GetTimestamp();
+
             foreach (var block in cachedBlock)
             {
                 block.Value.Flush();
             }
 
             file.Flush();
+
+            // var end = Stopwatch.GetTimestamp();
+            // Debug.Log($"flush {start}->{end}");
         }
 
         public Bookmark ReadBookmark(string path)

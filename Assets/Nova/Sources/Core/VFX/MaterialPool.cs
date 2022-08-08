@@ -19,6 +19,7 @@ namespace Nova
                     return;
                 }
 
+                // TODO: Should we destroy this?
                 // Utils.DestroyObject(_defaultMaterial);
                 _defaultMaterial = value;
             }

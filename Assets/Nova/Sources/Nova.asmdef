@@ -1,10 +1,10 @@
 {
     "name": "Nova",
     "references": [
-        "Unity.TextMeshPro",
+        "Unity.InputSystem",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.Universal.Runtime",
-        "Unity.InputSystem",
+        "Unity.TextMeshPro",
         "LoopScrollRect.Runtime"
     ],
     "includePlatforms": [],
