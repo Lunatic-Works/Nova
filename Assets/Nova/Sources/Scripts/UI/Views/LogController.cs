@@ -9,19 +9,23 @@ using TMPro;
 
 namespace Nova
 {
+    using VoiceEntries = IReadOnlyDictionary<string, VoiceEntry>;
+
     public class LogController : ViewControllerBase, IRestorable, LoopScrollPrefabSource, LoopScrollDataSource,
         LoopScrollSizeHelper
     {
         [Serializable]
         private class LogEntryRestoreData
         {
-            public readonly DialogueDisplayData displayData;
             public int index;
+            public readonly DialogueDisplayData displayData;
+            public readonly VoiceEntries voices;
 
-            public LogEntryRestoreData(DialogueDisplayData displayData, int index)
+            public LogEntryRestoreData(int index, DialogueDisplayData displayData, VoiceEntries voices)
             {
-                this.displayData = displayData;
                 this.index = index;
+                this.displayData = displayData;
+                this.voices = voices;
             }
         }
 
@@ -33,9 +37,10 @@ namespace Nova
             public readonly long checkpointOffset;
             public readonly ReachedDialogueData dialogueData;
             public readonly DialogueDisplayData displayData;
+            public readonly VoiceEntries voices;
 
             public LogEntry(float height, float prefixHeight, long nodeOffset, long checkpointOffset,
-                ReachedDialogueData dialogueData, DialogueDisplayData displayData)
+                ReachedDialogueData dialogueData, DialogueDisplayData displayData, VoiceEntries voices)
             {
                 this.height = height;
                 this.prefixHeight = prefixHeight;
@@ -43,6 +48,7 @@ namespace Nova
                 this.checkpointOffset = checkpointOffset;
                 this.dialogueData = dialogueData;
                 this.displayData = displayData;
+                this.voices = voices;
             }
         }
 
@@ -126,16 +132,17 @@ namespace Nova
 
         private void OnDialogueChanged(DialogueChangedData data)
         {
-            if (data.dialogueData.needInterpolate)
+            var displayData = data.dialogueData.needInterpolate ? data.displayData : null;
+            if (displayData != null || data.voices != null)
             {
-                logEntriesRestoreData.Add(new LogEntryRestoreData(data.displayData, logEntries.Count));
+                logEntriesRestoreData.Add(new LogEntryRestoreData(logEntries.Count, displayData, data.voices));
             }
 
-            AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
+            AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData, data.voices);
         }
 
         private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
-            DialogueDisplayData displayData)
+            DialogueDisplayData displayData, VoiceEntries voices)
         {
             var text = displayData.FormatNameDialogue();
             if (string.IsNullOrEmpty(text))
@@ -148,7 +155,7 @@ namespace Nova
             var cnt = logEntries.Count;
             var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
             logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData,
-                displayData));
+                displayData, voices));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
             {
@@ -223,14 +230,15 @@ namespace Nova
         public void ProvideData(Transform transform, int idx)
         {
             var logEntry = logEntries[idx];
-            var dialogueData = logEntry.dialogueData;
+
             UnityAction onGoBackButtonClicked = () =>
-                OnGoBackButtonClicked(logEntry.nodeOffset, logEntry.checkpointOffset, dialogueData.dialogueIndex, idx);
+                OnGoBackButtonClicked(logEntry.nodeOffset, logEntry.checkpointOffset,
+                    logEntry.dialogueData.dialogueIndex, idx);
 
             UnityAction onPlayVoiceButtonClicked = null;
-            if (dialogueData.voices.Any())
+            if (logEntry.voices != null)
             {
-                onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(dialogueData.voices);
+                onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(logEntry.voices);
             }
 
             var logEntryController = transform.GetComponent<LogEntryController>();
@@ -272,9 +280,9 @@ namespace Nova
             }
         }
 
-        private static void OnPlayVoiceButtonClicked(IReadOnlyDictionary<string, VoiceEntry> voiceEntries)
+        private static void OnPlayVoiceButtonClicked(VoiceEntries voices)
         {
-            GameCharacterController.ReplayVoice(voiceEntries);
+            GameCharacterController.ReplayVoice(voices);
         }
 
         public override void Show(Action onFinish)
@@ -374,16 +382,23 @@ namespace Nova
             logEntriesRestoreData.AddRange(data.logEntriesRestoreData);
 
             var i = 0;
+            var logEntryRestoreData = logEntriesRestoreData.FirstOrDefault();
             foreach (var pos in gameState.GetDialogueHistory(maxLogEntryNum))
             {
                 var dialogueData = checkpointManager.GetReachedDialogueData(pos.nodeRecord.name, pos.dialogueIndex);
-                DialogueDisplayData displayData;
-                if (dialogueData.needInterpolate)
+                DialogueDisplayData displayData = null;
+                VoiceEntries voices = null;
+
+                if (logEntryRestoreData != null && logEntryRestoreData.index == logEntries.Count)
                 {
-                    displayData = logEntriesRestoreData[i].displayData;
-                    i++;
+                    displayData = logEntryRestoreData.displayData;
+                    voices = logEntryRestoreData.voices;
+
+                    ++i;
+                    logEntryRestoreData = i < logEntriesRestoreData.Count ? logEntriesRestoreData[i] : null;
                 }
-                else
+
+                if (displayData == null)
                 {
                     var node = gameState.flowChartTree.GetNode(pos.nodeRecord.name);
                     gameState.AddDeferredDialogueChunks(node);
@@ -391,7 +406,7 @@ namespace Nova
                     displayData = entry.GetDisplayData();
                 }
 
-                AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData, displayData);
+                AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData, displayData, voices);
             }
         }
 

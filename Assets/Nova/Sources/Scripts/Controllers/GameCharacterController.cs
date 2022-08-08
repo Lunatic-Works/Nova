@@ -193,7 +193,7 @@ namespace Nova
             willSaySomething = true;
             voiceDelay = delay;
             audioSource.clip = audioClip;
-            gameState.AddVoiceNextDialogue(luaGlobalName, new VoiceEntry(voiceFileName, delay));
+            gameState.AddVoice(luaGlobalName, new VoiceEntry(voiceFileName, delay));
         }
 
         /// <summary>
