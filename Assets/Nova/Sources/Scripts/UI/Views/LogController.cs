@@ -50,6 +50,7 @@ namespace Nova
         private LogEntryController logEntryForTest;
         private TMP_Text contentForTest;
         private float contentDefaultWidth;
+        private float contentSpacing;
 
         private readonly List<LogParam> logParams = new List<LogParam>();
         private readonly List<float> logHeights = new List<float>();
@@ -71,6 +72,8 @@ namespace Nova
             scrollRect.prefabSource = this;
             scrollRect.dataSource = this;
             scrollRect.sizeHelper = this;
+
+            contentSpacing = scrollRect.content.GetComponent<VerticalLayoutGroup>().spacing;
 
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
@@ -310,16 +313,48 @@ namespace Nova
             base.Show(onFinish);
 
             scrollRect.RefillCellsFromEnd();
+            scrollRect.verticalNormalizedPosition = 1f;
             selectedLogEntryIndex = -1;
         }
+
+        private const float MaxScrollDownIdleTime = 0.2f;
+        private float scrollDownIdleTime;
 
         protected override void OnActivatedUpdate()
         {
             base.OnActivatedUpdate();
 
-            if (Mouse.current?.scroll.ReadValue().y < 0 && Mathf.Approximately(scrollRect.verticalScrollbar.value, 0f))
+            var delta = Mouse.current?.scroll.ReadValue().y ?? 0f;
+            if (delta < -1e-3f)
             {
-                Hide();
+                // If the content does not extend beyond the viewport, immediately hide log view
+                // In this case, verticalNormalizedPosition is always 0
+                // TODO: Let LoopScrollRect expose totalSize
+                var contentHeight = logPrefixHeights.Last() + contentSpacing * (logPrefixHeights.Count - 1);
+                if (contentHeight < scrollRect.viewport.rect.height)
+                {
+                    Hide();
+                    return;
+                }
+
+                // Otherwise, the first scrolling down stops when reaches the bottom,
+                // and the second scrolling down hides log view
+                // verticalNormalizedPosition can be > 1, which should be a bug of LoopScrollRect
+                if (scrollDownIdleTime > MaxScrollDownIdleTime && scrollRect.verticalNormalizedPosition > 1f - 1e-3f)
+                {
+                    Hide();
+                    return;
+                }
+
+                scrollDownIdleTime = 0f;
+            }
+            else if (delta > 1e-3f)
+            {
+                scrollDownIdleTime = 0f;
+            }
+            else
+            {
+                scrollDownIdleTime += Time.unscaledDeltaTime;
             }
 
             // TODO: fully support keyboard navigation
