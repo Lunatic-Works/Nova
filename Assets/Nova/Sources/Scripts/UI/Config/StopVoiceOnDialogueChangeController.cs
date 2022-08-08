@@ -32,7 +32,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            characterController.stopVoiceWhenDialogueWillChange = configManager.GetInt(configKeyName) > 0;
+            characterController.stopVoiceOnDialogueChange = configManager.GetInt(configKeyName) > 0;
         }
     }
 }

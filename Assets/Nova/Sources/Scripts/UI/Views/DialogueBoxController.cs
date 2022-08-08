@@ -470,7 +470,7 @@ namespace Nova
         {
             return Mathf.Max(
                 NovaAnimation.GetTotalTimeRemaining(AnimationType.PerDialogue | AnimationType.Text) + offset,
-                GameCharacterController.MaxVoiceDurationNextDialogue + voiceOffset
+                GameCharacterController.MaxVoiceDuration + voiceOffset
             );
         }
 

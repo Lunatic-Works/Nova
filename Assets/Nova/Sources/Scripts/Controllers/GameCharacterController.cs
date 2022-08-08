@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -95,9 +95,10 @@ namespace Nova
 
         #region Voice
 
-        public bool stopVoiceWhenDialogueWillChange { get; set; }
-        private bool willSaySomething = false;
-        private float voiceDelay = 0.0f;
+        [HideInInspector] public bool stopVoiceOnDialogueChange;
+        private bool willSaySomething;
+        private float voiceDelay;
+
         private bool dontPlaySound => gameState.isRestoring;
 
         /// <summary>
@@ -105,7 +106,7 @@ namespace Nova
         /// </summary>
         private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
         {
-            if (stopVoiceWhenDialogueWillChange)
+            if (stopVoiceOnDialogueChange)
             {
                 audioSource.Stop();
             }
@@ -132,7 +133,7 @@ namespace Nova
             }
         }
 
-        private void SayImmediatelyWithDelay(AudioClip clip, float delay)
+        private void SayImmediately(AudioClip clip, float delay)
         {
             StopVoice();
             audioSource.clip = clip;
@@ -144,7 +145,6 @@ namespace Nova
         #region Color
 
         private Color _color = Color.white;
-        private Color _environmentColor = Color.white;
 
         public override Color color
         {
@@ -155,6 +155,8 @@ namespace Nova
                 base.color = _color * _environmentColor;
             }
         }
+
+        private Color _environmentColor = Color.white;
 
         public Color environmentColor
         {
@@ -182,7 +184,7 @@ namespace Nova
         public void Say(string voiceFileName, float delay)
         {
             // Stop all to make sure all previous playing voices are stopped here
-            // Especially when stopVoiceWhenDialogueWillChange is off
+            // Especially when stopVoiceOnDialogueChange is off
             StopVoiceAll();
 
             voiceFileName = System.IO.Path.Combine(voiceFolder, voiceFileName);
@@ -275,11 +277,11 @@ namespace Nova
 
                 if (!Characters.TryGetValue(characterName, out var character)) continue;
                 var clip = AssetLoader.Load<AudioClip>(voiceEntry.voiceFileName);
-                character.SayImmediatelyWithDelay(clip, delay);
+                character.SayImmediately(clip, delay);
             }
         }
 
-        public static float MaxVoiceDurationNextDialogue
+        public static float MaxVoiceDuration
         {
             get
             {
