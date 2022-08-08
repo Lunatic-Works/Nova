@@ -53,6 +53,7 @@ namespace Nova
             }
             else
             {
+                button.gameObject.SetActive(true);
                 button.onClick.AddListener(onClick);
             }
         }
