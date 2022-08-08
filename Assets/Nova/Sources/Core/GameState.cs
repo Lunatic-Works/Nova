@@ -927,7 +927,6 @@ namespace Nova
                 return;
             }
 
-            isRestoring = true;
             for (var i = 0; i < stepCount; ++i)
             {
                 var isLast = i == stepCount - 1;
@@ -982,6 +981,7 @@ namespace Nova
 
             currentNode = flowChartTree.GetNode(nodeRecord.name);
 
+            isRestoring = true;
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
             UpdateGameState(true, true, false, false, true, onFinish);
