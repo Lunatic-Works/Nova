@@ -59,6 +59,7 @@
   "config.key.ShowConfig": "Settings",
   "config.key.ShowLog": "Backlog",
   "config.key.StepForward": "Step forward",
+  "config.key.SwitchLanguage": "Switch language",
   "config.key.ToggleDialogue": "Hide/Show dialogue box",
   "config.key.ToggleFullScreen": "Full screen",
   "config.quitgame": "Quit game",

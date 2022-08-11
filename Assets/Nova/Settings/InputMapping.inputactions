@@ -458,6 +458,15 @@
                     "processors": "",
                     "interactions": "Tap",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchLanguage",
+                    "type": "Button",
+                    "id": "e9a9be43-64eb-4bf4-b12e-4bfd01a50253",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -469,6 +478,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleFullScreen",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5b7dc04c-d3fd-4df1-9727-59681c32d94a",
+                    "path": "<Keyboard>/slash",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchLanguage",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
