@@ -80,7 +80,7 @@ namespace Nova
                 return;
             }
 
-            Debug.Log($"flush block {id}");
+            // Debug.Log($"flush block {id}");
             var x = BitConverter.GetBytes(_nextBlock);
             Buffer.BlockCopy(x, 0, data, 0, HeaderSize);
             stream.Seek(offset, SeekOrigin.Begin);
