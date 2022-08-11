@@ -300,7 +300,7 @@ namespace Nova.Editor
 
             entry.id = fileName;
             entry.displayNames = new List<LocaleStringPair>
-                {new LocaleStringPair {locale = I18n.DefaultLocale, value = fileName}};
+                {new LocaleStringPair { locale = I18n.DefaultLocale, value = fileName }};
             entry.resourcePath = Utils.ConvertPathSeparator(loadPath);
 
             // get loopBeginSample and loopEndSample from audio clips

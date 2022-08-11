@@ -654,7 +654,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configKeyName: FontSize
-  multipliers: []
+  multipliers:
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &5102853095687291503
 MonoBehaviour:
   m_ObjectHideFlags: 0

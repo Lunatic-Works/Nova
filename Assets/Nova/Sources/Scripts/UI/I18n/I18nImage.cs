@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +7,7 @@ namespace Nova
     public class I18nImage : MonoBehaviour
     {
         public List<LocaleSpritePair> sprites;
-        public List<LocaleFloatPair> multipliers;
+        public SerializableDictionary<SystemLanguage, float> multipliers;
 
         private Image image;
         private Sprite defaultSprite;
@@ -42,13 +42,9 @@ namespace Nova
             }
 
             float _scale = scale;
-            foreach (var pair in multipliers)
+            if (multipliers.ContainsKey(I18n.CurrentLocale))
             {
-                if (pair.locale == I18n.CurrentLocale)
-                {
-                    _scale *= pair.value;
-                    break;
-                }
+                _scale *= multipliers[I18n.CurrentLocale];
             }
 
             rectTransform.localScale = new Vector3(_scale, _scale, 1.0f);

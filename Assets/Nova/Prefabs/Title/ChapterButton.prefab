@@ -62,6 +62,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
+    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -106,6 +107,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -137,8 +139,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &6067027124068321097
 MonoBehaviour:
   m_ObjectHideFlags: 0

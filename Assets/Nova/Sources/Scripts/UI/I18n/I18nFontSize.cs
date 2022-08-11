@@ -1,4 +1,3 @@
-﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +6,7 @@ namespace Nova
 {
     public class I18nFontSize : MonoBehaviour
     {
-        public List<LocaleFloatPair> multipliers;
+        public SerializableDictionary<SystemLanguage, float> multipliers;
 
         private Text text;
         private TMP_Text textPro;
@@ -67,16 +66,14 @@ namespace Nova
 
         private void UpdateFontSize()
         {
-            foreach (var pair in multipliers)
+            if (multipliers.ContainsKey(I18n.CurrentLocale))
             {
-                if (pair.locale == I18n.CurrentLocale)
-                {
-                    fontSize = initFontSize * pair.value;
-                    return;
-                }
+                fontSize = initFontSize * multipliers[I18n.CurrentLocale];
             }
-
-            fontSize = initFontSize;
+            else
+            {
+                fontSize = initFontSize;
+            }
         }
 
         private void OnEnable()
