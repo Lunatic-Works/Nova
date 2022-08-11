@@ -863,7 +863,7 @@ namespace Nova
         private void SeekBackStep(int steps, IList<NodeRecord> nodeHistory, out long newCheckpointOffset,
             out int newDialogueIndex)
         {
-            Debug.Log($"stepback={steps}");
+            // Debug.Log($"stepback={steps}");
 
             nodeHistory.Clear();
             var hasLimit = steps != 0;
@@ -902,8 +902,8 @@ namespace Nova
                 newCheckpointOffset = nextCheckpoint;
             }
 
-            Debug.Log(
-                $"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
+            // Debug.Log(
+            //     $"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
         }
 
         public bool SeekBackStep(int steps, out NodeRecord nodeRecord, out long newCheckpointOffset,

@@ -120,14 +120,14 @@ namespace Nova
         {
             globalSave.endReached = serializer.NextRecord(globalSave.endReached);
             globalSaveDirty = true;
-            Debug.Log($"next reached {globalSave.endReached}");
+            // Debug.Log($"next reached {globalSave.endReached}");
         }
 
         private void NewCheckpoint()
         {
             globalSave.endCheckpoint = serializer.NextRecord(globalSave.endCheckpoint);
             globalSaveDirty = true;
-            Debug.Log($"next checkpoint {globalSave.endCheckpoint}");
+            // Debug.Log($"next checkpoint {globalSave.endCheckpoint}");
         }
 
         public long NextRecord(long offset)
