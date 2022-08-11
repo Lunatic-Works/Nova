@@ -19,13 +19,11 @@ namespace Nova
         {
             public int index;
             public readonly DialogueDisplayData displayData;
-            public readonly VoiceEntries voices;
 
-            public LogEntryRestoreData(int index, DialogueDisplayData displayData, VoiceEntries voices)
+            public LogEntryRestoreData(DialogueDisplayData displayData, int index)
             {
-                this.index = index;
                 this.displayData = displayData;
-                this.voices = voices;
+                this.index = index;
             }
         }
 
@@ -37,10 +35,9 @@ namespace Nova
             public readonly long checkpointOffset;
             public readonly ReachedDialogueData dialogueData;
             public readonly DialogueDisplayData displayData;
-            public readonly VoiceEntries voices;
 
             public LogEntry(float height, float prefixHeight, long nodeOffset, long checkpointOffset,
-                ReachedDialogueData dialogueData, DialogueDisplayData displayData, VoiceEntries voices)
+                ReachedDialogueData dialogueData, DialogueDisplayData displayData)
             {
                 this.height = height;
                 this.prefixHeight = prefixHeight;
@@ -48,7 +45,6 @@ namespace Nova
                 this.checkpointOffset = checkpointOffset;
                 this.dialogueData = dialogueData;
                 this.displayData = displayData;
-                this.voices = voices;
             }
         }
 
@@ -132,17 +128,16 @@ namespace Nova
 
         private void OnDialogueChanged(DialogueChangedData data)
         {
-            var displayData = data.dialogueData.needInterpolate ? data.displayData : null;
-            if (displayData != null || data.voices != null)
+            if (data.dialogueData.needInterpolate)
             {
-                logEntriesRestoreData.Add(new LogEntryRestoreData(logEntries.Count, displayData, data.voices));
+                logEntriesRestoreData.Add(new LogEntryRestoreData(data.displayData, logEntries.Count));
             }
 
-            AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData, data.voices);
+            AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
         }
 
         private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
-            DialogueDisplayData displayData, VoiceEntries voices)
+            DialogueDisplayData displayData)
         {
             var text = displayData.FormatNameDialogue();
             if (string.IsNullOrEmpty(text))
@@ -154,8 +149,7 @@ namespace Nova
             var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
             var cnt = logEntries.Count;
             var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
-            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData,
-                displayData, voices));
+            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData, displayData));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
             {
@@ -230,15 +224,15 @@ namespace Nova
         public void ProvideData(Transform transform, int idx)
         {
             var logEntry = logEntries[idx];
+            var dialogueData = logEntry.dialogueData;
 
             UnityAction onGoBackButtonClicked = () =>
-                OnGoBackButtonClicked(logEntry.nodeOffset, logEntry.checkpointOffset,
-                    logEntry.dialogueData.dialogueIndex, idx);
+                OnGoBackButtonClicked(logEntry.nodeOffset, logEntry.checkpointOffset, dialogueData.dialogueIndex, idx);
 
             UnityAction onPlayVoiceButtonClicked = null;
-            if (logEntry.voices != null)
+            if (dialogueData.voices != null)
             {
-                onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(logEntry.voices);
+                onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(dialogueData.voices);
             }
 
             var logEntryController = transform.GetComponent<LogEntryController>();
@@ -387,13 +381,10 @@ namespace Nova
             {
                 var dialogueData = checkpointManager.GetReachedDialogueData(pos.nodeRecord.name, pos.dialogueIndex);
                 DialogueDisplayData displayData = null;
-                VoiceEntries voices = null;
 
                 if (logEntryRestoreData != null && logEntryRestoreData.index == logEntries.Count)
                 {
                     displayData = logEntryRestoreData.displayData;
-                    voices = logEntryRestoreData.voices;
-
                     ++i;
                     logEntryRestoreData = i < logEntriesRestoreData.Count ? logEntriesRestoreData[i] : null;
                 }
@@ -406,7 +397,7 @@ namespace Nova
                     displayData = entry.GetDisplayData();
                 }
 
-                AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData, displayData, voices);
+                AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData, displayData);
             }
         }
 
