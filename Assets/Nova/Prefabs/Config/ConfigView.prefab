@@ -2265,10 +2265,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   configKeyName: Language
   localeTogglePairs:
-  - locale: 40
-    toggle: {fileID: 3113775754192490846}
-  - locale: 10
-    toggle: {fileID: 3579187505117937497}
+    keys: 280000000a000000
+    values:
+    - {fileID: 3113775754192490846}
+    - {fileID: 3579187505117937497}
 --- !u!114 &5261073870142313223
 MonoBehaviour:
   m_ObjectHideFlags: 0
