@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: final
   displayNames:
-  - locale: 40
-    value: still
-  - locale: 10
-    value: still
+    keys: 280000000a000000
+    values:
+    - still
+    - still
   resourcePath: BGM/final
   loopBeginSample: 0
   loopEndSample: 4797632

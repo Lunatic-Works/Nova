@@ -1,3 +1,5 @@
+// https://github.com/azixMcAze/Unity-SerializableDictionary
+
 using System;
 using System.Collections;
 using System.Collections.Generic;

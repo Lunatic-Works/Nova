@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: xiben
   displayNames:
-  - locale: 40
-    value: "\u964DE\u5927\u8C03\u591C\u66F2"
-  - locale: 10
-    value: Nocturne in E-flat Major
+    keys: 280000000a000000
+    values:
+    - "\u964DE\u5927\u8C03\u591C\u66F2"
+    - Nocturne in E-flat Major
   resourcePath: BGM/xiben
   loopBeginSample: 0
   loopEndSample: 5977312

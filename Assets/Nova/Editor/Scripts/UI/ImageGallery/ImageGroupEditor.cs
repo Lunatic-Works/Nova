@@ -70,8 +70,7 @@ namespace Nova.Editor
                 return new ImageEntry
                 {
                     id = fileName,
-                    displayNames = new List<LocaleStringPair>
-                        {new LocaleStringPair { locale = I18n.DefaultLocale, value = fileName }},
+                    displayNames = new SerializableDictionary<SystemLanguage, string> {[I18n.DefaultLocale] = fileName},
                     resourcePath = GetResourcePath(imagePath)
                 };
             }).ToList();

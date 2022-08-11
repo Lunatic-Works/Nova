@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -9,7 +8,7 @@ namespace Nova
     public class ImageEntry
     {
         public string id;
-        public List<LocaleStringPair> displayNames;
+        public SerializableDictionary<SystemLanguage, string> displayNames;
         public bool composite;
         public string poseString;
         public string resourcePath;
@@ -18,15 +17,14 @@ namespace Nova
 
         public string GetDisplayName()
         {
-            foreach (var pair in displayNames)
+            if (displayNames.ContainsKey(I18n.CurrentLocale))
             {
-                if (pair.locale == I18n.CurrentLocale)
-                {
-                    return pair.value;
-                }
+                return displayNames[I18n.CurrentLocale];
             }
-
-            return "(No title)";
+            else
+            {
+                return "(No title)";
+            }
         }
 
         public string snapshotResourcePath => Path.Combine(
@@ -35,6 +33,7 @@ namespace Nova
             (composite ? id : Path.GetFileNameWithoutExtension(resourcePath)) + ".__snapshot"
         );
 
-        public string unlockKey => Utils.ConvertPathSeparator(composite ? Path.Combine(resourcePath, poseString) : resourcePath);
+        public string unlockKey =>
+            Utils.ConvertPathSeparator(composite ? Path.Combine(resourcePath, poseString) : resourcePath);
     }
 }

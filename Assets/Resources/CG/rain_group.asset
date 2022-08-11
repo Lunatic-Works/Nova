@@ -15,8 +15,9 @@ MonoBehaviour:
   entries:
   - id: rain
     displayNames:
-    - locale: 40
-      value: rain
+      keys: 28000000
+      values:
+      - rain
     composite: 1
     poseString: rain_back
     resourcePath: CG
@@ -24,8 +25,9 @@ MonoBehaviour:
     snapshotScale: {x: 1, y: 1}
   - id: rain_text
     displayNames:
-    - locale: 40
-      value: rain_text
+      keys: 28000000
+      values:
+      - rain_text
     composite: 1
     poseString: rain_back+rain_text
     resourcePath: CG

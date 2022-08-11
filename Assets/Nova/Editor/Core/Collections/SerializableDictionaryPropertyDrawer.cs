@@ -1,3 +1,5 @@
+// https://github.com/azixMcAze/Unity-SerializableDictionary
+
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
