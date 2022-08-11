@@ -2733,13 +2733,17 @@ MonoBehaviour:
   - locale: 40
     fontAsset: {fileID: 11400000, guid: 06b54290bbba6437bbe1ce3d2767fdb1, type: 2}
     materials:
-    - name: outline
-      material: {fileID: 2100000, guid: 5b5059fbfab8e3340a479d48afa3c9ab, type: 2}
+      keys:
+      - outline
+      values:
+      - {fileID: 2100000, guid: 5b5059fbfab8e3340a479d48afa3c9ab, type: 2}
   - locale: 10
     fontAsset: {fileID: 11400000, guid: 224d1ec448c92dc428ff88f37d4fed71, type: 2}
     materials:
-    - name: outline
-      material: {fileID: 2100000, guid: 56c5a34fab6b3084d9b00b8bbc0dbe52, type: 2}
+      keys:
+      - outline
+      values:
+      - {fileID: 2100000, guid: 56c5a34fab6b3084d9b00b8bbc0dbe52, type: 2}
 --- !u!114 &922924605
 MonoBehaviour:
   m_ObjectHideFlags: 0
