@@ -37,16 +37,17 @@ namespace Nova.Editor
         private static string GetCommonPrefix(IEnumerable<string> paths)
         {
             var fileNames = paths.Select(Path.GetFileNameWithoutExtension).ToList();
-            var prefix = fileNames.First()
-                .Substring(0, fileNames.Min(s => s.Length))
-                .TakeWhile((c, i) => fileNames.All(s => s[i] == c))
-                .ToString();
+            var prefix = string.Join("",
+                fileNames.First()
+                    .Substring(0, fileNames.Min(s => s.Length))
+                    .TakeWhile((c, i) => fileNames.All(s => s[i] == c))
+            );
 
             prefix = prefix.TrimEnd('_');
 
             if (prefix.Length == 0)
             {
-                prefix = fileNames.OrderBy(s => s).First();
+                prefix = fileNames.Min();
             }
 
             return prefix;
