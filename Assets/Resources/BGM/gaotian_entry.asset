@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: gaotian
   displayNames:
-  - locale: 40
-    value: "A\u5C0F\u8C03\u534E\u5C14\u5179"
-  - locale: 10
-    value: Waltz in A Minor
+    keys: 280000000a000000
+    values:
+    - "A\u5C0F\u8C03\u534E\u5C14\u5179"
+    - Waltz in A Minor
   resourcePath: BGM/gaotian
   loopBeginSample: 0
   loopEndSample: 2063534

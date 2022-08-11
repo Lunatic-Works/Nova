@@ -299,8 +299,7 @@ namespace Nova.Editor
             }
 
             entry.id = fileName;
-            entry.displayNames = new List<LocaleStringPair>
-                {new LocaleStringPair { locale = I18n.DefaultLocale, value = fileName }};
+            entry.displayNames = new SerializableDictionary<SystemLanguage, string> {[I18n.DefaultLocale] = fileName};
             entry.resourcePath = Utils.ConvertPathSeparator(loadPath);
 
             // get loopBeginSample and loopEndSample from audio clips

@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: prelude
   displayNames:
-  - locale: 40
-    value: "C\u5927\u8C03\u524D\u594F\u66F2"
-  - locale: 10
-    value: Prelude in C Major
+    keys: 280000000a000000
+    values:
+    - "C\u5927\u8C03\u524D\u594F\u66F2"
+    - Prelude in C Major
   resourcePath: BGM/prelude
   loopBeginSample: 0
   loopEndSample: 4167099
