@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,13 +28,6 @@ namespace Nova
     }
 
     // Used in editor
-    [Serializable]
-    public class LocaleFloatPair
-    {
-        public SystemLanguage locale;
-        public float value;
-    }
-
     [Serializable]
     public class LocaleStringPair
     {

@@ -207,8 +207,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   configKeyName: FontSize
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &2069780267694724769
 MonoBehaviour:
   m_ObjectHideFlags: 0

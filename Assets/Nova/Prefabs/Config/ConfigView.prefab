@@ -2938,8 +2938,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &1128037462771719209
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3088,8 +3089,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &1601033573849535167
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3328,8 +3330,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &4302047356483401325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3492,8 +3495,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &2857735723999406749
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3762,8 +3766,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &7243503522299934207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3925,8 +3930,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &8506923708080737120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4200,8 +4206,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &8560199542238575203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4351,8 +4358,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &6879802562381602335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4515,8 +4523,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &3113775754578294774
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4906,8 +4915,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.65
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &3113775755100286050
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5181,8 +5191,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &3113775755252275281
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5324,8 +5335,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &3113775755271597953
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5599,8 +5611,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.7
 --- !u!1001 &3113775755398293879
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5874,8 +5887,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &3113775755586496336
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6025,8 +6039,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &3113775755772962795
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6155,8 +6170,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.65
+    keys: 0a000000
+    values:
+    - 0.65
 --- !u!114 &4302047356483401321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6306,8 +6322,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &2886203118188930355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6457,8 +6474,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &6412677015144040463
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6608,8 +6626,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &4925729185374494362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6756,8 +6775,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!114 &4786485131672455520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7489,8 +7509,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &6376483229351614726
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7640,8 +7661,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &6446363588333081849
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8005,8 +8027,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &7290282869854942619
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8162,8 +8185,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
 --- !u!1001 &8807646373870762872
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8319,5 +8343,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multipliers:
-  - locale: 10
-    value: 0.75
+    keys: 0a000000
+    values:
+    - 0.75
