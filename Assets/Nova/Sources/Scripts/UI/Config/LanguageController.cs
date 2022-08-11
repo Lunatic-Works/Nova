@@ -14,11 +14,7 @@ namespace Nova
         {
             configManager = Utils.FindNovaGameController().ConfigManager;
             var localeInt = configManager.GetInt(configKeyName);
-            if (localeInt < 0)
-            {
-                configManager.SetInt(configKeyName, (int)I18n.CurrentLocale);
-            }
-            else
+            if (localeInt >= 0)
             {
                 I18n.CurrentLocale = (SystemLanguage)localeInt;
             }
@@ -42,11 +38,11 @@ namespace Nova
         {
             if (!value) return;
             I18n.CurrentLocale = locale;
-            configManager.SetInt(configKeyName, (int)locale);
         }
 
         private void OnLocaleChanged()
         {
+            configManager.SetInt(configKeyName, (int)I18n.CurrentLocale);
             foreach (var pair in localeTogglePairs)
             {
                 pair.Value.SetIsOnWithoutNotify(pair.Key == I18n.CurrentLocale);

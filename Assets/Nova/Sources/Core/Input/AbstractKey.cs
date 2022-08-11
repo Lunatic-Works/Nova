@@ -17,6 +17,7 @@ namespace Nova
         ReturnTitle,
         QuitGame,
         ToggleFullScreen,
+        SwitchLanguage,
         LeaveView,
         EditorBackward,
         EditorBeginChapter,

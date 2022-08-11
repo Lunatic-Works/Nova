@@ -59,6 +59,7 @@
   "config.key.ShowConfig": "设置",
   "config.key.ShowLog": "文本回顾",
   "config.key.StepForward": "下一句",
+  "config.key.SwitchLanguage": "切换语言",
   "config.key.ToggleDialogue": "隐藏/显示对话框",
   "config.key.ToggleFullScreen": "全屏显示",
   "config.quitgame": "退出游戏",
