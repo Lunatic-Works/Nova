@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Nova
 {
@@ -33,12 +32,5 @@ namespace Nova
     {
         public SystemLanguage locale;
         public string value;
-    }
-
-    [Serializable]
-    public class LocaleTogglePair
-    {
-        public SystemLanguage locale;
-        public Toggle toggle;
     }
 }
