@@ -20,19 +20,16 @@ namespace Nova
         public readonly long checkpointOffset;
         public readonly ReachedDialogueData dialogueData;
         public readonly DialogueDisplayData displayData;
-        public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
         public readonly bool isReached;
         public readonly bool isReachedAnyHistory;
 
         public DialogueChangedData(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
-            DialogueDisplayData displayData, IReadOnlyDictionary<string, VoiceEntry> voices, bool isReached,
-            bool isReachedAnyHistory)
+            DialogueDisplayData displayData, bool isReached, bool isReachedAnyHistory)
         {
             this.nodeRecord = nodeRecord;
             this.checkpointOffset = checkpointOffset;
             this.dialogueData = dialogueData;
             this.displayData = displayData;
-            this.voices = voices;
             this.isReached = isReached;
             this.isReachedAnyHistory = isReachedAnyHistory;
         }
@@ -72,7 +69,8 @@ namespace Nova
             }
 
             public Selection(string text, BranchImageInformation imageInfo, bool active) : this(
-                new Dictionary<SystemLanguage, string> {[I18n.DefaultLocale] = text}, imageInfo, active) { }
+                new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text }, imageInfo, active)
+            { }
         }
 
         public readonly IReadOnlyList<Selection> selections;
@@ -411,16 +409,15 @@ namespace Nova
                 while (actionPauseLock.isLocked) yield return null;
             }
 
-            DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped, out var isReached, out var isReachedAnyHistory,
-                out var dialogueData);
+            var isReached = DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped);
             dialogueWillChange.Invoke(new DialogueWillChangeData());
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
-            var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
+            var isReachedAnyHistory = DialogueSaveReachedData(out var dialogueData);
             var dialogueChangedData = new DialogueChangedData(nodeRecord, checkpointOffset, dialogueData,
-                currentDialogueEntry.GetDisplayData(), voices, isReached, isReachedAnyHistory);
+                currentDialogueEntry.GetDisplayData(), isReached, isReachedAnyHistory);
             dialogueChangedEarly.Invoke(dialogueChangedData);
             dialogueChanged.Invoke(dialogueChangedData);
 
@@ -461,8 +458,7 @@ namespace Nova
             }
         }
 
-        private void DialogueSaveCheckpoint(bool firstEntryOfNode, bool dialogueStepped, out bool isReached,
-            out bool isReachedAnyHistory, out ReachedDialogueData dialogueData)
+        private bool DialogueSaveCheckpoint(bool firstEntryOfNode, bool dialogueStepped)
         {
             if (!firstEntryOfNode && dialogueStepped)
             {
@@ -474,20 +470,7 @@ namespace Nova
                 AppendSameNode();
             }
 
-            isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
-
-            if (!isReachedAnyHistory)
-            {
-                dialogueData = new ReachedDialogueData(currentNode.name, currentIndex,
-                    currentDialogueEntry.NeedInterpolate());
-                checkpointManager.SetReached(dialogueData);
-            }
-            else
-            {
-                dialogueData = checkpointManager.GetReachedDialogueData(currentNode.name, currentIndex);
-            }
-
-            isReached = currentIndex < nodeRecord.endDialogue;
+            var isReached = currentIndex < nodeRecord.endDialogue;
             if (shouldSaveCheckpoint)
             {
                 stepNumFromLastCheckpoint = 0;
@@ -506,6 +489,27 @@ namespace Nova
 
             // As the action for this dialogue will be re-run, it's fine to just reset forceCheckpoint to false
             forceCheckpoint = false;
+
+            return isReached;
+        }
+
+        private bool DialogueSaveReachedData(out ReachedDialogueData dialogueData)
+        {
+            var isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
+
+            if (!isReachedAnyHistory)
+            {
+                var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
+                dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, voices,
+                    currentDialogueEntry.NeedInterpolate());
+                checkpointManager.SetReached(dialogueData);
+            }
+            else
+            {
+                dialogueData = checkpointManager.GetReachedDialogueData(currentNode.name, currentIndex);
+            }
+
+            return isReachedAnyHistory;
         }
 
         private void StepAtEndOfNode(Action onFinish)
@@ -812,8 +816,7 @@ namespace Nova
         }
 
         private bool shouldSaveCheckpoint => forceCheckpoint ||
-                                             (!checkpointRestrained && stepNumFromLastCheckpoint >=
-                                                 maxStepNumFromLastCheckpoint);
+            (!checkpointRestrained && stepNumFromLastCheckpoint >= maxStepNumFromLastCheckpoint);
 
         /// <summary>
         /// Force to get the current game state as a checkpoint
