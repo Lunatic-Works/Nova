@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,13 +5,13 @@ namespace Nova
 {
     public class I18nImage : MonoBehaviour
     {
-        public List<LocaleSpritePair> sprites;
+        public SerializableDictionary<SystemLanguage, Sprite> sprites;
         public SerializableDictionary<SystemLanguage, float> multipliers;
 
         private Image image;
         private Sprite defaultSprite;
         private RectTransform rectTransform;
-        private float scale;
+        private float defaultScale;
 
         private void Awake()
         {
@@ -20,34 +19,27 @@ namespace Nova
             this.RuntimeAssert(image != null, "Missing Image.");
             defaultSprite = image.sprite;
             rectTransform = GetComponent<RectTransform>();
-            scale = rectTransform.localScale.x;
+            defaultScale = rectTransform.localScale.x;
         }
 
         private void UpdateImage()
         {
-            bool found = false;
-            foreach (var pair in sprites)
+            if (sprites.ContainsKey(I18n.CurrentLocale))
             {
-                if (pair.locale == I18n.CurrentLocale)
-                {
-                    image.sprite = pair.sprite;
-                    found = true;
-                    break;
-                }
+                image.sprite = sprites[I18n.CurrentLocale];
             }
-
-            if (!found)
+            else
             {
                 image.sprite = defaultSprite;
             }
 
-            float _scale = scale;
+            float scale = defaultScale;
             if (multipliers.ContainsKey(I18n.CurrentLocale))
             {
-                _scale *= multipliers[I18n.CurrentLocale];
+                scale *= multipliers[I18n.CurrentLocale];
             }
 
-            rectTransform.localScale = new Vector3(_scale, _scale, 1.0f);
+            rectTransform.localScale = new Vector3(scale, scale, 1.0f);
         }
 
         private void OnEnable()

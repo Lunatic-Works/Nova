@@ -36,13 +36,6 @@ namespace Nova
     }
 
     [Serializable]
-    public class LocaleSpritePair
-    {
-        public SystemLanguage locale;
-        public Sprite sprite;
-    }
-
-    [Serializable]
     public class LocaleTogglePair
     {
         public SystemLanguage locale;
