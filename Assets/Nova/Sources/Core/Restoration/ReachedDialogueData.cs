@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nova
 {
-    using VoiceEntries = IReadOnlyDictionary<string, VoiceEntry>;
+    using VoiceEntries = Dictionary<string, VoiceEntry>;
 
     public readonly struct ReachedDialoguePosition
     {

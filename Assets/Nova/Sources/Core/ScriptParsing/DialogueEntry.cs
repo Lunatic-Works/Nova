@@ -19,11 +19,11 @@ namespace Nova
     [Serializable]
     public class DialogueDisplayData
     {
-        public readonly IReadOnlyDictionary<SystemLanguage, string> displayNames;
-        public readonly IReadOnlyDictionary<SystemLanguage, string> dialogues;
+        public readonly Dictionary<SystemLanguage, string> displayNames;
+        public readonly Dictionary<SystemLanguage, string> dialogues;
 
-        public DialogueDisplayData(IReadOnlyDictionary<SystemLanguage, string> displayNames,
-            IReadOnlyDictionary<SystemLanguage, string> dialogues)
+        public DialogueDisplayData(Dictionary<SystemLanguage, string> displayNames,
+            Dictionary<SystemLanguage, string> dialogues)
         {
             this.displayNames = displayNames;
             this.dialogues = dialogues;
@@ -73,8 +73,8 @@ namespace Nova
             Dictionary<DialogueActionStage, LuaFunction> actions)
         {
             this.characterName = characterName;
-            displayNames = new Dictionary<SystemLanguage, string> {[I18n.DefaultLocale] = displayName};
-            dialogues = new Dictionary<SystemLanguage, string> {[I18n.DefaultLocale] = dialogue};
+            displayNames = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = displayName };
+            dialogues = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = dialogue };
             this.actions = actions;
         }
 
