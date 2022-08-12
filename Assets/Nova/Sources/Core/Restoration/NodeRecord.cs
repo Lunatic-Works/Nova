@@ -10,7 +10,7 @@ namespace Nova
         public readonly long offset;
         public long parent;
         public long child;
-        public long brother;
+        public long sibling; // please use more gender neutral names
         public readonly int beginDialogue;
         public int endDialogue;
         public int lastCheckpointDialogue;
@@ -25,7 +25,7 @@ namespace Nova
             var segment = new ByteSegment(buf);
             segment.WriteLong(0, parent);
             segment.WriteLong(8, child);
-            segment.WriteLong(16, brother);
+            segment.WriteLong(16, sibling);
             segment.WriteInt(24, beginDialogue);
             segment.WriteInt(28, endDialogue);
             segment.WriteInt(32, lastCheckpointDialogue);
@@ -49,7 +49,7 @@ namespace Nova
             this.offset = offset;
             parent = segment.ReadLong(0);
             child = segment.ReadLong(8);
-            brother = segment.ReadLong(16);
+            sibling = segment.ReadLong(16);
             beginDialogue = segment.ReadInt(24);
             endDialogue = segment.ReadInt(28);
             lastCheckpointDialogue = segment.ReadInt(32);

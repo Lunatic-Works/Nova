@@ -465,7 +465,8 @@ namespace Nova
                 stepNumFromLastCheckpoint++;
             }
 
-            if (currentIndex >= nodeRecord.endDialogue && !checkpointManager.CanAppendCheckpoint(checkpointOffset))
+            if (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
+                !checkpointManager.CanAppendCheckpoint(checkpointOffset))
             {
                 AppendSameNode();
             }
@@ -808,15 +809,15 @@ namespace Nova
         /// <remarks>
         /// Modified by DialogueSaveCheckpoint(), EnsureCheckpointOnNextDialogue() and RestoreCheckpoint()
         /// </remarks>
-        private bool forceCheckpoint = false;
+        private bool forceCheckpoint;
 
         public void EnsureCheckpointOnNextDialogue()
         {
             forceCheckpoint = true;
         }
 
-        private bool shouldSaveCheckpoint => forceCheckpoint ||
-            (!checkpointRestrained && stepNumFromLastCheckpoint >= maxStepNumFromLastCheckpoint);
+        private bool shouldSaveCheckpoint =>
+            forceCheckpoint || (!checkpointRestrained && stepNumFromLastCheckpoint >= maxStepNumFromLastCheckpoint);
 
         /// <summary>
         /// Force to get the current game state as a checkpoint

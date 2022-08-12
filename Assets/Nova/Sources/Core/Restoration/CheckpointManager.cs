@@ -153,14 +153,14 @@ namespace Nova
                     return record;
                 }
 
-                offset = record.brother;
+                offset = record.sibling;
             }
 
             offset = globalSave.endCheckpoint;
             var newRecord = new NodeRecord(offset, name, beginDialogue, variableHash);
             if (record != null)
             {
-                record.brother = offset;
+                record.sibling = offset;
                 serializer.UpdateNodeRecord(record);
             }
             else if (prevRecord != null)
