@@ -12,7 +12,7 @@ namespace Nova
         public readonly long nodeOffset;
         public readonly long checkpointOffset;
         public readonly int dialogueIndex;
-        public string description;
+        public DialogueDisplayData description;
         public readonly DateTime creationTime = DateTime.Now;
         public long globalSaveIdentifier;
 

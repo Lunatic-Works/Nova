@@ -149,7 +149,8 @@ namespace Nova
             var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
             var cnt = logEntries.Count;
             var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
-            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData, displayData));
+            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData,
+                displayData));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
             {
