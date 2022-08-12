@@ -16,21 +16,32 @@ namespace Nova
         public GameObject playButton;
         public GameObject pauseButton;
 
-        public bool isPlaying { get; private set; }
+        private bool isPlaying;
+
+        private void UpdateText()
+        {
+            if (currentMusic == null)
+            {
+                titleLabel.text = I18n.__("musicgallery.title");
+            }
+            else
+            {
+                titleLabel.text = currentMusic.GetDisplayName();
+            }
+        }
 
         private void ApplyInvalidMusicEntry()
         {
             audioSource.clip = null;
-            titleLabel.text = I18n.__("musicgallery.title");
+            UpdateText();
             progressBar.Init();
             progressBar.interactable = false;
         }
 
-        private void ApplyMusicEntry(MusicEntry music)
+        private void ApplyMusicEntry()
         {
-            Assert.IsNotNull(music);
-            audioSource.clip = AssetLoader.Load<AudioClip>(music.resourcePath);
-            titleLabel.text = music.GetDisplayName();
+            audioSource.clip = AssetLoader.Load<AudioClip>(currentMusic.resourcePath);
+            UpdateText();
             progressBar.Init();
             progressBar.interactable = true;
         }
@@ -70,6 +81,12 @@ namespace Nova
         private void OnEnable()
         {
             Refresh();
+            I18n.LocaleChanged.AddListener(UpdateText);
+        }
+
+        private void OnDisable()
+        {
+            I18n.LocaleChanged.RemoveListener(UpdateText);
         }
 
         private void Refresh()
@@ -83,7 +100,7 @@ namespace Nova
             }
             else
             {
-                ApplyMusicEntry(currentMusic);
+                ApplyMusicEntry();
             }
         }
 
@@ -143,13 +160,9 @@ namespace Nova
         private void Update()
         {
             if (audioSource.isPlaying == isPlaying) return;
-
-            // Out of sync with the underlying AudioSource
-            // Play the next music in musicList
             Assert.IsTrue(isPlaying);
-
-            // Out of sync also happens when the application loses focus
-            // Check the time to ensure the clip has finished playing
+            // Out of sync happens when the clip finishes playing, or the application loses focus
+            // Check the time to ensure that the clip finishes playing
             if (audioSource.time < float.Epsilon || Mathf.Approximately(audioSource.time, audioSource.clip.length))
             {
                 Step();
