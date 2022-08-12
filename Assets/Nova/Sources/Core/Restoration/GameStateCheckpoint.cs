@@ -18,10 +18,10 @@ namespace Nova
     {
         public readonly int dialogueIndex;
         public readonly int stepsCheckpointRestrained;
-        public readonly IReadOnlyDictionary<string, IRestoreData> restoreDatas;
+        public readonly Dictionary<string, IRestoreData> restoreDatas;
         public readonly Variables variables;
 
-        public GameStateCheckpoint(int dialogueIndex, IReadOnlyDictionary<string, IRestoreData> restoreDatas,
+        public GameStateCheckpoint(int dialogueIndex, Dictionary<string, IRestoreData> restoreDatas,
             Variables variables, int stepsCheckpointRestrained)
         {
             this.dialogueIndex = dialogueIndex;
