@@ -184,12 +184,7 @@ namespace Nova
                 catch (Exception e)
                 {
                     Debug.LogError($"Nova: Cannot load global save file.\n{e.Message}");
-                    Alert.Show(
-                        null,
-                        I18n.__("bookmark.load.globalfail"),
-                        ResetGlobalSave,
-                        Utils.Quit
-                    );
+                    Alert.Show(null, "bookmark.load.globalfail", ResetGlobalSave, Utils.Quit);
                 }
             }
             else

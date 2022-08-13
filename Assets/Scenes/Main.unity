@@ -1467,7 +1467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myPanel: {fileID: 1113146313}
-  notificationPrefab: {fileID: 1645968591548162, guid: f7118a26e1561a04f80a159e81a01266, type: 3}
+  notificationPrefab: {fileID: 6549840329675320612, guid: f7118a26e1561a04f80a159e81a01266, type: 3}
   notificationTimePerChar: 0.05
   notificationTimeOffset: 1
   notificationDropSpeed: 500

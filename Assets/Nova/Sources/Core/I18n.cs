@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,6 +19,8 @@ namespace Nova
     // __("ivebeenthere", 2) == "I've been there twice"
     // __("ivebeenthere", 4) == "I've been there 4 times"
     using TranslationBundle = Dictionary<string, object>;
+
+    using LocalizedStrings = IReadOnlyDictionary<SystemLanguage, string>;
 
     [ExportCustomType]
     public static class I18n
@@ -114,7 +117,7 @@ namespace Nova
         /// <param name="args">Arguments to provide to the translation as a format string.<para />
         /// The first argument will be used to determine the quantity if needed.</param>
         /// <returns>The translated string.</returns>
-        public static string __(SystemLanguage locale, string key, params object[] args)
+        private static string __(SystemLanguage locale, string key, params object[] args)
         {
 #if UNITY_EDITOR
             EditorOnly_GetLatestTranslation();
@@ -174,7 +177,7 @@ namespace Nova
         }
 
         // Get localized string with fallback to DefaultLocale
-        public static string __(IReadOnlyDictionary<SystemLanguage, string> dict)
+        public static string __(LocalizedStrings dict)
         {
             if (dict.ContainsKey(CurrentLocale))
             {
@@ -186,8 +189,14 @@ namespace Nova
             }
         }
 
+        public static LocalizedStrings GetLocalizedStrings(string key, params object[] args)
+        {
+            return SupportedLocales.ToDictionary(x => x, x => __(x, key, args));
+        }
+
 #if UNITY_EDITOR
-        private static string EditorTranslationPath => "Assets/Nova/Resources/" + LocalizedStringsPath + CurrentLocale + ".json";
+        private static string EditorTranslationPath =>
+            "Assets/Nova/Resources/" + LocalizedStringsPath + CurrentLocale + ".json";
 
         private static DateTime LastWriteTime;
 

@@ -72,26 +72,22 @@ namespace Nova
             }
             else
             {
-                Alert.Show(
-                    null,
-                    I18n.__("ingame.title.confirm"),
-                    _returnTitle,
-                    null,
-                    "ReturnTitle"
-                );
+                Alert.Show(null, "ingame.title.confirm", _returnTitle, null, "ReturnTitle");
             }
+        }
+
+        private void _resetDefault()
+        {
+            configManager.ResetDefault();
+            configManager.Apply();
+            inputMappingController.ResetDefault();
+            inputMappingController.Apply();
+            I18n.CurrentLocale = Application.systemLanguage;
         }
 
         private void ResetDefault()
         {
-            Alert.Show(null, I18n.__("config.alert.resetdefault"), () =>
-            {
-                configManager.ResetDefault();
-                inputMappingController.ResetDefault();
-                configManager.Apply();
-                inputMappingController.Apply();
-                I18n.CurrentLocale = Application.systemLanguage;
-            });
+            Alert.Show(null, "config.alert.resetdefault", _resetDefault);
         }
 
         private void _resetAlerts()
@@ -112,7 +108,7 @@ namespace Nova
 
         private void ResetAlerts()
         {
-            Alert.Show(null, I18n.__("config.alert.resetalerts"), _resetAlerts);
+            Alert.Show(null, "config.alert.resetalerts", _resetAlerts);
         }
 
         // No alert for restore and apply

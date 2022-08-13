@@ -75,13 +75,13 @@ namespace Nova
 
                 File.Delete(oldPath);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // If there is some problem with Alert.Show, we need to avoid infinite recursion
                 if (alertOnSafeWriteFail)
                 {
                     alertOnSafeWriteFail = false;
-                    Alert.Show(I18n.__("bookmark.save.fail"), e.Message);
+                    Alert.Show(null, "bookmark.save.fail");
                 }
 
                 throw;

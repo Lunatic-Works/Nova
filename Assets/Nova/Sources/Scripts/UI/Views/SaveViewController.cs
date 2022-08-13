@@ -329,7 +329,7 @@ namespace Nova
         {
             Alert.Show(
                 null,
-                I18n.__("bookmark.overwrite.confirm", SaveIDToDisplayID(saveID)),
+                I18n.GetLocalizedStrings("bookmark.overwrite.confirm", SaveIDToDisplayID(saveID)),
                 () => _saveBookmark(saveID),
                 null,
                 "BookmarkOverwrite"
@@ -355,14 +355,14 @@ namespace Nova
 
             Hide();
             viewManager.TryPlaySound(loadActionSound);
-            Alert.Show(I18n.__("bookmark.load.complete"));
+            Alert.Show("bookmark.load.complete");
         }
 
         private void LoadBookmark(int saveID)
         {
             Alert.Show(
                 null,
-                I18n.__("bookmark.load.confirm", SaveIDToDisplayID(saveID)),
+                I18n.GetLocalizedStrings("bookmark.load.confirm", SaveIDToDisplayID(saveID)),
                 () => _loadBookmark(saveID),
                 null,
                 "BookmarkLoad"
@@ -383,7 +383,7 @@ namespace Nova
         {
             Alert.Show(
                 null,
-                I18n.__("bookmark.delete.confirm", SaveIDToDisplayID(saveID)),
+                I18n.GetLocalizedStrings("bookmark.delete.confirm", SaveIDToDisplayID(saveID)),
                 () => _deleteBookmark(saveID),
                 null,
                 "BookmarkDelete"
@@ -417,18 +417,12 @@ namespace Nova
         {
             _autoSaveBookmark((int)BookmarkType.QuickSave, I18n.__("bookmark.quicksave.page"));
             viewManager.TryPlaySound(saveActionSound);
-            Alert.Show(I18n.__("bookmark.quicksave.complete"));
+            Alert.Show("bookmark.quicksave.complete");
         }
 
         public void QuickSaveBookmark()
         {
-            Alert.Show(
-                null,
-                I18n.__("bookmark.quicksave.confirm"),
-                _quickSaveBookmark,
-                null,
-                "BookmarkQuickSave"
-            );
+            Alert.Show(null, "bookmark.quicksave.confirm", _quickSaveBookmark, null, "BookmarkQuickSave");
         }
 
         private void _quickLoadBookmark()
@@ -445,7 +439,7 @@ namespace Nova
             gameState.LoadBookmark(bookmark);
 
             viewManager.TryPlaySound(loadActionSound);
-            Alert.Show(I18n.__("bookmark.load.complete"));
+            Alert.Show("bookmark.load.complete");
         }
 
         public void QuickLoadBookmark()
@@ -453,17 +447,11 @@ namespace Nova
             if (checkpointManager.saveSlotsMetadata.Values.Any(m =>
                     m.saveID >= (int)BookmarkType.QuickSave && m.saveID < (int)BookmarkType.QuickSave + maxSaveEntry))
             {
-                Alert.Show(
-                    null,
-                    I18n.__("bookmark.quickload.confirm"),
-                    _quickLoadBookmark,
-                    null,
-                    "BookmarkQuickLoad"
-                );
+                Alert.Show(null, "bookmark.quickload.confirm", _quickLoadBookmark, null, "BookmarkQuickLoad");
             }
             else
             {
-                Alert.Show(null, I18n.__("bookmark.quickload.nosave"));
+                Alert.Show(null, "bookmark.quickload.nosave");
             }
         }
 

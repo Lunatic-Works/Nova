@@ -295,13 +295,7 @@ namespace Nova
 
         public static void QuitWithConfirm()
         {
-            Alert.Show(
-                null,
-                I18n.__("ingame.quit.confirm"),
-                Quit,
-                null,
-                "QuitConfirm"
-            );
+            Alert.Show(null, "ingame.quit.confirm", Quit, null, "QuitConfirm");
         }
 
         public static bool ForceQuit = false;

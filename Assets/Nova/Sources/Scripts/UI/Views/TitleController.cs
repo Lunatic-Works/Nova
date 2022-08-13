@@ -61,7 +61,7 @@ namespace Nova
                         .Count(name => checkpointManager.IsReachedAnyHistory(name, 0));
                     if (unlockedChapterCount == 1 && reachedChapterCount > 1)
                     {
-                        Alert.Show(I18n.__("title.first.selectchapter"));
+                        Alert.Show("title.first.selectchapter");
                         configManager.SetInt(SelectChapterFirstShownKey, 1);
                     }
                 }
