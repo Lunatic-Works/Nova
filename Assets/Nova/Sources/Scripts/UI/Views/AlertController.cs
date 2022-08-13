@@ -25,6 +25,15 @@ namespace Nova
             ignoreToggle = myPanel.transform.Find("Background/Ignore").GetComponent<Toggle>();
 
             configManager = Utils.FindNovaGameController().ConfigManager;
+
+            I18n.LocaleChanged.AddListener(UpdateText);
+        }
+
+        protected void OnDestroy()
+        {
+            base.OnDestroy();
+
+            I18n.LocaleChanged.RemoveListener(UpdateText);
         }
 
         public void Alert(AlertParameters param)
@@ -93,17 +102,6 @@ namespace Nova
             }
 
             contentText.text = I18n.__(param.content);
-        }
-
-        private void OnEnable()
-        {
-            UpdateText();
-            I18n.LocaleChanged.AddListener(UpdateText);
-        }
-
-        private void OnDisable()
-        {
-            I18n.LocaleChanged.RemoveListener(UpdateText);
         }
 
         protected override void BackHide()
