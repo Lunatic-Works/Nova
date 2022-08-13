@@ -19,7 +19,6 @@ namespace Nova
     // __("ivebeenthere", 2) == "I've been there twice"
     // __("ivebeenthere", 4) == "I've been there 4 times"
     using TranslationBundle = Dictionary<string, object>;
-
     using LocalizedStrings = IReadOnlyDictionary<SystemLanguage, string>;
 
     [ExportCustomType]

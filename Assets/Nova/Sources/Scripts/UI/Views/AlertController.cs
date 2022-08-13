@@ -29,7 +29,7 @@ namespace Nova
             I18n.LocaleChanged.AddListener(UpdateText);
         }
 
-        protected void OnDestroy()
+        protected override void OnDestroy()
         {
             base.OnDestroy();
 
