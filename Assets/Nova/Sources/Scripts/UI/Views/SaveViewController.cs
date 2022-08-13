@@ -161,6 +161,8 @@ namespace Nova
 
             gameState.nodeChanged.AddListener(OnNodeChanged);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
+
+            I18n.LocaleChanged.AddListener(Refresh);
         }
 
         protected override void Start()
@@ -185,6 +187,8 @@ namespace Nova
 
             gameState.nodeChanged.RemoveListener(OnNodeChanged);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
+
+            I18n.LocaleChanged.RemoveListener(Refresh);
         }
 
         private void OnNodeChanged(NodeChangedData nodeChangedData)
@@ -315,7 +319,7 @@ namespace Nova
         private void _saveBookmark(int saveID)
         {
             var bookmark = gameState.GetBookmark();
-            bookmark.description = currentDialogue.FormatNameDialogue();
+            bookmark.description = currentDialogue;
             bookmark.screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
             checkpointManager.SaveBookmark(saveID, bookmark);
@@ -393,7 +397,7 @@ namespace Nova
         private void _autoSaveBookmark(int beginSaveID, string tagText)
         {
             var bookmark = gameState.GetBookmark();
-            bookmark.description = currentDialogue.FormatNameDialogue();
+            bookmark.description = currentDialogue;
             var texture = ScreenCapturer.GetBookmarkThumbnailTexture();
             bookmark.screenshot = texture;
 
@@ -587,7 +591,7 @@ namespace Nova
                     "bookmark.summary",
                     checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
                     displayName,
-                    bookmark.description
+                    bookmark.description.FormatNameDialogue()
                 ));
             }
             catch (Exception e)
@@ -764,6 +768,17 @@ namespace Nova
             }
 
             previewEntry.mode = saveViewMode;
+        }
+
+        private void Refresh()
+        {
+            if (previewEntry == null)
+            {
+                return;
+            }
+
+            ShowPage();
+            selectedSaveID = selectedSaveID;
         }
 
         #endregion

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,7 +44,7 @@ namespace Nova
 
         public readonly ulong nodeHistoryHash;
         public readonly int dialogueIndex;
-        public string description;
+        public DialogueDisplayData description;
         public readonly DateTime creationTime = DateTime.Now;
         public long globalSaveIdentifier;
 
@@ -238,7 +238,8 @@ namespace Nova
             nodeHistory.interrupts.Clear();
             foreach (var pair in data.interrupts)
             {
-                nodeHistory.interrupts[pair.Key] = new SortedDictionary<int, ulong>((IDictionary<int, ulong>)pair.Value);
+                nodeHistory.interrupts[pair.Key] =
+                    new SortedDictionary<int, ulong>((IDictionary<int, ulong>)pair.Value);
             }
         }
 
