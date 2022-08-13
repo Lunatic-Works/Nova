@@ -324,7 +324,7 @@ namespace Nova
                 }
                 else if (clicks == HintAbortAnimationClicks)
                 {
-                    Alert.Show(I18n.__("dialogue.hint.clickstopanimation"));
+                    Alert.Show("dialogue.hint.clickstopanimation");
                     configManager.SetInt(AbortAnimationFirstShownKey, clicks + 1);
                 }
 
@@ -350,13 +350,7 @@ namespace Nova
 
         private void ReturnTitle()
         {
-            Alert.Show(
-                null,
-                I18n.__("ingame.title.confirm"),
-                _returnTitle,
-                null,
-                "ReturnTitle"
-            );
+            Alert.Show(null, "ingame.title.confirm", _returnTitle, null, "ReturnTitle");
         }
 
         #region Restoration

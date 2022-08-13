@@ -81,17 +81,17 @@ namespace Nova
                             int clicks = configManager.GetInt(FastForwardReadFirstShownKey);
                             if (clicks < HintFastForwardReadClicks)
                             {
-                                Alert.Show(I18n.__("dialogue.noreadtext"));
+                                Alert.Show("dialogue.noreadtext");
                                 configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
                             }
                             else if (clicks == HintFastForwardReadClicks)
                             {
-                                Alert.Show(I18n.__("dialogue.hint.fastforwardread"));
+                                Alert.Show("dialogue.hint.fastforwardread");
                                 configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
                             }
                             else
                             {
-                                Alert.Show(I18n.__("dialogue.noreadtext"));
+                                Alert.Show("dialogue.noreadtext");
                             }
 
                             return;

@@ -285,7 +285,7 @@ namespace Nova
                 selectedLogEntryIndex = -1;
                 Alert.Show(
                     null,
-                    I18n.__("log.back.confirm"),
+                    "log.back.confirm",
                     () => _onGoBackButtonClicked(nodeHistoryEntry, dialogueIndex),
                     null,
                     "LogBack"
@@ -306,7 +306,7 @@ namespace Nova
         {
             if (configManager.GetInt(LogViewFirstShownKey) == 0)
             {
-                Alert.Show(I18n.__("log.first.hint"));
+                Alert.Show("log.first.hint");
                 configManager.SetInt(LogViewFirstShownKey, 1);
             }
 
