@@ -50,7 +50,6 @@ namespace Nova
         private LogEntryController logEntryForTest;
         private TMP_Text contentForTest;
         private float contentDefaultWidth;
-        private float contentSpacing;
 
         private readonly List<LogParam> logParams = new List<LogParam>();
         private readonly List<float> logHeights = new List<float>();
@@ -72,8 +71,6 @@ namespace Nova
             scrollRect.prefabSource = this;
             scrollRect.dataSource = this;
             scrollRect.sizeHelper = this;
-
-            contentSpacing = scrollRect.content.GetComponent<VerticalLayoutGroup>().spacing;
 
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
@@ -329,8 +326,7 @@ namespace Nova
             {
                 // If the content does not extend beyond the viewport, immediately hide log view
                 // In this case, verticalNormalizedPosition is always 0
-                float contentHeight, _;
-                scrollRect.GetVerticalOffsetAndSize(out contentHeight, out _);
+                scrollRect.GetVerticalOffsetAndSize(out var contentHeight, out _);
                 if (contentHeight < scrollRect.viewport.rect.height)
                 {
                     Hide();
@@ -339,7 +335,7 @@ namespace Nova
 
                 // Otherwise, the first scrolling down stops when reaches the bottom,
                 // and the second scrolling down hides log view
-                // verticalNormalizedPosition can be > 1, which should be a bug of LoopScrollRect
+                // verticalNormalizedPosition can be > 1
                 if (scrollDownIdleTime > MaxScrollDownIdleTime && scrollRect.verticalNormalizedPosition > 1f - 1e-3f)
                 {
                     Hide();
