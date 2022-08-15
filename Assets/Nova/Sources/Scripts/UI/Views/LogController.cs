@@ -329,8 +329,8 @@ namespace Nova
             {
                 // If the content does not extend beyond the viewport, immediately hide log view
                 // In this case, verticalNormalizedPosition is always 0
-                // TODO: Let LoopScrollRect expose totalSize
-                var contentHeight = logPrefixHeights.Last() + contentSpacing * (logPrefixHeights.Count - 1);
+                float contentHeight, _;
+                scrollRect.GetVerticalOffsetAndSize(out contentHeight, out _);
                 if (contentHeight < scrollRect.viewport.rect.height)
                 {
                     Hide();
