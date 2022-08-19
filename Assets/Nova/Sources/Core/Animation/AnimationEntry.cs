@@ -139,7 +139,7 @@ namespace Nova
             Transform parent)
         {
             var entry = PrefabFactory.Get<AnimationEntry>();
-            entry.transform.SetParent(parent);
+            entry.transform.SetParent(parent, false);
             entry.Init(property, duration, easing, repeatNum);
             return entry;
         }
@@ -260,7 +260,7 @@ namespace Nova
 
             foreach (Transform child in Utils.GetChildren(transform))
             {
-                child.SetParent(transform.parent);
+                child.SetParent(transform.parent, false);
                 child.GetComponent<AnimationEntry>().Play();
             }
 

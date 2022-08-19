@@ -24,7 +24,7 @@ namespace Nova
             this.RuntimeAssert(spriteRenderer != null || image != null, "Missing SpriteRenderer or Image.");
             novaAnimation = Utils.FindNovaGameController().PerDialogueAnimation;
             ghost = new GameObject("SpriteChangerGhost");
-            ghost.transform.SetParent(transform);
+            ghost.transform.SetParent(transform, false);
             ghost.SetActive(false);
             // Show ghost in front of original sprite
             ghost.transform.localPosition = 0.001f * Vector3.back;

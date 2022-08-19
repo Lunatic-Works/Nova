@@ -46,7 +46,7 @@ namespace Nova
         private void Awake()
         {
             ghost = new GameObject("AudioLooperGhost");
-            ghost.transform.SetParent(transform);
+            ghost.transform.SetParent(transform, false);
             audioSources = new[]
             {
                 GetComponent<AudioSource>(),

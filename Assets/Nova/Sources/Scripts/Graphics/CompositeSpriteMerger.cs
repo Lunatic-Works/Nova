@@ -19,9 +19,7 @@ namespace Nova
             for (int i = layers.Count; i < count; i++)
             {
                 var go = new GameObject("MergingSprite" + i);
-                go.transform.SetParent(transform);
-                go.transform.localPosition = Vector3.zero;
-                go.transform.localScale = Vector3.one;
+                go.transform.SetParent(transform, false);
                 go.layer = MergerLayer;
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sortingOrder = i;
@@ -150,7 +148,7 @@ namespace Nova
             merger.runInEditMode = true;
 
             var camera = new GameObject("Camera");
-            camera.transform.SetParent(root.transform);
+            camera.transform.SetParent(root.transform, false);
             renderCamera = camera.Ensure<Camera>();
             renderCamera.cullingMask = 1 << CompositeSpriteMerger.MergerLayer;
             renderCamera.orthographic = true;

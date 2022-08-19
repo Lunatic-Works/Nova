@@ -59,9 +59,7 @@ namespace Nova
                 for (int i = layers.Count; i < count; i++)
                 {
                     var go = new GameObject("MergingSprite" + i);
-                    go.transform.SetParent(transform);
-                    go.transform.localPosition = Vector3.zero;
-                    go.transform.localScale = Vector3.one;
+                    go.transform.SetParent(transform, false);
                     go.layer = layer;
                     var sr = go.AddComponent<SpriteRenderer>();
                     sr.sortingOrder = i;

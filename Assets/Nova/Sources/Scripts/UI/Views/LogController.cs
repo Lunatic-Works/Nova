@@ -91,7 +91,7 @@ namespace Nova
             // fake content to test size
             if (logEntryForTest == null)
             {
-                logEntryForTest = Instantiate(logEntryPrefab);
+                logEntryForTest = Instantiate(logEntryPrefab, scrollRect.content);
                 contentForTest = logEntryForTest.transform.Find("Text").GetComponent<TMP_Text>();
             }
 
