@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using UnityEngine;
 // using Stopwatch = System.Diagnostics.Stopwatch;
 
@@ -46,6 +48,29 @@ namespace Nova
         private FileStream file;
         private long endBlock;
         private readonly LRUCache<long, CheckpointBlock> cachedBlocks;
+
+        private class JsonTypeBinder : ISerializationBinder
+        {
+            private long offset;
+
+            public void BindToName(Type serializedType, out string assemblyName, out string typeName)
+            {
+                if (typeof(IRestoreData).IsAssignableFrom(serializedType))
+                {
+                    assemblyName = serializedType.Assembly.GetName().Name;
+                    typeName = serializedType.FullName;
+                }
+                else
+                {
+                    throw CheckpointCorruptedException.SerializationError(offset, $"type {serializedType.Name} should implement IRestoreData");
+                }
+            }
+
+            public Type BindToType(string assemblyName, string typeName)
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         public CheckpointSerializer(string path)
         {
@@ -212,6 +237,11 @@ namespace Nova
 
         public void SerializeRecord(long offset, object data, bool compress)
         {
+            var setting = new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            };
+            Debug.Log(JsonConvert.SerializeObject(data, setting));
             using var mem = new MemoryStream();
             if (compress)
             {
