@@ -142,13 +142,13 @@ namespace Nova
 
         public NodeRecord GetNextNode(NodeRecord prevRecord, string name, Variables variables, int beginDialogue)
         {
-            var variableHash = variables.hash;
+            var variablesHash = variables.hash;
             NodeRecord record = null;
             var offset = prevRecord?.child ?? globalSave.beginCheckpoint;
             while (offset != 0 && offset < globalSave.endCheckpoint)
             {
                 record = serializer.GetNodeRecord(offset);
-                if (record.name == name && record.variableHash == variableHash)
+                if (record.name == name && record.variablesHash == variablesHash)
                 {
                     return record;
                 }
@@ -157,7 +157,7 @@ namespace Nova
             }
 
             offset = globalSave.endCheckpoint;
-            var newRecord = new NodeRecord(offset, name, beginDialogue, variableHash);
+            var newRecord = new NodeRecord(offset, name, beginDialogue, variablesHash);
             if (record != null)
             {
                 record.sibling = offset;

@@ -14,7 +14,7 @@ namespace Nova
         public readonly int beginDialogue;
         public int endDialogue;
         public int lastCheckpointDialogue;
-        public readonly ulong variableHash;
+        public readonly ulong variablesHash;
         public readonly string name;
 
         // we need a fixed length serialization
@@ -29,19 +29,19 @@ namespace Nova
             segment.WriteInt(24, beginDialogue);
             segment.WriteInt(28, endDialogue);
             segment.WriteInt(32, lastCheckpointDialogue);
-            segment.WriteUlong(36, variableHash);
+            segment.WriteUlong(36, variablesHash);
             segment.WriteString(HeaderSize, name);
             return segment;
         }
 
-        public NodeRecord(long offset, string name, int beginDialogue, ulong variableHash)
+        public NodeRecord(long offset, string name, int beginDialogue, ulong variablesHash)
         {
             this.offset = offset;
             this.name = name;
             this.beginDialogue = beginDialogue;
             endDialogue = beginDialogue;
             lastCheckpointDialogue = -1;
-            this.variableHash = variableHash;
+            this.variablesHash = variablesHash;
         }
 
         public NodeRecord(long offset, ByteSegment segment)
@@ -53,7 +53,7 @@ namespace Nova
             beginDialogue = segment.ReadInt(24);
             endDialogue = segment.ReadInt(28);
             lastCheckpointDialogue = segment.ReadInt(32);
-            variableHash = segment.ReadUlong(36);
+            variablesHash = segment.ReadUlong(36);
             name = segment.ReadString(HeaderSize);
         }
     }
