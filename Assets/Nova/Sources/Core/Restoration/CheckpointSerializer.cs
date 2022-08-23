@@ -45,13 +45,13 @@ namespace Nova
         private readonly string path;
         private FileStream file;
         private long endBlock;
-        private readonly LRUCache<long, CheckpointBlock> cachedBlock;
+        private readonly LRUCache<long, CheckpointBlock> cachedBlocks;
 
         public CheckpointSerializer(string path)
         {
             this.path = path;
             // 1M block cache
-            cachedBlock = new LRUCache<long, CheckpointBlock>(256, true);
+            cachedBlocks = new LRUCache<long, CheckpointBlock>(256, true);
         }
 
         public void Open()
@@ -66,7 +66,7 @@ namespace Nova
 
         public void Dispose()
         {
-            cachedBlock.Clear();
+            cachedBlocks.Clear();
             if (file != null)
             {
                 file.Close();
@@ -76,10 +76,10 @@ namespace Nova
 
         private CheckpointBlock GetBlock(long id)
         {
-            if (!cachedBlock.TryGetValue(id, out var block))
+            if (!cachedBlocks.TryGetValue(id, out var block))
             {
                 block = CheckpointBlock.FromFile(file, id);
-                cachedBlock[id] = block;
+                cachedBlocks[id] = block;
             }
 
             return block;
@@ -138,7 +138,7 @@ namespace Nova
         {
             var id = endBlock++;
             var block = new CheckpointBlock(file, id);
-            cachedBlock[id] = block;
+            cachedBlocks[id] = block;
             return block;
         }
 
@@ -264,7 +264,7 @@ namespace Nova
         {
             // var start = Stopwatch.GetTimestamp();
 
-            foreach (var block in cachedBlock)
+            foreach (var block in cachedBlocks)
             {
                 block.Value.Flush();
             }
