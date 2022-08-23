@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace Nova
 {
+    using VoiceEntries = IReadOnlyDictionary<string, VoiceEntry>;
+
     public readonly struct ReachedDialoguePosition
     {
         public readonly NodeRecord nodeRecord;
@@ -36,11 +38,10 @@ namespace Nova
     {
         public readonly string nodeName;
         public readonly int dialogueIndex;
-        public readonly IReadOnlyDictionary<string, VoiceEntry> voices;
+        public readonly VoiceEntries voices;
         public readonly bool needInterpolate;
 
-        public ReachedDialogueData(string nodeName, int dialogueIndex, IReadOnlyDictionary<string, VoiceEntry> voices,
-            bool needInterpolate)
+        public ReachedDialogueData(string nodeName, int dialogueIndex, VoiceEntries voices, bool needInterpolate)
         {
             this.nodeName = nodeName;
             this.dialogueIndex = dialogueIndex;

@@ -231,7 +231,7 @@ namespace Nova
                 OnGoBackButtonClicked(logEntry.nodeOffset, logEntry.checkpointOffset, dialogueData.dialogueIndex, idx);
 
             UnityAction onPlayVoiceButtonClicked = null;
-            if (dialogueData.voices != null)
+            if (GameCharacterController.CanPlayVoice(dialogueData.voices))
             {
                 onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(dialogueData.voices);
             }

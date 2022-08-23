@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace Nova
 {
+    using VoiceEntries = IReadOnlyDictionary<string, VoiceEntry>;
+
     [Serializable]
     public class VoiceEntry
     {
@@ -187,8 +189,8 @@ namespace Nova
             // Especially when stopVoiceOnDialogueChange is off
             StopVoiceAll();
 
-            voiceFileName = System.IO.Path.Combine(voiceFolder, voiceFileName);
-            var audioClip = AssetLoader.Load<AudioClip>(voiceFileName);
+            var voicePath = System.IO.Path.Combine(voiceFolder, voiceFileName);
+            var audioClip = AssetLoader.Load<AudioClip>(voicePath);
 
             willSaySomething = true;
             voiceDelay = delay;
@@ -256,7 +258,26 @@ namespace Nova
             Characters.Remove(name);
         }
 
-        public static void ReplayVoice(IReadOnlyDictionary<string, VoiceEntry> voices, bool unbiasedDelay = true)
+        // Cannot play voice if all characters speaking are muted
+        public static bool CanPlayVoice(VoiceEntries voices)
+        {
+            if (voices == null)
+            {
+                return false;
+            }
+
+            foreach (var voice in voices)
+            {
+                if (Characters.TryGetValue(voice.Key, out var character) && character.audioSource.volume > 1e-3f)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static void ReplayVoice(VoiceEntries voices, bool unbiasedDelay = true)
         {
             StopVoiceAll();
             float bias = 0.0f;
@@ -276,7 +297,8 @@ namespace Nova
                 }
 
                 if (!Characters.TryGetValue(characterName, out var character)) continue;
-                var clip = AssetLoader.Load<AudioClip>(voiceEntry.voiceFileName);
+                var voicePath = System.IO.Path.Combine(character.voiceFolder, voiceEntry.voiceFileName);
+                var clip = AssetLoader.Load<AudioClip>(voicePath);
                 character.SayImmediately(clip, delay);
             }
         }
