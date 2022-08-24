@@ -23,7 +23,9 @@
 
 * **支持什么版本的Unity、什么操作系统/平台？**
 
-    支持Unity 2020及更高版本，Windows/Linux/macOS/Android/iOS平台。WebGL目前不支持，不过似乎已经有人成功让我们的依赖（ToLua#）支持WebGL了，我们真要做的话应该也可以。
+    支持Unity 2020及更高版本，Windows/Linux/macOS/Android/iOS平台。
+
+    WebGL/微信小程序可以参考[linsyking/Nova-WXM](https://github.com/linsyking/Nova-WXM)，以及一个在线编辑器[linsyking/Nova-online-editor](https://github.com/linsyking/Nova-online-editor)。
 
 * **我可以把解谜/战棋等游戏加到Nova里吗？我可以把Nova作为对话系统加到解谜/战棋等游戏里吗？**
 
@@ -31,7 +33,7 @@
 
 * **Unity已死，Godot万岁！**
 
-    等Godot 4出来了再说。。
+    我们打算在手头上的一部长篇作品做完之后迁移到Godot，也许会在2024年开始。
 
 ## 版本说明
 
