@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace Nova
 {
-    using LocalizedStrings = IReadOnlyDictionary<SystemLanguage, string>;
+    using LocalizedStrings = Dictionary<SystemLanguage, string>;
 
     [Serializable]
     public class AlertParameters

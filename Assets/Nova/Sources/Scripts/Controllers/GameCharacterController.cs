@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    using VoiceEntries = IReadOnlyDictionary<string, VoiceEntry>;
+    using VoiceEntries = Dictionary<string, VoiceEntry>;
 
     [Serializable]
     public class VoiceEntry

@@ -56,11 +56,11 @@ namespace Nova
         [ExportCustomType]
         public class Selection
         {
-            public readonly IReadOnlyDictionary<SystemLanguage, string> texts;
+            public readonly Dictionary<SystemLanguage, string> texts;
             public readonly BranchImageInformation imageInfo;
             public readonly bool active;
 
-            public Selection(IReadOnlyDictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo,
+            public Selection(Dictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo,
                 bool active)
             {
                 this.texts = texts;

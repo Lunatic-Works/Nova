@@ -9,7 +9,7 @@ using TMPro;
 
 namespace Nova
 {
-    using VoiceEntries = IReadOnlyDictionary<string, VoiceEntry>;
+    using VoiceEntries = Dictionary<string, VoiceEntry>;
 
     public class LogController : ViewControllerBase, IRestorable, LoopScrollPrefabSource, LoopScrollDataSource,
         LoopScrollSizeHelper
