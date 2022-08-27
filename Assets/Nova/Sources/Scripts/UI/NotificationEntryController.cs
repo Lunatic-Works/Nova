@@ -10,9 +10,9 @@ namespace Nova
         public RectTransform rectTransform;
         public UIViewTransitionBase transition;
 
-        private IReadOnlyDictionary<SystemLanguage, string> content;
+        private Dictionary<SystemLanguage, string> content;
 
-        public void Init(IReadOnlyDictionary<SystemLanguage, string> content)
+        public void Init(Dictionary<SystemLanguage, string> content)
         {
             this.content = content;
             UpdateText();
