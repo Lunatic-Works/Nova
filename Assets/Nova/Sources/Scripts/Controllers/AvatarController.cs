@@ -28,7 +28,7 @@ namespace Nova
         private string characterName;
         private Dictionary<string, string> characterToImageName = new Dictionary<string, string>();
 
-        public int textPaddingOrZero => currentPose.Any() ? textPadding : 0;
+        public int textPaddingOrZero => string.IsNullOrEmpty(currentPose) ? 0 : textPadding;
         public override bool renderToCamera => true;
         public override RenderTexture renderTexture => null;
 
