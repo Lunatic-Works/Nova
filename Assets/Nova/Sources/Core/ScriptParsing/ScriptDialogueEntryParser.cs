@@ -303,7 +303,7 @@ namespace Nova
                         stageValue = "";
                     }
 
-                    if (!stageValue.Equals(stageName))
+                    if (stageValue != stageName)
                     {
                         continue;
                     }

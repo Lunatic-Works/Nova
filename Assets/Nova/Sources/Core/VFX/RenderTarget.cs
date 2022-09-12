@@ -181,8 +181,8 @@ namespace Nova
     public class TextureRendererConfig
     {
         public readonly string name;
-        public readonly bool final;
         public readonly RenderTextureFormat format;
+        public readonly bool final;
 
         public TextureRendererConfig(string name, RenderTextureFormat format, bool final)
         {
@@ -195,21 +195,23 @@ namespace Nova
         {
             return obj is TextureRendererConfig config &&
                    name == config.name &&
-                   final == config.final &&
-                   format == config.format;
+                   format == config.format &&
+                   final == config.final;
         }
 
         public override int GetHashCode()
         {
-            var hashCode = -1601009945;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(name);
-            hashCode = hashCode * -1521134295 + final.GetHashCode();
-            hashCode = hashCode * -1521134295 + format.GetHashCode();
-            return hashCode;
+            unchecked
+            {
+                var hashCode = name.GetHashCode();
+                hashCode = hashCode * -1521134295 + final.GetHashCode();
+                hashCode = hashCode * -1521134295 + format.GetHashCode();
+                return hashCode;
+            }
         }
 
-        public static bool operator ==(TextureRendererConfig c1, TextureRendererConfig c2) => c1.Equals(c2);
+        public static bool operator ==(TextureRendererConfig a, TextureRendererConfig b) => a.Equals(b);
 
-        public static bool operator !=(TextureRendererConfig c1, TextureRendererConfig c2) => !c1.Equals(c2);
+        public static bool operator !=(TextureRendererConfig a, TextureRendererConfig b) => !(a == b);
     }
 }

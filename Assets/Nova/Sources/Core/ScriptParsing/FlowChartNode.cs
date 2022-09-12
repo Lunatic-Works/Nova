@@ -207,5 +207,9 @@ namespace Nova
         {
             return name.GetHashCode();
         }
+
+        public static bool operator ==(FlowChartNode a, FlowChartNode b) => a?.Equals(b) ?? b is null;
+
+        public static bool operator !=(FlowChartNode a, FlowChartNode b) => !(a == b);
     }
 }

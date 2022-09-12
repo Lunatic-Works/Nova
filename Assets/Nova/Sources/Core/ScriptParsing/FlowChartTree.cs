@@ -215,7 +215,7 @@ namespace Nova
                     _defaultStartNode = value;
                 }
 
-                if (!_defaultStartNode.Equals(value))
+                if (_defaultStartNode != value)
                 {
                     throw new DuplicatedDefinitionException(
                         $"Nova: Assigning two different default start points: {_defaultStartNode.name} and {value.name}");

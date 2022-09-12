@@ -1,4 +1,4 @@
-﻿using LuaInterface;
+using LuaInterface;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -100,5 +100,9 @@ namespace Nova
         {
             return name.GetHashCode();
         }
+
+        public static bool operator ==(BranchInformation a, BranchInformation b) => a.Equals(b);
+
+        public static bool operator !=(BranchInformation a, BranchInformation b) => !(a == b);
     }
 }
