@@ -230,7 +230,7 @@ public abstract class SerializableDictionary
 }
 
 [Serializable]
-public class SerializableDictionary<TKey, TValue> : SerializableDictionaryBase<TKey, TValue, TValue>
+public class SerializableDictionary<TKey, TValue> : SerializableDictionaryBase<TKey, TValue, TValue>, Nova.IRestoreData
 {
     public SerializableDictionary() { }
     public SerializableDictionary(IDictionary<TKey, TValue> dict) : base(dict) { }

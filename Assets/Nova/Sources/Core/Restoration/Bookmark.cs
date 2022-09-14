@@ -1,9 +1,11 @@
 using System;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Nova
 {
     [Serializable]
+    [JsonObject(MemberSerialization.Fields)]
     public class Bookmark
     {
         public const int ScreenshotWidth = 320;
