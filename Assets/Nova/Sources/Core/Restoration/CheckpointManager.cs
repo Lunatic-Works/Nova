@@ -30,7 +30,7 @@ namespace Nova
 
         private void InitGlobalSave()
         {
-            globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset, true);
+            globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset);
             if (globalSave.version != CheckpointSerializer.Version ||
                 !CheckpointSerializer.FileHeader.SequenceEqual(globalSave.fileHeader))
             {
@@ -44,7 +44,7 @@ namespace Nova
             reachedEnds.Clear();
             for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = serializer.NextRecord(cur))
             {
-                var record = serializer.DeserializeRecord(cur, true);
+                var record = serializer.DeserializeRecord(cur);
                 if (record is string endName)
                 {
                     reachedEnds.Add(endName);
@@ -210,7 +210,7 @@ namespace Nova
             serializer.AppendRecord(record, buf);
             NewCheckpoint();
 
-            serializer.SerializeRecord(globalSave.endCheckpoint, checkpoint, true);
+            serializer.SerializeRecord(globalSave.endCheckpoint, checkpoint);
             NewCheckpoint();
             return record;
         }
@@ -222,7 +222,7 @@ namespace Nova
 
         public GameStateCheckpoint GetCheckpoint(long offset)
         {
-            return serializer.DeserializeRecord<GameStateCheckpoint>(serializer.NextRecord(offset), true);
+            return serializer.DeserializeRecord<GameStateCheckpoint>(serializer.NextRecord(offset));
         }
 
         public void SetReached(ReachedDialogueData data)
@@ -234,7 +234,7 @@ namespace Nova
             }
 
             reachedDialogues.Add(key, data);
-            serializer.SerializeRecord(globalSave.endReached, data, true);
+            serializer.SerializeRecord(globalSave.endReached, data);
             NewReached();
         }
 
@@ -252,7 +252,7 @@ namespace Nova
             }
 
             reachedEnds.Add(endName);
-            serializer.SerializeRecord(globalSave.endReached, endName, true);
+            serializer.SerializeRecord(globalSave.endReached, endName);
             NewReached();
         }
 
@@ -286,7 +286,7 @@ namespace Nova
         {
             if (globalSaveDirty)
             {
-                serializer.SerializeRecord(CheckpointSerializer.GlobalSaveOffset, globalSave, true);
+                serializer.SerializeRecord(CheckpointSerializer.GlobalSaveOffset, globalSave);
                 globalSaveDirty = false;
             }
 

@@ -350,9 +350,9 @@ namespace Nova
         [Serializable]
         private class LogControllerRestoreData : IRestoreData
         {
-            public readonly IReadOnlyList<LogEntryRestoreData> logEntriesRestoreData;
+            public readonly List<LogEntryRestoreData> logEntriesRestoreData;
 
-            public LogControllerRestoreData(IReadOnlyList<LogEntryRestoreData> logEntriesRestoreData)
+            public LogControllerRestoreData(List<LogEntryRestoreData> logEntriesRestoreData)
             {
                 this.logEntriesRestoreData = logEntriesRestoreData;
             }
