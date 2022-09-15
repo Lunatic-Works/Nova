@@ -137,7 +137,7 @@ namespace Nova
 
         private void CheckInit()
         {
-            Utils.RuntimeAssert(inited, "ScriptLoader methods should be called after Init().");
+            Utils.RuntimeAssert(inited, "ScriptLoader methods should be called after Init.");
         }
 
         /// <summary>

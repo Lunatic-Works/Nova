@@ -26,7 +26,7 @@ namespace Nova
         {
             var name = isEnter ? "Forward" : "Backward";
             var path = Utils.GetPath(transform);
-            this.RuntimeAssert(transition != null, $"{name} transition {id} is null in {path}");
+            this.RuntimeAssert(transition != null, $"{name} transition {id} is null in {path}.");
         }
 
         private void BuildSequence(bool isEnter)

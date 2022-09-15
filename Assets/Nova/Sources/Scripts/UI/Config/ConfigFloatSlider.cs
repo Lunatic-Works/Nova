@@ -21,7 +21,7 @@ namespace Nova
             slider = GetComponent<Slider>();
             configManager = Utils.FindNovaGameController().ConfigManager;
             var def = configManager.GetDefinition(configKeyName);
-            this.RuntimeAssert(def != null, $"Config Key \"{configKeyName}\" Definition not Found.");
+            this.RuntimeAssert(def != null, $"Definition not found for config key {configKeyName}.");
             slider.maxValue = def.max ?? 1;
             slider.minValue = def.min ?? 0;
             slider.wholeNumbers = def.whole == true;

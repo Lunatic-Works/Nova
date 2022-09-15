@@ -30,7 +30,7 @@ namespace Nova
         protected override void Awake()
         {
             base.Awake();
-            this.RuntimeAssert(notificationPrefab != null, "Missing NotificationPrefab.");
+            this.RuntimeAssert(notificationPrefab != null, "Missing notificationPrefab.");
         }
 
         protected override void Start()

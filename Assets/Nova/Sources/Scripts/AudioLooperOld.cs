@@ -75,7 +75,7 @@ namespace Nova
             this.RuntimeAssert(musicEntry != null, "Missing musicEntry when playing loopable music.");
             // this.RuntimeAssert(
             //     musicEntry.loopEndSample <= clip.samples,
-            //     $"Loop end {musicEntry.loopEndSample} is larger than length {clip.samples}"
+            //     $"Loop end {musicEntry.loopEndSample} is larger than length {clip.samples}."
             // );
         }
 

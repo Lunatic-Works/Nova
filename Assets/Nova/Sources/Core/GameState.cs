@@ -920,15 +920,7 @@ namespace Nova
 
         private void FastForward(int stepCount, Action onFinish)
         {
-            if (stepCount <= 0 || actionPauseLock.isLocked)
-            {
-                if (actionPauseLock.isLocked)
-                {
-                    Debug.LogWarning("Nova: GameState paused by action when restoring.");
-                }
-
-                return;
-            }
+            this.RuntimeAssert(stepCount > 0, $"Invalid stepCount {stepCount}.");
 
             for (var i = 0; i < stepCount; ++i)
             {
@@ -989,6 +981,13 @@ namespace Nova
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
             UpdateGameState(true, true, false, false, true, onFinish);
+            if (actionPauseLock.isLocked)
+            {
+                Debug.LogWarning("Nova: GameState paused by action when restoring.");
+                isRestoring = false;
+                return;
+            }
+
             FastForward(dialogueIndex - currentIndex, onFinish);
 
             // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");

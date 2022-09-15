@@ -541,7 +541,8 @@ namespace Nova
 
         private IEnumerator ScheduledStep(float scheduledDelay)
         {
-            this.RuntimeAssert(dialogueAvailable, "Dialogue should be available when scheduling a step for it.");
+            this.RuntimeAssert(dialogueAvailable, "Dialogue not available when scheduling a step for it.");
+
             while (scheduledDelay > timeAfterDialogueChange)
             {
                 yield return new WaitForSeconds(scheduledDelay - timeAfterDialogueChange);
