@@ -358,7 +358,7 @@ namespace Nova
         /// Trigger events according to the current states and how they were changed
         /// </remarks>
         private void UpdateGameState(bool nodeChanged, bool dialogueChanged, bool firstEntryOfNode,
-            bool dialogueStepped, bool fromCheckpoint, Action onFinish)
+            bool dialogueStepped, bool fromCheckpoint)
         {
             // Debug.Log($"UpdateGameState begin {debugState}");
 
@@ -383,23 +383,18 @@ namespace Nova
                 if (currentNode.dialogueEntryCount > 0)
                 {
                     currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
-                    ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, fromCheckpoint, onFinish));
+                    ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, fromCheckpoint));
                 }
                 else
                 {
-                    StepAtEndOfNode(onFinish);
+                    StepAtEndOfNode();
                 }
-            }
-            else
-            {
-                onFinish?.Invoke();
             }
 
             // Debug.Log($"UpdateGameState end {debugState}");
         }
 
-        private IEnumerator UpdateDialogue(bool firstEntryOfNode, bool dialogueStepped, bool fromCheckpoint,
-            Action onFinish)
+        private IEnumerator UpdateDialogue(bool firstEntryOfNode, bool dialogueStepped, bool fromCheckpoint)
         {
             if (!fromCheckpoint)
             {
@@ -426,7 +421,7 @@ namespace Nova
 
             if (advancedDialogueHelper.GetFallThrough())
             {
-                Step(Utils.WrapActionWithParameter<bool>(onFinish));
+                Step();
                 yield break;
             }
 
@@ -435,11 +430,8 @@ namespace Nova
             {
                 var node = flowChartTree.GetNode(pendingJumpTarget);
                 this.RuntimeAssert(node != null, $"Node {pendingJumpTarget} not found.");
-                MoveToNextNode(node, onFinish);
-                yield break;
+                MoveToNextNode(node);
             }
-
-            onFinish?.Invoke();
         }
 
         private void StepCheckpoint(bool isReached)
@@ -513,23 +505,21 @@ namespace Nova
             return isReachedAnyHistory;
         }
 
-        private void StepAtEndOfNode(Action onFinish)
+        private void StepAtEndOfNode()
         {
             switch (currentNode.type)
             {
                 case FlowChartNodeType.Normal:
-                    MoveToNextNode(currentNode.next, onFinish);
+                    MoveToNextNode(currentNode.next);
                     break;
                 case FlowChartNodeType.Branching:
-                    ExecuteAction(DoBranch(currentNode.GetAllBranches(), onFinish));
+                    ExecuteAction(DoBranch(currentNode.GetAllBranches()));
                     break;
                 case FlowChartNodeType.End:
                     state = State.Ended;
                     var endName = flowChartTree.GetEndName(currentNode);
                     checkpointManager.SetEndReached(endName);
-
                     routeEnded.Invoke(new RouteEndedData(endName));
-                    onFinish?.Invoke();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -548,17 +538,17 @@ namespace Nova
             scriptLoader.AddDeferredDialogueChunks(node);
         }
 
-        private void MoveToNextNode(FlowChartNode nextNode, Action onFinish)
+        private void MoveToNextNode(FlowChartNode nextNode)
         {
             AddDeferredDialogueChunks(nextNode);
             nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
             currentNode = nextNode;
             currentIndex = 0;
             checkpointOffset = nodeRecord.offset;
-            UpdateGameState(true, true, true, true, false, onFinish);
+            UpdateGameState(true, true, true, true, false);
         }
 
-        private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos, Action onFinish)
+        private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos)
         {
             foreach (var branchInfo in branchInfos)
             {
@@ -566,7 +556,7 @@ namespace Nova
                 {
                     if (branchInfo.condition == null || branchInfo.condition.Invoke<bool>())
                     {
-                        SelectBranch(branchInfo.name, onFinish);
+                        SelectBranch(branchInfo.name);
                         yield break;
                     }
                 }
@@ -604,12 +594,12 @@ namespace Nova
             ReleaseActionPause();
 
             var index = (int)coroutineHelper.TakeFence();
-            SelectBranch(selectionNames[index], onFinish);
+            SelectBranch(selectionNames[index]);
         }
 
-        private void SelectBranch(string branchName, Action onFinish)
+        private void SelectBranch(string branchName)
         {
-            MoveToNextNode(currentNode.GetNext(branchName), onFinish);
+            MoveToNextNode(currentNode.GetNext(branchName));
         }
 
         #endregion
@@ -631,7 +621,7 @@ namespace Nova
         private void GameStart(FlowChartNode startNode)
         {
             ResetGameState();
-            MoveToNextNode(startNode, null);
+            MoveToNextNode(startNode);
         }
 
         /// <summary>
@@ -700,26 +690,22 @@ namespace Nova
         /// <remarks>
         /// This method can run asynchronously. The callback will be invoked when the step finishes.
         /// </remarks>
-        /// <param name="onFinish">(canStepForward) => { ... }</param>
-        public void Step(Action<bool> onFinish = null)
+        public void Step()
         {
             if (!canStepForward)
             {
-                onFinish?.Invoke(false);
                 return;
             }
-
-            var successCallback = Utils.WrapActionWithoutParameter(onFinish, true);
 
             // If the next dialogue entry is in the current node, directly step to it
             if (currentIndex + 1 < currentNode.dialogueEntryCount)
             {
                 ++currentIndex;
-                UpdateGameState(false, true, false, true, false, successCallback);
+                UpdateGameState(false, true, false, true, false);
             }
             else
             {
-                StepAtEndOfNode(successCallback);
+                StepAtEndOfNode();
             }
         }
 
@@ -918,7 +904,7 @@ namespace Nova
 
         public bool isRestoring { get; private set; }
 
-        private void FastForward(int stepCount, Action onFinish)
+        private void FastForward(int stepCount)
         {
             this.RuntimeAssert(stepCount > 0, $"Invalid stepCount {stepCount}.");
 
@@ -938,15 +924,10 @@ namespace Nova
                     isRestoring = false;
                     return;
                 }
-
-                if (isLast)
-                {
-                    onFinish?.Invoke();
-                }
             }
         }
 
-        public void MoveBackToFirstDialogue(Action onFinish = null)
+        public void MoveBackToFirstDialogue()
         {
             var entryNode = nodeRecord;
             while (entryNode.parent != 0 && entryNode.beginDialogue != 0)
@@ -954,11 +935,10 @@ namespace Nova
                 entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
             }
 
-            MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue, onFinish);
+            MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
         }
 
-        public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex,
-            Action onFinish = null)
+        public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
         {
             // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
 
@@ -987,7 +967,7 @@ namespace Nova
                 isRestoring = false;
             }
 
-            UpdateGameState(true, true, false, false, true, onFinish);
+            UpdateGameState(true, true, false, false, true);
             if (actionPauseLock.isLocked)
             {
                 Debug.LogWarning("Nova: GameState paused by action when restoring.");
@@ -997,7 +977,7 @@ namespace Nova
 
             if (dialogueIndex > currentIndex)
             {
-                FastForward(dialogueIndex - currentIndex, onFinish);
+                FastForward(dialogueIndex - currentIndex);
             }
 
             // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");

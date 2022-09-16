@@ -406,16 +406,6 @@ namespace Nova
             }
         }
 
-        public static Action<T> WrapActionWithParameter<T>(Action action)
-        {
-            return action != null ? new Action<T>(_ => action.Invoke()) : null;
-        }
-
-        public static Action WrapActionWithoutParameter<T>(Action<T> action, T value)
-        {
-            return action != null ? new Action(() => action.Invoke(value)) : null;
-        }
-
         public static int ConvertSamples(AudioClip source, AudioClip target)
         {
             return Mathf.RoundToInt(1.0f * target.frequency / source.frequency * source.samples);
