@@ -102,7 +102,6 @@ namespace Nova
 
         private const string DateTimeFormat = "yyyy/MM/dd  HH:mm";
 
-        private FlowChartNode currentNode;
         private DialogueDisplayData currentDialogue;
 
         protected override void Awake()
@@ -159,7 +158,6 @@ namespace Nova
                 }
             }
 
-            gameState.nodeChanged.AddListener(OnNodeChanged);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
 
             I18n.LocaleChanged.AddListener(Refresh);
@@ -185,15 +183,9 @@ namespace Nova
             leftButton.onClick.RemoveListener(PageLeft);
             rightButton.onClick.RemoveListener(PageRight);
 
-            gameState.nodeChanged.RemoveListener(OnNodeChanged);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
 
             I18n.LocaleChanged.RemoveListener(Refresh);
-        }
-
-        private void OnNodeChanged(NodeChangedData nodeChangedData)
-        {
-            currentNode = gameState.GetNode(nodeChangedData.newNode);
         }
 
         private void OnDialogueChanged(DialogueChangedData data)
@@ -239,7 +231,6 @@ namespace Nova
             {
                 // Cannot SetActive(false), otherwise layout will break
                 saveButtonCanvasGroup.alpha = 0.0f;
-                currentNode = null;
                 currentDialogue = null;
             }
             else
@@ -575,7 +566,7 @@ namespace Nova
             ShowPreview(screenSprite, Hide, I18n.__(
                 "bookmark.summary",
                 fromTitle ? "" : DateTime.Now.ToString(DateTimeFormat),
-                currentNode != null ? I18n.__(currentNode.displayNames) : "",
+                gameState.currentNode != null ? I18n.__(gameState.currentNode.displayNames) : "",
                 currentDialogue != null ? currentDialogue.FormatNameDialogue() : ""
             ));
         }

@@ -149,12 +149,8 @@ namespace Nova
         #region States
 
         /// <summary>
-        /// Names and visit counts of the nodes that have been walked through, including the current node
+        /// The current node record in the global save file
         /// </summary>
-        /// <remarks>
-        /// Modified by MoveToNextNode() and MoveBackTo()
-        /// </remarks>
-        // public readonly NodeHistory nodeHistory = new NodeHistory();
         private NodeRecord nodeRecord;
 
         private long checkpointOffset;
@@ -162,26 +158,16 @@ namespace Nova
         /// <summary>
         /// The current flow chart node
         /// </summary>
-        /// <remarks>
-        /// Modified by MoveToNextNode() and MoveBackTo()
-        /// TODO: Change it to private. It's only used externally in DebugJumpHelper
-        /// </remarks>
         public FlowChartNode currentNode { get; private set; }
 
         /// <summary>
         /// The index of the current dialogue entry in the current node
         /// </summary>
-        /// <remarks>
-        /// Modified by MoveToNextNode(), MoveBackTo() and Step()
-        /// </remarks>
         private int currentIndex;
 
         /// <summary>
         /// The current dialogueEntry
         /// </summary>
-        /// <remarks>
-        /// Modified by UpdateGameState()
-        /// </remarks>
         private DialogueEntry currentDialogueEntry;
 
         /// <summary>
@@ -725,7 +711,7 @@ namespace Nova
         /// <summary>
         /// Register a new restorable object
         /// </summary>
-        /// <param name="restorable">The restorable to be added</param>
+        /// <param name="restorable">The restorable object to be added</param>
         /// <exception cref="ArgumentException">
         /// Thrown when the name of the restorable object is null or duplicated
         /// </exception>
@@ -744,7 +730,7 @@ namespace Nova
         /// <summary>
         /// Unregister a restorable object
         /// </summary>
-        /// <param name="restorable">The restorable to be removed</param>
+        /// <param name="restorable">The restorable object to be removed</param>
         public void RemoveRestorable(IRestorable restorable)
         {
             restorables.Remove(restorable.restorableName);
@@ -759,9 +745,6 @@ namespace Nova
 
         public const int WarningStepsFromLastCheckpoint = 100;
 
-        /// <remarks>
-        /// Modified by DialogueSaveCheckpoint(), EnsureCheckpoint() and RestoreCheckpoint()
-        /// </remarks>
         private int stepsFromLastCheckpoint;
 
         /// <summary>
@@ -769,23 +752,20 @@ namespace Nova
         /// </summary>
         /// <remarks>
         /// This feature is necessary for restoring holding animations.
-        /// This restraint has higher priority than EnsureCheckpoint().
-        /// Modified by DialogueSaveCheckpoint(), RestrainCheckpoint() and RestoreCheckpoint()
+        /// This restraint has lower priority than checkpointEnsured.
         /// </remarks>
         private int stepsCheckpointRestrained;
 
         private bool checkpointRestrained => stepsCheckpointRestrained > 0;
 
         /// <summary>
-        /// Restrain saving checkpoints for given steps. Force overwrite the number of restraining steps when overridden is true.
+        /// Restrain saving checkpoints for given steps.
         /// </summary>
-        /// <param name="steps">the steps to restrain checkpoints</param>
-        /// <param name="overridden">if the new restraining step num should overwrite the old one</param>
+        /// <param name="steps">number of steps to restrain checkpoints</param>
+        /// <param name="overridden">if the new step number should overwrite the old one</param>
         public void RestrainCheckpoint(int steps, bool overridden = false)
         {
-            // check overwrite
             if (!overridden && stepsCheckpointRestrained >= steps) return;
-            // non-negative
             if (steps < 0) steps = 0;
             stepsCheckpointRestrained = steps;
         }
@@ -793,9 +773,6 @@ namespace Nova
         /// <summary>
         /// Used to force save a checkpoint before a holding animation begins.
         /// </summary>
-        /// <remarks>
-        /// Modified by DialogueSaveCheckpoint(), EnsureCheckpointOnNextDialogue() and RestoreCheckpoint()
-        /// </remarks>
         private bool checkpointEnsured;
 
         public void EnsureCheckpointOnNextDialogue()
@@ -807,9 +784,8 @@ namespace Nova
             checkpointEnsured || (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
 
         /// <summary>
-        /// Force to get the current game state as a checkpoint
+        /// Get the current game state as a checkpoint
         /// </summary>
-        /// <returns>current game state checkpoint</returns>
         private GameStateCheckpoint GetCheckpoint()
         {
             var restoreDatas = new Dictionary<string, IRestoreData>();
@@ -1041,7 +1017,7 @@ namespace Nova
         #region Bookmark
 
         /// <summary>
-        /// Get the Bookmark for the current state
+        /// Get the Bookmark for the current game state
         /// </summary>
         public Bookmark GetBookmark()
         {
@@ -1054,7 +1030,7 @@ namespace Nova
         }
 
         /// <summary>
-        /// Load a Bookmark and restore the saved state
+        /// Load a Bookmark and restore the saved game state
         /// </summary>
         public void LoadBookmark(Bookmark bookmark)
         {
