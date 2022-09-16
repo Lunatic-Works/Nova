@@ -980,6 +980,13 @@ namespace Nova
             isRestoring = true;
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
+            this.RuntimeAssert(dialogueIndex >= currentIndex,
+                $"dialogueIndex {dialogueIndex} is before currentIndex {currentIndex}.");
+            if (dialogueIndex == currentIndex)
+            {
+                isRestoring = false;
+            }
+
             UpdateGameState(true, true, false, false, true, onFinish);
             if (actionPauseLock.isLocked)
             {
@@ -988,7 +995,10 @@ namespace Nova
                 return;
             }
 
-            FastForward(dialogueIndex - currentIndex, onFinish);
+            if (dialogueIndex > currentIndex)
+            {
+                FastForward(dialogueIndex - currentIndex, onFinish);
+            }
 
             // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
         }
