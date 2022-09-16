@@ -921,7 +921,8 @@ namespace Nova
                 Step();
                 if (actionPauseLock.isLocked)
                 {
-                    Debug.LogWarning("Nova: GameState paused by action when restoring.");
+                    Debug.LogWarning("Nova: GameState paused by action when restoring. " +
+                                     "Maybe a minigame does not have a checkpoint ensured after it.");
                     isRestoring = false;
                     return;
                 }
@@ -971,7 +972,8 @@ namespace Nova
             UpdateGameState(true, true, false, false, true);
             if (actionPauseLock.isLocked)
             {
-                Debug.LogWarning("Nova: GameState paused by action when restoring.");
+                Debug.LogWarning("Nova: GameState paused by action when restoring. " +
+                                 "Maybe a minigame does not have a checkpoint ensured after it.");
                 isRestoring = false;
                 return;
             }

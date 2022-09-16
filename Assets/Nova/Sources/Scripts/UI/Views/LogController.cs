@@ -48,10 +48,9 @@ namespace Nova
             }
         }
 
-        public int maxLogEntryNum = 1000;
-        public LogEntryController logEntryPrefab;
-        public Button closeButton;
-        public bool hideOnGoBackButtonClicked;
+        [SerializeField] private int maxLogEntryNum = 1000;
+        [SerializeField] private LogEntryController logEntryPrefab;
+        [SerializeField] private Button closeButton;
 
         private const string LogViewFirstShownKey = ConfigManager.FirstShownKeyPrefix + "LogView";
 
@@ -247,11 +246,7 @@ namespace Nova
         {
             var nodeRecord = checkpointManager.GetNodeRecord(nodeOffset);
             gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
-            // Debug.Log($"Remaining log entries count: {logEntries.Count}");
-            if (hideOnGoBackButtonClicked)
-            {
-                Hide();
-            }
+            Hide();
         }
 
         private int selectedLogEntryIndex = -1;
@@ -373,6 +368,7 @@ namespace Nova
             logEntriesRestoreData.Clear();
             Clear();
             // TODO: In each checkpoint, only save logEntriesRestoreData from the last checkpoint
+            // Or we can use a binary indexed tree to store them
             var data = restoreData as LogControllerRestoreData;
             logEntriesRestoreData.AddRange(data.logEntriesRestoreData);
 
