@@ -17,15 +17,15 @@ namespace Nova
     public class GameStateCheckpoint
     {
         public readonly int dialogueIndex;
-        public readonly int restrainCheckpointNum;
+        public readonly int stepsCheckpointRestrained;
         public readonly IReadOnlyDictionary<string, IRestoreData> restoreDatas;
         public readonly Variables variables;
 
         public GameStateCheckpoint(int dialogueIndex, IReadOnlyDictionary<string, IRestoreData> restoreDatas,
-            Variables variables, int restrainCheckpointNum)
+            Variables variables, int stepsCheckpointRestrained)
         {
             this.dialogueIndex = dialogueIndex;
-            this.restrainCheckpointNum = restrainCheckpointNum;
+            this.stepsCheckpointRestrained = stepsCheckpointRestrained;
             this.restoreDatas = restoreDatas;
             this.variables = new Variables();
             this.variables.CloneFrom(variables);

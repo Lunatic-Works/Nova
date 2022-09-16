@@ -164,6 +164,7 @@ namespace Nova
         /// </summary>
         /// <remarks>
         /// Modified by MoveToNextNode() and MoveBackTo()
+        /// TODO: Change it to private. It's only used externally in DebugJumpHelper
         /// </remarks>
         public FlowChartNode currentNode { get; private set; }
 
@@ -173,7 +174,7 @@ namespace Nova
         /// <remarks>
         /// Modified by MoveToNextNode(), MoveBackTo() and Step()
         /// </remarks>
-        public int currentIndex { get; private set; }
+        private int currentIndex;
 
         /// <summary>
         /// The current dialogueEntry
@@ -370,7 +371,7 @@ namespace Nova
 
                 if (firstEntryOfNode)
                 {
-                    forceCheckpoint = true; // Always get a checkpoint at the beginning of the node
+                    checkpointEnsured = true; // Always get a checkpoint at the beginning of the node
                 }
             }
 
@@ -454,7 +455,7 @@ namespace Nova
         {
             if (!firstEntryOfNode && dialogueStepped)
             {
-                stepNumFromLastCheckpoint++;
+                stepsFromLastCheckpoint++;
             }
 
             if (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
@@ -466,7 +467,7 @@ namespace Nova
             var isReached = currentIndex < nodeRecord.endDialogue;
             if (shouldSaveCheckpoint)
             {
-                stepNumFromLastCheckpoint = 0;
+                stepsFromLastCheckpoint = 0;
                 StepCheckpoint(isReached);
             }
 
@@ -477,11 +478,11 @@ namespace Nova
 
             if (checkpointRestrained)
             {
-                restrainCheckpointNum--;
+                stepsCheckpointRestrained--;
             }
 
-            // As the action for this dialogue will be re-run, it's fine to just reset forceCheckpoint to false
-            forceCheckpoint = false;
+            // As the action for this dialogue will be re-run, it's fine to just reset checkpointEnsured to false
+            checkpointEnsured = false;
 
             return isReached;
         }
@@ -530,7 +531,7 @@ namespace Nova
         {
             nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
             checkpointOffset = nodeRecord.offset;
-            forceCheckpoint = true;
+            checkpointEnsured = true;
         }
 
         public void AddDeferredDialogueChunks(FlowChartNode node)
@@ -752,16 +753,16 @@ namespace Nova
         /// <summary>
         /// Not all states of objects can be easily restored, like holding animations.
         /// We store some checkpoints, and other states can be restored by re-executing from the last checkpoint.
-        /// At least one checkpoint will be saved every maxStepNumFromLastCheckpoint, except during holding animations.
+        /// At least one checkpoint will be saved every maxStepsFromLastCheckpoint, except during holding animations.
         /// </summary>
-        public int maxStepNumFromLastCheckpoint = 10;
+        [SerializeField] private int maxStepsFromLastCheckpoint = 10;
 
-        public const int WarningStepNumFromLastCheckpoint = 100;
+        public const int WarningStepsFromLastCheckpoint = 100;
 
         /// <remarks>
         /// Modified by DialogueSaveCheckpoint(), EnsureCheckpoint() and RestoreCheckpoint()
         /// </remarks>
-        private int stepNumFromLastCheckpoint;
+        private int stepsFromLastCheckpoint;
 
         /// <summary>
         /// Restrain saving checkpoints.
@@ -771,9 +772,9 @@ namespace Nova
         /// This restraint has higher priority than EnsureCheckpoint().
         /// Modified by DialogueSaveCheckpoint(), RestrainCheckpoint() and RestoreCheckpoint()
         /// </remarks>
-        private int restrainCheckpointNum;
+        private int stepsCheckpointRestrained;
 
-        private bool checkpointRestrained => restrainCheckpointNum > 0;
+        private bool checkpointRestrained => stepsCheckpointRestrained > 0;
 
         /// <summary>
         /// Restrain saving checkpoints for given steps. Force overwrite the number of restraining steps when overridden is true.
@@ -783,10 +784,10 @@ namespace Nova
         public void RestrainCheckpoint(int steps, bool overridden = false)
         {
             // check overwrite
-            if (!overridden && restrainCheckpointNum >= steps) return;
+            if (!overridden && stepsCheckpointRestrained >= steps) return;
             // non-negative
             if (steps < 0) steps = 0;
-            restrainCheckpointNum = steps;
+            stepsCheckpointRestrained = steps;
         }
 
         /// <summary>
@@ -795,15 +796,15 @@ namespace Nova
         /// <remarks>
         /// Modified by DialogueSaveCheckpoint(), EnsureCheckpointOnNextDialogue() and RestoreCheckpoint()
         /// </remarks>
-        private bool forceCheckpoint;
+        private bool checkpointEnsured;
 
         public void EnsureCheckpointOnNextDialogue()
         {
-            forceCheckpoint = true;
+            checkpointEnsured = true;
         }
 
         private bool shouldSaveCheckpoint =>
-            forceCheckpoint || (!checkpointRestrained && stepNumFromLastCheckpoint >= maxStepNumFromLastCheckpoint);
+            checkpointEnsured || (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
 
         /// <summary>
         /// Force to get the current game state as a checkpoint
@@ -817,7 +818,7 @@ namespace Nova
                 restoreDatas[restorable.Key] = restorable.Value.GetRestoreData();
             }
 
-            return new GameStateCheckpoint(currentIndex, restoreDatas, variables, restrainCheckpointNum);
+            return new GameStateCheckpoint(currentIndex, restoreDatas, variables, stepsCheckpointRestrained);
         }
 
         private void RestoreCheckpoint(GameStateCheckpoint entry)
@@ -825,9 +826,9 @@ namespace Nova
             this.RuntimeAssert(entry != null, "Checkpoint is null.");
 
             currentIndex = entry.dialogueIndex;
-            stepNumFromLastCheckpoint = 0;
-            restrainCheckpointNum = entry.restrainCheckpointNum;
-            forceCheckpoint = false;
+            stepsFromLastCheckpoint = 0;
+            stepsCheckpointRestrained = entry.stepsCheckpointRestrained;
+            checkpointEnsured = false;
 
             variables.CloneFrom(entry.variables);
 
@@ -1061,6 +1062,6 @@ namespace Nova
 
         #endregion
 
-        // private string debugState => $"{currentNode?.name} {currentIndex} {variables.hash} | {stepNumFromLastCheckpoint} {restrainCheckpointNum} {forceCheckpoint} {shouldSaveCheckpoint}";
+        // private string debugState => $"{currentNode?.name} {currentIndex} {variables.hash} | {stepsFromLastCheckpoint} {stepsCheckpointRestrained} {checkpointEnsured} {shouldSaveCheckpoint}";
     }
 }
