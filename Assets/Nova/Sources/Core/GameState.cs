@@ -453,13 +453,17 @@ namespace Nova
             var isReached = currentIndex < nodeRecord.endDialogue;
             if (shouldSaveCheckpoint)
             {
-                stepsFromLastCheckpoint = 0;
                 StepCheckpoint(isReached);
             }
 
             if (!isReached)
             {
                 checkpointManager.AppendDialogue(nodeRecord, currentIndex, shouldSaveCheckpoint);
+            }
+
+            if (shouldSaveCheckpoint)
+            {
+                stepsFromLastCheckpoint = 0;
             }
 
             if (checkpointRestrained)
@@ -828,9 +832,11 @@ namespace Nova
             out int newDialogueIndex)
         {
             // Debug.Log($"stepback={steps}");
+            this.RuntimeAssert(steps >= 0, $"Invalid steps {steps}.");
 
             nodeHistory.Clear();
-            var hasLimit = steps != 0;
+            var hasLimit = steps > 0;
+
             var curNode = nodeRecord;
             nodeHistory.Add(curNode);
             var endDialogue = currentIndex;
@@ -846,12 +852,15 @@ namespace Nova
                 endDialogue = curNode.endDialogue;
             }
 
-            if (hasLimit && steps > endDialogue - curNode.beginDialogue)
+            if (!hasLimit || steps > endDialogue - curNode.beginDialogue)
             {
-                steps = 0;
+                newDialogueIndex = curNode.beginDialogue;
+            }
+            else
+            {
+                newDialogueIndex = endDialogue - steps;
             }
 
-            newDialogueIndex = curNode.beginDialogue + steps;
             newCheckpointOffset = checkpointManager.NextRecord(curNode.offset);
             var checkpointDialogue = checkpointManager.GetCheckpointDialogue(newCheckpointOffset);
             while (checkpointDialogue < curNode.lastCheckpointDialogue)
@@ -869,14 +878,12 @@ namespace Nova
             // Debug.Log($"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
         }
 
-        public bool SeekBackStep(int steps, out NodeRecord nodeRecord, out long newCheckpointOffset,
+        public void SeekBackStep(int steps, out NodeRecord nodeRecord, out long newCheckpointOffset,
             out int newDialogueIndex)
         {
             var list = new List<NodeRecord>();
             SeekBackStep(steps, list, out newCheckpointOffset, out newDialogueIndex);
             nodeRecord = list[list.Count - 1];
-            // TODO: not ideal
-            return true;
         }
 
         public bool isRestoring { get; private set; }
