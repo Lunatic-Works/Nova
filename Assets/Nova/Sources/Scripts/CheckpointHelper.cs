@@ -71,7 +71,7 @@ namespace Nova
         public VariableEntry GetGlobalVariable(string name)
         {
             EnsureGlobalVariables();
-            CheckName(name);
+            name = CheckName(name);
             globalVariables.TryGetValue(name, out var entry);
             return entry;
         }
@@ -92,7 +92,7 @@ namespace Nova
         public void SetGlobalVariable(string name, VariableType type, object value)
         {
             EnsureGlobalVariables();
-            CheckName(name);
+            name = CheckName(name);
             if (value == null)
             {
                 globalVariables.Remove(name);
