@@ -1,12 +1,11 @@
-﻿namespace Nova
+namespace Nova
 {
     // We cannot put this class into LazyComputableAnimationProperty,
     // otherwise the type parameters will cause trouble in Lua binding
     [ExportCustomType]
     public class UseRelativeValue
     {
-        public static UseRelativeValue Yes = new UseRelativeValue();
-        private UseRelativeValue() { }
+        public static readonly UseRelativeValue Yes = new UseRelativeValue();
     }
 
     public abstract class LazyComputableAnimationProperty<T, D> : IAnimationProperty

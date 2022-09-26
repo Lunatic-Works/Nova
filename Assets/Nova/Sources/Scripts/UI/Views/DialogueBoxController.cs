@@ -142,7 +142,7 @@ namespace Nova
         [SerializeField] private GameObject basicBackgroundGO;
 
         [SerializeField] private List<Image> backgroundImages;
-        private List<CanvasGroup> backgroundCanvasGroups = new List<CanvasGroup>();
+        private readonly List<CanvasGroup> backgroundCanvasGroups = new List<CanvasGroup>();
         [SerializeField] private List<Button> hideDialogueButtons;
         [SerializeField] private List<GameObject> dialogueFinishIcons;
 
@@ -707,6 +707,7 @@ namespace Nova
                     return;
                 }
 
+                _closeButtonShown = value;
                 foreach (var btn in hideDialogueButtons)
                 {
                     btn.gameObject.SetActive(value);

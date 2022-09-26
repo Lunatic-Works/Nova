@@ -78,6 +78,9 @@ packages.config
 *.ndproj
 NDependOut/
 
+# SonarQube
+.sonarqube
+
 *.patch
 *.pptx
 *.pyc
