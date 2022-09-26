@@ -313,8 +313,8 @@ namespace Nova.Generate
         f.write(
             indent_lines(
                 """
-public static readonly Dictionary<string, Dictionary<string, ShaderPropertyType>> TypeData =
-    new Dictionary<string, Dictionary<string, ShaderPropertyType>>
+public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, ShaderPropertyType>> TypeData =
+    new Dictionary<string, IReadOnlyDictionary<string, ShaderPropertyType>>
 {
 """, 8) + '\n')
         for shader_name, now_type_data in sorted(type_data.items()):
@@ -340,8 +340,8 @@ public static readonly Dictionary<string, Dictionary<string, ShaderPropertyType>
         f.write(
             indent_lines(
                 """
-public static readonly Dictionary<string, Dictionary<string, float>> FloatData =
-    new Dictionary<string, Dictionary<string, float>>
+public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, float>> FloatData =
+    new Dictionary<string, IReadOnlyDictionary<string, float>>
 {
 """, 8) + '\n')
         for shader_name, now_float_data in sorted(float_data.items()):
@@ -365,8 +365,8 @@ public static readonly Dictionary<string, Dictionary<string, float>> FloatData =
         f.write(
             indent_lines(
                 """
-public static readonly Dictionary<string, Dictionary<string, Color>> ColorData =
-    new Dictionary<string, Dictionary<string, Color>>
+public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, Color>> ColorData =
+    new Dictionary<string, IReadOnlyDictionary<string, Color>>
 {
 """, 8) + '\n')
         for shader_name, now_color_data in sorted(color_data.items()):
@@ -392,8 +392,8 @@ public static readonly Dictionary<string, Dictionary<string, Color>> ColorData =
         f.write(
             indent_lines(
                 """
-public static readonly Dictionary<string, Dictionary<string, Vector4>> VectorData =
-    new Dictionary<string, Dictionary<string, Vector4>>
+public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, Vector4>> VectorData =
+    new Dictionary<string, IReadOnlyDictionary<string, Vector4>>
 {
 """, 8) + '\n')
         for shader_name, now_vector_data in sorted(vector_data.items()):
