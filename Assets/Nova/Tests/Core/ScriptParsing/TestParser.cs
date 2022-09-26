@@ -104,19 +104,19 @@ Text
 ");
             Assert.NotNull(parsed);
             var blocks = parsed.blocks;
-            Assert.AreEqual(blocks.Count, 4);
+            Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
                 Assert.IsNull(block.attributes);
             }
 
-            Assert.AreEqual(blocks[0].type, BlockType.EagerExecution);
-            Assert.AreEqual(blocks[0].content, " hello_world ");
-            Assert.AreEqual(blocks[1].type, BlockType.Separator);
-            Assert.AreEqual(blocks[2].type, BlockType.LazyExecution);
-            Assert.AreEqual(blocks[2].content, "\n--[[ <| |> ]] ");
-            Assert.AreEqual(blocks[3].type, BlockType.Text);
-            Assert.AreEqual(blocks[3].content, "Text");
+            Assert.AreEqual(BlockType.EagerExecution, blocks[0].type);
+            Assert.AreEqual(" hello_world ", blocks[0].content);
+            Assert.AreEqual(BlockType.Separator, blocks[1].type);
+            Assert.AreEqual(BlockType.LazyExecution, blocks[2].type);
+            Assert.AreEqual("\n--[[ <| |> ]] ", blocks[2].content);
+            Assert.AreEqual(BlockType.Text, blocks[3].type);
+            Assert.AreEqual("Text", blocks[3].content);
         }
 
         [Test]
