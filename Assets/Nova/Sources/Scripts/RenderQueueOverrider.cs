@@ -13,11 +13,9 @@ namespace Nova
 
         private void Awake()
         {
-            renderer = GetComponent<Renderer>();
-            if (renderer == null)
+            if (!TryGetComponent<Renderer>(out renderer))
             {
-                var textureChanger = GetComponent<IOverlayRenderer>();
-                if (textureChanger != null)
+                if (TryGetComponent<IOverlayRenderer>(out var textureChanger))
                 {
                     renderer = textureChanger.overlay.GetComponent<Renderer>();
                 }

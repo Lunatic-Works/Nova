@@ -81,8 +81,7 @@ namespace Nova
 
         public static T Ensure<T>(this GameObject go) where T : Component
         {
-            var x = go.GetComponent<T>();
-            if (x == null)
+            if (!go.TryGetComponent<T>(out var x))
             {
                 x = go.AddComponent<T>();
             }
@@ -134,8 +133,7 @@ namespace Nova
                     "Nova: Cannot find NovaGameController game object by tag. Maybe you should put NovaCreator prefab in your scene.");
             }
 
-            var gameController = go.GetComponent<GameController>();
-            if (gameController == null)
+            if (!go.TryGetComponent<GameController>(out var gameController))
             {
                 throw new InvalidAccessException(
                     "Nova: No GameController component in NovaGameController game object.");
@@ -152,8 +150,7 @@ namespace Nova
                 throw new InvalidAccessException("Nova: Cannot find RenderManager game object by tag.");
             }
 
-            var gameRenderManager = go.GetComponent<GameRenderManager>();
-            if (gameRenderManager == null)
+            if (!go.TryGetComponent<GameRenderManager>(out var gameRenderManager))
             {
                 throw new InvalidAccessException("Nova: No GameRenderManager component in RenderManager game object.");
             }
@@ -169,8 +166,7 @@ namespace Nova
                 throw new InvalidAccessException("Nova: Cannot find UI root game object by tag.");
             }
 
-            var viewManager = go.GetComponent<ViewManager>();
-            if (viewManager == null)
+            if (!go.TryGetComponent<ViewManager>(out var viewManager))
             {
                 throw new InvalidAccessException("Nova: No ViewManager component in UI root game object.");
             }

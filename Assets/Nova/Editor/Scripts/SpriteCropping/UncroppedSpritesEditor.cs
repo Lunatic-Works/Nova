@@ -26,8 +26,7 @@ namespace Nova.Editor
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                var oldSprites = go.GetComponent<UncroppedSprites>();
-                if (oldSprites == null)
+                if (!go.TryGetComponent<UncroppedSprites>(out var oldSprites))
                 {
                     continue;
                 }

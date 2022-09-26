@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -7,7 +7,7 @@ namespace Nova
     [ExportCustomType]
     public class TimelineController : PrefabLoader
     {
-        public CameraController gameCamera;
+        [SerializeField] private CameraController gameCamera;
 
         public PlayableDirector playableDirector { get; private set; }
 
@@ -24,9 +24,9 @@ namespace Nova
 
             prefabInstance.SetActive(false);
 
-            playableDirector = prefabInstance.GetComponent<PlayableDirector>();
-            if (playableDirector != null)
+            if (prefabInstance.TryGetComponent<PlayableDirector>(out var _playableDirector))
             {
+                playableDirector = _playableDirector;
                 playableDirector.timeUpdateMode = DirectorUpdateMode.Manual;
                 playableDirector.playOnAwake = false;
                 playableDirector.Evaluate();
@@ -35,7 +35,7 @@ namespace Nova
             Camera newCamera = prefabInstance.GetComponentInChildren<Camera>();
             if (newCamera != null)
             {
-                this.RuntimeAssert(newCamera.GetComponent<CameraController>() == null,
+                this.RuntimeAssert(!newCamera.TryGetComponent<CameraController>(out _),
                     "The camera in the timeline prefab should not have a CameraController.");
 
                 gameCamera.cameraEnabled = false;

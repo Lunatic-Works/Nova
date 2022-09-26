@@ -27,8 +27,7 @@ namespace Nova
 
         private void Awake()
         {
-            Renderer renderer = GetComponent<Renderer>();
-            if (renderer != null)
+            if (TryGetComponent<Renderer>(out var renderer))
             {
                 defaultMaterial = renderer.material;
             }

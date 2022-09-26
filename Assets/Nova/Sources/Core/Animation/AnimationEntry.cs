@@ -73,8 +73,7 @@ namespace Nova
                 float ret = 0.0f;
                 foreach (Transform child in transform)
                 {
-                    var anim = child.GetComponent<AnimationEntry>();
-                    if (anim == null) continue;
+                    if (!child.TryGetComponent<AnimationEntry>(out var anim)) continue;
                     float d = anim.totalDuration;
                     if (d > ret) ret = d;
                 }
@@ -344,8 +343,7 @@ namespace Nova
             Debug.Log($"{new string('+', level)}{property} {duration} {status}");
             foreach (Transform child in transform)
             {
-                var entry = child.GetComponent<AnimationEntry>();
-                if (entry == null) continue;
+                if (!child.TryGetComponent<AnimationEntry>(out var entry)) continue;
                 entry.DebugPrint(level + 1);
             }
         }

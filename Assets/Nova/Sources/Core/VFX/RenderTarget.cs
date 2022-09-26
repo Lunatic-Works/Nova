@@ -94,7 +94,7 @@ namespace Nova
 
             private void SetMatTexture(RenderTexture texture)
             {
-                var x = texture == null ? "null" : texture.name;
+                // var x = texture == null ? "null" : texture.name;
                 // Debug.Log($"setMatTexture {this}=>{x}");
                 mat.SetTexture(texName, texture);
             }

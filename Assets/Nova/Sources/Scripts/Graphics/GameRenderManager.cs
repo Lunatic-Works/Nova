@@ -260,16 +260,12 @@ namespace Nova
                 RealScreen.fHeight = lastScreenWidth / desiredAspectRatio;
                 RealScreen.height = (int)RealScreen.fHeight;
                 RealScreen.fWidth = RealScreen.width = lastScreenWidth;
-
-                var delta = 1 - aspectRatio / RealScreen.aspectRatio;
             }
             else
             {
                 RealScreen.fWidth = lastScreenHeight * desiredAspectRatio;
                 RealScreen.width = (int)RealScreen.fWidth;
                 RealScreen.fHeight = RealScreen.height = lastScreenHeight;
-
-                var delta = 1 - RealScreen.aspectRatio / aspectRatio;
             }
 
             if (RealScreen.isScreenInitialized &&

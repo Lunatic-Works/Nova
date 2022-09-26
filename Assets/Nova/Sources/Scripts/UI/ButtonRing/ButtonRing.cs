@@ -105,7 +105,7 @@ namespace Nova
         {
             var t = transform;
             var pos = Vector2.zero;
-            while (t.GetComponent<Canvas>() == null)
+            while (!t.TryGetComponent<Canvas>(out _))
             {
                 var rect = t.GetComponent<RectTransform>();
                 pos += rect.anchoredPosition;

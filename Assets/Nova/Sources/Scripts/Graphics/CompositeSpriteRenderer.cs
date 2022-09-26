@@ -22,8 +22,7 @@ namespace Nova
             cmd.ClearRenderTarget(true, true, Color.clear);
             cmd.Blit(BuiltinRenderTextureType.None, target, controller.fadeMaterial);
 
-            var postProcessing = controller.GetComponent<PostProcessing>();
-            if (postProcessing != null)
+            if (controller.TryGetComponent<PostProcessing>(out var postProcessing))
             {
                 postProcessing.Blit(cmd, target);
             }
@@ -42,8 +41,8 @@ namespace Nova
             cmd.GetTemporaryRT(PostProcessing.TempBlitId, width, height, 0);
             foreach (var go in gos)
             {
-                var controller = go.GetComponent<CompositeSpriteController>();
-                if (controller != null && (controller.layer == -1 || (((1 << controller.layer) & camera.cullingMask) != 0)))
+                if (go.TryGetComponent<CompositeSpriteController>(out var controller) &&
+                    (controller.layer == -1 || (((1 << controller.layer) & camera.cullingMask) != 0)))
                 {
                     if (controller.renderToCamera)
                     {

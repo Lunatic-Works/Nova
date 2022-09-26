@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -195,8 +195,7 @@ namespace Nova
             Debug.Log($"DebugPrintEntries begin {this}");
             foreach (Transform child in transform)
             {
-                var entry = child.GetComponent<AnimationEntry>();
-                if (entry == null) continue;
+                if (!child.TryGetComponent<AnimationEntry>(out var entry)) continue;
                 entry.DebugPrint(0);
             }
 
