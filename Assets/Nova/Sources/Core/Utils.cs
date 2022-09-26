@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nova.Exceptions;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.InputSystem;
 using UnityObject = UnityEngine.Object;
 
 namespace Nova
@@ -314,7 +312,7 @@ namespace Nova
 #endif
         }
 
-        // Only use in editor code
+        // Only use in editor code or when not inherited from MonoBehaviour
         public static void DestroyObject(UnityObject obj)
         {
             if (obj == null) return;
@@ -340,70 +338,6 @@ namespace Nova
             }
 
             return x != null;
-        }
-
-        public static TextAlignmentOptions TextAnchor2TextAlignmentOptions(TextAnchor anchor)
-        {
-            switch (anchor)
-            {
-                case TextAnchor.UpperLeft:
-                    return TextAlignmentOptions.TopJustified;
-                case TextAnchor.UpperCenter:
-                    return TextAlignmentOptions.Top;
-                case TextAnchor.UpperRight:
-                    return TextAlignmentOptions.TopRight;
-                case TextAnchor.MiddleLeft:
-                    return TextAlignmentOptions.MidlineJustified;
-                case TextAnchor.MiddleCenter:
-                    return TextAlignmentOptions.Midline;
-                case TextAnchor.MiddleRight:
-                    return TextAlignmentOptions.MidlineRight;
-                case TextAnchor.LowerLeft:
-                    return TextAlignmentOptions.BottomJustified;
-                case TextAnchor.LowerCenter:
-                    return TextAlignmentOptions.Bottom;
-                case TextAnchor.LowerRight:
-                    return TextAlignmentOptions.BottomRight;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public static TextAnchor TextAlignmentOptions2TextAnchor(TextAlignmentOptions anchor)
-        {
-            switch (anchor)
-            {
-                case TextAlignmentOptions.TopJustified:
-                    return TextAnchor.UpperLeft;
-                case TextAlignmentOptions.Top:
-                    return TextAnchor.UpperCenter;
-                case TextAlignmentOptions.TopRight:
-                    return TextAnchor.UpperRight;
-                case TextAlignmentOptions.MidlineJustified:
-                    return TextAnchor.MiddleLeft;
-                case TextAlignmentOptions.Midline:
-                    return TextAnchor.MiddleCenter;
-                case TextAlignmentOptions.MidlineRight:
-                    return TextAnchor.MiddleRight;
-                case TextAlignmentOptions.BottomJustified:
-                    return TextAnchor.LowerLeft;
-                case TextAlignmentOptions.Bottom:
-                    return TextAnchor.LowerCenter;
-                case TextAlignmentOptions.BottomRight:
-                    return TextAnchor.LowerRight;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public static IEnumerable<T> LazyList<T>(T first, Func<T, T> next)
-        {
-            var curr = first;
-            while (curr != null)
-            {
-                yield return curr;
-                curr = next(curr);
-            }
         }
 
         public static int ConvertSamples(AudioClip source, AudioClip target)
