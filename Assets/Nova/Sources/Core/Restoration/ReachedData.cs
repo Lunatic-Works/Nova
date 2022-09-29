@@ -5,6 +5,8 @@ namespace Nova
 {
     using VoiceEntries = Dictionary<string, VoiceEntry>;
 
+    public interface IReachedData : ISerializedData { }
+
     public readonly struct ReachedDialoguePosition
     {
         public readonly NodeRecord nodeRecord;
@@ -34,7 +36,18 @@ namespace Nova
     }
 
     [Serializable]
-    public class ReachedDialogueData
+    public class ReachedEndData : IReachedData
+    {
+        public readonly string endName;
+
+        public ReachedEndData(string endName)
+        {
+            this.endName = endName;
+        }
+    }
+
+    [Serializable]
+    public class ReachedDialogueData : IReachedData
     {
         public readonly string nodeName;
         public readonly int dialogueIndex;

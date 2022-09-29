@@ -11,7 +11,7 @@ namespace Nova
     /// </summary>
     /// <typeparam name="T">Type of values in the hash set</typeparam>
     [Serializable]
-    public class SerializableHashSet<T> : HashSet<T>, IRestoreData
+    public class SerializableHashSet<T> : HashSet<T>, ISerializedData
     {
         public SerializableHashSet() { }
 
