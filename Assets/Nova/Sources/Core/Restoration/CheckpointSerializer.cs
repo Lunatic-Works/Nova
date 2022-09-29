@@ -48,12 +48,13 @@ namespace Nova
 
         private const int RecordHeader = 4; // sizeof(int)
 
+        // Not to allow other assembly for security reason
         private class JsonTypeBinder : ISerializationBinder
         {
             public void BindToName(Type serializedType, out string assemblyName, out string typeName)
             {
                 var curAssembly = Assembly.GetExecutingAssembly();
-                if (!typeof(IRestoreData).IsAssignableFrom(serializedType) || serializedType.Assembly != curAssembly)
+                if (!typeof(ISerializedData).IsAssignableFrom(serializedType) || serializedType.Assembly != curAssembly)
                 {
                     throw CheckpointCorruptedException.JsonTypeDenied(serializedType.Name);
                 }
@@ -65,7 +66,7 @@ namespace Nova
             {
                 var curAssembly = Assembly.GetExecutingAssembly();
                 var type = curAssembly.GetType(typeName);
-                if (assemblyName != curAssembly.GetName().Name || type == null || !typeof(IRestoreData).IsAssignableFrom(type))
+                if (assemblyName != curAssembly.GetName().Name || type == null || !typeof(ISerializedData).IsAssignableFrom(type))
                 {
                     throw CheckpointCorruptedException.JsonTypeDenied(typeName);
                 }
@@ -88,7 +89,16 @@ namespace Nova
             {
                 TypeNameHandling = TypeNameHandling.Auto,
                 SerializationBinder = new JsonTypeBinder(),
-
+                ContractResolver = new DefaultContractResolver()
+                {
+                    // By default, public fields and properties are serialized
+                    // use this option to enable Fields serialization mode automatically for [Serializable] objects
+                    // i.e. all private and public fields are serialized
+                    // it also enables the use of uninitialized constructor
+                    IgnoreSerializableAttribute = false,
+                    // this seems to make ISerializable the same behavior as [Serializable]
+                    IgnoreSerializableInterface = false,
+                },
             };
         }
 
@@ -248,61 +258,54 @@ namespace Nova
             AppendRecord(record.offset, record.ToByteSegment());
         }
 
-        public void SerializeRecord(long offset, object data, bool compress = defaultCompress)
+        public void SerializeRecord<T>(long offset, T data, bool compress = defaultCompress)
         {
             using var mem = new MemoryStream();
             if (compress)
             {
                 using var compressor = new DeflateStream(mem, CompressionMode.Compress, true);
                 using var sw = new StreamWriter(compressor, Encoding.Default, 1024, true);
-                jsonSerializer.Serialize(sw, data);
+                jsonSerializer.Serialize(sw, data, typeof(T));
             }
             else
             {
                 using var sw = new StreamWriter(mem, Encoding.Default, 1024, true);
-                jsonSerializer.Serialize(sw, data);
+                jsonSerializer.Serialize(sw, data, typeof(T));
             }
 
+            Debug.Log($"serialize type={typeof(T)} json={Encoding.UTF8.GetString(mem.GetBuffer(), 0, (int)mem.Position)}");
             AppendRecord(offset, new ByteSegment(mem.GetBuffer(), 0, (int)mem.Position));
         }
 
-        public object DeserializeRecord(long offset, bool compress = defaultCompress)
+        public T DeserializeRecord<T>(long offset, bool compress = defaultCompress)
         {
-            using var mem = GetRecord(offset).ToStream();
+            var record = GetRecord(offset);
+            using var mem = record.ToStream();
+            Debug.Log($"deserialize type={typeof(T)} json={record.ReadString(0)})");
             try
             {
-                object obj;
+                T obj;
                 if (compress)
                 {
                     using var decompressor = new DeflateStream(mem, CompressionMode.Decompress);
                     using var sr = new StreamReader(decompressor);
                     using var jr = new JsonTextReader(sr);
-                    obj = jsonSerializer.Deserialize(jr);
+                    obj = jsonSerializer.Deserialize<T>(jr);
                 }
                 else
                 {
-                    Debug.Log(Encoding.UTF8.GetString(mem.GetBuffer()));
                     using var sr = new StreamReader(mem);
                     using var jr = new JsonTextReader(sr);
-                    obj = jsonSerializer.Deserialize(jr);
+                    obj = jsonSerializer.Deserialize<T>(jr);
                 }
 
                 return obj;
             }
             catch (Exception e)
             {
+                Debug.LogException(e);
                 throw CheckpointCorruptedException.SerializationError(offset, e.Message);
             }
-        }
-
-        public T DeserializeRecord<T>(long offset, bool compress = true)
-        {
-            if (DeserializeRecord(offset, compress) is T val)
-            {
-                return val;
-            }
-
-            throw CheckpointCorruptedException.SerializationError(offset, $"Type mismatch, need {typeof(T)}");
         }
 
         public void Flush()

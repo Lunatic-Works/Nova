@@ -44,10 +44,10 @@ namespace Nova
             reachedEnds.Clear();
             for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = serializer.NextRecord(cur))
             {
-                var record = serializer.DeserializeRecord(cur);
-                if (record is string endName)
+                var record = serializer.DeserializeRecord<IReachedData>(cur);
+                if (record is ReachedEndData end)
                 {
-                    reachedEnds.Add(endName);
+                    reachedEnds.Add(end.endName);
                 }
                 else if (record is ReachedDialogueData dialogue)
                 {
@@ -234,7 +234,7 @@ namespace Nova
             }
 
             reachedDialogues.Add(key, data);
-            serializer.SerializeRecord(globalSave.endReached, data);
+            serializer.SerializeRecord(globalSave.endReached, (IReachedData)data);
             NewReached();
         }
 
@@ -252,7 +252,8 @@ namespace Nova
             }
 
             reachedEnds.Add(endName);
-            serializer.SerializeRecord(globalSave.endReached, endName);
+            var reachedData = (IReachedData)new ReachedEndData(endName);
+            serializer.SerializeRecord(globalSave.endReached, reachedData);
             NewReached();
         }
 
