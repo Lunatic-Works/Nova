@@ -7,7 +7,10 @@ namespace Nova.URP
 {
     public class OnRenderImageFeature : ScriptableRendererFeature
     {
-        public static readonly int DefaultCameraTarget = Shader.PropertyToID("_CameraColorTexture");
+        public static RenderTargetIdentifier GetCurrentTarget(ref RenderingData renderingData)
+        {
+            return renderingData.cameraData.renderer.cameraColorTarget;
+        }
 
         private class CustomRenderPass : ScriptableRenderPass
         {

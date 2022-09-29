@@ -34,6 +34,7 @@ namespace Nova
             var camera = renderingData.cameraData.camera;
             var width = renderingData.cameraData.camera.scaledPixelWidth;
             var height = renderingData.cameraData.camera.scaledPixelHeight;
+            var cameraTarget = OnRenderImageFeature.GetCurrentTarget(ref renderingData);
 
             var cmd = CommandBufferPool.Get("Render Composite Sprite");
             cmd.GetTemporaryRT(PrimaryTexID, width, height, 0);
@@ -46,7 +47,7 @@ namespace Nova
                 {
                     if (controller.renderToCamera)
                     {
-                        Render(controller, cmd, OnRenderImageFeature.DefaultCameraTarget);
+                        Render(controller, cmd, cameraTarget);
                     }
                     else if (controller.renderTexture != null)
                     {
@@ -60,7 +61,7 @@ namespace Nova
             cmd.ReleaseTemporaryRT(PostProcessing.TempBlitId);
             // Manually reset default render target.
             // The render target is not automatically restored on some render backend :(
-            cmd.SetRenderTarget(OnRenderImageFeature.DefaultCameraTarget);
+            cmd.SetRenderTarget(cameraTarget);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }

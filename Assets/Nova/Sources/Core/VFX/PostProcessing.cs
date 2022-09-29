@@ -111,7 +111,7 @@ namespace Nova
             var cam = renderingData.cameraData.camera;
             cmd.GetTemporaryRT(TempBlitId, cam.scaledPixelWidth, cam.scaledPixelHeight, 0);
 
-            Blit(cmd, OnRenderImageFeature.DefaultCameraTarget);
+            Blit(cmd, OnRenderImageFeature.GetCurrentTarget(ref renderingData));
 
             cmd.ReleaseTemporaryRT(TempBlitId);
             context.ExecuteCommandBuffer(cmd);
