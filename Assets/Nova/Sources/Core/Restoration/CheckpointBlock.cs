@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using UnityEngine;
+using System.Linq;
 // using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Nova
@@ -20,7 +20,8 @@ namespace Nova
         {
             var id = offset / BlockSize;
             index = (int)(offset - id * BlockSize) - HeaderSize;
-            if (index < 0)
+            var minIndex = id == 0 ? CheckpointSerializer.FileHeaderSize : 0;
+            if (index < minIndex)
             {
                 throw CheckpointCorruptedException.BadOffset(offset);
             }
@@ -59,7 +60,18 @@ namespace Nova
             var block = new CheckpointBlock(stream, id);
             stream.Seek(block.offset, SeekOrigin.Begin);
             stream.Read(block.data, 0, BlockSize);
-            block._nextBlock = BitConverter.ToInt64(block.data, 0);
+            var index = 0;
+            if (id == 0)
+            {
+                var header = CheckpointSerializer.FileHeader;
+                var version = BitConverter.ToInt32(block.data, header.Length);
+                if (version != CheckpointSerializer.Version || !header.SequenceEqual(block.data.Take(header.Length)))
+                {
+                    throw CheckpointCorruptedException.BadHeader;
+                }
+                index += CheckpointSerializer.FileHeaderSize;
+            }
+            block._nextBlock = BitConverter.ToInt64(block.data, index);
             block.dirty = false;
 
             // var end = Stopwatch.GetTimestamp();
@@ -90,8 +102,18 @@ namespace Nova
             // Debug.Log($"flush block {id}");
             // var start = Stopwatch.GetTimestamp();
 
+
+            var index = 0;
+            if (id == 0)
+            {
+                var version = BitConverter.GetBytes(CheckpointSerializer.Version);
+                var header = CheckpointSerializer.FileHeader;
+                Buffer.BlockCopy(header, 0, data, 0, header.Length);
+                Buffer.BlockCopy(version, 0, data, header.Length, 4);
+                index += CheckpointSerializer.FileHeaderSize;
+            }
             var x = BitConverter.GetBytes(_nextBlock);
-            Buffer.BlockCopy(x, 0, data, 0, HeaderSize);
+            Buffer.BlockCopy(x, 0, data, index, HeaderSize);
             stream.Seek(offset, SeekOrigin.Begin);
             stream.Write(data, 0, BlockSize);
             dirty = false;
