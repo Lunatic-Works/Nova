@@ -6,11 +6,7 @@ namespace Nova
     [Serializable]
     public class GlobalSave
     {
-        // Cannot be static, because they need to be serialized into the file
-        public readonly int version;
-        public readonly byte[] fileHeader;
-        public readonly long identifier = DateTime.Now.ToBinary();
-
+        public readonly long identifier;
         public long beginReached;
         public long endReached;
         public long beginCheckpoint;
@@ -20,8 +16,7 @@ namespace Nova
 
         public GlobalSave(CheckpointSerializer serializer)
         {
-            version = CheckpointSerializer.Version;
-            fileHeader = CheckpointSerializer.FileHeader;
+            identifier = DateTime.Now.ToBinary();
             beginReached = endReached = serializer.BeginRecord();
             beginCheckpoint = endCheckpoint = serializer.BeginRecord();
         }

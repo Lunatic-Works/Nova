@@ -31,11 +31,6 @@ namespace Nova
         private void InitGlobalSave()
         {
             globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset);
-            if (globalSave.version != CheckpointSerializer.Version ||
-                !CheckpointSerializer.FileHeader.SequenceEqual(globalSave.fileHeader))
-            {
-                throw CheckpointCorruptedException.BadHeader;
-            }
         }
 
         private void InitReached()

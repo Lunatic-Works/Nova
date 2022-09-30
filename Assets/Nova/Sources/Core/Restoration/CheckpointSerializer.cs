@@ -16,7 +16,7 @@ namespace Nova
         public CheckpointCorruptedException(string message) : base(message) { }
 
         public static readonly CheckpointCorruptedException BadHeader =
-            new CheckpointCorruptedException("File header or version mismatch.");
+            new CheckpointCorruptedException("File header or version mismatch");
 
         public static CheckpointCorruptedException BadOffset(long offset)
         {
@@ -25,7 +25,7 @@ namespace Nova
 
         public static CheckpointCorruptedException RecordOverflow(long offset)
         {
-            return new CheckpointCorruptedException($"Record @{offset} overflow.");
+            return new CheckpointCorruptedException($"Record @{offset} overflow");
         }
 
         public static CheckpointCorruptedException SerializationError(long offset, string reason)
@@ -41,10 +41,11 @@ namespace Nova
 
     public class CheckpointSerializer : IDisposable
     {
-        public const int Version = 3;
+        public const int Version = 4;
         public const bool defaultCompress = false;
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
-        public const long GlobalSaveOffset = CheckpointBlock.HeaderSize;
+        public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
+        public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
 
         private const int RecordHeader = 4; // sizeof(int)
 
