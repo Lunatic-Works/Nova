@@ -16,7 +16,7 @@ namespace Nova
         public CheckpointCorruptedException(string message) : base(message) { }
 
         public static readonly CheckpointCorruptedException BadHeader =
-            new CheckpointCorruptedException("File header or version mismatch");
+            new CheckpointCorruptedException($"File header or version mismatch, expected version={CheckpointSerializer.Version}.");
 
         public static CheckpointCorruptedException BadOffset(long offset)
         {
@@ -25,7 +25,7 @@ namespace Nova
 
         public static CheckpointCorruptedException RecordOverflow(long offset)
         {
-            return new CheckpointCorruptedException($"Record @{offset} overflow");
+            return new CheckpointCorruptedException($"Record @{offset} overflow.");
         }
 
         public static CheckpointCorruptedException SerializationError(long offset, string reason)
