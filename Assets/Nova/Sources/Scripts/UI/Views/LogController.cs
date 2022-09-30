@@ -388,8 +388,7 @@ namespace Nova
 
                 if (displayData == null)
                 {
-                    var node = gameState.flowChartTree.GetNode(pos.nodeRecord.name);
-                    gameState.AddDeferredDialogueChunks(node);
+                    var node = gameState.GetNode(pos.nodeRecord.name);
                     var entry = node.GetDialogueEntryAt(pos.dialogueIndex);
                     displayData = entry.GetDisplayData();
                 }

@@ -415,7 +415,7 @@ namespace Nova
             var pendingJumpTarget = advancedDialogueHelper.GetJump();
             if (pendingJumpTarget != null)
             {
-                var node = flowChartTree.GetNode(pendingJumpTarget);
+                var node = GetNode(pendingJumpTarget);
                 this.RuntimeAssert(node != null, $"Node {pendingJumpTarget} not found.");
                 MoveToNextNode(node);
             }
@@ -524,14 +524,9 @@ namespace Nova
             checkpointEnsured = true;
         }
 
-        public void AddDeferredDialogueChunks(FlowChartNode node)
-        {
-            scriptLoader.AddDeferredDialogueChunks(node);
-        }
-
         private void MoveToNextNode(FlowChartNode nextNode)
         {
-            AddDeferredDialogueChunks(nextNode);
+            scriptLoader.AddDeferredDialogueChunks(nextNode);
             nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
             currentNode = nextNode;
             currentIndex = 0;
@@ -633,7 +628,9 @@ namespace Nova
 
         public FlowChartNode GetNode(string name)
         {
-            return flowChartTree.GetNode(name);
+            var node = flowChartTree.GetNode(name);
+            scriptLoader.AddDeferredDialogueChunks(node);
+            return node;
         }
 
         public IReadOnlyList<string> GetAllStartNodeNames()
@@ -925,8 +922,6 @@ namespace Nova
 
         public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
         {
-            // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
-
             CancelAction();
 
             // Animation should stop
@@ -940,7 +935,8 @@ namespace Nova
                 checkpointOffset = checkpointManager.NextRecord(checkpointOffset);
             }
 
-            currentNode = flowChartTree.GetNode(nodeRecord.name);
+            currentNode = GetNode(nodeRecord.name);
+            Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
 
             isRestoring = true;
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
