@@ -274,7 +274,7 @@ namespace Nova
                 jsonSerializer.Serialize(sw, data, typeof(T));
             }
 
-            Debug.Log($"serialize type={typeof(T)} json={Encoding.UTF8.GetString(mem.GetBuffer(), 0, (int)mem.Position)}");
+            // Debug.Log($"serialize type={typeof(T)} json={Encoding.UTF8.GetString(mem.GetBuffer(), 0, (int)mem.Position)}");
             AppendRecord(offset, new ByteSegment(mem.GetBuffer(), 0, (int)mem.Position));
         }
 
@@ -282,7 +282,7 @@ namespace Nova
         {
             var record = GetRecord(offset);
             using var mem = record.ToStream();
-            Debug.Log($"deserialize type={typeof(T)} json={record.ReadString(0)})");
+            // Debug.Log($"deserialize type={typeof(T)} json={record.ReadString(0)})");
             try
             {
                 T obj;
