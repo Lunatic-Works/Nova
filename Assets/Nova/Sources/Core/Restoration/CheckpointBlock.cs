@@ -69,8 +69,10 @@ namespace Nova
                 {
                     throw CheckpointCorruptedException.BadHeader;
                 }
+
                 index += CheckpointSerializer.FileHeaderSize;
             }
+
             block._nextBlock = BitConverter.ToInt64(block.data, index);
             block.dirty = false;
 
@@ -102,7 +104,6 @@ namespace Nova
             // Debug.Log($"flush block {id}");
             // var start = Stopwatch.GetTimestamp();
 
-
             var index = 0;
             if (id == 0)
             {
@@ -112,6 +113,7 @@ namespace Nova
                 Buffer.BlockCopy(version, 0, data, header.Length, 4);
                 index += CheckpointSerializer.FileHeaderSize;
             }
+
             var x = BitConverter.GetBytes(_nextBlock);
             Buffer.BlockCopy(x, 0, data, index, HeaderSize);
             stream.Seek(offset, SeekOrigin.Begin);

@@ -1,8 +1,8 @@
 using System;
-using System.Reflection;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -16,7 +16,8 @@ namespace Nova
         public CheckpointCorruptedException(string message) : base(message) { }
 
         public static readonly CheckpointCorruptedException BadHeader =
-            new CheckpointCorruptedException($"File header or version mismatch, expected version={CheckpointSerializer.Version}.");
+            new CheckpointCorruptedException(
+                $"File header or version mismatch, expected version={CheckpointSerializer.Version}.");
 
         public static CheckpointCorruptedException BadOffset(long offset)
         {
@@ -35,14 +36,14 @@ namespace Nova
 
         public static CheckpointCorruptedException JsonTypeDenied(string typeName)
         {
-            return new CheckpointCorruptedException($"json type {typeName} is not permitted to (de)serialize");
+            return new CheckpointCorruptedException($"JSON type {typeName} is not permitted to (de)serialize.");
         }
     }
 
     public class CheckpointSerializer : IDisposable
     {
         public const int Version = 4;
-        public const bool defaultCompress = true;
+        public const bool DefaultCompress = true;
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
         public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
         public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
@@ -59,6 +60,7 @@ namespace Nova
                 {
                     throw CheckpointCorruptedException.JsonTypeDenied(serializedType.Name);
                 }
+
                 assemblyName = curAssembly.GetName().Name;
                 typeName = serializedType.FullName;
             }
@@ -67,10 +69,12 @@ namespace Nova
             {
                 var curAssembly = Assembly.GetExecutingAssembly();
                 var type = curAssembly.GetType(typeName);
-                if (assemblyName != curAssembly.GetName().Name || type == null || !typeof(ISerializedData).IsAssignableFrom(type))
+                if (assemblyName != curAssembly.GetName().Name || type == null ||
+                    !typeof(ISerializedData).IsAssignableFrom(type))
                 {
                     throw CheckpointCorruptedException.JsonTypeDenied(typeName);
                 }
+
                 return type;
             }
         }
@@ -93,11 +97,11 @@ namespace Nova
                 ContractResolver = new DefaultContractResolver()
                 {
                     // By default, public fields and properties are serialized
-                    // use this option to enable Fields serialization mode automatically for [Serializable] objects
+                    // Use this option to enable Fields serialization mode automatically for [Serializable] objects
                     // i.e. all private and public fields are serialized
-                    // it also enables the use of uninitialized constructor
+                    // It also enables the use of uninitialized constructor
                     IgnoreSerializableAttribute = false,
-                    // this seems to make ISerializable the same behavior as [Serializable]
+                    // This seems to make ISerializable the same behavior as [Serializable]
                     IgnoreSerializableInterface = false,
                 },
             };
@@ -259,7 +263,7 @@ namespace Nova
             AppendRecord(record.offset, record.ToByteSegment());
         }
 
-        public void SerializeRecord<T>(long offset, T data, bool compress = defaultCompress)
+        public void SerializeRecord<T>(long offset, T data, bool compress = DefaultCompress)
         {
             using var mem = new MemoryStream();
             if (compress)
@@ -278,7 +282,7 @@ namespace Nova
             AppendRecord(offset, new ByteSegment(mem.GetBuffer(), 0, (int)mem.Position));
         }
 
-        public T DeserializeRecord<T>(long offset, bool compress = defaultCompress)
+        public T DeserializeRecord<T>(long offset, bool compress = DefaultCompress)
         {
             var record = GetRecord(offset);
             using var mem = record.ToStream();
@@ -348,14 +352,12 @@ namespace Nova
             using var r = new BinaryWriter(fs);
             r.Write(FileHeader);
             r.Write(Version);
-            using (var sr = new StringWriter())
-            using (var jr = new JsonTextWriter(sr))
-            {
-                jsonSerializer.Serialize(jr, obj);
-                jr.Flush();
-                jr.Close();
-                r.Write(sr.ToString());
-            }
+            using var sr = new StringWriter();
+            using var jr = new JsonTextWriter(sr);
+            jsonSerializer.Serialize(jr, obj);
+            jr.Flush();
+            jr.Close();
+            r.Write(sr.ToString());
         }
     }
 }

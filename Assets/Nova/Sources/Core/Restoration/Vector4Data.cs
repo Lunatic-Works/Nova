@@ -6,7 +6,7 @@ namespace Nova
     [Serializable]
     public class Vector4Data
     {
-        private float[] _data = { 0.0f, 0.0f, 0.0f, 0.0f };
+        private float[] _data = {0.0f, 0.0f, 0.0f, 0.0f};
 
         public float[] data
         {
@@ -40,7 +40,7 @@ namespace Nova
         {
             return new Vector4Data
             {
-                data = new[] { vec.x, vec.y, vec.z, vec.w }
+                data = new[] {vec.x, vec.y, vec.z, vec.w}
             };
         }
 
@@ -54,7 +54,7 @@ namespace Nova
         {
             return new Vector4Data
             {
-                data = new[] { color.r, color.g, color.b, color.a }
+                data = new[] {color.r, color.g, color.b, color.a}
             };
         }
 
@@ -68,7 +68,7 @@ namespace Nova
         {
             return new Vector4Data
             {
-                data = new[] { vec.x, vec.y, vec.z, vec.w }
+                data = new[] {vec.x, vec.y, vec.z, vec.w}
             };
         }
     }

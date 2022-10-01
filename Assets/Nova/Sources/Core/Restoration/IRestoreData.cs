@@ -1,9 +1,8 @@
-﻿namespace Nova
+namespace Nova
 {
     // A interface to replace the SerializableAttribute
-    // anything implements this interface are allowed to appear in the dynamic serialized objects of save data (in JSON)
-    // when serializeing/deserializing, a type check will be done to
-    // to make sure JSON serialization works
+    // Anything implements this interface are allowed to appear in the dynamic serialized objects of save data (in JSON)
+    // When serializing/deserializing, a type check will be done to make sure JSON serialization works
     public interface ISerializedData { }
 
     /// <summary>
