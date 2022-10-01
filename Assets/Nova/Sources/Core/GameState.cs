@@ -124,7 +124,7 @@ namespace Nova
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                Debug.LogException(e);
                 Utils.Quit();
             }
 
@@ -922,6 +922,8 @@ namespace Nova
 
         public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
         {
+            // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
+
             CancelAction();
 
             // Animation should stop
@@ -936,7 +938,7 @@ namespace Nova
             }
 
             currentNode = GetNode(nodeRecord.name);
-            Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
+            // Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
 
             isRestoring = true;
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);

@@ -6,7 +6,7 @@ namespace Nova
     [Serializable]
     public class Vector3Data
     {
-        private float[] _data = { 0.0f, 0.0f, 0.0f };
+        private float[] _data = {0.0f, 0.0f, 0.0f};
 
         public float[] data
         {
@@ -24,7 +24,7 @@ namespace Nova
         {
             return new Vector3Data
             {
-                data = new[] { vec.x, vec.y, vec.z }
+                data = new[] {vec.x, vec.y, vec.z}
             };
         }
     }
