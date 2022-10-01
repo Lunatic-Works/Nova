@@ -9,6 +9,8 @@ using UnityEngine.Events;
 
 namespace Nova
 {
+    using LocalizedStrings = Dictionary<SystemLanguage, string>;
+
     // object can be string or string[]
     //
     // For the i-th (zero-based) string in the string[],
@@ -19,7 +21,6 @@ namespace Nova
     // __("ivebeenthere", 2) == "I've been there twice"
     // __("ivebeenthere", 4) == "I've been there 4 times"
     using TranslationBundle = Dictionary<string, object>;
-    using LocalizedStrings = Dictionary<SystemLanguage, string>;
 
     [ExportCustomType]
     public static class I18n

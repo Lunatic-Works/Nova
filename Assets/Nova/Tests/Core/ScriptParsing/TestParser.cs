@@ -1,6 +1,5 @@
 using Nova.Script;
 using NUnit.Framework;
-using UnityEngine;
 
 namespace Tests
 {
