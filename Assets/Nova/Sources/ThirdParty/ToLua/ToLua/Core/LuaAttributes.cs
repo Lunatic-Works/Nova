@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -54,12 +54,12 @@ namespace LuaInterface
 
         }
     }
-    
+
     public sealed class LuaByteBufferAttribute : Attribute
-    {                
+    {
         public LuaByteBufferAttribute()
         {
-        }       
+        }
     }
 
     [AttributeUsage(AttributeTargets.Method)]

@@ -1,4 +1,4 @@
-﻿#if ENABLE_LUA_INJECTION
+#if ENABLE_LUA_INJECTION
 using System;
 using System.Collections.Generic;
 using Mono.Cecil;

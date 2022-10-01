@@ -1,4 +1,4 @@
-﻿using UnityEngine.EventSystems;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace Nova

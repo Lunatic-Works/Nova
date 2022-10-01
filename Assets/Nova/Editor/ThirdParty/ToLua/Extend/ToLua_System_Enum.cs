@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using LuaInterface;
 
 public class ToLua_System_Enum

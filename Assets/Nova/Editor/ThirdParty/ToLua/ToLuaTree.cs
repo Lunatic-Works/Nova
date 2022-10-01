@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,8 +32,8 @@ public class ToLuaNode<T>
     public int layer;
 }
 
-public class ToLuaTree<T> 
-{       
+public class ToLuaTree<T>
+{
     public ToLuaNode<T> _root = null;
     private List<ToLuaNode<T>> _list = null;
 
@@ -65,7 +65,7 @@ public class ToLuaTree<T>
 
     /*public void BreadthFirstTraversal(Action<ToLuaNode<T>> action)
     {
-        List<ToLuaNode<T>> root = _root.childs;        
+        List<ToLuaNode<T>> root = _root.childs;
         Queue<ToLuaNode<T>> queue = new Queue<ToLuaNode<T>>();
 
         for (int i = 0; i < root.Count; i++)
@@ -93,7 +93,7 @@ public class ToLuaTree<T>
         begin(node);
 
         for (int i = 0; i < node.childs.Count; i++)
-        {            
+        {
             DepthFirstTraversal(begin, end, node.childs[i]);
         }
 

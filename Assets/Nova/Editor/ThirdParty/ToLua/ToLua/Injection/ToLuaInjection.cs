@@ -10,7 +10,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unity.CecilTools;
 using Unity.CecilTools.Extensions;
-using CustomCecilRocks; 
+using CustomCecilRocks;
 using System.Reflection;
 using LuaInterface;
 using UnityEditor.Callbacks;
@@ -117,7 +117,7 @@ public static class ToLuaInjection
             EditorPrefs.SetInt(Application.dataPath + "WaitForInjection", 0);
         }
     }
-	
+
     [MenuItem("Lua/Inject All &i", false, 5)]
     static void InjectByMenu()
     {

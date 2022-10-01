@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using LuaInterface;
 
 public class ToLua_System_Delegate
-{    
+{
     public static string AdditionNameSpace = "System.Collections.Generic";
 
     [NoToLuaAttribute]
     public static string op_AdditionDefined =
 @"        try
-        {                        
+        {
             LuaTypes type = LuaDLL.lua_type(L, 1);
 
             switch (type)
@@ -43,7 +43,7 @@ public class ToLua_System_Delegate
     [NoToLuaAttribute]
     public static string op_SubtractionDefined =
 @"        try
-        {            
+        {
             Delegate arg0 = (Delegate)ToLua.CheckObject<Delegate>(L, 1);
             LuaTypes type = LuaDLL.lua_type(L, 2);
 
@@ -72,7 +72,7 @@ public class ToLua_System_Delegate
             else
             {
                 Delegate arg1 = (Delegate)ToLua.CheckObject<Delegate>(L, 2);
-                arg0 = DelegateFactory.RemoveDelegate(arg0, arg1);                
+                arg0 = DelegateFactory.RemoveDelegate(arg0, arg1);
                 ToLua.Push(L, arg0);
                 return 1;
             }
@@ -124,8 +124,8 @@ public class ToLua_System_Delegate
             LuaDelegate ld = ds[i].Target as LuaDelegate;
 
             if (ld != null)
-            {                
-                ld.Dispose();                
+            {
+                ld.Dispose();
             }
         }
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,7 +34,7 @@ namespace LuaInterface
         [NoToLuaAttribute]
         public LuaConstructor(ConstructorInfo func, Type[] types)
         {
-            method = func;            
+            method = func;
 
             if (types != null)
             {

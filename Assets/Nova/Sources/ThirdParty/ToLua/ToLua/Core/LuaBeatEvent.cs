@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,7 @@ using System;
 using LuaInterface;
 
 namespace LuaInterface
-{    
+{
     public class LuaBeatEvent : IDisposable
     {
         protected LuaState luaState;
@@ -34,20 +34,20 @@ namespace LuaInterface
         LuaFunction _remove = null;
         //LuaFunction _call = null;
 
-        public LuaBeatEvent(LuaTable table)            
+        public LuaBeatEvent(LuaTable table)
         {
             self = table;
             luaState = table.GetLuaState();
             self.AddRef();
-            
+
             _add = self.GetLuaFunction("Add");
             _remove = self.GetLuaFunction("Remove");
-            //_call = self.GetLuaFunction("__call");            
+            //_call = self.GetLuaFunction("__call");
         }
 
         public void Dispose()
         {
-            self.Dispose();            
+            self.Dispose();
             _add.Dispose();
             _remove.Dispose();
             //_call.Dispose();
@@ -59,7 +59,7 @@ namespace LuaInterface
             //_call = null;
             _add = null;
             _remove = null;
-            self = null;            
+            self = null;
             luaState = null;
         }
 

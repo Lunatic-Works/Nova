@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,8 +23,8 @@ using System;
 using UnityEngine;
 using LuaInterface;
 
-public class LuaLooper : MonoBehaviour 
-{    
+public class LuaLooper : MonoBehaviour
+{
     public LuaBeatEvent UpdateEvent
     {
         get;
@@ -45,7 +45,7 @@ public class LuaLooper : MonoBehaviour
 
     public LuaState luaState = null;
 
-    void Start() 
+    void Start()
     {
         try
         {
@@ -57,7 +57,7 @@ public class LuaLooper : MonoBehaviour
         {
             Destroy(this);
             throw e;
-        }        
+        }
 	}
 
     LuaBeatEvent GetEvent(string name)
@@ -78,7 +78,7 @@ public class LuaLooper : MonoBehaviour
     void ThrowException()
     {
         string error = luaState.LuaToString(-1);
-        luaState.LuaPop(2);                
+        luaState.LuaPop(2);
         throw new LuaException(error, LuaException.GetLastError());
     }
 

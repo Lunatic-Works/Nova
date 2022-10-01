@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using LuaInterface;
 
@@ -19,7 +19,7 @@ public class ToLua_System_String
             else
             {
                 return LuaDLL.luaL_throw(L, ""invalid arguments to string's ctor method"");
-            }            
+            }
         }
         catch(Exception e)
         {

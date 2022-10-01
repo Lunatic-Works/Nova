@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using LuaInterface;
 
 public class ToLua_LuaInterface_LuaMethod
 {
     public static string CallDefined =
 @"		try
-		{			
-			LuaMethod obj = (LuaMethod)ToLua.CheckObject(L, 1, typeof(LuaMethod));            
-			return obj.Call(L);						
+		{
+			LuaMethod obj = (LuaMethod)ToLua.CheckObject(L, 1, typeof(LuaMethod));
+			return obj.Call(L);
 		}
 		catch(Exception e)
 		{

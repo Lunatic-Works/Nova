@@ -8,7 +8,7 @@ namespace Nova
         private static readonly int PrimaryTextureID = Shader.PropertyToID("_PrimaryTex");
         private static readonly int SubTextureID = Shader.PropertyToID("_SubTex");
         private static readonly int OffsetsID = Shader.PropertyToID("_Offsets");
-        
+
         private Texture lastTexture;
 
         protected override string fadeShader => "Nova/VFX/Change Texture With Fade";

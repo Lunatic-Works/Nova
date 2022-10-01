@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using LuaInterface;
 
 public static partial class LuaBinder

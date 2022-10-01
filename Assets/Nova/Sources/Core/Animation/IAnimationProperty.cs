@@ -1,4 +1,4 @@
-﻿namespace Nova
+namespace Nova
 {
     /// <summary>
     /// The interface for properties controlled by NovaAnimation.

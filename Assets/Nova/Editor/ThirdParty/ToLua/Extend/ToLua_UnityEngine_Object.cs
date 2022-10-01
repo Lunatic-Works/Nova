@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using LuaInterface;
 
-public class ToLua_UnityEngine_Object     
-{        
+public class ToLua_UnityEngine_Object
+{
     public static string DestroyDefined =
 @"        try
         {
@@ -17,7 +17,7 @@ public class ToLua_UnityEngine_Object
                 return 0;
             }
             else if (count == 2)
-            {                
+            {
                 float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
                 int udata = LuaDLL.tolua_rawnetobj(L, 1);
                 ObjectTranslator translator = LuaState.GetTranslator(L);
@@ -33,7 +33,7 @@ public class ToLua_UnityEngine_Object
         {
             return LuaDLL.toluaL_exception(L, e);
         }";
-    
+
     public static string DestroyImmediateDefined =
 @"        try
         {
@@ -69,7 +69,7 @@ public class ToLua_UnityEngine_Object
 
         try
         {
-            ++LuaException.InstantiateCount;            
+            ++LuaException.InstantiateCount;
             LuaException.L = L;
             int count = LuaDLL.lua_gettop(L);
 
@@ -203,7 +203,7 @@ public class ToLua_UnityEngine_Object
     [UseDefinedAttribute]
     public static void Destroy(Object obj)
     {
-        
+
     }
 
     [UseDefinedAttribute]

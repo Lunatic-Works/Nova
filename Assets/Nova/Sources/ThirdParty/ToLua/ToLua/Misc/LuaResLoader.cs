@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,12 +42,12 @@ public class LuaResLoader : LuaFileUtils
         if (buffer == null)
         {
             buffer = ReadResourceFile(fileName);
-        }        
-        
+        }
+
         if (buffer == null)
         {
             buffer = base.ReadFile(fileName);
-        }        
+        }
 #else
         byte[] buffer = base.ReadFile(fileName);
 
@@ -74,7 +74,7 @@ public class LuaResLoader : LuaFileUtils
 
         if (Path.GetExtension(fileName) == ".lua")
         {
-            fileName = fileName.Substring(0, fileName.Length - 4);            
+            fileName = fileName.Substring(0, fileName.Length - 4);
         }
 
         using (CString.Block())
@@ -125,8 +125,8 @@ public class LuaResLoader : LuaFileUtils
         string path = fileName;
 
         if (!Path.IsPathRooted(fileName))
-        {            
-            path = string.Format("{0}/{1}", LuaConst.luaResDir, fileName);            
+        {
+            path = string.Format("{0}/{1}", LuaConst.luaResDir, fileName);
         }
 
         if (File.Exists(path))
