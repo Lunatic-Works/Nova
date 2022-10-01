@@ -42,7 +42,7 @@ namespace Nova
     public class CheckpointSerializer : IDisposable
     {
         public const int Version = 4;
-        public const bool defaultCompress = false;
+        public const bool defaultCompress = true;
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
         public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
         public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
