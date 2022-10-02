@@ -62,6 +62,7 @@
 
 以及通用游戏引擎：
 
+* [SakuraEngine](https://github.com/SakuraEngine/SakuraEngine)：为高性能而生的游戏运行时与工具箱
 * [PainterEngine](https://github.com/matrixcascade/PainterEngine)：由C语言编写的跨平台图形应用框架
 * [EtherEngine](https://github.com/EtherProject/EtherEngine)：基于Lua的跨平台游戏接口
 * [Luna Engine](https://github.com/JX-Master/Luna-Engine-0.6)：这个引擎不是我们做的，不过看起来很有意思
