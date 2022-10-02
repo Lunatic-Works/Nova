@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -58,34 +58,34 @@ namespace LuaInterface
             }
 
             IsAlive = false;
-            Dispose(true);            
+            Dispose(true);
         }
 
         public void AddRef()
         {
-            ++count;            
+            ++count;
         }
 
         public virtual void Dispose(bool disposeManagedResources)
         {
             if (!beDisposed)
             {
-                beDisposed = true;   
+                beDisposed = true;
 
                 if (reference > 0 && luaState != null)
                 {
                     luaState.CollectRef(reference, name, !disposeManagedResources);
                 }
-                
+
                 reference = -1;
                 luaState = null;
                 count = 0;
-            }            
+            }
         }
 
         //慎用
         public void Dispose(int generation)
-        {                         
+        {
             if (count > generation)
             {
                 return;
@@ -106,7 +106,7 @@ namespace LuaInterface
 
         public override int GetHashCode()
         {
-            return RuntimeHelpers.GetHashCode(this);            
+            return RuntimeHelpers.GetHashCode(this);
         }
 
         public virtual int GetReference()
@@ -117,8 +117,8 @@ namespace LuaInterface
         public override bool Equals(object o)
         {
             if (o == null) return reference <= 0;
-            LuaBaseRef lr = o as LuaBaseRef;      
-            
+            LuaBaseRef lr = o as LuaBaseRef;
+
             if (lr == null || lr.reference != reference)
             {
                 return false;

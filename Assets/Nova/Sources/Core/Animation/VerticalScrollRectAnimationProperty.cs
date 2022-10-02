@@ -1,4 +1,4 @@
-﻿using UnityEngine.UI;
+using UnityEngine.UI;
 
 namespace Nova
 {

@@ -1,4 +1,4 @@
-﻿namespace Nova
+namespace Nova
 {
     /// <summary>
     /// The <b>essential</b> data for the restoration of a restorable object

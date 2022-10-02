@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Reflection;
 using LuaInterface;
 
-public class ToLua_System_Type 
+public class ToLua_System_Type
 {
     [NoToLuaAttribute]
     public EventInfo GetEvent(string name)

@@ -1,4 +1,4 @@
-﻿using LuaInterface;
+using LuaInterface;
 using Nova.Exceptions;
 using System;
 using System.Collections.Generic;

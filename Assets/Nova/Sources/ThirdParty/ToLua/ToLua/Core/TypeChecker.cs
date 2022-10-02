@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,7 +27,7 @@ namespace LuaInterface
 {
     public static class TypeChecker
     {
-        public static Type[] LuaValueTypeMap = new Type[LuaValueType.Max];                
+        public static Type[] LuaValueTypeMap = new Type[LuaValueType.Max];
 
         static TypeChecker()
         {
@@ -44,7 +44,7 @@ namespace LuaInterface
             // LuaValueTypeMap[LuaValueType.RaycastHit] = typeof(RaycastHit);
             LuaValueTypeMap[LuaValueType.Int64] = typeof(long);
             LuaValueTypeMap[LuaValueType.UInt64] = typeof(ulong);
-        }        
+        }
 
         public static bool IsValueType(Type t)
         {
@@ -245,11 +245,11 @@ namespace LuaInterface
         {
             if (t == typeof(long))
             {
-                return LuaDLL.tolua_getvaluetype(L, pos) == LuaValueType.Int64;                
+                return LuaDLL.tolua_getvaluetype(L, pos) == LuaValueType.Int64;
             }
             else if (t == typeof(ulong))
             {
-                return LuaDLL.tolua_getvaluetype(L, pos) == LuaValueType.UInt64;                
+                return LuaDLL.tolua_getvaluetype(L, pos) == LuaValueType.UInt64;
             }
 
             object obj = null;
@@ -324,7 +324,7 @@ namespace LuaInterface
         }
 
         public static bool CheckTypes<T1>(IntPtr L, int pos)
-        {            
+        {
             return TypeTraits<T1>.Check(L, pos);
         }
 
@@ -418,7 +418,7 @@ namespace LuaInterface
             {
                 case LuaTypes.LUA_TNIL:
                     return true;
-                case LuaTypes.LUA_TUSERDATA:                    
+                case LuaTypes.LUA_TUSERDATA:
                     int udata = LuaDLL.tolua_rawnetobj(L, pos);
 
                     if (udata != -1)
@@ -436,7 +436,7 @@ namespace LuaInterface
         static public bool CheckEnumType(Type type, IntPtr L, int pos)
         {
             if (LuaDLL.lua_type(L, pos) == LuaTypes.LUA_TUSERDATA)
-            {                
+            {
                 int udata = LuaDLL.tolua_rawnetobj(L, pos);
 
                 if (udata != -1)

@@ -1,4 +1,4 @@
-﻿namespace Nova
+namespace Nova
 {
     [ExportCustomType]
     public class CameraSizeAnimationProperty : FloatBaseAnimationProperty

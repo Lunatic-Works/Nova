@@ -1,4 +1,4 @@
-﻿using LuaInterface;
+using LuaInterface;
 using Nova.Script;
 using System;
 using System.Collections.Generic;

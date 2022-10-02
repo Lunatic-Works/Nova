@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +26,7 @@ using System.Collections.Generic;
 namespace LuaInterface
 {
     public class LuaObjectPool
-    {        
+    {
         class PoolNode
         {
             public int index;
@@ -41,7 +41,7 @@ namespace LuaInterface
 
         private List<PoolNode> list;
         //同lua_ref策略，0作为一个回收链表头，不使用这个位置
-        private PoolNode head = null;   
+        private PoolNode head = null;
         private int count = 0;
         private int collectStep = 2;
         private int collectedIndex = -1;
@@ -57,7 +57,7 @@ namespace LuaInterface
 
         public object this[int i]
         {
-            get 
+            get
             {
                 if (i > 0 && i < count)
                 {
@@ -99,9 +99,9 @@ namespace LuaInterface
         {
             if (index > 0 && index < count)
             {
-                return list[index].obj;                
+                return list[index].obj;
             }
-            
+
             return null;
         }
 
@@ -110,7 +110,7 @@ namespace LuaInterface
             if (pos > 0 && pos < count)
             {
                 object o = list[pos].obj;
-                list[pos].obj = null;                
+                list[pos].obj = null;
                 list[pos].index = head.index;
                 head.index = pos;
 

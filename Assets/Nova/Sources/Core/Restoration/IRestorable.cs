@@ -1,4 +1,4 @@
-﻿namespace Nova
+namespace Nova
 {
     /// <summary>
     /// This interface represents an object that restores its state when GameState moves back

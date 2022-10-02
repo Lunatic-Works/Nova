@@ -1,4 +1,4 @@
-﻿// TODO: check on all platforms that when a touch is detected, the platform will hide the cursor
+// TODO: check on all platforms that when a touch is detected, the platform will hide the cursor
 
 using UnityEngine;
 using UnityEngine.EventSystems;

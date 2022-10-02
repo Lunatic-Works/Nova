@@ -1,4 +1,4 @@
-﻿// TODO: use circular buffer for log entries
+// TODO: use circular buffer for log entries
 
 using System;
 using System.Collections.Generic;

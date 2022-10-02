@@ -1,4 +1,4 @@
-﻿using LuaInterface;
+using LuaInterface;
 using System.Collections.Generic;
 using UnityEngine;
 

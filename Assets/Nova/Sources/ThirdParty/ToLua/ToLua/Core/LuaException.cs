@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -44,11 +44,11 @@ namespace LuaInterface
             }
         }
 
-        protected string _stack = string.Empty;        
+        protected string _stack = string.Empty;
 
         public LuaException(string msg, Exception e = null, int skip = 1)
             : base(msg)
-        {                                  
+        {
             if (e != null)
             {
                 if (e is LuaException)
@@ -56,13 +56,13 @@ namespace LuaInterface
                     _stack = e.StackTrace;
                 }
                 else
-                {                                        
+                {
                     StackTrace trace = new StackTrace(e, true);
                     StringBuilder sb = new StringBuilder();
-                    ExtractFormattedStackTrace(trace, sb);                    
+                    ExtractFormattedStackTrace(trace, sb);
                     StackTrace self = new StackTrace(skip, true);
                     ExtractFormattedStackTrace(self, sb, trace);
-                    _stack = sb.ToString();                    
+                    _stack = sb.ToString();
                 }
             }
             else
@@ -71,7 +71,7 @@ namespace LuaInterface
                 StringBuilder sb = new StringBuilder();
                 ExtractFormattedStackTrace(self, sb);
                 _stack = sb.ToString();
-            }                        
+            }
         }
 
         public static Exception GetLastError()
@@ -98,7 +98,7 @@ namespace LuaInterface
                     {
                         begin = i + 1;
                         break;
-                    }                    
+                    }
                 }
 
                 sb.AppendLineEx();
@@ -112,7 +112,7 @@ namespace LuaInterface
                 if (method == null || method.DeclaringType == null)
                 {
                     continue;
-                }                               
+                }
 
                 Type declaringType = method.DeclaringType;
                 string str = declaringType.Namespace;
@@ -153,7 +153,7 @@ namespace LuaInterface
                 }
 
                 sb.Append(")");
-                string fileName = frame.GetFileName();                
+                string fileName = frame.GetFileName();
 
                 if (fileName != null)
                 {

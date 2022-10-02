@@ -1,4 +1,4 @@
-﻿namespace Nova
+namespace Nova
 {
     // We cannot put this class into LazyComputableAnimationProperty,
     // otherwise the type parameters will cause trouble in Lua binding

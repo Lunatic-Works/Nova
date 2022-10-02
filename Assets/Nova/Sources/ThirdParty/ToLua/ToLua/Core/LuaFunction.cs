@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2015-2017 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -357,7 +357,7 @@ namespace LuaInterface
             PushGeneric(arg6);
             PushGeneric(arg7);
             PushGeneric(arg8);
-            PushGeneric(arg9);            
+            PushGeneric(arg9);
             PCall();
             R1 ret1 = CheckValue<R1>();
             EndPCall();
@@ -376,7 +376,7 @@ namespace LuaInterface
                 EndPCall();
                 throw new LuaException("stack overflow");
             }
-            
+
             PushArgs(args);
             PCall();
             object[] objs = luaState.CheckObjects(oldTop);
@@ -947,5 +947,5 @@ namespace LuaInterface
                 throw e;
             }
         }
-    }    
+    }
 }

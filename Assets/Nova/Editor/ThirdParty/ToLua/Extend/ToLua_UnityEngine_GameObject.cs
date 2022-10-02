@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using LuaInterface;
 using System;
@@ -18,7 +18,7 @@ public class ToLua_UnityEngine_GameObject
 			{
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
-				obj.SendMessage(arg0);                
+				obj.SendMessage(arg0);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -26,7 +26,7 @@ public class ToLua_UnityEngine_GameObject
                     LuaDLL.lua_pop(L, 1);
                     throw new LuaException(error, LuaException.GetLastError());
                 }
-                
+
 				--LuaException.SendMsgCount;
                 LuaException.L = L0;
 				return 0;
@@ -36,7 +36,7 @@ public class ToLua_UnityEngine_GameObject
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
 				UnityEngine.SendMessageOptions arg1 = (UnityEngine.SendMessageOptions)ToLua.ToObject(L, 3);
-				obj.SendMessage(arg0, arg1);                
+				obj.SendMessage(arg0, arg1);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -54,7 +54,7 @@ public class ToLua_UnityEngine_GameObject
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
 				object arg1 = ToLua.ToVarObject(L, 3);
-				obj.SendMessage(arg0, arg1);                
+				obj.SendMessage(arg0, arg1);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -73,7 +73,7 @@ public class ToLua_UnityEngine_GameObject
 				string arg0 = ToLua.ToString(L, 2);
 				object arg1 = ToLua.ToVarObject(L, 3);
 				UnityEngine.SendMessageOptions arg2 = (UnityEngine.SendMessageOptions)ToLua.ToObject(L, 4);
-				obj.SendMessage(arg0, arg1, arg2);                
+				obj.SendMessage(arg0, arg1, arg2);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -88,9 +88,9 @@ public class ToLua_UnityEngine_GameObject
 			}
 			else
 			{
-                --LuaException.SendMsgCount;      
-                LuaException.L = L0;                          
-                return LuaDLL.luaL_throw(L, ""invalid arguments to method: UnityEngine.GameObject.SendMessage"");     
+                --LuaException.SendMsgCount;
+                LuaException.L = L0;
+                return LuaDLL.luaL_throw(L, ""invalid arguments to method: UnityEngine.GameObject.SendMessage"");
 			}
 		}
 		catch(Exception e)
@@ -113,7 +113,7 @@ public class ToLua_UnityEngine_GameObject
 			{
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
-				obj.SendMessageUpwards(arg0);                
+				obj.SendMessageUpwards(arg0);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -131,7 +131,7 @@ public class ToLua_UnityEngine_GameObject
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
 				UnityEngine.SendMessageOptions arg1 = (UnityEngine.SendMessageOptions)ToLua.ToObject(L, 3);
-				obj.SendMessageUpwards(arg0, arg1);                
+				obj.SendMessageUpwards(arg0, arg1);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -149,7 +149,7 @@ public class ToLua_UnityEngine_GameObject
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
 				object arg1 = ToLua.ToVarObject(L, 3);
-				obj.SendMessageUpwards(arg0, arg1);                
+				obj.SendMessageUpwards(arg0, arg1);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -168,7 +168,7 @@ public class ToLua_UnityEngine_GameObject
 				string arg0 = ToLua.ToString(L, 2);
 				object arg1 = ToLua.ToVarObject(L, 3);
 				UnityEngine.SendMessageOptions arg2 = (UnityEngine.SendMessageOptions)ToLua.ToObject(L, 4);
-				obj.SendMessageUpwards(arg0, arg1, arg2);                
+				obj.SendMessageUpwards(arg0, arg1, arg2);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -184,7 +184,7 @@ public class ToLua_UnityEngine_GameObject
 			else
 			{
 				--LuaException.SendMsgCount;
-                LuaException.L = L0;                
+                LuaException.L = L0;
                 return LuaDLL.luaL_throw(L, ""invalid arguments to method: UnityEngine.GameObject.SendMessageUpwards"");
 			}
 		}
@@ -197,7 +197,7 @@ public class ToLua_UnityEngine_GameObject
 
     public static string BroadcastMessageDefined =
 @"		IntPtr L0 = LuaException.L;
-    
+
 		try
 		{
             ++LuaException.SendMsgCount;
@@ -208,7 +208,7 @@ public class ToLua_UnityEngine_GameObject
 			{
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
-				obj.BroadcastMessage(arg0);                
+				obj.BroadcastMessage(arg0);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -226,7 +226,7 @@ public class ToLua_UnityEngine_GameObject
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
 				UnityEngine.SendMessageOptions arg1 = (UnityEngine.SendMessageOptions)ToLua.ToObject(L, 3);
-				obj.BroadcastMessage(arg0, arg1);                
+				obj.BroadcastMessage(arg0, arg1);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -244,7 +244,7 @@ public class ToLua_UnityEngine_GameObject
 				UnityEngine.GameObject obj = (UnityEngine.GameObject)ToLua.CheckObject(L, 1, typeof(UnityEngine.GameObject));
 				string arg0 = ToLua.ToString(L, 2);
 				object arg1 = ToLua.ToVarObject(L, 3);
-				obj.BroadcastMessage(arg0, arg1);                
+				obj.BroadcastMessage(arg0, arg1);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -263,7 +263,7 @@ public class ToLua_UnityEngine_GameObject
 				string arg0 = ToLua.ToString(L, 2);
 				object arg1 = ToLua.ToVarObject(L, 3);
 				UnityEngine.SendMessageOptions arg2 = (UnityEngine.SendMessageOptions)ToLua.ToObject(L, 4);
-				obj.BroadcastMessage(arg0, arg1, arg2);                
+				obj.BroadcastMessage(arg0, arg1, arg2);
 
                 if (LuaDLL.lua_toboolean(L, LuaDLL.lua_upvalueindex(1)))
                 {
@@ -291,7 +291,7 @@ public class ToLua_UnityEngine_GameObject
 		}";
 
 
-    public static string AddComponentDefined = 
+    public static string AddComponentDefined =
 @"		IntPtr L0 = LuaException.L;
 
         try

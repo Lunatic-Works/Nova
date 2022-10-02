@@ -1,4 +1,4 @@
-﻿// https://gist.github.com/capnslipp/349c18283f2fea316369
+// https://gist.github.com/capnslipp/349c18283f2fea316369
 
 using UnityEngine.UI;
 

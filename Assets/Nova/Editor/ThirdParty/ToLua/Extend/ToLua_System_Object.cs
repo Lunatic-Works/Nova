@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using LuaInterface;
 
-public class ToLua_System_Object 
+public class ToLua_System_Object
 {
     public static string DestroyDefined = "\t\treturn ToLua.Destroy(L);";
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using LuaInterface;
 using System.Collections.Generic;
 using System.Collections;
