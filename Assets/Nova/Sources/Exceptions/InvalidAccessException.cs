@@ -7,10 +7,8 @@ namespace Nova.Exceptions
     /// </summary>
     public class InvalidAccessException : Exception
     {
-        public InvalidAccessException(string message, Exception innerException)
-            : base(message, innerException) { }
-
-        public InvalidAccessException(string message)
-            : base(message) { }
+        public InvalidAccessException() { }
+        public InvalidAccessException(string message) : base(message) { }
+        public InvalidAccessException(string message, Exception inner) : base(message, inner) { }
     }
 }

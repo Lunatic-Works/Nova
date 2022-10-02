@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Nova
 {
-    public class MusicGalleryProgressBar : MonoBehaviour
+    [RequireComponent(typeof(Slider))]
+    public class MusicGalleryProgressBar : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         public Text timeLabel;
 
@@ -37,12 +39,6 @@ namespace Nova
         private void Awake()
         {
             Init();
-            slider.onValueChanged.AddListener(OnValueChanged);
-        }
-
-        private void OnDestroy()
-        {
-            slider.onValueChanged.RemoveListener(OnValueChanged);
         }
 
         private float progressRatio
@@ -63,8 +59,9 @@ namespace Nova
                     return;
                 }
 
-                // add nice 0.01s padding for seeking
-                audioSource.time = Mathf.Min(audioSource.clip.length * Mathf.Clamp01(value), audioSource.clip.length - 0.01f);
+                // Add a nice 0.01s padding for seeking
+                audioSource.time = Mathf.Min(audioSource.clip.length * Mathf.Clamp01(value),
+                    audioSource.clip.length - 0.01f);
             }
         }
 
@@ -82,46 +79,6 @@ namespace Nova
             return $"{m:D2}:{s:D2}/{tm:D2}:{ts:D2}";
         }
 
-        private bool audioShouldPlay = false;
-
-        private void Pause()
-        {
-            audioShouldPlay = player.isPlaying;
-            player.Pause();
-        }
-
-        private void Resume()
-        {
-            if (audioShouldPlay)
-            {
-                player.Play();
-            }
-        }
-
-        private bool _isDragged = false;
-
-        public bool isDragged
-        {
-            get => _isDragged;
-            set
-            {
-                if (_isDragged == value)
-                {
-                    return;
-                }
-
-                _isDragged = value;
-                if (_isDragged)
-                {
-                    Pause();
-                }
-                else
-                {
-                    Resume();
-                }
-            }
-        }
-
         private void RefreshTimeIndication()
         {
             if (audioSource == null || audioSource.clip == null)
@@ -133,22 +90,27 @@ namespace Nova
             timeLabel.text = FormatTimeLabel(audioSource.time, audioSource.clip.length);
         }
 
-        private void OnValueChanged(float value)
-        {
-            if (isDragged)
-            {
-                progressRatio = value;
-            }
-        }
+        private bool isDragging;
 
         private void Update()
         {
-            if (!isDragged)
+            if (!isDragging)
             {
-                slider.value = progressRatio;
+                slider.SetValueWithoutNotify(progressRatio);
             }
 
             RefreshTimeIndication();
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            isDragging = true;
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            isDragging = false;
+            progressRatio = slider.value;
         }
     }
 }

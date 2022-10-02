@@ -107,7 +107,7 @@ namespace Nova.Script
 
             if (PeekChar(i) == '\0')
             {
-                throw new ParseException(Peek(), "Unpaired quote");
+                throw new ParserException(Peek(), "Unpaired quote");
             }
 
             AdvanceString(i + 1);
@@ -139,7 +139,7 @@ namespace Nova.Script
 
             if (!lastIsRightSquareBracket && PeekChar(offset + len) == ']')
             {
-                throw new ParseException(Peek(), "Unpaired multiline string");
+                throw new ParserException(Peek(), "Unpaired multiline string");
             }
 
             return len + 1;
@@ -165,7 +165,7 @@ namespace Nova.Script
             }
             else
             {
-                throw new ParseException(Peek(), "Should not happen");
+                throw new ParserException(Peek(), "Should not happen");
             }
 
             ParseNext();
@@ -217,7 +217,7 @@ namespace Nova.Script
             var endPatternIndex = text.IndexOf(endPattern, index, StringComparison.Ordinal);
             if (endPatternIndex == -1)
             {
-                throw new ParseException(Peek(), "Unpaired block comment");
+                throw new ParserException(Peek(), "Unpaired block comment");
             }
 
             AdvanceString(endPatternIndex - index + endPattern.Length);
@@ -235,7 +235,7 @@ namespace Nova.Script
                 return;
             }
 
-            // char.IsWhiteSpace('\n') == true
+            // char.IsWhiteSpace('\n')
             if (c == '\n')
             {
                 type = TokenType.NewLine;

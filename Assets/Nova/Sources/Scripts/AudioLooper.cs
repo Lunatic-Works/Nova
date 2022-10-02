@@ -30,7 +30,7 @@ namespace Nova
             audioSource = GetComponent<AudioSource>();
 
             var head = new GameObject("AudioLooperHead");
-            head.transform.SetParent(transform);
+            head.transform.SetParent(transform, false);
             headAudioSource = head.AddComponent<AudioSource>();
             headAudioSource.playOnAwake = false;
             headAudioSource.loop = false;

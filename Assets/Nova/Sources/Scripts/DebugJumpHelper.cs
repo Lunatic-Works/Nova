@@ -51,14 +51,8 @@ namespace Nova
             NovaAnimation.StopAll();
             dialogueState.state = DialogueState.State.Normal;
 
-            if (gameState.SeekBackStep(1, out var nodeName, out var dialogueIndex))
-            {
-                gameState.MoveBackTo(nodeName, dialogueIndex);
-            }
-            else
-            {
-                Debug.LogWarning("Nova: Cannot move backward at the first dialogue.");
-            }
+            gameState.SeekBackStep(1, out var nodeRecord, out var checkpointOffset, out var dialogueIndex);
+            gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
         }
 
         private void JumpChapter(int offset)
@@ -74,7 +68,7 @@ namespace Nova
             }
             else
             {
-                Debug.LogWarning($"Nova: No chapter index {targetChapterIndex}");
+                Debug.LogWarning($"Nova: Chapter index {targetChapterIndex} out of range.");
             }
         }
     }

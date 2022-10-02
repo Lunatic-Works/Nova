@@ -83,9 +83,27 @@
         ],
         "Tags": []
     },
+    "ShowConfig": {
+        "Keys": [
+            "M"
+        ],
+        "Groups": [
+            "Game"
+        ],
+        "Tags": []
+    },
     "ToggleFullScreen": {
         "Keys": [
             "F11"
+        ],
+        "Groups": [
+            "All"
+        ],
+        "Tags": []
+    },
+    "SwitchLanguage": {
+        "Keys": [
+            "Slash"
         ],
         "Groups": [
             "All"
@@ -156,12 +174,12 @@
             "Editor"
         ]
     },
-    "EditorRerunAction": {
+    "EditorUnlock": {
         "Keys": [
-            "F"
+            "Ctrl"
         ],
         "Groups": [
-            "Game"
+            "UI"
         ],
         "Tags": [
             "Editor"

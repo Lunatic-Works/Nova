@@ -142,7 +142,7 @@ namespace Nova
         [SerializeField] private GameObject basicBackgroundGO;
 
         [SerializeField] private List<Image> backgroundImages;
-        private List<CanvasGroup> backgroundCanvasGroups = new List<CanvasGroup>();
+        private readonly List<CanvasGroup> backgroundCanvasGroups = new List<CanvasGroup>();
         [SerializeField] private List<Button> hideDialogueButtons;
         [SerializeField] private List<GameObject> dialogueFinishIcons;
 
@@ -216,15 +216,16 @@ namespace Nova
             }
 
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
+            gameState.AddRestorable(this);
 
             return false;
         }
 
-        public override void Hide(Action onFinish)
+        protected override void OnDestroy()
         {
-            dialogueState.state = DialogueState.State.Normal;
+            gameState.RemoveRestorable(this);
 
-            base.Hide(onFinish);
+            base.OnDestroy();
         }
 
         private void OnEnable()
@@ -232,7 +233,6 @@ namespace Nova
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.routeEnded.AddListener(OnRouteEnded);
-            gameState.AddRestorable(this);
 
             dialogueState.autoModeStarts.AddListener(OnAutoModeStarts);
             dialogueState.autoModeStops.AddListener(OnAutoModeStops);
@@ -243,11 +243,11 @@ namespace Nova
         private void OnDisable()
         {
             StopAllCoroutines();
+            dialogueState.state = DialogueState.State.Normal;
 
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.routeEnded.RemoveListener(OnRouteEnded);
-            gameState.RemoveRestorable(this);
 
             dialogueState.autoModeStarts.RemoveListener(OnAutoModeStarts);
             dialogueState.autoModeStops.RemoveListener(OnAutoModeStops);
@@ -297,18 +297,18 @@ namespace Nova
         /// <summary>
         /// The content of the dialogue box needs to be changed
         /// </summary>
-        /// <param name="dialogueData"></param>
-        private void OnDialogueChanged(DialogueChangedData dialogueData)
+        /// <param name="data"></param>
+        private void OnDialogueChanged(DialogueChangedData data)
         {
             RestartTimer();
 
             switch (dialogueUpdateMode)
             {
                 case DialogueUpdateMode.Overwrite:
-                    OverwriteDialogue(dialogueData.displayData);
+                    OverwriteDialogue(data.displayData);
                     break;
                 case DialogueUpdateMode.Append:
-                    AppendDialogue(dialogueData.displayData);
+                    AppendDialogue(data.displayData);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -470,7 +470,7 @@ namespace Nova
         {
             return Mathf.Max(
                 NovaAnimation.GetTotalTimeRemaining(AnimationType.PerDialogue | AnimationType.Text) + offset,
-                CharacterController.MaxVoiceDurationNextDialogue + voiceOffset
+                GameCharacterController.MaxVoiceDuration + voiceOffset
             );
         }
 
@@ -541,7 +541,8 @@ namespace Nova
 
         private IEnumerator ScheduledStep(float scheduledDelay)
         {
-            this.RuntimeAssert(dialogueAvailable, "Dialogue should be available when scheduling a step for it.");
+            this.RuntimeAssert(dialogueAvailable, "Dialogue not available when scheduling a step for it.");
+
             while (scheduledDelay > timeAfterDialogueChange)
             {
                 yield return new WaitForSeconds(scheduledDelay - timeAfterDialogueChange);
@@ -706,6 +707,7 @@ namespace Nova
                     return;
                 }
 
+                _closeButtonShown = value;
                 foreach (var btn in hideDialogueButtons)
                 {
                     btn.gameObject.SetActive(value);
@@ -778,6 +780,7 @@ namespace Nova
             materialName = data.materialName;
 
             NewPage();
+            // TODO: Restore displayDatas from FlowChartTree, like in LogController
             foreach (var displayData in data.displayDatas)
             {
                 AppendDialogue(displayData, needAnimation: false);

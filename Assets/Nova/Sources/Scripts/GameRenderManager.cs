@@ -111,7 +111,7 @@ namespace Nova
 
                 if (configManager.GetInt(ChangeWindowSizeFirstShownKey) == 0)
                 {
-                    Alert.Show(I18n.__("config.changewindowsize"));
+                    Alert.Show("config.changewindowsize");
                     configManager.SetInt(ChangeWindowSizeFirstShownKey, 1);
                 }
             }

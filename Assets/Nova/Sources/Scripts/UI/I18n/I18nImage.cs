@@ -12,7 +12,7 @@ namespace Nova
         private Image image;
         private Sprite defaultSprite;
         private RectTransform rectTransform;
-        private float scale;
+        private float defaultScale;
 
         private void Awake()
         {
@@ -20,7 +20,7 @@ namespace Nova
             this.RuntimeAssert(image != null, "Missing Image.");
             defaultSprite = image.sprite;
             rectTransform = GetComponent<RectTransform>();
-            scale = rectTransform.localScale.x;
+            defaultScale = rectTransform.localScale.x;
         }
 
         private void UpdateImage()
@@ -41,17 +41,17 @@ namespace Nova
                 image.sprite = defaultSprite;
             }
 
-            float _scale = scale;
+            float scale = defaultScale;
             foreach (var pair in multipliers)
             {
                 if (pair.locale == I18n.CurrentLocale)
                 {
-                    _scale *= pair.value;
+                    scale *= pair.value;
                     break;
                 }
             }
 
-            rectTransform.localScale = new Vector3(_scale, _scale, 1.0f);
+            rectTransform.localScale = new Vector3(scale, scale, 1.0f);
         }
 
         private void OnEnable()

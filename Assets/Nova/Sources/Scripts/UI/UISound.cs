@@ -22,7 +22,7 @@ namespace Nova
         public void OnPointerDown(PointerEventData eventData)
         {
             // Only mouse left button or touch plays sound
-            if (eventData.pointerId < -1)
+            if (!(Utils.IsTouch(eventData) || Utils.IsLeftButton(eventData)))
             {
                 return;
             }
@@ -33,7 +33,7 @@ namespace Nova
         public void OnPointerUp(PointerEventData eventData)
         {
             // Only mouse left button or touch plays sound
-            if (eventData.pointerId < -1)
+            if (!(Utils.IsTouch(eventData) || Utils.IsLeftButton(eventData)))
             {
                 return;
             }
@@ -48,6 +48,7 @@ namespace Nova
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            // TODO: Is the loop correct?
             if (mouseInsideLoop != null)
             {
                 viewManager.TryPlaySound(mouseInsideLoop);

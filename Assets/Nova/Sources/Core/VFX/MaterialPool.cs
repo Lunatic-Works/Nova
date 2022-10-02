@@ -26,8 +26,7 @@ namespace Nova
 
         private void Awake()
         {
-            Renderer renderer = GetComponent<Renderer>();
-            if (renderer != null)
+            if (TryGetComponent<Renderer>(out var renderer))
             {
                 defaultMaterial = renderer.material;
             }
@@ -51,15 +50,10 @@ namespace Nova
             return factory.GetRestorableMaterial(shaderName);
         }
 
+        // Export to Lua
         public static MaterialPool Ensure(GameObject gameObject)
         {
-            var pool = gameObject.GetComponent<MaterialPool>();
-            if (pool == null)
-            {
-                pool = gameObject.AddComponent<MaterialPool>();
-            }
-
-            return pool;
+            return gameObject.Ensure<MaterialPool>();
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Nova
                 return true;
             }
 
-            this.RuntimeAssert(myPanel != null, "MyPanel is not set.");
+            this.RuntimeAssert(myPanel != null, "Missing myPanel.");
             transitions = myPanel.GetComponents<UIViewTransitionBase>().ToList();
             viewManager = GetComponentInParent<ViewManager>();
             this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");

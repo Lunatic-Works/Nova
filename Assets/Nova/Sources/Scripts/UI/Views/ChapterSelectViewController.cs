@@ -42,6 +42,14 @@ namespace Nova
             unlockedStartNodeNames = gameState.GetAllUnlockedStartNodeNames();
 
             returnButton.onClick.AddListener(Hide);
+            I18n.LocaleChanged.AddListener(UpdateButtons);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            I18n.LocaleChanged.RemoveListener(UpdateButtons);
         }
 
         protected override void Start()
@@ -61,13 +69,13 @@ namespace Nova
 
         public override void Show(Action onFinish)
         {
-            if (ReachedChapterCount() < 2 && !Utils.GetKeyInEditor(KeyCode.LeftShift))
+            if (ReachedChapterCount() < 2 && !inputMapper.GetKey(AbstractKey.EditorUnlock))
             {
                 BeginChapter();
                 return;
             }
 
-            UpdateAllButtons();
+            UpdateButtons();
 
             base.Show(onFinish);
         }
@@ -100,8 +108,13 @@ namespace Nova
             });
         }
 
-        private void UpdateAllButtons()
+        private void UpdateButtons()
         {
+            if (buttons == null)
+            {
+                return;
+            }
+
             foreach (var chapter in buttons)
             {
                 if (IsUnlocked(chapter.Key))
@@ -121,7 +134,7 @@ namespace Nova
         {
             base.OnActivatedUpdate();
 
-            if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
+            if (inputMapper.GetKeyUp(AbstractKey.EditorUnlock))
             {
                 foreach (var chapter in buttons)
                 {

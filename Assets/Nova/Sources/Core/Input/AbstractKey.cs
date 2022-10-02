@@ -13,22 +13,25 @@ namespace Nova
         QuickLoad,
         ToggleDialogue,
         ShowLog,
+        ShowConfig,
         ToggleFullScreen,
+        SwitchLanguage,
         LeaveView,
         EditorBackward,
         EditorBeginChapter,
         EditorPreviousChapter,
         EditorNextChapter,
         EditorReloadScripts,
-        EditorRerunAction
+        EditorUnlock
     }
 
+    // If groups a & b != 0, actions in a and b can conflict
     [Flags]
     public enum AbstractKeyGroup
     {
         None = 0,
-        Game = 1,
-        UI = 2,
-        All = 3
+        Game = 1 << 0,
+        UI = 1 << 1,
+        All = Game | UI
     }
 }

@@ -14,12 +14,14 @@ namespace Nova
 
         public float sectorRadius => buttonRing.sectorRadius;
 
+        private Vector3? lastPointerPosition;
+
         private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
             currentCanvas = GetComponentInParent<Canvas>();
-            buttonRing = GetComponentInChildren<ButtonRing>();
             backgroundBlur = transform.Find("BackgroundBlur").GetComponent<RectTransform>();
+            buttonRing = GetComponentInChildren<ButtonRing>();
         }
 
         private void ForceHideChildren()
@@ -31,19 +33,17 @@ namespace Nova
 
         public void Show(bool holdOpen)
         {
-            NoShowIfMouseMoved();
-
             if (buttonShowing)
             {
                 return;
             }
 
             this.holdOpen = holdOpen;
-            AdjustAnchorPosition();
 
+            AdjustAnchorPosition();
             buttonShowing = true;
-            buttonRing.gameObject.SetActive(true);
             backgroundBlur.gameObject.SetActive(true);
+            buttonRing.gameObject.SetActive(true);
 
             if (holdOpen)
             {
@@ -53,8 +53,6 @@ namespace Nova
 
         public void Hide(bool triggerAction)
         {
-            NoShowIfMouseMoved();
-
             if (!buttonShowing)
             {
                 return;
@@ -62,6 +60,7 @@ namespace Nova
 
             holdOpen = false;
 
+            lastPointerPosition = null;
             buttonShowing = false;
             if (!triggerAction)
             {
@@ -74,40 +73,36 @@ namespace Nova
 
         private void AdjustAnchorPosition()
         {
-            var targetPosition = currentCanvas.ScreenToCanvasPosition(RealInput.mousePosition);
-            rectTransform.anchoredPosition = targetPosition;
-            Vector2 v = currentCanvas.ViewportToCanvasPosition(Vector3.one) * 2;
+            var targetPosition = lastPointerPosition ?? RealInput.mousePosition;
+            rectTransform.anchoredPosition = currentCanvas.ScreenToCanvasPosition(targetPosition);
+            Vector2 v = currentCanvas.ViewportToCanvasPosition(Vector3.one) * 2.0f;
             backgroundBlur.offsetMin = -v;
             backgroundBlur.offsetMax = v;
         }
 
-        private Vector3? lastMousePosition = null;
-
-        public void ShowIfMouseMoved()
+        public void ShowIfPointerMoved()
         {
-            lastMousePosition = RealInput.mousePosition;
+            lastPointerPosition = RealInput.mousePosition;
         }
 
-        public void NoShowIfMouseMoved()
+        public void NoShowIfPointerMoved()
         {
-            lastMousePosition = null;
+            lastPointerPosition = null;
         }
 
         private bool isFirstCalled = true;
 
+        // Have to use late update
         private void LateUpdate()
         {
-            if (lastMousePosition != null)
+            if (!buttonShowing &&
+                lastPointerPosition != null &&
+                (RealInput.mousePosition - lastPointerPosition.Value).magnitude > sectorRadius * 0.5f)
             {
-                if ((RealInput.mousePosition - lastMousePosition).Value.magnitude > 20f)
-                {
-                    lastMousePosition = null;
-                    Show(false);
-                }
+                Show(false);
             }
 
-            // have to use late update
-            // wait for all background sectors fully initialized
+            // Wait for all sectors to initialize
             if (!isFirstCalled) return;
             ForceHideChildren();
             isFirstCalled = false;

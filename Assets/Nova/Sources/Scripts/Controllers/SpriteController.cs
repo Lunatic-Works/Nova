@@ -221,7 +221,7 @@ namespace Nova
                 materialData = null;
             }
 
-            int renderQueue = RenderQueueOverrider.Ensure(gameObject).renderQueue;
+            int renderQueue = gameObject.Ensure<RenderQueueOverrider>().renderQueue;
 
             return new SpriteControllerRestoreData(currentImageName, transform, color, materialData, renderQueue, layer);
         }
@@ -235,15 +235,15 @@ namespace Nova
             // Material must be RestorableMaterial or defaultMaterial
             if (data.materialData != null)
             {
-                MaterialFactory factory = MaterialPool.Ensure(gameObject).factory;
+                MaterialFactory factory = gameObject.Ensure<MaterialPool>().factory;
                 material = RestorableMaterial.Restore(data.materialData, factory);
             }
             else
             {
-                material = MaterialPool.Ensure(gameObject).defaultMaterial;
+                material = gameObject.Ensure<MaterialPool>().defaultMaterial;
             }
 
-            RenderQueueOverrider.Ensure(gameObject).renderQueue = data.renderQueue;
+            gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
             layer = data.layer;
 
             if (data.currentImageName == currentImageName)

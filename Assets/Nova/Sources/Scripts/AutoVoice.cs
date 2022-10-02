@@ -9,7 +9,7 @@ namespace Nova
     public class AutoVoiceConfig
     {
         public string characterName;
-        public CharacterController characterController;
+        public GameCharacterController characterController;
         public string prefix;
     }
 
@@ -56,7 +56,7 @@ namespace Nova
             }
         }
 
-        public CharacterController GetCharacterController(string name)
+        public GameCharacterController GetCharacterController(string name)
         {
             return nameToConfig[name].characterController;
         }

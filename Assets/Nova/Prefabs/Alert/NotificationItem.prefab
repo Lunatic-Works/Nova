@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3869656579108304694}
   - component: {fileID: 2537932973707241248}
   - component: {fileID: 114645128498543038}
+  - component: {fileID: 2979289299506620262}
   m_Layer: 5
   m_Name: NotificationItem
   m_TagString: Untagged
@@ -139,6 +140,21 @@ MonoBehaviour:
   rotationPercentage: 0.5
   fade: 1
   duration: 0.2
+--- !u!114 &2979289299506620262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1645968591548162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ff457d5425295d438c0839ae871ab37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 114056504850293126}
+  rectTransform: {fileID: 224988140429267332}
+  transition: {fileID: 114645128498543038}
 --- !u!1 &1688476088255332
 GameObject:
   m_ObjectHideFlags: 0

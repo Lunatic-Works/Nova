@@ -3,7 +3,6 @@ using Nova.Script;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace Nova
@@ -83,7 +82,8 @@ namespace Nova
             ScriptDialogueEntryParser.ClearPatterns();
             // requires.lua is executed and ScriptDialogueEntryParser.ActionGenerators is filled before calling ParseScript()
             LuaRuntime.Instance.BindObject("scriptLoader", this);
-            LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Eager, DialogueActionStage.Default, false));
+            LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Eager,
+                DialogueActionStage.Default, false));
             InitOnlyIncludedNames();
 
             flowChartTree.Unfreeze();
@@ -107,17 +107,19 @@ namespace Nova
                     }
 
 #if UNITY_EDITOR
-                    var scriptPath = AssetDatabase.GetAssetPath(script);
-                    Debug.Log($"Nova: Parse script {scriptPath}");
+                    // var scriptPath = AssetDatabase.GetAssetPath(script);
+                    // Debug.Log($"Nova: Parse script {scriptPath}");
 #endif
 
                     try
                     {
-                        ParseScript(script);
+                        // If deferChunks == true, only eager execution blocks are parsed and executed when the game starts
+                        // If deferChunks == false, dialogues and lazy execution blocks are also parsed
+                        ParseScript(script, true);
                     }
-                    catch (ParseException e)
+                    catch (ParserException e)
                     {
-                        throw new ParseException($"Failed to parse {script.name}", e);
+                        throw new ParserException($"Failed to parse {script.name}", e);
                     }
                 }
             }
@@ -134,7 +136,7 @@ namespace Nova
 
         private void CheckInit()
         {
-            Utils.RuntimeAssert(inited, "ScriptLoader methods should be called after Init().");
+            Utils.RuntimeAssert(inited, "ScriptLoader methods should be called after Init.");
         }
 
         /// <summary>
@@ -164,7 +166,7 @@ namespace Nova
 
             void FlushChunk()
             {
-                if (chunk.blocks.Count != 0)
+                if (chunk.blocks.Count > 0)
                 {
                     res.Add(chunk);
                     chunk = new Chunk();
@@ -198,22 +200,19 @@ namespace Nova
         /// <summary>
         /// Parse the given TextAsset to chunks and add them to currentNode.
         /// </summary>
-        private void ParseScript(TextAsset script)
+        private void ParseScript(TextAsset script, bool deferChunks = false)
         {
             hiddenCharacterNames.Clear();
             LuaRuntime.Instance.GetFunction("action_new_file").Call(script.name);
 
             var blocks = Parser.Parse(script.text).blocks;
-
             if (blocks.Count == 0)
             {
                 return;
             }
 
             var chunks = DivideBlocksToChunks(blocks);
-
             var nodeChunks = new List<Chunk>();
-
             foreach (var chunk in chunks)
             {
                 var firstBlock = chunk.blocks[0];
@@ -221,7 +220,15 @@ namespace Nova
                 {
                     if (nodeChunks.Count > 0)
                     {
-                        AddDialogueChunks(nodeChunks);
+                        if (deferChunks)
+                        {
+                            currentNode.deferredChunks[stateLocale] = nodeChunks;
+                        }
+                        else
+                        {
+                            AddDialogueChunks(nodeChunks);
+                        }
+
                         nodeChunks = new List<Chunk>();
                     }
 
@@ -251,6 +258,34 @@ namespace Nova
                 var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
                 currentNode.AddLocalizedDialogueEntries(stateLocale, entries);
             }
+        }
+
+        public void AddDeferredDialogueChunks(FlowChartNode node)
+        {
+            if (node.deferredChunks.Count == 0)
+            {
+                return;
+            }
+
+            node.Unfreeze();
+
+            foreach (var locale in node.deferredChunks.Keys)
+            {
+                var chunks = node.deferredChunks[locale];
+                if (locale == I18n.DefaultLocale)
+                {
+                    var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks, hiddenCharacterNames);
+                    node.SetDialogueEntries(entries);
+                }
+                else
+                {
+                    var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
+                    node.AddLocalizedDialogueEntries(locale, entries);
+                }
+            }
+
+            node.deferredChunks.Clear();
+            node.Freeze();
         }
 
         /// <summary>

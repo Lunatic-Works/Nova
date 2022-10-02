@@ -24,7 +24,7 @@ namespace Nova
             LuaRuntime.Instance.BindObject("checkpointHelper", this);
         }
 
-        public static int WarningStepNumFromLastCheckpoint => GameState.WarningStepNumFromLastCheckpoint;
+        public static int WarningStepsFromLastCheckpoint => GameState.WarningStepsFromLastCheckpoint;
 
         public void RestrainCheckpoint(int steps, bool overridden = false)
         {
@@ -71,7 +71,7 @@ namespace Nova
         public VariableEntry GetGlobalVariable(string name)
         {
             EnsureGlobalVariables();
-            CheckName(name);
+            name = CheckName(name);
             globalVariables.TryGetValue(name, out var entry);
             return entry;
         }
@@ -92,7 +92,7 @@ namespace Nova
         public void SetGlobalVariable(string name, VariableType type, object value)
         {
             EnsureGlobalVariables();
-            CheckName(name);
+            name = CheckName(name);
             if (value == null)
             {
                 globalVariables.Remove(name);

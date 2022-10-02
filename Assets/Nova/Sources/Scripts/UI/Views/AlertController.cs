@@ -6,7 +6,7 @@ namespace Nova
     public class AlertController : ViewControllerBase
     {
         private Text titleText;
-        private Text bodyContentText;
+        private Text contentText;
         private Button confirmButton;
         private Button cancelButton;
         private Toggle ignoreToggle;
@@ -19,12 +19,21 @@ namespace Nova
             base.Awake();
 
             titleText = myPanel.transform.Find("Background/Title").GetComponent<Text>();
-            bodyContentText = myPanel.transform.Find("Background/Text").GetComponent<Text>();
+            contentText = myPanel.transform.Find("Background/Text").GetComponent<Text>();
             confirmButton = myPanel.transform.Find("Background/Buttons/Confirm").GetComponent<Button>();
             cancelButton = myPanel.transform.Find("Background/Buttons/Cancel").GetComponent<Button>();
             ignoreToggle = myPanel.transform.Find("Background/Ignore").GetComponent<Toggle>();
 
             configManager = Utils.FindNovaGameController().ConfigManager;
+
+            I18n.LocaleChanged.AddListener(UpdateText);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            I18n.LocaleChanged.RemoveListener(UpdateText);
         }
 
         public void Alert(AlertParameters param)
@@ -51,8 +60,8 @@ namespace Nova
 
             titleText.gameObject.SetActive(param.title != null);
             titleText.text = param.title;
-            bodyContentText.gameObject.SetActive(param.bodyContent != null);
-            bodyContentText.text = param.bodyContent;
+            contentText.gameObject.SetActive(param.content != null);
+            UpdateText();
             cancelButton.gameObject.SetActive(param.onConfirm != null || param.onCancel != null);
             ignoreToggle.gameObject.SetActive(param.ignoreKey != "");
 
@@ -83,6 +92,16 @@ namespace Nova
             }
 
             Show();
+        }
+
+        private void UpdateText()
+        {
+            if (param == null)
+            {
+                return;
+            }
+
+            contentText.text = I18n.__(param.content);
         }
 
         protected override void BackHide()

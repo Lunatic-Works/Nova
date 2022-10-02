@@ -1,24 +1,25 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Nova
 {
     public class NotificationController : ViewControllerBase
     {
-        public GameObject notificationPrefab;
+        public NotificationEntryController notificationPrefab;
         public float notificationTimePerChar = 0.1f;
         public float notificationTimeOffset = 1f;
         public float notificationDropSpeed = 500f;
 
         private float placeholdingDeadItemCountPercentage
         {
-            get => (layoutGroupBasePos.y - layoutGroupTransform.position.y) * (RealScreen.uiSize.y / UICameraHelper.Active.orthographicSize * 0.5f);
+            get => (layoutGroupBasePos.y - layoutGroupTransform.position.y) *
+                   (RealScreen.uiSize.y / UICameraHelper.Active.orthographicSize * 0.5f);
             set
             {
                 Vector3 newPos = layoutGroupTransform.position;
-                newPos.y = layoutGroupBasePos.y - value / (RealScreen.uiSize.y / UICameraHelper.Active.orthographicSize * 0.5f);
+                newPos.y = layoutGroupBasePos.y -
+                           value / (RealScreen.uiSize.y / UICameraHelper.Active.orthographicSize * 0.5f);
                 layoutGroupTransform.position = newPos;
             }
         }
@@ -29,7 +30,7 @@ namespace Nova
         protected override void Awake()
         {
             base.Awake();
-            this.RuntimeAssert(notificationPrefab != null, "Missing NotificationPrefab.");
+            this.RuntimeAssert(notificationPrefab != null, "Missing notificationPrefab.");
         }
 
         protected override void Start()
@@ -40,10 +41,11 @@ namespace Nova
             layoutGroupBasePos = layoutGroupTransform.position;
         }
 
-        private IEnumerator NotificationFadeOut(GameObject notification, float timeout, Action onFinish)
+        private IEnumerator NotificationFadeOut(NotificationEntryController notification, float timeout,
+            Action onFinish)
         {
             yield return new WaitForSeconds(timeout);
-            var transition = notification.GetComponent<UIViewTransitionBase>();
+            var transition = notification.transition;
 
             // TODO: there is a NovaAnimation in NotificationItem, and this Action is in that NovaAnimation.
             // Destroy(notification) will call NovaAnimation.OnDisable() -> NovaAnimation.Stop() -> this Action.
@@ -56,7 +58,7 @@ namespace Nova
                 onFinishInvoked = true;
                 onFinish?.Invoke();
 
-                placeholdingDeadItemCountPercentage += notification.GetComponent<RectTransform>().rect.size.y;
+                placeholdingDeadItemCountPercentage += notification.rectTransform.rect.size.y;
                 Destroy(notification);
             });
         }
@@ -69,11 +71,10 @@ namespace Nova
             }
 
             var notification = Instantiate(notificationPrefab, myPanel.transform);
-            notification.SetActive(true);
-            notification.GetComponentInChildren<Text>().text = param.bodyContent;
-            float timeout = notificationTimePerChar * param.bodyContent.Length + notificationTimeOffset;
+            notification.Init(param.content);
+            float timeout = notificationTimePerChar * I18n.__(param.content).Length + notificationTimeOffset;
             ForceRebuildLayoutAndResetTransitionTarget();
-            var transition = notification.GetComponent<UIViewTransitionBase>();
+            var transition = notification.transition;
             transition.Enter(() => StartCoroutine(NotificationFadeOut(notification, timeout, param.onCancel)));
         }
 

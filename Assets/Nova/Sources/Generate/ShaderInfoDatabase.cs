@@ -7,8 +7,8 @@ namespace Nova.Generate
 {
     public static class ShaderInfoDatabase
     {
-        public static readonly Dictionary<string, Dictionary<string, ShaderPropertyType>> TypeData =
-            new Dictionary<string, Dictionary<string, ShaderPropertyType>>
+        public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, ShaderPropertyType>> TypeData =
+            new Dictionary<string, IReadOnlyDictionary<string, ShaderPropertyType>>
         {
             {
                 "Barrel",
@@ -356,8 +356,8 @@ namespace Nova.Generate
             },
         };
 
-        public static readonly Dictionary<string, Dictionary<string, float>> FloatData =
-            new Dictionary<string, Dictionary<string, float>>
+        public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, float>> FloatData =
+            new Dictionary<string, IReadOnlyDictionary<string, float>>
         {
             {
                 "Barrel",
@@ -669,8 +669,8 @@ namespace Nova.Generate
             },
         };
 
-        public static readonly Dictionary<string, Dictionary<string, Color>> ColorData =
-            new Dictionary<string, Dictionary<string, Color>>
+        public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, Color>> ColorData =
+            new Dictionary<string, IReadOnlyDictionary<string, Color>>
         {
             {
                 "Barrel",
@@ -739,8 +739,8 @@ namespace Nova.Generate
             },
         };
 
-        public static readonly Dictionary<string, Dictionary<string, Vector4>> VectorData =
-            new Dictionary<string, Dictionary<string, Vector4>>
+        public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, Vector4>> VectorData =
+            new Dictionary<string, IReadOnlyDictionary<string, Vector4>>
         {
             {
                 "Change Texture With Fade",

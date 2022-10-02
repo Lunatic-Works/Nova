@@ -16,21 +16,33 @@ namespace Nova.Script
 
     public class ParsedBlock
     {
-        public BlockType type;
-        public string content;
-        public AttributeDict attributes;
+        public readonly BlockType type;
+        public readonly string content;
+        public readonly AttributeDict attributes;
+
+        public ParsedBlock(BlockType type, string content, AttributeDict attributes)
+        {
+            this.type = type;
+            this.content = content;
+            this.attributes = attributes;
+        }
     }
 
     public class ParsedScript
     {
-        public IReadOnlyList<ParsedBlock> blocks;
+        public readonly IReadOnlyList<ParsedBlock> blocks;
+
+        public ParsedScript(IReadOnlyList<ParsedBlock> blocks)
+        {
+            this.blocks = blocks;
+        }
     }
 
     public static class Parser
     {
         private static ParsedBlock ParseCodeBlock(Tokenizer tokenizer, BlockType type, AttributeDict attributes)
         {
-            ParseException.ExpectToken(tokenizer.Peek(), TokenType.BlockStart, "<|");
+            ParserException.ExpectToken(tokenizer.Peek(), TokenType.BlockStart, "<|");
             var startToken = tokenizer.Peek().Clone();
             tokenizer.ParseNext();
             var matchFound = false;
@@ -69,27 +81,22 @@ namespace Nova.Script
 
             if (!matchFound)
             {
-                throw new ParseException(startToken, "Unpaired block start <|");
+                throw new ParserException(startToken, "Unpaired block start <|");
             }
 
             tokenizer.SkipWhiteSpace();
 
-            ParseException.ExpectToken(tokenizer.Peek(), TokenType.NewLine, TokenType.EndOfFile,
+            ParserException.ExpectToken(tokenizer.Peek(), TokenType.NewLine, TokenType.EndOfFile,
                 "new line or end of file after |>");
             tokenizer.ParseNext();
 
-            return new ParsedBlock
-            {
-                type = type,
-                attributes = attributes,
-                content = content
-            };
+            return new ParsedBlock(type, content, attributes);
         }
 
         private static ParsedBlock ParseEagerExecutionBlock(Tokenizer tokenizer)
         {
             var at = tokenizer.Peek();
-            ParseException.ExpectToken(at, TokenType.At, "@");
+            ParserException.ExpectToken(at, TokenType.At, "@");
             tokenizer.ParseNext();
             var token = tokenizer.Peek();
             if (token.type == TokenType.AttrStart)
@@ -99,10 +106,10 @@ namespace Nova.Script
 
             if (token.type == TokenType.BlockStart)
             {
-                return ParseCodeBlock(tokenizer, BlockType.EagerExecution, new AttributeDict());
+                return ParseCodeBlock(tokenizer, BlockType.EagerExecution, null);
             }
 
-            throw new ParseException(token, $"Except [ or <| after @, found {token.type}");
+            throw new ParserException(token, $"Except [ or <| after @, found {token.type}");
         }
 
         private static string ExpectIdentifierOrString(Tokenizer tokenizer)
@@ -123,7 +130,7 @@ namespace Nova.Script
                 return tokenizer.SubString(startIndex, endIndex - startIndex);
             }
 
-            throw new ParseException(tokenizer.Peek(), $"Expect identifier or string, found {tokenizer.Peek().type}");
+            throw new ParserException(tokenizer.Peek(), $"Expect identifier or string, found {tokenizer.Peek().type}");
         }
 
         private static char EscapeChar(char c)
@@ -178,7 +185,7 @@ namespace Nova.Script
 
         private static ParsedBlock ParseCodeBlockWithAttributes(Tokenizer tokenizer, BlockType type)
         {
-            ParseException.ExpectToken(tokenizer.Peek(), TokenType.AttrStart, "[");
+            ParserException.ExpectToken(tokenizer.Peek(), TokenType.AttrStart, "[");
             tokenizer.ParseNext();
             var attrs = new AttributeDict();
 
@@ -212,7 +219,7 @@ namespace Nova.Script
                 }
                 else
                 {
-                    throw new ParseException(token, "Expect , or ]");
+                    throw new ParserException(token, "Expect , or ]");
                 }
 
                 attrs.Add(UnQuote(key.Trim()), value == null ? null : UnQuote(value.Trim()));
@@ -239,12 +246,7 @@ namespace Nova.Script
             // eat up the last newline
             tokenizer.ParseNext();
 
-            return new ParsedBlock
-            {
-                type = BlockType.Text,
-                content = content,
-                attributes = new AttributeDict()
-            };
+            return new ParsedBlock(BlockType.Text, content, null);
         }
 
         private static ParsedBlock ParseBlock(Tokenizer tokenizer)
@@ -263,12 +265,7 @@ namespace Nova.Script
             {
                 string content = tokenizer.SubString(startIndex, endIndex - startIndex);
                 tokenizer.ParseNext();
-                return new ParsedBlock()
-                {
-                    type = BlockType.Separator,
-                    content = content,
-                    attributes = new AttributeDict()
-                };
+                return new ParsedBlock(BlockType.Separator, content, null);
             }
 
             if (token.type == TokenType.At)
@@ -283,7 +280,7 @@ namespace Nova.Script
 
             if (token.type == TokenType.BlockStart)
             {
-                return ParseCodeBlock(tokenizer, BlockType.LazyExecution, new AttributeDict());
+                return ParseCodeBlock(tokenizer, BlockType.LazyExecution, null);
             }
 
             return ParseTextBlock(tokenizer, startIndex);
@@ -293,10 +290,7 @@ namespace Nova.Script
         {
             var blocks = new List<ParsedBlock>();
 
-            blocks.Add(new ParsedBlock
-            {
-                type = BlockType.Separator
-            });
+            blocks.Add(new ParsedBlock(BlockType.Separator, null, null));
 
             foreach (var block in oldBlocks)
             {
@@ -325,10 +319,7 @@ namespace Nova.Script
                 blocks.Add(ParseBlock(tokenizer));
             }
 
-            return new ParsedScript
-            {
-                blocks = MergeConsecutiveSeparators(blocks)
-            };
+            return new ParsedScript(MergeConsecutiveSeparators(blocks));
         }
     }
 }

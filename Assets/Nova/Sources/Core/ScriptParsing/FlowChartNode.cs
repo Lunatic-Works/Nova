@@ -76,7 +76,7 @@ namespace Nova
         /// </summary>
         private readonly Dictionary<SystemLanguage, string> _displayNames = new Dictionary<SystemLanguage, string>();
 
-        public IReadOnlyDictionary<SystemLanguage, string> displayNames => _displayNames;
+        public Dictionary<SystemLanguage, string> displayNames => _displayNames;
 
         public void AddLocalizedName(SystemLanguage locale, string displayName)
         {
@@ -94,6 +94,9 @@ namespace Nova
         private IReadOnlyList<DialogueEntry> dialogueEntries = new List<DialogueEntry>();
 
         public int dialogueEntryCount => dialogueEntries.Count;
+
+        public readonly Dictionary<SystemLanguage, IReadOnlyList<ScriptLoader.Chunk>> deferredChunks =
+            new Dictionary<SystemLanguage, IReadOnlyList<ScriptLoader.Chunk>>();
 
         public void SetDialogueEntries(IReadOnlyList<DialogueEntry> entries)
         {
@@ -204,5 +207,9 @@ namespace Nova
         {
             return name.GetHashCode();
         }
+
+        public static bool operator ==(FlowChartNode a, FlowChartNode b) => a?.Equals(b) ?? b is null;
+
+        public static bool operator !=(FlowChartNode a, FlowChartNode b) => !(a == b);
     }
 }

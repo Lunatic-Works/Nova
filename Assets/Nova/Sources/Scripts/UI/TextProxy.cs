@@ -232,7 +232,9 @@ namespace Nova
         private void ApplyAlphaToCharAtIndex(int index, byte alpha)
         {
             var characterInfo = textBox.textInfo.characterInfo;
-            // TODO: skip animation for invisible characters?
+            // Boundary check in case characterInfo.Length is wrong
+            if (characterInfo.Length <= index) return;
+            // TODO: skip animation for invisible characters? <- Boundary Check Applied
             if (!characterInfo[index].isVisible) return;
 
             // Characters at different indices may have different materials

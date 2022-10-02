@@ -14,13 +14,13 @@ namespace Nova
         public OverlayTextureChangerBase textureChanger { get; protected set; }
 
         protected GameState gameState;
-        protected DialogueState dialogueState;
+        private DialogueState dialogueState;
 
         protected virtual void Awake()
         {
-            var gameController = Utils.FindNovaGameController();
-            gameState = gameController.GameState;
-            dialogueState = gameController.DialogueState;
+            var controller = Utils.FindNovaGameController();
+            gameState = controller.GameState;
+            dialogueState = controller.DialogueState;
             textureChanger = GetComponent<OverlayTextureChangerBase>();
         }
 
@@ -95,7 +95,7 @@ namespace Nova
         {
             foreach (string imageName in pose.ToArray().Cast<string>())
             {
-                AssetLoader.Preload(AssetCacheType.StandingLayer, System.IO.Path.Combine(imageFolder, imageName));
+                AssetLoader.Preload(AssetCacheType.Standing, System.IO.Path.Combine(imageFolder, imageName));
             }
         }
 
@@ -103,7 +103,7 @@ namespace Nova
         {
             foreach (string imageName in pose.ToArray().Cast<string>())
             {
-                AssetLoader.Unpreload(AssetCacheType.StandingLayer, System.IO.Path.Combine(imageFolder, imageName));
+                AssetLoader.Unpreload(AssetCacheType.Standing, System.IO.Path.Combine(imageFolder, imageName));
             }
         }
 
@@ -139,6 +139,8 @@ namespace Nova
 
         #region Restoration
 
+        public abstract string restorableName { get; }
+
         [Serializable]
         protected class CompositeSpriteControllerBaseRestoreData : IRestoreData
         {
@@ -164,8 +166,6 @@ namespace Nova
                 renderQueue = baseData.renderQueue;
             }
         }
-
-        public abstract string restorableName { get; }
 
         public virtual IRestoreData GetRestoreData()
         {

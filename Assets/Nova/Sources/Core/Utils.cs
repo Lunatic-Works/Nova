@@ -1,10 +1,10 @@
-using Nova.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
+using Nova.Exceptions;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 using UnityObject = UnityEngine.Object;
 
 namespace Nova
@@ -80,6 +80,16 @@ namespace Nova
             return value;
         }
 
+        public static T Ensure<T>(this GameObject go) where T : Component
+        {
+            if (!go.TryGetComponent<T>(out var x))
+            {
+                x = go.AddComponent<T>();
+            }
+
+            return x;
+        }
+
         public static Rect ToRect(this RectInt rectInt)
         {
             return new Rect(rectInt.min, rectInt.size);
@@ -124,8 +134,7 @@ namespace Nova
                     "Nova: Cannot find NovaGameController game object by tag. Maybe you should put NovaCreator prefab in your scene.");
             }
 
-            var gameController = go.GetComponent<GameController>();
-            if (gameController == null)
+            if (!go.TryGetComponent<GameController>(out var gameController))
             {
                 throw new InvalidAccessException(
                     "Nova: No GameController component in NovaGameController game object.");
@@ -142,8 +151,7 @@ namespace Nova
                 throw new InvalidAccessException("Nova: Cannot find UI root game object by tag.");
             }
 
-            var viewManager = go.GetComponent<ViewManager>();
-            if (viewManager == null)
+            if (!go.TryGetComponent<ViewManager>(out var viewManager))
             {
                 throw new InvalidAccessException("Nova: No ViewManager component in UI root game object.");
             }
@@ -266,13 +274,7 @@ namespace Nova
 
         public static void QuitWithConfirm()
         {
-            Alert.Show(
-                null,
-                I18n.__("ingame.exit.confirm"),
-                Quit,
-                null,
-                "QuitConfirm"
-            );
+            Alert.Show(null, "ingame.quit.confirm", Quit, null, "QuitConfirm");
         }
 
         public static bool ForceQuit = false;
@@ -291,7 +293,7 @@ namespace Nova
 #endif
         }
 
-        // Only use in editor code
+        // Only use in editor code or when not inherited from MonoBehaviour
         public static void DestroyObject(UnityObject obj)
         {
             if (obj == null) return;
@@ -306,107 +308,6 @@ namespace Nova
             }
 #else
             UnityObject.Destroy(obj);
-#endif
-        }
-
-        public static TextAlignmentOptions TextAnchor2TextAlignmentOptions(TextAnchor anchor)
-        {
-            switch (anchor)
-            {
-                case TextAnchor.UpperLeft:
-                    return TextAlignmentOptions.TopJustified;
-                case TextAnchor.UpperCenter:
-                    return TextAlignmentOptions.Top;
-                case TextAnchor.UpperRight:
-                    return TextAlignmentOptions.TopRight;
-                case TextAnchor.MiddleLeft:
-                    return TextAlignmentOptions.MidlineJustified;
-                case TextAnchor.MiddleCenter:
-                    return TextAlignmentOptions.Midline;
-                case TextAnchor.MiddleRight:
-                    return TextAlignmentOptions.MidlineRight;
-                case TextAnchor.LowerLeft:
-                    return TextAlignmentOptions.BottomJustified;
-                case TextAnchor.LowerCenter:
-                    return TextAlignmentOptions.Bottom;
-                case TextAnchor.LowerRight:
-                    return TextAlignmentOptions.BottomRight;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public static TextAnchor TextAlignmentOptions2TextAnchor(TextAlignmentOptions anchor)
-        {
-            switch (anchor)
-            {
-                case TextAlignmentOptions.TopJustified:
-                    return TextAnchor.UpperLeft;
-                case TextAlignmentOptions.Top:
-                    return TextAnchor.UpperCenter;
-                case TextAlignmentOptions.TopRight:
-                    return TextAnchor.UpperRight;
-                case TextAlignmentOptions.MidlineJustified:
-                    return TextAnchor.MiddleLeft;
-                case TextAlignmentOptions.Midline:
-                    return TextAnchor.MiddleCenter;
-                case TextAlignmentOptions.MidlineRight:
-                    return TextAnchor.MiddleRight;
-                case TextAlignmentOptions.BottomJustified:
-                    return TextAnchor.LowerLeft;
-                case TextAlignmentOptions.Bottom:
-                    return TextAnchor.LowerCenter;
-                case TextAlignmentOptions.BottomRight:
-                    return TextAnchor.LowerRight;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public static IEnumerable<T> LazyList<T>(T first, Func<T, T> next)
-        {
-            var curr = first;
-            while (curr != null)
-            {
-                yield return curr;
-                curr = next(curr);
-            }
-        }
-
-        public static Action<T> WrapActionWithParameter<T>(Action action)
-        {
-            return action != null ? new Action<T>(_ => action.Invoke()) : null;
-        }
-
-        public static Action WrapActionWithoutParameter<T>(Action<T> action, T value)
-        {
-            return action != null ? new Action(() => action.Invoke(value)) : null;
-        }
-
-        public static bool GetKeyInEditor(KeyCode key)
-        {
-#if UNITY_EDITOR
-            return Input.GetKey(key);
-#else
-            return false;
-#endif
-        }
-
-        public static bool GetKeyDownInEditor(KeyCode key)
-        {
-#if UNITY_EDITOR
-            return Input.GetKeyDown(key);
-#else
-            return false;
-#endif
-        }
-
-        public static bool GetKeyUpInEditor(KeyCode key)
-        {
-#if UNITY_EDITOR
-            return Input.GetKeyUp(key);
-#else
-            return false;
 #endif
         }
 
@@ -457,6 +358,23 @@ namespace Nova
                 default:
                     return false;
             }
+        }
+
+        // On iOS, eventData.pointerId can be < 0, maybe because of overflow
+        // So we disable mouse on mobile devices, even if mobile devices may have mouses
+        public static bool IsTouch(PointerEventData eventData)
+        {
+            return Application.isMobilePlatform || eventData.pointerId >= 0;
+        }
+
+        public static bool IsLeftButton(PointerEventData eventData)
+        {
+            return !Application.isMobilePlatform && eventData.pointerId == -1;
+        }
+
+        public static bool IsRightButton(PointerEventData eventData)
+        {
+            return !Application.isMobilePlatform && eventData.pointerId == -2;
         }
     }
 }

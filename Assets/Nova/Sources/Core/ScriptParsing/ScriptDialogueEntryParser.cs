@@ -298,12 +298,12 @@ namespace Nova
             {
                 if (block.type == BlockType.LazyExecution)
                 {
-                    if (!block.attributes.TryGetValue(stageKey, out var stageValue))
+                    if (block.attributes == null || !block.attributes.TryGetValue(stageKey, out var stageValue))
                     {
                         stageValue = "";
                     }
 
-                    if (!stageValue.Equals(stageName))
+                    if (stageValue != stageName)
                     {
                         continue;
                     }
@@ -450,7 +450,7 @@ namespace Nova
                     var action = LuaRuntime.Instance.WrapClosure(code);
                     if (action == null)
                     {
-                        throw new ParseException(
+                        throw new ParserException(
                             "Syntax error while parsing lazy execution block\n" +
                             $"characterName: {characterName}, displayName: {displayName}, dialogue: {dialogue}\n" +
                             $"stage: {stage}, code: {code}");

@@ -3,7 +3,8 @@ namespace Nova
     [ExportCustomType]
     public class CoroutineHelper
     {
-        private GameState gameState;
+        private readonly GameState gameState;
+
         public object fence;
 
         public CoroutineHelper(GameState gameState)

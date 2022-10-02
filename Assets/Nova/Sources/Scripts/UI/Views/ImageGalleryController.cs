@@ -215,7 +215,7 @@ namespace Nova
         {
             base.OnActivatedUpdate();
 
-            if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
+            if (inputMapper.GetKeyUp(AbstractKey.EditorUnlock))
             {
                 UnlockAllImages();
             }

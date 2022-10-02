@@ -5,8 +5,7 @@ namespace Nova
     [ExportCustomType]
     public class UseRelativeValue
     {
-        public static UseRelativeValue Yes = new UseRelativeValue();
-        private UseRelativeValue() { }
+        public static readonly UseRelativeValue Yes = new UseRelativeValue();
     }
 
     public abstract class LazyComputableAnimationProperty<T, D> : IAnimationProperty

@@ -51,7 +51,7 @@ namespace Nova
             }
 
             go.SetActive(false);
-            go.transform.SetParent(transform);
+            go.transform.SetParent(transform, false);
             buffer.Push(go);
             bufferCount++;
 

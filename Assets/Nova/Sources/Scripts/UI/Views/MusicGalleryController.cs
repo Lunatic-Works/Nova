@@ -185,12 +185,12 @@ namespace Nova
             {
                 if (IsUnlocked(music))
                 {
-                    var entry = Instantiate(musicEntryPrefab, musicListScrollContent, false);
+                    var entry = Instantiate(musicEntryPrefab, musicListScrollContent);
                     entry.Init(music, Play);
                 }
                 else
                 {
-                    Instantiate(lockedMusicEntryPrefab, musicListScrollContent, false);
+                    Instantiate(lockedMusicEntryPrefab, musicListScrollContent);
                 }
             }
         }
@@ -219,7 +219,7 @@ namespace Nova
         {
             base.OnActivatedUpdate();
 
-            if (Utils.GetKeyDownInEditor(KeyCode.LeftShift))
+            if (inputMapper.GetKeyUp(AbstractKey.EditorUnlock))
             {
                 UnlockAllMusics();
             }

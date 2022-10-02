@@ -13,11 +13,9 @@ namespace Nova
 
         private void Awake()
         {
-            renderer = GetComponent<Renderer>();
-            if (renderer == null)
+            if (!TryGetComponent<Renderer>(out renderer))
             {
-                var textureChanger = GetComponent<GameOverlayTextureChanger>();
-                if (textureChanger != null)
+                if (TryGetComponent<GameOverlayTextureChanger>(out var textureChanger))
                 {
                     renderer = textureChanger.actualImageObject.GetComponent<Renderer>();
                 }
@@ -26,7 +24,7 @@ namespace Nova
             image = GetComponent<Image>();
 
             // Create MaterialPool to keep an instance of defaultMaterial
-            MaterialPool.Ensure(gameObject);
+            gameObject.Ensure<MaterialPool>();
 
             renderQueue = GetRenderQueue();
         }
@@ -74,15 +72,10 @@ namespace Nova
             SetRenderQueue(renderQueue);
         }
 
+        // Export to Lua
         public static RenderQueueOverrider Ensure(GameObject gameObject)
         {
-            var overrider = gameObject.GetComponent<RenderQueueOverrider>();
-            if (overrider == null)
-            {
-                overrider = gameObject.AddComponent<RenderQueueOverrider>();
-            }
-
-            return overrider;
+            return gameObject.Ensure<RenderQueueOverrider>();
         }
     }
 }

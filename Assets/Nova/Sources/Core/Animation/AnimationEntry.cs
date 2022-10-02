@@ -73,8 +73,7 @@ namespace Nova
                 float ret = 0.0f;
                 foreach (Transform child in transform)
                 {
-                    var anim = child.GetComponent<AnimationEntry>();
-                    if (anim == null) continue;
+                    if (!child.TryGetComponent<AnimationEntry>(out var anim)) continue;
                     float d = anim.totalDuration;
                     if (d > ret) ret = d;
                 }
@@ -139,7 +138,7 @@ namespace Nova
             Transform parent)
         {
             var entry = PrefabFactory.Get<AnimationEntry>();
-            entry.transform.SetParent(parent);
+            entry.transform.SetParent(parent, false);
             entry.Init(property, duration, easing, repeatNum);
             return entry;
         }
@@ -260,7 +259,7 @@ namespace Nova
 
             foreach (Transform child in Utils.GetChildren(transform))
             {
-                child.SetParent(transform.parent);
+                child.SetParent(transform.parent, false);
                 child.GetComponent<AnimationEntry>().Play();
             }
 
@@ -271,8 +270,7 @@ namespace Nova
         {
             if (!isPlaying) return;
 
-            float deltaTime = Time.deltaTime;
-            timeElapsed += deltaTime;
+            timeElapsed += Time.deltaTime;
             if (timeElapsed < duration)
             {
                 Evaluate();
@@ -345,8 +343,7 @@ namespace Nova
             Debug.Log($"{new string('+', level)}{property} {duration} {status}");
             foreach (Transform child in transform)
             {
-                var entry = child.GetComponent<AnimationEntry>();
-                if (entry == null) continue;
+                if (!child.TryGetComponent<AnimationEntry>(out var entry)) continue;
                 entry.DebugPrint(level + 1);
             }
         }

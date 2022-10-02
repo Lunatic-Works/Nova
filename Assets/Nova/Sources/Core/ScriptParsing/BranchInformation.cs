@@ -45,7 +45,7 @@ namespace Nova
         public readonly string name;
 
         private readonly Dictionary<SystemLanguage, string> _texts;
-        public IReadOnlyDictionary<SystemLanguage, string> texts => _texts;
+        public Dictionary<SystemLanguage, string> texts => _texts;
 
         public readonly BranchImageInformation imageInfo;
         public readonly BranchMode mode;
@@ -100,5 +100,9 @@ namespace Nova
         {
             return name.GetHashCode();
         }
+
+        public static bool operator ==(BranchInformation a, BranchInformation b) => a.Equals(b);
+
+        public static bool operator !=(BranchInformation a, BranchInformation b) => !(a == b);
     }
 }

@@ -367,10 +367,10 @@ namespace Nova.Editor
         public static void CreateMusicEntryForAllAudioClips()
         {
             var dir = EditorUtils.GetSelectedDirectory();
-            var paths = AssetDatabase.FindAssets("t:AudioClip", new[] {dir})
-                .Select(AssetDatabase.GUIDToAssetPath);
-            foreach (var path in paths)
+            var guids = AssetDatabase.FindAssets("t:AudioClip", new[] {dir});
+            foreach (var guid in guids)
             {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
                 if (!path.Contains("_head") && !path.Contains("_loop"))
                 {
                     CreateMusicEntry(path);

@@ -29,11 +29,6 @@ namespace Nova
             {
                 ReloadScripts();
             }
-
-            if (inputMapper.GetKeyUp(AbstractKey.EditorRerunAction))
-            {
-                RerunAction();
-            }
         }
 
         private void ReloadScripts()
@@ -41,17 +36,7 @@ namespace Nova
             NovaAnimation.StopAll();
             dialogueState.state = DialogueState.State.Normal;
             gameState.ReloadScripts();
-            var nodeHistoryEntry = gameState.nodeHistory.GetCounted(gameState.currentNode.name);
-            gameState.MoveBackAndFastForward(nodeHistoryEntry, 0, gameState.currentIndex, true, null);
-        }
-
-        private void RerunAction()
-        {
-            // TODO: how is this useful?
-            // NovaAnimation.StopAll();
-            // dialogueBoxController.state = DialogueBoxState.Normal;
-            // gameState.currentNode.GetDialogueEntryAt(gameState.currentIndex)
-            //     .ExecuteAction(DialogueActionStage.Default, false);
+            gameState.MoveBackToFirstDialogue();
         }
     }
 }

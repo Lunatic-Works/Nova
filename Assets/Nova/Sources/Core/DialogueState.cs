@@ -68,30 +68,30 @@ namespace Nova
                         _state = State.Normal;
                         break;
                     case State.Auto:
-                        this.RuntimeAssert(state == State.Normal, "Dialogue state is not Normal when setting to Auto");
+                        this.RuntimeAssert(state == State.Normal, "Dialogue state is not Normal when setting to Auto.");
                         _state = State.Auto;
                         autoModeStarts.Invoke();
                         break;
                     case State.FastForward:
                         this.RuntimeAssert(state == State.Normal,
-                            "Dialogue state is not Normal when setting to FastForward");
+                            "Dialogue state is not Normal when setting to FastForward.");
 
                         if (unreadStopsFastForward)
                         {
                             int clicks = configManager.GetInt(FastForwardReadFirstShownKey);
                             if (clicks < HintFastForwardReadClicks)
                             {
-                                Alert.Show(I18n.__("dialogue.noreadtext"));
+                                Alert.Show("dialogue.noreadtext");
                                 configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
                             }
                             else if (clicks == HintFastForwardReadClicks)
                             {
-                                Alert.Show(I18n.__("dialogue.hint.fastforwardread"));
+                                Alert.Show("dialogue.hint.fastforwardread");
                                 configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
                             }
                             else
                             {
-                                Alert.Show(I18n.__("dialogue.noreadtext"));
+                                Alert.Show("dialogue.noreadtext");
                             }
 
                             return;

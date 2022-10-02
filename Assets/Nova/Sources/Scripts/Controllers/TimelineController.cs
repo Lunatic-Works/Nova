@@ -35,9 +35,9 @@ namespace Nova
 
             prefabInstance.SetActive(false);
 
-            playableDirector = prefabInstance.GetComponent<PlayableDirector>();
-            if (playableDirector != null)
+            if (prefabInstance.TryGetComponent<PlayableDirector>(out var _playableDirector))
             {
+                playableDirector = _playableDirector;
                 playableDirector.timeUpdateMode = DirectorUpdateMode.Manual;
                 playableDirector.playOnAwake = false;
                 playableDirector.Evaluate();
@@ -46,7 +46,7 @@ namespace Nova
             Camera newCamera = prefabInstance.GetComponentInChildren<Camera>();
             if (newCamera != null)
             {
-                this.RuntimeAssert(newCamera.GetComponent<CameraController>() == null,
+                this.RuntimeAssert(!newCamera.TryGetComponent<CameraController>(out _),
                     "The camera in the timeline prefab should not have a CameraController.");
 
                 mainCameraController.overridingCamera = newCamera;

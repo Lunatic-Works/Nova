@@ -9,7 +9,7 @@ namespace Nova
     public class AvatarConfig
     {
         public string characterName;
-        public CharacterController characterController;
+        public GameCharacterController characterController;
         public string prefix;
     }
 
@@ -77,7 +77,7 @@ namespace Nova
             return true;
         }
 
-        public CharacterController GetCharacterController()
+        public GameCharacterController GetCharacterController()
         {
             if (nameToConfig.ContainsKey(characterName))
             {

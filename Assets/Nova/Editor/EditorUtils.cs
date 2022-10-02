@@ -10,7 +10,6 @@ namespace Nova.Editor
         public static string GetSelectedDirectory()
         {
             var path = "";
-
             foreach (var obj in Selection.GetFiltered<Object>(SelectionMode.Assets))
             {
                 path = AssetDatabase.GetAssetPath(obj);

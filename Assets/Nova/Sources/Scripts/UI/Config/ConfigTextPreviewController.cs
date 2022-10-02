@@ -1,4 +1,3 @@
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -21,10 +20,8 @@ namespace Nova
 
         private DialogueDisplayData GetPreviewDisplayData()
         {
-            var displayNames =
-                I18n.SupportedLocales.ToDictionary(x => x, x => I18n.__(x, "config.textpreview.name"));
-            var dialogues =
-                I18n.SupportedLocales.ToDictionary(x => x, x => I18n.__(x, TextPreviewKeys[textPreviewIndex]));
+            var displayNames = I18n.GetLocalizedStrings("config.textpreview.name");
+            var dialogues = I18n.GetLocalizedStrings(TextPreviewKeys[textPreviewIndex]);
             return new DialogueDisplayData(displayNames, dialogues);
         }
 
@@ -45,10 +42,7 @@ namespace Nova
             var contentProxy = entry.contentProxy;
             var textDuration = characterFadeInDuration * contentProxy.GetPageCharacterCount();
             currentTextPreviewTimeLeft = textDuration + autoDelay;
-            textAnimation.Do(
-                new TextFadeInAnimationProperty(contentProxy, 255),
-                textDuration
-            );
+            textAnimation.Do(new TextFadeInAnimationProperty(contentProxy, 255), textDuration);
             textPreviewIndex = (textPreviewIndex + 1) % TextPreviewKeys.Length;
         }
 

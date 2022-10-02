@@ -7,8 +7,6 @@ using UnityEngine.Events;
 
 namespace Nova
 {
-    using NodeHistoryEntry = KeyValuePair<string, int>;
-
     #region Event types and datas
 
     public class DialogueWillChangeData { }
@@ -18,21 +16,20 @@ namespace Nova
 
     public class DialogueChangedData
     {
-        public readonly NodeHistoryEntry nodeHistoryEntry;
-        public readonly int dialogueIndex;
+        public readonly NodeRecord nodeRecord;
+        public readonly long checkpointOffset;
+        public readonly ReachedDialogueData dialogueData;
         public readonly DialogueDisplayData displayData;
-        public readonly IReadOnlyDictionary<string, VoiceEntry> voicesNextDialogue;
         public readonly bool isReached;
         public readonly bool isReachedAnyHistory;
 
-        public DialogueChangedData(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex,
-            DialogueDisplayData displayData, IReadOnlyDictionary<string, VoiceEntry> voicesNextDialogue, bool isReached,
-            bool isReachedAnyHistory)
+        public DialogueChangedData(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
+            DialogueDisplayData displayData, bool isReached, bool isReachedAnyHistory)
         {
-            this.nodeHistoryEntry = nodeHistoryEntry;
-            this.dialogueIndex = dialogueIndex;
+            this.nodeRecord = nodeRecord;
+            this.checkpointOffset = checkpointOffset;
+            this.dialogueData = dialogueData;
             this.displayData = displayData;
-            this.voicesNextDialogue = voicesNextDialogue;
             this.isReached = isReached;
             this.isReachedAnyHistory = isReachedAnyHistory;
         }
@@ -43,11 +40,11 @@ namespace Nova
 
     public class NodeChangedData
     {
-        public readonly NodeHistoryEntry nodeHistoryEntry;
+        public readonly string newNode;
 
-        public NodeChangedData(NodeHistoryEntry nodeHistoryEntry)
+        public NodeChangedData(string newNode)
         {
-            this.nodeHistoryEntry = nodeHistoryEntry;
+            this.newNode = newNode;
         }
     }
 
@@ -59,11 +56,11 @@ namespace Nova
         [ExportCustomType]
         public class Selection
         {
-            public readonly IReadOnlyDictionary<SystemLanguage, string> texts;
+            public readonly Dictionary<SystemLanguage, string> texts;
             public readonly BranchImageInformation imageInfo;
             public readonly bool active;
 
-            public Selection(IReadOnlyDictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo,
+            public Selection(Dictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo,
                 bool active)
             {
                 this.texts = texts;
@@ -71,11 +68,9 @@ namespace Nova
                 this.active = active;
             }
 
-            public Selection(string text, BranchImageInformation imageInfo, bool active)
-                : this(new Dictionary<SystemLanguage, string>
-                {
-                    [I18n.DefaultLocale] = text
-                }, imageInfo, active) { }
+            public Selection(string text, BranchImageInformation imageInfo, bool active) : this(
+                new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text }, imageInfo, active)
+            { }
         }
 
         public readonly IReadOnlyList<Selection> selections;
@@ -129,7 +124,7 @@ namespace Nova
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                Debug.LogException(e);
                 Utils.Quit();
             }
 
@@ -154,35 +149,25 @@ namespace Nova
         #region States
 
         /// <summary>
-        /// Names and visit counts of the nodes that have been walked through, including the current node
+        /// The current node record in the global save file
         /// </summary>
-        /// <remarks>
-        /// Modified by MoveToNextNode() and MoveBackTo()
-        /// </remarks>
-        public readonly NodeHistory nodeHistory = new NodeHistory();
+        private NodeRecord nodeRecord;
+
+        private long checkpointOffset;
 
         /// <summary>
         /// The current flow chart node
         /// </summary>
-        /// <remarks>
-        /// Modified by MoveToNextNode() and MoveBackTo()
-        /// </remarks>
         public FlowChartNode currentNode { get; private set; }
 
         /// <summary>
         /// The index of the current dialogue entry in the current node
         /// </summary>
-        /// <remarks>
-        /// Modified by MoveToNextNode(), MoveBackTo() and Step()
-        /// </remarks>
-        public int currentIndex { get; private set; }
+        private int currentIndex;
 
         /// <summary>
         /// The current dialogueEntry
         /// </summary>
-        /// <remarks>
-        /// Modified by UpdateGameState()
-        /// </remarks>
         private DialogueEntry currentDialogueEntry;
 
         /// <summary>
@@ -209,7 +194,7 @@ namespace Nova
             CancelAction();
 
             // Reset all states
-            nodeHistory.Clear();
+            nodeRecord = null;
             currentNode = null;
             currentIndex = 0;
             currentDialogueEntry = null;
@@ -261,17 +246,17 @@ namespace Nova
 
         #region Voice
 
-        private readonly Dictionary<string, VoiceEntry> voicesNextDialogue = new Dictionary<string, VoiceEntry>();
+        private readonly Dictionary<string, VoiceEntry> currentVoices = new Dictionary<string, VoiceEntry>();
 
         /// <summary>
-        /// Add a voice clip to be played on the next dialogue
+        /// Add a voice clip to be played in the current dialogue
         /// </summary>
         /// <remarks>
-        /// This method is called by CharacterController
+        /// This method is called by GameCharacterController
         /// </remarks>
-        public void AddVoiceNextDialogue(string characterName, VoiceEntry voiceEntry)
+        public void AddVoice(string characterName, VoiceEntry voiceEntry)
         {
-            voicesNextDialogue.Add(characterName, voiceEntry);
+            currentVoices.Add(characterName, voiceEntry);
         }
 
         #endregion
@@ -301,7 +286,7 @@ namespace Nova
 
         private void ResetActionContext()
         {
-            voicesNextDialogue.Clear();
+            currentVoices.Clear();
             advancedDialogueHelper.Reset();
             coroutineHelper.Reset();
             actionPauseLock.Reset();
@@ -340,7 +325,7 @@ namespace Nova
         {
             if (variables.hash != variablesHashBeforeInterrupt)
             {
-                nodeHistory.AddInterrupt(currentIndex, variables);
+                AppendSameNode();
             }
         }
 
@@ -360,7 +345,7 @@ namespace Nova
         /// Trigger events according to the current states and how they were changed
         /// </remarks>
         private void UpdateGameState(bool nodeChanged, bool dialogueChanged, bool firstEntryOfNode,
-            bool dialogueStepped, bool fromCheckpoint, Action onFinish)
+            bool dialogueStepped, bool fromCheckpoint)
         {
             // Debug.Log($"UpdateGameState begin {debugState}");
 
@@ -368,11 +353,11 @@ namespace Nova
             {
                 // Debug.Log($"Node changed to {currentNode.name}");
 
-                this.nodeChanged.Invoke(new NodeChangedData(nodeHistory.Last()));
+                this.nodeChanged.Invoke(new NodeChangedData(nodeRecord.name));
 
                 if (firstEntryOfNode)
                 {
-                    forceCheckpoint = true; // Always get a checkpoint at the beginning of the node
+                    checkpointEnsured = true; // Always get a checkpoint at the beginning of the node
                 }
             }
 
@@ -385,23 +370,18 @@ namespace Nova
                 if (currentNode.dialogueEntryCount > 0)
                 {
                     currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
-                    ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, fromCheckpoint, onFinish));
+                    ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, fromCheckpoint));
                 }
                 else
                 {
-                    StepAtEndOfNode(onFinish);
+                    StepAtEndOfNode();
                 }
-            }
-            else
-            {
-                onFinish?.Invoke();
             }
 
             // Debug.Log($"UpdateGameState end {debugState}");
         }
 
-        private IEnumerator UpdateDialogue(bool firstEntryOfNode, bool dialogueStepped, bool fromCheckpoint,
-            Action onFinish)
+        private IEnumerator UpdateDialogue(bool firstEntryOfNode, bool dialogueStepped, bool fromCheckpoint)
         {
             if (!fromCheckpoint)
             {
@@ -411,117 +391,150 @@ namespace Nova
                 while (actionPauseLock.isLocked) yield return null;
             }
 
-            DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped, out var isReached,
-                out var isReachedAnyHistory);
+            var isReached = DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped);
             dialogueWillChange.Invoke(new DialogueWillChangeData());
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
-            var dialogueChangedData = new DialogueChangedData(nodeHistory.Last(), currentIndex,
-                currentDialogueEntry.GetDisplayData(), new Dictionary<string, VoiceEntry>(voicesNextDialogue),
-                isReached, isReachedAnyHistory);
+            var isReachedAnyHistory = DialogueSaveReachedData(out var dialogueData);
+            var dialogueChangedData = new DialogueChangedData(nodeRecord, checkpointOffset, dialogueData,
+                currentDialogueEntry.GetDisplayData(), isReached, isReachedAnyHistory);
             dialogueChangedEarly.Invoke(dialogueChangedData);
             dialogueChanged.Invoke(dialogueChangedData);
-
-            voicesNextDialogue.Clear();
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.AfterDialogue, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
             if (advancedDialogueHelper.GetFallThrough())
             {
-                Step(Utils.WrapActionWithParameter<bool>(onFinish));
+                Step();
                 yield break;
             }
 
             var pendingJumpTarget = advancedDialogueHelper.GetJump();
             if (pendingJumpTarget != null)
             {
-                var node = flowChartTree.GetNode(pendingJumpTarget);
+                var node = GetNode(pendingJumpTarget);
                 this.RuntimeAssert(node != null, $"Node {pendingJumpTarget} not found.");
-                MoveToNextNode(node, onFinish);
-                yield break;
+                MoveToNextNode(node);
             }
-
-            onFinish?.Invoke();
         }
 
-        private void DialogueSaveCheckpoint(bool firstEntryOfNode, bool dialogueStepped, out bool isReached,
-            out bool isReachedAnyHistory)
+        private void StepCheckpoint(bool isReached)
+        {
+            if (!isReached)
+            {
+                checkpointOffset = checkpointManager.AppendCheckpoint(currentIndex, GetCheckpoint());
+            }
+            else if (checkpointOffset == nodeRecord.offset)
+            {
+                checkpointOffset = checkpointManager.NextRecord(checkpointOffset);
+            }
+            else
+            {
+                checkpointOffset = checkpointManager.NextCheckpoint(checkpointOffset);
+            }
+        }
+
+        private bool DialogueSaveCheckpoint(bool firstEntryOfNode, bool dialogueStepped)
         {
             if (!firstEntryOfNode && dialogueStepped)
             {
-                stepNumFromLastCheckpoint++;
+                stepsFromLastCheckpoint++;
             }
 
-            var entry = checkpointManager.GetReached(nodeHistory, currentIndex);
-            isReached = entry != null;
-            isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
-            if (entry == null)
+            if (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
+                !checkpointManager.CanAppendCheckpoint(checkpointOffset))
             {
-                // Tell CheckpointManager that a new dialogue entry has been reached
-                checkpointManager.SetReached(nodeHistory, currentIndex, GetRestoreEntry());
+                AppendSameNode();
             }
 
-            // Change states after creating or restoring from checkpoint
+            var isReached = currentIndex < nodeRecord.endDialogue;
             if (shouldSaveCheckpoint)
             {
-                stepNumFromLastCheckpoint = 0;
+                StepCheckpoint(isReached);
             }
 
-            if (entry != null)
+            if (!isReached)
             {
-                this.RuntimeAssert(stepNumFromLastCheckpoint == entry.stepNumFromLastCheckpoint,
-                    $"stepNumFromLastCheckpoint mismatch: {stepNumFromLastCheckpoint} {entry.stepNumFromLastCheckpoint}. Try to clear save data.");
-                this.RuntimeAssert(restrainCheckpointNum == entry.restrainCheckpointNum,
-                    $"restrainCheckpointNum mismatch: {restrainCheckpointNum} {entry.restrainCheckpointNum}. Try to clear save data.");
+                checkpointManager.AppendDialogue(nodeRecord, currentIndex, shouldSaveCheckpoint);
+            }
+
+            if (shouldSaveCheckpoint)
+            {
+                stepsFromLastCheckpoint = 0;
             }
 
             if (checkpointRestrained)
             {
-                restrainCheckpointNum--;
+                stepsCheckpointRestrained--;
             }
 
-            // As the action for this dialogue will be re-run, it's fine to just reset forceCheckpoint to false
-            forceCheckpoint = false;
+            // As the action for this dialogue will be re-run, it's fine to just reset checkpointEnsured to false
+            checkpointEnsured = false;
+
+            return isReached;
         }
 
-        private void StepAtEndOfNode(Action onFinish)
+        private bool DialogueSaveReachedData(out ReachedDialogueData dialogueData)
+        {
+            var isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
+
+            if (!isReachedAnyHistory)
+            {
+                var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
+                dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, voices,
+                    currentDialogueEntry.NeedInterpolate());
+                checkpointManager.SetReached(dialogueData);
+            }
+            else
+            {
+                dialogueData = checkpointManager.GetReachedDialogueData(currentNode.name, currentIndex);
+            }
+
+            return isReachedAnyHistory;
+        }
+
+        private void StepAtEndOfNode()
         {
             switch (currentNode.type)
             {
                 case FlowChartNodeType.Normal:
-                    MoveToNextNode(currentNode.next, onFinish);
+                    MoveToNextNode(currentNode.next);
                     break;
                 case FlowChartNodeType.Branching:
-                    ExecuteAction(DoBranch(currentNode.GetAllBranches(), onFinish));
+                    ExecuteAction(DoBranch(currentNode.GetAllBranches()));
                     break;
                 case FlowChartNodeType.End:
                     state = State.Ended;
                     var endName = flowChartTree.GetEndName(currentNode);
-                    if (!checkpointManager.IsEndReached(endName))
-                    {
-                        checkpointManager.SetEndReached(endName);
-                    }
-
+                    checkpointManager.SetEndReached(endName);
                     routeEnded.Invoke(new RouteEndedData(endName));
-                    onFinish?.Invoke();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private void MoveToNextNode(FlowChartNode nextNode, Action onFinish)
+        private void AppendSameNode()
         {
-            nodeHistory.Add(nextNode.name);
-            currentNode = nextNode;
-            currentIndex = 0;
-            UpdateGameState(true, true, true, true, false, onFinish);
+            nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
+            checkpointOffset = nodeRecord.offset;
+            checkpointEnsured = true;
         }
 
-        private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos, Action onFinish)
+        private void MoveToNextNode(FlowChartNode nextNode)
+        {
+            scriptLoader.AddDeferredDialogueChunks(nextNode);
+            nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
+            currentNode = nextNode;
+            currentIndex = 0;
+            checkpointOffset = nodeRecord.offset;
+            UpdateGameState(true, true, true, true, false);
+        }
+
+        private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos)
         {
             foreach (var branchInfo in branchInfos)
             {
@@ -529,7 +542,7 @@ namespace Nova
                 {
                     if (branchInfo.condition == null || branchInfo.condition.Invoke<bool>())
                     {
-                        SelectBranch(branchInfo.name, onFinish);
+                        SelectBranch(branchInfo.name);
                         yield break;
                     }
                 }
@@ -567,19 +580,12 @@ namespace Nova
             ReleaseActionPause();
 
             var index = (int)coroutineHelper.TakeFence();
-            SelectBranch(selectionNames[index], onFinish);
+            SelectBranch(selectionNames[index]);
         }
 
-        private void SelectBranch(string branchName, Action onFinish)
+        private void SelectBranch(string branchName)
         {
-            var nextNode = currentNode.GetNext(branchName);
-            if (!checkpointManager.IsBranchReached(nodeHistory, branchName))
-            {
-                // Tell the checkpoint manager that the branch has been selected
-                checkpointManager.SetBranchReached(nodeHistory, branchName);
-            }
-
-            MoveToNextNode(nextNode, onFinish);
+            MoveToNextNode(currentNode.GetNext(branchName));
         }
 
         #endregion
@@ -601,7 +607,7 @@ namespace Nova
         private void GameStart(FlowChartNode startNode)
         {
             ResetGameState();
-            MoveToNextNode(startNode, null);
+            MoveToNextNode(startNode);
         }
 
         /// <summary>
@@ -622,7 +628,9 @@ namespace Nova
 
         public FlowChartNode GetNode(string name)
         {
-            return flowChartTree.GetNode(name);
+            var node = flowChartTree.GetNode(name);
+            scriptLoader.AddDeferredDialogueChunks(node);
+            return node;
         }
 
         public IReadOnlyList<string> GetAllStartNodeNames()
@@ -670,26 +678,22 @@ namespace Nova
         /// <remarks>
         /// This method can run asynchronously. The callback will be invoked when the step finishes.
         /// </remarks>
-        /// <param name="onFinish">(canStepForward) => { ... }</param>
-        public void Step(Action<bool> onFinish = null)
+        public void Step()
         {
             if (!canStepForward)
             {
-                onFinish?.Invoke(false);
                 return;
             }
-
-            var successCallback = Utils.WrapActionWithoutParameter(onFinish, true);
 
             // If the next dialogue entry is in the current node, directly step to it
             if (currentIndex + 1 < currentNode.dialogueEntryCount)
             {
                 ++currentIndex;
-                UpdateGameState(false, true, false, true, false, successCallback);
+                UpdateGameState(false, true, false, true, false);
             }
             else
             {
-                StepAtEndOfNode(successCallback);
+                StepAtEndOfNode();
             }
         }
 
@@ -708,7 +712,7 @@ namespace Nova
         /// <summary>
         /// Register a new restorable object
         /// </summary>
-        /// <param name="restorable">The restorable to be added</param>
+        /// <param name="restorable">The restorable object to be added</param>
         /// <exception cref="ArgumentException">
         /// Thrown when the name of the restorable object is null or duplicated
         /// </exception>
@@ -727,7 +731,7 @@ namespace Nova
         /// <summary>
         /// Unregister a restorable object
         /// </summary>
-        /// <param name="restorable">The restorable to be removed</param>
+        /// <param name="restorable">The restorable object to be removed</param>
         public void RemoveRestorable(IRestorable restorable)
         {
             restorables.Remove(restorable.restorableName);
@@ -736,64 +740,53 @@ namespace Nova
         /// <summary>
         /// Not all states of objects can be easily restored, like holding animations.
         /// We store some checkpoints, and other states can be restored by re-executing from the last checkpoint.
-        /// At least one checkpoint will be saved every maxStepNumFromLastCheckpoint, except during holding animations.
+        /// At least one checkpoint will be saved every maxStepsFromLastCheckpoint, except during holding animations.
         /// </summary>
-        public int maxStepNumFromLastCheckpoint = 10;
+        [SerializeField] private int maxStepsFromLastCheckpoint = 10;
 
-        public const int WarningStepNumFromLastCheckpoint = 100;
+        public const int WarningStepsFromLastCheckpoint = 100;
 
-        /// <remarks>
-        /// Modified by DialogueSaveCheckpoint(), EnsureCheckpoint() and RestoreCheckpoint()
-        /// </remarks>
-        private int stepNumFromLastCheckpoint;
+        private int stepsFromLastCheckpoint;
 
         /// <summary>
         /// Restrain saving checkpoints.
         /// </summary>
         /// <remarks>
         /// This feature is necessary for restoring holding animations.
-        /// This restraint has higher priority than EnsureCheckpoint().
-        /// Modified by DialogueSaveCheckpoint(), RestrainCheckpoint() and RestoreCheckpoint()
+        /// This restraint has lower priority than checkpointEnsured.
         /// </remarks>
-        private int restrainCheckpointNum;
+        private int stepsCheckpointRestrained;
 
-        private bool checkpointRestrained => restrainCheckpointNum > 0;
+        private bool checkpointRestrained => stepsCheckpointRestrained > 0;
 
         /// <summary>
-        /// Restrain saving checkpoints for given steps. Force overwrite the number of restraining steps when overridden is true.
+        /// Restrain saving checkpoints for given steps.
         /// </summary>
-        /// <param name="steps">the steps to restrain checkpoints</param>
-        /// <param name="overridden">if the new restraining step num should overwrite the old one</param>
+        /// <param name="steps">number of steps to restrain checkpoints</param>
+        /// <param name="overridden">if the new step number should overwrite the old one</param>
         public void RestrainCheckpoint(int steps, bool overridden = false)
         {
-            // check overwrite
-            if (!overridden && restrainCheckpointNum >= steps) return;
-            // non-negative
+            if (!overridden && stepsCheckpointRestrained >= steps) return;
             if (steps < 0) steps = 0;
-            restrainCheckpointNum = steps;
+            stepsCheckpointRestrained = steps;
         }
 
         /// <summary>
         /// Used to force save a checkpoint before a holding animation begins.
         /// </summary>
-        /// <remarks>
-        /// Modified by DialogueSaveCheckpoint(), EnsureCheckpointOnNextDialogue() and RestoreCheckpoint()
-        /// </remarks>
-        private bool forceCheckpoint = false;
+        private bool checkpointEnsured;
 
         public void EnsureCheckpointOnNextDialogue()
         {
-            forceCheckpoint = true;
+            checkpointEnsured = true;
         }
 
-        private bool shouldSaveCheckpoint => forceCheckpoint ||
-                                             (!checkpointRestrained && stepNumFromLastCheckpoint >=
-                                                 maxStepNumFromLastCheckpoint);
+        private bool shouldSaveCheckpoint =>
+            checkpointEnsured || (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
 
         /// <summary>
-        /// Force to get the current game state as a checkpoint
+        /// Get the current game state as a checkpoint
         /// </summary>
-        /// <returns>current game state checkpoint</returns>
         private GameStateCheckpoint GetCheckpoint()
         {
             var restoreDatas = new Dictionary<string, IRestoreData>();
@@ -802,32 +795,17 @@ namespace Nova
                 restoreDatas[restorable.Key] = restorable.Value.GetRestoreData();
             }
 
-            return new GameStateCheckpoint(restoreDatas, variables, restrainCheckpointNum);
-        }
-
-        /// <summary>
-        /// Get all restore data from registered restorables
-        /// </summary>
-        /// <returns>a game state step restore entry that contains all restore datas for the current dialogue</returns>
-        private GameStateRestoreEntry GetRestoreEntry()
-        {
-            // Debug.Log($"GetRestoreEntry {debugState}");
-
-            if (shouldSaveCheckpoint)
-            {
-                return GetCheckpoint();
-            }
-
-            return new GameStateSimpleEntry(stepNumFromLastCheckpoint, restrainCheckpointNum);
+            return new GameStateCheckpoint(currentIndex, restoreDatas, variables, stepsCheckpointRestrained);
         }
 
         private void RestoreCheckpoint(GameStateCheckpoint entry)
         {
             this.RuntimeAssert(entry != null, "Checkpoint is null.");
 
-            stepNumFromLastCheckpoint = 0;
-            restrainCheckpointNum = entry.restrainCheckpointNum;
-            forceCheckpoint = false;
+            currentIndex = entry.dialogueIndex;
+            stepsFromLastCheckpoint = 0;
+            stepsCheckpointRestrained = entry.stepsCheckpointRestrained;
+            checkpointEnsured = false;
 
             variables.CloneFrom(entry.variables);
 
@@ -847,93 +825,69 @@ namespace Nova
             }
         }
 
-        /// <summary>
-        /// Get the node name, the visit count, and the dialogue index before specified steps
-        /// </summary>
-        /// <param name="steps">number to step back</param>
-        /// <param name="nodeHistoryEntry">node name and visit count at given steps before</param>
-        /// <param name="dialogueIndex">dialogue index at given steps before</param>
-        /// <returns>true when succeed, false when steps is too large or a negative number</returns>
-        public bool SeekBackStep(int steps, out NodeHistoryEntry nodeHistoryEntry, out int dialogueIndex)
+        private void SeekBackStep(int steps, IList<NodeRecord> nodeHistory, out long newCheckpointOffset,
+            out int newDialogueIndex)
         {
-            if (steps < 0)
-            {
-                nodeHistoryEntry = new NodeHistoryEntry("", -1);
-                dialogueIndex = -1;
-                return false;
-            }
+            // Debug.Log($"stepback={steps}");
+            this.RuntimeAssert(steps >= 0, $"Invalid steps {steps}.");
 
-            if (currentIndex >= steps)
-            {
-                nodeHistoryEntry = nodeHistory.Last();
-                dialogueIndex = currentIndex - steps;
-                return true;
-            }
+            nodeHistory.Clear();
+            var hasLimit = steps > 0;
 
-            // The following code won't be frequently executed, since there is always a checkpoint at the
-            // start of the node, and the step number in the restore entry never steps across node
-            // boundaries.
-
-            steps -= currentIndex;
-            for (var i = nodeHistory.Count - 2; i >= 0; i--)
+            var curNode = nodeRecord;
+            nodeHistory.Add(curNode);
+            var endDialogue = currentIndex;
+            while (curNode.parent != 0 && (!hasLimit || steps > endDialogue - curNode.beginDialogue))
             {
-                var node = flowChartTree.GetNode(nodeHistory[i].Key);
-                if (node.dialogueEntryCount >= steps)
+                if (hasLimit)
                 {
-                    nodeHistoryEntry = nodeHistory[i];
-                    dialogueIndex = node.dialogueEntryCount - steps;
-                    return true;
+                    steps -= endDialogue - curNode.beginDialogue;
                 }
 
-                steps -= node.dialogueEntryCount;
+                curNode = checkpointManager.GetNodeRecord(curNode.parent);
+                nodeHistory.Add(curNode);
+                endDialogue = curNode.endDialogue;
             }
 
-            nodeHistoryEntry = new NodeHistoryEntry("", -1);
-            dialogueIndex = -1;
-            return false;
+            if (!hasLimit || steps > endDialogue - curNode.beginDialogue)
+            {
+                newDialogueIndex = curNode.beginDialogue;
+            }
+            else
+            {
+                newDialogueIndex = endDialogue - steps;
+            }
+
+            newCheckpointOffset = checkpointManager.NextRecord(curNode.offset);
+            var checkpointDialogue = checkpointManager.GetCheckpointDialogue(newCheckpointOffset);
+            while (checkpointDialogue < curNode.lastCheckpointDialogue)
+            {
+                var nextCheckpoint = checkpointManager.NextCheckpoint(newCheckpointOffset);
+                var nextCheckpointDialogue = checkpointManager.GetCheckpointDialogue(nextCheckpoint);
+                if (nextCheckpointDialogue > newDialogueIndex)
+                {
+                    break;
+                }
+
+                newCheckpointOffset = nextCheckpoint;
+            }
+
+            // Debug.Log($"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
+        }
+
+        public void SeekBackStep(int steps, out NodeRecord nodeRecord, out long newCheckpointOffset,
+            out int newDialogueIndex)
+        {
+            var list = new List<NodeRecord>();
+            SeekBackStep(steps, list, out newCheckpointOffset, out newDialogueIndex);
+            nodeRecord = list[list.Count - 1];
         }
 
         public bool isRestoring { get; private set; }
 
-        /// <summary>
-        /// Restore all restorables. The lazy execution block in the target entry will be executed again.
-        /// </summary>
-        private void Restore(GameStateRestoreEntry restoreData, Action onFinish)
+        private void FastForward(int stepCount)
         {
-            if (restoreData is GameStateCheckpoint checkpointEntry)
-            {
-                RestoreCheckpoint(checkpointEntry);
-                UpdateGameState(true, true, false, false, true, onFinish);
-            }
-            else if (restoreData is GameStateSimpleEntry simpleEntry)
-            {
-                if (!SeekBackStep(simpleEntry.stepNumFromLastCheckpoint, out NodeHistoryEntry storedNode,
-                        out int storedDialogueIndex))
-                {
-                    throw new ArgumentException(
-                        $"Nova: Failed to seek back, invalid stepNumFromLastCheckpoint: {simpleEntry.stepNumFromLastCheckpoint}");
-                }
-
-                MoveBackAndFastForward(storedNode, storedDialogueIndex, simpleEntry.stepNumFromLastCheckpoint, false,
-                    onFinish);
-            }
-            else
-            {
-                throw new ArgumentException($"Nova: {restoreData} is not supported.");
-            }
-        }
-
-        public void MoveBackAndFastForward(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, int stepCount,
-            bool clearFuture, Action onFinish)
-        {
-            isRestoring = true;
-            MoveBackTo(nodeHistoryEntry, dialogueIndex, clearFuture);
-            if (actionPauseLock.isLocked)
-            {
-                Debug.LogWarning("Nova: GameState paused by action when restoring.");
-                isRestoring = false;
-                return;
-            }
+            this.RuntimeAssert(stepCount > 0, $"Invalid stepCount {stepCount}.");
 
             for (var i = 0; i < stepCount; ++i)
             {
@@ -947,20 +901,26 @@ namespace Nova
                 Step();
                 if (actionPauseLock.isLocked)
                 {
-                    Debug.LogWarning("Nova: GameState paused by action when restoring.");
+                    Debug.LogWarning("Nova: GameState paused by action when restoring. " +
+                                     "Maybe a minigame does not have a checkpoint ensured after it.");
                     isRestoring = false;
                     return;
-                }
-
-                if (isLast)
-                {
-                    onFinish?.Invoke();
                 }
             }
         }
 
-        public void MoveBackTo(NodeHistoryEntry nodeHistoryEntry, int dialogueIndex, bool clearFuture = false,
-            Action onFinish = null)
+        public void MoveBackToFirstDialogue()
+        {
+            var entryNode = nodeRecord;
+            while (entryNode.parent != 0 && entryNode.beginDialogue != 0)
+            {
+                entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
+            }
+
+            MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
+        }
+
+        public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
         {
             // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
 
@@ -970,43 +930,91 @@ namespace Nova
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
 
             // Restore history
-            var backNodeIndex = nodeHistory.FindLastIndex(x => x.Equals(nodeHistoryEntry));
-            if (backNodeIndex < 0)
+            nodeRecord = newNodeRecord;
+            checkpointOffset = newCheckpointOffset;
+            if (checkpointOffset == nodeRecord.offset)
             {
-                Debug.LogWarning($"Nova: Move back to node {nodeHistoryEntry.Key} that is not walked through.");
+                checkpointOffset = checkpointManager.NextRecord(checkpointOffset);
             }
 
-            if (clearFuture)
-            {
-                // All save data of nodes to be removed are deleted
-                for (var i = backNodeIndex + 1; i < nodeHistory.Count; ++i)
-                {
-                    checkpointManager.UnsetReached(nodeHistory.GetHashULong(0, i + 1));
-                }
+            currentNode = GetNode(nodeRecord.name);
+            // Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
 
-                // All save data of later dialogues are deleted
-                checkpointManager.UnsetReachedAfter(nodeHistory, dialogueIndex);
+            isRestoring = true;
+            var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
+            RestoreCheckpoint(checkpoint);
+            this.RuntimeAssert(dialogueIndex >= currentIndex,
+                $"dialogueIndex {dialogueIndex} is before currentIndex {currentIndex}.");
+            if (dialogueIndex == currentIndex)
+            {
+                isRestoring = false;
             }
 
-            nodeHistory.RemoveRange(backNodeIndex + 1, nodeHistory.Count - (backNodeIndex + 1));
-            if (backNodeIndex < 0)
+            UpdateGameState(true, true, false, false, true);
+            if (actionPauseLock.isLocked)
             {
-                nodeHistory.Add(nodeHistoryEntry.Key);
+                Debug.LogWarning("Nova: GameState paused by action when restoring. " +
+                                 "Maybe a minigame does not have a checkpoint ensured after it.");
+                isRestoring = false;
+                return;
             }
 
-            nodeHistory.RemoveInterruptsAfter(backNodeIndex, dialogueIndex);
-
-            currentNode = flowChartTree.GetNode(nodeHistoryEntry.Key);
-            currentIndex = dialogueIndex;
-
-            // Restore data
-            var entry = checkpointManager.GetReached(nodeHistory, dialogueIndex);
-            this.RuntimeAssert(entry != null,
-                $"Unable to find restore entry with {nodeHistory} {nodeHistory.Hash}, dialogueIndex {dialogueIndex}");
-
-            Restore(entry, onFinish);
+            if (dialogueIndex > currentIndex)
+            {
+                FastForward(dialogueIndex - currentIndex);
+            }
 
             // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
+        }
+
+        public IEnumerable<ReachedDialoguePosition> GetDialogueHistory(int limit = 0)
+        {
+            if (nodeRecord == null)
+            {
+                yield break;
+            }
+
+            List<NodeRecord> nodeHistory = new List<NodeRecord>();
+            SeekBackStep(limit, nodeHistory, out var curCheckpoint, out var curDialogue);
+
+            for (var i = nodeHistory.Count - 1; i >= 0; i--)
+            {
+                var curNode = nodeHistory[i];
+                if (i != nodeHistory.Count - 1)
+                {
+                    curCheckpoint = checkpointManager.NextRecord(curNode.offset);
+                    curDialogue = curNode.beginDialogue;
+                }
+
+                var checkpointDialogue = checkpointManager.GetCheckpointDialogue(curCheckpoint);
+                var endDialogue = i == 0 ? currentIndex : curNode.endDialogue;
+                while (curDialogue < endDialogue)
+                {
+                    var curEndDialogue = endDialogue;
+                    long nextCheckpoint = 0;
+                    if (checkpointDialogue < curNode.lastCheckpointDialogue)
+                    {
+                        nextCheckpoint = checkpointManager.NextCheckpoint(curCheckpoint);
+                        var nextCheckpointDialogue = checkpointManager.GetCheckpointDialogue(nextCheckpoint);
+                        if (nextCheckpointDialogue < endDialogue)
+                        {
+                            curEndDialogue = nextCheckpointDialogue;
+                        }
+                    }
+
+                    while (curDialogue < curEndDialogue)
+                    {
+                        yield return new ReachedDialoguePosition(curNode, curCheckpoint, curDialogue);
+                        curDialogue++;
+                    }
+
+                    if (curDialogue < endDialogue)
+                    {
+                        checkpointDialogue = curEndDialogue;
+                        curCheckpoint = nextCheckpoint;
+                    }
+                }
+            }
         }
 
         #endregion
@@ -1014,25 +1022,29 @@ namespace Nova
         #region Bookmark
 
         /// <summary>
-        /// Get the Bookmark for the current state
+        /// Get the Bookmark for the current game state
         /// </summary>
         public Bookmark GetBookmark()
         {
-            return new Bookmark(nodeHistory, currentIndex);
+            if (nodeRecord == null || checkpointOffset == nodeRecord.offset)
+            {
+                throw new InvalidOperationException("cannot save bookmark at this point");
+            }
+
+            return new Bookmark(nodeRecord, checkpointOffset, currentIndex);
         }
 
         /// <summary>
-        /// Load a Bookmark and restore the saved state
+        /// Load a Bookmark and restore the saved game state
         /// </summary>
         public void LoadBookmark(Bookmark bookmark)
         {
-            checkpointManager.GetNodeHistory(bookmark.nodeHistoryHash, nodeHistory);
-            MoveBackTo(nodeHistory.Last(), bookmark.dialogueIndex);
+            MoveBackTo(checkpointManager.GetNodeRecord(bookmark.nodeOffset), bookmark.checkpointOffset,
+                bookmark.dialogueIndex);
         }
 
         #endregion
 
-        private string debugState =>
-            $"{currentNode?.name} {currentIndex} {variables.hash} | {stepNumFromLastCheckpoint} {restrainCheckpointNum} {forceCheckpoint} {shouldSaveCheckpoint}";
+        // private string debugState => $"{currentNode?.name} {currentIndex} {variables.hash} | {stepsFromLastCheckpoint} {stepsCheckpointRestrained} {checkpointEnsured} {shouldSaveCheckpoint}";
     }
 }

@@ -1,14 +1,11 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Nova
 {
-    public class LogEntryController : MonoBehaviour, IPointerExitHandler
+    public class LogEntryController : MonoBehaviour
     {
-        [HideInInspector] public int logEntryIndex;
-
         private TextProxy textProxy;
         private Button goBackButton;
         private Button playVoiceButton;
@@ -40,40 +37,17 @@ namespace Nova
             }
             else
             {
+                button.gameObject.SetActive(true);
                 button.onClick.AddListener(onClick);
             }
         }
 
-        private UnityAction<int> onGoBackButtonClicked;
-
-        private void OnGoBackButtonClicked()
-        {
-            onGoBackButtonClicked?.Invoke(logEntryIndex);
-        }
-
-        private UnityAction<int> onPointerExit;
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            onPointerExit?.Invoke(logEntryIndex);
-        }
-
-        /// <summary>
-        /// Initialize the log entry prefab
-        /// </summary>
-        /// <param name="displayData"></param>
-        /// <param name="onGoBackButtonClicked">The action to perform when the go back button clicked</param>
-        /// <param name="onPlayVoiceButtonClicked">The action to perform when the play voice button clicked</param>
-        /// <param name="logEntryIndex"></param>
-        public void Init(DialogueDisplayData displayData, UnityAction<int> onGoBackButtonClicked,
-            UnityAction onPlayVoiceButtonClicked, UnityAction<int> onPointerExit, int logEntryIndex)
+        public void Init(DialogueDisplayData displayData, UnityAction onGoBackButtonClicked,
+            UnityAction onPlayVoiceButtonClicked)
         {
             InitReferences();
-            this.logEntryIndex = logEntryIndex;
-            this.onGoBackButtonClicked = onGoBackButtonClicked;
-            InitButton(goBackButton, OnGoBackButtonClicked);
+            InitButton(goBackButton, onGoBackButtonClicked);
             InitButton(playVoiceButton, onPlayVoiceButtonClicked);
-            this.onPointerExit = onPointerExit;
             this.displayData = displayData;
             UpdateText();
         }
@@ -82,7 +56,6 @@ namespace Nova
         {
             if (!inited) return;
             textProxy.text = displayData.FormatNameDialogue();
-            gameObject.SetActive(!string.IsNullOrEmpty(textProxy.text));
         }
 
         private void OnEnable()

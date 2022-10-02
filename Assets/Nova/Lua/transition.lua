@@ -128,9 +128,9 @@ local function set_mat(obj, mat, layer_id)
         return
     end
 
-    local character = go:GetComponent(typeof(Nova.CharacterController))
-    if character then
-        warn('Cannot set material for CharacterController ' .. dump(obj))
+    local chara = go:GetComponent(typeof(Nova.GameCharacterController))
+    if chara then
+        warn('Cannot set material for GameCharacterController ' .. dump(obj))
         return
     end
 

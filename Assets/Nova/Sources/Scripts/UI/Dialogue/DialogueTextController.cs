@@ -25,7 +25,7 @@ namespace Nova
                     if (t == null)
                     {
                         go = new GameObject("DialogueEntryFactory");
-                        go.transform.SetParent(transform.root);
+                        go.transform.SetParent(transform.root, false);
                     }
                     else
                     {
@@ -33,7 +33,7 @@ namespace Nova
                     }
 
                     var prefabFactoryGO = new GameObject("For " + name);
-                    prefabFactoryGO.transform.SetParent(go.transform);
+                    prefabFactoryGO.transform.SetParent(go.transform, false);
                     _prefabFactory = prefabFactoryGO.AddComponent<PrefabFactory>();
                     _prefabFactory.prefab = dialogueEntryPrefab;
                     _prefabFactory.maxBufferSize = 10;
@@ -59,11 +59,8 @@ namespace Nova
         {
             var dec = prefabFactory.Get<DialogueEntryController>();
             var _transform = dec.transform;
-            _transform.SetParent(transform);
+            _transform.SetParent(transform, false);
             _transform.SetAsLastSibling();
-            _transform.localPosition = Vector3.zero;
-            _transform.localRotation = Quaternion.identity;
-            _transform.localScale = Vector3.one;
             _dialogueEntryControllers.Add(dec);
             dec.Init(displayData, alignment, characterNameColor, textColor, materialName,
                 layoutSetting, textLeftExtraPadding);

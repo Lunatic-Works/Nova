@@ -19,11 +19,11 @@ namespace Nova
     [Serializable]
     public class DialogueDisplayData
     {
-        public readonly IReadOnlyDictionary<SystemLanguage, string> displayNames;
-        public readonly IReadOnlyDictionary<SystemLanguage, string> dialogues;
+        public readonly Dictionary<SystemLanguage, string> displayNames;
+        public readonly Dictionary<SystemLanguage, string> dialogues;
 
-        public DialogueDisplayData(IReadOnlyDictionary<SystemLanguage, string> displayNames,
-            IReadOnlyDictionary<SystemLanguage, string> dialogues)
+        public DialogueDisplayData(Dictionary<SystemLanguage, string> displayNames,
+            Dictionary<SystemLanguage, string> dialogues)
         {
             this.displayNames = displayNames;
             this.dialogues = dialogues;
@@ -86,32 +86,34 @@ namespace Nova
 
         // DialogueDisplayData is cached only if there is no need to interpolate
         private DialogueDisplayData cachedDisplayData;
+        private bool needInterpolate;
+
+        public bool NeedInterpolate()
+        {
+            if (cachedDisplayData == null && !needInterpolate)
+            {
+                var func = LuaRuntime.Instance.GetFunction("text_need_interpolate");
+                needInterpolate = displayNames.Any(x => func.Invoke<string, bool>(x.Value))
+                                  || dialogues.Any(x => func.Invoke<string, bool>(x.Value));
+                if (!needInterpolate)
+                {
+                    cachedDisplayData = new DialogueDisplayData(displayNames, dialogues);
+                }
+            }
+
+            return needInterpolate;
+        }
 
         public DialogueDisplayData GetDisplayData()
         {
-            if (cachedDisplayData != null)
+            if (NeedInterpolate())
             {
-                return cachedDisplayData;
+                var interpolatedDisplayNames = displayNames.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
+                var interpolatedDialogues = dialogues.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
+                return new DialogueDisplayData(interpolatedDisplayNames, interpolatedDialogues);
             }
 
-            LuaRuntime.Instance.GetFunction("reset_text_need_interpolate").Call();
-
-            var interpolatedDisplayNames = displayNames.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
-            var interpolatedDialogues = dialogues.ToDictionary(x => x.Key, x => InterpolateText(x.Value));
-
-            DialogueDisplayData displayData;
-            if (LuaRuntime.Instance.GetFunction("get_text_need_interpolate").Invoke<bool>())
-            {
-                displayData = new DialogueDisplayData(interpolatedDisplayNames, interpolatedDialogues);
-            }
-            else
-            {
-                // Release references of interpolatedDisplayNames and interpolatedDialogues
-                displayData = new DialogueDisplayData(displayNames, dialogues);
-                cachedDisplayData = displayData;
-            }
-
-            return displayData;
+            return cachedDisplayData;
         }
 
         /// <summary>
@@ -121,7 +123,8 @@ namespace Nova
         {
             if (actions.TryGetValue(stage, out var action))
             {
-                LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Lazy, stage, isRestoring));
+                LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Lazy, stage,
+                    isRestoring));
                 try
                 {
                     action.Call();
@@ -152,7 +155,7 @@ end)";
             LuaRuntime.Instance.GetFunction("coroutine.stop").Call(ActionCoroutineName);
         }
 
-        public static string InterpolateText(string s)
+        private static string InterpolateText(string s)
         {
             if (string.IsNullOrEmpty(s))
             {

@@ -9,33 +9,49 @@ namespace Nova
         private Text text;
         private Button button;
         private MusicListEntry entry;
-        private Action<MusicListEntry> onClick;
+        private bool inited;
 
-        private void Awake()
+        private void InitReferences()
         {
+            if (inited)
+            {
+                return;
+            }
+
             text = GetComponentInChildren<Text>();
             button = GetComponent<Button>();
+
+            inited = true;
         }
 
-        private void ForceUpdate()
+        private void UpdateText()
         {
-            if (entry == null) return;
-            if (text == null) return;
+            if (!inited || entry == null)
+            {
+                return;
+            }
+
             text.text = entry.entry.GetDisplayName();
-            if (button == null) return;
+        }
+
+        public void Init(MusicListEntry entry, Action<MusicListEntry> onClick)
+        {
+            InitReferences();
+            this.entry = entry;
+            UpdateText();
+            button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() => onClick(entry));
         }
 
         private void OnEnable()
         {
-            ForceUpdate();
+            UpdateText();
+            I18n.LocaleChanged.AddListener(UpdateText);
         }
 
-        public void Init(MusicListEntry entry, Action<MusicListEntry> onClick)
+        private void OnDisable()
         {
-            this.entry = entry;
-            this.onClick = onClick;
-            ForceUpdate();
+            I18n.LocaleChanged.RemoveListener(UpdateText);
         }
     }
 }

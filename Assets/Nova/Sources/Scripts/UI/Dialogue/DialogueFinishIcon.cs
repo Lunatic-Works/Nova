@@ -20,9 +20,10 @@ namespace Nova
 
         private void Awake()
         {
+            this.RuntimeAssert(cubeCamera != null, "Missing cubeCamera.");
+            this.RuntimeAssert(cube != null, "Missing cube.");
             rt = GetComponent<RectTransform>();
             img = GetComponent<RawImage>();
-            this.RuntimeAssert(cube != null && cubeCamera != null, "Missing parameter in DialogueFinishIcon.");
             var rect = rt.rect;
             // Don't do MSAA here. It's hard to check whether the driver supports it.
             cubeCamera.targetTexture = renderTexture = new RenderTexture((int)rect.height, (int)rect.height, 0)

@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace Nova
 {
+    using VoiceEntries = Dictionary<string, VoiceEntry>;
+
     [Serializable]
     public class VoiceEntry
     {
@@ -28,10 +30,10 @@ namespace Nova
             Environment
         }
 
-        private readonly CharacterController character;
+        private readonly GameCharacterController character;
         private readonly Type type;
 
-        public CharacterColor(CharacterController character, Type type)
+        public CharacterColor(GameCharacterController character, Type type)
         {
             this.character = character;
             this.type = type;
@@ -70,7 +72,7 @@ namespace Nova
 
     [ExportCustomType]
     [RequireComponent(typeof(AudioSource))]
-    public class CharacterController : CompositeSpriteControllerBase
+    public class GameCharacterController : CompositeSpriteControllerBase
     {
         public string luaGlobalName;
         public string voiceFolder;
@@ -148,10 +150,9 @@ namespace Nova
 
         #region Voice
 
-        [HideInInspector] public bool stopVoiceWhenDialogueWillChange;
-
-        private bool willSaySomething = false;
-        private float voiceDelay = 0.0f;
+        [HideInInspector] public bool stopVoiceOnDialogueChange;
+        private bool willSaySomething;
+        private float voiceDelay;
 
         private bool dontPlaySound => gameState.isRestoring;
 
@@ -160,7 +161,7 @@ namespace Nova
         /// </summary>
         private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
         {
-            if (stopVoiceWhenDialogueWillChange)
+            if (stopVoiceOnDialogueChange)
             {
                 audioSource.Stop();
             }
@@ -187,7 +188,7 @@ namespace Nova
             }
         }
 
-        private void SayImmediatelyWithDelay(AudioClip clip, float delay)
+        private void SayImmediately(AudioClip clip, float delay)
         {
             StopVoice();
             audioSource.clip = clip;
@@ -238,16 +239,16 @@ namespace Nova
         public void Say(string voiceFileName, float delay)
         {
             // Stop all to make sure all previous playing voices are stopped here
-            // Especially when stopVoiceWhenDialogueWillChange is off
+            // Especially when stopVoiceOnDialogueChange is off
             StopVoiceAll();
 
-            voiceFileName = System.IO.Path.Combine(voiceFolder, voiceFileName);
-            var audioClip = AssetLoader.Load<AudioClip>(voiceFileName);
+            var voicePath = System.IO.Path.Combine(voiceFolder, voiceFileName);
+            var audioClip = AssetLoader.Load<AudioClip>(voicePath);
 
             willSaySomething = true;
             voiceDelay = delay;
             audioSource.clip = audioClip;
-            gameState.AddVoiceNextDialogue(luaGlobalName, new VoiceEntry(voiceFileName, delay));
+            gameState.AddVoice(luaGlobalName, new VoiceEntry(voiceFileName, delay));
         }
 
         /// <summary>
@@ -268,13 +269,13 @@ namespace Nova
         public override string restorableName => luaGlobalName;
 
         [Serializable]
-        private class CharacterControllerRestoreData : CompositeSpriteControllerBaseRestoreData
+        private class GameCharacterControllerRestoreData : CompositeSpriteControllerBaseRestoreData
         {
             public readonly Vector4Data environmentColor;
             public readonly int layer;
 
-            public CharacterControllerRestoreData(CompositeSpriteControllerBaseRestoreData baseData,
-                Color environmentColor, int layer) : base(baseData)
+            public GameCharacterControllerRestoreData(CompositeSpriteControllerBaseRestoreData baseData, Color environmentColor,
+                int layer) : base(baseData)
             {
                 this.environmentColor = environmentColor;
                 this.layer = layer;
@@ -283,14 +284,14 @@ namespace Nova
 
         public override IRestoreData GetRestoreData()
         {
-            return new CharacterControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
+            return new GameCharacterControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerBaseRestoreData,
                 environmentColor, layer);
         }
 
         public override void Restore(IRestoreData restoreData)
         {
             base.Restore(restoreData);
-            var data = restoreData as CharacterControllerRestoreData;
+            var data = restoreData as GameCharacterControllerRestoreData;
             environmentColor = data.environmentColor;
             layer = data.layer;
         }
@@ -299,10 +300,10 @@ namespace Nova
 
         #region Static fields and methods
 
-        private static readonly Dictionary<string, CharacterController> Characters =
-            new Dictionary<string, CharacterController>();
+        private static readonly Dictionary<string, GameCharacterController> Characters =
+            new Dictionary<string, GameCharacterController>();
 
-        private static void AddCharacter(string name, CharacterController character)
+        private static void AddCharacter(string name, GameCharacterController character)
         {
             Characters.Add(name, character);
         }
@@ -312,7 +313,26 @@ namespace Nova
             Characters.Remove(name);
         }
 
-        public static void ReplayVoice(IReadOnlyDictionary<string, VoiceEntry> voices, bool unbiasedDelay = true)
+        // Cannot play voice if all characters speaking are muted
+        public static bool CanPlayVoice(VoiceEntries voices)
+        {
+            if (voices == null)
+            {
+                return false;
+            }
+
+            foreach (var voice in voices)
+            {
+                if (Characters.TryGetValue(voice.Key, out var character) && character.audioSource.volume > 1e-3f)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static void ReplayVoice(VoiceEntries voices, bool unbiasedDelay = true)
         {
             StopVoiceAll();
             float bias = 0.0f;
@@ -332,12 +352,13 @@ namespace Nova
                 }
 
                 if (!Characters.TryGetValue(characterName, out var character)) continue;
-                var clip = AssetLoader.Load<AudioClip>(voiceEntry.voiceFileName);
-                character.SayImmediatelyWithDelay(clip, delay);
+                var voicePath = System.IO.Path.Combine(character.voiceFolder, voiceEntry.voiceFileName);
+                var clip = AssetLoader.Load<AudioClip>(voicePath);
+                character.SayImmediately(clip, delay);
             }
         }
 
-        public static float MaxVoiceDurationNextDialogue
+        public static float MaxVoiceDuration
         {
             get
             {

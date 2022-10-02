@@ -138,8 +138,8 @@ namespace Nova
             compoundKeyRecorder.BeginRecording(entry);
         }
 
-        // In all abstract keys other than currentAbstractKey that have any same group as currentAbstractKey,
-        // remove any compound key that is in currentAbstractKey
+        // In all abstract keys other than currentAbstractKey that are in any same group as currentAbstractKey,
+        // remove all compound keys that conflict with currentAbstractKey
         public void ResolveDuplicate()
         {
             foreach (var ak in keyboardData.Keys.ToList())
