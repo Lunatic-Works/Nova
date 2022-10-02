@@ -17,8 +17,8 @@ namespace Nova
         [Serializable]
         private class LogEntryRestoreData
         {
-            public int index;
             public readonly DialogueDisplayData displayData;
+            public int index;
 
             public LogEntryRestoreData(DialogueDisplayData displayData, int index)
             {
