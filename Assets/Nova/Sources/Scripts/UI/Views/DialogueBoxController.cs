@@ -216,15 +216,16 @@ namespace Nova
             }
 
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
+            gameState.AddRestorable(this);
 
             return false;
         }
 
-        public override void Hide(Action onFinish)
+        protected override void OnDestroy()
         {
-            dialogueState.state = DialogueState.State.Normal;
+            gameState.RemoveRestorable(this);
 
-            base.Hide(onFinish);
+            base.OnDestroy();
         }
 
         private void OnEnable()
@@ -232,7 +233,6 @@ namespace Nova
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.routeEnded.AddListener(OnRouteEnded);
-            gameState.AddRestorable(this);
 
             dialogueState.autoModeStarts.AddListener(OnAutoModeStarts);
             dialogueState.autoModeStops.AddListener(OnAutoModeStops);
@@ -243,11 +243,11 @@ namespace Nova
         private void OnDisable()
         {
             StopAllCoroutines();
+            dialogueState.state = DialogueState.State.Normal;
 
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.routeEnded.RemoveListener(OnRouteEnded);
-            gameState.RemoveRestorable(this);
 
             dialogueState.autoModeStarts.RemoveListener(OnAutoModeStarts);
             dialogueState.autoModeStops.RemoveListener(OnAutoModeStops);

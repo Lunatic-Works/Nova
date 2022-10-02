@@ -110,7 +110,7 @@ namespace Nova
         private CheckpointManager checkpointManager;
         private GameStateCheckpoint initialCheckpoint;
         private readonly ScriptLoader scriptLoader = new ScriptLoader();
-        public FlowChartTree flowChartTree { get; private set; }
+        private FlowChartTree flowChartTree;
 
         private AdvancedDialogueHelper advancedDialogueHelper;
         private CoroutineHelper coroutineHelper;
