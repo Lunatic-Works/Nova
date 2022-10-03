@@ -1,4 +1,6 @@
 using System;
+using LuaInterface;
+using UnityEngine;
 
 namespace Nova
 {
@@ -19,7 +21,18 @@ namespace Nova
         public float value
         {
             get => 0f;
-            set => action?.Invoke();
+            set
+            {
+                try
+                {
+                    action?.Invoke();
+                }
+                catch (LuaException e)
+                {
+                    // Do not let the exception halt the animation chain
+                    Debug.LogException(e);
+                }
+            }
         }
     }
 }
