@@ -183,6 +183,8 @@ namespace Nova
 
         private State state = State.Normal;
 
+        public bool isEnded => state == State.Ended;
+
         /// <summary>
         /// Reset GameState as if the game is not started
         /// </summary>
