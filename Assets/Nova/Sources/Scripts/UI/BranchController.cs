@@ -54,7 +54,7 @@ namespace Nova
             }
         }
 
-        private void Select(int index)
+        public void Select(int index)
         {
             if (backPanel != null)
             {

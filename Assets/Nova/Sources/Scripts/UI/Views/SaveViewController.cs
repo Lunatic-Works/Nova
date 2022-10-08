@@ -256,7 +256,7 @@ namespace Nova
             base.Show(onFinish);
         }
 
-        public void ShowSave()
+        public void ShowSaveWithCallback(Action onFinish)
         {
             // Cannot enter save mode if from title
             if (myPanel.activeSelf && fromTitle)
@@ -266,14 +266,24 @@ namespace Nova
 
             saveViewMode = SaveViewMode.Save;
             fromTitle = false;
-            Show();
+            Show(onFinish);
+        }
+
+        public void ShowSave()
+        {
+            ShowSaveWithCallback(null);
+        }
+
+        public void ShowLoadWithCallback(Action onFinish)
+        {
+            saveViewMode = SaveViewMode.Load;
+            fromTitle = false;
+            Show(onFinish);
         }
 
         public void ShowLoad()
         {
-            saveViewMode = SaveViewMode.Load;
-            fromTitle = false;
-            Show();
+            ShowLoadWithCallback(null);
         }
 
         public void ShowLoadFromTitle()

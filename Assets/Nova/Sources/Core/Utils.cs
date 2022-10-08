@@ -394,5 +394,11 @@ namespace Nova
         {
             return random.Next() % (max - min) + min;
         }
+
+        public static T NextFromList<T>(this System.Random random, IReadOnlyList<T> list)
+        {
+            var idx = random.NextInt(list.Count);
+            return list[idx];
+        }
     }
 }
