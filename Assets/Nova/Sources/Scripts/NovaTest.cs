@@ -95,9 +95,17 @@ namespace Nova
             {
                 yield return Hide(helpView);
             }
-            yield return Show(chapterSelectView);
-            var chapter = random.NextFromList(chapterSelectView.unlockedStartNodeNames);
-            chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
+            yield return WaitForView(CurrentViewType.UI);
+            if (chapterSelectView.unlockedStartNodeNames.Count < 2)
+            {
+                chapterSelectView.BeginChapter();
+            }
+            else
+            {
+                yield return Show(chapterSelectView);
+                var chapter = random.NextFromList(chapterSelectView.unlockedStartNodeNames);
+                chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
+            }
             yield return WaitForView(CurrentViewType.Game);
         }
 
