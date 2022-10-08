@@ -54,16 +54,11 @@ namespace Nova
 
         private WaitForSeconds delay => new WaitForSeconds(delaySeconds);
 
-        private WaitWhile WaitForTransition()
-        {
-            return new WaitWhile(() => inTransition);
-        }
-
         private WaitWhile DoTransition(Action<Action> action)
         {
             inTransition = true;
             action.Invoke(() => inTransition = false);
-            return WaitForTransition();
+            return new WaitWhile(() => inTransition);
         }
 
         private WaitWhile Show(ViewControllerBase view)
@@ -108,18 +103,19 @@ namespace Nova
 
         private IEnumerator MockSave()
         {
-            yield return delay;
             if (random.NextInt(2) == 0)
             {
+                Debug.Log("quick save");
                 saveView.QuickSaveBookmark();
             }
             else
             {
-                // avoid page turn
-                // we can maybe change this behaviour
-                int index = (int)BookmarkType.NormalSave + random.NextInt(saveView.maxSaveEntry - 1);
+                Debug.Log("normal save");
                 yield return DoTransition(saveView.ShowSaveWithCallback);
                 yield return delay;
+                // avoid page turn
+                // we can maybe change this behaviour
+                var index = (int)BookmarkType.NormalSave + random.NextInt(saveView.maxSaveEntry - 1);
                 saveView.SaveBookmark(index);
                 yield return delay;
                 yield return Hide(saveView);
@@ -146,6 +142,7 @@ namespace Nova
 
                 if (viewManager.currentView == CurrentViewType.Alert)
                 {
+                    yield return delay;
                     yield return DoTransition(alert.Confirm);
                     yield return WaitForView(CurrentViewType.Game);
                 }
@@ -155,11 +152,14 @@ namespace Nova
 
                 if (!gameState.canStepForward)
                 {
+                    yield return delay;
                     var count = gameState.currentNode.branchCount;
                     branchController.Select(random.NextInt(count));
+                    curStep++;
                 }
                 else if (!isAnimating && !textIsAnimating)
                 {
+                    yield return delay;
                     if (random.NextDouble() < 0.1)
                     {
                         yield return StartCoroutine(MockSave());
@@ -168,13 +168,12 @@ namespace Nova
                     {
                         dialogueBox.NextPageOrStep();
                     }
+                    curStep++;
                 }
                 else if (fastForward)
                 {
                     NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 }
-
-                curStep++;
             }
         }
     }
