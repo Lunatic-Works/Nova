@@ -80,12 +80,12 @@ namespace Nova
 
             if (inputManager.IsTriggered(AbstractKey.QuickSave))
             {
-                saveViewController.QuickSaveBookmark();
+                saveViewController.QuickSaveBookmarkWithAlert();
             }
 
             if (inputManager.IsTriggered(AbstractKey.QuickLoad))
             {
-                saveViewController.QuickLoadBookmark();
+                saveViewController.QuickLoadBookmarkWithAlert();
             }
 
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))

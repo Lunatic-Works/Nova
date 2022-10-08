@@ -384,5 +384,15 @@ namespace Nova
                     return false;
             }
         }
+
+        public static int NextInt(this System.Random random, int max)
+        {
+            return random.Next() % max;
+        }
+
+        public static int NextInt(this System.Random random, int min, int max)
+        {
+            return random.Next() % (max - min) + min;
+        }
     }
 }
