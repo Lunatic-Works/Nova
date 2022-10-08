@@ -19,7 +19,7 @@ namespace Nova
         private NameSorter nameSorter;
 
         private IReadOnlyList<string> startNodeNames;
-        private IReadOnlyList<string> unlockedStartNodeNames;
+        public IReadOnlyList<string> unlockedStartNodeNames { get; private set; }
 
         private Dictionary<string, GameObject> buttons;
 
@@ -91,7 +91,7 @@ namespace Nova
             return startNodeNames.Count(IsUnlocked);
         }
 
-        private void BeginChapter(string chapterName = null)
+        public void BeginChapter(string chapterName = null)
         {
             viewManager.GetController<TitleController>().SwitchView<DialogueBoxController>(() =>
             {
