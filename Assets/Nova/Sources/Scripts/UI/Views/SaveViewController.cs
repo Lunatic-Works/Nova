@@ -274,23 +274,21 @@ namespace Nova
             ShowSaveWithCallback(null);
         }
 
-        public void ShowLoadWithCallback(Action onFinish)
+        public void ShowLoadWithCallback(bool fromTitle, Action onFinish)
         {
             saveViewMode = SaveViewMode.Load;
-            fromTitle = false;
+            this.fromTitle = fromTitle;
             Show(onFinish);
         }
 
         public void ShowLoad()
         {
-            ShowLoadWithCallback(null);
+            ShowLoadWithCallback(false, null);
         }
 
         public void ShowLoadFromTitle()
         {
-            saveViewMode = SaveViewMode.Load;
-            fromTitle = true;
-            Show();
+            ShowLoadWithCallback(true, null);
         }
 
         protected override void OnHideComplete()
@@ -430,7 +428,7 @@ namespace Nova
             Alert.Show(null, "bookmark.quicksave.confirm", QuickSaveBookmark, null, "BookmarkQuickSave");
         }
 
-        private void QuickLoadBookmark()
+        public void QuickLoadBookmark()
         {
             int saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.QuickSave,
                 (int)BookmarkType.NormalSave, SaveIDQueryType.Latest);

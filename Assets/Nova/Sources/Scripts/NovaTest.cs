@@ -12,6 +12,7 @@ namespace Nova
         public int seed;
 
         private GameState gameState;
+        private CheckpointManager checkpointManager;
         private ViewManager viewManager;
         private DialogueBoxController dialogueBox;
         private SaveViewController saveView;
@@ -29,6 +30,7 @@ namespace Nova
             var controller = Utils.FindNovaGameController();
             viewManager = Utils.FindViewManager();
             gameState = controller.GameState;
+            checkpointManager = controller.CheckpointManager;
             dialogueBox = viewManager.GetController<DialogueBoxController>();
             saveView = viewManager.GetController<SaveViewController>();
             branchController = viewManager.GetComponentInChildren<BranchController>();
@@ -96,15 +98,32 @@ namespace Nova
                 yield return Hide(helpView);
             }
             yield return WaitForView(CurrentViewType.UI);
-            if (chapterSelectView.unlockedStartNodeNames.Count < 2)
+
+
+            var startNormalSave = (int)BookmarkType.NormalSave;
+            var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startNormalSave);
+
+            if (maxNormalSave > startNormalSave && random.NextInt(2) == 0)
             {
-                chapterSelectView.BeginChapter();
+                var saveId = random.NextInt(startNormalSave, maxNormalSave);
+
+                yield return DoTransition((onFinish) => saveView.ShowLoadWithCallback(true, onFinish));
+                yield return delay;
+                saveView.LoadBookmark(saveId);
             }
             else
             {
-                yield return Show(chapterSelectView);
-                var chapter = random.NextFromList(chapterSelectView.unlockedStartNodeNames);
-                chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
+
+                if (chapterSelectView.unlockedStartNodeNames.Count < 2)
+                {
+                    chapterSelectView.BeginChapter();
+                }
+                else
+                {
+                    yield return Show(chapterSelectView);
+                    var chapter = random.NextFromList(chapterSelectView.unlockedStartNodeNames);
+                    chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
+                }
             }
             yield return WaitForView(CurrentViewType.Game);
         }
@@ -113,20 +132,41 @@ namespace Nova
         {
             if (random.NextInt(2) == 0)
             {
-                Debug.Log("quick save");
                 saveView.QuickSaveBookmark();
             }
             else
             {
-                Debug.Log("normal save");
+                var startSave = (int)BookmarkType.NormalSave;
+                var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startSave);
+                var saveId = random.NextInt(startSave, maxNormalSave + 1);
+
                 yield return DoTransition(saveView.ShowSaveWithCallback);
                 yield return delay;
-                // avoid page turn
-                // we can maybe change this behaviour
-                var index = (int)BookmarkType.NormalSave + random.NextInt(saveView.maxSaveEntry - 1);
-                saveView.SaveBookmark(index);
+                saveView.SaveBookmark(saveId);
                 yield return delay;
                 yield return Hide(saveView);
+                yield return WaitForView(CurrentViewType.Game);
+            }
+        }
+
+        private IEnumerator MockLoad()
+        {
+            var startQuickSave = (int)BookmarkType.QuickSave;
+            var startNormalSave = (int)BookmarkType.NormalSave;
+            var maxQuickSave = checkpointManager.QueryMinUnusedSaveID(startQuickSave);
+            var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startNormalSave);
+
+            if (maxQuickSave > startQuickSave && random.NextInt(2) == 0)
+            {
+                saveView.QuickLoadBookmark();
+            }
+            else if (maxNormalSave > startNormalSave)
+            {
+                var saveId = random.NextInt(startNormalSave, maxNormalSave);
+
+                yield return DoTransition((onFinish) => saveView.ShowLoadWithCallback(false, onFinish));
+                yield return delay;
+                saveView.LoadBookmark(saveId);
                 yield return WaitForView(CurrentViewType.Game);
             }
         }
@@ -170,7 +210,14 @@ namespace Nova
                     yield return delay;
                     if (random.NextDouble() < 0.1)
                     {
-                        yield return StartCoroutine(MockSave());
+                        if (random.NextInt(2) == 0)
+                        {
+                            yield return StartCoroutine(MockSave());
+                        }
+                        else
+                        {
+                            yield return StartCoroutine(MockLoad());
+                        }
                     }
                     else
                     {
