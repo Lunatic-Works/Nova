@@ -54,7 +54,7 @@ namespace Nova
         private readonly List<SaveEntryController> saveEntryControllers = new List<SaveEntryController>();
         private readonly Dictionary<int, Sprite> cachedThumbnailSprites = new Dictionary<int, Sprite>();
 
-        public int maxSaveEntry { get; private set; }
+        private int maxSaveEntry;
         private int page = 1;
 
         // maxPage is updated when ShowPage is called

@@ -19,7 +19,7 @@ namespace Nova
         private NameSorter nameSorter;
 
         private IReadOnlyList<string> startNodeNames;
-        public IReadOnlyList<string> unlockedStartNodeNames { get; private set; }
+        private IReadOnlyList<string> unlockedStartNodeNames;
 
         private Dictionary<string, GameObject> buttons;
 
