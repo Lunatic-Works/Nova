@@ -90,7 +90,7 @@ namespace Nova
                 yield return StartCoroutine(MockGame());
             }
 
-            Alert.Show("", "Test finished!");
+            Alert.Show(null, "test.finished");
         }
 
         private IEnumerator MockTitle()
