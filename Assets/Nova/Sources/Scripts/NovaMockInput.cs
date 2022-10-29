@@ -9,6 +9,8 @@ namespace Nova
         public int steps;
         public bool fastForward = true;
         public float delaySeconds = 0.001f;
+        public float saveRate = 0.01f;
+        public float loadRate = 0.01f;
         public int seed;
 
         private GameState gameState;
@@ -23,8 +25,6 @@ namespace Nova
         private AlertController alert;
 
         private System.Random random;
-        private bool inTransition;
-        private int curStep;
 
         private void Awake()
         {
@@ -42,13 +42,13 @@ namespace Nova
 
             if (seed == 0)
             {
-                seed = (int)DateTime.Now.Ticks & 0x0000FFFF;
+                seed = (int)DateTime.Now.Ticks & 0xffff;
             }
 
             random = new System.Random(seed);
         }
 
-        private void Start()
+        private void OnEnable()
         {
             if (steps > 0)
             {
@@ -56,11 +56,17 @@ namespace Nova
             }
         }
 
+        private void OnDisable()
+        {
+            StopAllCoroutines();
+            steps = 0;
+        }
+
         private WaitForSeconds delay => new WaitForSeconds(delaySeconds);
 
         private WaitWhile DoTransition(Action<Action> action)
         {
-            inTransition = true;
+            var inTransition = true;
             action.Invoke(() => inTransition = false);
             return new WaitWhile(() => inTransition);
         }
@@ -75,17 +81,15 @@ namespace Nova
             return DoTransition(view.Hide);
         }
 
-        private WaitWhile WaitForView(CurrentViewType viewType)
+        private WaitUntil WaitForView(CurrentViewType viewType)
         {
-            return new WaitWhile(() => viewManager.currentView != viewType);
+            return new WaitUntil(() => viewManager.currentView == viewType);
         }
 
         private IEnumerator Mock()
         {
-            curStep = 0;
-            while (curStep < steps)
+            while (steps > 0)
             {
-                yield return delay;
                 yield return StartCoroutine(MockTitle());
                 yield return StartCoroutine(MockGame());
             }
@@ -95,6 +99,19 @@ namespace Nova
 
         private IEnumerator MockTitle()
         {
+            yield return delay;
+
+            if (!gameState.isEnded)
+            {
+                if (viewManager.currentView != CurrentViewType.Game)
+                {
+                    Debug.Log("Waiting for game view");
+                    yield return WaitForView(CurrentViewType.Game);
+                }
+
+                yield break;
+            }
+
             yield return WaitForView(CurrentViewType.UI);
             if (helpView.myPanel.activeSelf)
             {
@@ -179,7 +196,7 @@ namespace Nova
             {
                 yield return delay;
 
-                if (curStep >= steps)
+                if (steps <= 0)
                 {
                     yield break;
                 }
@@ -192,38 +209,35 @@ namespace Nova
 
                 if (viewManager.currentView == CurrentViewType.Alert)
                 {
-                    yield return delay;
                     yield return DoTransition(alert.Confirm);
+                    yield return delay;
                     yield return WaitForView(CurrentViewType.Game);
                 }
 
                 if (!gameState.canStepForward)
                 {
-                    yield return delay;
-                    var count = gameState.currentNode.branchCount;
-                    branchController.Select(random.NextInt(count));
-                    curStep++;
+                    // TODO: Handle minigames
+                    yield return new WaitUntil(() => branchController.enabledSelectionCount > 0);
+                    branchController.Select(random.NextInt(branchController.enabledSelectionCount));
+                    steps--;
                 }
                 else if (!NovaAnimation.IsPlayingAny(AnimationType.PerDialogue | AnimationType.Text))
                 {
-                    yield return delay;
-                    if (random.NextDouble() < 0.1)
+                    var r = random.NextDouble();
+                    if (r < saveRate)
                     {
-                        if (random.NextInt(2) == 0)
-                        {
-                            yield return StartCoroutine(MockSave());
-                        }
-                        else
-                        {
-                            yield return StartCoroutine(MockLoad());
-                        }
+                        yield return StartCoroutine(MockSave());
+                    }
+                    else if (r < saveRate + loadRate)
+                    {
+                        yield return StartCoroutine(MockLoad());
                     }
                     else
                     {
                         dialogueBox.NextPageOrStep();
                     }
 
-                    curStep++;
+                    steps--;
                 }
                 else if (fastForward)
                 {

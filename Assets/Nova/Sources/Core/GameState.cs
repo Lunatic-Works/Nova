@@ -181,7 +181,7 @@ namespace Nova
             Ended
         }
 
-        private State state = State.Normal;
+        private State state = State.Ended;
 
         public bool isEnded => state == State.Ended;
 
@@ -201,7 +201,7 @@ namespace Nova
             currentIndex = 0;
             currentDialogueEntry = null;
             variables.Clear();
-            state = State.Normal;
+            state = State.Ended;
 
             // Restore scene
             if (initialCheckpoint != null)
@@ -609,6 +609,7 @@ namespace Nova
         private void GameStart(FlowChartNode startNode)
         {
             ResetGameState();
+            state = State.Normal;
             MoveToNextNode(startNode);
         }
 
@@ -1041,6 +1042,7 @@ namespace Nova
         /// </summary>
         public void LoadBookmark(Bookmark bookmark)
         {
+            state = State.Normal;
             MoveBackTo(checkpointManager.GetNodeRecord(bookmark.nodeOffset), bookmark.checkpointOffset,
                 bookmark.dialogueIndex);
         }

@@ -6,11 +6,12 @@ namespace Nova
 {
     public class BranchController : MonoBehaviour, IRestorable
     {
-        public BranchButtonController branchButtonPrefab;
-        public GameObject backPanel;
-        public string imageFolder;
+        [SerializeField] private BranchButtonController branchButtonPrefab;
+        [SerializeField] private GameObject backPanel;
+        [SerializeField] private string imageFolder;
 
         private GameState gameState;
+        [HideInInspector] public int enabledSelectionCount;
 
         private void Awake()
         {
@@ -34,7 +35,7 @@ namespace Nova
         {
             if (selections.Count == 0)
             {
-                throw new ArgumentException("Nova: No active branch for selection.");
+                throw new ArgumentException("Nova: No enabled selection.");
             }
 
             if (backPanel != null)
@@ -52,6 +53,8 @@ namespace Nova
                 button.Init(selection.texts, selection.imageInfo, imageFolder, () => Select(index), selection.active);
                 button.gameObject.SetActive(true);
             }
+
+            enabledSelectionCount = selections.Count;
         }
 
         public void Select(int index)
@@ -61,16 +64,18 @@ namespace Nova
                 backPanel.SetActive(false);
             }
 
-            RemoveAllSelectButton();
+            RemoveAllSelections();
             gameState.SignalFence(index);
         }
 
-        private void RemoveAllSelectButton()
+        private void RemoveAllSelections()
         {
             foreach (Transform child in transform)
             {
                 Destroy(child.gameObject);
             }
+
+            enabledSelectionCount = 0;
         }
 
         #region Restoration
@@ -89,7 +94,7 @@ namespace Nova
                 backPanel.SetActive(false);
             }
 
-            RemoveAllSelectButton();
+            RemoveAllSelections();
         }
 
         #endregion
