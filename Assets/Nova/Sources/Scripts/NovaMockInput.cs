@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class NovaTest : MonoBehaviour
+    public class NovaMockInput : MonoBehaviour
     {
         public int steps;
         public bool fastForward = true;
