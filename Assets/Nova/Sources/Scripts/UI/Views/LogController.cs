@@ -190,7 +190,7 @@ namespace Nova
 
         public LogEntry GetRandomLogEntry(System.Random random)
         {
-            return random.NextFromList(logEntries);
+            return random.Next(logEntries);
         }
 
         #region LoopScrollRect

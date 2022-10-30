@@ -46,6 +46,14 @@ namespace Nova
             titleView = viewManager.GetController<TitleController>();
             chapterSelectView = viewManager.GetController<ChapterSelectViewController>();
             alert = viewManager.GetController<AlertController>();
+        }
+
+        private void OnEnable()
+        {
+            if (steps <= 0)
+            {
+                return;
+            }
 
             if (seed == 0)
             {
@@ -53,14 +61,7 @@ namespace Nova
             }
 
             random = new System.Random(seed);
-        }
-
-        private void OnEnable()
-        {
-            if (steps > 0)
-            {
-                StartCoroutine(Mock());
-            }
+            StartCoroutine(Mock());
         }
 
         private void OnDisable()
@@ -129,9 +130,9 @@ namespace Nova
 
             var startNormalSave = (int)BookmarkType.NormalSave;
             var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startNormalSave);
-            if (maxNormalSave > startNormalSave && random.NextInt(2) == 0)
+            if (maxNormalSave > startNormalSave && random.Next(2) == 0)
             {
-                var saveId = random.NextInt(startNormalSave, maxNormalSave);
+                var saveId = random.Next(startNormalSave, maxNormalSave);
 
                 yield return DoTransition(onFinish => saveView.ShowLoadWithCallback(true, onFinish));
                 yield return delay;
@@ -147,7 +148,7 @@ namespace Nova
                 else
                 {
                     yield return Show(chapterSelectView);
-                    var chapter = random.NextFromList(chapters);
+                    var chapter = random.Next(chapters);
                     chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
                 }
             }
@@ -157,7 +158,7 @@ namespace Nova
 
         private IEnumerator MockSave()
         {
-            if (random.NextInt(2) == 0)
+            if (random.Next(2) == 0)
             {
                 saveView.QuickSaveBookmark();
             }
@@ -165,7 +166,7 @@ namespace Nova
             {
                 var startSave = (int)BookmarkType.NormalSave;
                 var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startSave);
-                var saveId = random.NextInt(startSave, maxNormalSave + 1);
+                var saveId = random.Next(startSave, maxNormalSave + 1);
 
                 yield return DoTransition(saveView.ShowSaveWithCallback);
                 yield return delay;
@@ -182,13 +183,13 @@ namespace Nova
             var startNormalSave = (int)BookmarkType.NormalSave;
             var maxQuickSave = checkpointManager.QueryMinUnusedSaveID(startQuickSave);
             var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startNormalSave);
-            if (maxQuickSave > startQuickSave && random.NextInt(2) == 0)
+            if (maxQuickSave > startQuickSave && random.Next(2) == 0)
             {
                 saveView.QuickLoadBookmark();
             }
             else if (maxNormalSave > startNormalSave)
             {
-                var saveId = random.NextInt(startNormalSave, maxNormalSave);
+                var saveId = random.Next(startNormalSave, maxNormalSave);
 
                 yield return DoTransition(onFinish => saveView.ShowLoadWithCallback(false, onFinish));
                 yield return delay;
@@ -252,7 +253,7 @@ namespace Nova
                 {
                     // TODO: Handle minigames
                     yield return new WaitUntil(() => branchController.enabledSelectionCount > 0);
-                    branchController.Select(random.NextInt(branchController.enabledSelectionCount));
+                    branchController.Select(random.Next(branchController.enabledSelectionCount));
                     steps--;
                 }
                 else if (!NovaAnimation.IsPlayingAny(AnimationType.PerDialogue | AnimationType.Text))
