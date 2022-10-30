@@ -287,7 +287,7 @@ namespace Nova
             gameController.InputManager.Save();
         }
 
-        public static void QuitWithConfirm()
+        public static void QuitWithAlert()
         {
             Alert.Show(null, "ingame.quit.confirm", Quit, null, "QuitConfirm");
         }

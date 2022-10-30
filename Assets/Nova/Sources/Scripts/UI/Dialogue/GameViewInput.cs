@@ -105,12 +105,12 @@ namespace Nova
 
             if (inputManager.IsTriggered(AbstractKey.ReturnTitle))
             {
-                ReturnTitle();
+                ReturnTitleWithAlert();
             }
 
             if (inputManager.IsTriggered(AbstractKey.QuitGame))
             {
-                Utils.QuitWithConfirm();
+                Utils.QuitWithAlert();
             }
 
             dialogueState.fastForwardHotKeyHolding = inputManager.IsPressed(AbstractKey.FastForward);
@@ -338,7 +338,7 @@ namespace Nova
             }
         }
 
-        private void _returnTitle()
+        private void ReturnTitle()
         {
             NovaAnimation.StopAll();
 
@@ -348,9 +348,9 @@ namespace Nova
             dialogueBoxController.SwitchView<TitleController>();
         }
 
-        private void ReturnTitle()
+        private void ReturnTitleWithAlert()
         {
-            Alert.Show(null, "ingame.title.confirm", _returnTitle, null, "ReturnTitle");
+            Alert.Show(null, "ingame.title.confirm", ReturnTitle, null, "ReturnTitle");
         }
 
         #region Restoration

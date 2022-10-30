@@ -6,13 +6,13 @@ namespace Nova
 {
     public class ConfigViewController : ViewControllerBase
     {
-        public Button resetDefaultButton;
-        public Button resetAlertsButton;
-        public Button restoreButton;
-        public Button backButton;
-        public Button returnTitleButton;
-        public Button quitGameButton;
-        public InputMappingController inputMappingController;
+        [SerializeField] private Button resetDefaultButton;
+        [SerializeField] private Button resetAlertsButton;
+        [SerializeField] private Button restoreButton;
+        [SerializeField] private Button backButton;
+        [SerializeField] private Button returnTitleButton;
+        [SerializeField] private Button quitGameButton;
+        [SerializeField] private InputMappingController inputMappingController;
 
         private ConfigManager configManager;
         private bool fromTitle;
@@ -21,13 +21,13 @@ namespace Nova
         {
             base.Awake();
 
-            returnTitleButton.onClick.AddListener(ReturnTitle);
-            quitGameButton.onClick.AddListener(Utils.QuitWithConfirm);
+            returnTitleButton.onClick.AddListener(ReturnTitleWithAlert);
+            quitGameButton.onClick.AddListener(Utils.QuitWithAlert);
 
             configManager = Utils.FindNovaGameController().ConfigManager;
 
-            resetDefaultButton.onClick.AddListener(ResetDefault);
-            resetAlertsButton.onClick.AddListener(ResetAlerts);
+            resetDefaultButton.onClick.AddListener(ResetDefaultWithAlert);
+            resetAlertsButton.onClick.AddListener(ResetAlertsWithAlert);
             if (restoreButton)
             {
                 restoreButton.onClick.AddListener(configManager.Restore);
@@ -54,29 +54,34 @@ namespace Nova
             base.Hide(onFinish);
         }
 
-        private void _returnTitle()
+        public void ReturnTitleWithCallback(Action onFinish)
         {
             NovaAnimation.StopAll();
 
             // TODO: Better transition between any two views
             viewManager.titlePanel.SetActive(true);
 
-            this.SwitchView<TitleController>();
+            this.SwitchView<TitleController>(onFinish);
         }
 
         private void ReturnTitle()
         {
+            ReturnTitleWithCallback(null);
+        }
+
+        private void ReturnTitleWithAlert()
+        {
             if (fromTitle)
             {
-                _returnTitle();
+                ReturnTitle();
             }
             else
             {
-                Alert.Show(null, "ingame.title.confirm", _returnTitle, null, "ReturnTitle");
+                Alert.Show(null, "ingame.title.confirm", ReturnTitle, null, "ReturnTitle");
             }
         }
 
-        private void _resetDefault()
+        private void ResetDefault()
         {
             configManager.ResetDefault();
             configManager.Apply();
@@ -85,12 +90,12 @@ namespace Nova
             I18n.CurrentLocale = Application.systemLanguage;
         }
 
-        private void ResetDefault()
+        private void ResetDefaultWithAlert()
         {
-            Alert.Show(null, "config.alert.resetdefault", _resetDefault);
+            Alert.Show(null, "config.alert.resetdefault", ResetDefault);
         }
 
-        private void _resetAlerts()
+        private void ResetAlerts()
         {
             foreach (string key in configManager.GetAllTrackedKeys())
             {
@@ -98,17 +103,16 @@ namespace Nova
                 {
                     configManager.SetInt(key, 1);
                 }
-
-                if (key.StartsWith(ConfigManager.FirstShownKeyPrefix, StringComparison.Ordinal))
+                else if (key.StartsWith(ConfigManager.FirstShownKeyPrefix, StringComparison.Ordinal))
                 {
                     configManager.SetInt(key, 0);
                 }
             }
         }
 
-        private void ResetAlerts()
+        private void ResetAlertsWithAlert()
         {
-            Alert.Show(null, "config.alert.resetalerts", _resetAlerts);
+            Alert.Show(null, "config.alert.resetalerts", ResetAlerts);
         }
 
         // No alert for restore and apply
