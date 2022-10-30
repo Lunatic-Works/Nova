@@ -6,18 +6,21 @@ namespace Nova
 {
     public class NovaMockInput : MonoBehaviour
     {
-        public int steps;
-        public bool fastForward = true;
-        public float delaySeconds = 0.001f;
-        public float saveRate = 0.01f;
-        public float loadRate = 0.01f;
-        public int seed;
+        [SerializeField] private int steps;
+        [SerializeField] private bool fastForward = true;
+        [SerializeField] private float delaySeconds = 0.001f;
+        [SerializeField] private bool canGoBack = true;
+        [SerializeField] private float saveRate = 0.01f;
+        [SerializeField] private float loadRate = 0.01f;
+        [SerializeField] private float returnTitleRate = 0.01f;
+        [SerializeField] private int seed;
 
         private GameState gameState;
         private CheckpointManager checkpointManager;
         private ViewManager viewManager;
         private DialogueBoxController dialogueBox;
         private SaveViewController saveView;
+        private ConfigViewController configView;
         private BranchController branchController;
         private HelpViewController helpView;
         private TitleController titleView;
@@ -34,6 +37,7 @@ namespace Nova
             viewManager = Utils.FindViewManager();
             dialogueBox = viewManager.GetController<DialogueBoxController>();
             saveView = viewManager.GetController<SaveViewController>();
+            configView = viewManager.GetController<ConfigViewController>();
             branchController = viewManager.GetComponentInChildren<BranchController>();
             helpView = viewManager.GetController<HelpViewController>();
             titleView = viewManager.GetController<TitleController>();
@@ -190,6 +194,13 @@ namespace Nova
             }
         }
 
+        private IEnumerator MockReturnTitle()
+        {
+            yield return Show(configView);
+            yield return delay;
+            yield return DoTransition(configView.ReturnTitleWithCallback);
+        }
+
         private IEnumerator MockGame()
         {
             while (true)
@@ -211,8 +222,9 @@ namespace Nova
                 {
                     yield return DoTransition(alert.Confirm);
                     yield return delay;
-                    yield return WaitForView(CurrentViewType.Game);
                 }
+
+                yield return WaitForView(CurrentViewType.Game);
 
                 if (!gameState.canStepForward)
                 {
@@ -228,9 +240,14 @@ namespace Nova
                     {
                         yield return StartCoroutine(MockSave());
                     }
-                    else if (r < saveRate + loadRate)
+                    else if (canGoBack && r < saveRate + loadRate)
                     {
                         yield return StartCoroutine(MockLoad());
+                    }
+                    else if (canGoBack && r < saveRate + loadRate + returnTitleRate)
+                    {
+                        yield return StartCoroutine(MockReturnTitle());
+                        yield break;
                     }
                     else
                     {

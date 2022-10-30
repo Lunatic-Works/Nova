@@ -8,10 +8,10 @@ namespace Nova
 {
     public class ChapterSelectViewController : ViewControllerBase
     {
-        public GameObject chapterButtonPrefab;
-        public GameObject chapterList;
-        public Button returnButton;
-        public bool unlockAllChaptersForDebug;
+        [SerializeField] private GameObject chapterButtonPrefab;
+        [SerializeField] private GameObject chapterList;
+        [SerializeField] private Button returnButton;
+        [SerializeField] private bool unlockAllChaptersForDebug;
 
         private GameState gameState;
         private CheckpointManager checkpointManager;

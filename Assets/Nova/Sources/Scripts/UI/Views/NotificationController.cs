@@ -6,10 +6,10 @@ namespace Nova
 {
     public class NotificationController : ViewControllerBase
     {
-        public NotificationEntryController notificationPrefab;
-        public float notificationTimePerChar = 0.1f;
-        public float notificationTimeOffset = 1f;
-        public float notificationDropSpeed = 500f;
+        [SerializeField] private NotificationEntryController notificationPrefab;
+        [SerializeField] private float notificationTimePerChar = 0.1f;
+        [SerializeField] private float notificationTimeOffset = 1f;
+        [SerializeField] private float notificationDropSpeed = 500f;
 
         private float placeholdingDeadItemCountPercentage
         {

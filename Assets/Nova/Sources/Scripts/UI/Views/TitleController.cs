@@ -1,15 +1,16 @@
 using System;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
 {
     public class TitleController : ViewControllerBase
     {
-        public Button quitButton;
-        public AudioController bgmController;
-        public string bgmName;
-        public float bgmVolume = 0.5f;
+        [SerializeField] private Button quitButton;
+        [SerializeField] private AudioController bgmController;
+        [SerializeField] private string bgmName;
+        [SerializeField] private float bgmVolume = 0.5f;
 
         private const string SelectChapterFirstShownKey = ConfigManager.FirstShownKeyPrefix + "SelectChapter";
 
