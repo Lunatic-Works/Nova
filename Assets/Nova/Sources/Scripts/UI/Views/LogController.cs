@@ -11,6 +11,27 @@ namespace Nova
 {
     using VoiceEntries = Dictionary<string, VoiceEntry>;
 
+    public class LogEntry
+    {
+        public readonly float height;
+        public float prefixHeight;
+        public readonly long nodeOffset;
+        public readonly long checkpointOffset;
+        public readonly ReachedDialogueData dialogueData;
+        public readonly DialogueDisplayData displayData;
+
+        public LogEntry(float height, float prefixHeight, long nodeOffset, long checkpointOffset,
+            ReachedDialogueData dialogueData, DialogueDisplayData displayData)
+        {
+            this.height = height;
+            this.prefixHeight = prefixHeight;
+            this.nodeOffset = nodeOffset;
+            this.checkpointOffset = checkpointOffset;
+            this.dialogueData = dialogueData;
+            this.displayData = displayData;
+        }
+    }
+
     public class LogController : ViewControllerBase, IRestorable, LoopScrollPrefabSource, LoopScrollDataSource,
         LoopScrollSizeHelper
     {
@@ -24,27 +45,6 @@ namespace Nova
             {
                 this.displayData = displayData;
                 this.index = index;
-            }
-        }
-
-        private class LogEntry
-        {
-            public readonly float height;
-            public float prefixHeight;
-            public readonly long nodeOffset;
-            public readonly long checkpointOffset;
-            public readonly ReachedDialogueData dialogueData;
-            public readonly DialogueDisplayData displayData;
-
-            public LogEntry(float height, float prefixHeight, long nodeOffset, long checkpointOffset,
-                ReachedDialogueData dialogueData, DialogueDisplayData displayData)
-            {
-                this.height = height;
-                this.prefixHeight = prefixHeight;
-                this.nodeOffset = nodeOffset;
-                this.checkpointOffset = checkpointOffset;
-                this.dialogueData = dialogueData;
-                this.displayData = displayData;
             }
         }
 
@@ -188,6 +188,11 @@ namespace Nova
             RemoveRange(0, logEntries.Count);
         }
 
+        public LogEntry GetRandomLogEntry(System.Random random)
+        {
+            return random.NextFromList(logEntries);
+        }
+
         #region LoopScrollRect
 
         public Vector2 GetItemsSize(int itemsCount)
@@ -224,15 +229,13 @@ namespace Nova
         public void ProvideData(Transform transform, int idx)
         {
             var logEntry = logEntries[idx];
-            var dialogueData = logEntry.dialogueData;
-
-            UnityAction onGoBackButtonClicked = () =>
-                OnGoBackButtonClicked(logEntry.nodeOffset, logEntry.checkpointOffset, dialogueData.dialogueIndex, idx);
+            UnityAction onGoBackButtonClicked = () => MoveBack(logEntry, idx);
 
             UnityAction onPlayVoiceButtonClicked = null;
-            if (GameCharacterController.CanPlayVoice(dialogueData.voices))
+            var voices = logEntry.dialogueData.voices;
+            if (GameCharacterController.CanPlayVoice(voices))
             {
-                onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(dialogueData.voices);
+                onPlayVoiceButtonClicked = () => GameCharacterController.ReplayVoice(voices);
             }
 
             var logEntryController = transform.GetComponent<LogEntryController>();
@@ -242,37 +245,32 @@ namespace Nova
 
         #endregion
 
-        private void _onGoBackButtonClicked(long nodeOffset, long checkpointOffset, int dialogueIndex)
+        public void MoveBackWithCallback(LogEntry logEntry, Action onFinish)
         {
-            var nodeRecord = checkpointManager.GetNodeRecord(nodeOffset);
-            gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
-            Hide();
+            var nodeRecord = checkpointManager.GetNodeRecord(logEntry.nodeOffset);
+            gameState.MoveBackTo(nodeRecord, logEntry.checkpointOffset, logEntry.dialogueData.dialogueIndex);
+            Hide(onFinish);
         }
 
         private int selectedLogEntryIndex = -1;
 
-        private void OnGoBackButtonClicked(long nodeOffset, long checkpointOffset, int dialogueIndex, int index)
+        private void MoveBack(LogEntry logEntry, int index)
         {
             if (index == selectedLogEntryIndex)
             {
                 selectedLogEntryIndex = -1;
                 Alert.Show(
                     null,
-                    "log.back.confirm",
-                    () => _onGoBackButtonClicked(nodeOffset, checkpointOffset, dialogueIndex),
+                    "log.moveback.confirm",
+                    () => MoveBackWithCallback(logEntry, null),
                     null,
-                    "LogBack"
+                    "LogMoveBack"
                 );
             }
             else
             {
                 selectedLogEntryIndex = index;
             }
-        }
-
-        private static void OnPlayVoiceButtonClicked(VoiceEntries voices)
-        {
-            GameCharacterController.ReplayVoice(voices);
         }
 
         public override void Show(Action onFinish)

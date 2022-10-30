@@ -103,7 +103,7 @@
   "ingame.title.button": "标题",
   "ingame.title.confirm": "要返回标题界面吗？",
   "inputmapping.leave.confirm": "有未保存的改动，要应用吗？",
-  "log.back.confirm": "要回到此处吗？",
+  "log.moveback.confirm": "要回到此处吗？",
   "log.first.hint": "双击文字可以跳转",
   "musicgallery.mode.loop": "单曲循环",
   "musicgallery.mode.rand": "随机播放",

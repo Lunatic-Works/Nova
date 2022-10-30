@@ -12,6 +12,7 @@ namespace Nova
         [SerializeField] private bool canGoBack = true;
         [SerializeField] private float saveRate = 0.01f;
         [SerializeField] private float loadRate = 0.01f;
+        [SerializeField] private float logMoveBackRate = 0.01f;
         [SerializeField] private float returnTitleRate = 0.01f;
         [SerializeField] private int seed;
 
@@ -20,6 +21,7 @@ namespace Nova
         private ViewManager viewManager;
         private DialogueBoxController dialogueBox;
         private SaveViewController saveView;
+        private LogController logView;
         private ConfigViewController configView;
         private BranchController branchController;
         private HelpViewController helpView;
@@ -37,6 +39,7 @@ namespace Nova
             viewManager = Utils.FindViewManager();
             dialogueBox = viewManager.GetController<DialogueBoxController>();
             saveView = viewManager.GetController<SaveViewController>();
+            logView = viewManager.GetController<LogController>();
             configView = viewManager.GetController<ConfigViewController>();
             branchController = viewManager.GetComponentInChildren<BranchController>();
             helpView = viewManager.GetController<HelpViewController>();
@@ -110,9 +113,9 @@ namespace Nova
                 if (viewManager.currentView != CurrentViewType.Game)
                 {
                     Debug.Log("Waiting for game view");
-                    yield return WaitForView(CurrentViewType.Game);
                 }
 
+                yield return WaitForView(CurrentViewType.Game);
                 yield break;
             }
 
@@ -194,6 +197,15 @@ namespace Nova
             }
         }
 
+        private IEnumerator MockLogMoveBack()
+        {
+            var logEntry = logView.GetRandomLogEntry(random);
+
+            yield return Show(logView);
+            yield return delay;
+            yield return DoTransition(onFinish => logView.MoveBackWithCallback(logEntry, onFinish));
+        }
+
         private IEnumerator MockReturnTitle()
         {
             yield return Show(configView);
@@ -218,10 +230,20 @@ namespace Nova
                     yield break;
                 }
 
+                if (viewManager.currentView == CurrentViewType.InTransition)
+                {
+                    yield return new WaitUntil(() => viewManager.currentView != CurrentViewType.InTransition);
+                }
+
                 if (viewManager.currentView == CurrentViewType.Alert)
                 {
                     yield return DoTransition(alert.Confirm);
                     yield return delay;
+                }
+
+                if (viewManager.currentView != CurrentViewType.Game)
+                {
+                    Debug.Log("Waiting for game view");
                 }
 
                 yield return WaitForView(CurrentViewType.Game);
@@ -244,7 +266,11 @@ namespace Nova
                     {
                         yield return StartCoroutine(MockLoad());
                     }
-                    else if (canGoBack && r < saveRate + loadRate + returnTitleRate)
+                    else if (canGoBack && r < saveRate + loadRate + logMoveBackRate)
+                    {
+                        yield return StartCoroutine(MockLogMoveBack());
+                    }
+                    else if (canGoBack && r < saveRate + loadRate + logMoveBackRate + returnTitleRate)
                     {
                         yield return StartCoroutine(MockReturnTitle());
                         yield break;
