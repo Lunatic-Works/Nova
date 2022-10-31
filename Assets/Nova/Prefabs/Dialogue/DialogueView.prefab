@@ -88,7 +88,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 0}
-          m_MethodName: QuickSaveBookmark
+          m_MethodName: QuickSaveBookmarkWithAlert
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -152,7 +152,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 0}
-          m_MethodName: QuickLoadBookmark
+          m_MethodName: QuickLoadBookmarkWithAlert
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1210,7 +1210,6 @@ MonoBehaviour:
   dialogueFinishIcons:
   - {fileID: 405814711}
   - {fileID: 5788387325920053426}
-  canRefreshTextProxy: 1
   autoModeIcon: {fileID: 490594862}
   fastForwardModeIcon: {fileID: 2012270591}
   textAnimation: {fileID: 1503052317}

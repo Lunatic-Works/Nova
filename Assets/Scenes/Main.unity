@@ -866,9 +866,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 671619210}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54e005860829a524a8e95b86b4ee74bd, type: 3}
+  m_Script: {fileID: 11500000, guid: e70fc0ba480c5024b9ca33fe1de1b1f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steps: 1000
+  fastForward: 1
+  delaySeconds: 0.001
+  canGoBack: 1
+  saveRate: 0.01
+  loadRate: 0.01
+  logMoveBackRate: 0.01
+  returnTitleRate: 0.01
+  seed: 0
 --- !u!1 &686561424
 GameObject:
   m_ObjectHideFlags: 0

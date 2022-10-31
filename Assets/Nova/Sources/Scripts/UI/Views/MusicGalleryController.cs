@@ -19,12 +19,12 @@ namespace Nova
     {
         public const string MusicUnlockStatusKey = "music_unlock_status";
 
-        public MusicGalleryPlayer musicPlayer;
-        public MusicEntryList musicList;
-        public Transform musicListScrollContent;
-        public MusicGalleryEntry musicEntryPrefab;
-        public GameObject lockedMusicEntryPrefab;
-        public List<AudioController> audioControllersToDisable;
+        [SerializeField] private MusicGalleryPlayer musicPlayer;
+        [SerializeField] private MusicEntryList musicList;
+        [SerializeField] private Transform musicListScrollContent;
+        [SerializeField] private MusicGalleryEntry musicEntryPrefab;
+        [SerializeField] private GameObject lockedMusicEntryPrefab;
+        [SerializeField] private List<AudioController> audioControllersToDisable;
 
         private CheckpointManager checkpointManager;
 

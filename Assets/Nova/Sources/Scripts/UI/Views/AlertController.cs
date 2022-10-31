@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine.UI;
 
@@ -123,6 +124,15 @@ namespace Nova
             {
                 OnActivatedUpdate();
             }
+        }
+
+        public void Confirm(Action onFinish = null)
+        {
+            Hide(() =>
+            {
+                param.onConfirm?.Invoke();
+                onFinish?.Invoke();
+            });
         }
     }
 }

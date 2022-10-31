@@ -272,7 +272,7 @@ namespace Nova
             gameController.InputMapper.Save();
         }
 
-        public static void QuitWithConfirm()
+        public static void QuitWithAlert()
         {
             Alert.Show(null, "ingame.quit.confirm", Quit, null, "QuitConfirm");
         }
@@ -358,6 +358,12 @@ namespace Nova
                 default:
                     return false;
             }
+        }
+
+        public static T Next<T>(this System.Random random, IReadOnlyList<T> list)
+        {
+            var idx = random.Next(list.Count);
+            return list[idx];
         }
 
         // On iOS, eventData.pointerId can be < 0, maybe because of overflow

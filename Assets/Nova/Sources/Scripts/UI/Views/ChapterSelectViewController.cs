@@ -8,10 +8,10 @@ namespace Nova
 {
     public class ChapterSelectViewController : ViewControllerBase
     {
-        public GameObject chapterButtonPrefab;
-        public GameObject chapterList;
-        public Button returnButton;
-        public bool unlockAllChaptersForDebug;
+        [SerializeField] private GameObject chapterButtonPrefab;
+        [SerializeField] private GameObject chapterList;
+        [SerializeField] private Button returnButton;
+        [SerializeField] private bool unlockAllChaptersForDebug;
 
         private GameState gameState;
         private CheckpointManager checkpointManager;
@@ -91,7 +91,7 @@ namespace Nova
             return startNodeNames.Count(IsUnlocked);
         }
 
-        private void BeginChapter(string chapterName = null)
+        public void BeginChapter(string chapterName = null)
         {
             viewManager.GetController<TitleController>().SwitchView<DialogueBoxController>(() =>
             {

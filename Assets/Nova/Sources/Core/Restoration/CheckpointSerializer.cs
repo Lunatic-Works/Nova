@@ -40,16 +40,8 @@ namespace Nova
         }
     }
 
-    public class CheckpointSerializer : IDisposable
+    public class CheckpointJsonSerializer : JsonSerializer
     {
-        public const int Version = 4;
-        public const bool DefaultCompress = true;
-        public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
-        public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
-        public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
-
-        private const int RecordHeader = 4; // sizeof(int)
-
         // Not to allow other assembly for security reason
         private class JsonTypeBinder : ISerializationBinder
         {
@@ -79,6 +71,33 @@ namespace Nova
             }
         }
 
+        public CheckpointJsonSerializer() : base()
+        {
+            TypeNameHandling = TypeNameHandling.Auto;
+            SerializationBinder = new JsonTypeBinder();
+            ContractResolver = new DefaultContractResolver()
+            {
+                // By default, public fields and properties are serialized
+                // Use this option to enable Fields serialization mode automatically for [Serializable] objects
+                // i.e. all private and public fields are serialized
+                // It also enables the use of uninitialized constructor
+                IgnoreSerializableAttribute = false,
+                // This seems to make ISerializable the same behavior as [Serializable]
+                IgnoreSerializableInterface = false,
+            };
+        }
+    }
+
+    public class CheckpointSerializer : IDisposable
+    {
+        public const int Version = 4;
+        public const bool DefaultCompress = true;
+        public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
+        public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
+        public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
+
+        private const int RecordHeader = 4; // sizeof(int)
+
         private readonly JsonSerializer jsonSerializer;
         private readonly string path;
         private FileStream file;
@@ -90,21 +109,7 @@ namespace Nova
             this.path = path;
             // 1M block cache
             cachedBlocks = new LRUCache<long, CheckpointBlock>(256, true);
-            jsonSerializer = new JsonSerializer()
-            {
-                TypeNameHandling = TypeNameHandling.Auto,
-                SerializationBinder = new JsonTypeBinder(),
-                ContractResolver = new DefaultContractResolver()
-                {
-                    // By default, public fields and properties are serialized
-                    // Use this option to enable Fields serialization mode automatically for [Serializable] objects
-                    // i.e. all private and public fields are serialized
-                    // It also enables the use of uninitialized constructor
-                    IgnoreSerializableAttribute = false,
-                    // This seems to make ISerializable the same behavior as [Serializable]
-                    IgnoreSerializableInterface = false,
-                },
-            };
+            jsonSerializer = new CheckpointJsonSerializer();
         }
 
         public void Open()

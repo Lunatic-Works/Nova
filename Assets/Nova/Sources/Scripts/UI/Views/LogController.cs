@@ -9,6 +9,22 @@ namespace Nova
 {
     using VoiceEntries = Dictionary<string, VoiceEntry>;
 
+    public class LogEntry
+    {
+        public readonly long nodeOffset;
+        public readonly long checkpointOffset;
+        public readonly int dialogueIndex;
+        public readonly LogEntryController controller;
+
+        public LogEntry(long nodeOffset, long checkpointOffset, int dialogueIndex, LogEntryController controller)
+        {
+            this.nodeOffset = nodeOffset;
+            this.checkpointOffset = checkpointOffset;
+            this.dialogueIndex = dialogueIndex;
+            this.controller = controller;
+        }
+    }
+
     public class LogController : ViewControllerBase, IRestorable
     {
         [Serializable]
@@ -37,7 +53,7 @@ namespace Nova
         private ScrollRect scrollRect;
         private GameObject logContent;
 
-        private readonly List<LogEntryController> logEntries = new List<LogEntryController>();
+        private readonly List<LogEntry> logEntries = new List<LogEntry>();
         private readonly List<LogEntryRestoreData> logEntriesRestoreData = new List<LogEntryRestoreData>();
 
         protected override void Awake()
@@ -96,19 +112,19 @@ namespace Nova
                 return;
             }
 
-            var logEntry = Instantiate(logEntryPrefab, logContent.transform);
+            var logEntryController = Instantiate(logEntryPrefab, logContent.transform);
+            var logEntry = new LogEntry(nodeRecord.offset, checkpointOffset, dialogueData.dialogueIndex,
+                logEntryController);
 
-            UnityAction onGoBackButtonClicked = () =>
-                OnGoBackButtonClicked(nodeRecord.offset, checkpointOffset, dialogueData.dialogueIndex,
-                    logEntry.GetInstanceID());
+            UnityAction onGoBackButtonClicked = () => MoveBack(logEntry, logEntryController.GetInstanceID());
 
             UnityAction onPlayVoiceButtonClicked = null;
             if (GameCharacterController.CanPlayVoice(dialogueData.voices))
             {
-                onPlayVoiceButtonClicked = () => OnPlayVoiceButtonClicked(dialogueData.voices);
+                onPlayVoiceButtonClicked = () => GameCharacterController.ReplayVoice(dialogueData.voices);
             }
 
-            logEntry.Init(displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked);
+            logEntryController.Init(displayData, onGoBackButtonClicked, onPlayVoiceButtonClicked);
 
             logEntries.Add(logEntry);
             RestrainLogEntryNum(maxLogEntryNum);
@@ -125,7 +141,7 @@ namespace Nova
         {
             for (int i = index; i < index + count; ++i)
             {
-                Destroy(logEntries[i].gameObject);
+                Destroy(logEntries[i].controller.gameObject);
             }
 
             logEntries.RemoveRange(index, count);
@@ -142,37 +158,37 @@ namespace Nova
             RemoveRange(0, logEntries.Count);
         }
 
-        private void _onGoBackButtonClicked(long nodeOffset, long checkpointOffset, int dialogueIndex)
+        public LogEntry GetRandomLogEntry(System.Random random)
         {
-            var nodeRecord = checkpointManager.GetNodeRecord(nodeOffset);
-            gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
-            Hide();
+            return random.Next(logEntries);
+        }
+
+        public void MoveBackWithCallback(LogEntry logEntry, Action onFinish)
+        {
+            var nodeRecord = checkpointManager.GetNodeRecord(logEntry.nodeOffset);
+            gameState.MoveBackTo(nodeRecord, logEntry.checkpointOffset, logEntry.dialogueIndex);
+            Hide(onFinish);
         }
 
         private int selectedLogEntryIndex = -1;
 
-        private void OnGoBackButtonClicked(long nodeOffset, long checkpointOffset, int dialogueIndex, int index)
+        private void MoveBack(LogEntry logEntry, int index)
         {
             if (index == selectedLogEntryIndex)
             {
                 selectedLogEntryIndex = -1;
                 Alert.Show(
                     null,
-                    "log.back.confirm",
-                    () => _onGoBackButtonClicked(nodeOffset, checkpointOffset, dialogueIndex),
+                    "log.moveback.confirm",
+                    () => MoveBackWithCallback(logEntry, null),
                     null,
-                    "LogBack"
+                    "LogMoveBack"
                 );
             }
             else
             {
                 selectedLogEntryIndex = index;
             }
-        }
-
-        private static void OnPlayVoiceButtonClicked(VoiceEntries voices)
-        {
-            GameCharacterController.ReplayVoice(voices);
         }
 
         public override void Show(Action onFinish)

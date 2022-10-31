@@ -455,7 +455,7 @@ namespace Nova
             return Math.Max(saveSlotsMetadata.Keys.Max(), begin);
         }
 
-        public int QueryMinUnusedSaveID(int begin, int end)
+        public int QueryMinUnusedSaveID(int begin, int end = int.MaxValue)
         {
             int saveID = begin;
             while (saveID < end && saveSlotsMetadata.ContainsKey(saveID))

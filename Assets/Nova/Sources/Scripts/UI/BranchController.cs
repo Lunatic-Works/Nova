@@ -6,11 +6,12 @@ namespace Nova
 {
     public class BranchController : MonoBehaviour, IRestorable
     {
-        public BranchButtonController branchButtonPrefab;
-        public GameObject backPanel;
-        public string imageFolder;
+        [SerializeField] private BranchButtonController branchButtonPrefab;
+        [SerializeField] private GameObject backPanel;
+        [SerializeField] private string imageFolder;
 
         private GameState gameState;
+        [HideInInspector] public int activeSelectionCount;
 
         private void Awake()
         {
@@ -34,7 +35,7 @@ namespace Nova
         {
             if (selections.Count == 0)
             {
-                throw new ArgumentException("Nova: No active branch for selection.");
+                throw new ArgumentException("Nova: No active selection.");
             }
 
             if (backPanel != null)
@@ -49,28 +50,33 @@ namespace Nova
                 var button = Instantiate(branchButtonPrefab, transform);
                 // Prevent showing the button before init
                 button.gameObject.SetActive(false);
-                button.Init(selection.texts, selection.imageInfo, imageFolder, () => Select(index), selection.active);
+                button.Init(selection.texts, selection.imageInfo, imageFolder, () => Select(index),
+                    selection.interactable);
                 button.gameObject.SetActive(true);
             }
+
+            activeSelectionCount = selections.Count;
         }
 
-        private void Select(int index)
+        public void Select(int index)
         {
             if (backPanel != null)
             {
                 backPanel.SetActive(false);
             }
 
-            RemoveAllSelectButton();
+            RemoveAllSelections();
             gameState.SignalFence(index);
         }
 
-        private void RemoveAllSelectButton()
+        private void RemoveAllSelections()
         {
             foreach (Transform child in transform)
             {
                 Destroy(child.gameObject);
             }
+
+            activeSelectionCount = 0;
         }
 
         #region Restoration
@@ -89,7 +95,7 @@ namespace Nova
                 backPanel.SetActive(false);
             }
 
-            RemoveAllSelectButton();
+            RemoveAllSelections();
         }
 
         #endregion

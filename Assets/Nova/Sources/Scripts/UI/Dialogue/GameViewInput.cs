@@ -79,12 +79,12 @@ namespace Nova
 
             if (inputMapper.GetKeyUp(AbstractKey.QuickSave))
             {
-                saveViewController.QuickSaveBookmark();
+                saveViewController.QuickSaveBookmarkWithAlert();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.QuickLoad))
             {
-                saveViewController.QuickLoadBookmark();
+                saveViewController.QuickLoadBookmarkWithAlert();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.ToggleDialogue))

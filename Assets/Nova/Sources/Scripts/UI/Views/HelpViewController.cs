@@ -1,11 +1,12 @@
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
 {
     public class HelpViewController : ViewControllerBase
     {
-        public Button returnButton;
-        public Button returnButton2;
+        [SerializeField] private Button returnButton;
+        [SerializeField] private Button returnButton2;
 
         private const string GameFirstShownKey = ConfigManager.FirstShownKeyPrefix + "Game";
 

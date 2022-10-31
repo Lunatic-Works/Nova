@@ -22,12 +22,12 @@ namespace Nova
         [HideInInspector] public ScreenCapturer screenCapturer;
 
         public RawImage transitionGhost;
-        public GameObject transitionInputBlocker;
-        public AudioSource uiAudioSource;
+        [SerializeField] private GameObject transitionInputBlocker;
+        [SerializeField] private AudioSource uiAudioSource;
 
         // Pause some animations and audios when switching the view
-        public List<NovaAnimation> animationsToPause;
-        public List<AudioController> audiosToPause;
+        [SerializeField] private List<NovaAnimation> animationsToPause;
+        [SerializeField] private List<AudioController> audiosToPause;
 
         private GameController gameController;
 

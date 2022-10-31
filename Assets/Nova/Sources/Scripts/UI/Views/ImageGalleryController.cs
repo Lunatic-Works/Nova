@@ -12,12 +12,12 @@ namespace Nova
     {
         public const string ImageUnlockStatusKey = "image_unlock_status";
 
-        public ImageGroupList imageGroupList;
-        public GameObject snapshotEntryPrefab;
-        public int maxRow;
-        public int maxCol;
-        public Sprite emptyImage;
-        public Sprite lockedImage;
+        [SerializeField] private ImageGroupList imageGroupList;
+        [SerializeField] private GameObject snapshotEntryPrefab;
+        [SerializeField] private int maxRow;
+        [SerializeField] private int maxCol;
+        [SerializeField] private Sprite emptyImage;
+        [SerializeField] private Sprite lockedImage;
 
         private CheckpointManager checkpointManager;
 

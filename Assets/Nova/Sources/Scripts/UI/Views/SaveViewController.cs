@@ -255,7 +255,7 @@ namespace Nova
             base.Show(onFinish);
         }
 
-        public void ShowSave()
+        public void ShowSaveWithCallback(Action onFinish)
         {
             // Cannot enter save mode if from title
             if (myPanel.activeSelf && fromTitle)
@@ -265,21 +265,29 @@ namespace Nova
 
             saveViewMode = SaveViewMode.Save;
             fromTitle = false;
-            Show();
+            Show(onFinish);
+        }
+
+        public void ShowSave()
+        {
+            ShowSaveWithCallback(null);
+        }
+
+        public void ShowLoadWithCallback(bool fromTitle, Action onFinish)
+        {
+            saveViewMode = SaveViewMode.Load;
+            this.fromTitle = fromTitle;
+            Show(onFinish);
         }
 
         public void ShowLoad()
         {
-            saveViewMode = SaveViewMode.Load;
-            fromTitle = false;
-            Show();
+            ShowLoadWithCallback(false, null);
         }
 
         public void ShowLoadFromTitle()
         {
-            saveViewMode = SaveViewMode.Load;
-            fromTitle = true;
-            Show();
+            ShowLoadWithCallback(true, null);
         }
 
         protected override void OnHideComplete()
@@ -306,7 +314,7 @@ namespace Nova
 
         #region Bookmark operations
 
-        private void _saveBookmark(int saveID)
+        public void SaveBookmark(int saveID)
         {
             var bookmark = gameState.GetBookmark();
             bookmark.description = currentDialogue;
@@ -319,18 +327,18 @@ namespace Nova
             viewManager.TryPlaySound(saveActionSound);
         }
 
-        private void SaveBookmark(int saveID)
+        private void SaveBookmarkWithAlert(int saveID)
         {
             Alert.Show(
                 null,
                 I18n.GetLocalizedStrings("bookmark.overwrite.confirm", SaveIDToDisplayID(saveID)),
-                () => _saveBookmark(saveID),
+                () => SaveBookmark(saveID),
                 null,
                 "BookmarkOverwrite"
             );
         }
 
-        private void _loadBookmark(int saveID)
+        public void LoadBookmark(int saveID)
         {
             var bookmark = checkpointManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
@@ -352,18 +360,18 @@ namespace Nova
             Alert.Show("bookmark.load.complete");
         }
 
-        private void LoadBookmark(int saveID)
+        private void LoadBookmarkWithAlert(int saveID)
         {
             Alert.Show(
                 null,
                 I18n.GetLocalizedStrings("bookmark.load.confirm", SaveIDToDisplayID(saveID)),
-                () => _loadBookmark(saveID),
+                () => LoadBookmark(saveID),
                 null,
                 "BookmarkLoad"
             );
         }
 
-        private void _deleteBookmark(int saveID)
+        private void DeleteBookmark(int saveID)
         {
             DeleteCachedThumbnailSprite(saveID);
             checkpointManager.DeleteBookmark(saveID);
@@ -373,18 +381,18 @@ namespace Nova
             viewManager.TryPlaySound(deleteActionSound);
         }
 
-        private void DeleteBookmark(int saveID)
+        private void DeleteBookmarkWithAlert(int saveID)
         {
             Alert.Show(
                 null,
                 I18n.GetLocalizedStrings("bookmark.delete.confirm", SaveIDToDisplayID(saveID)),
-                () => _deleteBookmark(saveID),
+                () => DeleteBookmark(saveID),
                 null,
                 "BookmarkDelete"
             );
         }
 
-        private void _autoSaveBookmark(int beginSaveID, string tagText)
+        private void AutoSaveBookmark(int beginSaveID, string tagText)
         {
             var bookmark = gameState.GetBookmark();
             bookmark.description = currentDialogue;
@@ -404,22 +412,22 @@ namespace Nova
 
         public void AutoSaveBookmark()
         {
-            _autoSaveBookmark((int)BookmarkType.AutoSave, I18n.__("bookmark.autosave.page"));
-        }
-
-        private void _quickSaveBookmark()
-        {
-            _autoSaveBookmark((int)BookmarkType.QuickSave, I18n.__("bookmark.quicksave.page"));
-            viewManager.TryPlaySound(saveActionSound);
-            Alert.Show("bookmark.quicksave.complete");
+            AutoSaveBookmark((int)BookmarkType.AutoSave, I18n.__("bookmark.autosave.page"));
         }
 
         public void QuickSaveBookmark()
         {
-            Alert.Show(null, "bookmark.quicksave.confirm", _quickSaveBookmark, null, "BookmarkQuickSave");
+            AutoSaveBookmark((int)BookmarkType.QuickSave, I18n.__("bookmark.quicksave.page"));
+            viewManager.TryPlaySound(saveActionSound);
+            Alert.Show("bookmark.quicksave.complete");
         }
 
-        private void _quickLoadBookmark()
+        public void QuickSaveBookmarkWithAlert()
+        {
+            Alert.Show(null, "bookmark.quicksave.confirm", QuickSaveBookmark, null, "BookmarkQuickSave");
+        }
+
+        public void QuickLoadBookmark()
         {
             int saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.QuickSave,
                 (int)BookmarkType.NormalSave, SaveIDQueryType.Latest);
@@ -436,12 +444,12 @@ namespace Nova
             Alert.Show("bookmark.load.complete");
         }
 
-        public void QuickLoadBookmark()
+        public void QuickLoadBookmarkWithAlert()
         {
             if (checkpointManager.saveSlotsMetadata.Values.Any(m =>
                     m.saveID >= (int)BookmarkType.QuickSave && m.saveID < (int)BookmarkType.QuickSave + maxSaveEntry))
             {
-                Alert.Show(null, "bookmark.quickload.confirm", _quickLoadBookmark, null, "BookmarkQuickLoad");
+                Alert.Show(null, "bookmark.quickload.confirm", QuickLoadBookmark, null, "BookmarkQuickLoad");
             }
             else
             {
@@ -461,19 +469,19 @@ namespace Nova
                 {
                     if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
                     {
-                        SaveBookmark(saveID);
+                        SaveBookmarkWithAlert(saveID);
                     }
                     else // Bookmark with this saveID does not exist
                     {
                         // No alert when saving to an empty slot
-                        _saveBookmark(saveID);
+                        SaveBookmark(saveID);
                     }
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
                     if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
                     {
-                        LoadBookmark(saveID);
+                        LoadBookmarkWithAlert(saveID);
                     }
                 }
             }
@@ -483,7 +491,7 @@ namespace Nova
                 {
                     if (saveID == selectedSaveID)
                     {
-                        SaveBookmark(saveID);
+                        SaveBookmarkWithAlert(saveID);
                     }
                     else // Another bookmark selected
                     {
@@ -495,7 +503,7 @@ namespace Nova
                         {
                             selectedSaveID = -1;
                             // No alert when saving to an empty slot
-                            _saveBookmark(saveID);
+                            SaveBookmark(saveID);
                         }
                     }
                 }
@@ -503,7 +511,7 @@ namespace Nova
                 {
                     if (saveID == selectedSaveID)
                     {
-                        LoadBookmark(saveID);
+                        LoadBookmarkWithAlert(saveID);
                     }
                     else // Another bookmark selected
                     {
@@ -720,7 +728,7 @@ namespace Nova
                     {
                         newFooterText = checkpointManager[saveID].creationTime.ToString(DateTimeFormat);
                         newThumbnailSprite = GetThumbnailSprite(saveID);
-                        onDeleteButtonClicked = () => DeleteBookmark(saveID);
+                        onDeleteButtonClicked = () => DeleteBookmarkWithAlert(saveID);
                         onThumbnailButtonClicked = () => OnThumbnailButtonClicked(saveID);
                     }
                     catch (Exception e)
@@ -728,7 +736,7 @@ namespace Nova
                         Debug.LogWarning(e);
                         newFooterText = I18n.__("bookmark.corrupted.title");
                         newThumbnailSprite = corruptedThumbnailSprite;
-                        onDeleteButtonClicked = () => DeleteBookmark(saveID);
+                        onDeleteButtonClicked = () => DeleteBookmarkWithAlert(saveID);
                         onThumbnailButtonClicked = null;
                     }
                 }
