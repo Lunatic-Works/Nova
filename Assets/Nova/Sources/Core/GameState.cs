@@ -58,18 +58,18 @@ namespace Nova
         {
             public readonly Dictionary<SystemLanguage, string> texts;
             public readonly BranchImageInformation imageInfo;
-            public readonly bool active;
+            public readonly bool interactable;
 
             public Selection(Dictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo,
-                bool active)
+                bool interactable)
             {
                 this.texts = texts;
                 this.imageInfo = imageInfo;
-                this.active = active;
+                this.interactable = interactable;
             }
 
-            public Selection(string text, BranchImageInformation imageInfo, bool active) : this(
-                new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text }, imageInfo, active)
+            public Selection(string text, BranchImageInformation imageInfo, bool interactable) : this(
+                new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text }, imageInfo, interactable)
             { }
         }
 
@@ -566,7 +566,7 @@ namespace Nova
                 }
 
                 var selection = new SelectionOccursData.Selection(branchInfo.texts, branchInfo.imageInfo,
-                    active: branchInfo.mode != BranchMode.Enable || branchInfo.condition.Invoke<bool>());
+                    interactable: branchInfo.mode != BranchMode.Enable || branchInfo.condition.Invoke<bool>());
                 selections.Add(selection);
                 selectionNames.Add(branchInfo.name);
             }

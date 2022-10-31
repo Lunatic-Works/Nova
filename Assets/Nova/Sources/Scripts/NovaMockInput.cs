@@ -252,9 +252,9 @@ namespace Nova
                 if (!gameState.canStepForward)
                 {
                     // TODO: Handle minigames
-                    yield return new WaitUntil(() => branchController.enabledSelectionCount > 0);
-                    // TODO: Only select from actually enabled selections
-                    branchController.Select(random.Next(branchController.enabledSelectionCount));
+                    yield return new WaitUntil(() => branchController.activeSelectionCount > 0);
+                    // TODO: Only select from interactable selections
+                    branchController.Select(random.Next(branchController.activeSelectionCount));
                     steps--;
                 }
                 else if (!NovaAnimation.IsPlayingAny(AnimationType.PerDialogue | AnimationType.Text))

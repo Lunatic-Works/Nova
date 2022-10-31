@@ -11,7 +11,7 @@ namespace Nova
         [SerializeField] private string imageFolder;
 
         private GameState gameState;
-        [HideInInspector] public int enabledSelectionCount;
+        [HideInInspector] public int activeSelectionCount;
 
         private void Awake()
         {
@@ -35,7 +35,7 @@ namespace Nova
         {
             if (selections.Count == 0)
             {
-                throw new ArgumentException("Nova: No enabled selection.");
+                throw new ArgumentException("Nova: No active selection.");
             }
 
             if (backPanel != null)
@@ -50,11 +50,12 @@ namespace Nova
                 var button = Instantiate(branchButtonPrefab, transform);
                 // Prevent showing the button before init
                 button.gameObject.SetActive(false);
-                button.Init(selection.texts, selection.imageInfo, imageFolder, () => Select(index), selection.active);
+                button.Init(selection.texts, selection.imageInfo, imageFolder, () => Select(index),
+                    selection.interactable);
                 button.gameObject.SetActive(true);
             }
 
-            enabledSelectionCount = selections.Count;
+            activeSelectionCount = selections.Count;
         }
 
         public void Select(int index)
@@ -75,7 +76,7 @@ namespace Nova
                 Destroy(child.gameObject);
             }
 
-            enabledSelectionCount = 0;
+            activeSelectionCount = 0;
         }
 
         #region Restoration

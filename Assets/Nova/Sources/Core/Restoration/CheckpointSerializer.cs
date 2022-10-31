@@ -289,11 +289,11 @@ namespace Nova
 
         public T DeserializeRecord<T>(long offset, bool compress = DefaultCompress)
         {
-            var record = GetRecord(offset);
-            using var mem = record.ToStream();
-            // Debug.Log($"deserialize type={typeof(T)} json={record.ReadString(0)})");
             try
             {
+                var record = GetRecord(offset);
+                // Debug.Log($"deserialize type={typeof(T)} json={record.ReadString(0)})");
+                using var mem = record.ToStream();
                 T obj;
                 if (compress)
                 {
@@ -340,7 +340,7 @@ namespace Nova
             var fileHeader = r.ReadBytes(FileHeader.Length);
             var version = r.ReadInt32();
 
-            if (version != Version || !fileHeader.SequenceEqual(FileHeader))
+            if (!fileHeader.SequenceEqual(FileHeader) || version != Version)
             {
                 throw CheckpointCorruptedException.BadHeader;
             }
