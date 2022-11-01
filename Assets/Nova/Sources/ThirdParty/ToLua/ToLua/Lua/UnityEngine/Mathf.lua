@@ -14,7 +14,7 @@ Mathf.Infinity = math.huge
 Mathf.NegativeInfinity = -math.huge
 Mathf.PI = math.pi
 Mathf.Rad2Deg = math.deg(1)
-		
+
 Mathf.Abs = math.abs
 Mathf.Acos = math.acos
 Mathf.Asin = math.asin
@@ -44,9 +44,9 @@ function Mathf.Clamp(value, min, max)
 	if value < min then
 		value = min
 	elseif value > max then
-		value = max    
+		value = max
 	end
-	
+
 	return value
 end
 
@@ -54,13 +54,13 @@ function Mathf.Clamp01(value)
 	if value < 0 then
 		return 0
 	elseif value > 1 then
-		return 1   
+		return 1
 	end
-	
+
 	return value
 end
 
-function Mathf.DeltaAngle(current, target)    
+function Mathf.DeltaAngle(current, target)
 	local num = Mathf.Repeat(target - current, 360)
 
 	if num > 180 then
@@ -68,32 +68,32 @@ function Mathf.DeltaAngle(current, target)
 	end
 
 	return num
-end 
+end
 
-function Mathf.Gamma(value, absmax, gamma) 
+function Mathf.Gamma(value, absmax, gamma)
 	local flag = false
-	
-    if value < 0 then    
+
+    if value < 0 then
         flag = true
     end
-	
+
     local num = abs(value)
-	
-    if num > absmax then    
+
+    if num > absmax then
         return (not flag) and num or -num
     end
-	
+
     local num2 = math.pow(num / absmax, gamma) * absmax
     return (not flag) and num2 or -num2
 end
 
 function Mathf.InverseLerp(from, to, value)
-	if from < to then      
-		if value < from then 
+	if from < to then
+		if value < from then
 			return 0
 		end
 
-		if value > to then      
+		if value > to then
 			return 1
 		end
 
@@ -153,20 +153,20 @@ function Mathf.PingPong(t, length)
     return length - abs(t - length)
 end
 
-function Mathf.Repeat(t, length)    
+function Mathf.Repeat(t, length)
 	return t - (floor(t / length) * length)
-end  
+end
 
 function Mathf.Round(num)
 	return floor(num + 0.5)
 end
 
-function Mathf.Sign(num)  
+function Mathf.Sign(num)
 	if num > 0 then
 		num = 1
 	elseif num < 0 then
 		num = -1
-	else 
+	else
 		num = 0
 	end
 
@@ -188,18 +188,18 @@ function Mathf.SmoothDamp(current, target, currentVelocity, smoothTime, maxSpeed
     local num7 = (currentVelocity + (num * num4)) * deltaTime
     currentVelocity = (currentVelocity - num * num7) * num3
     local num8 = target + (num4 + num7) * num3
-	
-    if (num5 > current) == (num8 > num5)  then    
+
+    if (num5 > current) == (num8 > num5)  then
         num8 = num5
-        currentVelocity = (num8 - num5) / deltaTime		
+        currentVelocity = (num8 - num5) / deltaTime
     end
-	
+
     return num8,currentVelocity
 end
 
 function Mathf.SmoothDampAngle(current, target, currentVelocity, smoothTime, maxSpeed, deltaTime)
 	deltaTime = deltaTime or Time.deltaTime
-	maxSpeed = maxSpeed or Mathf.Infinity	
+	maxSpeed = maxSpeed or Mathf.Infinity
 	target = current + Mathf.DeltaAngle(current, target)
     return Mathf.SmoothDamp(current, target, currentVelocity, smoothTime, maxSpeed, deltaTime)
 end
@@ -211,7 +211,7 @@ function Mathf.SmoothStep(from, to, t)
     return to * t + from * (1 - t)
 end
 
-function Mathf.HorizontalAngle(dir) 
+function Mathf.HorizontalAngle(dir)
 	return math.deg(math.atan2(dir.x, dir.z))
 end
 

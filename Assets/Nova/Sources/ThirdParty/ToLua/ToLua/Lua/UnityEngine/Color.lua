@@ -14,31 +14,31 @@ local get = tolua.initget(Color)
 
 Color.__index = function(t,k)
 	local var = rawget(Color, k)
-		
-	if var == nil then							
+
+	if var == nil then
 		var = rawget(get, k)
-		
+
 		if var ~= nil then
-			return var(t)	
+			return var(t)
 		end
 	end
-	
+
 	return var
 end
 
 Color.__call = function(t, r, g, b, a)
-	return setmetatable({r = r or 0, g = g or 0, b = b or 0, a = a or 1}, Color)   
+	return setmetatable({r = r or 0, g = g or 0, b = b or 0, a = a or 1}, Color)
 end
 
 function Color.New(r, g, b, a)
-	return setmetatable({r = r or 0, g = g or 0, b = b or 0, a = a or 1}, Color)		
+	return setmetatable({r = r or 0, g = g or 0, b = b or 0, a = a or 1}, Color)
 end
 
 function Color:Set(r, g, b, a)
 	self.r = r
 	self.g = g
 	self.b = b
-	self.a = a or 1 
+	self.a = a or 1
 end
 
 function Color:Get()
@@ -59,23 +59,23 @@ function Color.LerpUnclamped(a, b, t)
 end
 
 function Color.HSVToRGB(H, S, V, hdr)
-  hdr = hdr and false or true  
+  hdr = hdr and false or true
   local white = Color.New(1,1,1,1)
-  
-  if S == 0 then    
+
+  if S == 0 then
     white.r = V
     white.g = V
     white.b = V
     return white
   end
-  
-  if V == 0 then    
+
+  if V == 0 then
     white.r = 0
     white.g = 0
     white.b = 0
     return white
   end
-  
+
   white.r = 0
   white.g = 0
   white.b = 0;
@@ -88,9 +88,9 @@ function Color.HSVToRGB(H, S, V, hdr)
   local num7 = num2 * (1 - (num * num5))
   local num8 = num2 * (1 - (num * (1 - num5)))
   local num9 = num4
-  
+
   local flag = num9 + 1
-  
+
   if flag == 0 then
     white.r = num2
     white.g = num6
@@ -124,54 +124,54 @@ function Color.HSVToRGB(H, S, V, hdr)
     white.g = num8
     white.b = num6
   end
-  
-  if not hdr then    
+
+  if not hdr then
     white.r = Mathf.Clamp(white.r, 0, 1)
     white.g = Mathf.Clamp(white.g, 0, 1)
     white.b = Mathf.Clamp(white.b, 0, 1)
   end
-    
+
   return white
 end
 
 local function RGBToHSVHelper(offset, dominantcolor, colorone, colortwo)
   local V = dominantcolor
-    
-  if V ~= 0 then    
+
+  if V ~= 0 then
     local num = 0
-        
-    if colorone > colortwo then        
+
+    if colorone > colortwo then
       num = colortwo
-    else        
+    else
       num = colorone
     end
-        
+
     local num2 = V - num
     local H = 0
     local S = 0
-        
-    if num2 ~= 0 then        
+
+    if num2 ~= 0 then
       S = num2 / V
       H = offset + (colorone - colortwo) / num2
-    else        
+    else
       S = 0
       H = offset + (colorone - colortwo)
     end
-        
-    H = H / 6  
-    if H < 0 then H = H + 1 end                
+
+    H = H / 6
+    if H < 0 then H = H + 1 end
     return H, S, V
   end
-  
-  return 0, 0, V  
+
+  return 0, 0, V
 end
 
 function Color.RGBToHSV(rgbColor)
-    if rgbColor.b > rgbColor.g and rgbColor.b > rgbColor.r then    
-        return RGBToHSVHelper(4, rgbColor.b, rgbColor.r, rgbColor.g)    
-    elseif rgbColor.g > rgbColor.r then    
+    if rgbColor.b > rgbColor.g and rgbColor.b > rgbColor.r then
+        return RGBToHSVHelper(4, rgbColor.b, rgbColor.r, rgbColor.g)
+    elseif rgbColor.g > rgbColor.r then
         return RGBToHSVHelper(2, rgbColor.g, rgbColor.b, rgbColor.r)
-    else    
+    else
         return RGBToHSVHelper(0, rgbColor.r, rgbColor.g, rgbColor.b)
     end
 end
@@ -188,7 +188,7 @@ Color.__add = function(a, b)
 	return Color.New(a.r + b.r, a.g + b.g, a.b + b.b, a.a + b.a)
 end
 
-Color.__sub = function(a, b)	
+Color.__sub = function(a, b)
 	return Color.New(a.r - b.r, a.g - b.g, a.b - b.b, a.a - b.a)
 end
 
@@ -219,15 +219,15 @@ get.magenta	= function() return Color.New(1,0,1,1) end
 get.gray	= function() return Color.New(0.5,0.5,0.5,1) end
 get.clear	= function() return Color.New(0,0,0,0) end
 
-get.gamma = function(c) 
-  return Color.New(Mathf.LinearToGammaSpace(c.r), Mathf.LinearToGammaSpace(c.g), Mathf.LinearToGammaSpace(c.b), c.a)  
+get.gamma = function(c)
+  return Color.New(Mathf.LinearToGammaSpace(c.r), Mathf.LinearToGammaSpace(c.g), Mathf.LinearToGammaSpace(c.b), c.a)
 end
 
 get.linear = function(c)
   return Color.New(Mathf.GammaToLinearSpace(c.r), Mathf.GammaToLinearSpace(c.g), Mathf.GammaToLinearSpace(c.b), c.a)
 end
 
-get.maxColorComponent = function(c)    
+get.maxColorComponent = function(c)
   return Mathf.Max(Mathf.Max(c.r, c.g), c.b)
 end
 

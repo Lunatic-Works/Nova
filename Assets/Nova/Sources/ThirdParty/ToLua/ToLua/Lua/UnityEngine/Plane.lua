@@ -10,7 +10,7 @@ local Vector3 = Vector3
 local Plane = {}
 
 Plane.__index = function(t,k)
-	return rawget(Plane, k)	
+	return rawget(Plane, k)
 end
 
 Plane.__call = function(t,v)
@@ -18,7 +18,7 @@ Plane.__call = function(t,v)
 end
 
 function Plane.New(normal, d)
-	return setmetatable({normal = normal:Normalize(), distance = d}, Plane)	
+	return setmetatable({normal = normal:Normalize(), distance = d}, Plane)
 end
 
 function Plane:Get()
@@ -28,38 +28,38 @@ end
 function Plane:Raycast(ray)
 	local a = Vector3.Dot(ray.direction, self.normal)
     local num2 = -Vector3.Dot(ray.origin, self.normal) - self.distance
-	
-    if Mathf.Approximately(a, 0) then                   
-		return false, 0        
+
+    if Mathf.Approximately(a, 0) then
+		return false, 0
 	end
-	
-    local enter = num2 / a    
+
+    local enter = num2 / a
 	return enter > 0, enter
 end
 
-function Plane:SetNormalAndPosition(inNormal, inPoint)    
+function Plane:SetNormalAndPosition(inNormal, inPoint)
     self.normal = inNormal:Normalize()
     self.distance = -Vector3.Dot(inNormal, inPoint)
-end    
+end
 
-function Plane:Set3Points(a, b, c)    
+function Plane:Set3Points(a, b, c)
     self.normal = Vector3.Normalize(Vector3.Cross(b - a, c - a))
     self.distance = -Vector3.Dot(self.normal, a)
-end		    
+end
 
-function Plane:GetDistanceToPoint(inPt)    
+function Plane:GetDistanceToPoint(inPt)
 	return Vector3.Dot(self.normal, inPt) + self.distance
-end    
+end
 
-function Plane:GetSide(inPt)    
+function Plane:GetSide(inPt)
 	return (Vector3.Dot(self.normal, inPt) + self.distance) > 0
-end    
+end
 
-function Plane:SameSide(inPt0, inPt1)    
+function Plane:SameSide(inPt0, inPt1)
 	local distanceToPoint = self:GetDistanceToPoint(inPt0)
 	local num2 = self:GetDistanceToPoint(inPt1)
 	return (distanceToPoint > 0 and num2 > 0) or (distanceToPoint <= 0 and num2 <= 0)
-end    
+end
 
 UnityEngine.Plane = Plane
 setmetatable(Plane, Plane)
