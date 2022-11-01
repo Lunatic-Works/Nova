@@ -16,29 +16,29 @@ local get = tolua.initget(Vector4)
 
 Vector4.__index = function(t,k)
 	local var = rawget(Vector4, k)
-	
-	if var == nil then							
+
+	if var == nil then
 		var = rawget(get, k)
-		
+
 		if var ~= nil then
-			return var(t)	
+			return var(t)
 		end
 	end
-	
+
 	return var
 end
 
 Vector4.__call = function(t, x, y, z, w)
-	return setmetatable({x = x or 0, y = y or 0, z = z or 0, w = w or 0}, Vector4)		
+	return setmetatable({x = x or 0, y = y or 0, z = z or 0, w = w or 0}, Vector4)
 end
 
-function Vector4.New(x, y, z, w)	
-	return setmetatable({x = x or 0, y = y or 0, z = z or 0, w = w or 0}, Vector4)		
+function Vector4.New(x, y, z, w)
+	return setmetatable({x = x or 0, y = y or 0, z = z or 0, w = w or 0}, Vector4)
 end
 
 function Vector4:Set(x,y,z,w)
 	self.x = x or 0
-	self.y = y or 0	
+	self.y = y or 0
 	self.z = z or 0
 	self.w = w or 0
 end
@@ -47,28 +47,28 @@ function Vector4:Get()
 	return self.x, self.y, self.z, self.w
 end
 
-function Vector4.Lerp(from, to, t)    
+function Vector4.Lerp(from, to, t)
     t = clamp(t, 0, 1)
     return Vector4.New(from.x + ((to.x - from.x) * t), from.y + ((to.y - from.y) * t), from.z + ((to.z - from.z) * t), from.w + ((to.w - from.w) * t))
-end    
+end
 
-function Vector4.MoveTowards(current, target, maxDistanceDelta)    
+function Vector4.MoveTowards(current, target, maxDistanceDelta)
 	local vector = target - current
-	local magnitude = vector:Magnitude()	
-	
-	if magnitude > maxDistanceDelta and magnitude ~= 0 then     
+	local magnitude = vector:Magnitude()
+
+	if magnitude > maxDistanceDelta and magnitude ~= 0 then
 		maxDistanceDelta = maxDistanceDelta / magnitude
-		vector:Mul(maxDistanceDelta)   
+		vector:Mul(maxDistanceDelta)
 		vector:Add(current)
 		return vector
 	end
-	
-	return target
-end    
 
-function Vector4.Scale(a, b)    
+	return target
+end
+
+function Vector4.Scale(a, b)
     return Vector4.New(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w)
-end    
+end
 
 function Vector4:SetScale(scale)
 	self.x = self.x * scale.x
@@ -83,25 +83,25 @@ function Vector4:Normalize()
 end
 
 function Vector4:SetNormalize()
-	local num = self:Magnitude()	
-	
+	local num = self:Magnitude()
+
 	if num == 1 then
 		return self
-    elseif num > 1e-05 then    
+    elseif num > 1e-05 then
         self:Div(num)
-    else    
+    else
         self:Set(0,0,0,0)
-	end 
+	end
 
 	return self
 end
 
 function Vector4:Div(d)
 	self.x = self.x / d
-	self.y = self.y / d	
+	self.y = self.y / d
 	self.z = self.z / d
 	self.w = self.w / d
-	
+
 	return self
 end
 
@@ -109,8 +109,8 @@ function Vector4:Mul(d)
 	self.x = self.x * d
 	self.y = self.y * d
 	self.z = self.z * d
-	self.w = self.w * d	
-	
+	self.w = self.w * d
+
 	return self
 end
 
@@ -119,7 +119,7 @@ function Vector4:Add(b)
 	self.y = self.y + b.y
 	self.z = self.z + b.z
 	self.w = self.w + b.w
-	
+
 	return self
 end
 
@@ -128,7 +128,7 @@ function Vector4:Sub(b)
 	self.y = self.y - b.y
 	self.z = self.z - b.z
 	self.w = self.w - b.w
-	
+
 	return self
 end
 
@@ -188,7 +188,7 @@ end
 
 Vector4.__eq = function(va,vb)
 	local v = va - vb
-	local delta = Vector4.SqrMagnitude(v)	
+	local delta = Vector4.SqrMagnitude(v)
 	return delta < 1e-10
 end
 

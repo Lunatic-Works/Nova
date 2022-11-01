@@ -16,15 +16,15 @@ local get = tolua.initget(Vector2)
 
 Vector2.__index = function(t,k)
 	local var = rawget(Vector2, k)
-	
-	if var == nil then							
+
+	if var == nil then
 		var = rawget(get, k)
-		
+
 		if var ~= nil then
 			return var(t)
 		end
 	end
-	
+
 	return var
 end
 
@@ -38,7 +38,7 @@ end
 
 function Vector2:Set(x,y)
 	self.x = x or 0
-	self.y = y or 0	
+	self.y = y or 0
 end
 
 function Vector2:Get()
@@ -241,29 +241,29 @@ end
 
 function Vector2:Div(d)
 	self.x = self.x / d
-	self.y = self.y / d	
-	
+	self.y = self.y / d
+
 	return self
 end
 
 function Vector2:Mul(d)
 	self.x = self.x * d
 	self.y = self.y * d
-	
+
 	return self
 end
 
 function Vector2:Add(b)
 	self.x = self.x + b.x
 	self.y = self.y + b.y
-	
+
 	return self
 end
 
 function Vector2:Sub(b)
 	self.x = self.x - b.x
 	self.y = self.y - b.y
-	
+
 	return
 end
 
