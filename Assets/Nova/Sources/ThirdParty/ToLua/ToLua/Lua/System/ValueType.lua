@@ -18,12 +18,12 @@ ValueType[RaycastHit]	= 10
 ValueType[int64]		= 11
 ValueType[uint64]		= 12
 
-local function GetValueType()	
+local function GetValueType()
 	local getmetatable = getmetatable
 	local ValueType = ValueType
 
 	return function(udata)
-		local meta = getmetatable(udata)	
+		local meta = getmetatable(udata)
 
 		if meta == nil then
 			return 0
@@ -37,4 +37,4 @@ function AddValueType(table, type)
 	ValueType[table] = type
 end
 
-GetLuaValueType = GetValueType() 
+GetLuaValueType = GetValueType()

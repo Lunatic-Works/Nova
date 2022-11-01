@@ -17,40 +17,40 @@ local comap = {}
 local pool = {}
 setmetatable(comap, {__mode = "kv"})
 
-function coroutine.start(f, ...)	
+function coroutine.start(f, ...)
 	local co = create(f)
-	
+
 	if running() == nil then
 		local flag, msg = resume(co, ...)
-	
-		if not flag then					
+
+		if not flag then
 			error(debug.traceback(co, msg))
-		end					
+		end
 	else
 		local args = {...}
-		local timer = nil		
-		
-		local action = function()												
+		local timer = nil
+
+		local action = function()
 			comap[co] = nil
 			timer.func = nil
-			local flag, msg = resume(co, unpack(args, 1, table.maxn(args)))						
+			local flag, msg = resume(co, unpack(args, 1, table.maxn(args)))
 			table.insert(pool, timer)
-	
-			if not flag then	
-				timer:Stop()														
-				error(debug.traceback(co, msg))						
-			end		
+
+			if not flag then
+				timer:Stop()
+				error(debug.traceback(co, msg))
+			end
 		end
-			
+
 		if #pool > 0 then
 			timer = table.remove(pool)
 			timer:Reset(action, 0, 1)
 		else
 			timer = FrameTimer.New(action, 0, 1)
 		end
-		
+
 		comap[co] = timer
-		timer:Start()		
+		timer:Start()
 	end
 
 	return co
@@ -58,45 +58,45 @@ end
 
 function coroutine.wait(t, co, ...)
 	local args = {...}
-	co = co or running()		
+	co = co or running()
 	local timer = nil
-		
-	local action = function()		
-		comap[co] = nil		
+
+	local action = function()
+		comap[co] = nil
 		timer.func = nil
 		local flag, msg = resume(co, unpack(args, 1, table.maxn(args)))
-		
-		if not flag then	
-			timer:Stop()						
-			error(debug.traceback(co, msg))			
+
+		if not flag then
+			timer:Stop()
+			error(debug.traceback(co, msg))
 			return
 		end
 	end
-	
+
 	timer = CoTimer.New(action, t, 1)
-	comap[co] = timer	
+	comap[co] = timer
 	timer:Start()
 	return yield()
 end
 
 function coroutine.step(t, co, ...)
 	local args = {...}
-	co = co or running()		
+	co = co or running()
 	local timer = nil
-	
-	local action = function()	
-		comap[co] = nil					
+
+	local action = function()
+		comap[co] = nil
 		timer.func = nil
 		local flag, msg = resume(co, unpack(args, 1, table.maxn(args)))
 		table.insert(pool, timer)
-	
-		if not flag then	
-			timer:Stop()																			
+
+		if not flag then
+			timer:Stop()
 			error(debug.traceback(co, msg))
-			return	
-		end		
+			return
+		end
 	end
-				
+
 	if #pool > 0 then
 		timer = table.remove(pool)
 		timer:Reset(action, t or 1, 1)
@@ -109,44 +109,44 @@ function coroutine.step(t, co, ...)
 	return yield()
 end
 
-function coroutine.www(www, co)			
-	co = co or running()			
-	local timer = nil			
-			
-	local action = function()				
-		if not www.isDone then		
-			return		
-		end		
-				
+function coroutine.www(www, co)
+	co = co or running()
+	local timer = nil
+
+	local action = function()
+		if not www.isDone then
+			return
+		end
+
 		comap[co] = nil
-		timer:Stop()		
+		timer:Stop()
 		timer.func = nil
-		local flag, msg = resume(co)			
-		table.insert(pool, timer)	
-			
-		if not flag then												
-			error(debug.traceback(co, msg))			
-			return			
-		end				
-	end		
-				
+		local flag, msg = resume(co)
+		table.insert(pool, timer)
+
+		if not flag then
+			error(debug.traceback(co, msg))
+			return
+		end
+	end
+
 	if #pool > 0 then
 		timer = table.remove(pool)
 		timer:Reset(action, 1, -1)
-	else	
-		timer = FrameTimer.New(action, 1, -1)	
+	else
+		timer = FrameTimer.New(action, 1, -1)
 	end
-	comap[co] = timer	
+	comap[co] = timer
  	timer:Start()
  	return yield()
 end
 
 function coroutine.stop(co)
- 	local timer = comap[co] 	 	
+ 	local timer = comap[co]
 
  	if timer ~= nil then
  		comap[co] = nil
- 		timer:Stop()  	
- 		timer.func = nil	
+ 		timer:Stop()
+ 		timer.func = nil
  	end
 end

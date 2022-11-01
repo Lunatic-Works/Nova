@@ -7,19 +7,19 @@ local rawget = rawget
 local uTime = UnityEngine.Time
 local gettime = tolua.gettime
 
-local _Time = 
-{	
+local _Time =
+{
 	deltaTime			= 0,
 	fixedDeltaTime 	 	= 0,
 	maximumDeltaTime	= 0.3333333,
 	fixedTime			= 0,
-	frameCount			= 1,	
+	frameCount			= 1,
 	realtimeSinceStartup=0,
 	time 				= 0,
 	timeScale			= 1,
 	timeSinceLevelLoad	= 0,
-	unscaledDeltaTime	= 0,	
-	unscaledTime		= 0,	
+	unscaledDeltaTime	= 0,
+	unscaledTime		= 0,
 }
 
 local _set = {}
@@ -50,12 +50,12 @@ end
 
 _Time.__index = function(t, k)
 	local var = rawget(_Time, k)
-	
+
 	if var then
 		return var
 	end
 
-	return uTime.__index(uTime, k)	
+	return uTime.__index(uTime, k)
 end
 
 _Time.__newindex = function(t, k, v)
@@ -65,19 +65,19 @@ _Time.__newindex = function(t, k, v)
 		return func(v)
 	end
 
-	error(string.format("Property or indexer `UnityEngine.Time.%s' cannot be assigned to (it is read only)", k))	
+	error(string.format("Property or indexer `UnityEngine.Time.%s' cannot be assigned to (it is read only)", k))
 end
 
 local Time = {}
 local counter = 1
 
-function Time:SetDeltaTime(deltaTime, unscaledDeltaTime)	
+function Time:SetDeltaTime(deltaTime, unscaledDeltaTime)
 	local _Time = _Time
-	_Time.deltaTime = deltaTime	
+	_Time.deltaTime = deltaTime
 	_Time.unscaledDeltaTime = unscaledDeltaTime
 	counter = counter - 1
 
-	if counter == 0 and uTime then	
+	if counter == 0 and uTime then
 		_Time.time = uTime.time
 		_Time.timeSinceLevelLoad = uTime.timeSinceLevelLoad
 		_Time.unscaledTime = uTime.unscaledTime
@@ -87,12 +87,12 @@ function Time:SetDeltaTime(deltaTime, unscaledDeltaTime)
 	else
 		_Time.time = _Time.time + deltaTime
 		_Time.realtimeSinceStartup = _Time.realtimeSinceStartup + unscaledDeltaTime
-		_Time.timeSinceLevelLoad = _Time.timeSinceLevelLoad + deltaTime	
-		_Time.unscaledTime = _Time.unscaledTime + unscaledDeltaTime 
-	end		
+		_Time.timeSinceLevelLoad = _Time.timeSinceLevelLoad + deltaTime
+		_Time.unscaledTime = _Time.unscaledTime + unscaledDeltaTime
+	end
 end
 
-function Time:SetFixedDelta(fixedDeltaTime)	
+function Time:SetFixedDelta(fixedDeltaTime)
 	_Time.deltaTime = fixedDeltaTime
 	_Time.fixedDeltaTime = fixedDeltaTime
 
@@ -118,8 +118,8 @@ UnityEngine.Time = Time
 setmetatable(Time, _Time)
 
 if uTime ~= nil then
-	_Time.maximumDeltaTime = uTime.maximumDeltaTime	
-	_Time.timeScale = uTime.timeScale	
+	_Time.maximumDeltaTime = uTime.maximumDeltaTime
+	_Time.timeScale = uTime.timeScale
 end
 
 

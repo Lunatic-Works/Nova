@@ -10,15 +10,15 @@ local setmetatable = setmetatable
 local LayerMask = {}
 
 LayerMask.__index = function(t,k)
-	return rawget(LayerMask, k)	
+	return rawget(LayerMask, k)
 end
 
 LayerMask.__call = function(t,v)
 	return setmetatable({value = value or 0}, LayerMask)
 end
 
-function LayerMask.New(value)	
-	return setmetatable({value = value or 0}, LayerMask)		
+function LayerMask.New(value)
+	return setmetatable({value = value or 0}, LayerMask)
 end
 
 function LayerMask:Get()
@@ -31,16 +31,16 @@ end
 
 function LayerMask.GetMask(...)
 	local arg = {...}
-	local value = 0	
+	local value = 0
 
-	for i = 1, #arg do		
+	for i = 1, #arg do
 		local n = LayerMask.NameToLayer(arg[i])
-		
+
 		if n ~= nil then
-			value = value + 2 ^ n				
+			value = value + 2 ^ n
 		end
-	end	
-		
+	end
+
 	return value
 end
 
