@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class NovaMockInput : MonoBehaviour
+    public class MockInput : MonoBehaviour
     {
         [SerializeField] private int steps;
         [SerializeField] private bool fastForward = true;

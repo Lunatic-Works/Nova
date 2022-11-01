@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class NovaTextOutline : Shadow
+    public class TextOutline : Shadow
     {
         private readonly List<UIVertex> uiVerticesList = new List<UIVertex>();
 
