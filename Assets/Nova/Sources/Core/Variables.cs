@@ -15,7 +15,7 @@ namespace Nova
 
     [ExportCustomType]
     [Serializable]
-    public class VariableEntry
+    public class VariableEntry : ISerializedData
     {
         public readonly VariableType type;
         public readonly object value;
