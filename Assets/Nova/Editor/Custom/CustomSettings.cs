@@ -146,7 +146,6 @@ public static class CustomSettings
         // _GT(typeof(WrapMode)),
 
         // _GT(typeof(BlendWeights)),
-        // _GT(typeof(LuaProfiler)),
         // _GT(typeof(QualitySettings)),
         // _GT(typeof(RenderSettings)),
         _GT(typeof(RenderTexture)),
@@ -254,28 +253,5 @@ public static class CustomSettings
     public static DelegateType _DT(Type t)
     {
         return new DelegateType(t);
-    }
-
-    [MenuItem("Lua/Attach Profiler", false, 151)]
-    private static void AttachProfiler()
-    {
-        if (!Application.isPlaying)
-        {
-            EditorUtility.DisplayDialog("警告", "请在运行时执行此功能", "确定");
-            return;
-        }
-
-        LuaClient.Instance.AttachProfiler();
-    }
-
-    [MenuItem("Lua/Detach Profiler", false, 152)]
-    private static void DetachProfiler()
-    {
-        if (!Application.isPlaying)
-        {
-            return;
-        }
-
-        LuaClient.Instance.DetachProfiler();
     }
 }
