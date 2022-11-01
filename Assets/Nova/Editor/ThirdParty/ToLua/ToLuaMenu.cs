@@ -72,8 +72,6 @@ public static class ToLuaMenu
         //typeof(LuaInterface.LuaOutMetatable),               //手写支持
         typeof(LuaInterface.NullObject),
         typeof(System.Array),
-        typeof(System.Reflection.MemberInfo),
-        typeof(System.Reflection.BindingFlags),
         typeof(LuaClient),
         typeof(LuaInterface.LuaFunction),
         typeof(LuaInterface.LuaTable),
@@ -93,10 +91,6 @@ public static class ToLuaMenu
         typeof(System.Collections.IEnumerator),
         typeof(UnityEngine.Object),
         typeof(LuaInterface.EventObject),
-        typeof(LuaInterface.LuaMethod),
-        typeof(LuaInterface.LuaProperty),
-        typeof(LuaInterface.LuaField),
-        typeof(LuaInterface.LuaConstructor),
     };
 
     private static bool beAutoGen = false;
