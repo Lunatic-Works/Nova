@@ -14,7 +14,6 @@ public static class CustomSettings
     public static string saveDir = Application.dataPath + "/Nova/Sources/ThirdParty/ToLua/Source/Generate/";
     public static string toluaBaseType = Application.dataPath + "/Nova/Sources/ThirdParty/ToLua/BaseType/";
     public static string baseLuaDir = Application.dataPath + "/Nova/Lua/";
-    public static string injectionFilesPath = Application.dataPath + "/Nova/Sources/ThirdParty/ToLua/Injection/";
 
     // 导出时强制做为静态类的类型（注意customTypeList还要添加这个类型才能导出）
     // Unity有些类作为sealed class，其实完全等价于静态类
@@ -59,8 +58,6 @@ public static class CustomSettings
         // _GT(typeof(TestProtol)),
         // -------------------------------------------------------------------
 
-        // _GT(typeof(LuaInjectionStation)),
-        // _GT(typeof(InjectType)),
         // _GT(typeof(Debugger)).SetNameSpace(null),
 
 #if USING_DOTWEENING
