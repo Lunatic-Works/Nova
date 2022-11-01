@@ -8,7 +8,7 @@ namespace Nova
     public class SaveEntryController : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private Text idText;
-        private NovaTextOutline idTextOutline;
+        private TextOutline idTextOutline;
         private Text dateText;
 
         private GameObject latest;
@@ -32,7 +32,7 @@ namespace Nova
             var container = transform.Find("Container");
             var header = container.Find("Header");
             idText = header.Find("Id").GetComponent<Text>();
-            idTextOutline = header.Find("Id").GetComponent<NovaTextOutline>();
+            idTextOutline = header.Find("Id").GetComponent<TextOutline>();
             dateText = header.Find("Date").GetComponent<Text>();
             latest = container.Find("Latest").gameObject;
             thumbnailButton = container.GetComponent<Button>();
