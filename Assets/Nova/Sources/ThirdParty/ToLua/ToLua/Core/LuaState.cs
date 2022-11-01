@@ -36,7 +36,6 @@ namespace LuaInterface
     public class LuaState : LuaStatePtr, IDisposable
     {
         public ObjectTranslator translator = new ObjectTranslator();
-        public LuaReflection reflection = new LuaReflection();
 
         public int ArrayMetatable { get; private set; }
         public int DelegateMetatable { get; private set; }
@@ -163,7 +162,6 @@ namespace LuaInterface
             EndModule(); //end global
 
             LuaUnityLibs.OpenLibs(L);
-            LuaReflection.OpenLibs(L);
             ArrayMetatable = metaMap[typeof(System.Array)];
             TypeMetatable = metaMap[typeof(System.Type)];
             DelegateMetatable = metaMap[typeof(System.Delegate)];
@@ -543,20 +541,6 @@ namespace LuaInterface
             }
 
             return Get(ptr).translator;
-#endif
-        }
-
-        public static LuaReflection GetReflection(IntPtr ptr)
-        {
-#if !MULTI_STATE
-            return mainState.reflection;
-#else
-            if (mainState != null && mainState.L == ptr)
-            {
-                return mainState.reflection;
-            }
-
-            return Get(ptr).reflection;
 #endif
         }
 
