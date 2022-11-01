@@ -72,7 +72,6 @@ public static class ToLuaMenu
         //typeof(LuaInterface.LuaOutMetatable),               //手写支持
         typeof(LuaInterface.NullObject),
         typeof(System.Array),
-        typeof(LuaClient),
         typeof(LuaInterface.LuaFunction),
         typeof(LuaInterface.LuaTable),
         typeof(LuaInterface.LuaThread),
