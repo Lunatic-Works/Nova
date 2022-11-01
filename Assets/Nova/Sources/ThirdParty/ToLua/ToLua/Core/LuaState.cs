@@ -85,12 +85,10 @@ namespace LuaInterface
         HashSet<string> moduleSet = null;
 
         private static LuaState mainState = null;
-        private static LuaState injectionState = null;
         private static Dictionary<IntPtr, LuaState> stateMap = new Dictionary<IntPtr, LuaState>();
 
         private int beginCount = 0;
         private bool beLogGC = false;
-        private bool bInjectionInited = false;
 #if UNITY_EDITOR
         private bool beStart = false;
 #endif
@@ -104,8 +102,6 @@ namespace LuaInterface
             if (mainState == null)
             {
                 mainState = this;
-                // MULTI_STATE Not Support
-                injectionState = mainState;
             }
 
             float time = Time.realtimeSinceStartup;
@@ -218,19 +214,6 @@ namespace LuaInterface
 #endif
             // Debugger.Log("LuaState start");
             OpenBaseLuaLibs();
-#if ENABLE_LUA_INJECTION
-            Push(LuaDLL.tolua_tag());
-            LuaSetGlobal("tolua_tag");
-#if UNITY_EDITOR
-            if (UnityEditor.EditorPrefs.GetInt(Application.dataPath + "InjectStatus") == 1)
-            {
-#endif
-                DoFile("System/Injection/LuaInjectionStation.lua");
-                bInjectionInited = true;
-#if UNITY_EDITOR
-            }
-#endif
-#endif
             PackBounds = GetFuncRef("Bounds.New");
             UnpackBounds = GetFuncRef("Bounds.Get");
             PackRay = GetFuncRef("Ray.New");
@@ -384,16 +367,6 @@ namespace LuaInterface
             }
 
             return 0;
-        }
-
-        public static bool GetInjectInitState(int index)
-        {
-            if (injectionState != null && injectionState.bInjectionInited)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         string GetToLuaTypeName(Type t)
@@ -2020,11 +1993,6 @@ namespace LuaInterface
             if (mainState == this)
             {
                 mainState = null;
-            }
-            if (injectionState == this)
-            {
-                injectionState = null;
-                LuaInjectionStation.Clear();
             }
 
 #if UNITY_EDITOR
