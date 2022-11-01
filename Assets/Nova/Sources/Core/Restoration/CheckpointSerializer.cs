@@ -74,7 +74,7 @@ namespace Nova
         public CheckpointJsonSerializer() : base()
         {
             TypeNameHandling = TypeNameHandling.Auto;
-            SerializationBinder = new JsonTypeBinder();
+            // SerializationBinder = new JsonTypeBinder();
             ContractResolver = new DefaultContractResolver()
             {
                 // By default, public fields and properties are serialized
