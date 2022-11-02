@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using UnityEngine;
@@ -37,43 +37,49 @@ namespace Nova
 
         public static CheckpointCorruptedException JsonTypeDenied(string typeName, string assemblyName)
         {
-            return new CheckpointCorruptedException($"JSON type {typeName} in {assemblyName} is not permitted to (de)serialize.");
+            return new CheckpointCorruptedException(
+                $"JSON type {typeName} in {assemblyName} is not permitted to (de)serialize.");
         }
     }
 
-    public class CheckpointJsonSerializer : JsonSerializer
+    public sealed class CheckpointJsonSerializer : JsonSerializer
     {
         // Not to allow other assembly for security reason
         private class JsonTypeBinder : ISerializationBinder
         {
-            private static readonly Assembly curAssembly = Assembly.GetExecutingAssembly();
-            private static readonly HashSet<Assembly> allowedAssembly = new HashSet<Assembly> {
-                curAssembly,
+            private static readonly Assembly CurAssembly = Assembly.GetExecutingAssembly();
+
+            private static readonly HashSet<Assembly> AllowedAssembly = new HashSet<Assembly>
+            {
+                CurAssembly,
                 // mscorlib
                 typeof(List<>).Assembly,
             };
 
-            private bool IsPrimitiveType(Type serializedType, bool checkAssembly = true)
+            private static bool IsPrimitiveType(Type serializedType, bool checkAssembly = true)
             {
                 return serializedType.IsPrimitive || serializedType == typeof(string) ||
-                    (serializedType.IsEnum && (!checkAssembly || IsAllowedAssembly(serializedType)));
+                       (serializedType.IsEnum && (!checkAssembly || IsAllowedAssembly(serializedType)));
             }
 
-            private bool IsAllowedAssembly(Type serializedType)
+            private static bool IsAllowedAssembly(Type serializedType)
             {
-                return serializedType != null && !serializedType.IsGenericParameter && allowedAssembly.Contains(serializedType.Assembly);
+                return serializedType != null && !serializedType.IsGenericParameter &&
+                       AllowedAssembly.Contains(serializedType.Assembly);
             }
 
             private bool IsNovaType(Type serializedType)
             {
-                if (!typeof(ISerializedData).IsAssignableFrom(serializedType) || serializedType.Assembly != curAssembly)
+                if (!typeof(ISerializedData).IsAssignableFrom(serializedType) || serializedType.Assembly != CurAssembly)
                 {
                     return false;
                 }
+
                 if (serializedType.IsGenericType && serializedType.GetGenericArguments().Any(x => !IsAllowedType(x)))
                 {
                     return false;
                 }
+
                 return true;
             }
 
@@ -83,25 +89,29 @@ namespace Nova
                 {
                     return false;
                 }
+
                 // case 0: primitives
                 if (IsPrimitiveType(serializedType, false))
                 {
                     return true;
                 }
+
                 // case 1: all Nova types inheriting ISerializedData
                 if (IsNovaType(serializedType))
                 {
                     return true;
                 }
+
                 // case 2: Dictionary<K, V>
                 if (serializedType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
-                    Type[] KV = serializedType.GetGenericArguments();
-                    if (IsPrimitiveType(KV[0]) && IsAllowedType(KV[1]))
+                    Type[] kv = serializedType.GetGenericArguments();
+                    if (IsPrimitiveType(kv[0]) && IsAllowedType(kv[1]))
                     {
                         return true;
                     }
                 }
+
                 return false;
             }
 
@@ -117,7 +127,7 @@ namespace Nova
 
             public Type BindToType(string assemblyName, string typeName)
             {
-                var assembly = allowedAssembly.SingleOrDefault(x => x.GetName().Name == assemblyName);
+                var assembly = AllowedAssembly.SingleOrDefault(x => x.GetName().Name == assemblyName);
                 var type = assembly?.GetType(typeName);
                 if (!IsAllowedType(type))
                 {
