@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using UnityEngine;
@@ -34,9 +35,9 @@ namespace Nova
             return new CheckpointCorruptedException($"Serialization failed @{offset}: {reason}");
         }
 
-        public static CheckpointCorruptedException JsonTypeDenied(string typeName)
+        public static CheckpointCorruptedException JsonTypeDenied(string typeName, string assemblyName)
         {
-            return new CheckpointCorruptedException($"JSON type {typeName} is not permitted to (de)serialize.");
+            return new CheckpointCorruptedException($"JSON type {typeName} in {assemblyName} is not permitted to (de)serialize.");
         }
     }
 
@@ -45,26 +46,82 @@ namespace Nova
         // Not to allow other assembly for security reason
         private class JsonTypeBinder : ISerializationBinder
         {
-            public void BindToName(Type serializedType, out string assemblyName, out string typeName)
+            private static readonly Assembly curAssembly = Assembly.GetExecutingAssembly();
+            private static readonly HashSet<Assembly> allowedAssembly = new HashSet<Assembly> {
+                curAssembly,
+                // mscorlib
+                typeof(List<>).Assembly,
+            };
+
+            private bool IsPrimitiveType(Type serializedType, bool checkAssembly = true)
             {
-                var curAssembly = Assembly.GetExecutingAssembly();
+                return serializedType.IsPrimitive || serializedType == typeof(string) ||
+                    (serializedType.IsEnum && (!checkAssembly || IsAllowedAssembly(serializedType)));
+            }
+
+            private bool IsAllowedAssembly(Type serializedType)
+            {
+                return serializedType != null && !serializedType.IsGenericParameter && allowedAssembly.Contains(serializedType.Assembly);
+            }
+
+            private bool IsNovaType(Type serializedType)
+            {
                 if (!typeof(ISerializedData).IsAssignableFrom(serializedType) || serializedType.Assembly != curAssembly)
                 {
-                    throw CheckpointCorruptedException.JsonTypeDenied(serializedType.Name);
+                    return false;
                 }
+                if (serializedType.IsGenericType && serializedType.GetGenericArguments().Any(x => !IsAllowedType(x)))
+                {
+                    return false;
+                }
+                return true;
+            }
 
-                assemblyName = curAssembly.GetName().Name;
+            private bool IsAllowedType(Type serializedType)
+            {
+                if (!IsAllowedAssembly(serializedType))
+                {
+                    return false;
+                }
+                // case 0: primitives
+                if (IsPrimitiveType(serializedType, false))
+                {
+                    return true;
+                }
+                // case 1: all Nova types inheriting ISerializedData
+                if (IsNovaType(serializedType))
+                {
+                    return true;
+                }
+                // case 2: Dictionary<K, V>
+                if (serializedType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                {
+                    Type[] KV = serializedType.GetGenericArguments();
+                    if (IsPrimitiveType(KV[0]) && IsAllowedType(KV[1]))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public void BindToName(Type serializedType, out string assemblyName, out string typeName)
+            {
+                assemblyName = serializedType.Assembly.GetName().Name;
                 typeName = serializedType.FullName;
+                if (!IsAllowedType(serializedType))
+                {
+                    throw CheckpointCorruptedException.JsonTypeDenied(typeName, assemblyName);
+                }
             }
 
             public Type BindToType(string assemblyName, string typeName)
             {
-                var curAssembly = Assembly.GetExecutingAssembly();
-                var type = curAssembly.GetType(typeName);
-                if (assemblyName != curAssembly.GetName().Name || type == null ||
-                    !typeof(ISerializedData).IsAssignableFrom(type))
+                var assembly = allowedAssembly.SingleOrDefault(x => x.GetName().Name == assemblyName);
+                var type = assembly?.GetType(typeName);
+                if (!IsAllowedType(type))
                 {
-                    throw CheckpointCorruptedException.JsonTypeDenied(typeName);
+                    throw CheckpointCorruptedException.JsonTypeDenied(typeName, assemblyName);
                 }
 
                 return type;
@@ -74,7 +131,7 @@ namespace Nova
         public CheckpointJsonSerializer() : base()
         {
             TypeNameHandling = TypeNameHandling.Auto;
-            // SerializationBinder = new JsonTypeBinder();
+            SerializationBinder = new JsonTypeBinder();
             ContractResolver = new DefaultContractResolver()
             {
                 // By default, public fields and properties are serialized
