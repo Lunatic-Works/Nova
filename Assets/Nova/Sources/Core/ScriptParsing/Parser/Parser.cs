@@ -26,6 +26,11 @@ namespace Nova.Script
             this.content = content?.Replace("\r", "");
             this.attributes = attributes;
         }
+
+        public ulong GetHashUlong()
+        {
+            return Utils.HashList((new object[] { type, content }).Concat(attributes.SelectMany(x => new[] { x.Key, x.Value })));
+        }
     }
 
     public class ParsedScript

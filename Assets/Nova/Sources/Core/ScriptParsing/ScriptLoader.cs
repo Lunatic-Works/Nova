@@ -197,6 +197,11 @@ namespace Nova
             return res;
         }
 
+        private ulong GetNodeChunkHash(IReadOnlyList<Chunk> nodeChunks)
+        {
+            return Utils.HashList(nodeChunks.SelectMany(x => x.blocks).Select(x => x.GetHashUlong()));
+        }
+
         /// <summary>
         /// Parse the given TextAsset to chunks and add them to currentNode.
         /// </summary>
@@ -220,6 +225,7 @@ namespace Nova
                 {
                     if (nodeChunks.Count > 0)
                     {
+                        currentNode.textHash = GetNodeChunkHash(nodeChunks);
                         if (deferChunks)
                         {
                             currentNode.deferredChunks[stateLocale] = nodeChunks;
