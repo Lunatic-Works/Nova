@@ -572,9 +572,9 @@ PlayerSettings:
     Android: 1
   il2cppCompilerConfiguration: {}
   managedStrippingLevel:
-    Android: 1
-    Standalone: 1
-    iPhone: 1
+    Android: 0
+    Standalone: 0
+    iOS: 0
   incrementalIl2cppBuild: {}
   suppressCommonWarnings: 1
   allowUnsafeCode: 0
