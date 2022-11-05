@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -63,24 +64,9 @@ namespace Nova
             }
         }
 
-        // Knuth's golden ratio multiplicative hashing
         private ulong GetHashULong()
         {
-            unchecked
-            {
-                var x = 0UL;
-                foreach (var pair in dict)
-                {
-                    x += (ulong)pair.Key.GetHashCode();
-                    x *= 11400714819323199563UL;
-                    x += (ulong)pair.Value.type;
-                    x *= 11400714819323199563UL;
-                    x += (ulong)pair.Value.value.GetHashCode();
-                    x *= 11400714819323199563UL;
-                }
-
-                return x;
-            }
+            return Utils.HashList(dict.SelectMany(pair => new[] { pair.Key, pair.Value.type, pair.Value.value }));
         }
 
         public VariableEntry Get(string name)

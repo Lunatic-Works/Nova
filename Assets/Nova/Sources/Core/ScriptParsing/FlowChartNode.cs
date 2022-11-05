@@ -25,6 +25,9 @@ namespace Nova
         /// </summary>
         public readonly string name;
 
+        // hash value from text of the script
+        public ulong textHash;
+
         public FlowChartNode(string name)
         {
             this.name = name;
