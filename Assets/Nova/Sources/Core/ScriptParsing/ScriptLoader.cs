@@ -225,7 +225,10 @@ namespace Nova
                 {
                     if (nodeChunks.Count > 0)
                     {
-                        currentNode.textHash = GetNodeChunkHash(nodeChunks);
+                        if (stateLocale == I18n.DefaultLocale)
+                        {
+                            currentNode.textHash = GetNodeChunkHash(nodeChunks);
+                        }
                         if (deferChunks)
                         {
                             currentNode.deferredChunks[stateLocale] = nodeChunks;

@@ -417,5 +417,10 @@ namespace Nova
         {
             return HashList(list.Select(x => (ulong)x.GetHashCode()));
         }
+
+        public static ulong HashObjects(params object[] list)
+        {
+            return HashList(list);
+        }
     }
 }

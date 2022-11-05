@@ -1,5 +1,6 @@
 using Nova.Exceptions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -39,7 +40,7 @@ namespace Nova
     /// marked as end nodes.
     /// Everything in a flow chart tree cannot be modified after it is frozen.
     /// </remarks>
-    public class FlowChartTree
+    public class FlowChartTree : IEnumerable<FlowChartNode>
     {
         private readonly Dictionary<string, FlowChartNode> nodes = new Dictionary<string, FlowChartNode>();
         private readonly Dictionary<string, StartNode> startNodes = new Dictionary<string, StartNode>();
@@ -276,6 +277,16 @@ namespace Nova
                     AddEnd(node.name, node);
                 }
             }
+        }
+
+        public IEnumerator<FlowChartNode> GetEnumerator()
+        {
+            return nodes.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return nodes.Values.GetEnumerator();
         }
     }
 }
