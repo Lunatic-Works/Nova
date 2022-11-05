@@ -112,10 +112,14 @@ namespace Nova
 
         private void Awake()
         {
+            checkpointManager = GetComponent<CheckpointManager>();
+            checkpointManager.Init();
+
             try
             {
                 scriptLoader.Init(scriptPath);
                 flowChartTree = scriptLoader.GetFlowChartTree();
+                checkpointManager.CheckScript(flowChartTree);
             }
             catch (Exception e)
             {
@@ -123,7 +127,6 @@ namespace Nova
                 Utils.Quit();
             }
 
-            checkpointManager = GetComponent<CheckpointManager>();
             LuaRuntime.Instance.BindObject("variables", variables);
             advancedDialogueHelper = new AdvancedDialogueHelper(this);
             LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);

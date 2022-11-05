@@ -29,7 +29,14 @@ namespace Nova.Script
 
         public ulong GetHashUlong()
         {
-            return Utils.HashList((new object[] { type, content }).Concat(attributes.SelectMany(x => new[] { x.Key, x.Value })));
+            if (attributes == null)
+            {
+                return Utils.HashObjects(type, content);
+            }
+            else
+            {
+                return Utils.HashList((new object[] { type, content }).Concat(attributes.SelectMany(x => new[] { x.Key, x.Value })));
+            }
         }
     }
 

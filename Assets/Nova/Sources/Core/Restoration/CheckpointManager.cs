@@ -278,6 +278,22 @@ namespace Nova
             return reachedEnds.Contains(endName);
         }
 
+        public void CheckScript(FlowChartTree flowChart)
+        {
+            if (globalSave.nodeHashes != null)
+            {
+                // TODO: upgrade global save
+                foreach (var node in flowChart)
+                {
+                    if (globalSave.nodeHashes.ContainsKey(node.name) && globalSave.nodeHashes[node.name] != node.textHash)
+                    {
+                        Debug.Log($"node need upgrade {node.name}");
+                    }
+                }
+            }
+            globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
+        }
+
         public void UpdateGlobalSave()
         {
             if (globalSaveDirty)
@@ -304,7 +320,6 @@ namespace Nova
             serializer.Open();
             globalSave = new GlobalSave(serializer);
             globalSaveDirty = true;
-            UpdateGlobalSave();
             InitReached();
         }
 

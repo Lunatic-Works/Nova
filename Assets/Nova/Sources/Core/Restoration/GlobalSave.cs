@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Nova
 {
@@ -12,6 +13,7 @@ namespace Nova
         public long beginCheckpoint;
         public long endCheckpoint;
 
+        public Dictionary<string, ulong> nodeHashes;
         public readonly Dictionary<string, object> data = new Dictionary<string, object>();
 
         public GlobalSave(CheckpointSerializer serializer)
