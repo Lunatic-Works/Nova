@@ -1105,26 +1105,6 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 82410642365036290, guid: 1afd3bb28e69148ba92e05bf594c5bc9,
-        type: 3}
-      propertyPath: Loop
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 82410642365036290, guid: 1afd3bb28e69148ba92e05bf594c5bc9,
-        type: 3}
-      propertyPath: rolloffMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 82410642365036290, guid: 1afd3bb28e69148ba92e05bf594c5bc9,
-        type: 3}
-      propertyPath: m_PlayOnAwake
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 82410642365036290, guid: 1afd3bb28e69148ba92e05bf594c5bc9,
-        type: 3}
-      propertyPath: spreadCustomCurve.m_RotationOrder
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 114921118950064596, guid: 1afd3bb28e69148ba92e05bf594c5bc9,
         type: 3}
       propertyPath: luaName
@@ -2658,16 +2638,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 922924600}
     m_Modifications:
-    - target: {fileID: 1124277312707465585, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 91
-      objectReference: {fileID: 0}
-    - target: {fileID: 2914054466736184289, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 127.999985
-      objectReference: {fileID: 0}
     - target: {fileID: 3535619004574509351, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: musicList
@@ -2799,46 +2769,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3535619004859047374, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -17
-      objectReference: {fileID: 0}
     - target: {fileID: 3535619006079575071, guid: 68bda17d3044b4344852e02e4c58e8c4,
         type: 3}
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 530880088}
-    - target: {fileID: 3535619006091115217, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 18
-      objectReference: {fileID: 0}
-    - target: {fileID: 3962174862496820371, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 55
-      objectReference: {fileID: 0}
-    - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -69
-      objectReference: {fileID: 0}
-    - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -56
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049959921000225447, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -40.00003
-      objectReference: {fileID: 0}
-    - target: {fileID: 8733886360927594596, guid: 68bda17d3044b4344852e02e4c58e8c4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 163.99998
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
 --- !u!224 &1891790025 stripped
@@ -3293,11 +3228,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1127570233677003523, guid: 2d4e6a8a630b37a4b8d90154d8ec14c1,
-        type: 3}
-      propertyPath: logController
-      value: 
-      objectReference: {fileID: 1214848505}
     - target: {fileID: 1127570233677003525, guid: 2d4e6a8a630b37a4b8d90154d8ec14c1,
         type: 3}
       propertyPath: m_Name
@@ -3831,16 +3761,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 922924600}
     m_Modifications:
-    - target: {fileID: 3745355647677055384, guid: cd6a123d28e326f4fbd7c930095cc3e0,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 603
-      objectReference: {fileID: 0}
-    - target: {fileID: 3745355648084812223, guid: cd6a123d28e326f4fbd7c930095cc3e0,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 133
-      objectReference: {fileID: 0}
     - target: {fileID: 3745355648971507454, guid: cd6a123d28e326f4fbd7c930095cc3e0,
         type: 3}
       propertyPath: m_Name
@@ -4377,16 +4297,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 922924600}
     m_Modifications:
-    - target: {fileID: 3113775754512027877, guid: 85bfeeaac13b54597b7eff58b793f6d4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -69
-      objectReference: {fileID: 0}
-    - target: {fileID: 3113775754512027877, guid: 85bfeeaac13b54597b7eff58b793f6d4,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -56
-      objectReference: {fileID: 0}
     - target: {fileID: 3113775755284081194, guid: 85bfeeaac13b54597b7eff58b793f6d4,
         type: 3}
       propertyPath: m_Pivot.x
@@ -4685,16 +4595,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: HelpView
       objectReference: {fileID: 0}
-    - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -69
-      objectReference: {fileID: 0}
-    - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -56
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
 --- !u!114 &5908642565532396533 stripped
@@ -4773,11 +4673,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 922924600}
     m_Modifications:
-    - target: {fileID: 794920417235669879, guid: 79e0957580781694098a70feb271ad8c,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -69
-      objectReference: {fileID: 0}
     - target: {fileID: 8089046609868017880, guid: 79e0957580781694098a70feb271ad8c,
         type: 3}
       propertyPath: m_Pivot.x
