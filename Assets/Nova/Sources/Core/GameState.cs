@@ -529,10 +529,15 @@ namespace Nova
         private void MoveToNextNode(FlowChartNode nextNode)
         {
             scriptLoader.AddDeferredDialogueChunks(nextNode);
-            nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
+            // in case of empty node, do not change any of these
+            // so the bookmark is left at the end of last not
+            if (nextNode.dialogueEntryCount > 0)
+            {
+                nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
+                currentIndex = 0;
+                checkpointOffset = nodeRecord.offset;
+            }
             currentNode = nextNode;
-            currentIndex = 0;
-            checkpointOffset = nodeRecord.offset;
             UpdateGameState(true, true, true, true, false);
         }
 
