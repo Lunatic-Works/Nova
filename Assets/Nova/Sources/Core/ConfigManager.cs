@@ -2,24 +2,42 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace Nova
-{
+{   
+
     public class ConfigManager : MonoBehaviour
     {
         public const string TrackedKeysKey = "TrackedKeys";
         public const string TrackedKeyPrefix = "_";
         public const string FirstShownKeyPrefix = TrackedKeyPrefix + "FirstShown";
 
+        public TextAsset defaultSettingsJson;
+
         public class SettingDefinition
         {
+            public string defaultValue;
             public float? min;
             public float? max;
             public bool? whole;
-            public string defaultValue;
-        }
 
-        public TextAsset defaultSettingsJson;
+            [Preserve]
+            public SettingDefinition() { }
+
+            [Preserve]
+            public SettingDefinition(string defaultValue, float? min, float? max, bool? whole)
+            {
+                this.defaultValue = defaultValue;
+                if (min == null)
+                    this.min = min;
+                if (max != null)
+                    this.max = max;
+                if (whole != null)
+                    this.whole = whole;
+            }
+
+        }
 
         private Dictionary<string, SettingDefinition> definitions;
 
