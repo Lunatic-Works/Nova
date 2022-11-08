@@ -905,6 +905,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   steps: 1000
+  unlockAllChapters: 0
+  unlockDebugChapters: 0
   fastForward: 1
   delaySeconds: 0.001
   canGoBack: 1
