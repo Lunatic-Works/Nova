@@ -641,14 +641,27 @@ namespace Nova
             return node;
         }
 
-        public IReadOnlyList<string> GetAllStartNodeNames()
+        public IEnumerable<string> GetStartNodeNames()
         {
-            return flowChartTree.GetAllStartNodeNames();
+            return flowChartTree.GetStartNodes()
+                .Where(x => x.type != StartNodeType.Debug)
+                .Select(x => x.name);
         }
 
-        public IReadOnlyList<string> GetAllUnlockedStartNodeNames()
+        // this only returns nodes with is_unlocked_start
+        // it will not return unlocked nodes after visited
+        public IEnumerable<string> GetUnlockedStartNodeNames()
         {
-            return flowChartTree.GetAllUnlockedStartNodeNames();
+            return flowChartTree.GetStartNodes()
+                .Where(x => x.type == StartNodeType.Unlocked)
+                .Select(x => x.name);
+        }
+
+        public IEnumerable<string> GetDebugNodeNames()
+        {
+            return flowChartTree.GetStartNodes()
+                .Where(x => x.type == StartNodeType.Debug)
+                .Select(x => x.name);
         }
 
         #endregion

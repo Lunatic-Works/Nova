@@ -6,6 +6,29 @@ using UnityEngine;
 
 namespace Nova
 {
+    public enum StartNodeType
+    {
+        Normal,
+        Unlocked,
+        Debug,
+    }
+
+    public readonly struct StartNode
+    {
+        public readonly string name;
+        public readonly FlowChartNode node;
+        public readonly StartNodeType type;
+
+        public StartNode(string name, FlowChartNode node, StartNodeType type)
+        {
+            this.name = name;
+            this.node = node;
+            this.type = type;
+        }
+
+        public StartNode(FlowChartNode node, StartNodeType type) : this(node.name, node, type) { }
+    }
+
     /// <summary>
     /// The data structure that stores the flow chart.
     /// </summary>
@@ -17,8 +40,7 @@ namespace Nova
     public class FlowChartTree
     {
         private readonly Dictionary<string, FlowChartNode> nodes = new Dictionary<string, FlowChartNode>();
-        private readonly Dictionary<string, FlowChartNode> startNodes = new Dictionary<string, FlowChartNode>();
-        private readonly Dictionary<string, FlowChartNode> unlockedStartNodes = new Dictionary<string, FlowChartNode>();
+        private readonly Dictionary<string, StartNode> startNodes = new Dictionary<string, StartNode>();
         private readonly Dictionary<FlowChartNode, string> endNodes = new Dictionary<FlowChartNode, string>();
 
         private bool isFrozen = false;
@@ -104,17 +126,9 @@ namespace Nova
             return nodes.ContainsKey(node.name);
         }
 
-        /// <summary>
-        /// Returns names of all start nodes.
-        /// </summary>
-        public IReadOnlyList<string> GetAllStartNodeNames()
+        public IEnumerable<StartNode> GetStartNodes()
         {
-            return startNodes.Keys.ToList();
-        }
-
-        public IReadOnlyList<string> GetAllUnlockedStartNodeNames()
-        {
-            return unlockedStartNodes.Keys.ToList();
+            return startNodes.Values;
         }
 
         /// <summary>
@@ -130,7 +144,7 @@ namespace Nova
         /// <exception cref="ArgumentException">
         /// ArgumentException will be thrown if the name is null or empty, or the node is not in the tree.
         /// </exception>
-        public void AddStart(string name, FlowChartNode node)
+        public void AddStart(string name, FlowChartNode node, StartNodeType type)
         {
             CheckFreeze();
 
@@ -149,13 +163,7 @@ namespace Nova
                 Debug.LogWarning($"Nova: Overwrite start point: {name}");
             }
 
-            startNodes[name] = node;
-        }
-
-        public void AddUnlockedStart(string name, FlowChartNode node)
-        {
-            CheckFreeze();
-            unlockedStartNodes[name] = node;
+            startNodes[name] = new StartNode(name, node, type);
         }
 
         /// <summary>
@@ -167,8 +175,8 @@ namespace Nova
         /// </returns>
         public FlowChartNode GetStartNode(string name)
         {
-            startNodes.TryGetValue(name, out var node);
-            return node;
+            startNodes.TryGetValue(name, out var startNode);
+            return startNode.node;
         }
 
         /// <summary>
@@ -204,7 +212,8 @@ namespace Nova
                     return _defaultStartNode;
                 }
 
-                return startNodes.Values.FirstOrDefault();
+
+                return startNodes.Values.First().node;
             }
             set
             {

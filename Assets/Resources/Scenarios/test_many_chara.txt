@@ -1,6 +1,6 @@
 @<|
 label 'test_many_chara'
--- is_unlocked_start()
+is_debug()
 |>
 <|
 show(bg, 'room')

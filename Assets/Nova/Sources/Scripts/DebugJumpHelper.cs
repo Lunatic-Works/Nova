@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -8,6 +11,19 @@ namespace Nova
         private DialogueState dialogueState;
         private InputManager inputManager;
         private ViewManager viewManager;
+
+        private IReadOnlyList<string> _chapters;
+        private IReadOnlyList<string> chapters
+        {
+            get
+            {
+                if (_chapters == null)
+                {
+                    _chapters = gameState.GetStartNodeNames().ToList();
+                }
+                return _chapters;
+            }
+        }
 
         private void Awake()
         {
@@ -60,7 +76,6 @@ namespace Nova
             NovaAnimation.StopAll();
             dialogueState.state = DialogueState.State.Normal;
 
-            var chapters = gameState.GetAllStartNodeNames();
             int targetChapterIndex = chapters.IndexOf(gameState.currentNode.name) + offset;
             if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Count)
             {

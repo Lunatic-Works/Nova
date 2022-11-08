@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -7,6 +9,8 @@ namespace Nova
     public class MockInput : MonoBehaviour
     {
         [SerializeField] private int steps;
+        [SerializeField] private bool unlockAllChapters = false;
+        [SerializeField] private bool unlockDebugChapters = false;
         [SerializeField] private bool fastForward = true;
         [SerializeField] private float delaySeconds = 0.001f;
         [SerializeField] private bool canGoBack = true;
@@ -140,15 +144,19 @@ namespace Nova
             }
             else
             {
-                var chapters = gameState.GetAllUnlockedStartNodeNames();
-                if (chapters.Count < 2)
+                if (chapterSelectView.UnlockedChapterCount() < 2)
                 {
                     chapterSelectView.BeginChapter();
                 }
                 else
                 {
                     yield return Show(chapterSelectView);
-                    var chapter = random.Next(chapters);
+                    if (unlockAllChapters || unlockDebugChapters)
+                    {
+                        chapterSelectView.UnlockChapters(unlockAllChapters, unlockDebugChapters);
+                        yield return delay;
+                    }
+                    var chapter = random.Next(chapterSelectView.GetUnlockedChapters().ToList());
                     chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
                 }
             }

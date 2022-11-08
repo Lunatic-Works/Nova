@@ -159,6 +159,14 @@ function is_default_start(name)
     __Nova.scriptLoader:SetCurrentAsDefaultStart(name)
 end
 
+function is_debug(name)
+    if not check_eager('is_debug') then
+        return
+    end
+    name = try_get_local_name(name)
+    __Nova.scriptLoader:SetCurrentAsDebug(name)
+end
+
 --- set the current node as an end node
 --- should be called at the end of the node
 --- a name can be assigned to an end point, which can differ from the node name

@@ -440,6 +440,21 @@ namespace Nova
             currentNode = null;
         }
 
+        private string CheckNodeName(string name)
+        {
+            if (currentNode == null)
+            {
+                throw new ArgumentException(
+                    $"Nova: This function should be called after registering the current node.");
+            }
+
+            if (name == null)
+            {
+                name = currentNode.name;
+            }
+            return name;
+        }
+
         /// <summary>
         /// Set the current node as a start node.
         /// This method is designed to be called externally by scripts.
@@ -458,35 +473,12 @@ namespace Nova
         /// </exception>
         public void SetCurrentAsStart(string name)
         {
-            if (currentNode == null)
-            {
-                throw new ArgumentException(
-                    $"Nova: SetCurrentAsStart({name}) should be called after registering the current node.");
-            }
-
-            if (name == null)
-            {
-                name = currentNode.name;
-            }
-
-            flowChartTree.AddStart(name, currentNode);
+            flowChartTree.AddStart(CheckNodeName(name), currentNode, StartNodeType.Normal);
         }
 
         public void SetCurrentAsUnlockedStart(string name)
         {
-            if (currentNode == null)
-            {
-                throw new ArgumentException(
-                    $"Nova: SetCurrentAsUnlockedStart({name}) should be called after registering the current node.");
-            }
-
-            if (name == null)
-            {
-                name = currentNode.name;
-            }
-
-            SetCurrentAsStart(name);
-            flowChartTree.AddUnlockedStart(name, currentNode);
+            flowChartTree.AddStart(CheckNodeName(name), currentNode, StartNodeType.Unlocked);
         }
 
         /// <summary>
@@ -501,6 +493,11 @@ namespace Nova
         {
             SetCurrentAsUnlockedStart(name);
             flowChartTree.defaultStartNode = currentNode;
+        }
+
+        public void SetCurrentAsDebug(string name)
+        {
+            flowChartTree.AddStart(CheckNodeName(name), currentNode, StartNodeType.Debug);
         }
 
         /// <summary>
