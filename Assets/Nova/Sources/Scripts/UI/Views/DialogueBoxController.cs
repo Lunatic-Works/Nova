@@ -261,7 +261,7 @@ namespace Nova
             this.SwitchView<TitleController>();
         }
 
-        private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
+        private void OnDialogueWillChange()
         {
             StopTimer();
             ResetTextAnimationConfig();

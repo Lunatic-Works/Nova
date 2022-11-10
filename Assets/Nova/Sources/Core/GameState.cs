@@ -9,11 +9,6 @@ namespace Nova
 {
     #region Event types and datas
 
-    public class DialogueWillChangeData { }
-
-    [Serializable]
-    public class DialogueWillChangeEvent : UnityEvent<DialogueWillChangeData> { }
-
     public class DialogueChangedData
     {
         public readonly NodeRecord nodeRecord;
@@ -214,11 +209,13 @@ namespace Nova
 
         #region Events
 
+        public UnityEvent gameStarted;
+
         /// <summary>
         /// This event will be triggered if the content of the dialogue will change. It will be triggered before
         /// the lazy execution block of the new dialogue is invoked.
         /// </summary>
-        public DialogueWillChangeEvent dialogueWillChange;
+        public UnityEvent dialogueWillChange;
 
         /// <summary>
         /// This event will be triggered if the content of the dialogue has changed. The new dialogue text will be
@@ -394,7 +391,7 @@ namespace Nova
             }
 
             var isReached = DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped);
-            dialogueWillChange.Invoke(new DialogueWillChangeData());
+            dialogueWillChange.Invoke();
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
@@ -616,6 +613,7 @@ namespace Nova
         {
             ResetGameState();
             state = State.Normal;
+            gameStarted.Invoke();
             MoveToNextNode(startNode);
         }
 

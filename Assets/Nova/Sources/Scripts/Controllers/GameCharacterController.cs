@@ -106,7 +106,7 @@ namespace Nova
         /// <summary>
         /// Stop the voice when the dialogue will change
         /// </summary>
-        private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
+        private void OnDialogueWillChange()
         {
             if (stopVoiceOnDialogueChange)
             {

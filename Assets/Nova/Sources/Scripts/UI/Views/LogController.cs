@@ -84,6 +84,7 @@ namespace Nova
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
 
+            gameState.gameStarted.AddListener(Clear);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.AddRestorable(this);
         }
@@ -121,6 +122,7 @@ namespace Nova
             myPanel.GetComponent<Button>().onClick.RemoveListener(Hide);
             closeButton.onClick.RemoveListener(Hide);
 
+            gameState.gameStarted.RemoveListener(Clear);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.RemoveRestorable(this);
         }

@@ -16,7 +16,6 @@ namespace Nova
 
         private GameState gameState;
         private CheckpointManager checkpointManager;
-        private LogController logController;
         private NameSorter nameSorter;
 
         private IReadOnlyList<string> chapters;
@@ -31,7 +30,6 @@ namespace Nova
             var controller = Utils.FindNovaGameController();
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
-            logController = viewManager.GetController<LogController>();
             nameSorter = GetComponent<NameSorter>();
 
             var _chapters = gameState.GetStartNodeNames(StartNodeType.All);
@@ -93,8 +91,6 @@ namespace Nova
         {
             viewManager.GetController<TitleController>().SwitchView<DialogueBoxController>(() =>
             {
-                logController.Clear();
-
                 if (chapterName == null)
                 {
                     gameState.GameStart();
