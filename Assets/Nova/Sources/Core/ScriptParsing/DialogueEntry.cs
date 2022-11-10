@@ -69,6 +69,8 @@ namespace Nova
         /// </summary>
         private readonly Dictionary<DialogueActionStage, LuaFunction> actions;
 
+        private readonly ulong textHash;
+
         public DialogueEntry(string characterName, string displayName, string dialogue,
             Dictionary<DialogueActionStage, LuaFunction> actions)
         {
