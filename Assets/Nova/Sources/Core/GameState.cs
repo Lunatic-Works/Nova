@@ -631,7 +631,7 @@ namespace Nova
         /// </summary>
         public void GameStart(string startName)
         {
-            GameStart(flowChartTree.GetStartNode(startName));
+            GameStart(flowChartTree.GetNode(startName));
         }
 
         public FlowChartNode GetNode(string name)

@@ -15,18 +15,15 @@ namespace Nova
 
     public readonly struct StartNode
     {
-        public readonly string name;
         public readonly FlowChartNode node;
         public readonly StartNodeType type;
+        public string name => node.name;
 
-        public StartNode(string name, FlowChartNode node, StartNodeType type)
+        public StartNode(FlowChartNode node, StartNodeType type)
         {
-            this.name = name;
             this.node = node;
             this.type = type;
         }
-
-        public StartNode(FlowChartNode node, StartNodeType type) : this(node.name, node, type) { }
     }
 
     /// <summary>
@@ -144,39 +141,21 @@ namespace Nova
         /// <exception cref="ArgumentException">
         /// ArgumentException will be thrown if the name is null or empty, or the node is not in the tree.
         /// </exception>
-        public void AddStart(string name, FlowChartNode node, StartNodeType type)
+        public void AddStart(FlowChartNode node, StartNodeType type)
         {
             CheckFreeze();
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Nova: Start name is null or empty.");
-            }
 
             if (!HasNode(node))
             {
                 throw new ArgumentException("Nova: Only node in the tree can be set as a start node.");
             }
 
-            if (startNodes.ContainsKey(name))
+            if (startNodes.ContainsKey(node.name))
             {
-                Debug.LogWarning($"Nova: Overwrite start point: {name}");
+                Debug.LogWarning($"Nova: Overwrite start point: {node.name}");
             }
 
-            startNodes[name] = new StartNode(name, node, type);
-        }
-
-        /// <summary>
-        /// Get a start node by name
-        /// </summary>
-        /// <param name="name">Name of the start point</param>
-        /// <returns>
-        /// The start node if it is found, otherwise return null
-        /// </returns>
-        public FlowChartNode GetStartNode(string name)
-        {
-            startNodes.TryGetValue(name, out var startNode);
-            return startNode.node;
+            startNodes[node.name] = new StartNode(node, type);
         }
 
         /// <summary>
