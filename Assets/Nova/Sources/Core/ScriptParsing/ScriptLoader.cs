@@ -153,6 +153,19 @@ namespace Nova
         public class Chunk
         {
             public readonly List<ParsedBlock> blocks = new List<ParsedBlock>();
+
+            public ulong GetHashUlong()
+            {
+                return Utils.HashList(blocks.SelectMany(x =>
+                {
+                    IEnumerable<object> ret = new object[] { x.type, x.content };
+                    if (x.attributes != null)
+                    {
+                        ret = ret.Concat(x.attributes.Cast<object>());
+                    }
+                    return ret;
+                }));
+            }
         }
 
         /// <summary>
@@ -197,9 +210,9 @@ namespace Nova
             return res;
         }
 
-        private ulong GetNodeChunkHash(IReadOnlyList<Chunk> nodeChunks)
+        private ulong GetNodeHash(IReadOnlyList<Chunk> nodeChunks)
         {
-            return Utils.HashList(nodeChunks.SelectMany(x => x.blocks).Select(x => x.GetHashUlong()));
+            return Utils.HashList(nodeChunks.Select(x => x.GetHashUlong()));
         }
 
         /// <summary>
@@ -227,7 +240,7 @@ namespace Nova
                     {
                         if (stateLocale == I18n.DefaultLocale)
                         {
-                            currentNode.textHash = GetNodeChunkHash(nodeChunks);
+                            currentNode.textHash = GetNodeHash(nodeChunks);
                         }
                         if (deferChunks)
                         {
