@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -9,8 +8,8 @@ namespace Nova
     public class MockInput : MonoBehaviour
     {
         [SerializeField] private int steps;
-        [SerializeField] private bool unlockAllChapters = false;
-        [SerializeField] private bool unlockDebugChapters = false;
+        [SerializeField] private bool unlockAllChapters;
+        [SerializeField] private bool unlockDebugChapters;
         [SerializeField] private bool fastForward = true;
         [SerializeField] private float delaySeconds = 0.001f;
         [SerializeField] private bool canGoBack = true;
@@ -29,7 +28,6 @@ namespace Nova
         private ConfigViewController configView;
         private BranchController branchController;
         private HelpViewController helpView;
-        private TitleController titleView;
         private ChapterSelectViewController chapterSelectView;
         private AlertController alert;
 
@@ -47,7 +45,6 @@ namespace Nova
             configView = viewManager.GetController<ConfigViewController>();
             branchController = viewManager.GetComponentInChildren<BranchController>();
             helpView = viewManager.GetController<HelpViewController>();
-            titleView = viewManager.GetController<TitleController>();
             chapterSelectView = viewManager.GetController<ChapterSelectViewController>();
             alert = viewManager.GetController<AlertController>();
         }
@@ -76,19 +73,19 @@ namespace Nova
 
         private WaitForSeconds delay => new WaitForSeconds(delaySeconds);
 
-        private WaitWhile DoTransition(Action<Action> action)
+        private static WaitWhile DoTransition(Action<Action> action)
         {
             var inTransition = true;
             action.Invoke(() => inTransition = false);
             return new WaitWhile(() => inTransition);
         }
 
-        private WaitWhile Show(ViewControllerBase view)
+        private static WaitWhile Show(ViewControllerBase view)
         {
             return DoTransition(view.Show);
         }
 
-        private WaitWhile Hide(ViewControllerBase view)
+        private static WaitWhile Hide(ViewControllerBase view)
         {
             return DoTransition(view.Hide);
         }
@@ -144,7 +141,8 @@ namespace Nova
             }
             else
             {
-                if (chapterSelectView.UnlockedChapterCount() < 2)
+                chapterSelectView.UpdateChapters();
+                if (chapterSelectView.GetUnlockedChapters().Count() < 2)
                 {
                     chapterSelectView.BeginChapter();
                 }
@@ -156,6 +154,7 @@ namespace Nova
                         chapterSelectView.UnlockChapters(unlockAllChapters, unlockDebugChapters);
                         yield return delay;
                     }
+
                     var chapter = random.Next(chapterSelectView.GetUnlockedChapters().ToList());
                     chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
                 }

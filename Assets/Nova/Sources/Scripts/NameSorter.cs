@@ -7,15 +7,21 @@ namespace Nova
 {
     public class NameSorter : MonoBehaviour
     {
-        public List<string> matchers;
+        [SerializeField] List<string> matchers;
+        [SerializeField] private int padWidth = 3;
 
-        private static IEnumerable<string> NaturalSort(IEnumerable<string> names)
+        private IEnumerable<string> NaturalSort(IEnumerable<string> names)
         {
-            return names.OrderBy(x => Regex.Replace(x, @"\d+", m => m.Value.PadLeft(3, '0')));
+            return names.OrderBy(x => Regex.Replace(x, @"\d+", m => m.Value.PadLeft(padWidth, '0')));
         }
 
         public IEnumerable<string> Sort(IEnumerable<string> names)
         {
+            if (matchers.Count <= 0)
+            {
+                return names;
+            }
+
             var buckets = new Dictionary<string, List<string>>();
             foreach (var matcher in matchers)
             {

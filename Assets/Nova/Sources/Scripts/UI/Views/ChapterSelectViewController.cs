@@ -9,7 +9,7 @@ namespace Nova
     public class ChapterSelectViewController : ViewControllerBase
     {
         [SerializeField] private GameObject chapterButtonPrefab;
-        [SerializeField] private GameObject chapterList;
+        [SerializeField] private Transform chapterList;
         [SerializeField] private Button returnButton;
         [SerializeField] private bool unlockAllChapters;
         [SerializeField] private bool unlockDebugChapters;
@@ -19,11 +19,8 @@ namespace Nova
         private LogController logController;
         private NameSorter nameSorter;
 
-        private IReadOnlyList<string> startNodeNames;
-        private HashSet<string> unlockedStartNodeNames;
-        private HashSet<string> debugNodeNames;
-
-        private Dictionary<string, GameObject> buttons;
+        private IReadOnlyList<string> chapters;
+        private HashSet<string> unlockedChapters;
 
         protected override void Awake()
         {
@@ -34,16 +31,6 @@ namespace Nova
             checkpointManager = controller.CheckpointManager;
             logController = viewManager.GetController<LogController>();
             nameSorter = GetComponent<NameSorter>();
-
-            var startNodes = gameState.GetStartNodeNames();
-            if (nameSorter && nameSorter.matchers.Count > 0)
-            {
-                startNodes = nameSorter.Sort(startNodes);
-            }
-            startNodeNames = startNodes.ToList();
-
-            unlockedStartNodeNames = new HashSet<string>(gameState.GetUnlockedStartNodeNames());
-            debugNodeNames = new HashSet<string>(gameState.GetDebugNodeNames());
 
             returnButton.onClick.AddListener(Hide);
             I18n.LocaleChanged.AddListener(UpdateButtons);
@@ -56,57 +43,46 @@ namespace Nova
             I18n.LocaleChanged.RemoveListener(UpdateButtons);
         }
 
-        private GameObject InitButton(string chapter)
-        {
-            var go = Instantiate(chapterButtonPrefab, chapterList.transform);
-            var button = go.GetComponent<Button>();
-            button.onClick.AddListener(() => Hide(() => BeginChapter(chapter)));
-            return go;
-        }
-
         protected override void Start()
         {
             base.Start();
 
             checkpointManager.Init();
-
-            var allNodes = unlockDebugChapters ? startNodeNames.Concat(debugNodeNames) : startNodeNames;
-            buttons = allNodes.ToDictionary(chapter => chapter, InitButton);
         }
 
         public override void Show(Action onFinish)
         {
-            if (UnlockedChapterCount() < 2 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
+            UpdateChapters();
+            if (GetUnlockedChapters().Count() < 2 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
             {
                 BeginChapter();
                 return;
             }
 
             UpdateButtons();
-
             base.Show(onFinish);
         }
 
-        private bool IsUnlocked(string name)
+        public void UpdateChapters()
         {
-            return unlockAllChapters || unlockedStartNodeNames.Contains(name) ||
-                   debugNodeNames.Contains(name) || checkpointManager.IsReachedAnyHistory(name, 0);
-        }
-
-        public int UnlockedChapterCount()
-        {
-            var cnt = startNodeNames.Count(IsUnlocked);
-            if (unlockDebugChapters)
+            chapters = gameState.GetStartNodeNames(unlockDebugChapters ? StartNodeType.All : StartNodeType.Normal)
+                .ToList();
+            if (nameSorter)
             {
-                cnt += debugNodeNames.Count;
+                chapters = nameSorter.Sort(chapters).ToList();
             }
-            return cnt;
+
+            var unlockedAtFirst = new HashSet<string>(
+                gameState.GetStartNodeNames(unlockAllChapters ? StartNodeType.UnlockedAll : StartNodeType.Unlocked)
+            );
+            unlockedChapters = new HashSet<string>(
+                chapters.Where(name => unlockedAtFirst.Contains(name) || checkpointManager.IsReachedAnyHistory(name, 0))
+            );
         }
 
         public IEnumerable<string> GetUnlockedChapters()
         {
-            var ret = startNodeNames.Where(IsUnlocked);
-            return unlockDebugChapters ? ret.Concat(debugNodeNames) : ret;
+            return unlockedChapters;
         }
 
         public void BeginChapter(string chapterName = null)
@@ -126,33 +102,38 @@ namespace Nova
             });
         }
 
+        private void InitButton(string chapter, bool unlocked)
+        {
+            var go = Instantiate(chapterButtonPrefab, chapterList);
+            var text = go.GetComponent<Text>();
+            var button = go.GetComponent<Button>();
+            if (unlocked)
+            {
+                text.text = I18n.__(gameState.GetNode(chapter).displayNames);
+                button.enabled = true;
+                button.onClick.AddListener(() => Hide(() => BeginChapter(chapter)));
+            }
+            else
+            {
+                text.text = I18n.__("title.selectchapter.locked");
+                button.enabled = false;
+            }
+        }
+
+        private void ClearButtons()
+        {
+            foreach (var child in Utils.GetChildren(chapterList))
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
         private void UpdateButtons()
         {
-            if (buttons == null)
+            ClearButtons();
+            foreach (var chapter in chapters)
             {
-                return;
-            }
-
-            if (unlockDebugChapters && buttons.Count < startNodeNames.Count + debugNodeNames.Count)
-            {
-                foreach (var chapter in debugNodeNames)
-                {
-                    buttons.Add(chapter, InitButton(chapter));
-                }
-            }
-
-            foreach (var chapter in buttons)
-            {
-                if (IsUnlocked(chapter.Key))
-                {
-                    chapter.Value.GetComponent<Button>().enabled = true;
-                    chapter.Value.GetComponent<Text>().text = I18n.__(gameState.GetNode(chapter.Key).displayNames);
-                }
-                else
-                {
-                    chapter.Value.GetComponent<Button>().enabled = false;
-                    chapter.Value.GetComponent<Text>().text = I18n.__("title.selectchapter.locked");
-                }
+                InitButton(chapter, unlockedChapters.Contains(name));
             }
         }
 
@@ -160,6 +141,7 @@ namespace Nova
         {
             unlockAllChapters |= normal;
             unlockDebugChapters |= debug;
+            UpdateChapters();
             UpdateButtons();
         }
 

@@ -444,8 +444,7 @@ namespace Nova
         {
             if (currentNode == null)
             {
-                throw new ArgumentException(
-                    $"Nova: This function should be called after registering the current node.");
+                throw new ArgumentException("Nova: This function should be called after registering the current node.");
             }
         }
 
@@ -458,17 +457,13 @@ namespace Nova
         /// A name can be assigned to a start point, which can differ from the node name.
         /// The name should be unique among all start point names.
         /// </remarks>
-        /// <param name="name">
-        /// Name of the start point.
-        /// If no name is given, the name of the current node will be used.
-        /// </param>
         /// <exception cref="ArgumentException">
         /// ArgumentException will be thrown if called without registering the current node.
         /// </exception>
         public void SetCurrentAsStart()
         {
             CheckNode();
-            flowChartTree.AddStart(currentNode, StartNodeType.Normal);
+            flowChartTree.AddStart(currentNode, StartNodeType.Locked);
         }
 
         public void SetCurrentAsUnlockedStart()
@@ -484,7 +479,6 @@ namespace Nova
         /// <remarks>
         /// This method will first add the current node as a start node, then set it as default.
         /// </remarks>
-        /// <param name="name"></param>
         public void SetCurrentAsDefaultStart()
         {
             SetCurrentAsUnlockedStart();

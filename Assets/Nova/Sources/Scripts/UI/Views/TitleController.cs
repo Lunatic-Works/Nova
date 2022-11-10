@@ -28,9 +28,7 @@ namespace Nova
             configManager = controller.ConfigManager;
             checkpointManager = controller.CheckpointManager;
 
-            quitButton.onClick.AddListener(() =>
-                Hide(Utils.Quit)
-            );
+            quitButton.onClick.AddListener(() => Hide(Utils.Quit));
         }
 
         protected override void Start()
@@ -38,7 +36,7 @@ namespace Nova
             base.Start();
 
             checkpointManager.Init();
-            unlockedStartCount = gameState.GetUnlockedStartNodeNames().Count();
+            unlockedStartCount = gameState.GetStartNodeNames(StartNodeType.Unlocked).Count();
             gameState.SaveInitialCheckpoint();
             Show(null);
         }

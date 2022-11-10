@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,17 +12,8 @@ namespace Nova
         private ViewManager viewManager;
 
         private IReadOnlyList<string> _chapters;
-        private IReadOnlyList<string> chapters
-        {
-            get
-            {
-                if (_chapters == null)
-                {
-                    _chapters = gameState.GetStartNodeNames().ToList();
-                }
-                return _chapters;
-            }
-        }
+
+        private IReadOnlyList<string> chapters => _chapters ??= gameState.GetStartNodeNames().ToList();
 
         private void Awake()
         {

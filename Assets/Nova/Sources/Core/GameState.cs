@@ -530,13 +530,14 @@ namespace Nova
         {
             scriptLoader.AddDeferredDialogueChunks(nextNode);
             // in case of empty node, do not change any of these
-            // so the bookmark is left at the end of last not
+            // so the bookmark is left at the end of last node
             if (nextNode.dialogueEntryCount > 0)
             {
                 nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
                 currentIndex = 0;
                 checkpointOffset = nodeRecord.offset;
             }
+
             currentNode = nextNode;
             UpdateGameState(true, true, true, true, false);
         }
@@ -641,27 +642,9 @@ namespace Nova
             return node;
         }
 
-        public IEnumerable<string> GetStartNodeNames()
+        public IEnumerable<string> GetStartNodeNames(StartNodeType type = StartNodeType.Normal)
         {
-            return flowChartTree.GetStartNodes()
-                .Where(x => x.type != StartNodeType.Debug)
-                .Select(x => x.name);
-        }
-
-        // this only returns nodes with is_unlocked_start
-        // it will not return unlocked nodes after visited
-        public IEnumerable<string> GetUnlockedStartNodeNames()
-        {
-            return flowChartTree.GetStartNodes()
-                .Where(x => x.type == StartNodeType.Unlocked)
-                .Select(x => x.name);
-        }
-
-        public IEnumerable<string> GetDebugNodeNames()
-        {
-            return flowChartTree.GetStartNodes()
-                .Where(x => x.type == StartNodeType.Debug)
-                .Select(x => x.name);
+            return flowChartTree.GetStartNodeNames(type);
         }
 
         #endregion

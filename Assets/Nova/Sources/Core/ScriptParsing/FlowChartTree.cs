@@ -6,17 +6,23 @@ using UnityEngine;
 
 namespace Nova
 {
+    [Flags]
     public enum StartNodeType
     {
-        Normal,
-        Unlocked,
-        Debug,
+        None = 0,
+        Locked = 1,
+        Unlocked = 2,
+        Debug = 4,
+        Normal = Locked | Unlocked,
+        UnlockedAll = Unlocked | Debug,
+        All = Locked | Unlocked | Debug
     }
 
-    public readonly struct StartNode
+    public class StartNode
     {
         public readonly FlowChartNode node;
         public readonly StartNodeType type;
+
         public string name => node.name;
 
         public StartNode(FlowChartNode node, StartNodeType type)
@@ -40,7 +46,7 @@ namespace Nova
         private readonly Dictionary<string, StartNode> startNodes = new Dictionary<string, StartNode>();
         private readonly Dictionary<FlowChartNode, string> endNodes = new Dictionary<FlowChartNode, string>();
 
-        private bool isFrozen = false;
+        private bool isFrozen;
 
         /// <summary>
         /// Freeze all nodes. Should be called after the construction of the flow chart tree.
@@ -123,9 +129,9 @@ namespace Nova
             return nodes.ContainsKey(node.name);
         }
 
-        public IEnumerable<StartNode> GetStartNodes()
+        public IEnumerable<string> GetStartNodeNames(StartNodeType type)
         {
-            return startNodes.Values;
+            return startNodes.Values.Where(x => type.HasFlag(x.type)).Select(x => x.name);
         }
 
         /// <summary>
@@ -136,8 +142,6 @@ namespace Nova
         /// The name should be unique among all start point names.
         /// This method will check if the given name is not in the tree, and the given node is already in the tree.
         /// </remarks>
-        /// <param name="name">Name of the start point</param>
-        /// <param name="node">The node to add</param>
         /// <exception cref="ArgumentException">
         /// ArgumentException will be thrown if the name is null or empty, or the node is not in the tree.
         /// </exception>
@@ -190,7 +194,6 @@ namespace Nova
                 {
                     return _defaultStartNode;
                 }
-
 
                 return startNodes.Values.First().node;
             }
