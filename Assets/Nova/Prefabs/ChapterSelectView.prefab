@@ -79,8 +79,7 @@ MonoBehaviour:
 --- !u!1 &1127570233362738063
 GameObject:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 1931879755326992, guid: a8d81af0d5879154b9814eeeb6e0293a,
-    type: 3}
+  m_CorrespondingSourceObject: {fileID: 1931879755326992, guid: a8d81af0d5879154b9814eeeb6e0293a, type: 3}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
@@ -101,8 +100,7 @@ GameObject:
 --- !u!224 &1127570233362738060
 RectTransform:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 224907830076862314, guid: a8d81af0d5879154b9814eeeb6e0293a,
-    type: 3}
+  m_CorrespondingSourceObject: {fileID: 224907830076862314, guid: a8d81af0d5879154b9814eeeb6e0293a, type: 3}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127570233362738063}
@@ -121,8 +119,7 @@ RectTransform:
 --- !u!222 &1127570233362738056
 CanvasRenderer:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 222587496429468338, guid: a8d81af0d5879154b9814eeeb6e0293a,
-    type: 3}
+  m_CorrespondingSourceObject: {fileID: 222587496429468338, guid: a8d81af0d5879154b9814eeeb6e0293a, type: 3}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127570233362738063}
@@ -130,8 +127,7 @@ CanvasRenderer:
 --- !u!114 &1127570233362738059
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 114205822394568380, guid: a8d81af0d5879154b9814eeeb6e0293a,
-    type: 3}
+  m_CorrespondingSourceObject: {fileID: 114205822394568380, guid: a8d81af0d5879154b9814eeeb6e0293a, type: 3}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127570233362738063}
@@ -142,6 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Navigation:
     m_Mode: 3
+    m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
@@ -186,6 +183,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -294,6 +292,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0.6, g: 0.6, b: 0.6, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -359,12 +358,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myPanel: {fileID: 1127570233238569591}
-  chapterButtonPrefab: {fileID: 1256845950962052, guid: 3df45821c59bc05489f2e40e69ddbfe7,
-    type: 3}
-  chapterList: {fileID: 1127570233823713232}
+  chapterButtonPrefab: {fileID: 1256845950962052, guid: 3df45821c59bc05489f2e40e69ddbfe7, type: 3}
+  chapterList: {fileID: 1127570233823713233}
   returnButton: {fileID: 1127570233362738059}
-  logController: {fileID: 0}
-  unlockAllChaptersForDebug: 0
+  unlockAllChapters: 0
+  unlockDebugChapters: 0
 --- !u!114 &1127570233677003520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -378,6 +376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   matchers: []
+  padWidth: 3
 --- !u!1 &1127570233823713232
 GameObject:
   m_ObjectHideFlags: 0

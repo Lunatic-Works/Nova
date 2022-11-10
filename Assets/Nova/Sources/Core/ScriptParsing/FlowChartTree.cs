@@ -14,7 +14,6 @@ namespace Nova
         Unlocked = 2,
         Debug = 4,
         Normal = Locked | Unlocked,
-        UnlockedAll = Unlocked | Debug,
         All = Locked | Unlocked | Debug
     }
 
