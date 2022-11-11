@@ -9,6 +9,19 @@ namespace Nova
 {
     #region Event types and datas
 
+    public class NodeChangedData
+    {
+        public readonly string newNode;
+
+        public NodeChangedData(string newNode)
+        {
+            this.newNode = newNode;
+        }
+    }
+
+    [Serializable]
+    public class NodeChangedEvent : UnityEvent<NodeChangedData> { }
+
     public class DialogueChangedData
     {
         public readonly NodeRecord nodeRecord;
@@ -32,19 +45,6 @@ namespace Nova
 
     [Serializable]
     public class DialogueChangedEvent : UnityEvent<DialogueChangedData> { }
-
-    public class NodeChangedData
-    {
-        public readonly string newNode;
-
-        public NodeChangedData(string newNode)
-        {
-            this.newNode = newNode;
-        }
-    }
-
-    [Serializable]
-    public class NodeChangedEvent : UnityEvent<NodeChangedData> { }
 
     public class SelectionOccursData
     {
@@ -212,6 +212,11 @@ namespace Nova
         public UnityEvent gameStarted;
 
         /// <summary>
+        /// This event will be triggered if the node has changed. The new node name will be sent to all listeners.
+        /// </summary>
+        public NodeChangedEvent nodeChanged;
+
+        /// <summary>
         /// This event will be triggered if the content of the dialogue will change. It will be triggered before
         /// the lazy execution block of the new dialogue is invoked.
         /// </summary>
@@ -226,11 +231,6 @@ namespace Nova
         public DialogueChangedEvent dialogueChanged;
 
         /// <summary>
-        /// This event will be triggered if the node has changed. The new node name will be sent to all listeners.
-        /// </summary>
-        public NodeChangedEvent nodeChanged;
-
-        /// <summary>
         /// This event will be triggered if a selection occurs, either when branches occur or when a selection is
         /// triggered from the script.
         /// </summary>
@@ -240,6 +240,8 @@ namespace Nova
         /// This event will be triggered if the story route has reached an end.
         /// </summary>
         public RouteEndedEvent routeEnded;
+
+        public UnityEvent restoreStarts;
 
         #endregion
 
@@ -943,6 +945,7 @@ namespace Nova
             // Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
 
             isRestoring = true;
+            restoreStarts.Invoke();
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
             this.RuntimeAssert(dialogueIndex >= currentIndex,
