@@ -33,7 +33,7 @@ anim:trans2(cam, function()
 <|
 anim:vfx(cam, 'color', {0, 1}, 1, { _ColorMul = 0 })
 |>
-用两句话完成的转场
+用两条对话完成的转场
 先让画面变黑
 
 <|
@@ -158,6 +158,17 @@ cam2.cullingMask = (2^cam2_layer) + (2^cam2_overlay)
 cam2.cameraEnabled = false
 |>
 重置cam2的cullingMask，关闭cam2
+
+<|
+anim:vfx_multi(cam, 'lens_blur', 1, { _Size = {0, 4}, _Offset = {0, 0.5} })
+|>
+测试多个属性的特效动画
+
+<|
+anim:vfx_multi(cam, 'lens_blur', 1, { _Size = {4, 0}, _Offset = {0.5, 0} }
+    ):action(vfx, cam, nil)
+|>
+特效结束
 
 测试结束
 @<| is_end() |>

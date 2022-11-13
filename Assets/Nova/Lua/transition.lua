@@ -357,7 +357,7 @@ end, add_preload_pattern)
 
 --- usage:
 ---     vfx(obj, 'shader_name', [t, { name = value }])
----     vfx(obj, {'shader_name'. layer_id}, [t, { name = value }])
+---     vfx(obj, {'shader_name', layer_id}, [t, { name = value }])
 function vfx(obj, shader_layer, t, properties)
     local shader_name, layer_id = parse_shader_layer(shader_layer)
     if shader_name then
@@ -393,26 +393,27 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
         set_mat(obj, mat, layer_id)
     end
 
-    local action_end = function()
-        if target_t == 0 then
+    local entry = self:action(action_begin
+        ):_then(Nova.MaterialFloatAnimationProperty(mat, '_T', target_t)):_with(easing):_for(duration)
+
+    if target_t == 0 then
+        local action_end = function()
             if variant then
                 set_mat(obj, get_mat(obj, variant), layer_id)
             else
                 set_mat(obj, get_default_mat(obj), layer_id)
             end
         end
+        entry = entry:action(action_end)
     end
 
-    local entry = self:action(action_begin
-        ):_then(Nova.MaterialFloatAnimationProperty(mat, '_T', target_t)):_with(easing):_for(duration
-        ):action(action_end)
     entry.head = self
     return entry
 end)
 
 --- usage:
----     vfx_free(obj, 'shader_name', duration, {{'name', start_value, target_value}, ...}, [{ name = value }])
-make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_properties, properties)
+---     vfx_multi(obj, 'shader_name', duration, { name = {start_value, target_value} }, [{ name = value }])
+make_anim_method('vfx_multi', function(self, obj, shader_layer, times, anim_properties, properties)
     local shader_name, layer_id = parse_shader_layer(shader_layer)
     local mat, base_shader_name, _ = get_mat(obj, shader_name)
     local duration, easing = parse_times(times)
@@ -421,8 +422,8 @@ make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_prope
     local action_begin = function()
         set_mat_default_properties(mat, base_shader_name, properties)
         set_mat_properties(mat, base_shader_name, properties)
-        for i = 1, #anim_properties do
-            mat:SetFloat(anim_properties[i][1], anim_properties[i][2])
+        for name, value in pairs(anim_properties) do
+            mat:SetFloat(name, value[1])
         end
         mat:SetFloat('_T', 1)
         set_mat(obj, mat, layer_id)
@@ -430,8 +431,8 @@ make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_prope
 
     local entry0 = self:action(action_begin)
     local entry
-    for i = 1, #anim_properties do
-        entry = entry0:_then(Nova.MaterialFloatAnimationProperty(mat, anim_properties[i][1], anim_properties[i][3])):_with(easing):_for(duration)
+    for name, value in pairs(anim_properties) do
+        entry = entry0:_then(Nova.MaterialFloatAnimationProperty(mat, name, value[2])):_with(easing):_for(duration)
     end
     entry.head = self
     return entry
