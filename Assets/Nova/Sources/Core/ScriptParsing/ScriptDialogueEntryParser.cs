@@ -456,7 +456,7 @@ namespace Nova
                     actions.Add(stage, action);
                 }
 
-                results.Add(new DialogueEntry(characterName, displayName, dialogue, actions));
+                results.Add(new DialogueEntry(characterName, displayName, dialogue, actions, chunks[i].GetHashUlong()));
             }
 
             return results;

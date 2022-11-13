@@ -489,7 +489,7 @@ namespace Nova
             {
                 var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
                 dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, voices,
-                    currentDialogueEntry.NeedInterpolate());
+                    currentDialogueEntry.NeedInterpolate(), currentDialogueEntry.textHash);
                 checkpointManager.SetReached(dialogueData);
             }
             else

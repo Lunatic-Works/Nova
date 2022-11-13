@@ -51,7 +51,7 @@ namespace Nova
             }
         }
 
-        // Should be called in Start, not in Awake
+        // This now needs to be called in GameState.Awake, so consider removing calls in Start
         public void Init()
         {
             if (inited)
@@ -229,7 +229,7 @@ namespace Nova
             }
 
             reachedDialogues.Add(key, data);
-            serializer.SerializeRecord(globalSave.endReached, (IReachedData)data);
+            serializer.SerializeRecord<IReachedData>(globalSave.endReached, data);
             NewReached();
         }
 
