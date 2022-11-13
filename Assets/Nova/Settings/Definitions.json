@@ -22,8 +22,8 @@
         "defaultValue": 2,
         "max": 3
     },
-    "OnlyFastForwardRead": {
-        "defaultValue": 1
+    "FastForwardUnread": {
+        "defaultValue": 0
     },
     "AbortAnimation": {
         "defaultValue": 0

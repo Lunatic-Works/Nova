@@ -76,7 +76,7 @@ namespace Nova
                         this.RuntimeAssert(state == State.Normal,
                             "Dialogue state is not Normal when setting to FastForward.");
 
-                        if (unreadStopsFastForward)
+                        if (stopFastForward)
                         {
                             int clicks = configManager.GetInt(FastForwardReadFirstShownKey);
                             if (clicks < HintFastForwardReadClicks)
@@ -116,7 +116,7 @@ namespace Nova
         public UnityEvent fastForwardModeStops;
 
         [HideInInspector] public bool isReadDialogue;
-        [HideInInspector] public bool onlyFastForwardRead;
+        [HideInInspector] public bool fastForwardUnread;
 
         private bool _fastForwardHotKeyHolding;
 
@@ -135,14 +135,14 @@ namespace Nova
             }
         }
 
-        private bool unreadStopsFastForward => !isReadDialogue && onlyFastForwardRead && !fastForwardHotKeyHolding;
+        private bool stopFastForward => !isReadDialogue && !fastForwardUnread && !fastForwardHotKeyHolding;
 
         // Update state and isReadDialogue before OnDialogueChanged is invoked
         private void OnDialogueChangedEarly(DialogueChangedData dialogueData)
         {
             isReadDialogue = dialogueData.isReachedAnyHistory;
 
-            if (isFastForward && unreadStopsFastForward)
+            if (isFastForward && stopFastForward)
             {
                 state = State.Normal;
             }
