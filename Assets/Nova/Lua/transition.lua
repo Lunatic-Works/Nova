@@ -95,8 +95,9 @@ local function get_default_mat(obj)
     return Nova.MaterialPool.Ensure(obj.gameObject).defaultMaterial
 end
 
-local function set_mat(obj, mat, layer_id)
+local function set_mat(obj, mat, layer_id, token)
     layer_id = layer_id or 0
+    token = token or -1
 
     local go, renderer, pp = get_renderer_pp(obj)
 
@@ -105,26 +106,26 @@ local function set_mat(obj, mat, layer_id)
             warn('layer_id should be 0 for SpriteRenderer or Image or RawImage')
         end
         renderer.material = mat
-        return
+        return -1
     end
 
     if pp then
         if mat then
-            pp:SetLayer(layer_id, mat)
+            return pp:SetLayer(layer_id, mat)
         else
-            pp:ClearLayer(layer_id)
+            pp:ClearLayer(layer_id, token)
+            return -1
         end
-        return
     end
 
     local fade = go:GetComponent(typeof(Nova.FadeController))
     if fade then
         warn('Cannot set material for FadeController ' .. dump(obj))
-        return
+        return -1
     end
 
     warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. dump(obj))
-    return
+    return -1
 end
 
 local function set_mat_default_properties(mat, base_shader_name, skip_properties)
@@ -234,7 +235,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
     local duration, easing = parse_times(times)
     properties = properties or {}
 
-    local action_begin, action_end
+    local action_begin, action_end, token
     if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
             __Nova.screenCapturer:CaptureGameTexture()
@@ -250,11 +251,11 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 1)
-            set_mat(obj, mat, layer_id)
+            token = set_mat(obj, mat, layer_id)
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj), layer_id)
+            set_mat(obj, get_default_mat(obj), layer_id, token)
         end
     else
         action_begin = function()
@@ -269,13 +270,13 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 1)
             mat:SetColor('_SubColor', renderer.color)
-            set_mat(obj, mat)
+            token = set_mat(obj, mat)
 
             show_no_fade(obj, image_name, nil, color2)
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj))
+            set_mat(obj, get_default_mat(obj), nil, token)
         end
     end
 
@@ -302,13 +303,13 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
     local duration2, easing2 = parse_times(times2)
     properties2 = properties2 or {}
 
-    local action_begin, action_middle, action_end
+    local action_begin, action_middle, action_end, token
     if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 0)
-            set_mat(obj, mat, layer_id)
+            token = set_mat(obj, mat, layer_id)
         end
 
         action_middle = function()
@@ -323,14 +324,14 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj), layer_id)
+            set_mat(obj, get_default_mat(obj), layer_id, token)
         end
     else
         action_begin = function()
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 0)
-            set_mat(obj, mat)
+            token = set_mat(obj, mat)
         end
 
         action_middle = function()
@@ -342,7 +343,7 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj))
+            set_mat(obj, get_default_mat(obj), nil, token)
         end
     end
 
