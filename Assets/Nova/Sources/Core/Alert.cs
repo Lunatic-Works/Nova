@@ -84,16 +84,16 @@ namespace Nova
         /// <param name="ignoreKey">A key to identify the alert box when prompting user to ignore it. Empty string to disable this feature.</param>
         public static void Show(string title, LocalizedStrings content,
             Action onClickConfirm = null, Action onClickCancel = null,
-            string ignoreKey = "")
+            string ignoreKey = null)
         {
             AssertAlertFunction();
             _alert.Invoke(new AlertParameters(title, content, onClickConfirm, onClickCancel,
-                ignoreKey == "" ? "" : AlertKeyPrefix + ignoreKey));
+                string.IsNullOrEmpty(ignoreKey) ? "" : AlertKeyPrefix + ignoreKey));
         }
 
         public static void Show(string title, string content,
             Action onClickConfirm = null, Action onClickCancel = null,
-            string ignoreKey = "")
+            string ignoreKey = null)
         {
             Show(title, I18n.GetLocalizedStrings(content), onClickConfirm, onClickCancel, ignoreKey);
         }

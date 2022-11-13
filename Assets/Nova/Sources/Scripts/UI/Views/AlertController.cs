@@ -53,18 +53,19 @@ namespace Nova
 
             this.param = param;
 
-            if (param.ignoreKey != "" && configManager.GetInt(param.ignoreKey) == 0)
+            var hasIgnoreKey = !string.IsNullOrEmpty(param.ignoreKey);
+            if (hasIgnoreKey && configManager.GetInt(param.ignoreKey) == 0)
             {
                 param.onConfirm?.Invoke();
                 yield break;
             }
 
-            titleText.gameObject.SetActive(param.title != null);
+            titleText.gameObject.SetActive(!string.IsNullOrEmpty(param.title));
             titleText.text = param.title;
             contentText.gameObject.SetActive(param.content != null);
             UpdateText();
             cancelButton.gameObject.SetActive(param.onConfirm != null || param.onCancel != null);
-            ignoreToggle.gameObject.SetActive(param.ignoreKey != "");
+            ignoreToggle.gameObject.SetActive(hasIgnoreKey);
 
             confirmButton.onClick.RemoveAllListeners();
             confirmButton.onClick.AddListener(() => Hide(param.onConfirm));
@@ -72,7 +73,7 @@ namespace Nova
             cancelButton.onClick.RemoveAllListeners();
             cancelButton.onClick.AddListener(() =>
             {
-                if (param.ignoreKey != "")
+                if (hasIgnoreKey)
                 {
                     configManager.SetInt(param.ignoreKey, 1);
                 }
@@ -82,7 +83,7 @@ namespace Nova
 
             ignoreToggle.onValueChanged.RemoveAllListeners();
             ignoreToggle.isOn = false;
-            if (param.ignoreKey != "")
+            if (hasIgnoreKey)
             {
                 // 0: ignore alert, 1: show alert
                 ignoreToggle.onValueChanged.AddListener(value =>
@@ -109,7 +110,7 @@ namespace Nova
         {
             if (param != null)
             {
-                if (param.ignoreKey != "")
+                if (!string.IsNullOrEmpty(param.ignoreKey))
                 {
                     configManager.SetInt(param.ignoreKey, 1);
                 }
