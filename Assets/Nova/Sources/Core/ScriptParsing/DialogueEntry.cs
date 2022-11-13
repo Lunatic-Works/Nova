@@ -69,15 +69,16 @@ namespace Nova
         /// </summary>
         private readonly Dictionary<DialogueActionStage, LuaFunction> actions;
 
-        private readonly ulong textHash;
+        public readonly ulong textHash;
 
         public DialogueEntry(string characterName, string displayName, string dialogue,
-            Dictionary<DialogueActionStage, LuaFunction> actions)
+            Dictionary<DialogueActionStage, LuaFunction> actions, ulong textHash)
         {
             this.characterName = characterName;
             displayNames = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = displayName };
             dialogues = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = dialogue };
             this.actions = actions;
+            this.textHash = textHash;
         }
 
         public void AddLocalized(SystemLanguage locale, LocalizedDialogueEntry entry)

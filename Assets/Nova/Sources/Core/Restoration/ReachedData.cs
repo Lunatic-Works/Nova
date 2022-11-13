@@ -53,13 +53,15 @@ namespace Nova
         public readonly int dialogueIndex;
         public readonly VoiceEntries voices;
         public readonly bool needInterpolate;
+        public readonly ulong textHash;
 
-        public ReachedDialogueData(string nodeName, int dialogueIndex, VoiceEntries voices, bool needInterpolate)
+        public ReachedDialogueData(string nodeName, int dialogueIndex, VoiceEntries voices, bool needInterpolate, ulong textHash)
         {
             this.nodeName = nodeName;
             this.dialogueIndex = dialogueIndex;
             this.voices = voices;
             this.needInterpolate = needInterpolate;
+            this.textHash = textHash;
         }
     }
 }
