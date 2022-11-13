@@ -388,7 +388,7 @@ namespace Nova
 
                 if (displayData == null)
                 {
-                    var node = gameState.GetNode(pos.nodeRecord.name);
+                    var node = gameState.GetNode(pos.nodeRecord.name, true);
                     var entry = node.GetDialogueEntryAt(pos.dialogueIndex);
                     displayData = entry.GetDisplayData();
                 }

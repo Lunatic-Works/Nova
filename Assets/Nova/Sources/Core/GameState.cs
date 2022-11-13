@@ -635,10 +635,14 @@ namespace Nova
             GameStart(flowChartTree.GetNode(startName));
         }
 
-        public FlowChartNode GetNode(string name)
+        public FlowChartNode GetNode(string name, bool addDeferred = false)
         {
             var node = flowChartTree.GetNode(name);
-            scriptLoader.AddDeferredDialogueChunks(node);
+            if (addDeferred)
+            {
+                scriptLoader.AddDeferredDialogueChunks(node);
+            }
+
             return node;
         }
 
@@ -941,7 +945,7 @@ namespace Nova
                 checkpointOffset = checkpointManager.NextRecord(checkpointOffset);
             }
 
-            currentNode = GetNode(nodeRecord.name);
+            currentNode = GetNode(nodeRecord.name, true);
             // Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
 
             isRestoring = true;
