@@ -451,7 +451,7 @@ namespace Nova
                     if (action == null)
                     {
                         throw new ParserException(
-                            "Syntax error while parsing lazy execution block\n" +
+                            "Syntax error while parsing lazy execution block.\n" +
                             $"characterName: {characterName}, displayName: {displayName}, dialogue: {dialogue}\n" +
                             $"stage: {stage}, code: {code}");
                     }
@@ -472,7 +472,14 @@ namespace Nova
             foreach (var chunk in chunks)
             {
                 var text = GetText(chunk);
-                ParseNameDialogue(text, out var displayName, out var _, out var dialogue);
+                ParseNameDialogue(text, out var displayName, out var hiddenName, out var dialogue);
+                if (!string.IsNullOrEmpty(hiddenName))
+                {
+                    throw new ParserException(
+                        "Cannot set internal character name in non-default locale.\n" +
+                        $"hiddenName: {hiddenName}, displayName: {displayName}, dialogue: {dialogue}");
+                }
+
                 results.Add(new LocalizedDialogueEntry { displayName = displayName, dialogue = dialogue });
             }
 

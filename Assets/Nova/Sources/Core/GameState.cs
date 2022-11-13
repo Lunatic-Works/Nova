@@ -1037,7 +1037,7 @@ namespace Nova
         {
             if (nodeRecord == null || checkpointOffset == nodeRecord.offset)
             {
-                throw new InvalidOperationException("cannot save bookmark at this point");
+                throw new InvalidOperationException("Nova: Cannot save bookmark at this point.");
             }
 
             return new Bookmark(nodeRecord, checkpointOffset, currentIndex);
