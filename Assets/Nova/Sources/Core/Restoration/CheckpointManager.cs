@@ -29,37 +29,7 @@ namespace Nova
 
         private bool inited;
 
-        private void InitGlobalSave()
-        {
-            globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset);
-        }
-
-        private void InitReached()
-        {
-            reachedDialogues.Clear();
-            reachedEnds.Clear();
-            for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = serializer.NextRecord(cur))
-            {
-                var record = serializer.DeserializeRecord<IReachedData>(cur);
-                if (record is ReachedEndData end)
-                {
-                    reachedEnds.Add(end.endName);
-                }
-                else if (record is ReachedDialogueData dialogue)
-                {
-                    SetReachedDialogueData(dialogue);
-                }
-            }
-
-            // check each reached data is a prefix
-            foreach (var reachedList in reachedDialogues)
-            {
-                if (reachedList.Value.Contains(null))
-                {
-                    throw CheckpointCorruptedException.BadReachedData(reachedList.Key);
-                }
-            }
-        }
+        #region Initialization
 
         // This now needs to be called in GameState.Awake, so consider removing calls in Start
         public void Init()
@@ -119,7 +89,45 @@ namespace Nova
             serializer.Dispose();
         }
 
-        #region Global save
+        #endregion
+
+        #region Common methods
+
+        public long NextRecord(long offset)
+        {
+            return serializer.NextRecord(offset);
+        }
+
+        #endregion
+
+        #region Reached Data
+
+        private void InitReached()
+        {
+            reachedDialogues.Clear();
+            reachedEnds.Clear();
+            for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = serializer.NextRecord(cur))
+            {
+                var record = serializer.DeserializeRecord<IReachedData>(cur);
+                if (record is ReachedEndData end)
+                {
+                    reachedEnds.Add(end.endName);
+                }
+                else if (record is ReachedDialogueData dialogue)
+                {
+                    SetReachedDialogueData(dialogue);
+                }
+            }
+
+            // check each reached data is a prefix
+            foreach (var reachedList in reachedDialogues)
+            {
+                if (reachedList.Value.Contains(null))
+                {
+                    throw CheckpointCorruptedException.BadReachedData(reachedList.Key);
+                }
+            }
+        }
 
         private void NewReached()
         {
@@ -128,16 +136,62 @@ namespace Nova
             // Debug.Log($"next reached {globalSave.endReached}");
         }
 
-        private void NewCheckpoint()
+        private void SetReachedDialogueData(ReachedDialogueData data)
+        {
+            var list = reachedDialogues.Ensure(data.nodeName);
+            list.Ensure(data.dialogueIndex + 1);
+            list[data.dialogueIndex] = data;
+        }
+
+        public void SetReached(ReachedDialogueData data)
+        {
+            if (IsReachedAnyHistory(data.nodeName, data.dialogueIndex))
+            {
+                return;
+            }
+            SetReachedDialogueData(data);
+            serializer.SerializeRecord<IReachedData>(globalSave.endReached, data);
+            NewReached();
+        }
+
+        public void SetEndReached(string endName)
+        {
+            if (reachedEnds.Contains(endName))
+            {
+                return;
+            }
+
+            reachedEnds.Add(endName);
+            var reachedData = (IReachedData)new ReachedEndData(endName);
+            serializer.SerializeRecord(globalSave.endReached, reachedData);
+            NewReached();
+        }
+
+        public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
+        {
+            return reachedDialogues.ContainsKey(nodeName) &&
+                dialogueIndex < reachedDialogues[nodeName].Count;
+        }
+
+        public ReachedDialogueData GetReachedDialogueData(string nodeName, int dialogueIndex)
+        {
+            return reachedDialogues[nodeName][dialogueIndex];
+        }
+
+        public bool IsEndReached(string endName)
+        {
+            return reachedEnds.Contains(endName);
+        }
+
+        #endregion
+
+        #region Checkpoint
+
+        private void NewCheckpointRecord()
         {
             globalSave.endCheckpoint = serializer.NextRecord(globalSave.endCheckpoint);
             globalSaveDirty = true;
             // Debug.Log($"next checkpoint {globalSave.endCheckpoint}");
-        }
-
-        public long NextRecord(long offset)
-        {
-            return serializer.NextRecord(offset);
         }
 
         public long NextCheckpoint(long offset)
@@ -180,7 +234,7 @@ namespace Nova
             }
 
             serializer.UpdateNodeRecord(newRecord);
-            NewCheckpoint();
+            NewCheckpointRecord();
             return newRecord;
         }
 
@@ -213,10 +267,10 @@ namespace Nova
             var buf = new ByteSegment(new byte[4]);
             buf.WriteInt(0, dialogueIndex);
             serializer.AppendRecord(record, buf);
-            NewCheckpoint();
+            NewCheckpointRecord();
 
             serializer.SerializeRecord(globalSave.endCheckpoint, checkpoint);
-            NewCheckpoint();
+            NewCheckpointRecord();
             return record;
         }
 
@@ -228,70 +282,6 @@ namespace Nova
         public GameStateCheckpoint GetCheckpoint(long offset)
         {
             return serializer.DeserializeRecord<GameStateCheckpoint>(serializer.NextRecord(offset));
-        }
-
-        private void SetReachedDialogueData(ReachedDialogueData data)
-        {
-            var list = reachedDialogues.Ensure(data.nodeName);
-            list.Ensure(data.dialogueIndex + 1);
-            list[data.dialogueIndex] = data;
-        }
-
-        public void SetReached(ReachedDialogueData data)
-        {
-            if (IsReachedAnyHistory(data.nodeName, data.dialogueIndex))
-            {
-                return;
-            }
-            SetReachedDialogueData(data);
-            serializer.SerializeRecord<IReachedData>(globalSave.endReached, data);
-            NewReached();
-        }
-
-        public void SetBranchReached(NodeRecord nodeRecord, string branchName)
-        {
-            // currently we cannot find next node by branchName
-            throw new NotImplementedException();
-        }
-
-        public void SetEndReached(string endName)
-        {
-            if (reachedEnds.Contains(endName))
-            {
-                return;
-            }
-
-            reachedEnds.Add(endName);
-            var reachedData = (IReachedData)new ReachedEndData(endName);
-            serializer.SerializeRecord(globalSave.endReached, reachedData);
-            NewReached();
-        }
-
-        public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
-        {
-            return reachedDialogues.ContainsKey(nodeName) &&
-                dialogueIndex < reachedDialogues[nodeName].Count;
-        }
-
-        public ReachedDialogueData GetReachedDialogueData(string nodeName, int dialogueIndex)
-        {
-            return reachedDialogues[nodeName][dialogueIndex];
-        }
-
-        public bool IsBranchReached(NodeRecord nodeRecord, string nextNodeName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsBranchReachedAnyHistory(string nodeName, string nextNodeName)
-        {
-            // currently we don't store this
-            throw new NotImplementedException();
-        }
-
-        public bool IsEndReached(string endName)
-        {
-            return reachedEnds.Contains(endName);
         }
 
         public void CheckScript(ScriptLoader scriptLoader, FlowChartTree flowChart)
@@ -308,16 +298,24 @@ namespace Nova
 
                         scriptLoader.AddDeferredDialogueChunks(node);
                         Differ differ = new Differ(node, reachedDialogues[node.name]);
-                        differ.GetDiffs(out var deletes, out var inserts);
+                        differ.GetDiffs();
 
-                        Debug.Log($"diff: deletes={deletes.Dump()}, inserts={inserts.Dump()}");
+                        Debug.Log($"diff: deletes={differ.deletes.Dump()}, inserts={differ.inserts.Dump()}, remaps={differ.remap.Dump()}");
 
                         globalSaveDirty = true;
                     }
                 }
             }
             globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
+        }
 
+        #endregion
+
+        #region Global Save
+
+        private void InitGlobalSave()
+        {
+            globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset);
         }
 
         public void UpdateGlobalSave()
