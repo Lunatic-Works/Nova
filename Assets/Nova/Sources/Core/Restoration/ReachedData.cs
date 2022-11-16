@@ -50,4 +50,11 @@ namespace Nova
             this.textHash = textHash;
         }
     }
+
+    [Serializable]
+    public class ReachedDialoguePlaceholder : IReachedData
+    {
+        public readonly string nodeName;
+        public readonly int dialogueIndex;
+    }
 }

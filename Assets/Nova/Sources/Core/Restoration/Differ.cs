@@ -10,10 +10,20 @@ namespace Nova
     {
         private static readonly Exception bug = new Exception("differ internal bug");
 
-        private ulong[] saveHashes, scriptHashes;
+        private readonly ulong[] saveHashes, scriptHashes;
         // pseudo array of V[d][k]
         // the X value of furthest reached point for a d-path on diag-k
-        private List<int> _V = new List<int>();
+        private readonly List<int> v = new List<int>();
+        private readonly List<int> _inserts = new List<int>();
+        private readonly List<int> _deletes = new List<int>();
+        private readonly List<int> _remap = new List<int>();
+
+        public IReadOnlyList<int> inserts => _inserts;
+        public IReadOnlyList<int> deletes => _deletes;
+        // remap[i] == j means old list index i maps to new list index j
+        // new item in new list remaps to index -1
+        public IReadOnlyList<int> remap => _remap;
+        public int distance { get; private set; }
 
         // return V[d][k]
         private int V(int d, int k)
@@ -22,13 +32,14 @@ namespace Nova
             {
                 throw bug;
             }
-            return _V[(d + 1) * d / 2 + (k + d) / 2];
+            return v[(d + 1) * d / 2 + (k + d) / 2];
         }
 
         public Differ(FlowChartNode node, IEnumerable<ReachedDialogueData> reachedData)
         {
             scriptHashes = node.GetAllDialogues().Select(x => x.textHash).ToArray();
             saveHashes = reachedData.Select(x => x.textHash).ToArray();
+            distance = -1;
 
             Debug.Log($"{scriptHashes.Select(x => x % 32).Dump()} vs {saveHashes.Select(x => x % 32).Dump()}");
         }
@@ -60,7 +71,7 @@ namespace Nova
                         x++;
                         y++;
                     }
-                    _V.Add(x);
+                    v.Add(x);
                     if (x >= xMid && y >= yMax)
                     {
                         return d;
@@ -70,31 +81,61 @@ namespace Nova
             throw bug;
         }
 
-        public void GetDiffs(out List<int> deletes, out List<int> inserts)
+        private void CalcInsertsDeletes(int x, int k)
         {
-            deletes = new List<int>();
-            inserts = new List<int>();
-
-            int distance = CalcV(out var x, out var y);
-            Debug.Log($"distance={distance}, x={x}, y={y}");
-            int k = x - y;
             for (int d = distance - 1; d >= 0; d--)
             {
                 if (k + 1 > d || (k - 1 >= -d && V(d, k + 1) < V(d, k - 1) + 1))
                 {
                     k--;
                     x = V(d, k);
-                    deletes.Add(x);
+                    _deletes.Add(x);
                 }
                 else
                 {
                     k++;
                     x = V(d, k);
-                    inserts.Add(x - k);
+                    _inserts.Add(x - k);
                 }
             }
-            deletes.Reverse();
-            inserts.Reverse();
+            _deletes.Reverse();
+            _inserts.Reverse();
+        }
+
+        private void CalcRemap()
+        {
+            int x = 0, i = 0, j = 0;
+            for (var y = 0; y < scriptHashes.Length; y++)
+            {
+                while (i < _deletes.Count && _deletes[i] == x)
+                {
+                    i++;
+                    x++;
+                }
+                if (j < _inserts.Count && _inserts[j] == y)
+                {
+                    _remap.Add(-1);
+                    j++;
+                }
+                else
+                {
+                    _remap.Add(x);
+                    x++;
+                }
+            }
+        }
+
+        public void GetDiffs()
+        {
+            if (distance >= 0)
+            {
+                return;
+            }
+
+            distance = CalcV(out var x, out var y);
+            Debug.Log($"distance={distance}, x={x}, y={y}");
+            CalcInsertsDeletes(x, x - y);
+            CalcRemap();
         }
     }
 }
