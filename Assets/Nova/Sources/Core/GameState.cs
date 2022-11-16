@@ -119,7 +119,7 @@ namespace Nova
             {
                 scriptLoader.Init(scriptPath);
                 flowChartTree = scriptLoader.GetFlowChartTree();
-                checkpointManager.CheckScript(flowChartTree);
+                checkpointManager.CheckScript(scriptLoader, flowChartTree);
             }
             catch (Exception e)
             {

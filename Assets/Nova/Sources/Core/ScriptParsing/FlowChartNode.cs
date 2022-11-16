@@ -129,6 +129,11 @@ namespace Nova
             return dialogueEntries[index];
         }
 
+        public IEnumerable<DialogueEntry> GetAllDialogues()
+        {
+            return dialogueEntries;
+        }
+
         #endregion
 
         #region Branches
