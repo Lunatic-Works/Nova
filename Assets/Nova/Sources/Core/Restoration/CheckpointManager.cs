@@ -16,8 +16,9 @@ namespace Nova
         private GlobalSave globalSave;
         private bool globalSaveDirty;
 
-        private readonly Dictionary<ReachedDialogueKey, ReachedDialogueData> reachedDialogues =
-            new Dictionary<ReachedDialogueKey, ReachedDialogueData>();
+        // nodeName => dialogueIndex => data
+        private readonly Dictionary<string, List<ReachedDialogueData>> reachedDialogues =
+            new Dictionary<string, List<ReachedDialogueData>>();
 
         private readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
@@ -46,7 +47,16 @@ namespace Nova
                 }
                 else if (record is ReachedDialogueData dialogue)
                 {
-                    reachedDialogues.Add(new ReachedDialogueKey(dialogue), dialogue);
+                    SetReachedDialogueData(dialogue);
+                }
+            }
+
+            // check each reached data is a prefix
+            foreach (var reachedList in reachedDialogues)
+            {
+                if (reachedList.Value.Contains(null))
+                {
+                    throw CheckpointCorruptedException.BadReachedData(reachedList.Key);
                 }
             }
         }
@@ -220,15 +230,20 @@ namespace Nova
             return serializer.DeserializeRecord<GameStateCheckpoint>(serializer.NextRecord(offset));
         }
 
+        private void SetReachedDialogueData(ReachedDialogueData data)
+        {
+            var list = reachedDialogues.Ensure(data.nodeName);
+            list.Ensure(data.dialogueIndex + 1);
+            list[data.dialogueIndex] = data;
+        }
+
         public void SetReached(ReachedDialogueData data)
         {
-            var key = new ReachedDialogueKey(data);
-            if (reachedDialogues.ContainsKey(key))
+            if (IsReachedAnyHistory(data.nodeName, data.dialogueIndex))
             {
                 return;
             }
-
-            reachedDialogues.Add(key, data);
+            SetReachedDialogueData(data);
             serializer.SerializeRecord<IReachedData>(globalSave.endReached, data);
             NewReached();
         }
@@ -254,12 +269,13 @@ namespace Nova
 
         public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
         {
-            return reachedDialogues.ContainsKey(new ReachedDialogueKey(nodeName, dialogueIndex));
+            return reachedDialogues.ContainsKey(nodeName) &&
+                dialogueIndex < reachedDialogues[nodeName].Count;
         }
 
         public ReachedDialogueData GetReachedDialogueData(string nodeName, int dialogueIndex)
         {
-            return reachedDialogues[new ReachedDialogueKey(nodeName, dialogueIndex)];
+            return reachedDialogues[nodeName][dialogueIndex];
         }
 
         public bool IsBranchReached(NodeRecord nodeRecord, string nextNodeName)
@@ -278,20 +294,30 @@ namespace Nova
             return reachedEnds.Contains(endName);
         }
 
-        public void CheckScript(FlowChartTree flowChart)
+        public void CheckScript(ScriptLoader scriptLoader, FlowChartTree flowChart)
         {
             if (globalSave.nodeHashes != null)
             {
                 // TODO: upgrade global save
                 foreach (var node in flowChart)
                 {
-                    if (globalSave.nodeHashes.ContainsKey(node.name) && globalSave.nodeHashes[node.name] != node.textHash)
+                    if (globalSave.nodeHashes.ContainsKey(node.name) && globalSave.nodeHashes[node.name] != node.textHash &&
+                        reachedDialogues.ContainsKey(node.name))
                     {
                         Debug.Log($"node need upgrade {node.name}");
+
+                        scriptLoader.AddDeferredDialogueChunks(node);
+                        Differ differ = new Differ(node, reachedDialogues[node.name]);
+                        differ.GetDiffs(out var deletes, out var inserts);
+
+                        Debug.Log($"diff: deletes={deletes.Dump()}, inserts={inserts.Dump()}");
+
+                        globalSaveDirty = true;
                     }
                 }
             }
             globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
+
         }
 
         public void UpdateGlobalSave()

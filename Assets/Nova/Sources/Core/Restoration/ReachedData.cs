@@ -21,20 +21,6 @@ namespace Nova
         }
     }
 
-    public readonly struct ReachedDialogueKey
-    {
-        public readonly string nodeName;
-        public readonly int dialogueIndex;
-
-        public ReachedDialogueKey(string nodeName, int dialogueIndex)
-        {
-            this.nodeName = nodeName;
-            this.dialogueIndex = dialogueIndex;
-        }
-
-        public ReachedDialogueKey(ReachedDialogueData data) : this(data.nodeName, data.dialogueIndex) { }
-    }
-
     [Serializable]
     public class ReachedEndData : IReachedData
     {

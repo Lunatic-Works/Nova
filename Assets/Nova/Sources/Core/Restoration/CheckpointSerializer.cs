@@ -20,6 +20,11 @@ namespace Nova
             new CheckpointCorruptedException(
                 $"File header or version mismatch, expected version={CheckpointSerializer.Version}.");
 
+        public static CheckpointCorruptedException BadReachedData(string nodeName)
+        {
+            return new CheckpointCorruptedException($"Bad reached data, node={nodeName}");
+        }
+
         public static CheckpointCorruptedException BadOffset(long offset)
         {
             return new CheckpointCorruptedException($"Bad offset @{offset}");

@@ -95,6 +95,19 @@ namespace Nova
             return x;
         }
 
+        public static void Ensure<T>(this List<T> list, int size)
+        {
+            if (list.Count < size)
+            {
+                list.AddRange(Enumerable.Repeat(default(T), size - list.Count));
+            }
+        }
+
+        public static string Dump<T>(this IEnumerable<T> list)
+        {
+            return "[ " + String.Join(", ", list.Select(x => x.ToString())) + " ]";
+        }
+
         public static Rect ToRect(this RectInt rectInt)
         {
             return new Rect(rectInt.min, rectInt.size);
