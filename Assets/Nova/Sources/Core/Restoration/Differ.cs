@@ -17,12 +17,18 @@ namespace Nova
         private readonly List<int> _inserts = new List<int>();
         private readonly List<int> _deletes = new List<int>();
         private readonly List<int> _remap = new List<int>();
+        private readonly List<int> _leftMap = new List<int>();
+        private readonly List<int> _rightMap = new List<int>();
 
         public IReadOnlyList<int> inserts => _inserts;
         public IReadOnlyList<int> deletes => _deletes;
-        // remap[i] == j means old list index i maps to new list index j
+        // remap[i] == j means old list index j maps to new list index i
         // new item in new list remaps to index -1
         public IReadOnlyList<int> remap => _remap;
+        // leftMap[i] is new index "left" of old index i
+        public IReadOnlyList<int> leftMap => _leftMap;
+        // rightMap[i] is new index "right" of old index i
+        public IReadOnlyList<int> rightMap => _rightMap;
         public int distance { get; private set; }
 
         // return V[d][k]
@@ -119,9 +125,50 @@ namespace Nova
                 }
                 else
                 {
-                    _remap.Add(x);
+                    _remap.Add(x < saveHashes.Length ? x : -1);
                     x++;
                 }
+            }
+        }
+
+        private void CalcLeftMap()
+        {
+            var x = saveHashes.Length - 1;
+            for (var y = scriptHashes.Length - 1; y >= 0; y--)
+            {
+                if (_remap[y] == -1)
+                {
+                    continue;
+                }
+                for (; x >= _remap[y]; x--)
+                {
+                    _leftMap.Add(y);
+                }
+            }
+            for (; x >= 0; x--)
+            {
+                _leftMap.Add(-1);
+            }
+            _leftMap.Reverse();
+        }
+
+        private void CalcRightMap()
+        {
+            var x = 0;
+            for (var y = 0; y < scriptHashes.Length; y++)
+            {
+                if (_remap[y] == -1)
+                {
+                    continue;
+                }
+                for (; x < saveHashes.Length && x <= _remap[y]; x++)
+                {
+                    _rightMap.Add(y);
+                }
+            }
+            for (; x < saveHashes.Length; x++)
+            {
+                _rightMap.Add(scriptHashes.Length);
             }
         }
 
@@ -135,7 +182,12 @@ namespace Nova
             distance = CalcV(out var x, out var y);
             Debug.Log($"distance={distance}, x={x}, y={y}");
             CalcInsertsDeletes(x, x - y);
+            Debug.Log($"inserts={_inserts.Dump()}, deletes={_deletes.Dump()}");
             CalcRemap();
+            Debug.Log($"remap={_remap.Dump()}");
+            CalcLeftMap();
+            CalcRightMap();
+            Debug.Log($"leftMap={_leftMap.Dump()}, rightMap={_rightMap.Dump()}");
         }
     }
 }

@@ -300,8 +300,6 @@ namespace Nova
                         Differ differ = new Differ(node, reachedDialogues[node.name]);
                         differ.GetDiffs();
 
-                        Debug.Log($"diff: deletes={differ.deletes.Dump()}, inserts={differ.inserts.Dump()}, remaps={differ.remap.Dump()}");
-
                         globalSaveDirty = true;
                     }
                 }
