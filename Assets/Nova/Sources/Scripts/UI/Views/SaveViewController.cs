@@ -167,7 +167,6 @@ namespace Nova
         {
             base.Start();
 
-            checkpointManager.Init();
             previewEntry = myPanel.transform.Find("Background/Left/SaveEntry").GetComponent<SaveEntryController>();
             previewEntry.InitAsPreview(null, Hide);
             ShowPage();

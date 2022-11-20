@@ -103,7 +103,6 @@ namespace Nova
         {
             base.Start();
 
-            checkpointManager.Init();
             RefreshContent();
         }
 

@@ -60,8 +60,6 @@ namespace Nova
         {
             base.Start();
 
-            checkpointManager.Init();
-
             imageViewer.Hide();
             ShowPage();
         }

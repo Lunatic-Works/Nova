@@ -32,7 +32,7 @@ namespace Nova
 
         #region Initialization
 
-        // This now needs to be called in GameState.Awake, so consider removing calls in Start
+        // Needs to be called in Awake
         public void Init()
         {
             if (inited)
@@ -74,7 +74,7 @@ namespace Nova
             inited = true;
         }
 
-        private void Start()
+        private void Awake()
         {
             Init();
         }

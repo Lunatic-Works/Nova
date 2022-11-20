@@ -87,13 +87,6 @@ namespace Nova
             gameState.AddRestorable(this);
         }
 
-        protected override void Start()
-        {
-            base.Start();
-
-            checkpointManager.Init();
-        }
-
         protected override void ForceRebuildLayoutAndResetTransitionTarget()
         {
             // fake content to test size
