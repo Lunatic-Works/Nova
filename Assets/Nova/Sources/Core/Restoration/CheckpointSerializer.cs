@@ -45,6 +45,9 @@ namespace Nova
             return new CheckpointCorruptedException(
                 $"JSON type {typeName} in {assemblyName} is not permitted to (de)serialize.");
         }
+
+        public static readonly CheckpointCorruptedException CannotUpgrade =
+            new CheckpointCorruptedException("Global Save is not able to upgrade");
     }
 
     public sealed class CheckpointJsonSerializer : JsonSerializer
