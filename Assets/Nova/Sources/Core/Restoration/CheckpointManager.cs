@@ -117,6 +117,10 @@ namespace Nova
                 {
                     SetReachedDialogueData(dialogue);
                 }
+                else if (record is NodeUpgradeMaker maker)
+                {
+                    reachedDialogues.Remove(maker.nodeName);
+                }
             }
 
             // check each reached data is a prefix
@@ -143,6 +147,12 @@ namespace Nova
             list[data.dialogueIndex] = data;
         }
 
+        private void AppendReachedRecord(IReachedData data)
+        {
+            serializer.SerializeRecord(globalSave.endReached, data);
+            NewReached();
+        }
+
         public void SetReached(ReachedDialogueData data)
         {
             if (IsReachedAnyHistory(data.nodeName, data.dialogueIndex))
@@ -150,8 +160,7 @@ namespace Nova
                 return;
             }
             SetReachedDialogueData(data);
-            serializer.SerializeRecord<IReachedData>(globalSave.endReached, data);
-            NewReached();
+            AppendReachedRecord(data);
         }
 
         public void SetEndReached(string endName)
@@ -162,9 +171,7 @@ namespace Nova
             }
 
             reachedEnds.Add(endName);
-            var reachedData = (IReachedData)new ReachedEndData(endName);
-            serializer.SerializeRecord(globalSave.endReached, reachedData);
-            NewReached();
+            AppendReachedRecord(new ReachedEndData(endName));
         }
 
         public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
@@ -183,9 +190,28 @@ namespace Nova
             return reachedEnds.Contains(endName);
         }
 
+        public void InvalidateReachedData(string nodeName)
+        {
+            reachedDialogues.Remove(nodeName);
+            AppendReachedRecord(new NodeUpgradeMaker(nodeName));
+        }
+
         #endregion
 
         #region Checkpoint
+
+        public long beginNodeOffset
+        {
+            get
+            {
+                return globalSave.beginCheckpoint;
+            }
+            set
+            {
+                globalSave.beginCheckpoint = value;
+                globalSaveDirty = true;
+            }
+        }
 
         private void NewCheckpointRecord()
         {
@@ -284,8 +310,13 @@ namespace Nova
             return serializer.DeserializeRecord<GameStateCheckpoint>(serializer.NextRecord(offset));
         }
 
+        #endregion
+
+        #region Checkpoint Upgrade
+
         public void CheckScript(ScriptLoader scriptLoader, FlowChartTree flowChart)
         {
+            var changedNode = new Dictionary<string, Differ>();
             if (globalSave.nodeHashes != null)
             {
                 // TODO: upgrade global save
@@ -300,11 +331,76 @@ namespace Nova
                         Differ differ = new Differ(node, reachedDialogues[node.name]);
                         differ.GetDiffs();
 
-                        globalSaveDirty = true;
+                        if (differ.distance > 0)
+                        {
+                            changedNode.Add(node.name, differ);
+                        }
+                    }
+                }
+                foreach (var node in globalSave.nodeHashes.Keys)
+                {
+                    if (!flowChart.HasNode(node))
+                    {
+                        changedNode.Add(node, null);
                     }
                 }
             }
+
             globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
+            globalSaveDirty = true;
+        }
+
+        public long UpgradeNodeRecord(NodeRecord nodeRecord, int beginDialogue)
+        {
+            var beginCheckpoint = GetCheckpoint(NextRecord(nodeRecord.offset));
+
+            nodeRecord.beginDialogue = beginDialogue;
+            nodeRecord.endDialogue = beginDialogue + 1;
+            nodeRecord.lastCheckpointDialogue = beginDialogue;
+            nodeRecord.offset = globalSave.endCheckpoint;
+            serializer.UpdateNodeRecord(nodeRecord);
+            NewCheckpointRecord();
+
+            AppendCheckpoint(beginDialogue, beginCheckpoint);
+            return nodeRecord.offset;
+        }
+
+        private void ResetChildParent(NodeRecord nodeRecord)
+        {
+            var offset = nodeRecord.child;
+            NodeRecord child = null;
+            while (offset != 0)
+            {
+                child = GetNodeRecord(offset);
+                child.parent = nodeRecord.offset;
+                serializer.UpdateNodeRecord(child);
+                offset = child.sibling;
+            }
+        }
+
+        public void ResetChildParent(long offset)
+        {
+            ResetChildParent(GetNodeRecord(offset));
+        }
+
+        public long DeleteNodeRecord(NodeRecord nodeRecord)
+        {
+            nodeRecord.offset = 0;
+            ResetChildParent(nodeRecord);
+            return nodeRecord.sibling;
+        }
+
+        public bool IsNodeRecordTillEnd(NodeRecord nodeRecord)
+        {
+            if (nodeRecord.child != 0)
+            {
+                NodeRecord child = GetNodeRecord(nodeRecord.child);
+                if (child.name != nodeRecord.name)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         #endregion

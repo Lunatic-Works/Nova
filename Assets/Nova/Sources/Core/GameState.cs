@@ -326,10 +326,6 @@ namespace Nova
 
         public void StartInterrupt()
         {
-            if (isRestoring)
-            {
-                Debug.LogWarning("Interrupt while restoring, the game will be locked");
-            }
             variablesHashBeforeInterrupt = variables.hash;
         }
 
@@ -885,7 +881,25 @@ namespace Nova
             nodeRecord = list[list.Count - 1];
         }
 
+        private bool isUpgrading;
+
         public bool isRestoring { get; private set; }
+
+        private bool CheckUnlockInRestoring()
+        {
+            if (!actionPauseLock.isLocked)
+            {
+                return true;
+            }
+            if (isUpgrading)
+            {
+                throw CheckpointCorruptedException.CannotUpgrade;
+            }
+            Debug.LogWarning("Nova: GameState paused by action when restoring. " +
+                             "Maybe a minigame does not have a checkpoint ensured after it.");
+            isRestoring = false;
+            return false;
+        }
 
         private void FastForward(int stepCount)
         {
@@ -893,36 +907,21 @@ namespace Nova
 
             for (var i = 0; i < stepCount; ++i)
             {
-                var isLast = i == stepCount - 1;
-                if (isLast)
+                if (!isUpgrading && i == stepCount - 1)
                 {
                     isRestoring = false;
                 }
 
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 Step();
-                if (actionPauseLock.isLocked)
+                if (!CheckUnlockInRestoring())
                 {
-                    Debug.LogWarning("Nova: GameState paused by action when restoring. " +
-                                     "Maybe a minigame does not have a checkpoint ensured after it.");
-                    isRestoring = false;
                     return;
                 }
             }
         }
 
-        public void MoveBackToFirstDialogue()
-        {
-            var entryNode = nodeRecord;
-            while (entryNode.parent != 0 && entryNode.beginDialogue != 0)
-            {
-                entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
-            }
-
-            MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
-        }
-
-        public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
+        private void Move(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex, bool upgrade)
         {
             // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
 
@@ -943,6 +942,7 @@ namespace Nova
             // Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
 
             isRestoring = true;
+            isUpgrading = upgrade;
             restoreStarts.Invoke();
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
@@ -954,11 +954,8 @@ namespace Nova
             }
 
             UpdateGameState(true, true, false, false, true);
-            if (actionPauseLock.isLocked)
+            if (!CheckUnlockInRestoring())
             {
-                Debug.LogWarning("Nova: GameState paused by action when restoring. " +
-                                 "Maybe a minigame does not have a checkpoint ensured after it.");
-                isRestoring = false;
                 return;
             }
 
@@ -967,7 +964,29 @@ namespace Nova
                 FastForward(dialogueIndex - currentIndex);
             }
 
+            isUpgrading = false;
             // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
+        }
+
+        public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
+        {
+            Move(nodeRecord, newCheckpointOffset, dialogueIndex, false);
+        }
+
+        public void MoveToUpgrade(NodeRecord newNodeRecord, int lastDialogue)
+        {
+            Move(nodeRecord, checkpointManager.NextCheckpoint(newNodeRecord.offset), lastDialogue, true);
+        }
+
+        public void MoveBackToFirstDialogue()
+        {
+            var entryNode = nodeRecord;
+            while (entryNode.parent != 0 && entryNode.beginDialogue != 0)
+            {
+                entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
+            }
+
+            MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
         }
 
         public IEnumerable<ReachedDialoguePosition> GetDialogueHistory(int limit = 0)

@@ -46,8 +46,6 @@ namespace Nova
             scriptHashes = node.GetAllDialogues().Select(x => x.textHash).ToArray();
             saveHashes = reachedData.Select(x => x.textHash).ToArray();
             distance = -1;
-
-            Debug.Log($"{scriptHashes.Select(x => x % 32).Dump()} vs {saveHashes.Select(x => x % 32).Dump()}");
         }
 
         // find the shortest path and calculate V array

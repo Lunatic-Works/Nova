@@ -52,9 +52,13 @@ namespace Nova
     }
 
     [Serializable]
-    public class ReachedDialoguePlaceholder : IReachedData
+    public class NodeUpgradeMaker : IReachedData
     {
         public readonly string nodeName;
-        public readonly int dialogueIndex;
+
+        public NodeUpgradeMaker(string nodeName)
+        {
+            this.nodeName = nodeName;
+        }
     }
 }
