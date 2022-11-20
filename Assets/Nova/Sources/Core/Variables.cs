@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -66,7 +65,7 @@ namespace Nova
 
         private ulong GetHashULong()
         {
-            return Utils.HashList(dict.SelectMany(pair => new[] { pair.Key, pair.Value.type, pair.Value.value }));
+            return Utils.HashList(dict.SelectMany(pair => new[] {pair.Key, pair.Value.type, pair.Value.value}));
         }
 
         public VariableEntry Get(string name)

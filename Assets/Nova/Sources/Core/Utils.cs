@@ -423,8 +423,8 @@ namespace Nova
                     r *= 11400714819323199563UL;
                 }
             }
-            return r;
 
+            return r;
         }
 
         public static ulong HashList<T>(IEnumerable<T> list) where T : class

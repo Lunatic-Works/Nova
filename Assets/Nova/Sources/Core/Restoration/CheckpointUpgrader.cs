@@ -10,7 +10,8 @@ namespace Nova
         private readonly Dictionary<string, Differ> changedNodes;
         private readonly Dictionary<long, long> nodeRecordMap = new Dictionary<long, long>();
 
-        public CheckpointUpgrader(GameState gameState, CheckpointManager checkpointManager, Dictionary<string, Differ> changedNodes)
+        public CheckpointUpgrader(GameState gameState, CheckpointManager checkpointManager,
+            Dictionary<string, Differ> changedNodes)
         {
             this.gameState = gameState;
             this.checkpointManager = checkpointManager;
@@ -23,12 +24,13 @@ namespace Nova
             {
                 return 0;
             }
-            NodeRecord nodeRecord = checkpointManager.GetNodeRecord(offset);
+
+            var nodeRecord = checkpointManager.GetNodeRecord(offset);
             nodeRecord.child = UpgradeNodeTree(nodeRecord.child);
             nodeRecord.sibling = UpgradeNodeTree(nodeRecord.sibling);
 
             var newOffset = offset;
-            bool needResetParent = false;
+            var needResetParent = false;
             if (changedNodes.TryGetValue(nodeRecord.name, out var differ))
             {
                 if (differ == null)
@@ -38,6 +40,7 @@ namespace Nova
                     nodeRecordMap.Add(offset, 0);
                     return checkpointManager.DeleteNodeRecord(nodeRecord);
                 }
+
                 // normally we map beginDialogue to its rightMap
                 // and endDialogue to its leftMap
                 // several special cases are below
@@ -51,7 +54,7 @@ namespace Nova
                 var ed1 = differ.leftMap[ed0 - 1];
                 if (nodeRecord.child != 0)
                 {
-                    NodeRecord child = checkpointManager.GetNodeRecord(nodeRecord.child);
+                    var child = checkpointManager.GetNodeRecord(nodeRecord.child);
                     // case 1: if it has a child of a different node
                     // it must map endDialogue to the end of the node
                     if (child.name != nodeRecord.name)
@@ -65,6 +68,7 @@ namespace Nova
                         ed1 = child.beginDialogue - 1;
                     }
                 }
+
                 // Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1}]");
                 if (st1 <= ed1)
                 {
@@ -89,10 +93,12 @@ namespace Nova
                         {
                             throw CheckpointCorruptedException.CannotUpgrade;
                         }
+
                         if (nodeRecord.sibling == 0)
                         {
                             nodeRecord.sibling = child.sibling;
                         }
+
                         newOffset = nodeRecord.child;
                     }
                     else
@@ -101,52 +107,59 @@ namespace Nova
                     }
                 }
             }
+
             if (needResetParent)
             {
                 checkpointManager.ResetChildParent(newOffset);
             }
+
             return newOffset;
         }
 
         private bool UpgradeBookmark(int key, Bookmark bookmark)
         {
-            if (nodeRecordMap.TryGetValue(bookmark.nodeOffset, out var newOffset))
+            if (!nodeRecordMap.TryGetValue(bookmark.nodeOffset, out var newOffset))
             {
-                if (newOffset == 0)
-                {
-                    Debug.LogWarning($"cannot upgrade bookmark {key} because nodeRecord is deleted");
-                    return false;
-                }
-                NodeRecord nodeRecord = checkpointManager.GetNodeRecord(bookmark.nodeOffset);
-                NodeRecord newNodeRecord = checkpointManager.GetNodeRecord(newOffset);
-                var newDialogueIndex = changedNodes[nodeRecord.name].leftMap[bookmark.dialogueIndex];
-                if (newDialogueIndex < newNodeRecord.beginDialogue || newDialogueIndex >= newNodeRecord.endDialogue)
-                {
-                    Debug.LogWarning($"cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is deleted");
-                    return false;
-                }
-                bookmark.nodeOffset = newOffset;
-                bookmark.dialogueIndex = newDialogueIndex;
-                var checkpointOffset = checkpointManager.NextRecord(newOffset);
-                long lastOffset = -1;
-                while (true)
-                {
-                    var dialogue = checkpointManager.GetCheckpointDialogue(checkpointOffset);
-                    if (dialogue >= newNodeRecord.lastCheckpointDialogue)
-                    {
-                        bookmark.checkpointOffset = checkpointOffset;
-                        return true;
-                    }
-                    if (dialogue > newDialogueIndex)
-                    {
-                        bookmark.checkpointOffset = lastOffset;
-                        return true;
-                    }
-                    lastOffset = checkpointOffset;
-                    checkpointOffset = checkpointManager.NextCheckpoint(checkpointOffset);
-                }
+                return true;
             }
-            return true;
+
+            if (newOffset == 0)
+            {
+                Debug.LogWarning($"Nova: Cannot upgrade bookmark {key} because nodeRecord is deleted.");
+                return false;
+            }
+
+            var nodeRecord = checkpointManager.GetNodeRecord(bookmark.nodeOffset);
+            var newNodeRecord = checkpointManager.GetNodeRecord(newOffset);
+            var newDialogueIndex = changedNodes[nodeRecord.name].leftMap[bookmark.dialogueIndex];
+            if (newDialogueIndex < newNodeRecord.beginDialogue || newDialogueIndex >= newNodeRecord.endDialogue)
+            {
+                Debug.LogWarning($"Nova: Cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is deleted.");
+                return false;
+            }
+
+            bookmark.nodeOffset = newOffset;
+            bookmark.dialogueIndex = newDialogueIndex;
+            var checkpointOffset = checkpointManager.NextRecord(newOffset);
+            long lastOffset = -1;
+            while (true)
+            {
+                var dialogue = checkpointManager.GetCheckpointDialogue(checkpointOffset);
+                if (dialogue >= newNodeRecord.lastCheckpointDialogue)
+                {
+                    bookmark.checkpointOffset = checkpointOffset;
+                    return true;
+                }
+
+                if (dialogue > newDialogueIndex)
+                {
+                    bookmark.checkpointOffset = lastOffset;
+                    return true;
+                }
+
+                lastOffset = checkpointOffset;
+                checkpointOffset = checkpointManager.NextCheckpoint(checkpointOffset);
+            }
         }
 
         public void UpgradeSaves()
@@ -155,10 +168,11 @@ namespace Nova
             {
                 checkpointManager.InvalidateReachedData(nodeName);
             }
+
             checkpointManager.beginNodeOffset = UpgradeNodeTree(checkpointManager.beginNodeOffset);
             foreach (var id in checkpointManager.saveSlotsMetadata.Keys)
             {
-                Bookmark bookmark = checkpointManager.LoadBookmark(id, false);
+                var bookmark = checkpointManager.LoadBookmark(id, false);
                 if (UpgradeBookmark(id, bookmark))
                 {
                     checkpointManager.SaveBookmark(id, bookmark, false);

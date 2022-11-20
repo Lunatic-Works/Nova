@@ -372,7 +372,7 @@ namespace Nova
             }
 
             if (atEndOfNodeRecord || (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
-                !checkpointManager.CanAppendCheckpoint(checkpointOffset)))
+                                      !checkpointManager.CanAppendCheckpoint(checkpointOffset)))
             {
                 AppendSameNode();
             }
@@ -698,10 +698,11 @@ namespace Nova
             checkpointEnsured = true;
         }
 
-        private bool atEndOfNodeRecord => !isUpgrading &&
-            nodeRecord.child != 0 && currentIndex >= nodeRecord.endDialogue;
+        private bool atEndOfNodeRecord =>
+            !isUpgrading && nodeRecord.child != 0 && currentIndex >= nodeRecord.endDialogue;
 
-        private bool shouldSaveCheckpoint => checkpointEnsured || atEndOfNodeRecord ||
+        private bool shouldSaveCheckpoint =>
+            checkpointEnsured || atEndOfNodeRecord ||
             (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
 
         /// <summary>
@@ -729,7 +730,8 @@ namespace Nova
 
             variables.CloneFrom(entry.variables);
 
-            var pairs = restorables.OrderByDescending(x => (x.Value as IPrioritizedRestorable)?.priority ?? RestorablePriority.Normal);
+            var pairs = restorables.OrderByDescending(x =>
+                (x.Value as IPrioritizedRestorable)?.priority ?? RestorablePriority.Normal);
             foreach (var pair in pairs)
             {
                 if (entry.restoreDatas.TryGetValue(pair.Key, out var data))
@@ -742,6 +744,7 @@ namespace Nova
                     {
                         Debug.LogWarning($"Nova: Key {pair.Key} not found in restoreDatas. Please clear save data.");
                     }
+
                     // fallback to initialCheckpoint state
                     pair.Value.Restore(initialCheckpoint.restoreDatas[pair.Key]);
                 }
@@ -816,10 +819,12 @@ namespace Nova
             {
                 return true;
             }
+
             if (isUpgrading)
             {
                 throw CheckpointCorruptedException.CannotUpgrade;
             }
+
             Debug.LogWarning("Nova: GameState paused by action when restoring. " +
                              "Maybe a minigame does not have a checkpoint ensured after it.");
             isRestoring = false;

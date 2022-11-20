@@ -41,7 +41,8 @@ namespace Nova
         public readonly bool needInterpolate;
         public readonly ulong textHash;
 
-        public ReachedDialogueData(string nodeName, int dialogueIndex, VoiceEntries voices, bool needInterpolate, ulong textHash)
+        public ReachedDialogueData(string nodeName, int dialogueIndex, VoiceEntries voices, bool needInterpolate,
+            ulong textHash)
         {
             this.nodeName = nodeName;
             this.dialogueIndex = dialogueIndex;

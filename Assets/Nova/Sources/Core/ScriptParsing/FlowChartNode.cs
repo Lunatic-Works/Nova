@@ -33,7 +33,7 @@ namespace Nova
             this.name = name;
         }
 
-        private bool isFrozen = false;
+        private bool isFrozen;
 
         /// <summary>
         /// Freeze the type of this node
