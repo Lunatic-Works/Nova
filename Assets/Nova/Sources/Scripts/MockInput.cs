@@ -141,23 +141,15 @@ namespace Nova
             }
             else
             {
-                chapterSelectView.UpdateChapters();
-                if (chapterSelectView.GetUnlockedChapters().Count() < 2)
+                if (unlockAllChapters || unlockDebugChapters)
                 {
-                    chapterSelectView.BeginChapter();
+                    chapterSelectView.UnlockChapters(unlockAllChapters, unlockDebugChapters);
                 }
-                else
-                {
-                    yield return Show(chapterSelectView);
-                    if (unlockAllChapters || unlockDebugChapters)
-                    {
-                        chapterSelectView.UnlockChapters(unlockAllChapters, unlockDebugChapters);
-                        yield return delay;
-                    }
 
-                    var chapter = random.Next(chapterSelectView.GetUnlockedChapters().ToList());
-                    chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
-                }
+                yield return Show(chapterSelectView);
+                yield return delay;
+                var chapter = random.Next(chapterSelectView.GetUnlockedChapters().ToList());
+                chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
             }
 
             yield return WaitForView(CurrentViewType.Game);

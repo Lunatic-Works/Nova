@@ -619,17 +619,6 @@ namespace Nova
             MoveToNextNode(startNode);
         }
 
-        /// <summary>
-        /// Start the game from the default start point
-        /// </summary>
-        public void GameStart()
-        {
-            GameStart(flowChartTree.defaultStartNode);
-        }
-
-        /// <summary>
-        /// Start the game from a named start point
-        /// </summary>
         public void GameStart(string startName)
         {
             GameStart(flowChartTree.GetNode(startName));

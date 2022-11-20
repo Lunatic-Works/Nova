@@ -171,48 +171,6 @@ namespace Nova
             return startNodes.ContainsKey(name);
         }
 
-        private FlowChartNode _defaultStartNode;
-
-        /// <summary>
-        /// The default start node.
-        /// </summary>
-        /// <remarks>
-        /// When getting the value, if the default start node has been set, return the assigned value.
-        /// Otherwise, check the start node dict. If there is at least one start node, return the first one.
-        /// Otherwise, return null.
-        /// When setting the value, this property will check if the default start node has already been set.
-        /// </remarks>
-        /// <exception cref="DuplicatedDefinitionException">
-        /// DuplicatedDefinitionException will be thrown if assigning two different nodes to be the default start node.
-        /// </exception>
-        public FlowChartNode defaultStartNode
-        {
-            get
-            {
-                if (_defaultStartNode != null)
-                {
-                    return _defaultStartNode;
-                }
-
-                return startNodes.Values.First().node;
-            }
-            set
-            {
-                CheckFreeze();
-
-                if (_defaultStartNode == null)
-                {
-                    _defaultStartNode = value;
-                }
-
-                if (_defaultStartNode != value)
-                {
-                    throw new DuplicatedDefinitionException(
-                        $"Nova: Assigning two different default start points: {_defaultStartNode.name} and {value.name}");
-                }
-            }
-        }
-
         /// <summary>
         /// Add an end node.
         /// </summary>

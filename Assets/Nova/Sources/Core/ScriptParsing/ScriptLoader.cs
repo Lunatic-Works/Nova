@@ -472,19 +472,6 @@ namespace Nova
             flowChartTree.AddStart(currentNode, StartNodeType.Unlocked);
         }
 
-        /// <summary>
-        /// Set the current node as the default start node.
-        /// This method is designed to be called externally by scripts.
-        /// </summary>
-        /// <remarks>
-        /// This method will first add the current node as a start node, then set it as default.
-        /// </remarks>
-        public void SetCurrentAsDefaultStart()
-        {
-            SetCurrentAsUnlockedStart();
-            flowChartTree.defaultStartNode = currentNode;
-        }
-
         public void SetCurrentAsDebug()
         {
             CheckNode();

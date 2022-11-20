@@ -142,17 +142,6 @@ function is_unlocked_start()
     __Nova.scriptLoader:SetCurrentAsUnlockedStart()
 end
 
---- set the current node as the default start point
---- should be called at the end of the node
---- a game can have only one default start node, so this function cannot be called under different nodes
---- indicates is_unlocked_start()
-function is_default_start()
-    if not check_eager('is_default_start') then
-        return
-    end
-    __Nova.scriptLoader:SetCurrentAsDefaultStart()
-end
-
 function is_debug()
     if not check_eager('is_debug') then
         return

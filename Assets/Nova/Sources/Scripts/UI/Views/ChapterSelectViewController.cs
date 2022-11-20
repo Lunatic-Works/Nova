@@ -62,9 +62,9 @@ namespace Nova
         public override void Show(Action onFinish)
         {
             UpdateChapters();
-            if (GetUnlockedChapters().Count() < 2 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
+            if (unlockedChapters.Count == 1 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
             {
-                BeginChapter();
+                BeginChapter(unlockedChapters.First());
                 return;
             }
 
@@ -87,18 +87,11 @@ namespace Nova
             return unlockedChapters;
         }
 
-        public void BeginChapter(string chapterName = null)
+        public void BeginChapter(string chapterName)
         {
             viewManager.GetController<TitleController>().SwitchView<DialogueBoxController>(() =>
             {
-                if (chapterName == null)
-                {
-                    gameState.GameStart();
-                }
-                else
-                {
-                    gameState.GameStart(chapterName);
-                }
+                gameState.GameStart(chapterName);
             });
         }
 
