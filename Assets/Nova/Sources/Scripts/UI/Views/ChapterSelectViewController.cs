@@ -52,13 +52,6 @@ namespace Nova
             I18n.LocaleChanged.RemoveListener(UpdateButtons);
         }
 
-        protected override void Start()
-        {
-            base.Start();
-
-            checkpointManager.Init();
-        }
-
         public override void Show(Action onFinish)
         {
             UpdateChapters();
