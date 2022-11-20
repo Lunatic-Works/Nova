@@ -19,14 +19,20 @@ namespace Nova
             );
         }
 
+        private static Texture2D _ClearTexture;
+
         public static Texture2D ClearTexture
         {
             get
             {
-                var tex = new Texture2D(1, 1, TextureFormat.Alpha8, false);
-                tex.SetPixel(0, 0, Color.clear);
-                tex.Apply();
-                return tex;
+                if (_ClearTexture == null)
+                {
+                    _ClearTexture = new Texture2D(1, 1, TextureFormat.Alpha8, false);
+                    _ClearTexture.SetPixel(0, 0, Color.clear);
+                    _ClearTexture.Apply();
+                }
+
+                return _ClearTexture;
             }
         }
 
