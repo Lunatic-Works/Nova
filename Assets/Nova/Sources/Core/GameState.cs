@@ -133,9 +133,14 @@ namespace Nova
             LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
         }
 
-        public void CheckScript()
+        public void CheckScriptUpgrade()
         {
-            checkpointManager.CheckScript(scriptLoader, flowChartTree);
+            var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartTree);
+            if (changedNodes.Any())
+            {
+                var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
+                upgrader.UpgradeSaves();
+            }
         }
 
         /// <summary>
@@ -881,7 +886,7 @@ namespace Nova
             nodeRecord = list[list.Count - 1];
         }
 
-        private bool isUpgrading;
+        public bool isUpgrading { get; private set; }
 
         public bool isRestoring { get; private set; }
 
@@ -970,12 +975,14 @@ namespace Nova
 
         public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
         {
-            Move(nodeRecord, newCheckpointOffset, dialogueIndex, false);
+            Move(newNodeRecord, newCheckpointOffset, dialogueIndex, false);
         }
 
         public void MoveToUpgrade(NodeRecord newNodeRecord, int lastDialogue)
         {
-            Move(nodeRecord, checkpointManager.NextCheckpoint(newNodeRecord.offset), lastDialogue, true);
+            state = State.Normal;
+            Move(newNodeRecord, checkpointManager.NextRecord(newNodeRecord.offset), lastDialogue, true);
+            ResetGameState();
         }
 
         public void MoveBackToFirstDialogue()

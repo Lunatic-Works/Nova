@@ -134,7 +134,10 @@ namespace Nova
                 logEntriesRestoreData.Add(new LogEntryRestoreData(data.displayData, logEntries.Count));
             }
 
-            AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
+            if (!gameState.isUpgrading)
+            {
+                AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
+            }
         }
 
         private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
