@@ -119,7 +119,6 @@ namespace Nova
             {
                 scriptLoader.Init(scriptPath);
                 flowChartTree = scriptLoader.GetFlowChartTree();
-                checkpointManager.CheckScript(scriptLoader, flowChartTree);
             }
             catch (Exception e)
             {
@@ -132,6 +131,11 @@ namespace Nova
             LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);
             coroutineHelper = new CoroutineHelper(this);
             LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
+        }
+
+        public void CheckScript()
+        {
+            checkpointManager.CheckScript(scriptLoader, flowChartTree);
         }
 
         /// <summary>
@@ -322,6 +326,10 @@ namespace Nova
 
         public void StartInterrupt()
         {
+            if (isRestoring)
+            {
+                Debug.LogWarning("Interrupt while restoring, the game will be locked");
+            }
             variablesHashBeforeInterrupt = variables.hash;
         }
 
