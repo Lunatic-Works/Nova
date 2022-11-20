@@ -36,7 +36,7 @@ namespace Nova
                     nodeRecordMap.Add(offset, 0);
                     return checkpointManager.DeleteNodeRecord(nodeRecord);
                 }
-                var st = differ.rightMap[nodeRecord.beginDialogue];
+                var st = nodeRecord.beginDialogue == 0 ? 0 : differ.rightMap[nodeRecord.beginDialogue];
                 // if this node record has a child that in another node
                 // it means that the old save has reached this entire node
                 // in that case we must also reach the entire node in new save
