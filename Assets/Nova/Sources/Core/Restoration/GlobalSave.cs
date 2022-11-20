@@ -7,7 +7,7 @@ namespace Nova
     [Serializable]
     public class GlobalSave
     {
-        public readonly long identifier;
+        public long identifier;
         public long beginReached;
         public long endReached;
         public long beginCheckpoint;

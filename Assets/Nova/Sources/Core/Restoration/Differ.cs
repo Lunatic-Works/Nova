@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Nova
 {
     // An O(ND) diff algorithm: http://www.xmailserver.org/diff2.pdf
-    class Differ
+    public class Differ
     {
         private static readonly Exception bug = new Exception("differ internal bug");
 

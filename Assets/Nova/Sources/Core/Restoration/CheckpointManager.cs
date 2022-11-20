@@ -314,7 +314,7 @@ namespace Nova
 
         #region Checkpoint Upgrade
 
-        public void CheckScript(ScriptLoader scriptLoader, FlowChartTree flowChart)
+        public Dictionary<string, Differ> CheckScriptUpgrade(ScriptLoader scriptLoader, FlowChartTree flowChart)
         {
             var changedNode = new Dictionary<string, Differ>();
             if (globalSave.nodeHashes != null)
@@ -346,8 +346,13 @@ namespace Nova
                 }
             }
 
-            globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
-            globalSaveDirty = true;
+            if (changedNode.Any())
+            {
+                globalSave.identifier = DateTime.Now.ToBinary();
+                globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
+                globalSaveDirty = true;
+            }
+            return changedNode;
         }
 
         public long UpgradeNodeRecord(NodeRecord nodeRecord, int beginDialogue)
@@ -475,22 +480,19 @@ namespace Nova
             return bookmark;
         }
 
-        /// <summary>
-        /// Save a bookmark to disk, and update the global save file.
-        /// Will throw exception if it fails.
-        /// </summary>
-        /// <param name="saveID">ID of the bookmark.</param>
-        /// <param name="bookmark">The bookmark to save.</param>
-        public void SaveBookmark(int saveID, Bookmark bookmark)
+        public void SaveBookmark(int saveID, Bookmark bookmark, bool cache = true)
         {
-            var screenshot = new Texture2D(bookmark.screenshot.width, bookmark.screenshot.height,
-                bookmark.screenshot.format, false);
-            screenshot.SetPixels32(bookmark.screenshot.GetPixels32());
-            screenshot.Apply();
-            bookmark.screenshot = screenshot;
+            if (cache)
+            {
+                var screenshot = new Texture2D(bookmark.screenshot.width, bookmark.screenshot.height,
+                    bookmark.screenshot.format, false);
+                screenshot.SetPixels32(bookmark.screenshot.GetPixels32());
+                screenshot.Apply();
+                bookmark.screenshot = screenshot;
+            }
             bookmark.globalSaveIdentifier = globalSave.identifier;
 
-            serializer.WriteBookmark(GetBookmarkFileName(saveID), ReplaceCache(saveID, bookmark));
+            serializer.WriteBookmark(GetBookmarkFileName(saveID), cache ? ReplaceCache(saveID, bookmark) : bookmark);
             UpdateGlobalSave();
 
             var metadata = saveSlotsMetadata.Ensure(saveID);
@@ -504,16 +506,16 @@ namespace Nova
         /// </summary>
         /// <param name="saveID">ID of the bookmark.</param>
         /// <returns>The loaded bookmark.</returns>
-        public Bookmark LoadBookmark(int saveID)
+        public Bookmark LoadBookmark(int saveID, bool cache = true)
         {
             var bookmark = serializer.ReadBookmark(GetBookmarkFileName(saveID));
-            if (bookmark.globalSaveIdentifier != globalSave.identifier)
+            if (cache && bookmark.globalSaveIdentifier != globalSave.identifier)
             {
                 Debug.LogWarning($"Nova: Save file is incompatible with the global save file. saveID: {saveID}");
                 bookmark = null;
             }
 
-            return ReplaceCache(saveID, bookmark);
+            return cache ? ReplaceCache(saveID, bookmark) : bookmark;
         }
 
         /// <summary>

@@ -9,9 +9,9 @@ namespace Nova
         public const int ScreenshotWidth = 320;
         public const int ScreenshotHeight = 180;
 
-        public readonly long nodeOffset;
-        public readonly long checkpointOffset;
-        public readonly int dialogueIndex;
+        public long nodeOffset;
+        public long checkpointOffset;
+        public int dialogueIndex;
         public DialogueDisplayData description;
         public readonly DateTime creationTime = DateTime.Now;
         public long globalSaveIdentifier;
