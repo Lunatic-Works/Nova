@@ -158,11 +158,12 @@ namespace Nova
             {
                 return Utils.HashList(blocks.SelectMany(x =>
                 {
-                    IEnumerable<object> ret = new object[] { x.type, x.content };
+                    IEnumerable<object> ret = new object[] {x.type, x.content};
                     if (x.attributes != null)
                     {
                         ret = ret.Concat(x.attributes.Cast<object>());
                     }
+
                     return ret;
                 }));
             }
@@ -210,7 +211,7 @@ namespace Nova
             return res;
         }
 
-        private ulong GetNodeHash(IReadOnlyList<Chunk> nodeChunks)
+        private static ulong GetNodeHash(IReadOnlyList<Chunk> nodeChunks)
         {
             return Utils.HashList(nodeChunks.Select(x => x.GetHashUlong()));
         }
@@ -242,6 +243,7 @@ namespace Nova
                         {
                             currentNode.textHash = GetNodeHash(nodeChunks);
                         }
+
                         if (deferChunks)
                         {
                             currentNode.deferredChunks[stateLocale] = nodeChunks;

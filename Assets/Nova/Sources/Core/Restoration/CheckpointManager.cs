@@ -9,7 +9,7 @@ namespace Nova
 {
     public class CheckpointManager : MonoBehaviour
     {
-        public string saveFolder = "";
+        [SerializeField] private string saveFolder = "";
         private bool frozen;
         private string savePathBase;
         private string globalSavePath;
@@ -102,7 +102,7 @@ namespace Nova
 
         #endregion
 
-        #region Reached Data
+        #region Reached data
 
         private void InitReached()
         {
@@ -161,6 +161,7 @@ namespace Nova
             {
                 return;
             }
+
             SetReachedDialogueData(data);
             AppendReachedRecord(data);
         }
@@ -179,8 +180,8 @@ namespace Nova
         public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
         {
             return reachedDialogues.ContainsKey(nodeName) &&
-                dialogueIndex < reachedDialogues[nodeName].Count &&
-                reachedDialogues[nodeName][dialogueIndex] != null;
+                   dialogueIndex < reachedDialogues[nodeName].Count &&
+                   reachedDialogues[nodeName][dialogueIndex] != null;
         }
 
         public ReachedDialogueData GetReachedDialogueData(string nodeName, int dialogueIndex)
@@ -205,11 +206,7 @@ namespace Nova
 
         public long beginNodeOffset
         {
-            get
-            {
-                return globalSave.beginCheckpoint < globalSave.endCheckpoint ?
-                    globalSave.beginCheckpoint : 0;
-            }
+            get => globalSave.beginCheckpoint < globalSave.endCheckpoint ? globalSave.beginCheckpoint : 0;
             set
             {
                 globalSave.beginCheckpoint = value;
@@ -316,7 +313,7 @@ namespace Nova
 
         #endregion
 
-        #region Checkpoint Upgrade
+        #region Checkpoint upgrade
 
         public Dictionary<string, Differ> CheckScriptUpgrade(ScriptLoader scriptLoader, FlowChartTree flowChart)
         {
@@ -326,10 +323,11 @@ namespace Nova
                 // TODO: upgrade global save
                 foreach (var node in flowChart)
                 {
-                    if (globalSave.nodeHashes.ContainsKey(node.name) && globalSave.nodeHashes[node.name] != node.textHash &&
+                    if (globalSave.nodeHashes.ContainsKey(node.name) &&
+                        globalSave.nodeHashes[node.name] != node.textHash &&
                         reachedDialogues.ContainsKey(node.name))
                     {
-                        Debug.Log($"node need upgrade {node.name}");
+                        Debug.Log($"Nova: Node {node.name} needs upgrading.");
 
                         scriptLoader.AddDeferredDialogueChunks(node);
                         Differ differ = new Differ(node, reachedDialogues[node.name]);
@@ -341,6 +339,7 @@ namespace Nova
                         }
                     }
                 }
+
                 foreach (var node in globalSave.nodeHashes.Keys)
                 {
                     if (!flowChart.HasNode(node))
@@ -356,6 +355,7 @@ namespace Nova
                 globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
                 globalSaveDirty = true;
             }
+
             return changedNode;
         }
 
@@ -378,10 +378,9 @@ namespace Nova
         private void ResetChildParent(NodeRecord nodeRecord)
         {
             var offset = nodeRecord.child;
-            NodeRecord child = null;
             while (offset != 0)
             {
-                child = GetNodeRecord(offset);
+                var child = GetNodeRecord(offset);
                 child.parent = nodeRecord.offset;
                 serializer.UpdateNodeRecord(child);
                 offset = child.sibling;
@@ -400,9 +399,23 @@ namespace Nova
             return nodeRecord.sibling;
         }
 
+        public bool IsNodeRecordTillEnd(NodeRecord nodeRecord)
+        {
+            if (nodeRecord.child != 0)
+            {
+                NodeRecord child = GetNodeRecord(nodeRecord.child);
+                if (child.name != nodeRecord.name)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         #endregion
 
-        #region Global Save
+        #region Global save
 
         private void InitGlobalSave()
         {
@@ -415,6 +428,7 @@ namespace Nova
             {
                 return;
             }
+
             if (globalSaveDirty)
             {
                 serializer.SerializeRecord(CheckpointSerializer.GlobalSaveOffset, globalSave);
@@ -435,10 +449,12 @@ namespace Nova
             {
                 file.Delete();
             }
+
             if (!frozen)
             {
                 serializer.Open();
             }
+
             globalSave = new GlobalSave(serializer);
             globalSaveDirty = true;
             InitReached();
@@ -488,6 +504,7 @@ namespace Nova
                 screenshot.Apply();
                 bookmark.screenshot = screenshot;
             }
+
             bookmark.globalSaveIdentifier = globalSave.identifier;
 
             serializer.WriteBookmark(GetBookmarkFileName(saveID), cache ? ReplaceCache(saveID, bookmark) : bookmark);
@@ -498,12 +515,6 @@ namespace Nova
             metadata.modifiedTime = DateTime.Now;
         }
 
-        /// <summary>
-        /// Load a bookmark from disk. Never uses cache.
-        /// Will throw exception if it fails.
-        /// </summary>
-        /// <param name="saveID">ID of the bookmark.</param>
-        /// <returns>The loaded bookmark.</returns>
         public Bookmark LoadBookmark(int saveID, bool cache = true)
         {
             var bookmark = serializer.ReadBookmark(GetBookmarkFileName(saveID));
@@ -516,10 +527,6 @@ namespace Nova
             return cache ? ReplaceCache(saveID, bookmark) : bookmark;
         }
 
-        /// <summary>
-        /// Delete a specified bookmark.
-        /// </summary>
-        /// <param name="saveID">ID of the bookmark.</param>
         public void DeleteBookmark(int saveID)
         {
             File.Delete(GetBookmarkFileName(saveID));

@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Nova
 {
     // An O(ND) diff algorithm: http://www.xmailserver.org/diff2.pdf
     public class Differ
     {
-        private static readonly Exception bug = new Exception("differ internal bug");
+        private static readonly Exception Bug = new Exception("Nova: Differ internal bug.");
 
         private readonly ulong[] saveHashes, scriptHashes;
+
         // pseudo array of V[d][k]
         // the X value of furthest reached point for a d-path on diag-k
         private readonly List<int> v = new List<int>();
@@ -22,13 +22,17 @@ namespace Nova
 
         public IReadOnlyList<int> inserts => _inserts;
         public IReadOnlyList<int> deletes => _deletes;
+
         // remap[i] == j means old list index j maps to new list index i
         // new item in new list remaps to index -1
         public IReadOnlyList<int> remap => _remap;
+
         // leftMap[i] is new index "left" of old index i
         public IReadOnlyList<int> leftMap => _leftMap;
+
         // rightMap[i] is new index "right" of old index i
         public IReadOnlyList<int> rightMap => _rightMap;
+
         public int distance { get; private set; }
 
         // return V[d][k]
@@ -36,8 +40,9 @@ namespace Nova
         {
             if (k > d || k < -d || ((k + d) % 2 != 0))
             {
-                throw bug;
+                throw Bug;
             }
+
             return v[(d + 1) * d / 2 + (k + d) / 2];
         }
 
@@ -65,16 +70,19 @@ namespace Nova
                     {
                         x = Math.Max(x, V(d - 1, k - 1) + 1);
                     }
+
                     if (k < d)
                     {
                         x = Math.Max(x, V(d - 1, k + 1));
                     }
+
                     y = x - k;
                     while (x < xMax && y < yMax && (x >= xMid || saveHashes[x] == scriptHashes[y]))
                     {
                         x++;
                         y++;
                     }
+
                     v.Add(x);
                     if (x >= xMid && y >= yMax)
                     {
@@ -82,26 +90,28 @@ namespace Nova
                     }
                 }
             }
-            throw bug;
+
+            throw Bug;
         }
 
-        private void CalcInsertsDeletes(int x, int k)
+        private void CalcInsertsDeletes(int k)
         {
             for (int d = distance - 1; d >= 0; d--)
             {
                 if (k + 1 > d || (k - 1 >= -d && V(d, k + 1) < V(d, k - 1) + 1))
                 {
                     k--;
-                    x = V(d, k);
+                    var x = V(d, k);
                     _deletes.Add(x);
                 }
                 else
                 {
                     k++;
-                    x = V(d, k);
+                    var x = V(d, k);
                     _inserts.Add(x - k);
                 }
             }
+
             _deletes.Reverse();
             _inserts.Reverse();
         }
@@ -116,6 +126,7 @@ namespace Nova
                     i++;
                     x++;
                 }
+
                 if (j < _inserts.Count && _inserts[j] == y)
                 {
                     _remap.Add(-1);
@@ -138,15 +149,18 @@ namespace Nova
                 {
                     continue;
                 }
+
                 for (; x >= _remap[y]; x--)
                 {
                     _leftMap.Add(y);
                 }
             }
+
             for (; x >= 0; x--)
             {
                 _leftMap.Add(-1);
             }
+
             _leftMap.Reverse();
         }
 
@@ -159,11 +173,13 @@ namespace Nova
                 {
                     continue;
                 }
+
                 for (; x < saveHashes.Length && x <= _remap[y]; x++)
                 {
                     _rightMap.Add(y);
                 }
             }
+
             for (; x < saveHashes.Length; x++)
             {
                 _rightMap.Add(scriptHashes.Length);
@@ -178,7 +194,7 @@ namespace Nova
             }
 
             distance = CalcV(out var x, out var y);
-            CalcInsertsDeletes(x, x - y);
+            CalcInsertsDeletes(x - y);
             CalcRemap();
             CalcLeftMap();
             CalcRightMap();

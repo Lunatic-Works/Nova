@@ -17,8 +17,8 @@ namespace Nova.Editor
 
         private class SaveTreeView : TreeView
         {
-            private CheckpointManager checkpointManager;
-            private List<long> rows = new List<long>();
+            private readonly CheckpointManager checkpointManager;
+            private readonly List<long> rows = new List<long>();
 
             public SaveTreeView(CheckpointManager checkpointManager) : base(new TreeViewState())
             {
@@ -33,6 +33,7 @@ namespace Nova.Editor
                 {
                     return;
                 }
+
                 var nodeRecord = checkpointManager.GetNodeRecord(offset);
                 var item = new TreeViewItem { id = rows.Count, displayName = $"{nodeRecord.name} @{offset}" };
                 rows.Add(offset);
@@ -50,6 +51,7 @@ namespace Nova.Editor
                 {
                     root.AddChild(new TreeViewItem { id = 0, displayName = "" });
                 }
+
                 SetupDepthsFromParentsAndChildren(root);
                 return root;
             }
@@ -65,15 +67,16 @@ namespace Nova.Editor
                 {
                     return rows[GetSelection()[0]];
                 }
+
                 return -1;
             }
         }
 
         private class CheckpointTreeView : TreeView
         {
-            private CheckpointManager checkpointManager;
+            private readonly CheckpointManager checkpointManager;
             private NodeRecord nodeRecord;
-            private List<long> rows = new List<long>();
+            private readonly List<long> rows = new List<long>();
 
             public CheckpointTreeView(CheckpointManager checkpointManager) : base(new TreeViewState())
             {
@@ -106,10 +109,12 @@ namespace Nova.Editor
                         offset = checkpointManager.NextCheckpoint(offset);
                     }
                 }
+
                 if (rows.Count == 0)
                 {
                     root.AddChild(new TreeViewItem { id = 0, displayName = "" });
                 }
+
                 SetupDepthsFromParentsAndChildren(root);
 
                 return root;
@@ -126,6 +131,7 @@ namespace Nova.Editor
                 {
                     return rows[GetSelection()[0]];
                 }
+
                 return -1;
             }
         }
@@ -149,7 +155,7 @@ namespace Nova.Editor
         private Vector2 scrollPos;
         private bool showNodeRecord;
         private bool showCheckpoint;
-        private HashSet<string> showCheckpointDetails = new HashSet<string>();
+        private readonly HashSet<string> showCheckpointDetails = new HashSet<string>();
 
         private void OnEnable()
         {
@@ -182,6 +188,7 @@ namespace Nova.Editor
                 {
                     textAreaStyle = new GUIStyle(EditorStyles.textArea) { wordWrap = true };
                 }
+
                 EditorGUILayout.TextArea(value, textAreaStyle);
             }
             else
@@ -202,6 +209,7 @@ namespace Nova.Editor
                 selectedNodeRecord = selected >= 0 ? checkpointManager.GetNodeRecord(selected) : null;
                 checkpointTreeView.Reload(selectedNodeRecord);
             }
+
             checkpointTreeView.OnGUI(EditorGUILayout.GetControlRect(false, position.height / 2));
 
             selected = checkpointTreeView.GetSelected();
@@ -221,6 +229,7 @@ namespace Nova.Editor
                     }
                 }
             }
+
             GUILayout.EndVertical();
 
             scrollPos = GUILayout.BeginScrollView(scrollPos);
@@ -231,10 +240,12 @@ namespace Nova.Editor
                 showNodeRecord = EditorGUILayout.Foldout(showNodeRecord, "NodeRecord");
                 if (showNodeRecord)
                 {
-                    GUILayout.Label($"dialogues: [{selectedNodeRecord.beginDialogue}, {selectedNodeRecord.endDialogue})");
+                    GUILayout.Label(
+                        $"dialogues: [{selectedNodeRecord.beginDialogue}, {selectedNodeRecord.endDialogue})");
                     GUILayout.Label($"last checkpoint dialogue: {selectedNodeRecord.lastCheckpointDialogue}");
                     GUILayout.Label($"variable: {selectedNodeRecord.variablesHash}");
                 }
+
                 if (selectedCheckpoint.offset >= 0)
                 {
                     showCheckpoint = EditorGUILayout.Foldout(showCheckpoint, "Checkpoint");

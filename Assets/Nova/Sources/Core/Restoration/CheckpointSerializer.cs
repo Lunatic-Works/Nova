@@ -47,7 +47,7 @@ namespace Nova
         }
 
         public static readonly CheckpointCorruptedException CannotUpgrade =
-            new CheckpointCorruptedException("Global Save is not able to upgrade");
+            new CheckpointCorruptedException("Unable to upgrade global save.");
     }
 
     public sealed class CheckpointJsonSerializer : JsonSerializer
@@ -60,7 +60,7 @@ namespace Nova
             private static readonly HashSet<Assembly> AllowedAssembly = new HashSet<Assembly>
             {
                 CurAssembly,
-                // mscorlib
+                // mscorlib,
                 typeof(List<>).Assembly,
             };
 
@@ -146,7 +146,7 @@ namespace Nova
             }
         }
 
-        public CheckpointJsonSerializer() : base()
+        public CheckpointJsonSerializer()
         {
             TypeNameHandling = TypeNameHandling.Auto;
             SerializationBinder = new JsonTypeBinder();
@@ -166,11 +166,12 @@ namespace Nova
     public class CheckpointSerializer : IDisposable
     {
         public const int Version = 4;
-        public const bool DefaultCompress = true;
+
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
         public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
         public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
 
+        private const bool DefaultCompress = true;
         private const int RecordHeader = 4; // sizeof(int)
 
         private readonly JsonSerializer jsonSerializer;
