@@ -773,6 +773,9 @@ namespace Nova
         /// </summary>
         private bool checkpointEnsured;
 
+        // Used by the preload system when using anim_hold_begin
+        // Whether the current dialogue has a checkpoint is decided before the Lua code runs,
+        // so we can only ensure it on the next dialogue
         public void EnsureCheckpointOnNextDialogue()
         {
             checkpointEnsured = true;

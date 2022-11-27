@@ -14,6 +14,7 @@
     * `Assets/Resources/LocalizedResources/English/Scenarios/`文件夹下是英文版的脚本，可以全部删除
     * `Assets/Resources/LocalizedResourcePaths.txt`用来记录英文版用到的文件，可以删除
 6. 其他资料可以参考[GitHub Wiki](https://github.com/Lunatic-Works/Nova/wiki/)
+7. 遇到问题可以在issue里提
 
 ## 常见问题
 
@@ -48,8 +49,6 @@
 * 我们的第一部视觉小说作品《青箱》：[Steam](https://store.steampowered.com/app/1131740) [知乎](https://www.zhihu.com/question/409724349) [Bangumi](https://bgm.tv/subject/311066) [VNDB](https://vndb.org/v26506)
 * 我们的微博：[@LunaticWorks](https://weibo.com/LunaticWorks)
 * 我们的QQ群：876212259，如果以后讨论程序的人多了可能会再开一个程序群
-
-在使用Nova或者读代码的时候遇到任何问题都可以开一个issue，也可以加群讨论
 
 也可以看一看其他的视觉小说引擎：
 
