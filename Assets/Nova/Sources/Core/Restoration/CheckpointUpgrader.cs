@@ -32,22 +32,45 @@ namespace Nova
             {
                 if (differ == null)
                 {
-                    // node is deleted
+                    Debug.Log($"remove nodeRecord @{offset}");
+                    // node is removed
                     nodeRecordMap.Add(offset, 0);
                     return checkpointManager.DeleteNodeRecord(nodeRecord);
                 }
-                var st = nodeRecord.beginDialogue == 0 ? 0 : differ.rightMap[nodeRecord.beginDialogue];
-                // if this node record has a child that in another node
-                // it means that the old save has reached this entire node
-                // in that case we must also reach the entire node in new save
-                var ed = checkpointManager.IsNodeRecordTillEnd(nodeRecord) ?
-                    differ.remap.Count : differ.leftMap[nodeRecord.endDialogue - 1];
-                Debug.Log($"[{nodeRecord.beginDialogue}, {nodeRecord.endDialogue}) -> [{st}, {ed}]");
-                if (nodeRecord.beginDialogue < ed)
+                // normally we map beginDialogue to its rightMap
+                // and endDialogue to its leftMap
+                // several special cases are below
+                var st0 = nodeRecord.beginDialogue;
+                var ed0 = nodeRecord.endDialogue;
+
+                // case 0: if this is the start of a node
+                // it must map beginDialogue to 0
+                var st1 = st0 == 0 ? 0 : differ.rightMap[st0];
+                // ed1 is the mapped endDialogue - 1
+                var ed1 = differ.leftMap[ed0 - 1];
+                if (nodeRecord.child != 0)
                 {
-                    newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st);
+                    NodeRecord child = checkpointManager.GetNodeRecord(nodeRecord.child);
+                    // case 1: if it has a child of a different node
+                    // it must map endDialogue to the end of the node
+                    if (child.name != nodeRecord.name)
+                    {
+                        ed1 = differ.remap.Count - 1;
+                    }
+                    // case 2: if it has a child of the same node
+                    // it must map endDialogue to the last node of that node
+                    else
+                    {
+                        ed1 = child.beginDialogue - 1;
+                    }
+                }
+                Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1}]");
+                if (st1 <= ed1)
+                {
+                    newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
+                    Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
                     nodeRecordMap.Add(offset, newOffset);
-                    gameState.MoveToUpgrade(nodeRecord, ed);
+                    gameState.MoveToUpgrade(nodeRecord, ed1);
                 }
                 else
                 {
