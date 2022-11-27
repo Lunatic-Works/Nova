@@ -395,19 +395,6 @@ namespace Nova
             return nodeRecord.sibling;
         }
 
-        public bool IsNodeRecordTillEnd(NodeRecord nodeRecord)
-        {
-            if (nodeRecord.child != 0)
-            {
-                NodeRecord child = GetNodeRecord(nodeRecord.child);
-                if (child.name != nodeRecord.name)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         #endregion
 
         #region Global Save
