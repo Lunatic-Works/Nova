@@ -368,6 +368,11 @@ namespace Nova
         {
             logEntriesRestoreData.Clear();
             Clear();
+            if (gameState.isUpgrading)
+            {
+                return;
+            }
+
             // TODO: In each checkpoint, only save logEntriesRestoreData from the last checkpoint
             // Or we can use a binary indexed tree to store them
             var data = restoreData as LogControllerRestoreData;

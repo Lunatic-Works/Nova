@@ -729,16 +729,14 @@ namespace Nova
 
             variables.CloneFrom(entry.variables);
 
-            foreach (var pair in
-                     from pair in restorables
-                     orderby (pair.Value as IPrioritizedRestorable)?.priority ?? RestorablePriority.Normal descending
-                     select pair)
+            var pairs = restorables.OrderByDescending(x => (x.Value as IPrioritizedRestorable)?.priority ?? RestorablePriority.Normal);
+            foreach (var pair in pairs)
             {
-                try
+                if (entry.restoreDatas.TryGetValue(pair.Key, out var data))
                 {
-                    pair.Value.Restore(entry.restoreDatas[pair.Key]);
+                    pair.Value.Restore(data);
                 }
-                catch (KeyNotFoundException)
+                else
                 {
                     Debug.LogWarning($"Nova: Key {pair.Key} not found in restoreDatas. Please clear save data.");
                 }
