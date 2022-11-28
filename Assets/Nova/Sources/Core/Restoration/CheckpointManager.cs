@@ -9,7 +9,8 @@ namespace Nova
 {
     public class CheckpointManager : MonoBehaviour
     {
-        public string saveFolder;
+        public string saveFolder = "";
+        private bool frozen;
         private string savePathBase;
         private string globalSavePath;
 
@@ -39,6 +40,7 @@ namespace Nova
                 return;
             }
 
+            frozen = !Application.isPlaying;
             savePathBase = Path.Combine(Application.persistentDataPath, "Save", saveFolder);
             globalSavePath = Path.Combine(savePathBase, "global.nsav");
             Directory.CreateDirectory(savePathBase);
@@ -177,7 +179,8 @@ namespace Nova
         public bool IsReachedAnyHistory(string nodeName, int dialogueIndex)
         {
             return reachedDialogues.ContainsKey(nodeName) &&
-                dialogueIndex < reachedDialogues[nodeName].Count;
+                dialogueIndex < reachedDialogues[nodeName].Count &&
+                reachedDialogues[nodeName][dialogueIndex] != null;
         }
 
         public ReachedDialogueData GetReachedDialogueData(string nodeName, int dialogueIndex)
@@ -204,7 +207,8 @@ namespace Nova
         {
             get
             {
-                return globalSave.beginCheckpoint;
+                return globalSave.beginCheckpoint < globalSave.endCheckpoint ?
+                    globalSave.beginCheckpoint : 0;
             }
             set
             {
@@ -290,7 +294,7 @@ namespace Nova
         {
             var record = globalSave.endCheckpoint;
 
-            var buf = new ByteSegment(new byte[4]);
+            var buf = new ByteSegment(4);
             buf.WriteInt(0, dialogueIndex);
             serializer.AppendRecord(record, buf);
             NewCheckpointRecord();
@@ -346,7 +350,7 @@ namespace Nova
                 }
             }
 
-            if (changedNode.Any())
+            if (changedNode.Any() || globalSave.nodeHashes == null)
             {
                 globalSave.identifier = DateTime.Now.ToBinary();
                 globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
@@ -358,6 +362,7 @@ namespace Nova
         public long UpgradeNodeRecord(NodeRecord nodeRecord, int beginDialogue)
         {
             var beginCheckpoint = GetCheckpoint(NextRecord(nodeRecord.offset));
+            beginCheckpoint.dialogueIndex = beginDialogue;
 
             nodeRecord.beginDialogue = beginDialogue;
             nodeRecord.endDialogue = beginDialogue + 1;
@@ -406,6 +411,10 @@ namespace Nova
 
         public void UpdateGlobalSave()
         {
+            if (frozen)
+            {
+                return;
+            }
             if (globalSaveDirty)
             {
                 serializer.SerializeRecord(CheckpointSerializer.GlobalSaveOffset, globalSave);
@@ -426,8 +435,10 @@ namespace Nova
             {
                 file.Delete();
             }
-
-            serializer.Open();
+            if (!frozen)
+            {
+                serializer.Open();
+            }
             globalSave = new GlobalSave(serializer);
             globalSaveDirty = true;
             InitReached();

@@ -16,7 +16,7 @@ namespace Nova
     [Serializable]
     public class GameStateCheckpoint
     {
-        public readonly int dialogueIndex;
+        public int dialogueIndex;
         public readonly int stepsCheckpointRestrained;
         public readonly Dictionary<string, IRestoreData> restoreDatas;
         public readonly Variables variables;

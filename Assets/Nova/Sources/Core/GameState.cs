@@ -49,6 +49,7 @@ namespace Nova
         public void CheckScriptUpgrade()
         {
             var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartTree);
+            Debug.Log($"upgrade {changedNodes.Count} nodes");
             if (changedNodes.Any())
             {
                 var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
@@ -370,8 +371,8 @@ namespace Nova
                 stepsFromLastCheckpoint++;
             }
 
-            if (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
-                !checkpointManager.CanAppendCheckpoint(checkpointOffset))
+            if (atEndOfNodeRecord || (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
+                !checkpointManager.CanAppendCheckpoint(checkpointOffset)))
             {
                 AppendSameNode();
             }
@@ -697,8 +698,11 @@ namespace Nova
             checkpointEnsured = true;
         }
 
-        private bool shouldSaveCheckpoint =>
-            checkpointEnsured || (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
+        private bool atEndOfNodeRecord => !isUpgrading &&
+            nodeRecord.child != 0 && currentIndex >= nodeRecord.endDialogue;
+
+        private bool shouldSaveCheckpoint => checkpointEnsured || atEndOfNodeRecord ||
+            (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
 
         /// <summary>
         /// Get the current game state as a checkpoint
