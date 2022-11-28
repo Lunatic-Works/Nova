@@ -30,7 +30,7 @@ namespace Nova
 
     [ExportCustomType]
     [Serializable]
-    public class Variables
+    public class Variables : ISerializedData
     {
         private static string CheckName(string name)
         {

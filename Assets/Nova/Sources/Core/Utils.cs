@@ -4,6 +4,7 @@ using System.Linq;
 using Nova.Exceptions;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Newtonsoft.Json;
 using UnityObject = UnityEngine.Object;
 
 namespace Nova
@@ -434,6 +435,11 @@ namespace Nova
         public static ulong HashObjects(params object[] list)
         {
             return HashList(list);
+        }
+
+        public static string PrettyPrint(this ISerializedData data)
+        {
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
         }
     }
 }
