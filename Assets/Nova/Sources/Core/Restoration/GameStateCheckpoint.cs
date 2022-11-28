@@ -14,7 +14,7 @@ namespace Nova
     /// a checkpoint, the CheckpointManager should store all the GameStateRestoreEntry for walked passed dialogues.
     /// </remarks>
     [Serializable]
-    public class GameStateCheckpoint
+    public class GameStateCheckpoint : ISerializedData
     {
         public int dialogueIndex;
         public readonly int stepsCheckpointRestrained;
