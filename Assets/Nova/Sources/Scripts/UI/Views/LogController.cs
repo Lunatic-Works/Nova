@@ -9,8 +9,6 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    using VoiceEntries = Dictionary<string, VoiceEntry>;
-
     public class LogEntry
     {
         public readonly float height;

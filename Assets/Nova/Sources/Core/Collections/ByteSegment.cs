@@ -11,6 +11,13 @@ namespace Nova
 
         public readonly int Count;
 
+        public ByteSegment(int count)
+        {
+            array = new byte[count];
+            offset = 0;
+            Count = count;
+        }
+
         public ByteSegment(byte[] data)
         {
             array = data;

@@ -96,7 +96,7 @@ namespace Nova
 
         public void Flush()
         {
-            if (!dirty)
+            if (!dirty || stream == null)
             {
                 return;
             }
