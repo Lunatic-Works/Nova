@@ -32,7 +32,7 @@ namespace Nova
             {
                 if (differ == null)
                 {
-                    Debug.Log($"remove nodeRecord @{offset}");
+                    // Debug.Log($"remove nodeRecord @{offset}");
                     // node is removed
                     nodeRecordMap.Add(offset, 0);
                     return checkpointManager.DeleteNodeRecord(nodeRecord);
@@ -64,11 +64,11 @@ namespace Nova
                         ed1 = child.beginDialogue - 1;
                     }
                 }
-                Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1}]");
+                // Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1}]");
                 if (st1 <= ed1)
                 {
                     newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
-                    Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
+                    // Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
                     nodeRecordMap.Add(offset, newOffset);
                     gameState.MoveToUpgrade(nodeRecord, ed1);
                 }

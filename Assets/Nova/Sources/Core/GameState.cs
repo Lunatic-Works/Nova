@@ -49,7 +49,7 @@ namespace Nova
         public void CheckScriptUpgrade()
         {
             var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartTree);
-            Debug.Log($"upgrade {changedNodes.Count} nodes");
+            // Debug.Log($"upgrade {changedNodes.Count} nodes");
             if (changedNodes.Any())
             {
                 var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
@@ -738,7 +738,12 @@ namespace Nova
                 }
                 else
                 {
-                    Debug.LogWarning($"Nova: Key {pair.Key} not found in restoreDatas. Please clear save data.");
+                    if (!isUpgrading)
+                    {
+                        Debug.LogWarning($"Nova: Key {pair.Key} not found in restoreDatas. Please clear save data.");
+                    }
+                    // fallback to initialCheckpoint state
+                    pair.Value.Restore(initialCheckpoint.restoreDatas[pair.Key]);
                 }
             }
         }
