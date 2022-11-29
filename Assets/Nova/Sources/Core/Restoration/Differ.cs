@@ -178,14 +178,14 @@ namespace Nova
             }
 
             distance = CalcV(out var x, out var y);
-            Debug.Log($"distance={distance}, x={x}, y={y}");
             CalcInsertsDeletes(x, x - y);
-            Debug.Log($"inserts={_inserts.Dump()}, deletes={_deletes.Dump()}");
             CalcRemap();
-            Debug.Log($"remap={_remap.Dump()}");
             CalcLeftMap();
             CalcRightMap();
-            Debug.Log($"leftMap={_leftMap.Dump()}, rightMap={_rightMap.Dump()}");
+            // Debug.Log($"distance={distance}, x={x}, y={y}");
+            // Debug.Log($"inserts={_inserts.Dump()}, deletes={_deletes.Dump()}");
+            // Debug.Log($"remap={_remap.Dump()}");
+            // Debug.Log($"leftMap={_leftMap.Dump()}, rightMap={_rightMap.Dump()}");
         }
     }
 }
