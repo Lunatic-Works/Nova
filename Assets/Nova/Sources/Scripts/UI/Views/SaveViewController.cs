@@ -529,6 +529,7 @@ namespace Nova
             }
         }
 
+        // Called only if the pointer is mouse
         private void OnThumbnailButtonEnter(int saveID)
         {
             if (viewManager.currentView != CurrentViewType.UI)
@@ -536,12 +537,9 @@ namespace Nova
                 return;
             }
 
-            if (Touch.activeTouches.Count == 0) // Mouse
+            if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
             {
-                if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
-                {
-                    selectedSaveID = saveID;
-                }
+                selectedSaveID = saveID;
             }
         }
 
@@ -552,10 +550,7 @@ namespace Nova
                 return;
             }
 
-            if (Touch.activeTouches.Count == 0) // Mouse
-            {
-                selectedSaveID = -1;
-            }
+            selectedSaveID = -1;
         }
 
         private void Unselect()
