@@ -53,18 +53,14 @@
 也可以看一看其他的视觉小说引擎：
 
 * [Ren'Py](https://github.com/renpy/renpy)：如果你没有编程基础但是想学，或者有Python基础，推荐用这个引擎
-* [WebGAL](https://github.com/MakinoharaShoko/WebGAL)：如果你信仰web前端，推荐用这个引擎
-* [Ayaka](https://github.com/Uni-Gal/Ayaka)：用Rust写的引擎
-* [Librian](https://github.com/RimoChan/Librian)：Python后端和web前端混合的引擎，作者是个萝莉控
-* [AVGPlus](https://github.com/avg-plus/avg.renderer)：另一个基于web的引擎，似乎得到了Xihe Animation的支持
-* [AVG.js](https://github.com/avgjs/avg-core)：一个比较稳定的基于web的引擎
+* [WebGAL](https://github.com/MakinoharaShoko/WebGAL)：如果你信仰web，推荐用这个引擎
+* [Ayaka](https://github.com/Uni-Gal/Ayaka)：如果你信仰Rust，可以试试这个引擎
 
 以及通用游戏引擎：
 
 * [SakuraEngine](https://github.com/SakuraEngine/SakuraEngine)：为高性能而生的游戏运行时与工具箱
 * [PainterEngine](https://github.com/matrixcascade/PainterEngine)：由C语言编写的跨平台图形应用框架
 * [EtherEngine](https://github.com/EtherProject/EtherEngine)：基于Lua的跨平台游戏接口
-* [Luna Engine](https://github.com/JX-Master/Luna-Engine-0.6)：这个引擎不是我们做的，不过看起来很有意思
 
 以及
 
