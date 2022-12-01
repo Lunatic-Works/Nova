@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
-using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 namespace Nova
 {
@@ -159,7 +160,6 @@ namespace Nova
             }
 
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
-
             I18n.LocaleChanged.AddListener(Refresh);
         }
 
@@ -184,7 +184,6 @@ namespace Nova
             rightButton.onClick.RemoveListener(PageRight);
 
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
-
             I18n.LocaleChanged.RemoveListener(Refresh);
         }
 
@@ -250,7 +249,6 @@ namespace Nova
             }
 
             selectedSaveID = -1;
-
             ShowPage();
 
             base.Show(onFinish);
@@ -462,9 +460,11 @@ namespace Nova
 
         #region Preview
 
+        private bool isMouse;
+
         private void OnThumbnailButtonClicked(int saveID)
         {
-            if (Touch.activeTouches.Count == 0) // Mouse
+            if (isMouse)
             {
                 if (saveViewMode == SaveViewMode.Save)
                 {
@@ -529,28 +529,36 @@ namespace Nova
             }
         }
 
-        // Called only if the pointer is mouse
-        private void OnThumbnailButtonEnter(int saveID)
+        private void OnThumbnailButtonEnter(PointerEventData _eventData, int saveID)
         {
             if (viewManager.currentView != CurrentViewType.UI)
             {
                 return;
             }
 
-            if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+            var eventData = (ExtendedPointerEventData)_eventData;
+            isMouse = eventData.pointerType == UIPointerType.MouseOrPen;
+            if (isMouse)
             {
-                selectedSaveID = saveID;
+                if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                {
+                    selectedSaveID = saveID;
+                }
             }
         }
 
-        private void OnThumbnailButtonExit(int saveID)
+        private void OnThumbnailButtonExit(PointerEventData _eventData, int saveID)
         {
             if (viewManager.currentView != CurrentViewType.UI)
             {
                 return;
             }
 
-            selectedSaveID = -1;
+            var eventData = (ExtendedPointerEventData)_eventData;
+            if (eventData.pointerType == UIPointerType.MouseOrPen)
+            {
+                selectedSaveID = -1;
+            }
         }
 
         private void Unselect()
@@ -751,8 +759,10 @@ namespace Nova
                     }
                 }
 
-                UnityAction onThumbnailButtonEnter = () => OnThumbnailButtonEnter(saveID);
-                UnityAction onThumbnailButtonExit = () => OnThumbnailButtonExit(saveID);
+                UnityAction<PointerEventData> onThumbnailButtonEnter =
+                    eventData => OnThumbnailButtonEnter(eventData, saveID);
+                UnityAction<PointerEventData> onThumbnailButtonExit =
+                    eventData => OnThumbnailButtonExit(eventData, saveID);
 
                 // Update UI of saveEntry
                 var saveEntryController = saveEntryControllers[i];

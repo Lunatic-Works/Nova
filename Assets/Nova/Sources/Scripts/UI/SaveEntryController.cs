@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 namespace Nova
@@ -25,8 +24,8 @@ namespace Nova
 
         private bool deleteButtonEnabled;
 
-        private UnityAction onPointerEnter;
-        private UnityAction onPointerExit;
+        private UnityAction<PointerEventData> onPointerEnter;
+        private UnityAction<PointerEventData> onPointerExit;
 
         private void Awake()
         {
@@ -87,8 +86,8 @@ namespace Nova
         }
 
         public void Init(string newIDText, string newDateText, bool isLatest, Sprite newThumbnailSprite,
-            UnityAction onDeleteButtonClicked, UnityAction onThumbnailButtonClicked, UnityAction onThumbnailButtonEnter,
-            UnityAction onThumbnailButtonExit)
+            UnityAction onDeleteButtonClicked, UnityAction onThumbnailButtonClicked,
+            UnityAction<PointerEventData> onThumbnailButtonEnter, UnityAction<PointerEventData> onThumbnailButtonExit)
         {
             idText.text = newIDText;
             dateText.gameObject.SetActive(true);
@@ -115,22 +114,14 @@ namespace Nova
             onPointerExit = onThumbnailButtonExit;
         }
 
-        public void OnPointerEnter(PointerEventData _eventData)
+        public void OnPointerEnter(PointerEventData eventData)
         {
-            var eventData = (ExtendedPointerEventData)_eventData;
-            if (eventData.pointerType == UIPointerType.MouseOrPen)
-            {
-                onPointerEnter?.Invoke();
-            }
+            onPointerEnter?.Invoke(eventData);
         }
 
-        public void OnPointerExit(PointerEventData _eventData)
+        public void OnPointerExit(PointerEventData eventData)
         {
-            var eventData = (ExtendedPointerEventData)_eventData;
-            if (eventData.pointerType == UIPointerType.MouseOrPen)
-            {
-                onPointerExit?.Invoke();
-            }
+            onPointerExit?.Invoke(eventData);
         }
 
         public void ShowDeleteButton()
