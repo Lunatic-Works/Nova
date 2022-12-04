@@ -28,6 +28,7 @@ namespace Nova
             nodeRecord.sibling = UpgradeNodeTree(nodeRecord.sibling);
 
             var newOffset = offset;
+            bool needResetParent = false;
             if (changedNodes.TryGetValue(nodeRecord.name, out var differ))
             {
                 if (differ == null)
@@ -68,6 +69,7 @@ namespace Nova
                 if (st1 <= ed1)
                 {
                     newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
+                    needResetParent = true;
                     // Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
                     nodeRecordMap.Add(offset, newOffset);
                     gameState.MoveToUpgrade(nodeRecord, ed1);
@@ -78,29 +80,41 @@ namespace Nova
                     // but if both this node and its child has siblings
                     // we cannot do such operation
                     // this only happens in mini game cases
+                    // Debug.Log($"remove nodeRecord @{offset}");
                     nodeRecordMap.Add(offset, 0);
-                    var child = checkpointManager.GetNodeRecord(nodeRecord.child);
-                    if (nodeRecord.sibling != 0 && child.sibling != 0)
+                    if (nodeRecord.child != 0)
                     {
-                        throw CheckpointCorruptedException.CannotUpgrade;
+                        var child = checkpointManager.GetNodeRecord(nodeRecord.child);
+                        if (nodeRecord.sibling != 0 && child.sibling != 0)
+                        {
+                            throw CheckpointCorruptedException.CannotUpgrade;
+                        }
+                        if (nodeRecord.sibling == 0)
+                        {
+                            nodeRecord.sibling = child.sibling;
+                        }
+                        newOffset = nodeRecord.child;
                     }
-                    if (nodeRecord.sibling == 0)
+                    else
                     {
-                        nodeRecord.sibling = child.sibling;
+                        newOffset = nodeRecord.sibling;
                     }
-                    newOffset = nodeRecord.child;
                 }
             }
-            checkpointManager.ResetChildParent(newOffset);
+            if (needResetParent)
+            {
+                checkpointManager.ResetChildParent(newOffset);
+            }
             return newOffset;
         }
 
-        private bool UpgradeBookmark(Bookmark bookmark)
+        private bool UpgradeBookmark(int key, Bookmark bookmark)
         {
             if (nodeRecordMap.TryGetValue(bookmark.nodeOffset, out var newOffset))
             {
                 if (newOffset == 0)
                 {
+                    Debug.LogWarning($"cannot upgrade bookmark {key} because nodeRecord is deleted");
                     return false;
                 }
                 NodeRecord nodeRecord = checkpointManager.GetNodeRecord(bookmark.nodeOffset);
@@ -108,6 +122,7 @@ namespace Nova
                 var newDialogueIndex = changedNodes[nodeRecord.name].leftMap[bookmark.dialogueIndex];
                 if (newDialogueIndex < newNodeRecord.beginDialogue || newDialogueIndex >= newNodeRecord.endDialogue)
                 {
+                    Debug.LogWarning($"cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is deleted");
                     return false;
                 }
                 bookmark.nodeOffset = newOffset;
@@ -144,7 +159,7 @@ namespace Nova
             foreach (var id in checkpointManager.saveSlotsMetadata.Keys)
             {
                 Bookmark bookmark = checkpointManager.LoadBookmark(id, false);
-                if (UpgradeBookmark(bookmark))
+                if (UpgradeBookmark(id, bookmark))
                 {
                     checkpointManager.SaveBookmark(id, bookmark, false);
                 }
