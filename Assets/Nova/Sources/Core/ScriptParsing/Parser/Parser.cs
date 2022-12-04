@@ -23,7 +23,7 @@ namespace Nova.Script
         public ParsedBlock(BlockType type, string content, AttributeDict attributes)
         {
             this.type = type;
-            this.content = content;
+            this.content = content?.Replace("\r", "");
             this.attributes = attributes;
         }
     }

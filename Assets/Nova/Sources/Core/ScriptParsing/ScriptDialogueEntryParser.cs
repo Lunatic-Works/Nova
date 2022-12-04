@@ -259,9 +259,6 @@ namespace Nova
                 }
             }
 
-            // Normalize line endings
-            sb.Replace("\r", "");
-
             var text = sb.ToString();
 
             // Markdown syntaxes used in tutorials
