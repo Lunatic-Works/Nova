@@ -537,7 +537,7 @@ namespace Nova
             }
 
             var eventData = (ExtendedPointerEventData)_eventData;
-            isMouse = eventData.pointerType == UIPointerType.MouseOrPen;
+            isMouse = !TouchFix.IsTouch(eventData);
             if (isMouse)
             {
                 if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
@@ -555,7 +555,7 @@ namespace Nova
             }
 
             var eventData = (ExtendedPointerEventData)_eventData;
-            if (eventData.pointerType == UIPointerType.MouseOrPen)
+            if (!TouchFix.IsTouch(eventData))
             {
                 selectedSaveID = -1;
             }

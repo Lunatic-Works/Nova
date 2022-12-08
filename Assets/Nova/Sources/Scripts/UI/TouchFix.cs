@@ -14,11 +14,14 @@ namespace Nova
     {
         private const float MaxIdleTime = 0.2f;
 
-        private bool inited;
-        private InputAction pointAction;
-        private InputAction clickAction;
+        public static bool UsingTouch;
 
-        private bool usingTouch;
+        public static bool IsTouch(ExtendedPointerEventData eventData)
+        {
+            return UsingTouch || eventData.pointerType == UIPointerType.Touch;
+        }
+
+        private bool inited;
         private float idleTime;
 
         // If we call it in Start, EventSystem.current can be uninitialized
@@ -30,44 +33,49 @@ namespace Nova
             }
 
             EnhancedTouchSupport.Enable();
+            Touch.onFingerDown += OnFingerDown;
 
+            // Multi-touch is disabled
             var inputModule = (InputSystemUIInputModule)EventSystem.current.currentInputModule;
-            var actions = inputModule.actionsAsset;
-            pointAction = actions.FindAction("Point", true);
-            clickAction = actions.FindAction("Click", true);
+            inputModule.pointerBehavior = UIPointerBehavior.SingleUnifiedPointer;
 
             inited = true;
         }
 
+        private void OnDestroy()
+        {
+            Touch.onFingerDown -= OnFingerDown;
+        }
+
+        private void OnFingerDown(Finger finger)
+        {
+            if (!UsingTouch)
+            {
+                UsingTouch = true;
+                idleTime = 0.0f;
+            }
+        }
+
         private void Update()
         {
-            if (Application.isMobilePlatform)
+            // Currently we assume that mobile platform = full screen, touch screen, no mouse/keyboard/gamepad
+            // We may properly detect those features in future
+            if (Application.isMobilePlatform || Touchscreen.current == null)
             {
+                enabled = false;
                 return;
             }
 
             Init();
 
-            if (Touch.activeTouches.Count > 0)
+            if (Touch.activeTouches.Count == 0)
             {
-                if (!usingTouch)
-                {
-                    usingTouch = true;
-                    idleTime = 0.0f;
-                    pointAction.ChangeBindingWithPath("<Mouse>/position").Erase();
-                    clickAction.ChangeBindingWithPath("<Mouse>/leftButton").Erase();
-                }
-            }
-            else
-            {
-                if (usingTouch)
+                if (UsingTouch)
                 {
                     idleTime += Time.unscaledDeltaTime;
                     if (idleTime > MaxIdleTime)
                     {
-                        usingTouch = false;
-                        pointAction.AddBinding("<Mouse>/position");
-                        clickAction.AddBinding("<Mouse>/leftButton");
+                        UsingTouch = false;
                     }
                 }
             }

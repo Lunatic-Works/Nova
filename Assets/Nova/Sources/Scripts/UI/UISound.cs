@@ -24,8 +24,7 @@ namespace Nova
         {
             var eventData = (ExtendedPointerEventData)_eventData;
             // Only mouse left button or touch plays sound
-            if (eventData.pointerType == UIPointerType.MouseOrPen &&
-                eventData.button != PointerEventData.InputButton.Left)
+            if (!TouchFix.IsTouch(eventData) && eventData.button != PointerEventData.InputButton.Left)
             {
                 return;
             }
@@ -37,8 +36,7 @@ namespace Nova
         {
             var eventData = (ExtendedPointerEventData)_eventData;
             // Only mouse left button or touch plays sound
-            if (eventData.pointerType == UIPointerType.MouseOrPen &&
-                eventData.button != PointerEventData.InputButton.Left)
+            if (!TouchFix.IsTouch(eventData) && eventData.button != PointerEventData.InputButton.Left)
             {
                 return;
             }

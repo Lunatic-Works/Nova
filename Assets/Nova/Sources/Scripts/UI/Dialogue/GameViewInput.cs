@@ -159,13 +159,36 @@ namespace Nova
             }
         }
 
+        public void OnPointerDown(PointerEventData _eventData)
+        {
+            var eventData = (ExtendedPointerEventData)_eventData;
+            if (!inputManager.inputEnabled ||
+                viewManager.currentView != CurrentViewType.Game ||
+                buttonRingTrigger.buttonShowing)
+            {
+                return;
+            }
+
+            // Stop auto/fast forward on any button or touch
+            dialogueState.state = DialogueState.State.Normal;
+
+            if (TouchFix.IsTouch(eventData) || eventData.button == PointerEventData.InputButton.Right)
+            {
+                if (canTriggerButtonRing)
+                {
+                    buttonRingTrigger.ShowIfPointerMoved();
+                }
+            }
+        }
+
         public void OnPointerUp(PointerEventData _eventData)
         {
             var eventData = (ExtendedPointerEventData)_eventData;
+
+            // When the input is not enabled, the user can only click forward
             if (!inputManager.inputEnabled)
             {
-                if (eventData.pointerType == UIPointerType.Touch ||
-                    eventData.button == PointerEventData.InputButton.Left)
+                if (TouchFix.IsTouch(eventData) || eventData.button == PointerEventData.InputButton.Left)
                 {
                     ClickForward();
                 }
@@ -192,7 +215,7 @@ namespace Nova
                 return;
             }
 
-            if (eventData.pointerType == UIPointerType.Touch || eventData.button == PointerEventData.InputButton.Left)
+            if (TouchFix.IsTouch(eventData) || eventData.button == PointerEventData.InputButton.Left)
             {
                 buttonRingTrigger.NoShowIfPointerMoved();
 
@@ -221,28 +244,6 @@ namespace Nova
                     {
                         buttonRingTrigger.Show(true);
                     }
-                }
-            }
-        }
-
-        public void OnPointerDown(PointerEventData _eventData)
-        {
-            var eventData = (ExtendedPointerEventData)_eventData;
-            if (!inputManager.inputEnabled ||
-                viewManager.currentView != CurrentViewType.Game ||
-                buttonRingTrigger.buttonShowing)
-            {
-                return;
-            }
-
-            // Stop auto/fast forward on any button or touch
-            dialogueState.state = DialogueState.State.Normal;
-
-            if (eventData.pointerType == UIPointerType.Touch || eventData.button == PointerEventData.InputButton.Right)
-            {
-                if (canTriggerButtonRing)
-                {
-                    buttonRingTrigger.ShowIfPointerMoved();
                 }
             }
         }

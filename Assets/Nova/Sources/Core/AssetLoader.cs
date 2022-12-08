@@ -25,7 +25,7 @@ namespace Nova
     [ExportCustomType]
     public class AssetLoader : MonoBehaviour, IPrioritizedRestorable
     {
-        public static readonly string RenderTargetPrefix = "RenderTargets/";
+        public const string RenderTargetPrefix = "RenderTargets/";
 
         private static AssetLoader Current;
 
