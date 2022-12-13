@@ -15,6 +15,11 @@ namespace Nova
 
         private void Awake()
         {
+            if (backPanel != null)
+            {
+                backPanel.SetActive(false);
+            }
+
             gameState = Utils.FindNovaGameController().GameState;
             gameState.selectionOccurs.AddListener(OnSelectionOccurs);
             gameState.restoreStarts.AddListener(RemoveAllSelections);
