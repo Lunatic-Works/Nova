@@ -10,7 +10,9 @@ namespace Nova
     public class CheckpointManager : MonoBehaviour
     {
         [SerializeField] private string saveFolder = "";
+
         private bool frozen;
+
         private string savePathBase;
         private string globalSavePath;
 
@@ -41,6 +43,7 @@ namespace Nova
             }
 
             frozen = !Application.isPlaying;
+
             savePathBase = Path.Combine(Application.persistentDataPath, "Save", saveFolder);
             globalSavePath = Path.Combine(savePathBase, "global.nsav");
             Directory.CreateDirectory(savePathBase);

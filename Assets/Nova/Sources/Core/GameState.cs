@@ -15,23 +15,24 @@ namespace Nova
     {
         [SerializeField] private string scriptPath;
 
-        private CheckpointManager checkpointManager;
-        private GameStateCheckpoint initialCheckpoint;
         private readonly ScriptLoader scriptLoader = new ScriptLoader();
         private FlowChartTree flowChartTree;
+        private CheckpointManager checkpointManager;
+        private GameStateCheckpoint initialCheckpoint;
 
         private AdvancedDialogueHelper advancedDialogueHelper;
         private CoroutineHelper coroutineHelper;
 
         private void Awake()
         {
-            checkpointManager = GetComponent<CheckpointManager>();
-            checkpointManager.Init();
-
             try
             {
                 scriptLoader.Init(scriptPath);
                 flowChartTree = scriptLoader.GetFlowChartTree();
+
+                checkpointManager = GetComponent<CheckpointManager>();
+                checkpointManager.Init();
+                CheckScriptUpgrade();
             }
             catch (Exception e)
             {
@@ -46,7 +47,12 @@ namespace Nova
             LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
         }
 
-        public void CheckScriptUpgrade()
+        private void Start()
+        {
+            SaveInitialCheckpoint();
+        }
+
+        private void CheckScriptUpgrade()
         {
             var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartTree);
             // Debug.Log($"upgrade {changedNodes.Count} nodes");
@@ -516,7 +522,8 @@ namespace Nova
 
         #region Game start
 
-        public void SaveInitialCheckpoint()
+        // Called in Start after all restorables are initialized
+        private void SaveInitialCheckpoint()
         {
             // Save a clean state of game scene
             if (initialCheckpoint == null)

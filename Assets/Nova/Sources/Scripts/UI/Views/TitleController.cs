@@ -36,8 +36,6 @@ namespace Nova
             base.Start();
 
             unlockedStartCount = gameState.GetStartNodeNames(StartNodeType.Unlocked).Count();
-            gameState.SaveInitialCheckpoint();
-            gameState.CheckScriptUpgrade();
             Show(null);
         }
 
