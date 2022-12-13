@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// The class that loads scripts and constructs the flow chart tree.
+    /// The class that loads scripts and constructs the flow chart graph.
     /// </summary>
     [ExportCustomType]
     public class ScriptLoader
@@ -17,7 +17,7 @@ namespace Nova
 
         /// <summary>
         /// Initialize the script loader. This method will load all text asset files in the given folder, parse all the
-        /// scripts, and construct the flow chart tree.
+        /// scripts, and construct the flow chart graph.
         /// </summary>
         /// <remarks>
         /// All scripts will be parsed, so this method might take some time to finish.
@@ -38,7 +38,7 @@ namespace Nova
             inited = true;
         }
 
-        private readonly FlowChartTree flowChartTree = new FlowChartTree();
+        private readonly FlowChartGraph flowChartGraph = new FlowChartGraph();
 
         private FlowChartNode currentNode;
 
@@ -86,7 +86,7 @@ namespace Nova
                 DialogueActionStage.Default, false));
             InitOnlyIncludedNames();
 
-            flowChartTree.Unfreeze();
+            flowChartGraph.Unfreeze();
 
             foreach (var locale in I18n.SupportedLocales)
             {
@@ -128,10 +128,10 @@ namespace Nova
             BindAllLazyBindingEntries();
 
             // Perform sanity check
-            flowChartTree.SanityCheck();
+            flowChartGraph.SanityCheck();
 
-            // Construction finished, freeze the tree status
-            flowChartTree.Freeze();
+            // Construction finished, freeze the graph status
+            flowChartGraph.Freeze();
         }
 
         private void CheckInit()
@@ -140,14 +140,14 @@ namespace Nova
         }
 
         /// <summary>
-        /// Get the flow chart tree.
+        /// Get the flow chart graph.
         /// </summary>
         /// <remarks>This method should be called after init</remarks>
-        /// <returns>The flow chart tree</returns>
-        public FlowChartTree GetFlowChartTree()
+        /// <returns>The flow chart graph</returns>
+        public FlowChartGraph GetFlowChartGraph()
         {
             CheckInit();
-            return flowChartTree;
+            return flowChartGraph;
         }
 
         public class Chunk
@@ -320,7 +320,7 @@ namespace Nova
             foreach (var entry in lazyBindingLinks)
             {
                 var node = entry.from;
-                node.AddBranch(entry.branchInfo, flowChartTree.GetNode(entry.destination));
+                node.AddBranch(entry.branchInfo, flowChartGraph.GetNode(entry.destination));
             }
 
             // Remove unnecessary reference
@@ -339,7 +339,7 @@ namespace Nova
         #region Methods called by external scripts
 
         /// <summary>
-        /// Create a new flow chart node register it to the current constructing FlowChartTree.
+        /// Create a new flow chart node register it to the current constructing FlowChartGraph.
         /// If the current node is a normal node, the newly created one is intended to be its
         /// succeeding node. The link between the new node and the current one will be added immediately, which
         /// will not be registered as a lazy binding link.
@@ -357,14 +357,14 @@ namespace Nova
 
             currentNode = nextNode;
 
-            flowChartTree.AddNode(currentNode);
+            flowChartGraph.AddNode(currentNode);
 
             currentNode.AddLocalizedName(stateLocale, displayName);
         }
 
         public void AddLocalizedNode(string name, string displayName)
         {
-            currentNode = flowChartTree.GetNode(name);
+            currentNode = flowChartGraph.GetNode(name);
             if (currentNode == null)
             {
                 throw new ArgumentException(
@@ -477,7 +477,7 @@ namespace Nova
         /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// A flow chart tree can have multiple start points.
+        /// A flow chart graph can have multiple start points.
         /// A name can be assigned to a start point, which can differ from the node name.
         /// The name should be unique among all start point names.
         /// </remarks>
@@ -487,19 +487,19 @@ namespace Nova
         public void SetCurrentAsStart()
         {
             CheckNode();
-            flowChartTree.AddStart(currentNode, StartNodeType.Locked);
+            flowChartGraph.AddStart(currentNode, StartNodeType.Locked);
         }
 
         public void SetCurrentAsUnlockedStart()
         {
             CheckNode();
-            flowChartTree.AddStart(currentNode, StartNodeType.Unlocked);
+            flowChartGraph.AddStart(currentNode, StartNodeType.Unlocked);
         }
 
         public void SetCurrentAsDebug()
         {
             CheckNode();
-            flowChartTree.AddStart(currentNode, StartNodeType.Debug);
+            flowChartGraph.AddStart(currentNode, StartNodeType.Debug);
         }
 
         /// <summary>
@@ -507,7 +507,7 @@ namespace Nova
         /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// A flow chart tree can have multiple end points.
+        /// A flow chart graph can have multiple end points.
         /// A name can be assigned to an end point, which can differ from the node name.
         /// The name should be unique among all end point names.
         /// </remarks>
@@ -535,7 +535,7 @@ namespace Nova
                 name = currentNode.name;
             }
 
-            flowChartTree.AddEnd(name, currentNode);
+            flowChartGraph.AddEnd(name, currentNode);
 
             // Null the current node, because SetCurrentAsEnd() indicates the end of a node
             currentNode = null;

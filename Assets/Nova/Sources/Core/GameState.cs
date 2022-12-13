@@ -16,7 +16,7 @@ namespace Nova
         [SerializeField] private string scriptPath;
 
         private readonly ScriptLoader scriptLoader = new ScriptLoader();
-        private FlowChartTree flowChartTree;
+        private FlowChartGraph flowChartGraph;
         private CheckpointManager checkpointManager;
         private GameStateCheckpoint initialCheckpoint;
 
@@ -28,7 +28,7 @@ namespace Nova
             try
             {
                 scriptLoader.Init(scriptPath);
-                flowChartTree = scriptLoader.GetFlowChartTree();
+                flowChartGraph = scriptLoader.GetFlowChartGraph();
 
                 checkpointManager = GetComponent<CheckpointManager>();
                 checkpointManager.Init();
@@ -54,7 +54,7 @@ namespace Nova
 
         private void CheckScriptUpgrade()
         {
-            var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartTree);
+            var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);
             // Debug.Log($"upgrade {changedNodes.Count} nodes");
             if (changedNodes.Any())
             {
@@ -70,7 +70,7 @@ namespace Nova
         {
             LuaRuntime.Instance.Reset();
             scriptLoader.ForceInit(scriptPath);
-            flowChartTree = scriptLoader.GetFlowChartTree();
+            flowChartGraph = scriptLoader.GetFlowChartGraph();
         }
 
         #region States
@@ -441,7 +441,7 @@ namespace Nova
                     break;
                 case FlowChartNodeType.End:
                     state = State.Ended;
-                    var endName = flowChartTree.GetEndName(currentNode);
+                    var endName = flowChartGraph.GetEndName(currentNode);
                     checkpointManager.SetEndReached(endName);
                     routeEnded.Invoke(new RouteEndedData(endName));
                     break;
@@ -545,12 +545,12 @@ namespace Nova
 
         public void GameStart(string startName)
         {
-            GameStart(flowChartTree.GetNode(startName));
+            GameStart(flowChartGraph.GetNode(startName));
         }
 
         public FlowChartNode GetNode(string name, bool addDeferred = false)
         {
-            var node = flowChartTree.GetNode(name);
+            var node = flowChartGraph.GetNode(name);
             if (addDeferred)
             {
                 scriptLoader.AddDeferredDialogueChunks(node);
@@ -561,7 +561,7 @@ namespace Nova
 
         public IEnumerable<string> GetStartNodeNames(StartNodeType type = StartNodeType.Normal)
         {
-            return flowChartTree.GetStartNodeNames(type);
+            return flowChartGraph.GetStartNodeNames(type);
         }
 
         #endregion

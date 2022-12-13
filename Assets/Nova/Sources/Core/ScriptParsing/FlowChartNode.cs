@@ -60,7 +60,7 @@ namespace Nova
         /// </summary>
         /// <remarks>
         /// The type of a node is always gettable but only settable before it is frozen.
-        /// A flow chart tree should freeze all its nodes after the construction.
+        /// A flow chart graph should freeze all its nodes after the construction.
         /// </remarks>
         public FlowChartNodeType type
         {

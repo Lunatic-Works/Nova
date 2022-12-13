@@ -319,12 +319,12 @@ namespace Nova
 
         #region Checkpoint upgrade
 
-        public Dictionary<string, Differ> CheckScriptUpgrade(ScriptLoader scriptLoader, FlowChartTree flowChart)
+        public Dictionary<string, Differ> CheckScriptUpgrade(ScriptLoader scriptLoader, FlowChartGraph flowChartGraph)
         {
             var changedNode = new Dictionary<string, Differ>();
             if (globalSave.nodeHashes != null)
             {
-                foreach (var node in flowChart)
+                foreach (var node in flowChartGraph)
                 {
                     if (globalSave.nodeHashes.ContainsKey(node.name) &&
                         globalSave.nodeHashes[node.name] != node.textHash &&
@@ -345,7 +345,7 @@ namespace Nova
 
                 foreach (var node in globalSave.nodeHashes.Keys)
                 {
-                    if (!flowChart.HasNode(node))
+                    if (!flowChartGraph.HasNode(node))
                     {
                         changedNode.Add(node, null);
                     }
@@ -355,7 +355,7 @@ namespace Nova
             if (changedNode.Any() || globalSave.nodeHashes == null)
             {
                 globalSave.identifier = DateTime.Now.ToBinary();
-                globalSave.nodeHashes = flowChart.ToDictionary(node => node.name, node => node.textHash);
+                globalSave.nodeHashes = flowChartGraph.ToDictionary(node => node.name, node => node.textHash);
                 globalSaveDirty = true;
             }
 
