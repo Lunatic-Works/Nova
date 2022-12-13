@@ -11,6 +11,7 @@ namespace Nova
     {
         [SerializeField] private string saveFolder = "";
 
+        // When constructed in editor, e.g. by SaveViewer, it avoids modifying the global save file
         private bool frozen;
 
         private string savePathBase;
