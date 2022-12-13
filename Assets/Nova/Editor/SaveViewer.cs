@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -223,7 +224,7 @@ namespace Nova.Editor
                     selectedCheckpoint.checkpoint = checkpoint;
                     selectedCheckpoint.details.Clear();
                     selectedCheckpoint.details.Add("Variables", checkpoint.variables.PrettyPrint());
-                    foreach (var x in checkpoint.restoreDatas)
+                    foreach (var x in checkpoint.restoreDatas.OrderBy(x => x.Key))
                     {
                         selectedCheckpoint.details.Add(x.Key, x.Value.PrettyPrint());
                     }
