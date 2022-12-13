@@ -543,6 +543,8 @@ namespace Nova
 
         private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos)
         {
+            var selections = new List<SelectionOccursData.Selection>();
+            var selectionNames = new List<string>();
             foreach (var branchInfo in branchInfos)
             {
                 if (branchInfo.mode == BranchMode.Jump)
@@ -552,17 +554,6 @@ namespace Nova
                         SelectBranch(branchInfo.name);
                         yield break;
                     }
-                }
-            }
-
-            var selections = new List<SelectionOccursData.Selection>();
-            var selectionNames = new List<string>();
-
-            foreach (var branchInfo in branchInfos)
-            {
-                if (branchInfo.mode == BranchMode.Jump)
-                {
-                    continue;
                 }
 
                 if (branchInfo.mode == BranchMode.Show && !branchInfo.condition.Invoke<bool>())
