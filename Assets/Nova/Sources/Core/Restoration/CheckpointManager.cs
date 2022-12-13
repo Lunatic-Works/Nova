@@ -323,7 +323,6 @@ namespace Nova
             var changedNode = new Dictionary<string, Differ>();
             if (globalSave.nodeHashes != null)
             {
-                // TODO: upgrade global save
                 foreach (var node in flowChart)
                 {
                     if (globalSave.nodeHashes.ContainsKey(node.name) &&
