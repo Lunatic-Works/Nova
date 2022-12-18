@@ -23,6 +23,8 @@ namespace Nova
         EditorBeginChapter,
         EditorPreviousChapter,
         EditorNextChapter,
+        EditorPreviousBranch,
+        EditorNextBranch,
         EditorReloadScripts,
         EditorUnlock
     }

@@ -930,6 +930,39 @@ namespace Nova
             MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
         }
 
+        public bool MoveToLastBranch()
+        {
+            var entryNode = nodeRecord;
+            var found = false;
+            while (entryNode.parent != 0)
+            {
+                entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
+                var node = flowChartGraph.GetNode(entryNode.name);
+                if (entryNode.endDialogue == node.dialogueEntryCount && node.type == FlowChartNodeType.Branching)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                return false;
+            }
+
+            var offset = checkpointManager.NextRecord(entryNode.offset);
+            while (checkpointManager.GetCheckpointDialogue(offset) != entryNode.lastCheckpointDialogue)
+            {
+                offset = checkpointManager.NextCheckpoint(offset);
+            }
+            MoveBackTo(entryNode, offset, entryNode.endDialogue - 1);
+            return true;
+        }
+
+        public void MoveToNextBranch(bool allowUnreached)
+        {
+
+        }
+
         public IEnumerable<ReachedDialoguePosition> GetDialogueHistory(int limit = 0)
         {
             if (nodeRecord == null)

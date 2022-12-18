@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Nova
 {
     public class DebugJumpHelper : MonoBehaviour
     {
+        public bool fastForwardUnreached;
+
         private GameState gameState;
         private DialogueState dialogueState;
         private InputManager inputManager;
@@ -50,6 +53,16 @@ namespace Nova
             {
                 JumpChapter(1);
             }
+
+            if (inputManager.IsTriggered(AbstractKey.EditorPreviousBranch))
+            {
+                gameState.MoveToLastBranch();
+            }
+
+            if (inputManager.IsTriggered(AbstractKey.EditorNextBranch))
+            {
+                FastForwardToNextBranch(fastForwardUnreached);
+            }
         }
 
         private void MoveBackward()
@@ -75,6 +88,19 @@ namespace Nova
             {
                 Debug.LogWarning($"Nova: Chapter index {targetChapterIndex} out of range.");
             }
+        }
+
+        private void FastForwardToNextBranch(bool allowUnreached)
+        {
+            var isReached = true;
+            UnityAction<DialogueChangedData> listener = data => isReached = data.isReachedAnyHistory;
+            gameState.dialogueChangedEarly.AddListener(listener);
+            while ((isReached || allowUnreached) && gameState.canStepForward)
+            {
+                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+                gameState.Step();
+            }
+            gameState.dialogueChangedEarly.RemoveListener(listener);
         }
     }
 }
