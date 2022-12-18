@@ -132,6 +132,24 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "EditorPreviousBranch",
+                    "type": "Button",
+                    "id": "04d7b7b7-3c7e-4a6e-a143-1f283819284e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Tap",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EditorNextBranch",
+                    "type": "Button",
+                    "id": "fa4f3c48-b425-4461-b4b6-60b2e97efd9d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "EditorReloadScripts",
                     "type": "Button",
                     "id": "57a915be-4fe8-4ce0-a5b1-30432e1fed4a",
@@ -337,6 +355,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "ShowConfig",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b32f03ac-24b6-4c49-bf13-bf7ce5eba227",
+                    "path": "<Keyboard>/semicolon",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EditorPreviousBranch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e1a0d8a2-1661-4b9d-996c-2980d817eb26",
+                    "path": "<Keyboard>/quote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EditorNextBranch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
