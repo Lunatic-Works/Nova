@@ -7,6 +7,10 @@ namespace Nova
 {
     public class DebugJumpHelper : MonoBehaviour
     {
+        public bool backward;
+        public bool beginChapter;
+        public bool previousChapter, nextChapter;
+        public bool previousBranch, nextBranch;
         public bool fastForwardUnreached;
 
         private GameState gameState;
@@ -34,33 +38,39 @@ namespace Nova
                 return;
             }
 
-            if (inputManager.IsTriggered(AbstractKey.EditorBackward))
+            if (backward)
             {
+                backward = false;
                 MoveBackward();
             }
 
-            if (inputManager.IsTriggered(AbstractKey.EditorBeginChapter))
+            if (beginChapter)
             {
+                beginChapter = false;
                 JumpChapter(0);
             }
 
-            if (inputManager.IsTriggered(AbstractKey.EditorPreviousChapter))
+            if (previousChapter)
             {
+                previousChapter = false;
                 JumpChapter(-1);
             }
 
-            if (inputManager.IsTriggered(AbstractKey.EditorNextChapter))
+            if (nextChapter)
             {
+                nextChapter = false;
                 JumpChapter(1);
             }
 
-            if (inputManager.IsTriggered(AbstractKey.EditorPreviousBranch))
+            if (previousBranch)
             {
+                previousBranch = false;
                 gameState.MoveToLastBranch();
             }
 
-            if (inputManager.IsTriggered(AbstractKey.EditorNextBranch))
+            if (nextBranch)
             {
+                nextBranch = false;
                 FastForwardToNextBranch(fastForwardUnreached);
             }
         }

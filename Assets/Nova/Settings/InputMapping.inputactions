@@ -96,60 +96,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "EditorBackward",
-                    "type": "Button",
-                    "id": "e2429f1d-13f3-42b4-b49c-f0c8c5147f65",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "EditorBeginChapter",
-                    "type": "Button",
-                    "id": "552f0aa8-31f3-402f-937f-f84b87dd516b",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "EditorPreviousChapter",
-                    "type": "Button",
-                    "id": "eb4090c5-6384-4c4e-bc12-a358bbb1fa6e",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "EditorNextChapter",
-                    "type": "Button",
-                    "id": "daee26a0-50bb-4746-a9de-39ef9517e1a6",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "EditorPreviousBranch",
-                    "type": "Button",
-                    "id": "04d7b7b7-3c7e-4a6e-a143-1f283819284e",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "EditorNextBranch",
-                    "type": "Button",
-                    "id": "fa4f3c48-b425-4461-b4b6-60b2e97efd9d",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "EditorReloadScripts",
                     "type": "Button",
                     "id": "57a915be-4fe8-4ce0-a5b1-30432e1fed4a",
@@ -283,50 +229,6 @@
                 },
                 {
                     "name": "",
-                    "id": "3bb483e3-d685-46dc-aefc-24a6382c7134",
-                    "path": "<Keyboard>/rightBracket",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "EditorNextChapter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "bee06911-ee1f-4e66-a466-a61ef72e14b8",
-                    "path": "<Keyboard>/leftBracket",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "EditorPreviousChapter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "5294cb74-2d3a-44b8-82ea-b88961e4afa8",
-                    "path": "<Keyboard>/equals",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "EditorBeginChapter",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "27a97de2-5244-4603-822d-fa449280960a",
-                    "path": "<Keyboard>/leftArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "EditorBackward",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "2d2314ed-fa62-4b96-8fd1-f0c8445dd1f5",
                     "path": "<Keyboard>/r",
                     "interactions": "",
@@ -355,28 +257,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "ShowConfig",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b32f03ac-24b6-4c49-bf13-bf7ce5eba227",
-                    "path": "<Keyboard>/semicolon",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "EditorPreviousBranch",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "e1a0d8a2-1661-4b9d-996c-2980d817eb26",
-                    "path": "<Keyboard>/quote",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "EditorNextBranch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
