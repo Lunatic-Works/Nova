@@ -106,6 +106,7 @@ namespace Nova
                 {
                     slider.value = 1.0f * audioSource.timeSamples / audioSource.clip.samples;
                 }
+
                 if (text != null)
                 {
                     text.text = $"{audioSource.timeSamples} / {audioSource.clip.samples}";

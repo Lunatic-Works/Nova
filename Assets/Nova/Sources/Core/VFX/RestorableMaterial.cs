@@ -71,9 +71,14 @@ namespace Nova
                 var rt = Utils.FindGameRenderManager().GetRenderTarget(rtName) as RenderTarget;
                 rt.Bind(this, propertyName);
             }
-            else if (texturePath != "")
+            else
             {
-                var tex = AssetLoader.Load<Texture>(texturePath);
+                Texture tex = null;
+                if (texturePath != "")
+                {
+                    tex = AssetLoader.Load<Texture>(texturePath);
+                }
+
                 base.SetTexture(propertyName, tex);
             }
 

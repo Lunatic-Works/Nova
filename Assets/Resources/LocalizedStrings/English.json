@@ -84,7 +84,7 @@
   "config.title.shortcuts": "Shortcuts",
   "config.title.volume": "Volume",
   "dialogue.hint.clickstopanimation": "“Click to stop animation” can be enabled in settings",
-  "dialogue.hint.fastforwardread": "“Fast forward unread” can be enabled in settings",
+  "dialogue.hint.fastforwardunread": "“Fast forward unread” can be enabled in settings",
   "dialogue.noreadtext": "Unread contents ahead",
   "format.namedialogue": "{0}: {1}",
   "help.close": "Close",

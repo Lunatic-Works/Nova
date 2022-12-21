@@ -486,6 +486,8 @@ namespace Nova
                         SelectBranch(branchInfo.name);
                         yield break;
                     }
+
+                    continue;
                 }
 
                 if (branchInfo.mode == BranchMode.Show && !branchInfo.condition.Invoke<bool>())

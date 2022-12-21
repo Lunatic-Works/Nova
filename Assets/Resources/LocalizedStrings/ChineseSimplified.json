@@ -84,7 +84,7 @@
   "config.title.shortcuts": "快捷键",
   "config.title.volume": "音量",
   "dialogue.hint.clickstopanimation": "系统设置可以选择\n点击终止动画",
-  "dialogue.hint.fastforwardread": "系统设置可以选择\n快进未读内容",
+  "dialogue.hint.fastforwardunread": "系统设置可以选择\n快进未读内容",
   "dialogue.noreadtext": "前方是未读内容",
   "format.namedialogue": "{0}：{1}",
   "help.close": "关      闭",

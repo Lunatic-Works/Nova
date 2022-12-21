@@ -7,8 +7,8 @@ namespace Nova
     [ExportCustomType]
     public class DialogueState : MonoBehaviour
     {
-        private const string FastForwardReadFirstShownKey = ConfigManager.FirstShownKeyPrefix + "FastForwardRead";
-        private const int HintFastForwardReadClicks = 3;
+        private const string FastForwardUnreadFirstShownKey = ConfigManager.FirstShownKeyPrefix + "FastForwardUnread";
+        private const int HintFastForwardUnreadClicks = 3;
 
         private GameState gameState;
         private ConfigManager configManager;
@@ -78,16 +78,16 @@ namespace Nova
 
                         if (stopFastForward)
                         {
-                            int clicks = configManager.GetInt(FastForwardReadFirstShownKey);
-                            if (clicks < HintFastForwardReadClicks)
+                            int clicks = configManager.GetInt(FastForwardUnreadFirstShownKey);
+                            if (clicks < HintFastForwardUnreadClicks)
                             {
                                 Alert.Show("dialogue.noreadtext");
-                                configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
+                                configManager.SetInt(FastForwardUnreadFirstShownKey, clicks + 1);
                             }
-                            else if (clicks == HintFastForwardReadClicks)
+                            else if (clicks == HintFastForwardUnreadClicks)
                             {
-                                Alert.Show("dialogue.hint.fastforwardread");
-                                configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
+                                Alert.Show("dialogue.hint.fastforwardunread");
+                                configManager.SetInt(FastForwardUnreadFirstShownKey, clicks + 1);
                             }
                             else
                             {

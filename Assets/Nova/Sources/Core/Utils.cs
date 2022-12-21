@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Nova.Exceptions;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Newtonsoft.Json;
 using UnityObject = UnityEngine.Object;
 
 namespace Nova

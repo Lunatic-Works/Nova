@@ -19,7 +19,7 @@ namespace Nova
                     return;
                 }
 
-                // TODO: Should we destroy this?
+                // TODO: Should we destroy this when using URP?
                 // Utils.DestroyObject(_defaultMaterial);
                 _defaultMaterial = value;
             }
