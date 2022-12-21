@@ -6,17 +6,17 @@ namespace Nova
     /// Control whether to stop voice on dialogue change based on the value in ConfigManager
     /// </summary>
     [RequireComponent(typeof(GameCharacterController))]
-    public class StopVoiceOnDialogueChangeController : MonoBehaviour
+    public class StopVoiceOnDialogueChangeReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
-        private GameCharacterController characterController;
         private ConfigManager configManager;
+        private GameCharacterController characterController;
 
         private void Awake()
         {
-            characterController = GetComponent<GameCharacterController>();
             configManager = Utils.FindNovaGameController().ConfigManager;
+            characterController = GetComponent<GameCharacterController>();
         }
 
         private void OnEnable()

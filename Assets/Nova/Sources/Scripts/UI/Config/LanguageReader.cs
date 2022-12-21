@@ -3,10 +3,10 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class LanguageController : MonoBehaviour
+    public class LanguageReader : MonoBehaviour
     {
-        public string configKeyName;
-        public SerializableDictionary<SystemLanguage, Toggle> localeTogglePairs;
+        [SerializeField] private string configKeyName;
+        [SerializeField] private SerializableDictionary<SystemLanguage, Toggle> localeTogglePairs;
 
         private ConfigManager configManager;
 

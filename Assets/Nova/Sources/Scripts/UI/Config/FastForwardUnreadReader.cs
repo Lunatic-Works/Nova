@@ -5,9 +5,9 @@ namespace Nova
     /// <summary>
     /// Toggle whether to fast forward unread text based on the value in ConfigManager
     /// </summary>
-    public class FastForwardUnreadController : MonoBehaviour
+    public class FastForwardUnreadReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private DialogueState dialogueState;
         private ConfigManager configManager;

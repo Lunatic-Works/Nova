@@ -14,9 +14,9 @@ namespace Nova
     /// Change the action of right button for DialogueBoxController
     /// </summary>
     [RequireComponent(typeof(GameViewInput))]
-    public class RightButtonActionController : MonoBehaviour
+    public class RightButtonActionReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
         private GameViewInput gameViewInput;

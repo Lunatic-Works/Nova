@@ -5,9 +5,9 @@ namespace Nova
     /// <summary>
     /// Control auto mode speed based on the value in ConfigManager
     /// </summary>
-    public class AutoSpeedController : MonoBehaviour
+    public class AutoSpeedReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
         private DialogueBoxController dialogueBoxController;

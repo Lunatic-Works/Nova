@@ -6,9 +6,9 @@ namespace Nova
     /// Toggle ability to abort animation based on the value in ConfigManager
     /// </summary>
     [RequireComponent(typeof(DialogueBoxController))]
-    public class AbortAnimationController : MonoBehaviour
+    public class AbortAnimationReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
         private GameViewInput gameViewInput;

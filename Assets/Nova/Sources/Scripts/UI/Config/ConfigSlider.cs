@@ -7,9 +7,9 @@ namespace Nova
     /// Use slider to modify the value in ConfigManager
     /// </summary>
     [RequireComponent(typeof(Slider))]
-    public class ConfigFloatSlider : MonoBehaviour
+    public class ConfigSlider : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private Slider slider;
         private ConfigManager configManager;

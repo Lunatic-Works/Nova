@@ -3,20 +3,23 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// Control fast forward speed based on the value in ConfigManager
+    /// Control opacity of dialogue box based on the value in ConfigManager
     /// </summary>
-    [RequireComponent(typeof(DialogueBoxController))]
-    public class FastForwardSpeedController : MonoBehaviour
+    public class DialogueOpacityReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
+        private CanvasGroup canvasGroup;
         private DialogueBoxController dialogueBoxController;
 
         private void Awake()
         {
             configManager = Utils.FindNovaGameController().ConfigManager;
+            canvasGroup = GetComponent<CanvasGroup>();
             dialogueBoxController = GetComponent<DialogueBoxController>();
+            this.RuntimeAssert(canvasGroup != null || dialogueBoxController != null,
+                "Missing CanvasGroup or DialogueBoxController.");
         }
 
         private void OnEnable()
@@ -32,8 +35,14 @@ namespace Nova
 
         private void UpdateValue()
         {
-            // Convert speed to duration
-            dialogueBoxController.fastForwardDelay = Mathf.Pow(0.1f, configManager.GetFloat(configKeyName));
+            if (dialogueBoxController != null)
+            {
+                dialogueBoxController.configOpacity = configManager.GetFloat(configKeyName);
+            }
+            else
+            {
+                canvasGroup.alpha = configManager.GetFloat(configKeyName);
+            }
         }
     }
 }

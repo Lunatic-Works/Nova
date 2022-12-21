@@ -7,24 +7,24 @@ namespace Nova
     /// <summary>
     /// Control font size based on the value in ConfigManager
     /// </summary>
-    public class FontSizeController : MonoBehaviour
+    public class FontSizeReader : MonoBehaviour
     {
-        public string configKeyName;
-        public SerializableDictionary<SystemLanguage, float> multipliers;
+        [SerializeField] private string configKeyName;
+        [SerializeField] private SerializableDictionary<SystemLanguage, float> multipliers;
 
+        private ConfigManager configManager;
         private Text text;
         private TMP_Text textPro;
         private TextProxy textProxy;
-        private ConfigManager configManager;
 
         private void Awake()
         {
+            configManager = Utils.FindNovaGameController().ConfigManager;
             text = GetComponent<Text>();
             textPro = GetComponent<TMP_Text>();
             textProxy = GetComponent<TextProxy>();
             this.RuntimeAssert(text != null || textPro != null || textProxy != null,
                 "Missing Text or TMP_Text or TextProxy.");
-            configManager = Utils.FindNovaGameController().ConfigManager;
         }
 
         private void OnEnable()

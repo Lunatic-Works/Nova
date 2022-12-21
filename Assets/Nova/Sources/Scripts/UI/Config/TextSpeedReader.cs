@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class TextSpeedController : MonoBehaviour
+    public class TextSpeedReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
         private DialogueBoxController dialogueBoxController;

@@ -5,28 +5,28 @@ namespace Nova
     /// <summary>
     /// Control audio volume based on the value in ConfigManager
     /// </summary>
-    public class AudioVolumeController : MonoBehaviour
+    public class AudioVolumeReader : MonoBehaviour
     {
         private const string GlobalConfigKeyName = "GlobalVolume";
 
-        public string configKeyName;
-        public string secondaryConfigKeyName;
-        public float multiplier = 1.0f;
-        public float gamma = 1.0f;
+        [SerializeField] private string configKeyName;
+        [SerializeField] private string secondaryConfigKeyName;
+        [SerializeField] private float multiplier = 1.0f;
+        [SerializeField] private float gamma = 1.0f;
 
+        private ConfigManager configManager;
         private AudioController audioController;
         private SoundController soundController;
         private AudioSource audioSource;
-        private ConfigManager configManager;
 
         private void Awake()
         {
+            configManager = Utils.FindNovaGameController().ConfigManager;
             audioController = GetComponent<AudioController>();
             soundController = GetComponent<SoundController>();
             audioSource = GetComponent<AudioSource>();
             this.RuntimeAssert(audioController != null || soundController != null || audioSource != null,
                 "Missing AudioController or SoundController or AudioSource.");
-            configManager = Utils.FindNovaGameController().ConfigManager;
         }
 
         private void OnEnable()
