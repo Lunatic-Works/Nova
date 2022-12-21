@@ -73,7 +73,8 @@ namespace Nova
             }
         }
 
-        private bool _isChapter = false;
+        private bool _isChapter;
+
         public bool isChapter
         {
             get => _isChapter;
@@ -214,10 +215,10 @@ namespace Nova
         }
 
         /// <summary>
-        /// Returns whether this node is a branch select node
-        /// If a branch node has all branches with jump mode, it is not considered branch select node
+        /// Returns whether this node is a manual branch node
+        /// If a branch node has all branches with jump mode, it is not manual
         /// </summary>
-        public bool isBranchSelectNode()
+        public bool IsManualBranchNode()
         {
             return type == FlowChartNodeType.Branching && branches.Keys.Any(b => b.mode != BranchMode.Jump);
         }

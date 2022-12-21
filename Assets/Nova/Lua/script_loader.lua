@@ -141,11 +141,12 @@ end
 
 --- set the current node as a start point which is unlocked when running the game for the first time
 --- should be called at the end of the node
---- indicates is_start()
+--- indicates is_chapter() and is_start()
 function is_unlocked_start()
     if not check_eager('is_unlocked_start') then
         return
     end
+    __Nova.scriptLoader:SetCurrentAsChapter()
     __Nova.scriptLoader:SetCurrentAsUnlockedStart()
 end
 
