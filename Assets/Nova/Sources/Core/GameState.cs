@@ -937,7 +937,7 @@ namespace Nova
         /// <param name="allowChapter">Whether to stop at chapter.</param>
         /// <param name="allowBranch">Whether to stop at branch, only works in backward mode.</param>
         /// <returns>Whether succeeded. if not will move to the beginning/end</returns>
-        public bool MoveToKeyPoint(bool forward, bool allowChapter, bool allowBranch = true)
+        public void MoveToKeyPoint(bool forward, bool allowChapter, bool allowBranch = true)
         {
             var entryNode = nodeRecord;
             var foundHead = false;
@@ -955,21 +955,23 @@ namespace Nova
                 // special handling of current node
                 // 1. if going backward, the current node branch should not be considered
                 // 2. if going forward, or right at the beginning, the current node beginning should not be considered
-                var isBranch = allowBranch && entryNode.endDialogue == node.dialogueEntryCount && node.isBranchSelectNode() &&
-                    (!(entryNode == nodeRecord && !forward));
+                var isBranch = allowBranch && entryNode.endDialogue == node.dialogueEntryCount &&
+                               node.IsManualBranchNode() && (!(entryNode == nodeRecord && !forward));
                 var isChapter = allowChapter && entryNode.beginDialogue == 0 && node.isChapter &&
-                    (!(entryNode == nodeRecord && (currentIndex == 0 || forward)));
+                                (!(entryNode == nodeRecord && (currentIndex == 0 || forward)));
                 if (isBranch || isChapter)
                 {
                     foundHead = forward ? isChapter : !isBranch;
                     break;
                 }
+
                 var next = forward ? entryNode.child : entryNode.parent;
                 if (next == 0)
                 {
                     foundHead = !forward;
                     break;
                 }
+
                 var nextEntryNode = checkpointManager.GetNodeRecord(next);
                 // multiple children case should only happen in interrupt (minigame)
                 if (forward && nextEntryNode.sibling != 0)
@@ -977,6 +979,7 @@ namespace Nova
                     foundHead = false;
                     break;
                 }
+
                 entryNode = nextEntryNode;
             }
 
@@ -990,8 +993,8 @@ namespace Nova
                     offset = checkpointManager.NextCheckpoint(offset);
                 }
             }
+
             MoveBackTo(entryNode, offset, dialogue);
-            return true;
         }
 
         public IEnumerable<ReachedDialoguePosition> GetDialogueHistory(int limit = 0)
@@ -1001,7 +1004,7 @@ namespace Nova
                 yield break;
             }
 
-            List<NodeRecord> nodeHistory = new List<NodeRecord>();
+            var nodeHistory = new List<NodeRecord>();
             SeekBackStep(limit, nodeHistory, out var curCheckpoint, out var curDialogue);
 
             for (var i = nodeHistory.Count - 1; i >= 0; i--)

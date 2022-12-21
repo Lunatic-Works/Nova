@@ -134,7 +134,7 @@ namespace Nova
             return startNodes.Values.Where(x => type.HasFlag(x.type)).Select(x => x.name);
         }
 
-        public void CheckNode(FlowChartNode node)
+        private void CheckNode(FlowChartNode node)
         {
             CheckFreeze();
             if (!HasNode(node))
@@ -162,6 +162,7 @@ namespace Nova
             {
                 Debug.LogWarning($"Nova: Overwrite start point: {node.name}");
             }
+
             startNodes[node.name] = new StartNode(node, type);
         }
 

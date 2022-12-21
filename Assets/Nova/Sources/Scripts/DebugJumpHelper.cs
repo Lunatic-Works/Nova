@@ -1,23 +1,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Nova
 {
     public class DebugJumpHelper : MonoBehaviour
     {
-        public bool backward;
-        public bool previousChapter, nextChapter;
-        public bool previousBranch, nextBranch;
+        [SerializeField] private bool moveBackward;
+        [SerializeField] private bool previousChapter;
+        [SerializeField] private bool nextChapter;
+        [SerializeField] private bool previousBranch;
+        [SerializeField] private bool nextBranch;
 
         private GameState gameState;
         private DialogueState dialogueState;
-        private InputManager inputManager;
         private ViewManager viewManager;
 
         private IReadOnlyList<string> _chapters;
-
         private IReadOnlyList<string> chapters => _chapters ??= gameState.GetStartNodeNames().ToList();
 
         private void Awake()
@@ -25,7 +24,6 @@ namespace Nova
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
-            inputManager = controller.InputManager;
             viewManager = Utils.FindViewManager();
         }
 
@@ -36,9 +34,9 @@ namespace Nova
                 return;
             }
 
-            if (backward)
+            if (moveBackward)
             {
-                backward = false;
+                moveBackward = false;
                 MoveBackward();
             }
 
