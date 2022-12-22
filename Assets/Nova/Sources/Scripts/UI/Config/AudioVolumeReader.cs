@@ -21,7 +21,7 @@ namespace Nova
 
         private void Awake()
         {
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             audioController = GetComponent<AudioController>();
             soundController = GetComponent<SoundController>();
             audioSource = GetComponent<AudioSource>();

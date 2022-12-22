@@ -95,7 +95,7 @@ namespace Nova
         {
             base.Awake();
 
-            checkpointManager = Utils.FindNovaGameController().CheckpointManager;
+            checkpointManager = Utils.FindNovaController().CheckpointManager;
             allMusics.AddRange(musicList.entries.Select(entry => new MusicListEntry(LockedIndex, entry)));
         }
 

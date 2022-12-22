@@ -31,7 +31,7 @@ namespace Nova
             materialPool = gameObject.Ensure<MaterialPool>();
             fadeMaterial = materialPool.Get(fadeShader);
             materialPool.defaultMaterial = fadeMaterial;
-            novaAnimation = Utils.FindNovaGameController().PerDialogueAnimation;
+            novaAnimation = Utils.FindNovaController().PerDialogueAnimation;
         }
 
         protected void FadeAnimation(float delay)

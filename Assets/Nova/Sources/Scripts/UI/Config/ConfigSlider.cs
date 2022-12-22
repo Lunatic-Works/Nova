@@ -19,7 +19,7 @@ namespace Nova
             this.RuntimeAssert(!string.IsNullOrEmpty(configKeyName), "Empty configKeyName.");
 
             slider = GetComponent<Slider>();
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             var def = configManager.GetDefinition(configKeyName);
             this.RuntimeAssert(def != null, $"Definition not found for config key {configKeyName}.");
             slider.maxValue = def.max ?? 1;

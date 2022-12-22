@@ -9,7 +9,7 @@ namespace Nova
 
         private void Awake()
         {
-            inputManager = Utils.FindNovaGameController().InputManager;
+            inputManager = Utils.FindNovaController().InputManager;
 
             I18n.LocaleChanged.AddListener(OnLocaleChanged);
         }
@@ -23,7 +23,7 @@ namespace Nova
         {
             if (inputManager.IsTriggered(AbstractKey.ToggleFullScreen))
             {
-                GameRenderManager.SwitchFullScreen();
+                RenderManager.SwitchFullScreen();
             }
 
             if (inputManager.IsTriggered(AbstractKey.SwitchLanguage))

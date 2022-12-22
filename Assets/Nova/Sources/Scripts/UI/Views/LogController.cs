@@ -69,7 +69,7 @@ namespace Nova
         {
             base.Awake();
 
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
             configManager = controller.ConfigManager;

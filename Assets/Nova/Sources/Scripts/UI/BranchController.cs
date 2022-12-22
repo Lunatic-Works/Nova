@@ -17,7 +17,7 @@ namespace Nova
         {
             RemoveAllSelections();
 
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
             gameState.selectionOccurs.AddListener(OnSelectionOccurs);
             gameState.restoreStarts.AddListener(RemoveAllSelections);
         }

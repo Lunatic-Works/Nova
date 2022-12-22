@@ -64,7 +64,7 @@ namespace Nova
                 return;
             }
 
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
 
             if (musicEntryList != null)
             {

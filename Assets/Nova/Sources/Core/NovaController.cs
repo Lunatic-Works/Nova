@@ -4,9 +4,9 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// Wrapper for finding all necessary components in NovaGameController
+    /// Wrapper for finding all necessary components in Nova
     /// </summary>
-    public class GameController : MonoBehaviour
+    public class NovaController : MonoBehaviour
     {
         public GameState GameState { get; private set; }
         public DialogueState DialogueState { get; private set; }
@@ -36,7 +36,7 @@ namespace Nova
 
         private static void AssertNotNull(MonoBehaviour component, string name)
         {
-            Utils.RuntimeAssert(component != null, $"Cannot find {name}, ill-formed NovaGameController.");
+            Utils.RuntimeAssert(component != null, $"Cannot find {name}, ill-formed NovaController game object.");
         }
 
         private T FindComponent<T>(string childPath = "") where T : MonoBehaviour

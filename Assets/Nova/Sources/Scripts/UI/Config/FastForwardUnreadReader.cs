@@ -14,7 +14,7 @@ namespace Nova
 
         private void Awake()
         {
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             dialogueState = controller.DialogueState;
             configManager = controller.ConfigManager;
         }

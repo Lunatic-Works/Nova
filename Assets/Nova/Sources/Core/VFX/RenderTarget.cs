@@ -20,7 +20,7 @@ namespace Nova
         public const string SUFFIX = "Texture";
 
         protected TextureRendererConfig oldConfig;
-        protected GameRenderManager renderManager;
+        protected RenderManager renderManager;
         protected bool _needUpdate = true;
         protected bool registered = false;
         protected RenderTexture _targetTexture;
@@ -54,7 +54,7 @@ namespace Nova
 
         public virtual void Awake()
         {
-            renderManager = Utils.FindGameRenderManager();
+            renderManager = Utils.FindRenderManager();
             registered = renderManager.RegisterRenderTarget(this);
             oldConfig = new TextureRendererConfig(textureName, textureFormat, isFinal);
         }

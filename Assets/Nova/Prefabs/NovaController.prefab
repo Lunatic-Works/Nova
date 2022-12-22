@@ -139,8 +139,8 @@ GameObject:
   - component: {fileID: 114014151699594742}
   - component: {fileID: 6935519797362669510}
   m_Layer: 0
-  m_Name: NovaGameController
-  m_TagString: NovaGameController
+  m_Name: NovaController
+  m_TagString: NovaController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

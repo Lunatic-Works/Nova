@@ -142,27 +142,27 @@ namespace Nova
 
         /// <remarks>
         /// This is usually called in Awake or Start
-        /// Do not call this when the game is quitting, because NovaGameController may be already destroyed
+        /// Do not call this when the game is quitting, because NovaController may be already destroyed
         /// </remarks>
-        public static GameController FindNovaGameController()
+        public static NovaController FindNovaController()
         {
-            var go = GameObject.FindWithTag("NovaGameController");
+            var go = GameObject.FindWithTag("NovaController");
             if (go == null)
             {
                 throw new InvalidAccessException(
-                    "Nova: Cannot find NovaGameController game object by tag. Maybe you should put NovaCreator prefab in your scene.");
+                    "Nova: Cannot find NovaController game object by tag. " +
+                    "Maybe you should put NovaCreator prefab in your scene.");
             }
 
-            if (!go.TryGetComponent<GameController>(out var gameController))
+            if (!go.TryGetComponent<NovaController>(out var controller))
             {
-                throw new InvalidAccessException(
-                    "Nova: No GameController component in NovaGameController game object.");
+                throw new InvalidAccessException("Nova: No NovaController component in NovaController game object.");
             }
 
-            return gameController;
+            return controller;
         }
 
-        public static GameRenderManager FindGameRenderManager()
+        public static RenderManager FindRenderManager()
         {
             var go = GameObject.FindGameObjectWithTag("RenderManager");
             if (go == null)
@@ -170,12 +170,12 @@ namespace Nova
                 throw new InvalidAccessException("Nova: Cannot find RenderManager game object by tag.");
             }
 
-            if (!go.TryGetComponent<GameRenderManager>(out var gameRenderManager))
+            if (!go.TryGetComponent<RenderManager>(out var renderManager))
             {
-                throw new InvalidAccessException("Nova: No GameRenderManager component in RenderManager game object.");
+                throw new InvalidAccessException("Nova: No RenderManager component in RenderManager game object.");
             }
 
-            return gameRenderManager;
+            return renderManager;
         }
 
         public static ViewManager FindViewManager()
@@ -301,10 +301,10 @@ namespace Nova
 
         public static void SaveAll()
         {
-            var gameController = FindNovaGameController();
-            gameController.CheckpointManager.UpdateGlobalSave();
-            gameController.ConfigManager.Apply();
-            gameController.InputManager.Save();
+            var controller = FindNovaController();
+            controller.CheckpointManager.UpdateGlobalSave();
+            controller.ConfigManager.Apply();
+            controller.InputManager.Save();
         }
 
         public static void QuitWithAlert()

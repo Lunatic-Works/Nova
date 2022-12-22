@@ -15,7 +15,7 @@ namespace Nova
         private void Awake()
         {
             buttonRing = GetComponentInChildren<ButtonRing>();
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
         }
 
         private void OnEnable()

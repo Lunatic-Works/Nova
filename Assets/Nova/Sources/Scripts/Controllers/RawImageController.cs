@@ -22,7 +22,7 @@ namespace Nova
 
         private void Awake()
         {
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
             image = GetComponent<RawImage>();
 
             if (!string.IsNullOrEmpty(luaGlobalName))

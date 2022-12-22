@@ -19,7 +19,7 @@ namespace Nova
             this.RuntimeAssert(!string.IsNullOrEmpty(configKeyName), "Empty configKeyName.");
 
             toggle = GetComponent<Toggle>();
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
         }
 
         private void UpdateValue()

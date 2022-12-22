@@ -40,8 +40,7 @@ namespace Nova
 
             if (target == null)
             {
-                target =
-                    Utils.FindGameRenderManager().GetRenderTarget(renderCamera.name + RenderTarget.SUFFIX) as MyTarget;
+                target = Utils.FindRenderManager().GetRenderTarget(renderCamera.name + RenderTarget.SUFFIX) as MyTarget;
                 if (target == null)
                 {
                     target = new MyTarget(this);

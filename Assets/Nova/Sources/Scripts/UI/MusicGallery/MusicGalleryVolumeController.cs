@@ -23,7 +23,7 @@ namespace Nova
         {
             slider = GetComponent<Slider>();
             audioSource = GetComponentInParent<MusicGalleryPlayer>().audioSource;
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             slider.onValueChanged.AddListener(OnValueChanged);
         }
 

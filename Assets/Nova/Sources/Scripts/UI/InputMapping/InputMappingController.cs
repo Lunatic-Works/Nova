@@ -34,7 +34,7 @@ namespace Nova
                 return;
             }
 
-            _inputManager = Utils.FindNovaGameController().InputManager;
+            _inputManager = Utils.FindNovaController().InputManager;
             _inputManager.Init();
 
             inited = true;

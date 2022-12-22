@@ -53,7 +53,7 @@ namespace Nova
         private void Awake()
         {
             camera = GetComponent<Camera>();
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {

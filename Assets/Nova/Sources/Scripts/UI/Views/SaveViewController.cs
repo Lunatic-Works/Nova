@@ -111,8 +111,8 @@ namespace Nova
 
             maxSaveEntry = maxRow * maxCol;
 
-            gameState = Utils.FindNovaGameController().GameState;
-            checkpointManager = Utils.FindNovaGameController().CheckpointManager;
+            gameState = Utils.FindNovaController().GameState;
+            checkpointManager = Utils.FindNovaController().CheckpointManager;
 
             backgroundButton = myPanel.transform.Find("Background").GetComponent<Button>();
             thumbnailTextProxy = myPanel.transform.Find("Background/Left/TextBox/Text").GetComponent<TextProxy>();

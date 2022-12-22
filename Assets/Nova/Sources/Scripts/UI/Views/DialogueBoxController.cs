@@ -192,7 +192,7 @@ namespace Nova
                 return true;
             }
 
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
 

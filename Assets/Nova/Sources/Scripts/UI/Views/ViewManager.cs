@@ -29,9 +29,9 @@ namespace Nova
         [SerializeField] private List<NovaAnimation> animationsToPause;
         [SerializeField] private List<AudioController> audiosToPause;
 
-        private GameController gameController;
+        private NovaController novaController;
 
-        // animationsToPause + gameController.PerDialogueAnimation + gameController.HoldingAnimation
+        // animationsToPause + novaController.PerDialogueAnimation + novaController.HoldingAnimation
         private IEnumerable<NovaAnimation> allAnimationsToPause => GetAllAnimationsToPause();
 
         private IEnumerable<NovaAnimation> GetAllAnimationsToPause()
@@ -40,12 +40,12 @@ namespace Nova
             var hasHolding = false;
             foreach (var anim in animationsToPause)
             {
-                if (anim == gameController.PerDialogueAnimation)
+                if (anim == novaController.PerDialogueAnimation)
                 {
                     hasPerDialogue = true;
                 }
 
-                if (anim == gameController.HoldingAnimation)
+                if (anim == novaController.HoldingAnimation)
                 {
                     hasHolding = true;
                 }
@@ -55,12 +55,12 @@ namespace Nova
 
             if (!hasPerDialogue)
             {
-                yield return gameController.PerDialogueAnimation;
+                yield return novaController.PerDialogueAnimation;
             }
 
             if (!hasHolding)
             {
-                yield return gameController.HoldingAnimation;
+                yield return novaController.HoldingAnimation;
             }
         }
 
@@ -74,8 +74,8 @@ namespace Nova
         private void Awake()
         {
             currentView = CurrentViewType.UI;
-            gameController = Utils.FindNovaGameController();
-            uiAnimation = gameController.transform.Find("NovaAnimation/UI").GetComponent<NovaAnimation>();
+            novaController = Utils.FindNovaController();
+            uiAnimation = novaController.transform.Find("NovaAnimation/UI").GetComponent<NovaAnimation>();
             screenCapturer = GetComponent<ScreenCapturer>();
             this.RuntimeAssert(screenCapturer != null, "Missing ScreenCapturer.");
         }

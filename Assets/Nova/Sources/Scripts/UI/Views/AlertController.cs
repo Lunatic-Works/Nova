@@ -25,7 +25,7 @@ namespace Nova
             cancelButton = myPanel.transform.Find("Background/Buttons/Cancel").GetComponent<Button>();
             ignoreToggle = myPanel.transform.Find("Background/Ignore").GetComponent<Toggle>();
 
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
 
             I18n.LocaleChanged.AddListener(UpdateText);
         }

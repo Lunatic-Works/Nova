@@ -36,7 +36,7 @@ namespace Nova
             this.RuntimeAssert(!string.IsNullOrEmpty(configKeyName), "Empty configKeyName.");
 
             toggleGroup = GetComponent<ToggleGroup>();
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
 
             var configEnum = Type.GetType("Nova." + enumTypeName);
             if (configEnum != null && configEnum.IsEnum)

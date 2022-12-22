@@ -15,7 +15,7 @@ namespace Nova
 
         private void Awake()
         {
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             canvasGroup = GetComponent<CanvasGroup>();
             dialogueBoxController = GetComponent<DialogueBoxController>();
             this.RuntimeAssert(canvasGroup != null || dialogueBoxController != null,

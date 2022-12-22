@@ -14,13 +14,6 @@ namespace Nova
 
         private bool inited;
 
-        /// <summary>
-        /// Inititialize the Lua runtime environment
-        /// </summary>
-        /// <remarks>
-        /// This method should be called before any Nova-related code runs. The beginning of Start or Awake
-        /// of GameController might be a good choice.
-        /// </remarks>
         private void Init()
         {
             if (inited)

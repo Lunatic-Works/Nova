@@ -113,7 +113,7 @@ namespace Nova
 
         private void Awake()
         {
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
             spriteRenderer = GetComponent<SpriteRenderer>();
             image = GetComponent<Image>();
             if (image != null && image.sprite == null)

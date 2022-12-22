@@ -29,7 +29,7 @@ namespace Nova
             viewManager = GetComponentInParent<ViewManager>();
             this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");
             viewManager.SetController(this);
-            inputManager = Utils.FindNovaGameController().InputManager;
+            inputManager = Utils.FindNovaController().InputManager;
 
             inited = true;
             return false;

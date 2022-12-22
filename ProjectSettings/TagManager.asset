@@ -4,7 +4,7 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - NovaGameController
+  - NovaController
   - UICamera
   - RenderManager
   - UIRoot

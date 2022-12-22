@@ -9,7 +9,7 @@ namespace Nova
 
         private void Awake()
         {
-            inputManager = Utils.FindNovaGameController().InputManager;
+            inputManager = Utils.FindNovaController().InputManager;
             LuaRuntime.Instance.BindObject("inputHelper", this);
         }
 

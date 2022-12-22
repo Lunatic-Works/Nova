@@ -17,7 +17,7 @@ namespace Nova
 
         protected virtual void Awake()
         {
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
 
             if (!string.IsNullOrEmpty(luaName))
             {

@@ -19,7 +19,7 @@ namespace Nova
             returnButton.onClick.AddListener(Hide);
             returnButton2.onClick.AddListener(Hide);
 
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
         }
 
         protected override void Start()

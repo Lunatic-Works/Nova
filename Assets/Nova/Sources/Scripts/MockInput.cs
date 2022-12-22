@@ -35,7 +35,7 @@ namespace Nova
 
         private void Awake()
         {
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
             viewManager = Utils.FindViewManager();

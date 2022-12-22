@@ -19,7 +19,7 @@ namespace Nova
 
         private void Awake()
         {
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             text = GetComponent<Text>();
             textPro = GetComponent<TMP_Text>();
             textProxy = GetComponent<TextProxy>();

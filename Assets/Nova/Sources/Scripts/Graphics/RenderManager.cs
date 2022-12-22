@@ -9,9 +9,9 @@ using UnityEngine.UI;
 namespace Nova
 {
     // a render texture config
-    // GameRenderManager will set targetTexture if isActive
+    // RenderManager will set targetTexture if isActive
     // if needUpdate, will generate new texture
-    // if isFinal, GameRenderManager will Blit this to final screen
+    // if isFinal, RenderManager will Blit this to final screen
     public interface IRenderTargetConfig
     {
         RenderTexture targetTexture { get; set; }
@@ -33,7 +33,7 @@ namespace Nova
     /// * Hijack the camera rendering process and directly blit the render texture to screen instead
     /// </summary>
     [ExecuteInEditMode]
-    public class GameRenderManager : OnPostRenderBehaviour
+    public class RenderManager : OnPostRenderBehaviour
     {
         private const string LastWindowedHeightKey = "_LastWindowedHeight";
         private const string LastWindowedWidthKey = "_LastWindowedWidth";
@@ -68,7 +68,7 @@ namespace Nova
 
             if (Application.isPlaying)
             {
-                configManager = Utils.FindNovaGameController().ConfigManager;
+                configManager = Utils.FindNovaController().ConfigManager;
 
                 fullScreenToggle.isOn = isLogicalFullScreen = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
                 fullScreenToggle.onValueChanged.AddListener(UpdateFullScreenStatus);
@@ -344,7 +344,7 @@ namespace Nova
         public static void SwitchFullScreen()
         {
             var go = GameObject.FindWithTag(Tag);
-            go.GetComponent<GameRenderManager>()._switchFullScreen();
+            go.GetComponent<RenderManager>()._switchFullScreen();
         }
     }
 

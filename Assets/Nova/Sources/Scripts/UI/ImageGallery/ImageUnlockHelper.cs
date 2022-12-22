@@ -12,7 +12,7 @@ namespace Nova
 
         private void Awake()
         {
-            checkpointManager = Utils.FindNovaGameController().CheckpointManager;
+            checkpointManager = Utils.FindNovaController().CheckpointManager;
             LuaRuntime.Instance.BindObject("imageUnlockHelper", this);
         }
 
