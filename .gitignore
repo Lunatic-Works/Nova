@@ -1,7 +1,8 @@
-# https://github.com/github/gitignore/blob/master/Unity.gitignore
+# https://github.com/github/gitignore/blob/main/Unity.gitignore
 
 /Build/
 /Builds/
+/Docs/
 /Library*/
 /Logs/
 /MemoryCaptures/
@@ -74,6 +75,9 @@ packages.config
 # VS Code
 .vscode/
 
+# IDEA
+.idea
+
 # NDepend
 *.ndproj
 NDependOut/
@@ -85,7 +89,6 @@ NDependOut/
 *.pptx
 *.pyc
 .DS_Store
-.idea
 __pycache__
 
 !.gitkeep

@@ -248,8 +248,7 @@ public class SerializableDictionary<TKey, TValue> : SerializableDictionaryBase<T
 }
 
 [Serializable]
-public class
-    SerializableDictionary<TKey, TValue, TValueStorage> : SerializableDictionaryBase<TKey, TValue, TValueStorage>
+public class SerializableDictionary<TKey, TValue, TValueStorage> : SerializableDictionaryBase<TKey, TValue, TValueStorage>
     where TValueStorage : SerializableDictionary.Storage<TValue>, new()
 {
     public SerializableDictionary() { }
