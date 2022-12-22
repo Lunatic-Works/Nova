@@ -39,13 +39,7 @@ namespace Nova
 
         public void Reset()
         {
-            foreach (var func in cachedLuaFunctions.Values)
-            {
-                func.Dispose();
-            }
-
-            cachedLuaFunctions.Clear();
-
+            ClearCachedLuaFunctions();
             lua.Require("requires");
         }
 
@@ -79,6 +73,7 @@ namespace Nova
 
         /// <summary>
         /// Wrap the given code in a closure
+        /// The LuaFunction will be cached, and will be disposed in Dispose
         /// </summary>
         /// <param name="code">
         /// The code that should be wrapped
@@ -88,9 +83,14 @@ namespace Nova
         /// </returns>
         public LuaFunction WrapClosure(string code)
         {
-            CheckInit();
-            // loadstring is deprecated after Lua 5.2
-            return GetFunction("loadstring").Invoke<string, LuaFunction>(code);
+            if (!cachedLuaFunctions.TryGetValue(code, out var func))
+            {
+                // loadstring is deprecated after Lua 5.2
+                func = GetFunction("loadstring").Invoke<string, LuaFunction>(code);
+                cachedLuaFunctions[code] = func;
+            }
+
+            return func;
         }
 
         public void DoString(string chunk)
@@ -113,13 +113,20 @@ namespace Nova
             if (!cachedLuaFunctions.TryGetValue(name, out var func))
             {
                 func = lua.GetFunction(name);
-                if (func != null)
-                {
-                    cachedLuaFunctions[name] = func;
-                }
+                cachedLuaFunctions[name] = func;
             }
 
             return func;
+        }
+
+        private void ClearCachedLuaFunctions()
+        {
+            foreach (var func in cachedLuaFunctions.Values)
+            {
+                func.Dispose();
+            }
+
+            cachedLuaFunctions.Clear();
         }
 
         /// <summary>
@@ -129,11 +136,7 @@ namespace Nova
         private void Dispose()
         {
             CheckInit();
-            foreach (var func in cachedLuaFunctions.Values)
-            {
-                func.Dispose();
-            }
-
+            ClearCachedLuaFunctions();
             lua.Dispose();
         }
 
