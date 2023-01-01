@@ -43,7 +43,7 @@ namespace Nova
             saveView = viewManager.GetController<SaveViewController>();
             logView = viewManager.GetController<LogController>();
             configView = viewManager.GetController<ConfigViewController>();
-            branchController = viewManager.GetComponentInChildren<BranchController>();
+            branchController = viewManager.GetComponentInChildren<BranchController>(true);
             helpView = viewManager.GetController<HelpViewController>();
             chapterSelectView = viewManager.GetController<ChapterSelectViewController>();
             alert = viewManager.GetController<AlertController>();

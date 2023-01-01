@@ -9,7 +9,7 @@ function anim_hold_begin()
     __Nova.checkpointHelper:RestrainCheckpoint(Nova.CheckpointHelper.WarningStepsFromLastCheckpoint, true)
     anim_hold_has_begun = true
 end
-Nova.ScriptDialogueEntryParser.AddCheckpointPattern('anim_hold_begin', 'ensure_ckpt_on_next_dialogue')
+Nova.DialogueEntryPreprocessor.AddCheckpointPattern('anim_hold_begin', 'ensure_ckpt_on_next_dialogue')
 
 function anim_hold_end()
     anim_hold:stop()

@@ -45,8 +45,6 @@ namespace Nova
         // Current locale of the state machine
         public SystemLanguage stateLocale;
 
-        private readonly Dictionary<string, string> hiddenCharacterNames = new Dictionary<string, string>();
-
         private class LazyBindingEntry
         {
             public readonly FlowChartNode from;
@@ -63,28 +61,25 @@ namespace Nova
 
         private readonly List<LazyBindingEntry> lazyBindingLinks = new List<LazyBindingEntry>();
 
-        private readonly HashSet<string> onlyIncludedNames = new HashSet<string>();
-
-        private void InitOnlyIncludedNames()
+        private static HashSet<string> GetOnlyIncludedNames()
         {
             var table = LuaRuntime.Instance.GetTable("only_included_scenario_names");
-            onlyIncludedNames.Clear();
-            onlyIncludedNames.UnionWith(table.ToArray().Cast<string>());
+            var names = new HashSet<string>(table.ToArray().Cast<string>());
             table.Dispose();
+            return names;
         }
 
         public void ForceInit(string path)
         {
             currentNode = null;
             stateLocale = I18n.DefaultLocale;
-            lazyBindingLinks.Clear();
 
-            ScriptDialogueEntryParser.ClearPatterns();
-            // requires.lua is executed and ScriptDialogueEntryParser.ActionGenerators is filled before calling ParseScript()
+            DialogueEntryPreprocessor.ClearPatterns();
+            // requires.lua is executed and DialogueEntryPreprocessor.ActionGenerators is filled before calling ParseScript()
             LuaRuntime.Instance.BindObject("scriptLoader", this);
             LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Eager,
                 DialogueActionStage.Default, false));
-            InitOnlyIncludedNames();
+            var onlyIncludedNames = GetOnlyIncludedNames();
 
             flowChartGraph.Unfreeze();
 
@@ -124,13 +119,9 @@ namespace Nova
                 }
             }
 
-            // Bind all lazy binding entries
             BindAllLazyBindingEntries();
 
-            // Perform sanity check
             flowChartGraph.SanityCheck();
-
-            // Construction finished, freeze the graph status
             flowChartGraph.Freeze();
         }
 
@@ -221,7 +212,6 @@ namespace Nova
         /// </summary>
         private void ParseScript(TextAsset script, bool deferChunks = false)
         {
-            hiddenCharacterNames.Clear();
             LuaRuntime.Instance.GetFunction("action_new_file").Call(script.name);
 
             var blocks = Parser.Parse(script.text).blocks;
@@ -274,12 +264,12 @@ namespace Nova
 
             if (stateLocale == I18n.DefaultLocale)
             {
-                var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks, hiddenCharacterNames);
+                var entries = DialogueEntryParser.ParseDialogueEntries(chunks);
                 currentNode.SetDialogueEntries(entries);
             }
             else
             {
-                var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
+                var entries = DialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
                 currentNode.AddLocalizedDialogueEntries(stateLocale, entries);
             }
         }
@@ -298,12 +288,12 @@ namespace Nova
                 var chunks = node.deferredChunks[locale];
                 if (locale == I18n.DefaultLocale)
                 {
-                    var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks, hiddenCharacterNames);
+                    var entries = DialogueEntryParser.ParseDialogueEntries(chunks);
                     node.SetDialogueEntries(entries);
                 }
                 else
                 {
-                    var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
+                    var entries = DialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
                     node.AddLocalizedDialogueEntries(locale, entries);
                 }
             }
@@ -323,7 +313,6 @@ namespace Nova
                 node.AddBranch(entry.branchInfo, flowChartGraph.GetNode(entry.destination));
             }
 
-            // Remove unnecessary reference
             lazyBindingLinks.Clear();
         }
 
