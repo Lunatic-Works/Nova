@@ -9,8 +9,14 @@ namespace Nova
 {
     public class LocalizedDialogueEntry
     {
-        public string displayName;
-        public string dialogue;
+        public readonly string displayName;
+        public readonly string dialogue;
+
+        public LocalizedDialogueEntry(string displayName, string dialogue)
+        {
+            this.displayName = displayName;
+            this.dialogue = dialogue;
+        }
     }
 
     /// <summary>

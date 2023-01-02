@@ -39,8 +39,8 @@
 ## 版本说明
 
 * v0.1：兼容《青箱》v1.1.0的版本
-* v0.2：兼容Unity 2019的版本，重要的新功能包括新的脚本parser、新的存档系统、异步的`GameState`
-* v0.3：`master` branch上滚动更新的版本，重要的新功能包括Input System、URP，预计的新功能包括Addressables
+* v0.2：兼容Unity 2019的版本，重要的新功能包括小游戏支持、新的脚本parser、新的存档系统
+* v0.3：`master` branch上滚动更新的版本，重要的新功能包括URP、新的立绘合成系统、Input System，预计的新功能包括Addressables
 
 ## 友情链接
 

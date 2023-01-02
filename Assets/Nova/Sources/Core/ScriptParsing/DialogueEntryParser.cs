@@ -129,13 +129,14 @@ namespace Nova
                 }
             }
 
-            var code = sb.ToString().Trim();
+            var code = sb.ToString();
 
             // If you don't use Lua multiline comment, or any Lua comment at all,
             // you can commit out the following for better performance
             code = LuaMultilineCommentPattern.Replace(code, "");
             code = LuaCommentPattern.Replace(code, "");
 
+            code = code.Trim();
             if (code == "")
             {
                 code = null;
@@ -310,7 +311,7 @@ namespace Nova
                         $"hiddenName: {hiddenName}, displayName: {displayName}, dialogue: {dialogue}");
                 }
 
-                results.Add(new LocalizedDialogueEntry { displayName = displayName, dialogue = dialogue });
+                results.Add(new LocalizedDialogueEntry(displayName, dialogue));
             }
 
             return results;
