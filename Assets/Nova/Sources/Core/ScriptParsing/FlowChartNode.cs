@@ -77,14 +77,12 @@ namespace Nova
         /// <summary>
         /// Displayed node name in each locale.
         /// </summary>
-        private readonly Dictionary<SystemLanguage, string> _displayNames = new Dictionary<SystemLanguage, string>();
-
-        public Dictionary<SystemLanguage, string> displayNames => _displayNames;
+        public readonly Dictionary<SystemLanguage, string> displayNames = new Dictionary<SystemLanguage, string>();
 
         public void AddLocalizedName(SystemLanguage locale, string displayName)
         {
             CheckFreeze();
-            _displayNames[locale] = displayName;
+            displayNames[locale] = displayName;
         }
 
         #endregion
