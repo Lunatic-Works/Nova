@@ -8,14 +8,18 @@ namespace Nova
     public class RealInput : MonoBehaviour
     {
         private static RealInput Current;
-        private static bool focused = true;
+        public static bool Focused
+        {
+            private set;
+            get;
+        }
 
         // Valid even if the cursor is hidden
         public static Vector2 mousePosition
         {
             get
             {
-                if (Mouse.current == null || !focused)
+                if (Mouse.current == null || !Focused)
                 {
                     return Vector2.positiveInfinity;
                 }
@@ -28,7 +32,7 @@ namespace Nova
         {
             get
             {
-                if (Current?.action == null || !focused)
+                if (Current?.action == null || !Focused)
                 {
                     return Vector2.positiveInfinity;
                 }
@@ -43,11 +47,13 @@ namespace Nova
         {
             Current = this;
             action = GetComponent<InputSystemUIInputModule>().point.action;
+
+            Focused = true;
         }
 
         private void OnApplicationFocus(bool focus)
         {
-            focused= focus;
+            Focused = focus;
         }
     }
 }
