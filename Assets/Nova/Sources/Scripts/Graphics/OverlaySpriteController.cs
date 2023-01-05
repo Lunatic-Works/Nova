@@ -13,10 +13,11 @@ namespace Nova
 
         private static readonly int MainTexID = Shader.PropertyToID("_MainTex");
 
-        public GameObject overlayObject;
+        [SerializeField] private GameObject overlayObject;
         public GameObject overlay => overlayObject;
 
-        private static Mesh quad;
+        private static Mesh Quad;
+
         private MeshRenderer meshRenderer;
         private MeshFilter meshFilter;
         private MyTarget myTarget;
@@ -33,9 +34,9 @@ namespace Nova
 
         protected override void Awake()
         {
-            if (quad == null)
+            if (Quad == null)
             {
-                quad = new Mesh
+                Quad = new Mesh
                 {
                     vertices = new[]
                     {
@@ -62,7 +63,7 @@ namespace Nova
             }
 
             meshFilter = overlay.Ensure<MeshFilter>();
-            meshFilter.mesh = quad;
+            meshFilter.mesh = Quad;
             meshRenderer = overlay.Ensure<MeshRenderer>();
             base.Awake();
             overlayMaterial = materialPool.Get(OverlayShader);

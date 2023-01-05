@@ -191,7 +191,7 @@ namespace Nova
         public void Open()
         {
             file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            endBlock = CheckpointBlock.GetBlockId(file.Length);
+            endBlock = CheckpointBlock.GetBlockID(file.Length);
             if (endBlock < 1)
             {
                 AppendBlock();
@@ -221,7 +221,7 @@ namespace Nova
 
         private CheckpointBlock GetBlockIndex(long offset, out int index)
         {
-            return GetBlock(CheckpointBlock.GetBlockIdIndex(offset, out index));
+            return GetBlock(CheckpointBlock.GetBlockIDIndex(offset, out index));
         }
 
         public ByteSegment GetRecord(long offset)

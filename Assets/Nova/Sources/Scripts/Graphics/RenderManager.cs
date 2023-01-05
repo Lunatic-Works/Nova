@@ -8,10 +8,9 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    // a render texture config
-    // RenderManager will set targetTexture if isActive
-    // if needUpdate, will generate new texture
-    // if isFinal, RenderManager will Blit this to final screen
+    // if isActive, RenderManager will set targetTexture
+    // if needUpdate, generate a new render texture
+    // if isFinal, blit this to the screen
     public interface IRenderTargetConfig
     {
         RenderTexture targetTexture { get; set; }
@@ -23,14 +22,14 @@ namespace Nova
     }
 
     /// <summary>
-    /// Central component to connect the render process and
-    /// preserve aspect ratio by adding black margin around actual game view.
+    /// Central component to connect the rendering process and
+    /// preserve the aspect ratio by adding black margins around the game view.
     /// It does the following jobs:
-    /// * Connect game camera output to ui
-    /// * Create a dummy final camera & render texture for final rendering
-    /// * Calculate desired dimensions, set to RealScreen class, and update final camera rect
-    /// * Make current main camera render to the render texture
-    /// * Hijack the camera rendering process and directly blit the render texture to screen instead
+    /// * Render UI over the game view
+    /// * Create a dummy camera and a render texture for the final rendering
+    /// * Calculate desired dimensions, set them to RealScreen, and update the final camera's rect
+    /// * Make the current main camera render to the final render texture
+    /// * Hijack the camera rendering process and directly blit the render texture to the screen instead
     /// </summary>
     [ExecuteInEditMode]
     public class RenderManager : OnPostRenderBehaviour
@@ -43,16 +42,16 @@ namespace Nova
         private const string SHADER = "Nova/VFX/Final Blit";
         private const string ChangeWindowSizeFirstShownKey = ConfigManager.FirstShownKeyPrefix + "ChangeWindowSize";
 
-        public Color marginColor;
-        public float desiredAspectRatio;
-        public RawImage gameRenderTarget;
-        public Toggle fullScreenToggle;
+        [SerializeField] private Color marginColor;
+        [SerializeField] private float desiredAspectRatio;
+        [SerializeField] private RawImage gameRenderTarget;
+        [SerializeField] private Toggle fullScreenToggle;
 
         private ConfigManager configManager;
         private Camera finalCamera;
         private Material material;
         private bool isLogicalFullScreen;
-        private bool needUpdateTexture = false;
+        private bool needUpdateTexture;
         private int lastScreenHeight, lastScreenWidth;
         private int lastRealHeight, lastRealWidth;
         private int shouldUpdateUIAfter = -1;
@@ -165,6 +164,7 @@ namespace Nova
                 {
                     if (Screen.resolutions.Length == 0)
                     {
+                        // A conservative guess for the initial size
                         targetW = 1280;
                         targetH = 720;
                     }

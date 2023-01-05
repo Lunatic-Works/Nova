@@ -6,14 +6,15 @@ namespace Nova.URP
 {
     public interface IOnRenderImage
     {
-        void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData);
         RenderPassEvent renderPassEvent { get; }
+        void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData);
     }
 
     public abstract class OnPostRenderBehaviour : MonoBehaviour, IOnRenderImage
     {
         public RenderPassEvent renderPassEvent => RenderPassEvent.AfterRendering;
 
-        public abstract void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData);
+        public abstract void ExecuteOnRenderImageFeature(ScriptableRenderContext context,
+            ref RenderingData renderingData);
     }
 }

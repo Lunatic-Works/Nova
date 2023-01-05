@@ -34,7 +34,7 @@ namespace Nova.URP
 
         private CustomRenderPass[] allPasses;
 
-        private static readonly RenderPassEvent[] allEvents =
+        private static readonly RenderPassEvent[] AllEvents =
         {
             RenderPassEvent.AfterRendering,
             RenderPassEvent.BeforeRenderingTransparents,
@@ -43,7 +43,7 @@ namespace Nova.URP
         /// <inheritdoc/>
         public override void Create()
         {
-            allPasses = allEvents.Select(x => new CustomRenderPass(x)).ToArray();
+            allPasses = AllEvents.Select(x => new CustomRenderPass(x)).ToArray();
         }
 
         // Here you can inject one or multiple render passes in the renderer.

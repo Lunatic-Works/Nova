@@ -133,11 +133,11 @@ namespace Nova
             var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startNormalSave);
             if (maxNormalSave > startNormalSave && random.Next(2) == 0)
             {
-                var saveId = random.Next(startNormalSave, maxNormalSave);
+                var saveID = random.Next(startNormalSave, maxNormalSave);
 
                 yield return DoTransition(onFinish => saveView.ShowLoadWithCallback(true, onFinish));
                 yield return delay;
-                saveView.LoadBookmark(saveId);
+                saveView.LoadBookmark(saveID);
             }
             else
             {
@@ -165,11 +165,11 @@ namespace Nova
             {
                 var startSave = (int)BookmarkType.NormalSave;
                 var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startSave);
-                var saveId = random.Next(startSave, maxNormalSave + 1);
+                var saveID = random.Next(startSave, maxNormalSave + 1);
 
                 yield return DoTransition(saveView.ShowSaveWithCallback);
                 yield return delay;
-                saveView.SaveBookmark(saveId);
+                saveView.SaveBookmark(saveID);
                 yield return delay;
                 yield return Hide(saveView);
                 yield return WaitForView(CurrentViewType.Game);
@@ -188,11 +188,11 @@ namespace Nova
             }
             else if (maxNormalSave > startNormalSave)
             {
-                var saveId = random.Next(startNormalSave, maxNormalSave);
+                var saveID = random.Next(startNormalSave, maxNormalSave);
 
                 yield return DoTransition(onFinish => saveView.ShowLoadWithCallback(false, onFinish));
                 yield return delay;
-                saveView.LoadBookmark(saveId);
+                saveView.LoadBookmark(saveID);
                 yield return WaitForView(CurrentViewType.Game);
             }
         }

@@ -9,8 +9,9 @@ namespace Nova
     [RequireComponent(typeof(Camera))]
     public class CameraRenderTarget : MonoBehaviour
     {
-        public bool isFinalTarget;
-        public List<RawImage> images = new List<RawImage>();
+        [SerializeField] private bool isFinalTarget;
+        [SerializeField] private List<RawImage> images = new List<RawImage>();
+
         private Camera renderCamera;
         private MyTarget target;
 
@@ -60,6 +61,7 @@ namespace Nova
         private class MyTarget : RenderTarget
         {
             private readonly CameraRenderTarget parent;
+
             public override bool isActive => parent.renderCamera != null && parent.renderCamera.isActiveAndEnabled;
             public override bool isFinal => parent.isFinalTarget;
             public override string textureName => parent == null ? oldConfig.name : parent.renderCamera.name + SUFFIX;

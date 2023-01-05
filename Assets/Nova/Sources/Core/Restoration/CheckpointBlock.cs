@@ -11,12 +11,12 @@ namespace Nova
         public const int HeaderSize = 8; // sizeof(long)
         public const int DataSize = BlockSize - HeaderSize;
 
-        public static long GetBlockId(long offset)
+        public static long GetBlockID(long offset)
         {
             return offset / BlockSize;
         }
 
-        public static long GetBlockIdIndex(long offset, out int index)
+        public static long GetBlockIDIndex(long offset, out int index)
         {
             var id = offset / BlockSize;
             index = (int)(offset - id * BlockSize) - HeaderSize;

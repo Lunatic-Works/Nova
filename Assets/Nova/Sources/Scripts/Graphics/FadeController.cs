@@ -11,7 +11,7 @@ namespace Nova
         private static readonly int ColorID = Shader.PropertyToID("_Color");
         private static readonly int SubColorID = Shader.PropertyToID("_SubColor");
 
-        public float fadeDuration = 0.1f;
+        [SerializeField] protected float fadeDuration = 0.1f;
 
         protected MaterialPool materialPool;
         protected NovaAnimation novaAnimation;
@@ -34,7 +34,7 @@ namespace Nova
             novaAnimation = Utils.FindNovaController().PerDialogueAnimation;
         }
 
-        protected void FadeAnimation(float delay)
+        protected void DoFadeAnimation(float delay)
         {
             fadeMaterial.SetColor(SubColorID, fadeMaterial.GetColor(ColorID));
             if (delay < EPS)

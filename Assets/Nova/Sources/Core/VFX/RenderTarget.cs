@@ -10,10 +10,10 @@ namespace Nova
         void SetTexture(RenderTexture texture);
     }
 
-    // It seems intriguing to make this a MonoBehaviour
-    // but in case when a gameObject needs multiple render targets it is not so good
-    // Current design mode is to make a nested class inheriting this one and
-    // being a member of MonoBehaviour
+    // It seems intriguing to make this a MonoBehaviour,
+    // but in case a gameObject needs multiple render targets it is not so good
+    // The current design pattern is to make a nested class inheriting this and
+    // being a member of the MonoBehaviour
     [ExportCustomType]
     public abstract class RenderTarget : IRenderTargetConfig
     {
@@ -22,11 +22,11 @@ namespace Nova
         protected TextureRendererConfig oldConfig;
         protected RenderManager renderManager;
         protected bool _needUpdate = true;
-        protected bool registered = false;
+        protected bool registered;
         protected RenderTexture _targetTexture;
 
-        // these binding are not persist
-        // need extra mechanism (e.g. RestorableMaterial or RawImageController to be restorable)
+        // these bindings are not persistent
+        // need extra mechanism (e.g. RestorableMaterial or RawImageController) to be restorable
         protected readonly List<ITextureReceiver> receivers = new List<ITextureReceiver>();
 
         public abstract string textureName { get; }

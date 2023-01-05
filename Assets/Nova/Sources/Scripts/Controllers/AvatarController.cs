@@ -18,9 +18,9 @@ namespace Nova
     [RequireComponent(typeof(RawImage))]
     public class AvatarController : CompositeSpriteController
     {
-        public List<AvatarConfig> avatarConfigs;
-        public int textPadding;
-        public Camera renderCamera;
+        [SerializeField] private List<AvatarConfig> avatarConfigs;
+        [SerializeField] private int textPadding;
+        [SerializeField] private Camera renderCamera;
 
         private RawImage image;
         private RectTransform rectTransform;

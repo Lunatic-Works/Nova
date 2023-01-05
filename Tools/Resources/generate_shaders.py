@@ -63,6 +63,7 @@ Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
             def_gscale='',
             gscale='1.0',
         )
+
     elif variant == 'Multiply':
         write_shader(
             filename,
@@ -80,6 +81,7 @@ col.a = 1.0;
             def_gscale='',
             gscale='1.0',
         )
+
     elif variant == 'Screen':
         write_shader(
             filename,
@@ -97,6 +99,7 @@ col.a = 1.0;
             def_gscale='',
             gscale='1.0',
         )
+
     elif variant == 'PP':
         write_shader(
             filename,
@@ -110,6 +113,7 @@ Cull Off ZWrite Off ZTest Always
             def_gscale='float _GScale;',
             gscale='_GScale',
         )
+
     elif variant == 'Premul':
         write_shader(
             filename,
@@ -124,6 +128,7 @@ Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
             def_gscale='',
             gscale='1.0',
         )
+
     else:
         raise ValueError(f'Unknown variant: {variant}')
 

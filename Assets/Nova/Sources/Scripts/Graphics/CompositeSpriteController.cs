@@ -24,13 +24,14 @@ namespace Nova
         public abstract bool renderToCamera { get; }
         public abstract RenderTexture renderTexture { get; }
 
-        // the actually layer of this object
+        // the actual layer of this object
         // if layer = -1, render without considering camera's culling mask
         public virtual int layer { get; set; } = -1;
 
         protected override void Awake()
         {
             base.Awake();
+
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
@@ -67,7 +68,7 @@ namespace Nova
             mergerPrimary.SetTextures(sprites);
             if (fade)
             {
-                FadeAnimation(fadeDuration);
+                DoFadeAnimation(fadeDuration);
             }
 
             currentPose = pose;

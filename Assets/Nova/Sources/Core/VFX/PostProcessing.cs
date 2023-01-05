@@ -100,7 +100,7 @@ namespace Nova
             }
         }
 
-        public static readonly int TempBlitId = Shader.PropertyToID("_NovaTempBlit");
+        public static readonly int TempBlitID = Shader.PropertyToID("_NovaTempBlit");
 
         public void Blit(CommandBuffer cmd, RenderTargetIdentifier renderTarget)
         {
@@ -109,7 +109,7 @@ namespace Nova
                 return;
             }
 
-            RenderTargetIdentifier[] buffers = { TempBlitId, renderTarget };
+            RenderTargetIdentifier[] buffers = { TempBlitID, renderTarget };
             var from = 1;
 
             foreach (var mat in EnabledMaterials())
@@ -133,11 +133,11 @@ namespace Nova
 
             var cmd = CommandBufferPool.Get("Nova Post Processing");
             var cam = renderingData.cameraData.camera;
-            cmd.GetTemporaryRT(TempBlitId, cam.scaledPixelWidth, cam.scaledPixelHeight, 0);
+            cmd.GetTemporaryRT(TempBlitID, cam.scaledPixelWidth, cam.scaledPixelHeight, 0);
 
             Blit(cmd, OnRenderImageFeature.GetCurrentTarget(ref renderingData));
 
-            cmd.ReleaseTemporaryRT(TempBlitId);
+            cmd.ReleaseTemporaryRT(TempBlitID);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }

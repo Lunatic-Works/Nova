@@ -119,21 +119,21 @@ namespace Nova
                 return Rect.zero;
             }
 
-            var xmin = float.MaxValue;
-            var ymin = float.MaxValue;
-            var xmax = float.MinValue;
-            var ymax = float.MinValue;
+            var xMin = float.MaxValue;
+            var yMin = float.MaxValue;
+            var xMax = float.MinValue;
+            var yMax = float.MinValue;
             foreach (var sprite in sprites)
             {
                 var b = sprite.sprite.bounds;
                 var o = sprite.offset;
-                xmin = Mathf.Min(xmin, b.min.x + o.x);
-                ymin = Mathf.Min(ymin, b.min.y + o.y);
-                xmax = Mathf.Max(xmax, b.max.x + o.x);
-                ymax = Mathf.Max(ymax, b.max.y + o.y);
+                xMin = Mathf.Min(xMin, b.min.x + o.x);
+                yMin = Mathf.Min(yMin, b.min.y + o.y);
+                xMax = Mathf.Max(xMax, b.max.x + o.x);
+                yMax = Mathf.Max(yMax, b.max.y + o.y);
             }
 
-            return Rect.MinMaxRect(xmin, ymin, xmax, ymax);
+            return Rect.MinMaxRect(xMin, yMin, xMax, yMax);
         }
 
 #if UNITY_EDITOR
@@ -150,7 +150,7 @@ namespace Nova
             var camera = new GameObject("Camera");
             camera.transform.SetParent(root.transform, false);
             renderCamera = camera.Ensure<Camera>();
-            renderCamera.cullingMask = 1 << CompositeSpriteMerger.MergerLayer;
+            renderCamera.cullingMask = 1 << MergerLayer;
             renderCamera.orthographic = true;
             renderCamera.enabled = false;
             renderCamera.nearClipPlane = -1;

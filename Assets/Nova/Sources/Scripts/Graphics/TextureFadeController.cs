@@ -39,7 +39,7 @@ namespace Nova
                     ? rendererSize.InverseScale(new Vector2(lastTexture.width, lastTexture.height))
                     : Vector2.zero
             );
-            FadeAnimation(delay);
+            DoFadeAnimation(delay);
             lastTexture = to;
         }
 
