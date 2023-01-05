@@ -51,11 +51,6 @@ namespace Nova
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!RealInput.Focused)
-            {
-                return;
-            }
-            
             if (mouseInsideLoop != null)
             {
                 viewManager.TryPlaySound(mouseInsideLoop);

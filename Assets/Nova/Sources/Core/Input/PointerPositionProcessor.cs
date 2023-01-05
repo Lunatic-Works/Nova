@@ -28,6 +28,11 @@ namespace Nova
         // Valid even if the cursor is hidden
         public override Vector2 Process(Vector2 value, InputControl control)
         {
+            if (!RealInput.Focused)
+            {
+                return Vector2.positiveInfinity;
+            }
+
             return value - RealScreen.offset;
         }
     }
