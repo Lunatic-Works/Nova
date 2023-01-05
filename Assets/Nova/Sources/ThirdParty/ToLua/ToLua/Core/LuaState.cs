@@ -123,46 +123,47 @@ namespace LuaInterface
 
             BeginModule("System");
             System_ObjectWrap.Register(this);
-            System_NullObjectWrap.Register(this);
-            System_StringWrap.Register(this);
+            // System_NullObjectWrap.Register(this);
             System_DelegateWrap.Register(this);
+            System_StringWrap.Register(this);
             System_EnumWrap.Register(this);
-            System_ArrayWrap.Register(this);
+            // System_ArrayWrap.Register(this);
             System_TypeWrap.Register(this);
+
             BeginModule("Collections");
             System_Collections_IEnumeratorWrap.Register(this);
 
             BeginModule("ObjectModel");
-            System_Collections_ObjectModel_ReadOnlyCollectionWrap.Register(this);
+            // System_Collections_ObjectModel_ReadOnlyCollectionWrap.Register(this);
             EndModule();//ObjectModel
 
             BeginModule("Generic");
-            System_Collections_Generic_ListWrap.Register(this);
-            System_Collections_Generic_DictionaryWrap.Register(this);
-            System_Collections_Generic_KeyValuePairWrap.Register(this);
+            // System_Collections_Generic_ListWrap.Register(this);
+            // System_Collections_Generic_DictionaryWrap.Register(this);
+            // System_Collections_Generic_KeyValuePairWrap.Register(this);
 
             BeginModule("Dictionary");
-            System_Collections_Generic_Dictionary_KeyCollectionWrap.Register(this);
-            System_Collections_Generic_Dictionary_ValueCollectionWrap.Register(this);
+            // System_Collections_Generic_Dictionary_KeyCollectionWrap.Register(this);
+            // System_Collections_Generic_Dictionary_ValueCollectionWrap.Register(this);
             EndModule();//Dictionary
             EndModule();//Generic
             EndModule();//Collections
             EndModule();//end System
 
             BeginModule("LuaInterface");
-            LuaInterface_LuaOutWrap.Register(this);
+            // LuaInterface_LuaOutWrap.Register(this);
             LuaInterface_EventObjectWrap.Register(this);
             EndModule();//end LuaInterface
 
             BeginModule("UnityEngine");
             UnityEngine_ObjectWrap.Register(this);
-            UnityEngine_CoroutineWrap.Register(this);
+            // UnityEngine_CoroutineWrap.Register(this);
             EndModule(); //end UnityEngine
 
             EndModule(); //end global
 
             LuaUnityLibs.OpenLibs(L);
-            ArrayMetatable = metaMap[typeof(System.Array)];
+            // ArrayMetatable = metaMap[typeof(System.Array)];
             TypeMetatable = metaMap[typeof(System.Type)];
             DelegateMetatable = metaMap[typeof(System.Delegate)];
             EnumMetatable = metaMap[typeof(System.Enum)];
