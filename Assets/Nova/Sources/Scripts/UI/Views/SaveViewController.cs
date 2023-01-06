@@ -587,7 +587,7 @@ namespace Nova
             {
                 Bookmark bookmark = checkpointManager[saveID];
                 var nodeName = checkpointManager.GetNodeRecord(bookmark.nodeOffset).name;
-                var displayName = I18n.__(gameState.GetNode(nodeName).displayNames);
+                var displayName = I18n.__(gameState.GetNode(nodeName, false).displayNames);
                 ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",
                     checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
