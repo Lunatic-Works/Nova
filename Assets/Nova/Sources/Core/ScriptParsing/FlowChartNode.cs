@@ -72,6 +72,17 @@ namespace Nova
             }
         }
 
+        private bool _isChapter = false;
+        public bool isChapter
+        {
+            get => _isChapter;
+            set
+            {
+                CheckFreeze();
+                _isChapter = value;
+            }
+        }
+
         #region Displayed names
 
         /// <summary>
