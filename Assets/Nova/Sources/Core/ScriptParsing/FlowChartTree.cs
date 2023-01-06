@@ -45,6 +45,7 @@ namespace Nova
         private readonly Dictionary<string, FlowChartNode> nodes = new Dictionary<string, FlowChartNode>();
         private readonly Dictionary<string, StartNode> startNodes = new Dictionary<string, StartNode>();
         private readonly Dictionary<FlowChartNode, string> endNodes = new Dictionary<FlowChartNode, string>();
+        private readonly Dictionary<string, FlowChartNode> chapterNodes = new Dictionary<string, FlowChartNode>();
 
         private bool isFrozen;
 
@@ -134,6 +135,30 @@ namespace Nova
             return startNodes.Values.Where(x => type.HasFlag(x.type)).Select(x => x.name);
         }
 
+        public void CheckNode(FlowChartNode node)
+        {
+            CheckFreeze();
+            if (!HasNode(node))
+            {
+                throw new ArgumentException($"Nova: Node {node.name} is not in the graph.");
+            }
+        }
+
+        public void AddChapter(FlowChartNode node)
+        {
+            CheckNode(node);
+            if (chapterNodes.ContainsKey(node.name))
+            {
+                Debug.LogWarning($"Nova: Overwrite chapter: {node.name}");
+            }
+            chapterNodes[node.name] = node;
+        }
+
+        public bool isChapter(FlowChartNode node)
+        {
+            return chapterNodes.ContainsKey(node.name);
+        }
+
         /// <summary>
         /// Add a start node.
         /// </summary>
@@ -147,18 +172,11 @@ namespace Nova
         /// </exception>
         public void AddStart(FlowChartNode node, StartNodeType type)
         {
-            CheckFreeze();
-
-            if (!HasNode(node))
-            {
-                throw new ArgumentException("Nova: Only node in the graph can be set as a start node.");
-            }
-
+            AddChapter(node);
             if (startNodes.ContainsKey(node.name))
             {
                 Debug.LogWarning($"Nova: Overwrite start point: {node.name}");
             }
-
             startNodes[node.name] = new StartNode(node, type);
         }
 
@@ -190,16 +208,11 @@ namespace Nova
         /// </exception>
         public void AddEnd(string name, FlowChartNode node)
         {
-            CheckFreeze();
+            CheckNode(node);
 
             if (string.IsNullOrEmpty(name))
             {
                 throw new ArgumentException("Nova: End name is null or empty.");
-            }
-
-            if (!HasNode(node))
-            {
-                throw new ArgumentException("Nova: Only node in the graph can be set as an end node.");
             }
 
             var existingNodeName = GetEndName(node);
