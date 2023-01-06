@@ -1055,7 +1055,7 @@ public static class ToLuaMenu
 
     }
 
-    [MenuItem("Lua/Build Lua Files to Resources (PC)", false, 53)]
+    [MenuItem("Lua/Build Lua Files to Resources (Windows Only)", false, 53)]
     public static void BuildLuaToResources()
     {
         ClearAllLuaFiles();
