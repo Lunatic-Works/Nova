@@ -8,10 +8,8 @@ namespace Nova
     public class DebugJumpHelper : MonoBehaviour
     {
         public bool backward;
-        public bool beginChapter;
         public bool previousChapter, nextChapter;
         public bool previousBranch, nextBranch;
-        public bool fastForwardUnreached;
 
         private GameState gameState;
         private DialogueState dialogueState;
@@ -44,34 +42,28 @@ namespace Nova
                 MoveBackward();
             }
 
-            if (beginChapter)
-            {
-                beginChapter = false;
-                JumpChapter(0);
-            }
-
             if (previousChapter)
             {
                 previousChapter = false;
-                gameState.MoveToBranch(false, true);
+                gameState.MoveToKeyPoint(false, true);
             }
 
             if (nextChapter)
             {
                 nextChapter = false;
-                gameState.MoveToBranch(true, true);
+                gameState.MoveToKeyPoint(true, true);
             }
 
             if (previousBranch)
             {
                 previousBranch = false;
-                gameState.MoveToBranch(false, false);
+                gameState.MoveToKeyPoint(false, false);
             }
 
             if (nextBranch)
             {
                 nextBranch = false;
-                gameState.MoveToBranch(true, false);
+                gameState.MoveToKeyPoint(true, false);
             }
         }
 
@@ -82,22 +74,6 @@ namespace Nova
 
             gameState.SeekBackStep(1, out var nodeRecord, out var checkpointOffset, out var dialogueIndex);
             gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
-        }
-
-        private void JumpChapter(int offset)
-        {
-            NovaAnimation.StopAll();
-            dialogueState.state = DialogueState.State.Normal;
-
-            int targetChapterIndex = chapters.IndexOf(gameState.currentNode.name) + offset;
-            if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Count)
-            {
-                gameState.GameStart(chapters[targetChapterIndex]);
-            }
-            else
-            {
-                Debug.LogWarning($"Nova: Chapter index {targetChapterIndex} out of range.");
-            }
         }
     }
 }
