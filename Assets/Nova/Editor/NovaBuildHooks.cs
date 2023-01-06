@@ -9,7 +9,7 @@ namespace Nova.Editor
 
         public void OnPreprocessBuild(BuildReport report)
         {
-            ToLuaMenu.CopyLuaFilesToRes();
+            ToLuaMenu.BuildLuaToResources();
         }
     }
 }
