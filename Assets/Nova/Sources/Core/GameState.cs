@@ -930,10 +930,21 @@ namespace Nova
             MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
         }
 
-        public bool MoveToBranch(bool forward, bool allowChapter)
+        /// <summary>
+        /// Move to previous/next chapter/branch.
+        /// </summary>
+        /// <param name="forward">Moving forward or backward.</param>
+        /// <param name="allowChapter">Whether to stop at chapter.</param>
+        /// <param name="allowBranch">Whether to stop at branch, only works in backward mode.</param>
+        /// <returns>Whether succeeded. if not will move to the beginning/end</returns>
+        public bool MoveToKeyPoint(bool forward, bool allowChapter, bool allowBranch = true)
         {
             var entryNode = nodeRecord;
             var foundHead = false;
+            if (forward)
+            {
+                allowBranch = true;
+            }
 
             while (true)
             {
@@ -944,7 +955,7 @@ namespace Nova
                 // special handling of current node
                 // 1. if going backward, the current node branch should not be considered
                 // 2. if going forward, or right at the beginning, the current node beginning should not be considered
-                var isBranch = entryNode.endDialogue == node.dialogueEntryCount && node.isBranchSelectNode() &&
+                var isBranch = allowBranch && entryNode.endDialogue == node.dialogueEntryCount && node.isBranchSelectNode() &&
                     (!(entryNode == nodeRecord && !forward));
                 var isChapter = allowChapter && entryNode.beginDialogue == 0 && node.isChapter &&
                     (!(entryNode == nodeRecord && (currentIndex == 0 || forward)));
