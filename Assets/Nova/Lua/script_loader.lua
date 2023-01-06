@@ -121,6 +121,13 @@ function branch(branches)
     __Nova.scriptLoader:EndRegisterBranch()
 end
 
+function is_chapter()
+    if not check_eager('is_chapter') then
+        return
+    end
+    __Nova.scriptLoader:SetCurrentAsChapter()
+end
+
 --- set the current node as a start node
 --- should be called at the end of the node
 --- a game can have multiple start points, which means this function can be called several times under
