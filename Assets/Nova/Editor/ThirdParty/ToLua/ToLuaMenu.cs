@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.IO;
+using System.Linq;
 using System.Diagnostics;
 using LuaInterface;
 
@@ -1065,12 +1066,19 @@ public static class ToLuaMenu
         path = path.Substring(0, path.LastIndexOf('/'));
         CopyBuildBat(path, tempDir);
         CopyLuaBytesFiles(LuaConst.luaDir, tempDir, false);
+        CopyLuaBytesFiles(LuaConst.toluaDir, tempDir, false);
         Process proc = Process.Start(tempDir + "/Build.bat");
         proc.WaitForExit();
         CopyLuaBytesFiles(tempDir + "/Out/", destDir, false, "*.lua.bytes");
-        CopyLuaBytesFiles(LuaConst.toluaDir, destDir);
 
         Directory.Delete(tempDir, true);
+        var parent = Directory.GetParent(tempDir).FullName;
+        if (!Directory.EnumerateFileSystemEntries(parent).Any())
+        {
+            Directory.Delete(parent);
+            File.Delete(parent + ".meta");
+        }
+
         AssetDatabase.Refresh();
     }
 
