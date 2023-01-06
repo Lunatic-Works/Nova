@@ -464,7 +464,7 @@ namespace Nova
         public void SetCurrentAsChapter()
         {
             CheckNode();
-            flowChartGraph.AddChapter(currentNode);
+            currentNode.isChapter = true;
         }
 
         /// <summary>

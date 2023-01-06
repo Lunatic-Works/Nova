@@ -45,7 +45,6 @@ namespace Nova
         private readonly Dictionary<string, FlowChartNode> nodes = new Dictionary<string, FlowChartNode>();
         private readonly Dictionary<string, StartNode> startNodes = new Dictionary<string, StartNode>();
         private readonly Dictionary<FlowChartNode, string> endNodes = new Dictionary<FlowChartNode, string>();
-        private readonly Dictionary<string, FlowChartNode> chapterNodes = new Dictionary<string, FlowChartNode>();
 
         private bool isFrozen;
 
@@ -144,21 +143,6 @@ namespace Nova
             }
         }
 
-        public void AddChapter(FlowChartNode node)
-        {
-            CheckNode(node);
-            if (chapterNodes.ContainsKey(node.name))
-            {
-                Debug.LogWarning($"Nova: Overwrite chapter: {node.name}");
-            }
-            chapterNodes[node.name] = node;
-        }
-
-        public bool isChapter(FlowChartNode node)
-        {
-            return chapterNodes.ContainsKey(node.name);
-        }
-
         /// <summary>
         /// Add a start node.
         /// </summary>
@@ -172,7 +156,8 @@ namespace Nova
         /// </exception>
         public void AddStart(FlowChartNode node, StartNodeType type)
         {
-            AddChapter(node);
+            CheckNode(node);
+            node.isChapter = true;
             if (startNodes.ContainsKey(node.name))
             {
                 Debug.LogWarning($"Nova: Overwrite start point: {node.name}");
