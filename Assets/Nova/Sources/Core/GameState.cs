@@ -930,37 +930,51 @@ namespace Nova
             MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
         }
 
-        public bool MoveToLastBranch()
+        public bool MoveToBranch(bool forward, bool allowChapter)
         {
             var entryNode = nodeRecord;
-            var found = false;
-            while (entryNode.parent != 0)
+            var foundHead = false;
+
+            while (true)
             {
-                entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
-                var node = flowChartGraph.GetNode(entryNode.name);
-                if (entryNode.endDialogue == node.dialogueEntryCount && node.type == FlowChartNodeType.Branching)
+                var node = GetNode(entryNode.name, true);
+                var isBranch = entryNode.endDialogue == node.dialogueEntryCount && node.isBranchSelectNode();
+                var isChapter = allowChapter && entryNode.beginDialogue == 0 && node.isChapter;
+                if (isBranch || isChapter)
                 {
-                    found = true;
+                    foundHead = forward ? isChapter : !isBranch;
+                    if (!(foundHead == forward && entryNode == nodeRecord))
+                    {
+                        break;
+                    }
+                }
+                var next = forward ? entryNode.child : entryNode.parent;
+                if (next == 0)
+                {
+                    foundHead = !forward;
                     break;
                 }
-            }
-            if (!found)
-            {
-                return false;
+                var nextEntryNode = checkpointManager.GetNodeRecord(next);
+                if (forward && nextEntryNode.sibling != 0)
+                {
+                    foundHead = false;
+                    break;
+                }
+                entryNode = nextEntryNode;
             }
 
             var offset = checkpointManager.NextRecord(entryNode.offset);
-            while (checkpointManager.GetCheckpointDialogue(offset) != entryNode.lastCheckpointDialogue)
+            var dialogue = entryNode.beginDialogue;
+            if (!foundHead)
             {
-                offset = checkpointManager.NextCheckpoint(offset);
+                dialogue = entryNode.endDialogue - 1;
+                while (checkpointManager.GetCheckpointDialogue(offset) != entryNode.lastCheckpointDialogue)
+                {
+                    offset = checkpointManager.NextCheckpoint(offset);
+                }
             }
-            MoveBackTo(entryNode, offset, entryNode.endDialogue - 1);
+            MoveBackTo(entryNode, offset, dialogue);
             return true;
-        }
-
-        public void MoveToNextBranch(bool allowUnreached)
-        {
-
         }
 
         public IEnumerable<ReachedDialoguePosition> GetDialogueHistory(int limit = 0)

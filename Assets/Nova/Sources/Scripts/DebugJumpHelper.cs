@@ -53,25 +53,25 @@ namespace Nova
             if (previousChapter)
             {
                 previousChapter = false;
-                JumpChapter(-1);
+                gameState.MoveToBranch(false, true);
             }
 
             if (nextChapter)
             {
                 nextChapter = false;
-                JumpChapter(1);
+                gameState.MoveToBranch(true, true);
             }
 
             if (previousBranch)
             {
                 previousBranch = false;
-                gameState.MoveToLastBranch();
+                gameState.MoveToBranch(false, false);
             }
 
             if (nextBranch)
             {
                 nextBranch = false;
-                FastForwardToNextBranch(fastForwardUnreached);
+                gameState.MoveToBranch(true, false);
             }
         }
 
@@ -98,19 +98,6 @@ namespace Nova
             {
                 Debug.LogWarning($"Nova: Chapter index {targetChapterIndex} out of range.");
             }
-        }
-
-        private void FastForwardToNextBranch(bool allowUnreached)
-        {
-            var isReached = true;
-            UnityAction<DialogueChangedData> listener = data => isReached = data.isReachedAnyHistory;
-            gameState.dialogueChangedEarly.AddListener(listener);
-            while ((isReached || allowUnreached) && gameState.canStepForward)
-            {
-                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-                gameState.Step();
-            }
-            gameState.dialogueChangedEarly.RemoveListener(listener);
         }
     }
 }

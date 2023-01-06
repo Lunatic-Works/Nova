@@ -1,5 +1,6 @@
 using Nova.Exceptions;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -210,6 +211,15 @@ namespace Nova
         public FlowChartNode GetNext(string branchName)
         {
             return branches[new BranchInformation(branchName)];
+        }
+
+        /// <summary>
+        /// Returns whether this node is a branch select node
+        /// If a branch node has all branches with jump mode, it is not considered branch select node
+        /// </summary>
+        public bool isBranchSelectNode()
+        {
+            return type == FlowChartNodeType.Branching && branches.Keys.Any(b => b.mode != BranchMode.Jump);
         }
 
         #endregion
