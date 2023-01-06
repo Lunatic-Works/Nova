@@ -1026,17 +1026,17 @@ public static class ToLuaMenu
     {
         if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64)
         {
-            File.Copy(path + "/Tools/Luajit64/Build.bat", tempDir + "/Build.bat", true);
+            File.Copy(path + "/Tools/LuaJIT/64/Build.bat", tempDir + "/Build.bat", true);
         }
         else if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows)
         {
             if (IntPtr.Size == 4)
             {
-                File.Copy(path + "/Tools/Luajit/Build.bat", tempDir + "/Build.bat", true);
+                File.Copy(path + "/Tools/LuaJIT/32/Build.bat", tempDir + "/Build.bat", true);
             }
             else if (IntPtr.Size == 8)
             {
-                File.Copy(path + "/Tools/Luajit64/Build.bat", tempDir + "/Build.bat", true);
+                File.Copy(path + "/Tools/LuaJIT/64/Build.bat", tempDir + "/Build.bat", true);
             }
         }
 #if UNITY_5_3_OR_NEWER
@@ -1046,11 +1046,11 @@ public static class ToLuaMenu
 #endif
         {
             //Debug.Log("iOS默认用64位，32位自行考虑");
-            File.Copy(path + "/Tools/Luajit64/Build.bat", tempDir + "/Build.bat", true);
+            File.Copy(path + "/Tools/LuaJIT/64/Build.bat", tempDir + "/Build.bat", true);
         }
         else
         {
-            File.Copy(path + "/Tools/Luajit/Build.bat", tempDir + "/Build.bat", true);
+            File.Copy(path + "/Tools/LuaJIT/32/Build.bat", tempDir + "/Build.bat", true);
         }
 
     }
