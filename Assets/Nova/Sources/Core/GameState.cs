@@ -938,15 +938,20 @@ namespace Nova
             while (true)
             {
                 var node = GetNode(entryNode.name);
-                var isBranch = entryNode.endDialogue == node.dialogueEntryCount && node.isBranchSelectNode();
-                var isChapter = allowChapter && entryNode.beginDialogue == 0 && node.isChapter;
+                // we move to either node start (chapter) or end (branch)
+                // stored in foundHead
+                //
+                // special handling of current node
+                // 1. if going backward, the current node branch should not be considered
+                // 2. if going forward, or right at the beginning, the current node beginning should not be considered
+                var isBranch = entryNode.endDialogue == node.dialogueEntryCount && node.isBranchSelectNode() &&
+                    (!(entryNode == nodeRecord && !forward));
+                var isChapter = allowChapter && entryNode.beginDialogue == 0 && node.isChapter &&
+                    (!(entryNode == nodeRecord && (currentIndex == 0 || forward)));
                 if (isBranch || isChapter)
                 {
                     foundHead = forward ? isChapter : !isBranch;
-                    if (!(foundHead == forward && entryNode == nodeRecord))
-                    {
-                        break;
-                    }
+                    break;
                 }
                 var next = forward ? entryNode.child : entryNode.parent;
                 if (next == 0)
@@ -955,6 +960,7 @@ namespace Nova
                     break;
                 }
                 var nextEntryNode = checkpointManager.GetNodeRecord(next);
+                // multiple children case should only happen in interrupt (minigame)
                 if (forward && nextEntryNode.sibling != 0)
                 {
                     foundHead = false;
