@@ -547,10 +547,10 @@ namespace Nova
 
         public void GameStart(string startName)
         {
-            GameStart(flowChartGraph.GetNode(startName));
+            GameStart(GetNode(startName));
         }
 
-        public FlowChartNode GetNode(string name, bool addDeferred = false)
+        public FlowChartNode GetNode(string name, bool addDeferred = true)
         {
             var node = flowChartGraph.GetNode(name);
             if (addDeferred)
@@ -877,7 +877,7 @@ namespace Nova
                 checkpointOffset = checkpointManager.NextRecord(checkpointOffset);
             }
 
-            currentNode = GetNode(nodeRecord.name, true);
+            currentNode = GetNode(nodeRecord.name);
             // Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
 
             isRestoring = true;
@@ -937,7 +937,7 @@ namespace Nova
 
             while (true)
             {
-                var node = GetNode(entryNode.name, true);
+                var node = GetNode(entryNode.name);
                 var isBranch = entryNode.endDialogue == node.dialogueEntryCount && node.isBranchSelectNode();
                 var isChapter = allowChapter && entryNode.beginDialogue == 0 && node.isChapter;
                 if (isBranch || isChapter)

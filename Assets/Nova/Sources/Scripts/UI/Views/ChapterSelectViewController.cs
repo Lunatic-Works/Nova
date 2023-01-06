@@ -114,7 +114,7 @@ namespace Nova
                     var button = go.GetComponent<Button>();
                     if (unlockedChapters.Contains(chapter))
                     {
-                        text.text = I18n.__(gameState.GetNode(chapter).displayNames);
+                        text.text = I18n.__(gameState.GetNode(chapter, false).displayNames);
                         button.enabled = true;
                     }
                     else
