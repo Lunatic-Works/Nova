@@ -137,6 +137,7 @@ namespace Nova
         private void CheckNode(FlowChartNode node)
         {
             CheckFreeze();
+
             if (!HasNode(node))
             {
                 throw new ArgumentException($"Nova: Node {node.name} is not in the graph.");
@@ -157,7 +158,7 @@ namespace Nova
         public void AddStart(FlowChartNode node, StartNodeType type)
         {
             CheckNode(node);
-            node.isChapter = true;
+
             if (startNodes.ContainsKey(node.name))
             {
                 Debug.LogWarning($"Nova: Overwrite start point: {node.name}");
