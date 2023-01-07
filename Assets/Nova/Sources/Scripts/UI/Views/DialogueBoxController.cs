@@ -390,7 +390,7 @@ namespace Nova
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
             Color nowTextColor = textColorHasSet ? textColor : dialogueState.isReadDialogue ? readColor : unreadColor;
-            textLeftExtraPadding = avatarController.textPaddingOrZero;
+            textLeftExtraPadding = avatarController?.textPaddingOrZero ?? 0;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
 

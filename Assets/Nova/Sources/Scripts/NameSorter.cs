@@ -7,7 +7,7 @@ namespace Nova
 {
     public class NameSorter : MonoBehaviour
     {
-        [SerializeField] List<string> matchers;
+        [SerializeField] private List<string> matchers;
         [SerializeField] private int padWidth = 3;
 
         private IEnumerable<string> NaturalSort(IEnumerable<string> names)
