@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -7,6 +8,8 @@ namespace Nova
     public class MockInput : MonoBehaviour
     {
         [SerializeField] private int steps;
+        [SerializeField] private bool unlockAllNodes;
+        [SerializeField] private bool unlockDebugNodes;
         [SerializeField] private bool fastForward = true;
         [SerializeField] private float delaySeconds = 0.001f;
         [SerializeField] private bool canGoBack = true;
@@ -25,7 +28,6 @@ namespace Nova
         private ConfigViewController configView;
         private BranchController branchController;
         private HelpViewController helpView;
-        private TitleController titleView;
         private ChapterSelectViewController chapterSelectView;
         private AlertController alert;
 
@@ -33,7 +35,7 @@ namespace Nova
 
         private void Awake()
         {
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
             viewManager = Utils.FindViewManager();
@@ -41,9 +43,8 @@ namespace Nova
             saveView = viewManager.GetController<SaveViewController>();
             logView = viewManager.GetController<LogController>();
             configView = viewManager.GetController<ConfigViewController>();
-            branchController = viewManager.GetComponentInChildren<BranchController>();
+            branchController = viewManager.GetComponentInChildren<BranchController>(true);
             helpView = viewManager.GetController<HelpViewController>();
-            titleView = viewManager.GetController<TitleController>();
             chapterSelectView = viewManager.GetController<ChapterSelectViewController>();
             alert = viewManager.GetController<AlertController>();
         }
@@ -72,19 +73,19 @@ namespace Nova
 
         private WaitForSeconds delay => new WaitForSeconds(delaySeconds);
 
-        private WaitWhile DoTransition(Action<Action> action)
+        private static WaitWhile DoTransition(Action<Action> action)
         {
             var inTransition = true;
             action.Invoke(() => inTransition = false);
             return new WaitWhile(() => inTransition);
         }
 
-        private WaitWhile Show(ViewControllerBase view)
+        private static WaitWhile Show(ViewControllerBase view)
         {
             return DoTransition(view.Show);
         }
 
-        private WaitWhile Hide(ViewControllerBase view)
+        private static WaitWhile Hide(ViewControllerBase view)
         {
             return DoTransition(view.Hide);
         }
@@ -132,25 +133,23 @@ namespace Nova
             var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startNormalSave);
             if (maxNormalSave > startNormalSave && random.Next(2) == 0)
             {
-                var saveId = random.Next(startNormalSave, maxNormalSave);
+                var saveID = random.Next(startNormalSave, maxNormalSave);
 
                 yield return DoTransition(onFinish => saveView.ShowLoadWithCallback(true, onFinish));
                 yield return delay;
-                saveView.LoadBookmark(saveId);
+                saveView.LoadBookmark(saveID);
             }
             else
             {
-                var chapters = gameState.GetAllUnlockedStartNodeNames();
-                if (chapters.Count < 2)
+                if (unlockAllNodes || unlockDebugNodes)
                 {
-                    chapterSelectView.BeginChapter();
+                    chapterSelectView.UnlockNodes(unlockAllNodes, unlockDebugNodes);
                 }
-                else
-                {
-                    yield return Show(chapterSelectView);
-                    var chapter = random.Next(chapters);
-                    chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
-                }
+
+                yield return Show(chapterSelectView);
+                yield return delay;
+                var node = random.Next(chapterSelectView.GetUnlockedNodes().ToList());
+                chapterSelectView.Hide(() => chapterSelectView.GameStart(node));
             }
 
             yield return WaitForView(CurrentViewType.Game);
@@ -166,11 +165,11 @@ namespace Nova
             {
                 var startSave = (int)BookmarkType.NormalSave;
                 var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startSave);
-                var saveId = random.Next(startSave, maxNormalSave + 1);
+                var saveID = random.Next(startSave, maxNormalSave + 1);
 
                 yield return DoTransition(saveView.ShowSaveWithCallback);
                 yield return delay;
-                saveView.SaveBookmark(saveId);
+                saveView.SaveBookmark(saveID);
                 yield return delay;
                 yield return Hide(saveView);
                 yield return WaitForView(CurrentViewType.Game);
@@ -189,11 +188,11 @@ namespace Nova
             }
             else if (maxNormalSave > startNormalSave)
             {
-                var saveId = random.Next(startNormalSave, maxNormalSave);
+                var saveID = random.Next(startNormalSave, maxNormalSave);
 
                 yield return DoTransition(onFinish => saveView.ShowLoadWithCallback(false, onFinish));
                 yield return delay;
-                saveView.LoadBookmark(saveId);
+                saveView.LoadBookmark(saveID);
                 yield return WaitForView(CurrentViewType.Game);
             }
         }

@@ -17,27 +17,25 @@ namespace Nova
         private GameState gameState;
         private ConfigManager configManager;
         private CheckpointManager checkpointManager;
+        private int unlockedStartCount;
 
         protected override void Awake()
         {
             base.Awake();
 
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             configManager = controller.ConfigManager;
             checkpointManager = controller.CheckpointManager;
 
-            quitButton.onClick.AddListener(() =>
-                Hide(Utils.Quit)
-            );
+            quitButton.onClick.AddListener(() => Hide(Utils.Quit));
         }
 
         protected override void Start()
         {
             base.Start();
 
-            checkpointManager.Init();
-            gameState.SaveInitialCheckpoint();
+            unlockedStartCount = gameState.GetStartNodeNames(StartNodeType.Unlocked).Count();
             Show(null);
         }
 
@@ -57,10 +55,9 @@ namespace Nova
 
                 if (configManager.GetInt(SelectChapterFirstShownKey) == 0)
                 {
-                    var unlockedChapterCount = gameState.GetAllUnlockedStartNodeNames().Count;
-                    var reachedChapterCount = gameState.GetAllStartNodeNames()
+                    var reachedChapterCount = gameState.GetStartNodeNames()
                         .Count(name => checkpointManager.IsReachedAnyHistory(name, 0));
-                    if (unlockedChapterCount == 1 && reachedChapterCount > 1)
+                    if (unlockedStartCount == 1 && reachedChapterCount > 1)
                     {
                         Alert.Show("title.first.selectchapter");
                         configManager.SetInt(SelectChapterFirstShownKey, 1);

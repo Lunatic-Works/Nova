@@ -37,7 +37,7 @@ namespace Nova
         private void Awake()
         {
             controller = GetComponentInParent<MusicGalleryController>();
-            config = Utils.FindNovaGameController().ConfigManager;
+            config = Utils.FindNovaController().ConfigManager;
         }
 
         private MusicListMode mode

@@ -18,7 +18,7 @@ namespace Nova
 
         private void Awake()
         {
-            inputMapper = Utils.FindNovaGameController().InputMapper;
+            inputMapper = Utils.FindNovaController().InputMapper;
         }
 
         private void OnEnable()

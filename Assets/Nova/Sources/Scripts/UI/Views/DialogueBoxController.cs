@@ -192,7 +192,7 @@ namespace Nova
                 return true;
             }
 
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
 
@@ -261,7 +261,7 @@ namespace Nova
             this.SwitchView<TitleController>();
         }
 
-        private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
+        private void OnDialogueWillChange()
         {
             StopTimer();
             ResetTextAnimationConfig();
@@ -390,7 +390,7 @@ namespace Nova
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
             Color nowTextColor = textColorHasSet ? textColor : dialogueState.isReadDialogue ? readColor : unreadColor;
-            textLeftExtraPadding = avatarController.textPaddingOrZero;
+            textLeftExtraPadding = avatarController?.textPaddingOrZero ?? 0;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
 
@@ -780,7 +780,7 @@ namespace Nova
             materialName = data.materialName;
 
             NewPage();
-            // TODO: Restore displayDatas from FlowChartTree, like in LogController
+            // TODO: Restore displayDatas from FlowChartGraph, like in LogController
             foreach (var displayData in data.displayDatas)
             {
                 AppendDialogue(displayData, needAnimation: false);

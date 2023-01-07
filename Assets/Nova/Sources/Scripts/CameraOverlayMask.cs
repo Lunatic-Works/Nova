@@ -32,7 +32,7 @@ namespace Nova
 
         private void Awake()
         {
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
             masterCamera = GetComponent<Camera>();
 
             if (maskCamera)

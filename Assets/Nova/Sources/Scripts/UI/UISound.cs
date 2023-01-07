@@ -48,7 +48,6 @@ namespace Nova
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            // TODO: Is the loop correct?
             if (mouseInsideLoop != null)
             {
                 viewManager.TryPlaySound(mouseInsideLoop);

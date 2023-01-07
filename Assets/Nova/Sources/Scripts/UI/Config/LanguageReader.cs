@@ -3,16 +3,16 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class LanguageController : MonoBehaviour
+    public class LanguageReader : MonoBehaviour
     {
-        public string configKeyName;
-        public List<LocaleTogglePair> localeTogglePairs;
+        [SerializeField] private string configKeyName;
+        [SerializeField] private List<LocaleTogglePair> localeTogglePairs;
 
         private ConfigManager configManager;
 
         private void Awake()
         {
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             var localeInt = configManager.GetInt(configKeyName);
             if (localeInt >= 0)
             {

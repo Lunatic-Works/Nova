@@ -1,5 +1,6 @@
 using Nova.Exceptions;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -25,12 +26,15 @@ namespace Nova
         /// </summary>
         public readonly string name;
 
+        // hash value from text of the script
+        public ulong textHash;
+
         public FlowChartNode(string name)
         {
             this.name = name;
         }
 
-        private bool isFrozen = false;
+        private bool isFrozen;
 
         /// <summary>
         /// Freeze the type of this node
@@ -57,7 +61,7 @@ namespace Nova
         /// </summary>
         /// <remarks>
         /// The type of a node is always gettable but only settable before it is frozen.
-        /// A flow chart tree should freeze all its nodes after the construction.
+        /// A flow chart graph should freeze all its nodes after the construction.
         /// </remarks>
         public FlowChartNodeType type
         {
@@ -69,19 +73,29 @@ namespace Nova
             }
         }
 
+        private bool _isChapter;
+
+        public bool isChapter
+        {
+            get => _isChapter;
+            set
+            {
+                CheckFreeze();
+                _isChapter = value;
+            }
+        }
+
         #region Displayed names
 
         /// <summary>
         /// Displayed node name in each locale.
         /// </summary>
-        private readonly Dictionary<SystemLanguage, string> _displayNames = new Dictionary<SystemLanguage, string>();
-
-        public Dictionary<SystemLanguage, string> displayNames => _displayNames;
+        public readonly Dictionary<SystemLanguage, string> displayNames = new Dictionary<SystemLanguage, string>();
 
         public void AddLocalizedName(SystemLanguage locale, string displayName)
         {
             CheckFreeze();
-            _displayNames[locale] = displayName;
+            displayNames[locale] = displayName;
         }
 
         #endregion
@@ -124,6 +138,11 @@ namespace Nova
         public DialogueEntry GetDialogueEntryAt(int index)
         {
             return dialogueEntries[index];
+        }
+
+        public IEnumerable<DialogueEntry> GetAllDialogues()
+        {
+            return dialogueEntries;
         }
 
         #endregion
@@ -193,6 +212,15 @@ namespace Nova
         public FlowChartNode GetNext(string branchName)
         {
             return branches[new BranchInformation(branchName)];
+        }
+
+        /// <summary>
+        /// Returns whether this node is a manual branch node
+        /// If a branch node has all branches with jump mode, it is not manual
+        /// </summary>
+        public bool IsManualBranchNode()
+        {
+            return type == FlowChartNodeType.Branching && branches.Keys.Any(b => b.mode != BranchMode.Jump);
         }
 
         #endregion

@@ -24,7 +24,7 @@ namespace Nova
             returnTitleButton.onClick.AddListener(ReturnTitleWithAlert);
             quitGameButton.onClick.AddListener(Utils.QuitWithAlert);
 
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
 
             resetDefaultButton.onClick.AddListener(ResetDefaultWithAlert);
             resetAlertsButton.onClick.AddListener(ResetAlertsWithAlert);

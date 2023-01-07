@@ -7,7 +7,7 @@ namespace Nova
     [ExportCustomType]
     public class TimelineController : PrefabLoader
     {
-        public Camera mainCamera;
+        [SerializeField] private Camera mainCamera;
 
         public PlayableDirector playableDirector { get; private set; }
 

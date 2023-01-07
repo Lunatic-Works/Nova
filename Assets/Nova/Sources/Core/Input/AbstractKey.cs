@@ -17,10 +17,6 @@ namespace Nova
         ToggleFullScreen,
         SwitchLanguage,
         LeaveView,
-        EditorBackward,
-        EditorBeginChapter,
-        EditorPreviousChapter,
-        EditorNextChapter,
         EditorReloadScripts,
         EditorUnlock
     }

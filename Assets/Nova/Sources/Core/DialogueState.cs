@@ -7,15 +7,15 @@ namespace Nova
     [ExportCustomType]
     public class DialogueState : MonoBehaviour
     {
-        private const string FastForwardReadFirstShownKey = ConfigManager.FirstShownKeyPrefix + "FastForwardRead";
-        private const int HintFastForwardReadClicks = 3;
+        private const string FastForwardUnreadFirstShownKey = ConfigManager.FirstShownKeyPrefix + "FastForwardUnread";
+        private const int HintFastForwardUnreadClicks = 3;
 
         private GameState gameState;
         private ConfigManager configManager;
 
         private void Awake()
         {
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             configManager = controller.ConfigManager;
 
@@ -76,18 +76,18 @@ namespace Nova
                         this.RuntimeAssert(state == State.Normal,
                             "Dialogue state is not Normal when setting to FastForward.");
 
-                        if (unreadStopsFastForward)
+                        if (stopFastForward)
                         {
-                            int clicks = configManager.GetInt(FastForwardReadFirstShownKey);
-                            if (clicks < HintFastForwardReadClicks)
+                            int clicks = configManager.GetInt(FastForwardUnreadFirstShownKey);
+                            if (clicks < HintFastForwardUnreadClicks)
                             {
                                 Alert.Show("dialogue.noreadtext");
-                                configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
+                                configManager.SetInt(FastForwardUnreadFirstShownKey, clicks + 1);
                             }
-                            else if (clicks == HintFastForwardReadClicks)
+                            else if (clicks == HintFastForwardUnreadClicks)
                             {
-                                Alert.Show("dialogue.hint.fastforwardread");
-                                configManager.SetInt(FastForwardReadFirstShownKey, clicks + 1);
+                                Alert.Show("dialogue.hint.fastforwardunread");
+                                configManager.SetInt(FastForwardUnreadFirstShownKey, clicks + 1);
                             }
                             else
                             {
@@ -116,7 +116,7 @@ namespace Nova
         public UnityEvent fastForwardModeStops;
 
         [HideInInspector] public bool isReadDialogue;
-        [HideInInspector] public bool onlyFastForwardRead;
+        [HideInInspector] public bool fastForwardUnread;
 
         private bool _fastForwardHotKeyHolding;
 
@@ -135,14 +135,14 @@ namespace Nova
             }
         }
 
-        private bool unreadStopsFastForward => !isReadDialogue && onlyFastForwardRead && !fastForwardHotKeyHolding;
+        private bool stopFastForward => !isReadDialogue && !fastForwardUnread && !fastForwardHotKeyHolding;
 
         // Update state and isReadDialogue before OnDialogueChanged is invoked
         private void OnDialogueChangedEarly(DialogueChangedData dialogueData)
         {
             isReadDialogue = dialogueData.isReachedAnyHistory;
 
-            if (isFastForward && unreadStopsFastForward)
+            if (isFastForward && stopFastForward)
             {
                 state = State.Normal;
             }

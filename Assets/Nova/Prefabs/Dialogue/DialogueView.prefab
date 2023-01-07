@@ -1286,7 +1286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b55bc709342695c4585a171396005580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configKeyName: OnlyFastForwardRead
+  configKeyName: FastForwardUnread
 --- !u!114 &387142933
 MonoBehaviour:
   m_ObjectHideFlags: 0

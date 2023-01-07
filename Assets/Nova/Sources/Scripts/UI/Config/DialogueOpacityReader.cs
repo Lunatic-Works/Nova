@@ -5,9 +5,9 @@ namespace Nova
     /// <summary>
     /// Control opacity of dialogue box based on the value in ConfigManager
     /// </summary>
-    public class DialogueOpacityController : MonoBehaviour
+    public class DialogueOpacityReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
         private CanvasGroup canvasGroup;
@@ -15,7 +15,7 @@ namespace Nova
 
         private void Awake()
         {
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             canvasGroup = GetComponent<CanvasGroup>();
             dialogueBoxController = GetComponent<DialogueBoxController>();
             this.RuntimeAssert(canvasGroup != null || dialogueBoxController != null,

@@ -20,6 +20,11 @@ namespace Nova
             new CheckpointCorruptedException(
                 $"File header or version mismatch, expected version={CheckpointSerializer.Version}.");
 
+        public static CheckpointCorruptedException BadReachedData(string nodeName)
+        {
+            return new CheckpointCorruptedException($"Bad reached data, node={nodeName}");
+        }
+
         public static CheckpointCorruptedException BadOffset(long offset)
         {
             return new CheckpointCorruptedException($"Bad offset @{offset}");
@@ -40,6 +45,9 @@ namespace Nova
             return new CheckpointCorruptedException(
                 $"JSON type {typeName} in {assemblyName} is not permitted to (de)serialize.");
         }
+
+        public static readonly CheckpointCorruptedException CannotUpgrade =
+            new CheckpointCorruptedException("Unable to upgrade global save.");
     }
 
     public sealed class CheckpointJsonSerializer : JsonSerializer
@@ -52,7 +60,7 @@ namespace Nova
             private static readonly HashSet<Assembly> AllowedAssembly = new HashSet<Assembly>
             {
                 CurAssembly,
-                // mscorlib
+                // mscorlib,
                 typeof(List<>).Assembly,
             };
 
@@ -138,7 +146,7 @@ namespace Nova
             }
         }
 
-        public CheckpointJsonSerializer() : base()
+        public CheckpointJsonSerializer()
         {
             TypeNameHandling = TypeNameHandling.Auto;
             SerializationBinder = new JsonTypeBinder();
@@ -158,11 +166,12 @@ namespace Nova
     public class CheckpointSerializer : IDisposable
     {
         public const int Version = 4;
-        public const bool DefaultCompress = true;
+
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
         public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
         public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
 
+        private const bool DefaultCompress = true;
         private const int RecordHeader = 4; // sizeof(int)
 
         private readonly JsonSerializer jsonSerializer;
@@ -182,7 +191,7 @@ namespace Nova
         public void Open()
         {
             file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            endBlock = CheckpointBlock.GetBlockId(file.Length);
+            endBlock = CheckpointBlock.GetBlockID(file.Length);
             if (endBlock < 1)
             {
                 AppendBlock();
@@ -212,7 +221,7 @@ namespace Nova
 
         private CheckpointBlock GetBlockIndex(long offset, out int index)
         {
-            return GetBlock(CheckpointBlock.GetBlockIdIndex(offset, out index));
+            return GetBlock(CheckpointBlock.GetBlockIDIndex(offset, out index));
         }
 
         public ByteSegment GetRecord(long offset)

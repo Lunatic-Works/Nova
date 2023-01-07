@@ -57,7 +57,7 @@ namespace Nova
                 [AssetCacheType.Audio] = new LRUCache<string, CachedAssetEntry>(4, true)
             };
 
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
             gameState.AddRestorable(this);
 
             Application.lowMemory += UnloadUnusedAndCachedAssets;

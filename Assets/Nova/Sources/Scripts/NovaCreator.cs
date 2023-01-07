@@ -3,18 +3,18 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// Create and init NovaGameController prefab
+    /// Create NovaController prefab
     /// </summary>
     public class NovaCreator : MonoBehaviour
     {
-        public GameObject novaGameControllerPrefab;
+        public GameObject novaControllerPrefab;
 
         private void Awake()
         {
-            var controllerCount = GameObject.FindGameObjectsWithTag("NovaGameController").Length;
+            var controllerCount = GameObject.FindGameObjectsWithTag("NovaController").Length;
             if (controllerCount > 1)
             {
-                Debug.LogWarning("Nova: Multiple NovaGameController found in the scene.");
+                Debug.LogWarning("Nova: Multiple NovaController found in the scene.");
             }
 
             if (controllerCount >= 1)
@@ -22,8 +22,8 @@ namespace Nova
                 return;
             }
 
-            var controller = Instantiate(novaGameControllerPrefab);
-            controller.tag = "NovaGameController";
+            var controller = Instantiate(novaControllerPrefab);
+            controller.tag = "NovaController";
             DontDestroyOnLoad(controller);
         }
     }

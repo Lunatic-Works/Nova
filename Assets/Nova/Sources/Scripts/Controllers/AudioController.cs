@@ -11,23 +11,22 @@ namespace Nova
     [RequireComponent(typeof(AudioSource))]
     public class AudioController : MonoBehaviour, IRestorable
     {
-        public Slider slider;
-        public Text text;
-
         public string luaGlobalName;
         public string audioFolder;
+
+        [SerializeField] private MusicEntryList musicEntryList;
+
+        // For debug
+        [SerializeField] private Slider slider;
+        [SerializeField] private Text text;
 
         public string currentAudioName { get; private set; }
         private string lastAudioName;
 
         public bool isPlaying { get; private set; }
-
-        public MusicEntryList musicEntryList;
-
         private bool lastIsPlaying;
 
         private GameState gameState;
-
         private UnifiedAudioSource audioSource;
 
         private float _scriptVolume;
@@ -65,7 +64,7 @@ namespace Nova
                 return;
             }
 
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
 
             if (musicEntryList != null)
             {
@@ -101,10 +100,17 @@ namespace Nova
         // Do not call ForceUpdate() frequently, because change of BGM needs to be smooth
         private void Update()
         {
-            if (audioSource.clip != null && slider != null)
+            if (audioSource.clip != null)
             {
-                slider.value = 1.0f * audioSource.timeSamples / audioSource.clip.samples;
-                text.text = audioSource.timeSamples + " / " + audioSource.clip.samples;
+                if (slider != null)
+                {
+                    slider.value = 1.0f * audioSource.timeSamples / audioSource.clip.samples;
+                }
+
+                if (text != null)
+                {
+                    text.text = $"{audioSource.timeSamples} / {audioSource.clip.samples}";
+                }
             }
 
             if (currentAudioName == lastAudioName && isPlaying == lastIsPlaying) return;

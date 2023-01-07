@@ -3,18 +3,18 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// Toggle whether only fast forward read text based on the value in ConfigManager
+    /// Toggle whether to fast forward unread text based on the value in ConfigManager
     /// </summary>
-    public class OnlyFastForwardReadController : MonoBehaviour
+    public class FastForwardUnreadReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private DialogueState dialogueState;
         private ConfigManager configManager;
 
         private void Awake()
         {
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             dialogueState = controller.DialogueState;
             configManager = controller.ConfigManager;
         }
@@ -32,7 +32,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            dialogueState.onlyFastForwardRead = configManager.GetInt(configKeyName) > 0;
+            dialogueState.fastForwardUnread = configManager.GetInt(configKeyName) > 0;
         }
     }
 }

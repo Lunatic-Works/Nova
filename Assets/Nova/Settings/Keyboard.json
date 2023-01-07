@@ -119,50 +119,6 @@
         ],
         "Tags": []
     },
-    "EditorBackward": {
-        "Keys": [
-            "LeftArrow"
-        ],
-        "Groups": [
-            "Game"
-        ],
-        "Tags": [
-            "Editor"
-        ]
-    },
-    "EditorBeginChapter": {
-        "Keys": [
-            "Equals"
-        ],
-        "Groups": [
-            "Game"
-        ],
-        "Tags": [
-            "Editor"
-        ]
-    },
-    "EditorPreviousChapter": {
-        "Keys": [
-            "LeftBracket"
-        ],
-        "Groups": [
-            "Game"
-        ],
-        "Tags": [
-            "Editor"
-        ]
-    },
-    "EditorNextChapter": {
-        "Keys": [
-            "RightBracket"
-        ],
-        "Groups": [
-            "Game"
-        ],
-        "Tags": [
-            "Editor"
-        ]
-    },
     "EditorReloadScripts": {
         "Keys": [
             "R"

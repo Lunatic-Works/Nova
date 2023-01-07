@@ -3,20 +3,20 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// Control fast forward speed based on the value in ConfigManager
+    /// Toggle ability to abort animation based on the value in ConfigManager
     /// </summary>
     [RequireComponent(typeof(DialogueBoxController))]
-    public class FastForwardSpeedController : MonoBehaviour
+    public class AbortAnimationReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
-        private DialogueBoxController dialogueBoxController;
+        private GameViewInput gameViewInput;
 
         private void Awake()
         {
-            configManager = Utils.FindNovaGameController().ConfigManager;
-            dialogueBoxController = GetComponent<DialogueBoxController>();
+            configManager = Utils.FindNovaController().ConfigManager;
+            gameViewInput = GetComponent<GameViewInput>();
         }
 
         private void OnEnable()
@@ -32,8 +32,7 @@ namespace Nova
 
         private void UpdateValue()
         {
-            // Convert speed to duration
-            dialogueBoxController.fastForwardDelay = Mathf.Pow(0.1f, configManager.GetFloat(configKeyName));
+            gameViewInput.canAbortAnimation = configManager.GetInt(configKeyName) > 0;
         }
     }
 }

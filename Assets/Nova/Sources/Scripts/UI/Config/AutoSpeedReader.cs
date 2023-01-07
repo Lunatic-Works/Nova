@@ -2,9 +2,12 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class TextSpeedController : MonoBehaviour
+    /// <summary>
+    /// Control auto mode speed based on the value in ConfigManager
+    /// </summary>
+    public class AutoSpeedReader : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
         private DialogueBoxController dialogueBoxController;
@@ -12,7 +15,7 @@ namespace Nova
 
         private void Awake()
         {
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             dialogueBoxController = GetComponent<DialogueBoxController>();
             configTextPreviewController = GetComponent<ConfigTextPreviewController>();
             this.RuntimeAssert(
@@ -35,14 +38,14 @@ namespace Nova
         private void UpdateValue()
         {
             // Convert speed to duration
-            float val = Mathf.Max(2f * Mathf.Pow(0.1f, configManager.GetFloat(configKeyName)) - 0.02f, 0.001f);
+            float val = 10f * Mathf.Pow(0.2f, configManager.GetFloat(configKeyName));
             if (dialogueBoxController != null)
             {
-                dialogueBoxController.characterFadeInDuration = val;
+                dialogueBoxController.autoDelay = val;
             }
-            else // configTextPreviewController != null
+            else
             {
-                configTextPreviewController.characterFadeInDuration = val;
+                configTextPreviewController.autoDelay = val;
             }
         }
     }

@@ -22,7 +22,7 @@ namespace Nova
                 return;
             }
 
-            _inputMapper = Utils.FindNovaGameController().InputMapper;
+            _inputMapper = Utils.FindNovaController().InputMapper;
             _inputMapper.Init();
 
             inited = true;

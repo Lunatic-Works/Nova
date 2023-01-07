@@ -12,18 +12,30 @@ namespace Nova
     {
         public float hideAfterSeconds = 5.0f;
 
+        private bool inited;
         private EventSystem eventSystem;
+
         private Vector3 lastMousePosition;
         private float idleTime;
 
-        private void Start()
+        // If we call it in Start, EventSystem.current can be uninitialized
+        private void Init()
         {
+            if (inited)
+            {
+                return;
+            }
+
             eventSystem = EventSystem.current;
             lastMousePosition = RealInput.mousePosition;
+
+            inited = true;
         }
 
         private void Update()
         {
+            Init();
+
             // Clear selection on mobile platforms
             if (Application.isMobilePlatform)
             {

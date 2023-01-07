@@ -1,30 +1,55 @@
 using Nova.Exceptions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Nova
 {
+    [Flags]
+    public enum StartNodeType
+    {
+        None = 0,
+        Locked = 1,
+        Unlocked = 2,
+        Debug = 4,
+        Normal = Locked | Unlocked,
+        All = Locked | Unlocked | Debug
+    }
+
+    public class StartNode
+    {
+        public readonly FlowChartNode node;
+        public readonly StartNodeType type;
+
+        public string name => node.name;
+
+        public StartNode(FlowChartNode node, StartNodeType type)
+        {
+            this.node = node;
+            this.type = type;
+        }
+    }
+
     /// <summary>
     /// The data structure that stores the flow chart.
     /// </summary>
     /// <remarks>
-    /// A well-defined flow chart tree should have at least one start node, and all nodes without children are
+    /// A well-defined flow chart graph should have at least one start node, and all nodes without children are
     /// marked as end nodes.
-    /// Everything in a flow chart tree cannot be modified after it is frozen.
+    /// Everything in a flow chart graph cannot be modified after it is frozen.
     /// </remarks>
-    public class FlowChartTree
+    public class FlowChartGraph : IEnumerable<FlowChartNode>
     {
         private readonly Dictionary<string, FlowChartNode> nodes = new Dictionary<string, FlowChartNode>();
-        private readonly Dictionary<string, FlowChartNode> startNodes = new Dictionary<string, FlowChartNode>();
-        private readonly Dictionary<string, FlowChartNode> unlockedStartNodes = new Dictionary<string, FlowChartNode>();
+        private readonly Dictionary<string, StartNode> startNodes = new Dictionary<string, StartNode>();
         private readonly Dictionary<FlowChartNode, string> endNodes = new Dictionary<FlowChartNode, string>();
 
-        private bool isFrozen = false;
+        private bool isFrozen;
 
         /// <summary>
-        /// Freeze all nodes. Should be called after the construction of the flow chart tree.
+        /// Freeze all nodes. Should be called after the construction of the flow chart graph.
         /// </summary>
         public void Freeze()
         {
@@ -46,11 +71,11 @@ namespace Nova
 
         private void CheckFreeze()
         {
-            Utils.RuntimeAssert(!isFrozen, "Cannot modify a flow chart tree when it is frozen.");
+            Utils.RuntimeAssert(!isFrozen, "Cannot modify a flow chart graph when it is frozen.");
         }
 
         /// <summary>
-        /// Add a node to the flow chart tree
+        /// Add a node to the flow chart graph
         /// </summary>
         /// <param name="node">The node to add</param>
         /// <exception cref="ArgumentException">
@@ -85,36 +110,38 @@ namespace Nova
         }
 
         /// <summary>
-        /// Check if the tree contains the node with the given name
+        /// Check if the graph contains the node with the given name
         /// </summary>
         /// <param name="name">Name of the node</param>
-        /// <returns>True if the tree contains the given node, otherwise return false</returns>
+        /// <returns>True if the graph contains the given node, otherwise return false</returns>
         public bool HasNode(string name)
         {
             return nodes.ContainsKey(name);
         }
 
         /// <summary>
-        /// Check if the tree contains the given node
+        /// Check if the graph contains the given node
         /// </summary>
         /// <param name="node">Node to check</param>
-        /// <returns>True if the tree contains the given node, otherwise return false</returns>
+        /// <returns>True if the graph contains the given node, otherwise return false</returns>
         public bool HasNode(FlowChartNode node)
         {
             return nodes.ContainsKey(node.name);
         }
 
-        /// <summary>
-        /// Returns names of all start nodes.
-        /// </summary>
-        public IReadOnlyList<string> GetAllStartNodeNames()
+        public IEnumerable<string> GetStartNodeNames(StartNodeType type)
         {
-            return startNodes.Keys.ToList();
+            return startNodes.Values.Where(x => type.HasFlag(x.type)).Select(x => x.name);
         }
 
-        public IReadOnlyList<string> GetAllUnlockedStartNodeNames()
+        private void CheckNode(FlowChartNode node)
         {
-            return unlockedStartNodes.Keys.ToList();
+            CheckFreeze();
+
+            if (!HasNode(node))
+            {
+                throw new ArgumentException($"Nova: Node {node.name} is not in the graph.");
+            }
         }
 
         /// <summary>
@@ -123,104 +150,31 @@ namespace Nova
         /// <remarks>
         /// A name can be assigned to a start point, which can differ from the node name.
         /// The name should be unique among all start point names.
-        /// This method will check if the given name is not in the tree, and the given node is already in the tree.
+        /// This method will check if the given name is not in the graph, and the given node is already in the graph.
         /// </remarks>
-        /// <param name="name">Name of the start point</param>
-        /// <param name="node">The node to add</param>
         /// <exception cref="ArgumentException">
-        /// ArgumentException will be thrown if the name is null or empty, or the node is not in the tree.
+        /// ArgumentException will be thrown if the name is null or empty, or the node is not in the graph.
         /// </exception>
-        public void AddStart(string name, FlowChartNode node)
+        public void AddStart(FlowChartNode node, StartNodeType type)
         {
-            CheckFreeze();
+            CheckNode(node);
 
-            if (string.IsNullOrEmpty(name))
+            if (startNodes.ContainsKey(node.name))
             {
-                throw new ArgumentException("Nova: Start name is null or empty.");
+                Debug.LogWarning($"Nova: Overwrite start point: {node.name}");
             }
 
-            if (!HasNode(node))
-            {
-                throw new ArgumentException("Nova: Only node in the tree can be set as a start node.");
-            }
-
-            if (startNodes.ContainsKey(name))
-            {
-                Debug.LogWarning($"Nova: Overwrite start point: {name}");
-            }
-
-            startNodes[name] = node;
-        }
-
-        public void AddUnlockedStart(string name, FlowChartNode node)
-        {
-            CheckFreeze();
-            unlockedStartNodes[name] = node;
+            startNodes[node.name] = new StartNode(node, type);
         }
 
         /// <summary>
-        /// Get a start node by name
+        /// Check if the graph contains the given start point name
         /// </summary>
         /// <param name="name">Name of the start point</param>
-        /// <returns>
-        /// The start node if it is found, otherwise return null
-        /// </returns>
-        public FlowChartNode GetStartNode(string name)
-        {
-            startNodes.TryGetValue(name, out var node);
-            return node;
-        }
-
-        /// <summary>
-        /// Check if the tree contains the given start point name
-        /// </summary>
-        /// <param name="name">Name of the start point</param>
-        /// <returns>True if the tree contains the given name, otherwise return false</returns>
+        /// <returns>True if the graph contains the given name, otherwise return false</returns>
         public bool HasStart(string name)
         {
             return startNodes.ContainsKey(name);
-        }
-
-        private FlowChartNode _defaultStartNode;
-
-        /// <summary>
-        /// The default start node.
-        /// </summary>
-        /// <remarks>
-        /// When getting the value, if the default start node has been set, return the assigned value.
-        /// Otherwise, check the start node dict. If there is at least one start node, return the first one.
-        /// Otherwise, return null.
-        /// When setting the value, this property will check if the default start node has already been set.
-        /// </remarks>
-        /// <exception cref="DuplicatedDefinitionException">
-        /// DuplicatedDefinitionException will be thrown if assigning two different nodes to be the default start node.
-        /// </exception>
-        public FlowChartNode defaultStartNode
-        {
-            get
-            {
-                if (_defaultStartNode != null)
-                {
-                    return _defaultStartNode;
-                }
-
-                return startNodes.Values.FirstOrDefault();
-            }
-            set
-            {
-                CheckFreeze();
-
-                if (_defaultStartNode == null)
-                {
-                    _defaultStartNode = value;
-                }
-
-                if (_defaultStartNode != value)
-                {
-                    throw new DuplicatedDefinitionException(
-                        $"Nova: Assigning two different default start points: {_defaultStartNode.name} and {value.name}");
-                }
-            }
         }
 
         /// <summary>
@@ -229,7 +183,7 @@ namespace Nova
         /// <remarks>
         /// A name can be assigned to an end point, which can differ from the node name.
         /// The name should be unique among all end point names.
-        /// This method will check if the given name is not in the tree, and the given node is already in the tree.
+        /// This method will check if the given name is not in the graph, and the given node is already in the graph.
         /// </remarks>
         /// <param name="name">Name of the end point</param>
         /// <param name="node">The node to add</param>
@@ -237,20 +191,15 @@ namespace Nova
         /// DuplicatedDefinitionException will be thrown if assigning two different end names to the same node.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// ArgumentException will be thrown if the name is null or empty, or the node is not in the tree.
+        /// ArgumentException will be thrown if the name is null or empty, or the node is not in the graph.
         /// </exception>
         public void AddEnd(string name, FlowChartNode node)
         {
-            CheckFreeze();
+            CheckNode(node);
 
             if (string.IsNullOrEmpty(name))
             {
                 throw new ArgumentException("Nova: End name is null or empty.");
-            }
-
-            if (!HasNode(node))
-            {
-                throw new ArgumentException("Nova: Only node in the tree can be set as an end node.");
             }
 
             var existingNodeName = GetEndName(node);
@@ -291,23 +240,23 @@ namespace Nova
         }
 
         /// <summary>
-        /// Check if the tree contains the given end point name
+        /// Check if the graph contains the given end point name
         /// </summary>
         /// <param name="name">Name of the end point</param>
-        /// <returns>True if the tree contains the given name, otherwise return false</returns>
+        /// <returns>True if the graph contains the given name, otherwise return false</returns>
         public bool HasEnd(string name)
         {
             return endNodes.ContainsValue(name);
         }
 
         /// <summary>
-        /// Perform a sanity check on the flow chart tree.
+        /// Perform a sanity check on the flow chart graph.
         /// </summary>
         /// <remarks>
         /// The sanity check includes:
-        /// + The tree has at least one start node;
+        /// + The graph has at least one start node;
         /// + All nodes without children are marked as end nodes.
-        /// This method should be called after the construction of the flow chart tree.
+        /// This method should be called after the construction of the flow chart graph.
         /// </remarks>
         public void SanityCheck()
         {
@@ -328,6 +277,16 @@ namespace Nova
                     AddEnd(node.name, node);
                 }
             }
+        }
+
+        public IEnumerator<FlowChartNode> GetEnumerator()
+        {
+            return nodes.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return nodes.Values.GetEnumerator();
         }
     }
 }

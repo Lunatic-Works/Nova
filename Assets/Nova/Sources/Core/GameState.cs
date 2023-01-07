@@ -7,98 +7,6 @@ using UnityEngine.Events;
 
 namespace Nova
 {
-    #region Event types and datas
-
-    public class DialogueWillChangeData { }
-
-    [Serializable]
-    public class DialogueWillChangeEvent : UnityEvent<DialogueWillChangeData> { }
-
-    public class DialogueChangedData
-    {
-        public readonly NodeRecord nodeRecord;
-        public readonly long checkpointOffset;
-        public readonly ReachedDialogueData dialogueData;
-        public readonly DialogueDisplayData displayData;
-        public readonly bool isReached;
-        public readonly bool isReachedAnyHistory;
-
-        public DialogueChangedData(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
-            DialogueDisplayData displayData, bool isReached, bool isReachedAnyHistory)
-        {
-            this.nodeRecord = nodeRecord;
-            this.checkpointOffset = checkpointOffset;
-            this.dialogueData = dialogueData;
-            this.displayData = displayData;
-            this.isReached = isReached;
-            this.isReachedAnyHistory = isReachedAnyHistory;
-        }
-    }
-
-    [Serializable]
-    public class DialogueChangedEvent : UnityEvent<DialogueChangedData> { }
-
-    public class NodeChangedData
-    {
-        public readonly string newNode;
-
-        public NodeChangedData(string newNode)
-        {
-            this.newNode = newNode;
-        }
-    }
-
-    [Serializable]
-    public class NodeChangedEvent : UnityEvent<NodeChangedData> { }
-
-    public class SelectionOccursData
-    {
-        [ExportCustomType]
-        public class Selection
-        {
-            public readonly Dictionary<SystemLanguage, string> texts;
-            public readonly BranchImageInformation imageInfo;
-            public readonly bool interactable;
-
-            public Selection(Dictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo,
-                bool interactable)
-            {
-                this.texts = texts;
-                this.imageInfo = imageInfo;
-                this.interactable = interactable;
-            }
-
-            public Selection(string text, BranchImageInformation imageInfo, bool interactable) : this(
-                new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text }, imageInfo, interactable)
-            { }
-        }
-
-        public readonly IReadOnlyList<Selection> selections;
-
-        public SelectionOccursData(IReadOnlyList<Selection> selections)
-        {
-            this.selections = selections;
-        }
-    }
-
-    [Serializable]
-    public class SelectionOccursEvent : UnityEvent<SelectionOccursData> { }
-
-    public class RouteEndedData
-    {
-        public readonly string endName;
-
-        public RouteEndedData(string endName)
-        {
-            this.endName = endName;
-        }
-    }
-
-    [Serializable]
-    public class RouteEndedEvent : UnityEvent<RouteEndedData> { }
-
-    #endregion
-
     /// <inheritdoc />
     /// <summary>
     /// This class manages the AVG game state.
@@ -107,10 +15,10 @@ namespace Nova
     {
         [SerializeField] private string scriptPath;
 
+        private readonly ScriptLoader scriptLoader = new ScriptLoader();
+        private FlowChartGraph flowChartGraph;
         private CheckpointManager checkpointManager;
         private GameStateCheckpoint initialCheckpoint;
-        private readonly ScriptLoader scriptLoader = new ScriptLoader();
-        private FlowChartTree flowChartTree;
 
         private AdvancedDialogueHelper advancedDialogueHelper;
         private CoroutineHelper coroutineHelper;
@@ -120,7 +28,11 @@ namespace Nova
             try
             {
                 scriptLoader.Init(scriptPath);
-                flowChartTree = scriptLoader.GetFlowChartTree();
+                flowChartGraph = scriptLoader.GetFlowChartGraph();
+
+                checkpointManager = GetComponent<CheckpointManager>();
+                checkpointManager.Init();
+                CheckScriptUpgrade();
             }
             catch (Exception e)
             {
@@ -128,12 +40,27 @@ namespace Nova
                 Utils.Quit();
             }
 
-            checkpointManager = GetComponent<CheckpointManager>();
             LuaRuntime.Instance.BindObject("variables", variables);
             advancedDialogueHelper = new AdvancedDialogueHelper(this);
             LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);
             coroutineHelper = new CoroutineHelper(this);
             LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
+        }
+
+        private void Start()
+        {
+            SaveInitialCheckpoint();
+        }
+
+        private void CheckScriptUpgrade()
+        {
+            var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);
+            // Debug.Log($"upgrade {changedNodes.Count} nodes");
+            if (changedNodes.Any())
+            {
+                var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
+                upgrader.UpgradeSaves();
+            }
         }
 
         /// <summary>
@@ -143,7 +70,7 @@ namespace Nova
         {
             LuaRuntime.Instance.Reset();
             scriptLoader.ForceInit(scriptPath);
-            flowChartTree = scriptLoader.GetFlowChartTree();
+            flowChartGraph = scriptLoader.GetFlowChartGraph();
         }
 
         #region States
@@ -214,11 +141,18 @@ namespace Nova
 
         #region Events
 
+        public UnityEvent gameStarted;
+
+        /// <summary>
+        /// This event will be triggered if the node has changed. The new node name will be sent to all listeners.
+        /// </summary>
+        public NodeChangedEvent nodeChanged;
+
         /// <summary>
         /// This event will be triggered if the content of the dialogue will change. It will be triggered before
         /// the lazy execution block of the new dialogue is invoked.
         /// </summary>
-        public DialogueWillChangeEvent dialogueWillChange;
+        public UnityEvent dialogueWillChange;
 
         /// <summary>
         /// This event will be triggered if the content of the dialogue has changed. The new dialogue text will be
@@ -227,11 +161,6 @@ namespace Nova
         public DialogueChangedEvent dialogueChangedEarly;
 
         public DialogueChangedEvent dialogueChanged;
-
-        /// <summary>
-        /// This event will be triggered if the node has changed. The new node name will be sent to all listeners.
-        /// </summary>
-        public NodeChangedEvent nodeChanged;
 
         /// <summary>
         /// This event will be triggered if a selection occurs, either when branches occur or when a selection is
@@ -243,6 +172,8 @@ namespace Nova
         /// This event will be triggered if the story route has reached an end.
         /// </summary>
         public RouteEndedEvent routeEnded;
+
+        public UnityEvent restoreStarts;
 
         #endregion
 
@@ -394,7 +325,7 @@ namespace Nova
             }
 
             var isReached = DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped);
-            dialogueWillChange.Invoke(new DialogueWillChangeData());
+            dialogueWillChange.Invoke();
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
@@ -446,8 +377,8 @@ namespace Nova
                 stepsFromLastCheckpoint++;
             }
 
-            if (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
-                !checkpointManager.CanAppendCheckpoint(checkpointOffset))
+            if (atEndOfNodeRecord || (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
+                                      !checkpointManager.CanAppendCheckpoint(checkpointOffset)))
             {
                 AppendSameNode();
             }
@@ -487,7 +418,7 @@ namespace Nova
             {
                 var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
                 dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, voices,
-                    currentDialogueEntry.NeedInterpolate());
+                    currentDialogueEntry.NeedInterpolate(), currentDialogueEntry.textHash);
                 checkpointManager.SetReached(dialogueData);
             }
             else
@@ -510,7 +441,7 @@ namespace Nova
                     break;
                 case FlowChartNodeType.End:
                     state = State.Ended;
-                    var endName = flowChartTree.GetEndName(currentNode);
+                    var endName = flowChartGraph.GetEndName(currentNode);
                     checkpointManager.SetEndReached(endName);
                     routeEnded.Invoke(new RouteEndedData(endName));
                     break;
@@ -529,15 +460,23 @@ namespace Nova
         private void MoveToNextNode(FlowChartNode nextNode)
         {
             scriptLoader.AddDeferredDialogueChunks(nextNode);
-            nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
+            // in case of empty node, do not change any of these
+            // so the bookmark is left at the end of last node
+            if (nextNode.dialogueEntryCount > 0)
+            {
+                nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
+                currentIndex = 0;
+                checkpointOffset = nodeRecord.offset;
+            }
+
             currentNode = nextNode;
-            currentIndex = 0;
-            checkpointOffset = nodeRecord.offset;
             UpdateGameState(true, true, true, true, false);
         }
 
         private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos)
         {
+            var selections = new List<SelectionOccursData.Selection>();
+            var selectionNames = new List<string>();
             foreach (var branchInfo in branchInfos)
             {
                 if (branchInfo.mode == BranchMode.Jump)
@@ -547,16 +486,7 @@ namespace Nova
                         SelectBranch(branchInfo.name);
                         yield break;
                     }
-                }
-            }
 
-            var selections = new List<SelectionOccursData.Selection>();
-            var selectionNames = new List<string>();
-
-            foreach (var branchInfo in branchInfos)
-            {
-                if (branchInfo.mode == BranchMode.Jump)
-                {
                     continue;
                 }
 
@@ -594,7 +524,8 @@ namespace Nova
 
         #region Game start
 
-        public void SaveInitialCheckpoint()
+        // Called in Start after all restorables are initialized
+        private void SaveInitialCheckpoint()
         {
             // Save a clean state of game scene
             if (initialCheckpoint == null)
@@ -610,40 +541,29 @@ namespace Nova
         {
             ResetGameState();
             state = State.Normal;
+            gameStarted.Invoke();
             MoveToNextNode(startNode);
         }
 
-        /// <summary>
-        /// Start the game from the default start point
-        /// </summary>
-        public void GameStart()
+        public void GameStart(string nodeName)
         {
-            GameStart(flowChartTree.defaultStartNode);
+            GameStart(GetNode(nodeName));
         }
 
-        /// <summary>
-        /// Start the game from a named start point
-        /// </summary>
-        public void GameStart(string startName)
+        public FlowChartNode GetNode(string name, bool addDeferred = true)
         {
-            GameStart(flowChartTree.GetStartNode(startName));
-        }
+            var node = flowChartGraph.GetNode(name);
+            if (addDeferred)
+            {
+                scriptLoader.AddDeferredDialogueChunks(node);
+            }
 
-        public FlowChartNode GetNode(string name)
-        {
-            var node = flowChartTree.GetNode(name);
-            scriptLoader.AddDeferredDialogueChunks(node);
             return node;
         }
 
-        public IReadOnlyList<string> GetAllStartNodeNames()
+        public IEnumerable<string> GetStartNodeNames(StartNodeType type = StartNodeType.Normal)
         {
-            return flowChartTree.GetAllStartNodeNames();
-        }
-
-        public IReadOnlyList<string> GetAllUnlockedStartNodeNames()
-        {
-            return flowChartTree.GetAllUnlockedStartNodeNames();
+            return flowChartGraph.GetStartNodeNames(type);
         }
 
         #endregion
@@ -779,13 +699,20 @@ namespace Nova
         /// </summary>
         private bool checkpointEnsured;
 
+        // Used by the preload system when using anim_hold_begin
+        // Whether the current dialogue has a checkpoint is decided before the Lua code runs,
+        // so we can only ensure it on the next dialogue
         public void EnsureCheckpointOnNextDialogue()
         {
             checkpointEnsured = true;
         }
 
+        private bool atEndOfNodeRecord =>
+            !isUpgrading && nodeRecord.child != 0 && currentIndex >= nodeRecord.endDialogue;
+
         private bool shouldSaveCheckpoint =>
-            checkpointEnsured || (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
+            checkpointEnsured || atEndOfNodeRecord ||
+            (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
 
         /// <summary>
         /// Get the current game state as a checkpoint
@@ -812,18 +739,23 @@ namespace Nova
 
             variables.CloneFrom(entry.variables);
 
-            foreach (var pair in
-                     from pair in restorables
-                     orderby (pair.Value as IPrioritizedRestorable)?.priority ?? RestorablePriority.Normal descending
-                     select pair)
+            var pairs = restorables.OrderByDescending(x =>
+                (x.Value as IPrioritizedRestorable)?.priority ?? RestorablePriority.Normal);
+            foreach (var pair in pairs)
             {
-                try
+                if (entry.restoreDatas.TryGetValue(pair.Key, out var data))
                 {
-                    pair.Value.Restore(entry.restoreDatas[pair.Key]);
+                    pair.Value.Restore(data);
                 }
-                catch (KeyNotFoundException)
+                else
                 {
-                    Debug.LogWarning($"Nova: Key {pair.Key} not found in restoreDatas. Please clear save data.");
+                    if (!isUpgrading)
+                    {
+                        Debug.LogWarning($"Nova: Key {pair.Key} not found in restoreDatas. Please clear save data.");
+                    }
+
+                    // fallback to initialCheckpoint state
+                    pair.Value.Restore(initialCheckpoint.restoreDatas[pair.Key]);
                 }
             }
         }
@@ -886,7 +818,27 @@ namespace Nova
             nodeRecord = list[list.Count - 1];
         }
 
+        public bool isUpgrading { get; private set; }
+
         public bool isRestoring { get; private set; }
+
+        private bool CheckUnlockInRestoring()
+        {
+            if (!actionPauseLock.isLocked)
+            {
+                return true;
+            }
+
+            if (isUpgrading)
+            {
+                throw CheckpointCorruptedException.CannotUpgrade;
+            }
+
+            Debug.LogWarning("Nova: GameState paused by action when restoring. " +
+                             "Maybe a minigame does not have a checkpoint ensured after it.");
+            isRestoring = false;
+            return false;
+        }
 
         private void FastForward(int stepCount)
         {
@@ -894,36 +846,21 @@ namespace Nova
 
             for (var i = 0; i < stepCount; ++i)
             {
-                var isLast = i == stepCount - 1;
-                if (isLast)
+                if (!isUpgrading && i == stepCount - 1)
                 {
                     isRestoring = false;
                 }
 
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 Step();
-                if (actionPauseLock.isLocked)
+                if (!CheckUnlockInRestoring())
                 {
-                    Debug.LogWarning("Nova: GameState paused by action when restoring. " +
-                                     "Maybe a minigame does not have a checkpoint ensured after it.");
-                    isRestoring = false;
                     return;
                 }
             }
         }
 
-        public void MoveBackToFirstDialogue()
-        {
-            var entryNode = nodeRecord;
-            while (entryNode.parent != 0 && entryNode.beginDialogue != 0)
-            {
-                entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
-            }
-
-            MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
-        }
-
-        public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
+        private void Move(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex, bool upgrade)
         {
             // Debug.Log($"MoveBackTo begin {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
 
@@ -944,6 +881,8 @@ namespace Nova
             // Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
 
             isRestoring = true;
+            isUpgrading = upgrade;
+            restoreStarts.Invoke();
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
             this.RuntimeAssert(dialogueIndex >= currentIndex,
@@ -954,11 +893,8 @@ namespace Nova
             }
 
             UpdateGameState(true, true, false, false, true);
-            if (actionPauseLock.isLocked)
+            if (!CheckUnlockInRestoring())
             {
-                Debug.LogWarning("Nova: GameState paused by action when restoring. " +
-                                 "Maybe a minigame does not have a checkpoint ensured after it.");
-                isRestoring = false;
                 return;
             }
 
@@ -967,7 +903,98 @@ namespace Nova
                 FastForward(dialogueIndex - currentIndex);
             }
 
+            isUpgrading = false;
             // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
+        }
+
+        public void MoveBackTo(NodeRecord newNodeRecord, long newCheckpointOffset, int dialogueIndex)
+        {
+            Move(newNodeRecord, newCheckpointOffset, dialogueIndex, false);
+        }
+
+        public void MoveToUpgrade(NodeRecord newNodeRecord, int lastDialogue)
+        {
+            state = State.Normal;
+            Move(newNodeRecord, checkpointManager.NextRecord(newNodeRecord.offset), lastDialogue, true);
+            ResetGameState();
+        }
+
+        public void MoveBackToFirstDialogue()
+        {
+            var entryNode = nodeRecord;
+            while (entryNode.parent != 0 && entryNode.beginDialogue != 0)
+            {
+                entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
+            }
+
+            MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
+        }
+
+        /// <summary>
+        /// Move to previous/next chapter/branch.
+        /// </summary>
+        /// <param name="forward">Moving forward or backward.</param>
+        /// <param name="allowChapter">Whether to stop at chapter.</param>
+        /// <param name="allowBranch">Whether to stop at branch, only works in backward mode.</param>
+        /// <returns>Whether succeeded. if not will move to the beginning/end</returns>
+        public void MoveToKeyPoint(bool forward, bool allowChapter, bool allowBranch = true)
+        {
+            var entryNode = nodeRecord;
+            var foundHead = false;
+            if (forward)
+            {
+                allowBranch = true;
+            }
+
+            while (true)
+            {
+                var node = GetNode(entryNode.name);
+                // we move to either node start (chapter) or end (branch)
+                // stored in foundHead
+                //
+                // special handling of current node
+                // 1. if going backward, the current node branch should not be considered
+                // 2. if going forward, or right at the beginning, the current node beginning should not be considered
+                var isBranch = allowBranch && entryNode.endDialogue == node.dialogueEntryCount &&
+                               node.IsManualBranchNode() && (!(entryNode == nodeRecord && !forward));
+                var isChapter = allowChapter && entryNode.beginDialogue == 0 && node.isChapter &&
+                                (!(entryNode == nodeRecord && (currentIndex == 0 || forward)));
+                if (isBranch || isChapter)
+                {
+                    foundHead = forward ? isChapter : !isBranch;
+                    break;
+                }
+
+                var next = forward ? entryNode.child : entryNode.parent;
+                if (next == 0)
+                {
+                    foundHead = !forward;
+                    break;
+                }
+
+                var nextEntryNode = checkpointManager.GetNodeRecord(next);
+                // multiple children case should only happen in interrupt (minigame)
+                if (forward && nextEntryNode.sibling != 0)
+                {
+                    foundHead = false;
+                    break;
+                }
+
+                entryNode = nextEntryNode;
+            }
+
+            var offset = checkpointManager.NextRecord(entryNode.offset);
+            var dialogue = entryNode.beginDialogue;
+            if (!foundHead)
+            {
+                dialogue = entryNode.endDialogue - 1;
+                while (checkpointManager.GetCheckpointDialogue(offset) != entryNode.lastCheckpointDialogue)
+                {
+                    offset = checkpointManager.NextCheckpoint(offset);
+                }
+            }
+
+            MoveBackTo(entryNode, offset, dialogue);
         }
 
         public IEnumerable<ReachedDialoguePosition> GetDialogueHistory(int limit = 0)
@@ -977,7 +1004,7 @@ namespace Nova
                 yield break;
             }
 
-            List<NodeRecord> nodeHistory = new List<NodeRecord>();
+            var nodeHistory = new List<NodeRecord>();
             SeekBackStep(limit, nodeHistory, out var curCheckpoint, out var curDialogue);
 
             for (var i = nodeHistory.Count - 1; i >= 0; i--)
@@ -1031,7 +1058,7 @@ namespace Nova
         {
             if (nodeRecord == null || checkpointOffset == nodeRecord.offset)
             {
-                throw new InvalidOperationException("cannot save bookmark at this point");
+                throw new InvalidOperationException("Nova: Cannot save bookmark at this point.");
             }
 
             return new Bookmark(nodeRecord, checkpointOffset, currentIndex);

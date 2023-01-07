@@ -9,14 +9,21 @@ namespace Nova
 
         private void Awake()
         {
-            inputMapper = Utils.FindNovaGameController().InputMapper;
+            inputMapper = Utils.FindNovaController().InputMapper;
+
+            I18n.LocaleChanged.AddListener(OnLocaleChanged);
+        }
+
+        private void OnDestroy()
+        {
+            I18n.LocaleChanged.RemoveListener(OnLocaleChanged);
         }
 
         private void Update()
         {
             if (inputMapper.GetKeyUp(AbstractKey.ToggleFullScreen))
             {
-                GameRenderManager.SwitchFullScreen();
+                RenderManager.SwitchFullScreen();
             }
 
             if (inputMapper.GetKeyUp(AbstractKey.SwitchLanguage))
@@ -30,6 +37,11 @@ namespace Nova
             var i = Array.IndexOf(I18n.SupportedLocales, I18n.CurrentLocale);
             i = (i + 1) % I18n.SupportedLocales.Length;
             I18n.CurrentLocale = I18n.SupportedLocales[i];
+        }
+
+        private void OnLocaleChanged()
+        {
+            NovaAnimation.StopAll(AnimationType.Text);
         }
     }
 }

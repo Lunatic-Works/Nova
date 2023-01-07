@@ -35,7 +35,7 @@ namespace Nova
             material = pool.Get(SHADER);
             pool.defaultMaterial = material;
 
-            novaAnimation = Utils.FindNovaGameController().PerDialogueAnimation;
+            novaAnimation = Utils.FindNovaController().PerDialogueAnimation;
         }
 
         protected abstract void ResetSize(float width, float height, Vector2 pivot);

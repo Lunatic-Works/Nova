@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Nova.Exceptions;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -20,14 +21,20 @@ namespace Nova
             );
         }
 
+        private static Texture2D _ClearTexture;
+
         public static Texture2D ClearTexture
         {
             get
             {
-                var tex = new Texture2D(1, 1, TextureFormat.Alpha8, false);
-                tex.SetPixel(0, 0, Color.clear);
-                tex.Apply();
-                return tex;
+                if (_ClearTexture == null)
+                {
+                    _ClearTexture = new Texture2D(1, 1, TextureFormat.Alpha8, false);
+                    _ClearTexture.SetPixel(0, 0, Color.clear);
+                    _ClearTexture.Apply();
+                }
+
+                return _ClearTexture;
             }
         }
 
@@ -90,6 +97,19 @@ namespace Nova
             return x;
         }
 
+        public static void Ensure<T>(this List<T> list, int size)
+        {
+            if (list.Count < size)
+            {
+                list.AddRange(Enumerable.Repeat(default(T), size - list.Count));
+            }
+        }
+
+        public static string Dump<T>(this IEnumerable<T> list)
+        {
+            return "[ " + String.Join(", ", list.Select(x => x.ToString())) + " ]";
+        }
+
         public static Rect ToRect(this RectInt rectInt)
         {
             return new Rect(rectInt.min, rectInt.size);
@@ -123,24 +143,24 @@ namespace Nova
 
         /// <remarks>
         /// This is usually called in Awake or Start
-        /// Do not call this when the game is quitting, because NovaGameController may be already destroyed
+        /// Do not call this when the game is quitting, because NovaController may be already destroyed
         /// </remarks>
-        public static GameController FindNovaGameController()
+        public static NovaController FindNovaController()
         {
-            var go = GameObject.FindWithTag("NovaGameController");
+            var go = GameObject.FindWithTag("NovaController");
             if (go == null)
             {
                 throw new InvalidAccessException(
-                    "Nova: Cannot find NovaGameController game object by tag. Maybe you should put NovaCreator prefab in your scene.");
+                    "Nova: Cannot find NovaController game object by tag. " +
+                    "Maybe you should put NovaCreator prefab in your scene.");
             }
 
-            if (!go.TryGetComponent<GameController>(out var gameController))
+            if (!go.TryGetComponent<NovaController>(out var controller))
             {
-                throw new InvalidAccessException(
-                    "Nova: No GameController component in NovaGameController game object.");
+                throw new InvalidAccessException("Nova: No NovaController component in NovaController game object.");
             }
 
-            return gameController;
+            return controller;
         }
 
         public static ViewManager FindViewManager()
@@ -266,10 +286,10 @@ namespace Nova
 
         public static void SaveAll()
         {
-            var gameController = FindNovaGameController();
-            gameController.CheckpointManager.UpdateGlobalSave();
-            gameController.ConfigManager.Apply();
-            gameController.InputMapper.Save();
+            var controller = FindNovaController();
+            controller.CheckpointManager.UpdateGlobalSave();
+            controller.ConfigManager.Apply();
+            controller.InputMapper.Save();
         }
 
         public static void QuitWithAlert()
@@ -364,6 +384,37 @@ namespace Nova
         {
             var idx = random.Next(list.Count);
             return list[idx];
+        }
+
+        // Knuth's golden ratio multiplicative hashing
+        public static ulong HashList(IEnumerable<ulong> hashes)
+        {
+            var r = 0UL;
+            unchecked
+            {
+                foreach (var x in hashes)
+                {
+                    r += x;
+                    r *= 11400714819323199563UL;
+                }
+            }
+
+            return r;
+        }
+
+        public static ulong HashList<T>(IEnumerable<T> list) where T : class
+        {
+            return HashList(list.Select(x => (ulong)x.GetHashCode()));
+        }
+
+        public static ulong HashObjects(params object[] list)
+        {
+            return HashList(list);
+        }
+
+        public static string PrettyPrint(this ISerializedData data)
+        {
+            return JsonConvert.SerializeObject(data, Formatting.Indented);
         }
 
         // On iOS, eventData.pointerId can be < 0, maybe because of overflow

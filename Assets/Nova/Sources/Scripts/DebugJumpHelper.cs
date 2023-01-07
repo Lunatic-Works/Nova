@@ -1,20 +1,26 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
 {
     public class DebugJumpHelper : MonoBehaviour
     {
+        [SerializeField] private bool moveBackward;
+        [SerializeField] private bool previousChapter;
+        [SerializeField] private bool nextChapter;
+        [SerializeField] private bool previousBranch;
+        [SerializeField] private bool nextBranch;
+
         private GameState gameState;
         private DialogueState dialogueState;
-        private InputMapper inputMapper;
         private ViewManager viewManager;
 
         private void Awake()
         {
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
-            inputMapper = controller.InputMapper;
             viewManager = Utils.FindViewManager();
         }
 
@@ -25,24 +31,34 @@ namespace Nova
                 return;
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorBackward))
+            if (moveBackward)
             {
+                moveBackward = false;
                 MoveBackward();
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorBeginChapter))
+            if (previousChapter)
             {
-                JumpChapter(0);
+                previousChapter = false;
+                gameState.MoveToKeyPoint(false, true);
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorPreviousChapter))
+            if (nextChapter)
             {
-                JumpChapter(-1);
+                nextChapter = false;
+                gameState.MoveToKeyPoint(true, true);
             }
 
-            if (inputMapper.GetKeyUp(AbstractKey.EditorNextChapter))
+            if (previousBranch)
             {
-                JumpChapter(1);
+                previousBranch = false;
+                gameState.MoveToKeyPoint(false, false);
+            }
+
+            if (nextBranch)
+            {
+                nextBranch = false;
+                gameState.MoveToKeyPoint(true, false);
             }
         }
 
@@ -53,23 +69,6 @@ namespace Nova
 
             gameState.SeekBackStep(1, out var nodeRecord, out var checkpointOffset, out var dialogueIndex);
             gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
-        }
-
-        private void JumpChapter(int offset)
-        {
-            NovaAnimation.StopAll();
-            dialogueState.state = DialogueState.State.Normal;
-
-            var chapters = gameState.GetAllStartNodeNames();
-            int targetChapterIndex = chapters.IndexOf(gameState.currentNode.name) + offset;
-            if (targetChapterIndex >= 0 && targetChapterIndex < chapters.Count)
-            {
-                gameState.GameStart(chapters[targetChapterIndex]);
-            }
-            else
-            {
-                Debug.LogWarning($"Nova: Chapter index {targetChapterIndex} out of range.");
-            }
         }
     }
 }

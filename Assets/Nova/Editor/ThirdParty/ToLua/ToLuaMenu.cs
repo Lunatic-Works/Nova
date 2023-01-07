@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.IO;
+using System.Linq;
 using System.Diagnostics;
 using LuaInterface;
 
@@ -1025,17 +1026,17 @@ public static class ToLuaMenu
     {
         if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64)
         {
-            File.Copy(path + "/Luajit64/Build.bat", tempDir + "/Build.bat", true);
+            File.Copy(path + "/Tools/LuaJIT/64/Build.bat", tempDir + "/Build.bat", true);
         }
         else if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows)
         {
             if (IntPtr.Size == 4)
             {
-                File.Copy(path + "/Luajit/Build.bat", tempDir + "/Build.bat", true);
+                File.Copy(path + "/Tools/LuaJIT/32/Build.bat", tempDir + "/Build.bat", true);
             }
             else if (IntPtr.Size == 8)
             {
-                File.Copy(path + "/Luajit64/Build.bat", tempDir + "/Build.bat", true);
+                File.Copy(path + "/Tools/LuaJIT/64/Build.bat", tempDir + "/Build.bat", true);
             }
         }
 #if UNITY_5_3_OR_NEWER
@@ -1045,16 +1046,16 @@ public static class ToLuaMenu
 #endif
         {
             //Debug.Log("iOS默认用64位，32位自行考虑");
-            File.Copy(path + "/Luajit64/Build.bat", tempDir + "/Build.bat", true);
+            File.Copy(path + "/Tools/LuaJIT/64/Build.bat", tempDir + "/Build.bat", true);
         }
         else
         {
-            File.Copy(path + "/Luajit/Build.bat", tempDir + "/Build.bat", true);
+            File.Copy(path + "/Tools/LuaJIT/32/Build.bat", tempDir + "/Build.bat", true);
         }
 
     }
 
-    // [MenuItem("Lua/Build Lua Files to Resources (PC)", false, 53)]
+    // [MenuItem("Lua/Build Lua Files to Resources (Windows Only)", false, 53)]
     public static void BuildLuaToResources()
     {
         ClearAllLuaFiles();
@@ -1065,12 +1066,19 @@ public static class ToLuaMenu
         path = path.Substring(0, path.LastIndexOf('/'));
         CopyBuildBat(path, tempDir);
         CopyLuaBytesFiles(LuaConst.luaDir, tempDir, false);
+        CopyLuaBytesFiles(LuaConst.toluaDir, tempDir, false);
         Process proc = Process.Start(tempDir + "/Build.bat");
         proc.WaitForExit();
         CopyLuaBytesFiles(tempDir + "/Out/", destDir, false, "*.lua.bytes");
-        CopyLuaBytesFiles(LuaConst.toluaDir, destDir);
 
         Directory.Delete(tempDir, true);
+        var parent = Directory.GetParent(tempDir).FullName;
+        if (!Directory.EnumerateFileSystemEntries(parent).Any())
+        {
+            Directory.Delete(parent);
+            File.Delete(parent + ".meta");
+        }
+
         AssetDatabase.Refresh();
     }
 

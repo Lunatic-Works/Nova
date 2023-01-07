@@ -1,6 +1,6 @@
 @<|
 label('ch1', '第一章')
-is_default_start()
+is_unlocked_start()
 |>
 <|
 anim:trans_fade(cam, function()

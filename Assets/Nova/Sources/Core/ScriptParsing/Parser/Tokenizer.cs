@@ -356,7 +356,6 @@ namespace Nova.Script
             next.type = tokenType;
         }
 
-        /// <returns>null if no more tokens</returns>
         public void ParseNext()
         {
             ParseNextImpl();

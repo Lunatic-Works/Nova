@@ -11,7 +11,7 @@ namespace Nova
         {
             var luaHiddenName = "_" + luaGlobalName;
             LuaRuntime.Instance.BindObject(luaHiddenName, GetComponent<NovaAnimation>());
-            LuaRuntime.Instance.DoString($"{luaGlobalName} = NovaAnimation:new {{ anim = __Nova['{luaHiddenName}'] }}");
+            LuaRuntime.Instance.DoString($"{luaGlobalName} = NovaAnimation:new {{ anim = __Nova.{luaHiddenName} }}");
         }
     }
 }

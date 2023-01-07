@@ -10,7 +10,7 @@ namespace Nova
         private const string AbortAnimationFirstShownKey = ConfigManager.FirstShownKeyPrefix + "AbortAnimation";
         private const int HintAbortAnimationClicks = 10;
 
-        private GameController gameController;
+        private NovaController novaController;
         private GameState gameState;
         private DialogueState dialogueState;
         private ConfigManager configManager;
@@ -26,11 +26,11 @@ namespace Nova
 
         private void Awake()
         {
-            gameController = Utils.FindNovaGameController();
-            gameState = gameController.GameState;
-            dialogueState = gameController.DialogueState;
-            configManager = gameController.ConfigManager;
-            inputMapper = gameController.InputMapper;
+            novaController = Utils.FindNovaController();
+            gameState = novaController.GameState;
+            dialogueState = novaController.DialogueState;
+            configManager = novaController.ConfigManager;
+            inputMapper = novaController.InputMapper;
 
             buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
 
@@ -148,9 +148,31 @@ namespace Nova
             }
         }
 
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (!novaController.inputEnabled ||
+                viewManager.currentView != CurrentViewType.Game ||
+                buttonRingTrigger.buttonShowing)
+            {
+                return;
+            }
+
+            // Stop auto/fast forward on any button or touch
+            dialogueState.state = DialogueState.State.Normal;
+
+            if (Utils.IsTouch(eventData) || Utils.IsRightButton(eventData))
+            {
+                if (canTriggerButtonRing)
+                {
+                    buttonRingTrigger.ShowIfPointerMoved();
+                }
+            }
+        }
+
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (!gameController.inputEnabled)
+            // When the input is not enabled, the user can only click forward
+            if (!novaController.inputEnabled)
             {
                 if (Utils.IsTouch(eventData) || Utils.IsLeftButton(eventData))
                 {
@@ -211,30 +233,9 @@ namespace Nova
             }
         }
 
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            if (!gameController.inputEnabled ||
-                viewManager.currentView != CurrentViewType.Game ||
-                buttonRingTrigger.buttonShowing)
-            {
-                return;
-            }
-
-            // Stop auto/fast forward on any button or touch
-            dialogueState.state = DialogueState.State.Normal;
-
-            if (Utils.IsTouch(eventData) || Utils.IsRightButton(eventData))
-            {
-                if (canTriggerButtonRing)
-                {
-                    buttonRingTrigger.ShowIfPointerMoved();
-                }
-            }
-        }
-
         private void HandleScroll()
         {
-            if (!gameController.inputEnabled)
+            if (!novaController.inputEnabled)
             {
                 return;
             }

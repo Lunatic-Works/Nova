@@ -9,7 +9,7 @@ namespace Nova
     [RequireComponent(typeof(Toggle))]
     public class ConfigToggle : MonoBehaviour
     {
-        public string configKeyName;
+        [SerializeField] private string configKeyName;
 
         private Toggle toggle;
         private ConfigManager configManager;
@@ -19,7 +19,7 @@ namespace Nova
             this.RuntimeAssert(!string.IsNullOrEmpty(configKeyName), "Empty configKeyName.");
 
             toggle = GetComponent<Toggle>();
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
         }
 
         private void UpdateValue()

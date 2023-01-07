@@ -11,7 +11,7 @@ namespace Nova
 
         private void Start()
         {
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
             saveViewController = Utils.FindViewManager().GetController<SaveViewController>();
 
             gameState.selectionOccurs.AddListener(OnSelectionOccurs);

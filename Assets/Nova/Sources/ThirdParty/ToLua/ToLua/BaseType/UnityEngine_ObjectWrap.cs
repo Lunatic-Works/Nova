@@ -106,27 +106,11 @@ public class UnityEngine_ObjectWrap
 	{
 		try
 		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1)
-			{
-				System.Type arg0 = ToLua.CheckMonoType(L, 1);
-				UnityEngine.Object[] o = UnityEngine.Object.FindObjectsOfType(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2)
-			{
-				System.Type arg0 = ToLua.CheckMonoType(L, 1);
-				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
-				UnityEngine.Object[] o = UnityEngine.Object.FindObjectsOfType(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Object.FindObjectsOfType");
-			}
+			ToLua.CheckArgsCount(L, 1);
+			System.Type arg0 = ToLua.CheckMonoType(L, 1);
+			UnityEngine.Object[] o = UnityEngine.Object.FindObjectsOfType(arg0);
+			ToLua.Push(L, o);
+			return 1;
 		}
 		catch (Exception e)
 		{
@@ -155,27 +139,11 @@ public class UnityEngine_ObjectWrap
 	{
 		try
 		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1)
-			{
-				System.Type arg0 = ToLua.CheckMonoType(L, 1);
-				UnityEngine.Object o = UnityEngine.Object.FindObjectOfType(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2)
-			{
-				System.Type arg0 = ToLua.CheckMonoType(L, 1);
-				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
-				UnityEngine.Object o = UnityEngine.Object.FindObjectOfType(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Object.FindObjectOfType");
-			}
+			ToLua.CheckArgsCount(L, 1);
+			System.Type arg0 = ToLua.CheckMonoType(L, 1);
+			UnityEngine.Object o = UnityEngine.Object.FindObjectOfType(arg0);
+			ToLua.Push(L, o);
+			return 1;
 		}
 		catch (Exception e)
 		{

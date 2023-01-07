@@ -9,7 +9,7 @@ namespace Nova
 
         private void Awake()
         {
-            dialogueState = Utils.FindNovaGameController().DialogueState;
+            dialogueState = Utils.FindNovaController().DialogueState;
         }
 
         public void StartNormal()

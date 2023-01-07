@@ -106,8 +106,9 @@ local function get_default_mat(obj)
     return Nova.MaterialPool.Ensure(go).defaultMaterial
 end
 
-local function set_mat(obj, mat, layer_id)
+local function set_mat(obj, mat, layer_id, token)
     layer_id = layer_id or 0
+    token = token or -1
 
     local go, renderer, pp = get_renderer_pp(obj)
 
@@ -116,26 +117,26 @@ local function set_mat(obj, mat, layer_id)
             warn('layer_id should be 0 for SpriteRenderer or Image')
         end
         renderer.material = mat
-        return
+        return -1
     end
 
     if pp then
         if mat then
-            pp:SetLayer(layer_id, mat)
+            return pp:SetLayer(layer_id, mat)
         else
-            pp:ClearLayer(layer_id)
+            pp:ClearLayer(layer_id, token)
+            return -1
         end
-        return
     end
 
     local chara = go:GetComponent(typeof(Nova.GameCharacterController))
     if chara then
         warn('Cannot set material for GameCharacterController ' .. dump(obj))
-        return
+        return -1
     end
 
     warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. dump(obj))
-    return
+    return -1
 end
 
 local function set_mat_default_properties(mat, base_shader_name, skip_properties)
@@ -167,6 +168,19 @@ local function set_mat_default_properties(mat, base_shader_name, skip_properties
     end
 end
 
+local function set_texture_by_path(mat, name, path)
+    if mat:GetType() == typeof(Nova.RestorableMaterial) then
+        mat:SetTexturePath(name, path)
+    else
+        local tex
+        -- we cannot set value = nil in table, so we use ''
+        if path and path ~= '' then
+            tex = Nova.AssetLoader.LoadTexture(path)
+        end
+        mat:SetTexture(name, tex)
+    end
+end
+
 local function set_mat_properties(mat, base_shader_name, properties)
     local _type_data = shader_type_data[base_shader_name]
     if _type_data == nil then
@@ -182,16 +196,7 @@ local function set_mat_properties(mat, base_shader_name, properties)
         elseif dtype == 'Vector' then
             mat:SetVector(name, parse_color(value, true))
         elseif dtype == '2D' then
-            if mat:GetType() == typeof(Nova.RestorableMaterial) then
-                mat:SetTexturePath(name, value)
-            else
-                local tex
-                -- we cannot set value = nil in table, so we use ''
-                if value and value ~= '' then
-                    tex = Nova.AssetLoader.LoadTexture(value)
-                end
-                mat:SetTexture(name, tex)
-            end
+            set_texture_by_path(mat, name, value)
         else
             warn('Unknown dtype ' .. dump(dtype) .. ' for property ' .. dump(name))
         end
@@ -234,7 +239,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
     local duration, easing = parse_times(times)
     properties = properties or {}
 
-    local action_begin, action_end
+    local action_begin, action_end, token
     if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
             __Nova.screenCapturer:CaptureGameTexture()
@@ -250,11 +255,11 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 1)
-            set_mat(obj, mat, layer_id)
+            token = set_mat(obj, mat, layer_id)
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj), layer_id)
+            set_mat(obj, get_default_mat(obj), layer_id, token)
         end
     else
         action_begin = function()
@@ -269,13 +274,13 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 1)
             mat:SetColor('_SubColor', renderer.color)
-            set_mat(obj, mat)
+            token = set_mat(obj, mat)
 
             show_no_fade(obj, image_name, nil, color2)
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj))
+            set_mat(obj, get_default_mat(obj), nil, token)
         end
     end
 
@@ -302,13 +307,13 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
     local duration2, easing2 = parse_times(times2)
     properties2 = properties2 or {}
 
-    local action_begin, action_middle, action_end
+    local action_begin, action_middle, action_end, token
     if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 0)
-            set_mat(obj, mat, layer_id)
+            token = set_mat(obj, mat, layer_id)
         end
 
         action_middle = function()
@@ -323,14 +328,14 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj), layer_id)
+            set_mat(obj, get_default_mat(obj), layer_id, token)
         end
     else
         action_begin = function()
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 0)
-            set_mat(obj, mat)
+            token = set_mat(obj, mat)
         end
 
         action_middle = function()
@@ -342,7 +347,7 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj))
+            set_mat(obj, get_default_mat(obj), nil, token)
         end
     end
 
@@ -357,7 +362,7 @@ end, add_preload_pattern)
 
 --- usage:
 ---     vfx(obj, 'shader_name', [t, { name = value }])
----     vfx(obj, {'shader_name'. layer_id}, [t, { name = value }])
+---     vfx(obj, {'shader_name', layer_id}, [t, { name = value }])
 function vfx(obj, shader_layer, t, properties)
     local shader_name, layer_id = parse_shader_layer(shader_layer)
     if shader_name then
@@ -407,8 +412,11 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
         end
     end
 
-    local action_end = function()
-        if target_t == 0 then
+    local entry = self:action(action_begin
+        ):_then(Nova.MaterialFloatAnimationProperty(mat, '_T', target_t)):_with(easing):_for(duration)
+
+    if target_t == 0 then
+        local action_end = function()
             if obj:GetType() == typeof(Nova.CameraOverlayMask) then
                 obj.blitMaterial = nil
             else
@@ -419,18 +427,16 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
                 end
             end
         end
+        entry = entry:action(action_end)
     end
 
-    local entry = self:action(action_begin
-        ):_then(Nova.MaterialFloatAnimationProperty(mat, '_T', target_t)):_with(easing):_for(duration
-        ):action(action_end)
     entry.head = self
     return entry
 end)
 
 --- usage:
----     vfx_free(obj, 'shader_name', duration, {{'name', start_value, target_value}, ...}, [{ name = value }])
-make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_properties, properties)
+---     vfx_multi(obj, 'shader_name', duration, { name = {start_value, target_value} }, [{ name = value }])
+make_anim_method('vfx_multi', function(self, obj, shader_layer, times, anim_properties, properties)
     local shader_name, layer_id = parse_shader_layer(shader_layer)
     local mat, base_shader_name, _ = get_mat(obj, shader_name)
     local duration, easing = parse_times(times)
@@ -439,8 +445,8 @@ make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_prope
     local action_begin = function()
         set_mat_default_properties(mat, base_shader_name, properties)
         set_mat_properties(mat, base_shader_name, properties)
-        for i = 1, #anim_properties do
-            mat:SetFloat(anim_properties[i][1], anim_properties[i][2])
+        for name, value in pairs(anim_properties) do
+            mat:SetFloat(name, value[1])
         end
         mat:SetFloat('_T', 1)
 
@@ -453,8 +459,8 @@ make_anim_method('vfx_free', function(self, obj, shader_layer, times, anim_prope
 
     local entry0 = self:action(action_begin)
     local entry
-    for i = 1, #anim_properties do
-        entry = entry0:_then(Nova.MaterialFloatAnimationProperty(mat, anim_properties[i][1], anim_properties[i][3])):_with(easing):_for(duration)
+    for name, value in pairs(anim_properties) do
+        entry = entry0:_then(Nova.MaterialFloatAnimationProperty(mat, name, value[2])):_with(easing):_for(duration)
     end
     entry.head = self
     return entry

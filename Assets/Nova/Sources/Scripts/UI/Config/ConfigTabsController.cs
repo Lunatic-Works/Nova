@@ -6,7 +6,7 @@ namespace Nova
 {
     public class ConfigTabsController : MonoBehaviour
     {
-        public List<ConfigTabButton> tabs;
+        [SerializeField] private List<ConfigTabButton> tabs;
 
         private void Awake()
         {

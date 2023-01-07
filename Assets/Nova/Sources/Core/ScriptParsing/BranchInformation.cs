@@ -44,9 +44,7 @@ namespace Nova
         /// </summary>
         public readonly string name;
 
-        private readonly Dictionary<SystemLanguage, string> _texts;
-        public Dictionary<SystemLanguage, string> texts => _texts;
-
+        public readonly Dictionary<SystemLanguage, string> texts;
         public readonly BranchImageInformation imageInfo;
         public readonly BranchMode mode;
         public readonly LuaFunction condition;
@@ -68,7 +66,7 @@ namespace Nova
             LuaFunction condition)
         {
             this.name = name;
-            _texts = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text };
+            texts = new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text };
             this.imageInfo = imageInfo;
             this.mode = mode;
             this.condition = condition;
@@ -76,18 +74,7 @@ namespace Nova
 
         public void AddLocalizedText(SystemLanguage locale, string text)
         {
-            _texts[locale] = text;
-        }
-
-        /// <summary>
-        /// Check if this branch is a default sequential branch
-        /// </summary>
-        /// <returns>
-        /// true if this branch equals the default branch
-        /// </returns>
-        public bool IsDefaultValue()
-        {
-            return Equals(Default);
+            texts[locale] = text;
         }
 
         // BranchInformation are considered equal if they have the same name

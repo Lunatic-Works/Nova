@@ -18,14 +18,14 @@ namespace Nova
     }
 
     /// <summary>
-    /// Use radio group to modify the value in ConfigManager
+    /// Use toggle group to modify the value in ConfigManager
     /// </summary>
-    [RequireComponent(typeof(ToggleGroup), typeof(LayoutGroup))]
-    public class ConfigChooser : MonoBehaviour
+    [RequireComponent(typeof(ToggleGroup))]
+    public class ConfigToggleGroup : MonoBehaviour
     {
-        public string configKeyName;
-        public string enumTypeName;
-        public GameObject togglePrefab;
+        [SerializeField] private string configKeyName;
+        [SerializeField] private string enumTypeName;
+        [SerializeField] private GameObject togglePrefab;
 
         private ToggleGroup toggleGroup;
         private List<Toggle> toggles;
@@ -36,8 +36,8 @@ namespace Nova
             this.RuntimeAssert(!string.IsNullOrEmpty(configKeyName), "Empty configKeyName.");
 
             toggleGroup = GetComponent<ToggleGroup>();
+            configManager = Utils.FindNovaController().ConfigManager;
 
-            configManager = Utils.FindNovaGameController().ConfigManager;
             var configEnum = Type.GetType("Nova." + enumTypeName);
             if (configEnum != null && configEnum.IsEnum)
             {

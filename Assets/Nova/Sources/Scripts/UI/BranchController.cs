@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class BranchController : MonoBehaviour, IRestorable
+    public class BranchController : MonoBehaviour
     {
         [SerializeField] private BranchButtonController branchButtonPrefab;
         [SerializeField] private GameObject backPanel;
@@ -15,18 +15,20 @@ namespace Nova
 
         private void Awake()
         {
-            gameState = Utils.FindNovaGameController().GameState;
-            gameState.selectionOccurs.AddListener(RaiseSelectionsCallback);
-            gameState.AddRestorable(this);
+            RemoveAllSelections();
+
+            gameState = Utils.FindNovaController().GameState;
+            gameState.selectionOccurs.AddListener(OnSelectionOccurs);
+            gameState.restoreStarts.AddListener(RemoveAllSelections);
         }
 
         private void OnDestroy()
         {
-            gameState.selectionOccurs.RemoveListener(RaiseSelectionsCallback);
-            gameState.RemoveRestorable(this);
+            gameState.selectionOccurs.RemoveListener(OnSelectionOccurs);
+            gameState.restoreStarts.RemoveListener(RemoveAllSelections);
         }
 
-        private void RaiseSelectionsCallback(SelectionOccursData data)
+        private void OnSelectionOccurs(SelectionOccursData data)
         {
             RaiseSelections(data.selections);
         }
@@ -60,11 +62,6 @@ namespace Nova
 
         public void Select(int index)
         {
-            if (backPanel != null)
-            {
-                backPanel.SetActive(false);
-            }
-
             RemoveAllSelections();
             gameState.SignalFence(index);
         }
@@ -77,27 +74,11 @@ namespace Nova
             }
 
             activeSelectionCount = 0;
-        }
 
-        #region Restoration
-
-        public string restorableName => "BranchController";
-
-        public IRestoreData GetRestoreData()
-        {
-            return null;
-        }
-
-        public void Restore(IRestoreData restoreData)
-        {
             if (backPanel != null)
             {
                 backPanel.SetActive(false);
             }
-
-            RemoveAllSelections();
         }
-
-        #endregion
     }
 }

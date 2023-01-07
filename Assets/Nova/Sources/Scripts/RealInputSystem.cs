@@ -30,10 +30,4 @@ namespace Nova
             return touch;
         }
     }
-
-    public static class RealInput
-    {
-        // Valid even if the cursor is hidden
-        public static Vector3 mousePosition => Input.mousePosition - (Vector3)RealScreen.offset;
-    }
 }

@@ -36,7 +36,7 @@ namespace Nova
         {
             base.Awake();
 
-            checkpointManager = Utils.FindNovaGameController().CheckpointManager;
+            checkpointManager = Utils.FindNovaController().CheckpointManager;
 
             var pagerPanel = myPanel.transform.Find("Snapshots/Footer/Pager");
             leftButton = pagerPanel.Find("LeftButton").GetComponent<Button>();

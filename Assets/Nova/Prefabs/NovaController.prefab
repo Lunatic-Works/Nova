@@ -139,8 +139,8 @@ GameObject:
   - component: {fileID: 7273781188685514655}
   - component: {fileID: 6935519797362669510}
   m_Layer: 0
-  m_Name: NovaGameController
-  m_TagString: NovaGameController
+  m_Name: NovaController
+  m_TagString: NovaController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -229,7 +229,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   isReadDialogue: 0
-  onlyFastForwardRead: 0
+  fastForwardUnread: 0
 --- !u!114 &114045275974384532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,7 +356,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b55bc709342695c4585a171396005580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configKeyName: OnlyFastForwardRead
+  configKeyName: FastForwardUnread
 --- !u!1 &1963475629363514
 GameObject:
   m_ObjectHideFlags: 0

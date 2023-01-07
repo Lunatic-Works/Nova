@@ -11,7 +11,7 @@ namespace Nova
 
         private void Awake()
         {
-            dialogueState = Utils.FindNovaGameController().DialogueState;
+            dialogueState = Utils.FindNovaController().DialogueState;
             postProcessing = UICameraHelper.Active.GetComponent<PostProcessing>();
 
             dialogueState.fastForwardModeStarts.AddListener(OnFastForwardModeStarts);

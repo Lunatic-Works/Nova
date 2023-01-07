@@ -7,11 +7,11 @@ namespace Nova
         // 4 * sizeof(long) + 3 * sizeof(int)
         private const int HeaderSize = 4 * 8 + 3 * 4;
 
-        public readonly long offset;
+        public long offset;
         public long parent;
         public long child;
         public long sibling; // please use more gender neutral names
-        public readonly int beginDialogue;
+        public int beginDialogue;
         public int endDialogue;
         public int lastCheckpointDialogue;
         public readonly ulong variablesHash;

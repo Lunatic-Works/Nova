@@ -121,42 +121,40 @@ function branch(branches)
     __Nova.scriptLoader:EndRegisterBranch()
 end
 
+function is_chapter()
+    if not check_eager('is_chapter') then
+        return
+    end
+    __Nova.scriptLoader:SetCurrentAsChapter()
+end
+
 --- set the current node as a start node
 --- should be called at the end of the node
 --- a game can have multiple start points, which means this function can be called several times under
 --- different nodes
---- a name can be assigned to a start point, which can differ from the node name
---- the name should be unique among all start point names
---- if no name is given, the name of the current node will be used
-function is_start(name)
+function is_start()
     if not check_eager('is_start') then
         return
     end
-    name = try_get_local_name(name)
-    __Nova.scriptLoader:SetCurrentAsStart(name)
+    __Nova.scriptLoader:SetCurrentAsStart()
 end
 
 --- set the current node as a start point which is unlocked when running the game for the first time
 --- should be called at the end of the node
---- indicates is_start()
-function is_unlocked_start(name)
+--- indicates is_chapter() and is_start()
+function is_unlocked_start()
     if not check_eager('is_unlocked_start') then
         return
     end
-    name = try_get_local_name(name)
-    __Nova.scriptLoader:SetCurrentAsUnlockedStart(name)
+    __Nova.scriptLoader:SetCurrentAsChapter()
+    __Nova.scriptLoader:SetCurrentAsUnlockedStart()
 end
 
---- set the current node as the default start point
---- should be called at the end of the node
---- a game can have only one default start node, so this function cannot be called under different nodes
---- indicates is_unlocked_start()
-function is_default_start(name)
-    if not check_eager('is_default_start') then
+function is_debug()
+    if not check_eager('is_debug') then
         return
     end
-    name = try_get_local_name(name)
-    __Nova.scriptLoader:SetCurrentAsDefaultStart(name)
+    __Nova.scriptLoader:SetCurrentAsDebug()
 end
 
 --- set the current node as an end node

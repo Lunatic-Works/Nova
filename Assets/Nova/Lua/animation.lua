@@ -129,8 +129,7 @@ function make_anim_method(func_name, func, preload_func, preload_param)
     if preload_func then
         if preload_param then
             if type(preload_param) == 'table' then
-                for i = 1, #preload_param do
-                    local item = preload_param[i]
+                for _, item in ipairs(preload_param) do
                     if type(item) == 'table' then
                         preload_func(func_name, unpack(item))
                     else

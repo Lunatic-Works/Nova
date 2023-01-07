@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Nova
 {
     /// <summary>
-    /// The class that loads scripts and constructs the flow chart tree.
+    /// The class that loads scripts and constructs the flow chart graph.
     /// </summary>
     [ExportCustomType]
     public class ScriptLoader
@@ -17,7 +17,7 @@ namespace Nova
 
         /// <summary>
         /// Initialize the script loader. This method will load all text asset files in the given folder, parse all the
-        /// scripts, and construct the flow chart tree.
+        /// scripts, and construct the flow chart graph.
         /// </summary>
         /// <remarks>
         /// All scripts will be parsed, so this method might take some time to finish.
@@ -38,14 +38,12 @@ namespace Nova
             inited = true;
         }
 
-        private readonly FlowChartTree flowChartTree = new FlowChartTree();
+        private readonly FlowChartGraph flowChartGraph = new FlowChartGraph();
 
         private FlowChartNode currentNode;
 
         // Current locale of the state machine
         public SystemLanguage stateLocale;
-
-        private readonly Dictionary<string, string> hiddenCharacterNames = new Dictionary<string, string>();
 
         private class LazyBindingEntry
         {
@@ -63,30 +61,27 @@ namespace Nova
 
         private readonly List<LazyBindingEntry> lazyBindingLinks = new List<LazyBindingEntry>();
 
-        private readonly HashSet<string> onlyIncludedNames = new HashSet<string>();
-
-        private void InitOnlyIncludedNames()
+        private static HashSet<string> GetOnlyIncludedNames()
         {
             var table = LuaRuntime.Instance.GetTable("only_included_scenario_names");
-            onlyIncludedNames.Clear();
-            onlyIncludedNames.UnionWith(table.ToArray().Cast<string>());
+            var names = new HashSet<string>(table.ToArray().Cast<string>());
             table.Dispose();
+            return names;
         }
 
         public void ForceInit(string path)
         {
             currentNode = null;
             stateLocale = I18n.DefaultLocale;
-            lazyBindingLinks.Clear();
 
-            ScriptDialogueEntryParser.ClearPatterns();
-            // requires.lua is executed and ScriptDialogueEntryParser.ActionGenerators is filled before calling ParseScript()
+            DialogueEntryPreprocessor.ClearPatterns();
+            // requires.lua is executed and DialogueEntryPreprocessor.ActionGenerators is filled before calling ParseScript()
             LuaRuntime.Instance.BindObject("scriptLoader", this);
             LuaRuntime.Instance.UpdateExecutionContext(new ExecutionContext(ExecutionMode.Eager,
                 DialogueActionStage.Default, false));
-            InitOnlyIncludedNames();
+            var onlyIncludedNames = GetOnlyIncludedNames();
 
-            flowChartTree.Unfreeze();
+            flowChartGraph.Unfreeze();
 
             foreach (var locale in I18n.SupportedLocales)
             {
@@ -124,14 +119,10 @@ namespace Nova
                 }
             }
 
-            // Bind all lazy binding entries
             BindAllLazyBindingEntries();
 
-            // Perform sanity check
-            flowChartTree.SanityCheck();
-
-            // Construction finished, freeze the tree status
-            flowChartTree.Freeze();
+            flowChartGraph.SanityCheck();
+            flowChartGraph.Freeze();
         }
 
         private void CheckInit()
@@ -140,19 +131,33 @@ namespace Nova
         }
 
         /// <summary>
-        /// Get the flow chart tree.
+        /// Get the flow chart graph.
         /// </summary>
         /// <remarks>This method should be called after init</remarks>
-        /// <returns>The flow chart tree</returns>
-        public FlowChartTree GetFlowChartTree()
+        /// <returns>The flow chart graph</returns>
+        public FlowChartGraph GetFlowChartGraph()
         {
             CheckInit();
-            return flowChartTree;
+            return flowChartGraph;
         }
 
         public class Chunk
         {
             public readonly List<ParsedBlock> blocks = new List<ParsedBlock>();
+
+            public ulong GetHashUlong()
+            {
+                return Utils.HashList(blocks.SelectMany(x =>
+                {
+                    IEnumerable<object> ret = new object[] {x.type, x.content};
+                    if (x.attributes != null)
+                    {
+                        ret = ret.Concat(x.attributes.Cast<object>());
+                    }
+
+                    return ret;
+                }));
+            }
         }
 
         /// <summary>
@@ -197,12 +202,16 @@ namespace Nova
             return res;
         }
 
+        private static ulong GetNodeHash(IReadOnlyList<Chunk> nodeChunks)
+        {
+            return Utils.HashList(nodeChunks.Select(x => x.GetHashUlong()));
+        }
+
         /// <summary>
         /// Parse the given TextAsset to chunks and add them to currentNode.
         /// </summary>
         private void ParseScript(TextAsset script, bool deferChunks = false)
         {
-            hiddenCharacterNames.Clear();
             LuaRuntime.Instance.GetFunction("action_new_file").Call(script.name);
 
             var blocks = Parser.Parse(script.text).blocks;
@@ -220,6 +229,11 @@ namespace Nova
                 {
                     if (nodeChunks.Count > 0)
                     {
+                        if (stateLocale == I18n.DefaultLocale)
+                        {
+                            currentNode.textHash = GetNodeHash(nodeChunks);
+                        }
+
                         if (deferChunks)
                         {
                             currentNode.deferredChunks[stateLocale] = nodeChunks;
@@ -250,12 +264,12 @@ namespace Nova
 
             if (stateLocale == I18n.DefaultLocale)
             {
-                var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks, hiddenCharacterNames);
+                var entries = DialogueEntryParser.ParseDialogueEntries(chunks);
                 currentNode.SetDialogueEntries(entries);
             }
             else
             {
-                var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
+                var entries = DialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
                 currentNode.AddLocalizedDialogueEntries(stateLocale, entries);
             }
         }
@@ -274,12 +288,12 @@ namespace Nova
                 var chunks = node.deferredChunks[locale];
                 if (locale == I18n.DefaultLocale)
                 {
-                    var entries = ScriptDialogueEntryParser.ParseDialogueEntries(chunks, hiddenCharacterNames);
+                    var entries = DialogueEntryParser.ParseDialogueEntries(chunks);
                     node.SetDialogueEntries(entries);
                 }
                 else
                 {
-                    var entries = ScriptDialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
+                    var entries = DialogueEntryParser.ParseLocalizedDialogueEntries(chunks);
                     node.AddLocalizedDialogueEntries(locale, entries);
                 }
             }
@@ -296,10 +310,9 @@ namespace Nova
             foreach (var entry in lazyBindingLinks)
             {
                 var node = entry.from;
-                node.AddBranch(entry.branchInfo, flowChartTree.GetNode(entry.destination));
+                node.AddBranch(entry.branchInfo, flowChartGraph.GetNode(entry.destination));
             }
 
-            // Remove unnecessary reference
             lazyBindingLinks.Clear();
         }
 
@@ -315,7 +328,7 @@ namespace Nova
         #region Methods called by external scripts
 
         /// <summary>
-        /// Create a new flow chart node register it to the current constructing FlowChartTree.
+        /// Create a new flow chart node register it to the current constructing FlowChartGraph.
         /// If the current node is a normal node, the newly created one is intended to be its
         /// succeeding node. The link between the new node and the current one will be added immediately, which
         /// will not be registered as a lazy binding link.
@@ -333,14 +346,14 @@ namespace Nova
 
             currentNode = nextNode;
 
-            flowChartTree.AddNode(currentNode);
+            flowChartGraph.AddNode(currentNode);
 
             currentNode.AddLocalizedName(stateLocale, displayName);
         }
 
         public void AddLocalizedNode(string name, string displayName)
         {
-            currentNode = flowChartTree.GetNode(name);
+            currentNode = flowChartGraph.GetNode(name);
             if (currentNode == null)
             {
                 throw new ArgumentException(
@@ -440,67 +453,48 @@ namespace Nova
             currentNode = null;
         }
 
+        private void CheckNode()
+        {
+            if (currentNode == null)
+            {
+                throw new ArgumentException("Nova: This function should be called after registering the current node.");
+            }
+        }
+
+        public void SetCurrentAsChapter()
+        {
+            CheckNode();
+            currentNode.isChapter = true;
+        }
+
         /// <summary>
         /// Set the current node as a start node.
         /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// A flow chart tree can have multiple start points.
+        /// A flow chart graph can have multiple start points.
         /// A name can be assigned to a start point, which can differ from the node name.
         /// The name should be unique among all start point names.
         /// </remarks>
-        /// <param name="name">
-        /// Name of the start point.
-        /// If no name is given, the name of the current node will be used.
-        /// </param>
         /// <exception cref="ArgumentException">
         /// ArgumentException will be thrown if called without registering the current node.
         /// </exception>
-        public void SetCurrentAsStart(string name)
+        public void SetCurrentAsStart()
         {
-            if (currentNode == null)
-            {
-                throw new ArgumentException(
-                    $"Nova: SetCurrentAsStart({name}) should be called after registering the current node.");
-            }
-
-            if (name == null)
-            {
-                name = currentNode.name;
-            }
-
-            flowChartTree.AddStart(name, currentNode);
+            CheckNode();
+            flowChartGraph.AddStart(currentNode, StartNodeType.Locked);
         }
 
-        public void SetCurrentAsUnlockedStart(string name)
+        public void SetCurrentAsUnlockedStart()
         {
-            if (currentNode == null)
-            {
-                throw new ArgumentException(
-                    $"Nova: SetCurrentAsUnlockedStart({name}) should be called after registering the current node.");
-            }
-
-            if (name == null)
-            {
-                name = currentNode.name;
-            }
-
-            SetCurrentAsStart(name);
-            flowChartTree.AddUnlockedStart(name, currentNode);
+            CheckNode();
+            flowChartGraph.AddStart(currentNode, StartNodeType.Unlocked);
         }
 
-        /// <summary>
-        /// Set the current node as the default start node.
-        /// This method is designed to be called externally by scripts.
-        /// </summary>
-        /// <remarks>
-        /// This method will first add the current node as a start node, then set it as default.
-        /// </remarks>
-        /// <param name="name"></param>
-        public void SetCurrentAsDefaultStart(string name)
+        public void SetCurrentAsDebug()
         {
-            SetCurrentAsUnlockedStart(name);
-            flowChartTree.defaultStartNode = currentNode;
+            CheckNode();
+            flowChartGraph.AddStart(currentNode, StartNodeType.Debug);
         }
 
         /// <summary>
@@ -508,7 +502,7 @@ namespace Nova
         /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// A flow chart tree can have multiple end points.
+        /// A flow chart graph can have multiple end points.
         /// A name can be assigned to an end point, which can differ from the node name.
         /// The name should be unique among all end point names.
         /// </remarks>
@@ -536,7 +530,7 @@ namespace Nova
                 name = currentNode.name;
             }
 
-            flowChartTree.AddEnd(name, currentNode);
+            flowChartGraph.AddEnd(name, currentNode);
 
             // Null the current node, because SetCurrentAsEnd() indicates the end of a node
             currentNode = null;

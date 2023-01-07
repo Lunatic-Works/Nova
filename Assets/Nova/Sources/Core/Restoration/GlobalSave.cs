@@ -6,12 +6,13 @@ namespace Nova
     [Serializable]
     public class GlobalSave
     {
-        public readonly long identifier;
+        public long identifier;
         public long beginReached;
         public long endReached;
         public long beginCheckpoint;
         public long endCheckpoint;
 
+        public Dictionary<string, ulong> nodeHashes;
         public readonly Dictionary<string, object> data = new Dictionary<string, object>();
 
         public GlobalSave(CheckpointSerializer serializer)

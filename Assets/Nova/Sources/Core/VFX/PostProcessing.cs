@@ -13,9 +13,21 @@ namespace Nova
 
         private GameState gameState;
 
+        private readonly List<Material> layers = new List<Material>();
+
+        // The owner of each VFX can hold a token to uniquely label the VFX,
+        // even if two VFXs can reuse the same material
+        // When clearing a layer, the owner can provide the token to check if
+        // the layer is the intended VFX, and we do not clear it if the layer
+        // is overwritten by another VFX
+        // The automatic creation and removal of VFX only happens inside
+        // transitions, so we don't need to restore the tokens
+        private readonly Dictionary<int, int> tokens = new Dictionary<int, int>();
+        private int lastToken;
+
         private void Awake()
         {
-            gameState = Utils.FindNovaGameController().GameState;
+            gameState = Utils.FindNovaController().GameState;
 
             if (!string.IsNullOrEmpty(luaName))
             {
@@ -32,9 +44,7 @@ namespace Nova
             }
         }
 
-        private readonly List<Material> layers = new List<Material>();
-
-        public void SetLayer(int layerID, Material material)
+        public int SetLayer(int layerID, Material material)
         {
             this.RuntimeAssert(asProxyOf == null, "SetLayer cannot be called on a proxy.");
 
@@ -44,27 +54,41 @@ namespace Nova
             }
 
             layers[layerID] = material;
+
+            tokens[layerID] = lastToken;
+            ++lastToken;
+            return tokens[layerID];
         }
 
-        public void ClearLayer(int layerID)
+        public void ClearLayer(int layerID, int token = -1)
         {
             this.RuntimeAssert(asProxyOf == null, "ClearLayer cannot be called on a proxy.");
 
-            if (layers.Count > layerID)
-            {
-                layers[layerID] = null;
-            }
-            else
+            if (layers.Count <= layerID || (token >= 0 && !tokens.ContainsKey(layerID)))
             {
                 Debug.LogWarning(
-                    "Post processing layer already cleared. Maybe a trans is overwritten by another. " +
-                    $"layerID: {layerID}, layers.Count: {layers.Count}");
+                    "Nova: Post processing layer already cleared. Maybe a trans is overwritten by another. " +
+                    $"layerID: {layerID}, layers.Count: {layers.Count}, expected token: {token}");
+                return;
             }
 
+            if (token >= 0 && tokens[layerID] != token)
+            {
+                Debug.LogWarning(
+                    "Nova: Token not match when clearing post processing layer. " +
+                    "Maybe a trans is overwritten by another. " +
+                    $"layerID: {layerID}, layers.Count: {layers.Count}, expected token: {token}, " +
+                    $"actual token: {tokens[layerID]}");
+                return;
+            }
+
+            layers[layerID] = null;
             while (layers.Count > 0 && layers[layers.Count - 1] == null)
             {
                 layers.RemoveAt(layers.Count - 1);
             }
+
+            tokens.Remove(layerID);
         }
 
         private IEnumerable<Material> EnabledMaterials()

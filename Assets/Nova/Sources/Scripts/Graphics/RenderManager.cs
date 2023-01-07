@@ -4,37 +4,35 @@ using UnityEngine.UI;
 namespace Nova
 {
     /// <summary>
-    /// Central component to connect the render process and
-    /// preserve aspect ratio by adding black margin around actual game view.
+    /// Central component to connect the rendering process and
+    /// preserve the aspect ratio by adding black margins around the game view.
     /// It does the following jobs:
-    /// * Connect game camera output to ui
-    /// * Create a dummy final camera & render texture for final rendering
-    /// * Calculate desired dimensions, set to RealScreen class, and update final camera rect
-    /// * Make current main camera render to the render texture
-    /// * Hijack the camera rendering process and directly blit the render texture to screen instead
+    /// * Render UI over the game view
+    /// * Create a dummy camera and a render texture for the final rendering
+    /// * Calculate desired dimensions, set them to RealScreen, and update the final camera's rect
+    /// * Make the current main camera render to the final render texture
+    /// * Hijack the camera rendering process and directly blit the render texture to the screen instead
     /// </summary>
-    public class GameRenderManager : MonoBehaviour
+    public class RenderManager : MonoBehaviour
     {
         private const string LastWindowedHeightKey = "_LastWindowedHeight";
         private const string LastWindowedWidthKey = "_LastWindowedWidth";
         private static readonly int GlobalRealScreenHeightID = Shader.PropertyToID("_GH");
         private static readonly int GlobalRealScreenWidthID = Shader.PropertyToID("_GW");
         private static readonly int Global1920ScaleID = Shader.PropertyToID("_GScale");
-        private bool isLogicalFullScreen;
-
         private const string ChangeWindowSizeFirstShownKey = ConfigManager.FirstShownKeyPrefix + "ChangeWindowSize";
 
-        public Color marginColor;
-        public float desiredAspectRatio;
-        public RawImage gameRenderTarget;
-        public Toggle fullScreenToggle;
+        [SerializeField] private Color marginColor;
+        [SerializeField] private float desiredAspectRatio;
+        [SerializeField] private RawImage gameRenderTarget;
+        [SerializeField] private Toggle fullScreenToggle;
 
         private ConfigManager configManager;
-
-        private int lastScreenHeight, lastScreenWidth;
         private Camera finalCamera;
+        private bool isLogicalFullScreen;
+        private int lastScreenHeight, lastScreenWidth;
+        private int shouldUpdateUIAfter = -1;
         private RenderTexture gameRenderTexture, finalRenderTexture;
-        private int shouldUpdateTransitionsAfter = -1;
 
         private void Awake()
         {
@@ -43,7 +41,7 @@ namespace Nova
 
             Tag = tag;
 
-            configManager = Utils.FindNovaGameController().ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
 
             finalCamera = gameObject.AddComponent<Camera>();
             finalCamera.backgroundColor = marginColor;
@@ -96,6 +94,7 @@ namespace Nova
                 {
                     if (Screen.resolutions.Length == 0)
                     {
+                        // A conservative guess for the initial size
                         targetW = 1280;
                         targetH = 720;
                     }
@@ -155,7 +154,7 @@ namespace Nova
 
             Shader.SetGlobalFloat(GlobalRealScreenHeightID, RealScreen.fHeight);
             Shader.SetGlobalFloat(GlobalRealScreenWidthID, RealScreen.fWidth);
-            Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.fWidth / 1920);
+            Shader.SetGlobalFloat(Global1920ScaleID, RealScreen.scale);
 
             Destroy(gameRenderTexture);
             gameRenderTarget.texture = gameRenderTexture =
@@ -178,14 +177,14 @@ namespace Nova
 
             // Debug.Log($"Screen Size: {RealScreen.width} x {RealScreen.height}");
 
-            shouldUpdateTransitionsAfter = 2;
+            shouldUpdateUIAfter = 2;
         }
 
         private void Update()
         {
             UpdateDesiredDimensions();
 
-            if (shouldUpdateTransitionsAfter >= 0)
+            if (shouldUpdateUIAfter >= 0)
             {
                 foreach (var t in FindObjectsOfType<UIViewTransitionBase>())
                 {
@@ -193,7 +192,7 @@ namespace Nova
                 }
 
                 RealScreen.uiSize = gameRenderTarget.rectTransform.rect.size;
-                shouldUpdateTransitionsAfter--;
+                shouldUpdateUIAfter--;
             }
         }
 
@@ -220,7 +219,7 @@ namespace Nova
         public static void SwitchFullScreen()
         {
             var go = GameObject.FindWithTag(Tag);
-            go.GetComponent<GameRenderManager>()._switchFullScreen();
+            go.GetComponent<RenderManager>()._switchFullScreen();
         }
     }
 

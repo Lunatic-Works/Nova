@@ -21,20 +21,6 @@ namespace Nova
         }
     }
 
-    public readonly struct ReachedDialogueKey
-    {
-        public readonly string nodeName;
-        public readonly int dialogueIndex;
-
-        public ReachedDialogueKey(string nodeName, int dialogueIndex)
-        {
-            this.nodeName = nodeName;
-            this.dialogueIndex = dialogueIndex;
-        }
-
-        public ReachedDialogueKey(ReachedDialogueData data) : this(data.nodeName, data.dialogueIndex) { }
-    }
-
     [Serializable]
     public class ReachedEndData : IReachedData
     {
@@ -53,13 +39,27 @@ namespace Nova
         public readonly int dialogueIndex;
         public readonly VoiceEntries voices;
         public readonly bool needInterpolate;
+        public readonly ulong textHash;
 
-        public ReachedDialogueData(string nodeName, int dialogueIndex, VoiceEntries voices, bool needInterpolate)
+        public ReachedDialogueData(string nodeName, int dialogueIndex, VoiceEntries voices, bool needInterpolate,
+            ulong textHash)
         {
             this.nodeName = nodeName;
             this.dialogueIndex = dialogueIndex;
             this.voices = voices;
             this.needInterpolate = needInterpolate;
+            this.textHash = textHash;
+        }
+    }
+
+    [Serializable]
+    public class NodeUpgradeMaker : IReachedData
+    {
+        public readonly string nodeName;
+
+        public NodeUpgradeMaker(string nodeName)
+        {
+            this.nodeName = nodeName;
         }
     }
 }

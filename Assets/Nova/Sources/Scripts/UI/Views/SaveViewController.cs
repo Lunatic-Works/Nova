@@ -109,8 +109,8 @@ namespace Nova
 
             maxSaveEntry = maxRow * maxCol;
 
-            gameState = Utils.FindNovaGameController().GameState;
-            checkpointManager = Utils.FindNovaGameController().CheckpointManager;
+            gameState = Utils.FindNovaController().GameState;
+            checkpointManager = Utils.FindNovaController().CheckpointManager;
 
             backgroundButton = myPanel.transform.Find("Background").GetComponent<Button>();
             thumbnailTextProxy = myPanel.transform.Find("Background/Left/TextBox/Text").GetComponent<TextProxy>();
@@ -158,7 +158,6 @@ namespace Nova
             }
 
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
-
             I18n.LocaleChanged.AddListener(Refresh);
         }
 
@@ -166,7 +165,6 @@ namespace Nova
         {
             base.Start();
 
-            checkpointManager.Init();
             previewEntry = myPanel.transform.Find("Background/Left/SaveEntry").GetComponent<SaveEntryController>();
             previewEntry.InitAsPreview(null, Hide);
             ShowPage();
@@ -183,7 +181,6 @@ namespace Nova
             rightButton.onClick.RemoveListener(PageRight);
 
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
-
             I18n.LocaleChanged.RemoveListener(Refresh);
         }
 
@@ -584,7 +581,7 @@ namespace Nova
             {
                 Bookmark bookmark = checkpointManager[saveID];
                 var nodeName = checkpointManager.GetNodeRecord(bookmark.nodeOffset).name;
-                var displayName = I18n.__(gameState.GetNode(nodeName).displayNames);
+                var displayName = I18n.__(gameState.GetNode(nodeName, false).displayNames);
                 ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",
                     checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),

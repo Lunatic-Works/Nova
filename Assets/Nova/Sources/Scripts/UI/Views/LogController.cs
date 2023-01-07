@@ -60,7 +60,7 @@ namespace Nova
         {
             base.Awake();
 
-            var controller = Utils.FindNovaGameController();
+            var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
             configManager = controller.ConfigManager;
@@ -71,6 +71,7 @@ namespace Nova
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
 
+            gameState.gameStarted.AddListener(Clear);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.AddRestorable(this);
         }
@@ -89,6 +90,7 @@ namespace Nova
             myPanel.GetComponent<Button>().onClick.RemoveListener(Hide);
             closeButton.onClick.RemoveListener(Hide);
 
+            gameState.gameStarted.RemoveListener(Clear);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.RemoveRestorable(this);
         }
@@ -100,7 +102,10 @@ namespace Nova
                 logEntriesRestoreData.Add(new LogEntryRestoreData(data.displayData, logEntries.Count));
             }
 
-            AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
+            if (!gameState.isUpgrading)
+            {
+                AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
+            }
         }
 
         private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
@@ -279,6 +284,11 @@ namespace Nova
         {
             logEntriesRestoreData.Clear();
             Clear();
+            if (gameState.isUpgrading)
+            {
+                return;
+            }
+
             // TODO: In each checkpoint, only save logEntriesRestoreData from the last checkpoint
             // Or we can use a binary indexed tree to store them
             var data = restoreData as LogControllerRestoreData;

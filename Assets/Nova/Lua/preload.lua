@@ -1,8 +1,8 @@
-add_preload_pattern = Nova.ScriptDialogueEntryParser.AddPattern
-add_preload_pattern_with_obj = Nova.ScriptDialogueEntryParser.AddPatternWithObject
-add_preload_pattern_for_table = Nova.ScriptDialogueEntryParser.AddPatternForTable
-add_preload_pattern_with_obj_for_table = Nova.ScriptDialogueEntryParser.AddPatternWithObjectForTable
-add_preload_pattern_with_obj_and_res = Nova.ScriptDialogueEntryParser.AddPatternWithObjectAndResource
+add_preload_pattern = Nova.DialogueEntryPreprocessor.AddPattern
+add_preload_pattern_with_obj = Nova.DialogueEntryPreprocessor.AddPatternWithObject
+add_preload_pattern_for_table = Nova.DialogueEntryPreprocessor.AddPatternForTable
+add_preload_pattern_with_obj_for_table = Nova.DialogueEntryPreprocessor.AddPatternWithObjectForTable
+add_preload_pattern_with_obj_and_res = Nova.DialogueEntryPreprocessor.AddPatternWithObjectAndResource
 
 function preload(obj, resource_name)
     if obj == nil then

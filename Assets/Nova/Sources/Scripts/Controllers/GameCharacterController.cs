@@ -129,6 +129,7 @@ namespace Nova
 
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
+            gameState.restoreStarts.AddListener(StopVoice);
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -141,6 +142,7 @@ namespace Nova
         {
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
+            gameState.restoreStarts.RemoveListener(StopVoice);
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -159,7 +161,7 @@ namespace Nova
         /// <summary>
         /// Stop the voice when the dialogue will change
         /// </summary>
-        private void OnDialogueWillChange(DialogueWillChangeData dialogueWillChangeData)
+        private void OnDialogueWillChange()
         {
             if (stopVoiceOnDialogueChange)
             {
@@ -363,9 +365,8 @@ namespace Nova
             get
             {
                 float maxLength = 0.0f;
-                foreach (var c in Characters)
+                foreach (var character in Characters.Values)
                 {
-                    var character = c.Value;
                     if (!character.willSaySomething) continue;
                     var clip = character.audioSource.clip;
                     if (clip == null) continue;
@@ -382,9 +383,9 @@ namespace Nova
 
         public static void StopVoiceAll()
         {
-            foreach (var c in Characters)
+            foreach (var character in Characters.Values)
             {
-                c.Value.StopVoice();
+                character.StopVoice();
             }
         }
 
