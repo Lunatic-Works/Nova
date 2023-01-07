@@ -545,9 +545,9 @@ namespace Nova
             MoveToNextNode(startNode);
         }
 
-        public void GameStart(string startName)
+        public void GameStart(string nodeName)
         {
-            GameStart(GetNode(startName));
+            GameStart(GetNode(nodeName));
         }
 
         public FlowChartNode GetNode(string name, bool addDeferred = true)

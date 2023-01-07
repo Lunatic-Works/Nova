@@ -8,8 +8,8 @@ namespace Nova
     public class MockInput : MonoBehaviour
     {
         [SerializeField] private int steps;
-        [SerializeField] private bool unlockAllChapters;
-        [SerializeField] private bool unlockDebugChapters;
+        [SerializeField] private bool unlockAllNodes;
+        [SerializeField] private bool unlockDebugNodes;
         [SerializeField] private bool fastForward = true;
         [SerializeField] private float delaySeconds = 0.001f;
         [SerializeField] private bool canGoBack = true;
@@ -141,15 +141,15 @@ namespace Nova
             }
             else
             {
-                if (unlockAllChapters || unlockDebugChapters)
+                if (unlockAllNodes || unlockDebugNodes)
                 {
-                    chapterSelectView.UnlockChapters(unlockAllChapters, unlockDebugChapters);
+                    chapterSelectView.UnlockNodes(unlockAllNodes, unlockDebugNodes);
                 }
 
                 yield return Show(chapterSelectView);
                 yield return delay;
-                var chapter = random.Next(chapterSelectView.GetUnlockedChapters().ToList());
-                chapterSelectView.Hide(() => chapterSelectView.BeginChapter(chapter));
+                var node = random.Next(chapterSelectView.GetUnlockedNodes().ToList());
+                chapterSelectView.Hide(() => chapterSelectView.GameStart(node));
             }
 
             yield return WaitForView(CurrentViewType.Game);

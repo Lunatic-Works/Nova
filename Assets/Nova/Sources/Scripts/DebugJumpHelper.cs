@@ -16,9 +16,6 @@ namespace Nova
         private DialogueState dialogueState;
         private ViewManager viewManager;
 
-        private IReadOnlyList<string> _chapters;
-        private IReadOnlyList<string> chapters => _chapters ??= gameState.GetStartNodeNames().ToList();
-
         private void Awake()
         {
             var controller = Utils.FindNovaController();
