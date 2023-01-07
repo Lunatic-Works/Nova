@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace Nova
 {
@@ -11,6 +12,7 @@ namespace Nova
         public const string TrackedKeyPrefix = "_";
         public const string FirstShownKeyPrefix = TrackedKeyPrefix + "FirstShown";
 
+        [Preserve]
         public class SettingDefinition
         {
             public float? min;
