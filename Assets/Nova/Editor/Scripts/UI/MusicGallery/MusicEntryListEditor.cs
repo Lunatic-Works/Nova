@@ -8,7 +8,7 @@ namespace Nova.Editor
     [CustomEditor(typeof(MusicEntryList))]
     public class MusicEntryListEditor : SimpleEntryListEditor
     {
-        [MenuItem("Assets/Nova/Create List for All Music Entries", false)]
+        [MenuItem("Assets/Nova/Create List for All Music Entries")]
         public static void CreateListForAllMusicEntries()
         {
             var dir = EditorUtils.GetSelectedDirectory();

@@ -99,7 +99,7 @@ namespace Nova.Editor
             EditorUtility.SetDirty(group);
         }
 
-        [MenuItem("Assets/Create/Nova/Image Group", false)]
+        [MenuItem("Assets/Create/Nova/Image Group")]
         public static void CreateImageGroup()
         {
             // split path name and file name

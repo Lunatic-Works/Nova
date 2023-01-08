@@ -349,7 +349,7 @@ namespace Nova.Editor
             EditorUtility.SetDirty(entry);
         }
 
-        [MenuItem("Assets/Create/Nova/Music Entry", false)]
+        [MenuItem("Assets/Create/Nova/Music Entry")]
         public static void CreateMusicEntry()
         {
             var path = AssetDatabase.GetAssetPath(Selection.activeObject);
@@ -363,7 +363,7 @@ namespace Nova.Editor
             return AssetDatabase.GetMainAssetTypeAtPath(path) == typeof(AudioClip);
         }
 
-        [MenuItem("Assets/Nova/Create Music Entries for All Audio Clips", false)]
+        [MenuItem("Assets/Nova/Create Music Entries for All Audio Clips")]
         public static void CreateMusicEntryForAllAudioClips()
         {
             var dir = EditorUtils.GetSelectedDirectory();
