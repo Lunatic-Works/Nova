@@ -87,7 +87,10 @@ namespace Nova
             {
                 // loadstring is deprecated after Lua 5.2
                 func = GetFunction("loadstring").Invoke<string, LuaFunction>(code);
-                cachedLuaFunctions[code] = func;
+                if (func != null)
+                {
+                    cachedLuaFunctions[code] = func;
+                }
             }
 
             return func;
@@ -113,7 +116,10 @@ namespace Nova
             if (!cachedLuaFunctions.TryGetValue(name, out var func))
             {
                 func = lua.GetFunction(name);
-                cachedLuaFunctions[name] = func;
+                if (func != null)
+                {
+                    cachedLuaFunctions[name] = func;
+                }
             }
 
             return func;
