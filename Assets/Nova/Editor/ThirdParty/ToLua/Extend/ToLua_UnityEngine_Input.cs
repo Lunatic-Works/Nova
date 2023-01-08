@@ -3,7 +3,6 @@ using LuaInterface;
 
 public class ToLua_UnityEngine_Input
 {
-    // TODO(Input System): Replace this with Input System
     public static string GetTouchDefined =
 @"        try
         {

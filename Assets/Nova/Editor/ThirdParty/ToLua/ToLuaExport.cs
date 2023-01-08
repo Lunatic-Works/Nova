@@ -160,8 +160,7 @@ public static class ToLuaExport
         "UIInput.ProcessEvent",
         "UIWidget.showHandlesWithMoveTool",
         "UIWidget.showHandles",
-        // TODO(Input System): Find an alternative
-        // "Input.IsJoystickPreconfigured",
+        "Input.IsJoystickPreconfigured",
         "UIDrawCall.isActive",
         "Dictionary.TryAdd",
         "KeyValuePair.Deconstruct",
