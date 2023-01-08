@@ -596,7 +596,7 @@ public static class ToLuaMenu
         return str;
     }
 
-    // [MenuItem("Lua/Gen LuaBinder File", false, 4)]
+    // [MenuItem("Lua/Gen LuaBinder File", false, 3)]
     static void GenLuaBinder()
     {
         if (!beAutoGen && EditorApplication.isCompiling)

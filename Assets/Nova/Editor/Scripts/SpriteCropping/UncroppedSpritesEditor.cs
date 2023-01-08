@@ -15,7 +15,7 @@ namespace Nova.Editor
             transform.rotation = Quaternion.identity;
         }
 
-        [MenuItem("Assets/Create/Nova/Uncropped Sprites", false)]
+        [MenuItem("Assets/Create/Nova/Uncropped Sprites")]
         public static void CreateUncroppedSprites()
         {
             var dir = EditorUtils.GetSelectedDirectory();

@@ -28,7 +28,7 @@ namespace Nova.Editor
             return new GUIContent("Image Groups");
         }
 
-        [MenuItem("Assets/Nova/Create List for All Image Groups", false)]
+        [MenuItem("Assets/Nova/Create List for All Image Groups")]
         public static void CreateListForAllImageGroups()
         {
             var dir = EditorUtils.GetSelectedDirectory();

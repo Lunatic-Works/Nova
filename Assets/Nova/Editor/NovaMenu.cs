@@ -16,19 +16,27 @@ namespace Nova.Editor
             }
         }
 
-        [MenuItem("Nova/Clear Config Data", false, 1)]
+        [MenuItem("Nova/Clear Config Data", false, 2)]
         public static void ClearConfigData()
         {
             PlayerPrefs.DeleteAll();
         }
 
-        [MenuItem("Nova/Reset Input Mapping", false, 1)]
-        public static void ResetInputMapping()
+        [MenuItem("Nova/Clear Input Mapping", false, 3)]
+        public static void ClearInputMapping()
         {
             if (Directory.Exists(InputManager.InputFilesDirectory))
             {
                 Directory.Delete(InputManager.InputFilesDirectory, true);
             }
+        }
+
+        [MenuItem("Nova/Clear All", false, 4)]
+        public static void ClearAll()
+        {
+            ClearSaveData();
+            ClearConfigData();
+            ClearInputMapping();
         }
     }
 }
