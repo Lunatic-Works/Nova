@@ -17,7 +17,7 @@ namespace Nova
         private ActionAssetData actionAsset
         {
             get => inputManager.actionAsset;
-            set => inputManager.SetActionAsset(value);
+            set => inputManager.actionAsset = value;
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace Nova
 
         public void RestoreAll()
         {
-            actionAsset = oldActionAsset;
+            actionAsset = oldActionAsset.Clone();
             RefreshBindingList();
         }
 
@@ -215,12 +215,12 @@ namespace Nova
         // remove all bindings that conflict with any binding in currentAbstractKey
         public void ResolveDuplicate()
         {
-            var group = actionAsset.GetActionGroup(currentAbstractKey);
+            var group = actionAsset.GetGroup(currentAbstractKey);
             var compositeBindings = GenerateCompositeBindings(currentAction).ToList();
             var bindingIndicesToRemove = new Dictionary<AbstractKey, List<int>>();
             foreach (var otherAk in mappableKeys)
             {
-                if (otherAk == currentAbstractKey || (actionAsset.GetActionGroup(otherAk) & group) == 0)
+                if (otherAk == currentAbstractKey || (actionAsset.GetGroup(otherAk) & group) == 0)
                 {
                     continue;
                 }

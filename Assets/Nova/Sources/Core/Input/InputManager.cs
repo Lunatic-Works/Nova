@@ -6,36 +6,28 @@ using UnityEngine.InputSystem;
 
 namespace Nova
 {
-    using KeyStatus = Dictionary<AbstractKey, bool>;
-
     public class InputManager : MonoBehaviour
     {
         public static string InputFilesDirectory => Path.Combine(Application.persistentDataPath, "Input");
         private static string BindingsFilePath => Path.Combine(InputFilesDirectory, "bindings.json");
 
         public InputActionAsset defaultActionAsset;
-        public ActionAssetData actionAsset { get; private set; }
 
-        private void Load()
+        private ActionAssetData _actionAsset;
+
+        public ActionAssetData actionAsset
         {
-            if (File.Exists(BindingsFilePath))
+            get => _actionAsset;
+            set
             {
-                var json = File.ReadAllText(BindingsFilePath);
-                actionAsset = new ActionAssetData(InputActionAsset.FromJson(json));
+                _actionAsset = value;
+                _actionAsset.data.Enable();
             }
-        }
-
-        public void Save()
-        {
-            var json = actionAsset.data.ToJson();
-            Directory.CreateDirectory(InputFilesDirectory);
-            File.WriteAllText(BindingsFilePath, json);
         }
 
         private void Awake()
         {
             Init();
-            EnableInput();
         }
 
         private void OnDestroy()
@@ -48,37 +40,27 @@ namespace Nova
         /// </summary>
         public void Init()
         {
-            if (actionAsset != null) return;
-
-            actionAsset = new ActionAssetData(defaultActionAsset.Clone());
-            Load();
-        }
-
-        public void SetEnableGroup(AbstractKeyGroup group)
-        {
-            foreach (var actionMap in actionAsset.GetActionMaps(group))
-                actionMap.Enable();
-
-            foreach (var actionMap in actionAsset.GetActionMaps(AbstractKeyGroup.All ^ group))
-                actionMap.Disable();
-        }
-
-        public void SetEnable(AbstractKey key, bool enable)
-        {
-            if (!actionAsset.TryGetAction(key, out var action))
+            if (actionAsset != null)
             {
-                Debug.LogError($"Nova: Missing action key: {key}");
                 return;
             }
 
-            if (enable)
+            if (File.Exists(BindingsFilePath))
             {
-                action.Enable();
+                var json = File.ReadAllText(BindingsFilePath);
+                actionAsset = new ActionAssetData(InputActionAsset.FromJson(json));
             }
             else
             {
-                action.Disable();
+                actionAsset = new ActionAssetData(defaultActionAsset.Clone());
             }
+        }
+
+        public void Save()
+        {
+            var json = actionAsset.data.ToJson();
+            Directory.CreateDirectory(InputFilesDirectory);
+            File.WriteAllText(BindingsFilePath, json);
         }
 
         /// <summary>
@@ -87,6 +69,11 @@ namespace Nova
         /// </summary>
         public bool IsTriggered(AbstractKey key)
         {
+            if (isRebinding)
+            {
+                return false;
+            }
+
 #if !UNITY_EDITOR
             if (ActionAssetData.IsEditorOnly(key))
             {
@@ -105,6 +92,11 @@ namespace Nova
 
         public bool IsPressed(AbstractKey key)
         {
+            if (isRebinding)
+            {
+                return false;
+            }
+
 #if !UNITY_EDITOR
             if (ActionAssetData.IsEditorOnly(key))
             {
@@ -121,49 +113,11 @@ namespace Nova
             return action.IsPressed();
         }
 
-        public void SetActionAsset(ActionAssetData other)
-        {
-            var enabledState = new KeyStatus();
-            GetEnabledState(enabledState);
-            actionAsset?.data.Disable();
-            actionAsset = other.Clone();
-            SetEnabledState(enabledState);
-        }
-
-        public void GetEnabledState(KeyStatus status)
-        {
-            foreach (AbstractKey key in Enum.GetValues(typeof(AbstractKey)))
-            {
-                if (actionAsset.TryGetAction(key, out var action))
-                {
-                    status[key] = action.enabled;
-                }
-            }
-        }
-
-        public void SetEnabledState(KeyStatus status)
-        {
-            foreach (var key in status.Keys)
-            {
-                SetEnable(key, status[key]);
-            }
-        }
-
+        // When the input is disabled, the user can still close alert box, hide button ring, show dialogue box,
+        // step forward, and trigger global shortcuts
         // inputEnabled is not in RestoreData, because the user cannot save when the input is disabled
-        public bool inputEnabled { get; private set; }
+        [HideInInspector] public bool inputEnabled = true;
 
-        // Disable all abstract keys except StepForward
-        public void DisableInput()
-        {
-            inputEnabled = false;
-            SetEnableGroup(AbstractKeyGroup.None);
-            SetEnable(AbstractKey.StepForward, true);
-        }
-
-        public void EnableInput()
-        {
-            inputEnabled = true;
-            SetEnableGroup(AbstractKeyGroup.All);
-        }
+        [HideInInspector] public bool isRebinding;
     }
 }

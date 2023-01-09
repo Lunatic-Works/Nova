@@ -13,14 +13,10 @@ namespace Nova
             LuaRuntime.Instance.BindObject("inputHelper", this);
         }
 
-        public void DisableInput()
+        public bool inputEnabled
         {
-            inputManager.DisableInput();
-        }
-
-        public void EnableInput()
-        {
-            inputManager.EnableInput();
+            get => inputManager.inputEnabled;
+            set => inputManager.inputEnabled = value;
         }
     }
 }

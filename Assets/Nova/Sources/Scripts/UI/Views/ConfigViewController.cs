@@ -120,7 +120,7 @@ namespace Nova
         protected override void OnActivatedUpdate()
         {
             // Avoid going back when recoding shortcuts
-            if (inputMappingController.compoundKeyRecorder.isRebinding)
+            if (inputMappingController.inputManager.isRebinding)
             {
                 return;
             }

@@ -63,6 +63,12 @@ namespace Nova
                 ClickForward();
             }
 
+            // When the input is not enabled, the user can only click forward
+            if (!inputManager.inputEnabled)
+            {
+                return;
+            }
+
             if (inputManager.IsTriggered(AbstractKey.Auto))
             {
                 dialogueState.state = DialogueState.State.Auto;

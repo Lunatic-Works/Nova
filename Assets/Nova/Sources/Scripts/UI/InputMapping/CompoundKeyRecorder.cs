@@ -8,8 +8,6 @@ using UnityEngine.InputSystem.Controls;
 
 namespace Nova
 {
-    using KeyStatus = Dictionary<AbstractKey, bool>;
-
     public class CompoundKeyRecorder : MonoBehaviour, IPointerClickHandler
     {
         private static readonly Regex PathPattern = new Regex(@"^\/?[^\/]*\/", RegexOptions.Compiled);
@@ -78,14 +76,12 @@ namespace Nova
         private InputMappingController controller;
         private InputAction action => controller.currentAction;
 
-        public bool isRebinding { get; private set; }
         private bool isCtrl;
         private bool isAlt;
         private bool isWin;
         private bool isShift;
 
         private readonly List<InputControl> boundControls = new List<InputControl>();
-        private readonly KeyStatus enabledState = new KeyStatus();
 
         /// <summary>
         /// Gets general paths from input control.
@@ -151,20 +147,17 @@ namespace Nova
 
         private void OnEnable()
         {
-            isRebinding = true;
+            controller.inputManager.isRebinding = true;
             boundControls.Clear();
             popupController.controls = boundControls;
             popupController.Show();
             isCtrl = isAlt = isWin = isShift = false;
-            controller.inputManager.GetEnabledState(enabledState);
-            controller.inputManager.SetEnableGroup(AbstractKeyGroup.None);
         }
 
         private void OnDisable()
         {
-            isRebinding = false;
+            controller.inputManager.isRebinding = false;
             isCtrl = isAlt = isWin = isShift = false;
-            controller.inputManager.SetEnabledState(enabledState);
 
             popupController.Hide();
             entry?.FinishModify();
