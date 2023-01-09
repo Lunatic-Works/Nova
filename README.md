@@ -44,11 +44,15 @@
 
 ## 友情链接
 
-如果你在用Nova做你的作品，欢迎来告诉我们，我们可以互相宣传一下
-
-* 我们的第一部视觉小说作品《青箱》：[Steam](https://store.steampowered.com/app/1131740) [知乎](https://www.zhihu.com/question/409724349) [Bangumi](https://bgm.tv/subject/311066) [VNDB](https://vndb.org/v26506)
 * 我们的微博：[@LunaticWorks](https://weibo.com/LunaticWorks)
 * 我们的QQ群：876212259，如果以后讨论程序的人多了可能会再开一个程序群
+
+使用Nova的作品：
+
+* [青箱](https://store.steampowered.com/app/1131740)
+* [东北之夏](https://store.steampowered.com/app/2121360)
+
+如果你用Nova做出了作品，欢迎来告诉我们，我们可以互相宣传一下
 
 也可以看一看其他的视觉小说引擎：
 
