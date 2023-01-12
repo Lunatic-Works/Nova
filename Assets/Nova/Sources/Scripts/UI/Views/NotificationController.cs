@@ -11,7 +11,7 @@ namespace Nova
         [SerializeField] private float notificationTimeOffset = 1f;
         [SerializeField] private float notificationDropSpeed = 500f;
 
-        private float placeholdingDeadItemCountPercentage
+        private float deadPercentage
         {
             get => (layoutGroupBasePos.y - layoutGroupTransform.position.y) *
                    (RealScreen.uiSize.y / UICameraHelper.Active.orthographicSize * 0.5f);
@@ -47,19 +47,12 @@ namespace Nova
             yield return new WaitForSeconds(timeout);
             var transition = notification.transition;
 
-            // TODO: there is a NovaAnimation in NotificationItem, and this Action is in that NovaAnimation.
-            // Destroy(notification) will call NovaAnimation.OnDisable() -> NovaAnimation.Stop() -> this Action.
-            // That is a strange call stack.
-            bool onFinishInvoked = false;
             transition.ResetTransitionTarget();
             transition.Exit(() =>
             {
-                if (onFinishInvoked) return;
-                onFinishInvoked = true;
                 onFinish?.Invoke();
-
-                placeholdingDeadItemCountPercentage += notification.rectTransform.rect.size.y;
-                Destroy(notification);
+                deadPercentage += notification.rectTransform.rect.size.y;
+                Destroy(notification.gameObject);
             });
         }
 
@@ -80,14 +73,14 @@ namespace Nova
 
         protected override void Update()
         {
-            var delta = placeholdingDeadItemCountPercentage;
+            var delta = deadPercentage;
             if (delta < float.Epsilon)
             {
-                placeholdingDeadItemCountPercentage = 0f;
+                deadPercentage = 0f;
             }
             else
             {
-                placeholdingDeadItemCountPercentage = delta - Time.deltaTime * notificationDropSpeed;
+                deadPercentage = delta - Time.deltaTime * notificationDropSpeed;
             }
         }
     }
