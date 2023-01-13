@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 114645128498543038}
   - component: {fileID: 2979289299506620262}
   m_Layer: 5
-  m_Name: NotificationItem
+  m_Name: NotificationEntry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -246,5 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 605db7aa9a7d4466db70bdedffa0b9dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _minWidth: -1
+  _minHeight: 60
   _maxWidth: 400
   _maxHeight: 180
