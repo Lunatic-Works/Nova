@@ -10,6 +10,8 @@ namespace Nova
     {
         private Text text;
 
+        [SerializeField] private float _minWidth = -1f;
+        [SerializeField] private float _minHeight = -1f;
         [SerializeField] private float _maxWidth = -1f;
         [SerializeField] private float _maxHeight = -1f;
 
@@ -28,41 +30,19 @@ namespace Nova
             text.CalculateLayoutInputVertical();
         }
 
-        public float minWidth => text.minWidth;
+        public float minWidth => Mathf.Max(text.minWidth, _minWidth);
 
-        public float minHeight => text.minHeight;
+        public float minHeight => Mathf.Max(text.minHeight, _minHeight);
 
-        public float preferredWidth => Mathf.Min(text.preferredWidth, maxWidth);
+        public float preferredWidth => Mathf.Min(text.preferredWidth, _maxWidth);
 
-        public float preferredHeight => Mathf.Min(text.preferredHeight, maxHeight);
+        public float preferredHeight => Mathf.Min(text.preferredHeight, _maxHeight);
 
         public float flexibleWidth => text.flexibleWidth;
 
         public float flexibleHeight => text.flexibleHeight;
 
         public int layoutPriority => text.layoutPriority + 1;
-
-        public float maxHeight
-        {
-            get => _maxHeight;
-            set
-            {
-                if (Mathf.Approximately(_maxHeight, value)) return;
-                _maxHeight = value;
-                SetDirty();
-            }
-        }
-
-        public float maxWidth
-        {
-            get => _maxWidth;
-            set
-            {
-                if (Mathf.Approximately(_maxWidth, value)) return;
-                _maxWidth = value;
-                SetDirty();
-            }
-        }
 
         protected override void OnEnable()
         {
