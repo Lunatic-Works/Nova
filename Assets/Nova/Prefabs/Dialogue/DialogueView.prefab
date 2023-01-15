@@ -1049,11 +1049,8 @@ GameObject:
   - component: {fileID: 114292351133079710}
   - component: {fileID: 114698272224023466}
   - component: {fileID: 387142925}
-  - component: {fileID: 1736227319366896007}
   - component: {fileID: 387142937}
   - component: {fileID: 387142934}
-  - component: {fileID: 387142933}
-  - component: {fileID: 387142929}
   - component: {fileID: 387142936}
   m_Layer: 5
   m_Name: DialogueView
@@ -1171,22 +1168,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5717f27082e4e28803384df41538350, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1736227319366896007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1515438340287766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d2751be25bbae64aa6ee0600f58b36b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rightButtonAction: 0
-  canClickForward: 1
-  canAbortAnimation: 1
-  scriptCanAbortAnimation: 1
 --- !u!114 &387142937
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1213,32 +1194,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configKeyName: AutoSpeed
---- !u!114 &387142933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1515438340287766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 826e9c6b6dd960f42a1d3bd0852e9295, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  configKeyName: AbortAnimation
---- !u!114 &387142929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1515438340287766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c8160c0c4298584795559b6a832f298, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  configKeyName: RightButtonAction
 --- !u!114 &387142936
 MonoBehaviour:
   m_ObjectHideFlags: 0
