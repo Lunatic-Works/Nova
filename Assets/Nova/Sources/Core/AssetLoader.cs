@@ -171,7 +171,8 @@ namespace Nova
             }
             else
             {
-                Debug.LogWarning($"Nova: Asset {type}:{path} not cached when unpreloading.");
+                Debug.LogWarning($"Nova: Asset {type}:{path} not cached when unpreloading." +
+                                 "Maybe you need to increase the cache size in AssetLoader.Awake.");
             }
         }
 
