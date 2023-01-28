@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public abstract class ViewControllerBase : MonoBehaviour
+    public abstract class ViewControllerBase : MonoBehaviour, IViewController
     {
         public GameObject myPanel;
         public ViewManager viewManager { get; private set; }
@@ -63,6 +63,8 @@ namespace Nova
                 }
             }
         }
+
+        public bool active => myPanel.activeSelf;
 
         public void Show()
         {
