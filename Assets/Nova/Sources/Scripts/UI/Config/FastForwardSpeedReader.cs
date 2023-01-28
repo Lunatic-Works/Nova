@@ -11,12 +11,12 @@ namespace Nova
         [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
-        private DialogueBoxController dialogueBoxController;
+        private GameViewController gameViewController;
 
         private void Awake()
         {
             configManager = Utils.FindNovaController().ConfigManager;
-            dialogueBoxController = GetComponent<DialogueBoxController>();
+            gameViewController = GetComponent<GameViewController>();
         }
 
         private void OnEnable()
@@ -33,7 +33,7 @@ namespace Nova
         private void UpdateValue()
         {
             // Convert speed to duration
-            dialogueBoxController.fastForwardDelay = Mathf.Pow(0.1f, configManager.GetFloat(configKeyName));
+            gameViewController.fastForwardDelay = Mathf.Pow(0.1f, configManager.GetFloat(configKeyName));
         }
     }
 }
