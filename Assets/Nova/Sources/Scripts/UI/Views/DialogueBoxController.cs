@@ -233,11 +233,6 @@ namespace Nova
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.routeEnded.AddListener(OnRouteEnded);
-
-            dialogueState.autoModeStarts.AddListener(OnAutoModeStarts);
-            dialogueState.autoModeStops.AddListener(OnAutoModeStops);
-            dialogueState.fastForwardModeStarts.AddListener(OnFastForwardModeStarts);
-            dialogueState.fastForwardModeStops.AddListener(OnFastForwardModeStops);
         }
 
         private void OnDisable()
@@ -248,11 +243,6 @@ namespace Nova
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.routeEnded.RemoveListener(OnRouteEnded);
-
-            dialogueState.autoModeStarts.RemoveListener(OnAutoModeStarts);
-            dialogueState.autoModeStops.RemoveListener(OnAutoModeStops);
-            dialogueState.fastForwardModeStarts.RemoveListener(OnFastForwardModeStarts);
-            dialogueState.fastForwardModeStops.RemoveListener(OnFastForwardModeStops);
         }
 
         private void OnRouteEnded(RouteEndedData routeEndedData)
@@ -263,23 +253,8 @@ namespace Nova
 
         private void OnDialogueWillChange()
         {
-            StopTimer();
             ResetTextAnimationConfig();
             ShowDialogueFinishIcon(false);
-        }
-
-        protected override void Update()
-        {
-            if (viewManager.currentView == CurrentViewType.Game && dialogueAvailable)
-            {
-                timeAfterDialogueChange += Time.deltaTime;
-
-                if (dialogueFinishIconShown && dialogueState.isNormal &&
-                    viewManager.currentView != CurrentViewType.InTransition && timeAfterDialogueChange > dialogueTime)
-                {
-                    ShowDialogueFinishIcon(true);
-                }
-            }
         }
 
         // Used when aborting animations by clicking
@@ -291,17 +266,12 @@ namespace Nova
             }
         }
 
-        [SerializeField] private GameObject autoModeIcon;
-        [SerializeField] private GameObject fastForwardModeIcon;
-
         /// <summary>
         /// The content of the dialogue box needs to be changed
         /// </summary>
         /// <param name="data"></param>
         private void OnDialogueChanged(DialogueChangedData data)
         {
-            RestartTimer();
-
             switch (dialogueUpdateMode)
             {
                 case DialogueUpdateMode.Overwrite:
@@ -309,28 +279,6 @@ namespace Nova
                     break;
                 case DialogueUpdateMode.Append:
                     AppendDialogue(data.displayData);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            SetSchedule();
-            dialogueTime = GetDialogueTime();
-        }
-
-        // Check current state and set schedule for the next dialogue entry
-        private void SetSchedule()
-        {
-            TryRemoveSchedule();
-            switch (dialogueState.state)
-            {
-                case DialogueState.State.Normal:
-                    break;
-                case DialogueState.State.Auto:
-                    TrySchedule(GetDialogueTimeAuto());
-                    break;
-                case DialogueState.State.FastForward:
-                    TrySchedule(fastForwardDelay);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -385,11 +333,11 @@ namespace Nova
                 true);
         }
 
-        [HideInInspector] public float characterFadeInDuration;
+        public float characterFadeInDuration { get; set; }
 
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
-            Color nowTextColor = textColorHasSet ? textColor : dialogueState.isReadDialogue ? readColor : unreadColor;
+            Color nowTextColor = textColorHasSet ? textColor : dialogueState.isDialogueReached ? readColor : unreadColor;
             textLeftExtraPadding = avatarController?.textPaddingOrZero ?? 0;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
@@ -446,82 +394,6 @@ namespace Nova
             AppendDialogue(displayData);
         }
 
-        [HideInInspector] public float autoDelay;
-        [HideInInspector] public float fastForwardDelay;
-
-        private Coroutine scheduledStepCoroutine;
-
-        private void TrySchedule(float scheduledDelay)
-        {
-            if (dialogueAvailable)
-            {
-                scheduledStepCoroutine = StartCoroutine(ScheduledStep(scheduledDelay));
-            }
-        }
-
-        private void TryRemoveSchedule()
-        {
-            if (scheduledStepCoroutine == null) return;
-            StopCoroutine(scheduledStepCoroutine);
-            scheduledStepCoroutine = null;
-        }
-
-        private static float GetDialogueTime(float offset = 0.0f, float voiceOffset = 0.0f)
-        {
-            return Mathf.Max(
-                NovaAnimation.GetTotalTimeRemaining(AnimationType.PerDialogue | AnimationType.Text) + offset,
-                GameCharacterController.MaxVoiceDuration + voiceOffset
-            );
-        }
-
-        private float GetDialogueTimeAuto()
-        {
-            return Mathf.Max(
-                GetDialogueTime(autoDelay, autoDelay * 0.5f),
-                NovaAnimation.GetTotalTimeRemaining(AnimationType.Text) / characterFadeInDuration * autoDelay * 0.1f
-            );
-        }
-
-        private void OnAutoModeStarts()
-        {
-            TrySchedule(GetDialogueTimeAuto());
-
-            if (autoModeIcon != null)
-            {
-                autoModeIcon.SetActive(true);
-            }
-        }
-
-        private void OnAutoModeStops()
-        {
-            TryRemoveSchedule();
-
-            if (autoModeIcon != null)
-            {
-                autoModeIcon.SetActive(false);
-            }
-        }
-
-        private void OnFastForwardModeStarts()
-        {
-            TrySchedule(fastForwardDelay);
-
-            if (fastForwardModeIcon != null)
-            {
-                fastForwardModeIcon.SetActive(true);
-            }
-        }
-
-        private void OnFastForwardModeStops()
-        {
-            TryRemoveSchedule();
-
-            if (fastForwardModeIcon != null)
-            {
-                fastForwardModeIcon.SetActive(false);
-            }
-        }
-
         public bool NextPageOrStep()
         {
             if (dialogueText.Count == 0 || !dialogueText.dialogueEntryControllers.Last().Forward())
@@ -537,52 +409,6 @@ namespace Nova
         {
             NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
             gameState.Step();
-        }
-
-        private IEnumerator ScheduledStep(float scheduledDelay)
-        {
-            this.RuntimeAssert(dialogueAvailable, "Dialogue not available when scheduling a step for it.");
-
-            while (scheduledDelay > timeAfterDialogueChange)
-            {
-                yield return new WaitForSeconds(scheduledDelay - timeAfterDialogueChange);
-            }
-
-            // Pause one frame before step
-            // Give time for rendering and can stop schedule step in time before any unwanted effects occurs
-            yield return null;
-
-            if (gameState.canStepForward)
-            {
-                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-                if (NextPageOrStep())
-                {
-                    timeAfterDialogueChange = 0f;
-                    TrySchedule(dialogueState.isAuto ? autoDelay : fastForwardDelay);
-                }
-            }
-            else
-            {
-                dialogueState.state = DialogueState.State.Normal;
-            }
-        }
-
-        private float timeAfterDialogueChange;
-
-        private float dialogueTime = float.MaxValue;
-
-        private bool dialogueAvailable;
-
-        private void StopTimer()
-        {
-            timeAfterDialogueChange = 0f;
-            dialogueAvailable = false;
-        }
-
-        private void RestartTimer()
-        {
-            timeAfterDialogueChange = 0f;
-            dialogueAvailable = true;
         }
 
         #region Properties for dialogue entries
@@ -695,19 +521,19 @@ namespace Nova
 
         #region Show/Hide close button and dialogue finish icon
 
-        private bool _closeButtonShown = true;
+        private bool _showCloseButton = true;
 
-        public bool closeButtonShown
+        public bool showCloseButton
         {
-            get => _closeButtonShown;
+            get => _showCloseButton;
             set
             {
-                if (_closeButtonShown == value)
+                if (_showCloseButton == value)
                 {
                     return;
                 }
 
-                _closeButtonShown = value;
+                _showCloseButton = value;
                 foreach (var btn in hideDialogueButtons)
                 {
                     btn.gameObject.SetActive(value);
@@ -715,7 +541,7 @@ namespace Nova
             }
         }
 
-        [HideInInspector] public bool dialogueFinishIconShown = true;
+        [HideInInspector] public bool showDialogueFinishIcon = true;
 
         #endregion
 
@@ -735,8 +561,8 @@ namespace Nova
             public readonly bool textColorHasSet;
             public readonly Vector4Data textColor;
             public readonly string materialName;
-            public readonly bool closeButtonShown;
-            public readonly bool dialogueFinishIconShown;
+            public readonly bool showCloseButton;
+            public readonly bool showDialogueFinishIcon;
 
             public DialogueBoxControllerRestoreData(RectTransform rect, Color backgroundColor,
                 DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, Theme theme,
@@ -752,8 +578,8 @@ namespace Nova
                 this.textColorHasSet = textColorHasSet;
                 this.textColor = textColor;
                 this.materialName = materialName;
-                this.closeButtonShown = closeButtonShown;
-                this.dialogueFinishIconShown = dialogueFinishIconShown;
+                this.showCloseButton = closeButtonShown;
+                this.showDialogueFinishIcon = dialogueFinishIconShown;
             }
         }
 
@@ -761,8 +587,8 @@ namespace Nova
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
             return new DialogueBoxControllerRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas, theme,
-                (int)textAlignment, textColorHasSet, textColor, materialName, closeButtonShown,
-                dialogueFinishIconShown);
+                (int)textAlignment, textColorHasSet, textColor, materialName, showCloseButton,
+                showDialogueFinishIcon);
         }
 
         public void Restore(IRestoreData restoreData)
@@ -786,8 +612,8 @@ namespace Nova
                 AppendDialogue(displayData, needAnimation: false);
             }
 
-            closeButtonShown = data.closeButtonShown;
-            dialogueFinishIconShown = data.dialogueFinishIconShown;
+            showCloseButton = data.showCloseButton;
+            showDialogueFinishIcon = data.showDialogueFinishIcon;
         }
 
         #endregion

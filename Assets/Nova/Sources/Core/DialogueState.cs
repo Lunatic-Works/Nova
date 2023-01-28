@@ -28,6 +28,8 @@ namespace Nova
             gameState.dialogueChangedEarly.RemoveListener(OnDialogueChangedEarly);
         }
 
+        private bool stopFastForward => !isDialogueReached && !fastForwardUnread && !fastForwardHotKeyHolding;
+
         [ExportCustomType]
         public enum State
         {
@@ -115,8 +117,8 @@ namespace Nova
         public UnityEvent fastForwardModeStarts;
         public UnityEvent fastForwardModeStops;
 
-        [HideInInspector] public bool isReadDialogue;
-        [HideInInspector] public bool fastForwardUnread;
+        public bool isDialogueReached { get; private set; }
+        public bool fastForwardUnread { get; set; }
 
         private bool _fastForwardHotKeyHolding;
 
@@ -135,12 +137,10 @@ namespace Nova
             }
         }
 
-        private bool stopFastForward => !isReadDialogue && !fastForwardUnread && !fastForwardHotKeyHolding;
-
         // Update state and isReadDialogue before OnDialogueChanged is invoked
         private void OnDialogueChangedEarly(DialogueChangedData dialogueData)
         {
-            isReadDialogue = dialogueData.isReachedAnyHistory;
+            isDialogueReached = dialogueData.isReachedAnyHistory;
 
             if (isFastForward && stopFastForward)
             {
