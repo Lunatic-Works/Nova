@@ -64,8 +64,8 @@ namespace Nova
             }
         }
 
-        private readonly Dictionary<Type, ViewControllerBase> controllers = new Dictionary<Type, ViewControllerBase>();
-        private readonly Type[] overlayViewControllers = {typeof(NotificationController)};
+        private readonly Dictionary<Type, IViewController> controllers = new Dictionary<Type, IViewController>();
+        private readonly Type[] overlayViewControllers = { typeof(NotificationController) };
 
         public GameObject dialoguePanel => GetController<DialogueBoxController>().myPanel;
         public GameObject titlePanel => GetController<TitleController>().myPanel;
@@ -80,17 +80,17 @@ namespace Nova
             this.RuntimeAssert(screenCapturer != null, "Missing ScreenCapturer.");
         }
 
-        public void SetController(ViewControllerBase controller)
+        public void SetController(IViewController controller)
         {
             controllers[controller.GetType()] = controller;
         }
 
-        public void UnsetController(ViewControllerBase controller)
+        public void UnsetController(IViewController controller)
         {
             controllers.Remove(controller.GetType());
         }
 
-        public T GetController<T>() where T : ViewControllerBase
+        public T GetController<T>() where T : class, IViewController
         {
             var t = typeof(T);
             if (controllers.ContainsKey(t))
@@ -147,10 +147,12 @@ namespace Nova
         }
 
         public void SwitchView<FromController, TargetController>(Action onFinish = null)
-            where FromController : ViewControllerBase
-            where TargetController : ViewControllerBase
+            where FromController : class, IViewController
+            where TargetController : class, IViewController
         {
-            GetController<FromController>().SwitchView<TargetController>(onFinish);
+            var from = GetController<FromController>();
+            var target = GetController<TargetController>();
+            from.Hide(() => target.Show(onFinish));
         }
 
         public void StopAllAnimations()
@@ -176,7 +178,7 @@ namespace Nova
             var activeNonGameControllerCount = controllers.Values.Count(c =>
                 overlayViewControllers.All(t => !t.IsInstanceOfType(c)) &&
                 !(c is DialogueBoxController) &&
-                c.myPanel.activeSelf
+                c.active
             );
             if (activeNonGameControllerCount == 0)
             {
@@ -213,8 +215,8 @@ namespace Nova
 
     public static class ViewHelper
     {
-        public static void SwitchView<TargetController>(this ViewControllerBase controller, Action onFinish = null)
-            where TargetController : ViewControllerBase
+        public static void SwitchView<TargetController>(this IViewController controller, Action onFinish = null)
+            where TargetController : class, IViewController
         {
             controller.Hide(() =>
                 controller.viewManager.GetController<TargetController>().Show(onFinish)

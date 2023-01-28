@@ -80,12 +80,12 @@ namespace Nova
             return new WaitWhile(() => inTransition);
         }
 
-        private static WaitWhile Show(ViewControllerBase view)
+        private static WaitWhile Show(IViewController view)
         {
             return DoTransition(view.Show);
         }
 
-        private static WaitWhile Hide(ViewControllerBase view)
+        private static WaitWhile Hide(IViewController view)
         {
             return DoTransition(view.Hide);
         }
