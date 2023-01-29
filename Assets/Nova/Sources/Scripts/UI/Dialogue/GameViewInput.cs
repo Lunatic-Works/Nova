@@ -140,13 +140,13 @@ namespace Nova
                     buttonRingTrigger.Hide(false);
                 }
             }
-            else
+            else if (viewManager.currentView == CurrentViewType.Game)
             {
-                if (viewManager.currentView == CurrentViewType.Game)
+                if (gameViewController.dialogueBoxActive)
                 {
                     HandleShortcutWhenDialogueShown();
                 }
-                else if (viewManager.currentView == CurrentViewType.DialogueHidden)
+                else
                 {
                     HandleShortcutWhenDialogueHidden();
                 }
@@ -170,6 +170,7 @@ namespace Nova
             var eventData = (ExtendedPointerEventData)_eventData;
             if (!inputManager.inputEnabled ||
                 viewManager.currentView != CurrentViewType.Game ||
+                !gameViewController.dialogueBoxActive ||
                 buttonRingTrigger.buttonShowing)
             {
                 return;
@@ -191,6 +192,17 @@ namespace Nova
         {
             var eventData = (ExtendedPointerEventData)_eventData;
 
+            if (viewManager.currentView != CurrentViewType.Game)
+            {
+                return;
+            }
+
+            if (!gameViewController.dialogueBoxActive)
+            {
+                gameViewController.Show();
+                return;
+            }
+
             // When the input is not enabled, the user can only click forward
             if (!inputManager.inputEnabled)
             {
@@ -199,18 +211,6 @@ namespace Nova
                     ClickForward();
                 }
 
-                return;
-            }
-
-            var view = viewManager.currentView;
-            if (view == CurrentViewType.DialogueHidden)
-            {
-                gameViewController.Show();
-                return;
-            }
-
-            if (view != CurrentViewType.Game)
-            {
                 return;
             }
 
@@ -267,23 +267,27 @@ namespace Nova
                 return;
             }
 
-            if (buttonRingTrigger.buttonShowing)
+            if (buttonRingTrigger.buttonShowing || viewManager.currentView != CurrentViewType.Game)
             {
                 return;
             }
 
-            if (viewManager.currentView == CurrentViewType.Game)
+            if (!gameViewController.dialogueBoxActive)
             {
-                float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
-                if (scroll > float.Epsilon)
-                {
-                    dialogueState.state = DialogueState.State.Normal;
-                    logController.Show();
-                }
-                else if (scroll < -float.Epsilon)
-                {
-                    ClickForward();
-                }
+                gameViewController.Show();
+                return;
+            }
+
+            float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
+            if (scroll > float.Epsilon)
+            {
+                dialogueState.state = DialogueState.State.Normal;
+                gameViewController.AbortAnimation(false);
+                logController.Show();
+            }
+            else if (scroll < -float.Epsilon)
+            {
+                ClickForward();
             }
         }
 
@@ -309,17 +313,6 @@ namespace Nova
                 return;
             }
 
-            // When user clicks, text animation should stop, regardless of canAbortAnimation
-            if (textIsAnimating)
-            {
-                NovaAnimation.StopAll(AnimationType.Text);
-            }
-
-            if (!scriptCanAbortAnimation)
-            {
-                return;
-            }
-
             if (!canAbortAnimation)
             {
                 int clicks = configManager.GetInt(AbortAnimationFirstShownKey);
@@ -336,10 +329,7 @@ namespace Nova
                 return;
             }
 
-            if (isAnimating)
-            {
-                gameViewController.AbortAnimation();
-            }
+            gameViewController.AbortAnimation(scriptCanAbortAnimation && canAbortAnimation);
         }
 
         private void ReturnTitle()

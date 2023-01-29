@@ -226,28 +226,12 @@ namespace Nova
             gameState.RemoveRestorable(this);
         }
 
-        private void OnEnable()
-        {
-            gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
-            gameState.dialogueChanged.AddListener(OnDialogueChanged);
-        }
-
         private void OnDisable()
         {
             StopAllCoroutines();
             dialogueState.state = DialogueState.State.Normal;
-
-            gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
-            gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
         }
 
-        private void OnDialogueWillChange()
-        {
-            ResetTextAnimationConfig();
-            ShowDialogueFinishIcon(false);
-        }
-
-        // Used when aborting animations by clicking
         public void ShowDialogueFinishIcon(bool to)
         {
             foreach (var icon in dialogueFinishIcons)
@@ -256,19 +240,21 @@ namespace Nova
             }
         }
 
-        /// <summary>
-        /// The content of the dialogue box needs to be changed
-        /// </summary>
-        /// <param name="data"></param>
-        private void OnDialogueChanged(DialogueChangedData data)
+        public void OnDialogueWillChange()
+        {
+            ResetTextAnimationConfig();
+            ShowDialogueFinishIcon(false);
+        }
+
+        public void DisplayDialogue(DialogueDisplayData displayData)
         {
             switch (dialogueUpdateMode)
             {
                 case DialogueUpdateMode.Overwrite:
-                    OverwriteDialogue(data.displayData);
+                    OverwriteDialogue(displayData);
                     break;
                 case DialogueUpdateMode.Append:
-                    AppendDialogue(data.displayData);
+                    AppendDialogue(displayData);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -511,19 +497,19 @@ namespace Nova
 
         #region Show/Hide close button and dialogue finish icon
 
-        private bool _showCloseButton = true;
+        private bool _closeButtonShown = true;
 
-        public bool showCloseButton
+        public bool closeButtonShown
         {
-            get => _showCloseButton;
+            get => _closeButtonShown;
             set
             {
-                if (_showCloseButton == value)
+                if (_closeButtonShown == value)
                 {
                     return;
                 }
 
-                _showCloseButton = value;
+                _closeButtonShown = value;
                 foreach (var btn in hideDialogueButtons)
                 {
                     btn.gameObject.SetActive(value);
@@ -531,7 +517,7 @@ namespace Nova
             }
         }
 
-        [HideInInspector] public bool showDialogueFinishIcon = true;
+        [HideInInspector] public bool dialogueFinishIconShown = true;
 
         #endregion
 
@@ -551,8 +537,8 @@ namespace Nova
             public readonly bool textColorHasSet;
             public readonly Vector4Data textColor;
             public readonly string materialName;
-            public readonly bool showCloseButton;
-            public readonly bool showDialogueFinishIcon;
+            public readonly bool closeButtonShown;
+            public readonly bool dialogueFinishIconShown;
 
             public DialogueBoxControllerRestoreData(RectTransform rect, Color backgroundColor,
                 DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, Theme theme,
@@ -568,8 +554,8 @@ namespace Nova
                 this.textColorHasSet = textColorHasSet;
                 this.textColor = textColor;
                 this.materialName = materialName;
-                this.showCloseButton = closeButtonShown;
-                this.showDialogueFinishIcon = dialogueFinishIconShown;
+                this.closeButtonShown = closeButtonShown;
+                this.dialogueFinishIconShown = dialogueFinishIconShown;
             }
         }
 
@@ -577,8 +563,8 @@ namespace Nova
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
             return new DialogueBoxControllerRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas, theme,
-                (int)textAlignment, textColorHasSet, textColor, materialName, showCloseButton,
-                showDialogueFinishIcon);
+                (int)textAlignment, textColorHasSet, textColor, materialName, closeButtonShown,
+                dialogueFinishIconShown);
         }
 
         public void Restore(IRestoreData restoreData)
@@ -602,8 +588,8 @@ namespace Nova
                 AppendDialogue(displayData, needAnimation: false);
             }
 
-            showCloseButton = data.showCloseButton;
-            showDialogueFinishIcon = data.showDialogueFinishIcon;
+            closeButtonShown = data.closeButtonShown;
+            dialogueFinishIconShown = data.dialogueFinishIconShown;
         }
 
         #endregion
