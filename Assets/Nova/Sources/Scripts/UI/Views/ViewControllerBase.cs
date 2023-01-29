@@ -11,11 +11,9 @@ namespace Nova
         public ViewManager viewManager { get; private set; }
         protected InputManager inputManager;
 
-        private bool inited;
-
-        protected virtual bool Init()
+        protected override bool Init()
         {
-            if (inited)
+            if (base.Init())
             {
                 return true;
             }
@@ -24,14 +22,7 @@ namespace Nova
             this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");
             viewManager.SetController(this);
             inputManager = Utils.FindNovaController().InputManager;
-
-            inited = true;
             return false;
-        }
-
-        protected virtual void Awake()
-        {
-            Init();
         }
 
         protected virtual void OnDestroy()
