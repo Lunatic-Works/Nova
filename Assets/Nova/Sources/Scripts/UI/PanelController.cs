@@ -9,7 +9,28 @@ namespace Nova
     public class PanelController : MonoBehaviour
     {
         public GameObject myPanel;
+
         protected List<UIViewTransitionBase> transitions;
+        private bool inited;
+
+        protected virtual bool Init()
+        {
+            if (inited)
+            {
+                return true;
+            }
+
+            this.RuntimeAssert(myPanel != null, "Missing myPanel.");
+            transitions = myPanel.GetComponents<UIViewTransitionBase>().ToList();
+
+            inited = true;
+            return false;
+        }
+
+        protected virtual void Awake()
+        {
+            Init();
+        }
 
         public bool active => myPanel.activeSelf;
 
