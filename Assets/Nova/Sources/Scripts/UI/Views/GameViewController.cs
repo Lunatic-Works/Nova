@@ -23,7 +23,7 @@ namespace Nova
             gameState = controller.GameState;
         }
 
-        private void onEnable()
+        private void OnEnable()
         {
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
@@ -35,7 +35,7 @@ namespace Nova
             dialogueState.fastForwardModeStops.AddListener(OnFastForwardModeStops);
         }
 
-        private void onDisable()
+        private void OnDisable()
         {
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
@@ -51,12 +51,12 @@ namespace Nova
 
         public bool dialogueBoxActive => currentDialogueBox?.active ?? false;
 
-        public void Hide(Action onFinish)
+        public void Show(Action onFinish)
         {
             currentDialogueBox?.Show(onFinish);
         }
 
-        public void Show(Action onFinish)
+        public void Hide(Action onFinish)
         {
             currentDialogueBox?.Hide(onFinish);
         }
@@ -83,9 +83,14 @@ namespace Nova
             }
         }
 
-        public void AbortAnimation()
+        public void AbortAnimation(bool perDialogue)
         {
-            NovaAnimation.StopAll(AnimationType.PerDialogue);
+            var animation = AnimationType.Text;
+            if (perDialogue)
+            {
+                animation |= AnimationType.PerDialogue;
+            }
+            NovaAnimation.StopAll(animation);
             currentDialogueBox?.ShowDialogueFinishIcon(true);
         }
 
@@ -211,7 +216,9 @@ namespace Nova
             {
                 timeAfterDialogueChange += Time.deltaTime;
 
-                if (currentDialogueBox != null && currentDialogueBox.showDialogueFinishIcon && dialogueState.isNormal &&
+                Debug.Log($"{timeAfterDialogueChange}, {dialogueTime}");
+
+                if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown && dialogueState.isNormal &&
                     viewManager.currentView != CurrentViewType.InTransition && timeAfterDialogueChange > dialogueTime)
                 {
                     currentDialogueBox.ShowDialogueFinishIcon(true);
@@ -222,11 +229,13 @@ namespace Nova
         private void OnDialogueWillChange()
         {
             StopTimer();
+            currentDialogueBox?.OnDialogueWillChange();
         }
 
         private void OnDialogueChanged(DialogueChangedData dialogueData)
         {
             RestartTimer();
+            currentDialogueBox?.DisplayDialogue(dialogueData.displayData);
             SetSchedule();
             dialogueTime = GetDialogueTime();
         }

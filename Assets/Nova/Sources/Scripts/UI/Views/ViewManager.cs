@@ -10,7 +10,6 @@ namespace Nova
     {
         UI,
         Game,
-        DialogueHidden,
         InTransition,
         Alert
     }
@@ -171,18 +170,13 @@ namespace Nova
                 return CurrentViewType.Alert;
             }
 
-            var activeNonGameControllerCount = controllers.Values.Count(c =>
+            var hasUI = controllers.Values.Any(c =>
                 overlayViewControllers.All(t => !t.IsInstanceOfType(c)) &&
-                !(c is DialogueBoxController) &&
+                !(c is GameViewController) &&
                 c.active
             );
-            if (activeNonGameControllerCount == 0)
-            {
-                return GetController<GameViewController>().dialogueBoxActive ?
-                    CurrentViewType.Game : CurrentViewType.DialogueHidden;
-            }
 
-            return CurrentViewType.UI;
+            return hasUI ? CurrentViewType.UI : CurrentViewType.Game;
         }
 
         public void TryPlaySound(AudioClip clip)
