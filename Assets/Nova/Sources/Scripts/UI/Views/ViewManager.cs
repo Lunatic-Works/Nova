@@ -67,10 +67,6 @@ namespace Nova
         private readonly Dictionary<Type, IViewController> controllers = new Dictionary<Type, IViewController>();
         private readonly Type[] overlayViewControllers = { typeof(NotificationController) };
 
-        public GameObject dialoguePanel => GetController<DialogueBoxController>().myPanel;
-        public GameObject titlePanel => GetController<TitleController>().myPanel;
-        public GameObject alertPanel => GetController<AlertController>().myPanel;
-
         private void Awake()
         {
             currentView = CurrentViewType.UI;
@@ -170,7 +166,7 @@ namespace Nova
                 return CurrentViewType.InTransition;
             }
 
-            if (alertPanel.activeSelf)
+            if (GetController<AlertController>().active)
             {
                 return CurrentViewType.Alert;
             }
@@ -182,14 +178,8 @@ namespace Nova
             );
             if (activeNonGameControllerCount == 0)
             {
-                if (dialoguePanel.activeSelf)
-                {
-                    return CurrentViewType.Game;
-                }
-                else
-                {
-                    return CurrentViewType.DialogueHidden;
-                }
+                return GetController<GameViewController>().dialogueBoxActive ?
+                    CurrentViewType.Game : CurrentViewType.DialogueHidden;
             }
 
             return CurrentViewType.UI;
@@ -221,6 +211,26 @@ namespace Nova
             controller.Hide(() =>
                 controller.viewManager.GetController<TargetController>().Show(onFinish)
             );
+        }
+
+        public static void Hide(this IPanelController controller)
+        {
+            controller.Hide(null);
+        }
+
+        public static void Show(this IPanelController controller)
+        {
+            controller.Show(null);
+        }
+
+        public static void ShowImmediate(this IPanelController controller)
+        {
+            controller.ShowImmediate(null);
+        }
+
+        public static void HideImmediate(this IPanelController controller)
+        {
+            controller.HideImmediate(null);
         }
     }
 }

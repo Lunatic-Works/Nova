@@ -43,7 +43,7 @@ namespace Nova
         {
             base.Show(() =>
             {
-                viewManager.dialoguePanel.SetActive(false);
+                viewManager.GetController<GameViewController>().HideImmediate();
                 viewManager.StopAllAnimations();
                 gameState.ResetGameState();
 

@@ -1036,6 +1036,7 @@ GameObject:
   - component: {fileID: 695111634}
   - component: {fileID: 695111633}
   - component: {fileID: 695111635}
+  - component: {fileID: 695111637}
   m_Layer: 5
   m_Name: GameView
   m_TagString: Untagged
@@ -1120,10 +1121,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de783f267d0570645b528696aa32c5a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myPanel: {fileID: 0}
   autoModeIcon: {fileID: 849972639}
   fastForwardModeIcon: {fileID: 1225254981}
-  activeDialogueBox: {fileID: 8904821941984626519}
+  currentDialogueBox: {fileID: 8904821941984626519}
+--- !u!114 &695111637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 695111631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdb645b19171ca846abbb0b6052277d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  configKeyName: AutoSpeed
 --- !u!114 &702255952
 MonoBehaviour:
   m_ObjectHideFlags: 0

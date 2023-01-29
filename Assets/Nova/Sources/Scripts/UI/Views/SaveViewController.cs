@@ -347,10 +347,11 @@ namespace Nova
 
             gameState.LoadBookmark(bookmark);
 
-            if (viewManager.titlePanel.activeSelf)
+            var titleController = viewManager.GetController<TitleController>();
+            if (titleController.active)
             {
-                viewManager.titlePanel.SetActive(false);
-                viewManager.dialoguePanel.SetActive(true);
+                titleController.HideImmediate();
+                viewManager.GetController<GameViewController>().ShowImmediate();
             }
 
             Hide();

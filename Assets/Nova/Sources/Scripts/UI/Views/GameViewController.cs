@@ -8,7 +8,7 @@ namespace Nova
     {
         [SerializeField] private GameObject autoModeIcon;
         [SerializeField] private GameObject fastForwardModeIcon;
-        public DialogueBoxController activeDialogueBox;
+        public DialogueBoxController currentDialogueBox;
 
         public ViewManager viewManager { get; private set; }
         private GameState gameState;
@@ -27,6 +27,8 @@ namespace Nova
         {
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
+            gameState.routeEnded.AddListener(OnRouteEnded);
+
             dialogueState.autoModeStarts.AddListener(OnAutoModeStarts);
             dialogueState.autoModeStops.AddListener(OnAutoModeStops);
             dialogueState.fastForwardModeStarts.AddListener(OnFastForwardModeStarts);
@@ -37,6 +39,8 @@ namespace Nova
         {
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
+            gameState.routeEnded.RemoveListener(OnRouteEnded);
+
             dialogueState.autoModeStarts.RemoveListener(OnAutoModeStarts);
             dialogueState.autoModeStops.RemoveListener(OnAutoModeStops);
             dialogueState.fastForwardModeStarts.RemoveListener(OnFastForwardModeStarts);
@@ -45,24 +49,59 @@ namespace Nova
 
         public bool active => true;
 
-        public void Hide()
-        {
-            Hide(null);
-        }
-
-        public void Show()
-        {
-            Show(null);
-        }
+        public bool dialogueBoxActive => currentDialogueBox?.active ?? false;
 
         public void Hide(Action onFinish)
         {
-            throw new NotImplementedException();
+            currentDialogueBox?.Show(onFinish);
         }
 
         public void Show(Action onFinish)
         {
-            throw new NotImplementedException();
+            currentDialogueBox?.Hide(onFinish);
+        }
+
+        public void ShowImmediate(Action onFinish)
+        {
+            currentDialogueBox?.ShowImmediate(onFinish);
+        }
+
+        public void HideImmediate(Action onFinish)
+        {
+            currentDialogueBox?.HideImmediate(onFinish);
+        }
+
+        public void Step()
+        {
+            if (currentDialogueBox != null)
+            {
+                currentDialogueBox.NextPageOrStep();
+            }
+            else
+            {
+                gameState.Step();
+            }
+        }
+
+        public void AbortAnimation()
+        {
+            NovaAnimation.StopAll(AnimationType.PerDialogue);
+            currentDialogueBox?.ShowDialogueFinishIcon(true);
+        }
+
+        public bool TryClickLink(Vector3 position, Camera camera)
+        {
+            if (currentDialogueBox == null)
+            {
+                return false;
+            }
+            var link = currentDialogueBox.FindIntersectingLink(position, camera);
+            if (!string.IsNullOrEmpty(link))
+            {
+                Application.OpenURL(link);
+                return true;
+            }
+            return false;
         }
 
         public float autoDelay { get; set; }
@@ -113,10 +152,10 @@ namespace Nova
             // Give time for rendering and can stop schedule step in time before any unwanted effects occurs
             yield return null;
 
-            if (gameState.canStepForward && activeDialogueBox != null)
+            if (gameState.canStepForward && currentDialogueBox != null)
             {
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-                if (activeDialogueBox.NextPageOrStep())
+                if (currentDialogueBox.NextPageOrStep())
                 {
                     timeAfterDialogueChange = 0f;
                     TrySchedule(dialogueState.isAuto ? autoDelay : fastForwardDelay);
@@ -158,10 +197,10 @@ namespace Nova
         private float GetDialogueTimeAuto()
         {
             var delay = GetDialogueTime(autoDelay, autoDelay * 0.5f);
-            if (activeDialogueBox != null)
+            if (currentDialogueBox != null)
             {
                 delay = Mathf.Max(delay, NovaAnimation.GetTotalTimeRemaining(AnimationType.Text) /
-                    activeDialogueBox.characterFadeInDuration * autoDelay * 0.1f);
+                    currentDialogueBox.characterFadeInDuration * autoDelay * 0.1f);
             }
             return delay;
         }
@@ -172,10 +211,10 @@ namespace Nova
             {
                 timeAfterDialogueChange += Time.deltaTime;
 
-                if (activeDialogueBox != null && activeDialogueBox.showDialogueFinishIcon && dialogueState.isNormal &&
+                if (currentDialogueBox != null && currentDialogueBox.showDialogueFinishIcon && dialogueState.isNormal &&
                     viewManager.currentView != CurrentViewType.InTransition && timeAfterDialogueChange > dialogueTime)
                 {
-                    activeDialogueBox.ShowDialogueFinishIcon(true);
+                    currentDialogueBox.ShowDialogueFinishIcon(true);
                 }
             }
         }
@@ -192,6 +231,11 @@ namespace Nova
             dialogueTime = GetDialogueTime();
         }
 
+        private void OnRouteEnded(RouteEndedData routeEndedData)
+        {
+            dialogueState.state = DialogueState.State.Normal;
+            this.SwitchView<TitleController>();
+        }
 
         private void OnAutoModeStarts()
         {

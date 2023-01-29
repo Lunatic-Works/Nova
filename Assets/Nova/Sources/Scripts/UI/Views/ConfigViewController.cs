@@ -59,9 +59,8 @@ namespace Nova
             NovaAnimation.StopAll();
 
             // TODO: Better transition between any two views
-            viewManager.titlePanel.SetActive(true);
-
-            this.SwitchView<TitleController>(onFinish);
+            viewManager.GetController<TitleController>().ShowImmediate();
+            Hide(onFinish);
         }
 
         private void ReturnTitle()

@@ -59,7 +59,7 @@ namespace Nova
     }
 
     [ExportCustomType]
-    public class DialogueBoxController : ViewControllerBase, IRestorable
+    public class DialogueBoxController : PanelController, IRestorable
     {
         [ExportCustomType]
         public enum DialogueUpdateMode
@@ -212,7 +212,7 @@ namespace Nova
 
             foreach (var btn in hideDialogueButtons)
             {
-                btn.onClick.AddListener(Hide);
+                btn.onClick.AddListener(this.Hide);
             }
 
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
@@ -221,18 +221,15 @@ namespace Nova
             return false;
         }
 
-        protected override void OnDestroy()
+        private void OnDestroy()
         {
             gameState.RemoveRestorable(this);
-
-            base.OnDestroy();
         }
 
         private void OnEnable()
         {
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
-            gameState.routeEnded.AddListener(OnRouteEnded);
         }
 
         private void OnDisable()
@@ -242,13 +239,6 @@ namespace Nova
 
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
-            gameState.routeEnded.RemoveListener(OnRouteEnded);
-        }
-
-        private void OnRouteEnded(RouteEndedData routeEndedData)
-        {
-            dialogueState.state = DialogueState.State.Normal;
-            this.SwitchView<TitleController>();
         }
 
         private void OnDialogueWillChange()

@@ -22,7 +22,7 @@ namespace Nova
         private GameState gameState;
         private CheckpointManager checkpointManager;
         private ViewManager viewManager;
-        private DialogueBoxController dialogueBox;
+        private GameViewController gameView;
         private SaveViewController saveView;
         private LogController logView;
         private ConfigViewController configView;
@@ -39,7 +39,7 @@ namespace Nova
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
             viewManager = Utils.FindViewManager();
-            dialogueBox = viewManager.GetController<DialogueBoxController>();
+            gameView = viewManager.GetController<GameViewController>();
             saveView = viewManager.GetController<SaveViewController>();
             logView = viewManager.GetController<LogController>();
             configView = viewManager.GetController<ConfigViewController>();
@@ -278,7 +278,7 @@ namespace Nova
                     }
                     else
                     {
-                        dialogueBox.NextPageOrStep();
+                        gameView.Step();
                     }
 
                     steps--;

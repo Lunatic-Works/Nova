@@ -30,6 +30,16 @@ namespace Nova
             viewManager.UnsetController(this);
         }
 
+        public void Show()
+        {
+            Show(null);
+        }
+
+        public void Hide()
+        {
+            Hide(null);
+        }
+
         protected override void onTransitionBegin()
         {
             viewManager.UpdateView(true);
