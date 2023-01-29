@@ -517,7 +517,7 @@ namespace Nova
             }
         }
 
-        [HideInInspector] public bool dialogueFinishIconShown = true;
+        public bool dialogueFinishIconShown { get; private set; } = true;
 
         #endregion
 

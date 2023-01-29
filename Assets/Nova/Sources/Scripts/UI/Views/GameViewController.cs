@@ -216,8 +216,6 @@ namespace Nova
             {
                 timeAfterDialogueChange += Time.deltaTime;
 
-                Debug.Log($"{timeAfterDialogueChange}, {dialogueTime}");
-
                 if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown && dialogueState.isNormal &&
                     viewManager.currentView != CurrentViewType.InTransition && timeAfterDialogueChange > dialogueTime)
                 {
