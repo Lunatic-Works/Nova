@@ -122,7 +122,7 @@ namespace Nova
             }
 
             yield return WaitForView(CurrentViewType.UI);
-            if (helpView.myPanel.activeSelf)
+            if (helpView.active)
             {
                 yield return Hide(helpView);
             }

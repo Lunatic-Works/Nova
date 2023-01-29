@@ -4,27 +4,23 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class GameViewController : ViewControllerBase
+    public class GameViewController : MonoBehaviour, IViewController
     {
         [SerializeField] private GameObject autoModeIcon;
         [SerializeField] private GameObject fastForwardModeIcon;
-
-        private GameState gameState;
-        private DialogueState dialogueState;
         public DialogueBoxController activeDialogueBox;
 
-        protected override bool Init()
-        {
-            if (base.Init())
-            {
-                return true;
-            }
+        public ViewManager viewManager { get; private set; }
+        private GameState gameState;
+        private DialogueState dialogueState;
 
+        private void Awake()
+        {
+            viewManager = GetComponentInParent<ViewManager>();
+            viewManager.SetController(this);
             var controller = Utils.FindNovaController();
             dialogueState = controller.DialogueState;
             gameState = controller.GameState;
-
-            return false;
         }
 
         private void onEnable()
@@ -45,6 +41,28 @@ namespace Nova
             dialogueState.autoModeStops.RemoveListener(OnAutoModeStops);
             dialogueState.fastForwardModeStarts.RemoveListener(OnFastForwardModeStarts);
             dialogueState.fastForwardModeStops.RemoveListener(OnFastForwardModeStops);
+        }
+
+        public bool active => true;
+
+        public void Hide()
+        {
+            Hide(null);
+        }
+
+        public void Show()
+        {
+            Show(null);
+        }
+
+        public void Hide(Action onFinish)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Show(Action onFinish)
+        {
+            throw new NotImplementedException();
         }
 
         public float autoDelay { get; set; }
@@ -148,7 +166,7 @@ namespace Nova
             return delay;
         }
 
-        protected override void Update()
+        private void Update()
         {
             if (viewManager.currentView == CurrentViewType.Game && dialogueAvailable)
             {
@@ -214,6 +232,5 @@ namespace Nova
                 fastForwardModeIcon.SetActive(false);
             }
         }
-
     }
 }

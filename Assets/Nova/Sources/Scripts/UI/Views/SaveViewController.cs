@@ -196,7 +196,7 @@ namespace Nova
         public override void Show(Action onFinish)
         {
             // Initialize page
-            if (myPanel.activeSelf)
+            if (active)
             {
                 // Cannot see auto save and quick save in save mode
                 if (saveViewMode == SaveViewMode.Save && saveViewBookmarkType != BookmarkType.NormalSave)
@@ -236,7 +236,7 @@ namespace Nova
                 saveButtonCanvasGroup.alpha = 1.0f;
             }
 
-            if (!myPanel.activeSelf)
+            if (!active)
             {
                 if (screenTexture != null)
                 {
@@ -256,7 +256,7 @@ namespace Nova
         public void ShowSaveWithCallback(Action onFinish)
         {
             // Cannot enter save mode if from title
-            if (myPanel.activeSelf && fromTitle)
+            if (active && fromTitle)
             {
                 return;
             }
@@ -290,7 +290,7 @@ namespace Nova
 
         protected override void OnHideComplete()
         {
-            if (myPanel.activeSelf)
+            if (active)
             {
                 if (screenTexture != null)
                 {
