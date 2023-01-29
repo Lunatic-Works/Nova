@@ -20,7 +20,7 @@ namespace Nova
         private ButtonRingTrigger buttonRingTrigger;
 
         private ViewManager viewManager;
-        private DialogueBoxController dialogueBoxController;
+        private GameViewController gameViewController;
         private SaveViewController saveViewController;
         private LogController logController;
         private ConfigViewController configViewController;
@@ -36,7 +36,7 @@ namespace Nova
             buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
 
             viewManager = Utils.FindViewManager();
-            dialogueBoxController = viewManager.GetController<DialogueBoxController>();
+            gameViewController = viewManager.GetController<GameViewController>();
             saveViewController = viewManager.GetController<SaveViewController>();
             logController = viewManager.GetController<LogController>();
             configViewController = viewManager.GetController<ConfigViewController>();
@@ -96,7 +96,7 @@ namespace Nova
 
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
-                dialogueBoxController.Hide();
+                gameViewController.Hide();
             }
 
             if (inputManager.IsTriggered(AbstractKey.ShowLog))
@@ -126,7 +126,7 @@ namespace Nova
         {
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
-                dialogueBoxController.Show();
+                gameViewController.Show();
             }
         }
 
@@ -205,7 +205,7 @@ namespace Nova
             var view = viewManager.currentView;
             if (view == CurrentViewType.DialogueHidden)
             {
-                dialogueBoxController.Show();
+                gameViewController.Show();
                 return;
             }
 
@@ -225,10 +225,8 @@ namespace Nova
             {
                 buttonRingTrigger.NoShowIfPointerMoved();
 
-                var link = dialogueBoxController.FindIntersectingLink(RealInput.pointerPosition, UICameraHelper.Active);
-                if (!string.IsNullOrEmpty(link))
+                if (gameViewController.TryClickLink(RealInput.pointerPosition, UICameraHelper.Active))
                 {
-                    Application.OpenURL(link);
                     return;
                 }
 
@@ -242,7 +240,7 @@ namespace Nova
 
                 if (rightButtonAction == RightButtonAction.HideDialoguePanel)
                 {
-                    dialogueBoxController.Hide();
+                    gameViewController.Hide();
                 }
                 else if (rightButtonAction == RightButtonAction.ShowButtonRing)
                 {
@@ -307,7 +305,7 @@ namespace Nova
 
             if (!isAnimating && !textIsAnimating)
             {
-                dialogueBoxController.NextPageOrStep();
+                gameViewController.Step();
                 return;
             }
 
@@ -340,8 +338,7 @@ namespace Nova
 
             if (isAnimating)
             {
-                NovaAnimation.StopAll(AnimationType.PerDialogue);
-                dialogueBoxController.ShowDialogueFinishIcon(true);
+                gameViewController.AbortAnimation();
             }
         }
 
@@ -352,7 +349,7 @@ namespace Nova
             // TODO: Use a faster transition from game view to title view
             // viewManager.titlePanel.SetActive(true);
 
-            dialogueBoxController.SwitchView<TitleController>();
+            gameViewController.SwitchView<TitleController>();
         }
 
         private void ReturnTitleWithAlert()

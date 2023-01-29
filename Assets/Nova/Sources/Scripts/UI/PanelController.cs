@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class PanelController : MonoBehaviour
+    public class PanelController : MonoBehaviour, IPanelController
     {
         public GameObject myPanel;
 
@@ -33,16 +33,6 @@ namespace Nova
         }
 
         public bool active => myPanel.activeSelf;
-
-        public void Show()
-        {
-            Show(null);
-        }
-
-        public void Hide()
-        {
-            Hide(null);
-        }
 
         protected virtual void onTransitionBegin() { }
 
@@ -101,6 +91,20 @@ namespace Nova
                 myPanel.SetActive(false);
                 onFinish?.Invoke();
             }
+        }
+
+        public void ShowImmediate(Action onFinish)
+        {
+            myPanel.SetActive(true);
+            onShowComplete();
+            onFinish?.Invoke();
+        }
+
+        public void HideImmediate(Action onFinish)
+        {
+            OnHideComplete();
+            myPanel.SetActive(false);
+            onFinish?.Invoke();
         }
 
         protected virtual void Start()
