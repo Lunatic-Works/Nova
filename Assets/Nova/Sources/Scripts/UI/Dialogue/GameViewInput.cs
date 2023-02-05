@@ -272,20 +272,24 @@ namespace Nova
                 return;
             }
 
+            float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
+            if (Math.Abs(scroll) < float.Epsilon)
+            {
+                return;
+            }
+
             if (!gameViewController.dialogueBoxActive)
             {
                 gameViewController.Show();
                 return;
             }
-
-            float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
-            if (scroll > float.Epsilon)
+            if (scroll > 0)
             {
                 dialogueState.state = DialogueState.State.Normal;
                 gameViewController.AbortAnimation(false);
                 logController.Show();
             }
-            else if (scroll < -float.Epsilon)
+            else
             {
                 ClickForward();
             }
