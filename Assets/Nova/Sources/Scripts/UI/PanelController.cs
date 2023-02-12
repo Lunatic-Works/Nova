@@ -11,7 +11,7 @@ namespace Nova
         public GameObject myPanel;
 
         protected List<UIViewTransitionBase> transitions;
-        private bool inited;
+        protected bool inited;
 
         protected virtual bool Init()
         {

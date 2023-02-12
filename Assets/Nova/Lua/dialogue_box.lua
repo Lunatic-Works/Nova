@@ -40,11 +40,11 @@ make_anim_method('box_anchor', function(self, anchor, duration, easing)
 end)
 
 function box_update_mode(mode)
-    __Nova.dialogueBoxController.dialogueUpdateMode = mode
+    -- __Nova.dialogueBoxController.dialogueUpdateMode = mode
 end
 
 function box_theme(theme)
-    __Nova.dialogueBoxController.theme = theme
+    -- __Nova.dialogueBoxController.theme = theme
 end
 
 function box_tint(color)

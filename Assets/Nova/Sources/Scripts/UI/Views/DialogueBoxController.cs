@@ -68,7 +68,7 @@ namespace Nova
             Append
         }
 
-        [HideInInspector] public DialogueUpdateMode dialogueUpdateMode;
+        [SerializeField] private DialogueUpdateMode dialogueUpdateMode;
 
         private GameState gameState;
         private DialogueState dialogueState;
@@ -76,7 +76,6 @@ namespace Nova
         private ScrollRect dialogueTextScrollRect;
         private DialogueTextController dialogueText;
         private RectTransform dialogueTextRect;
-        private VerticalLayoutGroup dialogueTextVerticalLayoutGroup;
 
         private AvatarController avatarController;
 
@@ -88,65 +87,67 @@ namespace Nova
             Basic
         }
 
-        private bool themeInited;
-        private Theme _theme;
+        // private bool themeInited;
+        // private Theme _theme;
 
-        public Theme theme
-        {
-            get => _theme;
-            set
-            {
-                if (themeInited && _theme == value)
-                {
-                    return;
-                }
+        // public Theme theme
+        // {
+        //     get => _theme;
+        //     set
+        //     {
+        //         if (themeInited && _theme == value)
+        //         {
+        //             return;
+        //         }
 
-                themeInited = true;
-                _theme = value;
-                Init();
+        //         themeInited = true;
+        //         _theme = value;
+        //         Init();
 
-                defaultBackgroundGO.SetActive(value == Theme.Default);
-                basicBackgroundGO.SetActive(value == Theme.Basic);
+        //         var scrollRectTransform = dialogueTextScrollRect.transform as RectTransform;
 
-                var scrollRectTransform = dialogueTextScrollRect.transform as RectTransform;
-
-                switch (value)
-                {
-                    case Theme.Default:
-                        scrollRectTransform.offsetMin = new Vector2(120f, 0f);
-                        scrollRectTransform.offsetMax = new Vector2(-180f, -40f);
-                        dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 0);
-                        dialogueEntryLayoutSetting = new DialogueEntryLayoutSetting
-                        {
-                            leftPadding = 0,
-                            rightPadding = 0,
-                            nameTextSpacing = 16f,
-                            preferredHeight = 180f
-                        };
-                        break;
-                    case Theme.Basic:
-                        scrollRectTransform.offsetMin = new Vector2(60f, 42f);
-                        scrollRectTransform.offsetMax = new Vector2(-120f, -42f);
-                        dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 120);
-                        dialogueEntryLayoutSetting = DialogueEntryLayoutSetting.Default;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
+        //         switch (value)
+        //         {
+        //             case Theme.Default:
+        //                 scrollRectTransform.offsetMin = new Vector2(120f, 0f);
+        //                 scrollRectTransform.offsetMax = new Vector2(-180f, -40f);
+        //                 dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 0);
+        //                 dialogueEntryLayoutSetting = new DialogueEntryLayoutSetting
+        //                 {
+        //                     leftPadding = 0,
+        //                     rightPadding = 0,
+        //                     nameTextSpacing = 16f,
+        //                     preferredHeight = 180f
+        //                 };
+        //                 break;
+        //             case Theme.Basic:
+        //                 scrollRectTransform.offsetMin = new Vector2(60f, 42f);
+        //                 scrollRectTransform.offsetMax = new Vector2(-120f, -42f);
+        //                 dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 120);
+        //                 dialogueEntryLayoutSetting = DialogueEntryLayoutSetting.Default;
+        //                 break;
+        //             default:
+        //                 throw new ArgumentOutOfRangeException();
+        //         }
+        //     }
+        // }
 
         public RectTransform rect { get; private set; }
 
-        [SerializeField] private GameObject defaultBackgroundGO;
-        [SerializeField] private GameObject basicBackgroundGO;
-
-        [SerializeField] private List<Image> backgroundImages;
-        private readonly List<CanvasGroup> backgroundCanvasGroups = new List<CanvasGroup>();
-        [SerializeField] private List<Button> hideDialogueButtons;
-        [SerializeField] private List<GameObject> dialogueFinishIcons;
+        [SerializeField] private GameObject backgroundPrefab;
+        private Image backgroundImage;
+        private CanvasGroup backgroundCanvasGroup;
+        private Button hideDialogueButton;
+        private GameObject dialogueFinishIcon;
 
         private Color _backgroundColor;
+        private float _configOpacity;
+
+        private void UpdateColor()
+        {
+            backgroundImage.color = new Color(_backgroundColor.r, _backgroundColor.g, _backgroundColor.b, 1f);
+            backgroundCanvasGroup.alpha = _backgroundColor.a * configOpacity;
+        }
 
         public Color backgroundColor
         {
@@ -154,21 +155,12 @@ namespace Nova
             set
             {
                 _backgroundColor = value;
-                Init();
-
-                foreach (var image in backgroundImages)
+                if (inited)
                 {
-                    image.color = new Color(_backgroundColor.r, _backgroundColor.g, _backgroundColor.b, 1f);
-                }
-
-                foreach (var cg in backgroundCanvasGroups)
-                {
-                    cg.alpha = _backgroundColor.a * configOpacity;
+                    UpdateColor();
                 }
             }
         }
-
-        private float _configOpacity;
 
         public float configOpacity
         {
@@ -176,11 +168,9 @@ namespace Nova
             set
             {
                 _configOpacity = value;
-                Init();
-
-                foreach (var cg in backgroundCanvasGroups)
+                if (inited)
                 {
-                    cg.alpha = backgroundColor.a * _configOpacity;
+                    UpdateColor();
                 }
             }
         }
@@ -199,21 +189,20 @@ namespace Nova
             dialogueTextScrollRect = GetComponentInChildren<ScrollRect>();
             dialogueText = GetComponentInChildren<DialogueTextController>();
             dialogueTextRect = dialogueText.transform as RectTransform;
-            dialogueTextVerticalLayoutGroup = dialogueText.GetComponent<VerticalLayoutGroup>();
 
             avatarController = GetComponentInChildren<AvatarController>();
 
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
-            foreach (var image in backgroundImages)
-            {
-                backgroundCanvasGroups.Add(image.GetComponent<CanvasGroup>());
-            }
+            var background = Instantiate(backgroundPrefab, myPanel.transform, false) as GameObject;
+            background.transform.SetSiblingIndex(0);
+            backgroundImage = background.GetComponent<Image>();
+            backgroundCanvasGroup = background.GetComponent<CanvasGroup>();
+            hideDialogueButton = background.transform.Find("CloseButton").GetComponent<Button>();
+            dialogueFinishIcon = background.transform.Find("DialogueFinishIcon").gameObject;
 
-            foreach (var btn in hideDialogueButtons)
-            {
-                btn.onClick.AddListener(this.Hide);
-            }
+            UpdateColor();
+            hideDialogueButton.onClick.AddListener(this.Hide);
 
             LuaRuntime.Instance.BindObject("dialogueBoxController", this);
             gameState.AddRestorable(this);
@@ -234,10 +223,7 @@ namespace Nova
 
         public void ShowDialogueFinishIcon(bool to)
         {
-            foreach (var icon in dialogueFinishIcons)
-            {
-                icon.SetActive(to);
-            }
+            dialogueFinishIcon.SetActive(to);
         }
 
         public void OnDialogueWillChange()
@@ -439,21 +425,7 @@ namespace Nova
             }
         }
 
-        private DialogueEntryLayoutSetting _dialogueEntryLayoutSetting = DialogueEntryLayoutSetting.Default;
-
-        // Modified only by theme
-        private DialogueEntryLayoutSetting dialogueEntryLayoutSetting
-        {
-            get => _dialogueEntryLayoutSetting;
-            set
-            {
-                _dialogueEntryLayoutSetting = value;
-                foreach (var dec in dialogueText.dialogueEntryControllers)
-                {
-                    dec.layoutSetting = value;
-                }
-            }
-        }
+        [SerializeField] private DialogueEntryLayoutSetting dialogueEntryLayoutSetting;
 
         private int _textLeftExtraPadding;
 
@@ -510,10 +482,7 @@ namespace Nova
                 }
 
                 _closeButtonShown = value;
-                foreach (var btn in hideDialogueButtons)
-                {
-                    btn.gameObject.SetActive(value);
-                }
+                hideDialogueButton.gameObject.SetActive(value);
             }
         }
 
@@ -532,7 +501,6 @@ namespace Nova
             public readonly Vector4Data backgroundColor;
             public readonly DialogueUpdateMode dialogueUpdateMode;
             public readonly List<DialogueDisplayData> displayDatas;
-            public readonly Theme theme;
             public readonly int textAlignment;
             public readonly bool textColorHasSet;
             public readonly Vector4Data textColor;
@@ -541,7 +509,7 @@ namespace Nova
             public readonly bool dialogueFinishIconShown;
 
             public DialogueBoxControllerRestoreData(RectTransform rect, Color backgroundColor,
-                DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, Theme theme,
+                DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas,
                 int textAlignment, bool textColorHasSet, Color textColor, string materialName, bool closeButtonShown,
                 bool dialogueFinishIconShown)
             {
@@ -549,7 +517,6 @@ namespace Nova
                 this.backgroundColor = backgroundColor;
                 this.dialogueUpdateMode = dialogueUpdateMode;
                 this.displayDatas = displayDatas;
-                this.theme = theme;
                 this.textAlignment = textAlignment;
                 this.textColorHasSet = textColorHasSet;
                 this.textColor = textColor;
@@ -562,7 +529,7 @@ namespace Nova
         public IRestoreData GetRestoreData()
         {
             var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
-            return new DialogueBoxControllerRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas, theme,
+            return new DialogueBoxControllerRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas,
                 (int)textAlignment, textColorHasSet, textColor, materialName, closeButtonShown,
                 dialogueFinishIconShown);
         }
@@ -575,7 +542,6 @@ namespace Nova
 
             dialogueUpdateMode = data.dialogueUpdateMode;
 
-            theme = data.theme;
             textAlignment = (TextAlignmentOptions)data.textAlignment;
             textColorHasSet = data.textColorHasSet;
             textColor = data.textColor;
