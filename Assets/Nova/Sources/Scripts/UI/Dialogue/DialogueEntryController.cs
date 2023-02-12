@@ -1,15 +1,17 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
 {
+    [Serializable]
     public class DialogueEntryLayoutSetting
     {
-        internal int leftPadding;
-        internal int rightPadding;
-        internal float nameTextSpacing;
-        internal float preferredHeight = -1f;
+        public int leftPadding;
+        public int rightPadding;
+        public float nameTextSpacing;
+        public float preferredHeight = -1f;
 
         internal static readonly DialogueEntryLayoutSetting Default = new DialogueEntryLayoutSetting();
     }
