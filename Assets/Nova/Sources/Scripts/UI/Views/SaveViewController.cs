@@ -168,7 +168,7 @@ namespace Nova
             base.Start();
 
             previewEntry = myPanel.transform.Find("Background/Left/SaveEntry").GetComponent<SaveEntryController>();
-            previewEntry.InitAsPreview(null, Hide);
+            previewEntry.InitAsPreview(null, this.Hide);
             ShowPage();
         }
 
@@ -193,7 +193,7 @@ namespace Nova
 
         #region Show and hide
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             // Initialize page
             if (active)
@@ -250,7 +250,7 @@ namespace Nova
             selectedSaveID = -1;
             ShowPage();
 
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
         }
 
         public void ShowSaveWithCallback(Action onFinish)
@@ -263,7 +263,7 @@ namespace Nova
 
             saveViewMode = SaveViewMode.Save;
             fromTitle = false;
-            Show(onFinish);
+            this.Show(onFinish);
         }
 
         public void ShowSave()
@@ -275,7 +275,7 @@ namespace Nova
         {
             saveViewMode = SaveViewMode.Load;
             this.fromTitle = fromTitle;
-            Show(onFinish);
+            this.Show(onFinish);
         }
 
         public void ShowLoad()
@@ -354,7 +354,7 @@ namespace Nova
                 viewManager.GetController<GameViewController>().ShowImmediate();
             }
 
-            Hide();
+            this.Hide();
             viewManager.TryPlaySound(loadActionSound);
             Alert.Show("bookmark.load.complete");
         }
@@ -574,7 +574,7 @@ namespace Nova
 
         private void ShowPreviewScreen()
         {
-            ShowPreview(screenSprite, Hide, I18n.__(
+            ShowPreview(screenSprite, this.Hide, I18n.__(
                 "bookmark.summary",
                 fromTitle ? "" : DateTime.Now.ToString(DateTimeFormat),
                 gameState.currentNode != null ? I18n.__(gameState.currentNode.displayNames) : "",

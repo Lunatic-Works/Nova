@@ -28,7 +28,7 @@ namespace Nova
             configManager = controller.ConfigManager;
             checkpointManager = controller.CheckpointManager;
 
-            quitButton.onClick.AddListener(() => Hide(Utils.Quit));
+            quitButton.onClick.AddListener(() => this.Hide(Utils.Quit));
         }
 
         protected override void Start()
@@ -36,12 +36,12 @@ namespace Nova
             base.Start();
 
             unlockedStartCount = gameState.GetStartNodeNames(StartNodeType.Unlocked).Count();
-            Show(null);
+            this.Show();
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
-            base.Show(() =>
+            base.Show(doTransition, () =>
             {
                 viewManager.GetController<GameViewController>().HideImmediate();
                 viewManager.StopAllAnimations();

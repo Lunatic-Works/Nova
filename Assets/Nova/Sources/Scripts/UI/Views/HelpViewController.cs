@@ -16,8 +16,8 @@ namespace Nova
         {
             base.Awake();
 
-            returnButton.onClick.AddListener(Hide);
-            returnButton2.onClick.AddListener(Hide);
+            returnButton.onClick.AddListener(this.Hide);
+            returnButton2.onClick.AddListener(this.Hide);
 
             configManager = Utils.FindNovaController().ConfigManager;
         }
@@ -29,7 +29,7 @@ namespace Nova
             if (configManager.GetInt(GameFirstShownKey) == 0)
             {
                 configManager.SetInt(GameFirstShownKey, 1);
-                Show();
+                this.Show();
             }
         }
     }
