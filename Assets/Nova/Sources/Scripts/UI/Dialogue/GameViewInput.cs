@@ -327,8 +327,6 @@ namespace Nova
                     Alert.Show("dialogue.hint.clickstopanimation");
                     configManager.SetInt(AbortAnimationFirstShownKey, clicks + 1);
                 }
-
-                return;
             }
 
             gameViewController.AbortAnimation(scriptCanAbortAnimation && canAbortAnimation);
