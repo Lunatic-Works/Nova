@@ -17,7 +17,7 @@ namespace Nova
         private ConfigManager configManager;
         private InputManager inputManager;
 
-        private ButtonRingTrigger buttonRingTrigger;
+        [SerializeField] private ButtonRingTrigger buttonRingTrigger;
 
         private ViewManager viewManager;
         private GameViewController gameViewController;
@@ -32,8 +32,6 @@ namespace Nova
             dialogueState = controller.DialogueState;
             configManager = controller.ConfigManager;
             inputManager = controller.InputManager;
-
-            buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
 
             viewManager = Utils.FindViewManager();
             gameViewController = viewManager.GetController<GameViewController>();
@@ -96,7 +94,7 @@ namespace Nova
 
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
-                gameViewController.Hide();
+                gameViewController.HideDialogue();
             }
 
             if (inputManager.IsTriggered(AbstractKey.ShowLog))
@@ -126,7 +124,7 @@ namespace Nova
         {
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
-                gameViewController.Show();
+                gameViewController.ShowDialogue();
             }
         }
 
@@ -142,13 +140,13 @@ namespace Nova
             }
             else if (viewManager.currentView == CurrentViewType.Game)
             {
-                if (gameViewController.dialogueBoxActive)
+                if (gameViewController.dialogueBoxHidden)
                 {
-                    HandleShortcutWhenDialogueShown();
+                    HandleShortcutWhenDialogueHidden();
                 }
                 else
                 {
-                    HandleShortcutWhenDialogueHidden();
+                    HandleShortcutWhenDialogueShown();
                 }
             }
         }
@@ -170,7 +168,7 @@ namespace Nova
             var eventData = (ExtendedPointerEventData)_eventData;
             if (!inputManager.inputEnabled ||
                 viewManager.currentView != CurrentViewType.Game ||
-                !gameViewController.dialogueBoxActive ||
+                gameViewController.dialogueBoxHidden ||
                 buttonRingTrigger.buttonShowing)
             {
                 return;
@@ -197,9 +195,9 @@ namespace Nova
                 return;
             }
 
-            if (!gameViewController.dialogueBoxActive)
+            if (gameViewController.dialogueBoxHidden)
             {
-                gameViewController.Show();
+                gameViewController.ShowDialogue();
                 return;
             }
 
@@ -240,7 +238,7 @@ namespace Nova
 
                 if (rightButtonAction == RightButtonAction.HideDialoguePanel)
                 {
-                    gameViewController.Hide();
+                    gameViewController.HideDialogue();
                 }
                 else if (rightButtonAction == RightButtonAction.ShowButtonRing)
                 {
@@ -278,9 +276,9 @@ namespace Nova
                 return;
             }
 
-            if (!gameViewController.dialogueBoxActive)
+            if (gameViewController.dialogueBoxHidden)
             {
-                gameViewController.Show();
+                gameViewController.ShowDialogue();
                 return;
             }
             if (scroll > 0)

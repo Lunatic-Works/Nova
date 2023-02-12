@@ -154,7 +154,7 @@ RectTransform:
   m_Children:
   - {fileID: 1350072128}
   - {fileID: 1991460653}
-  m_Father: {fileID: 695111632}
+  m_Father: {fileID: 1497741437}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1119,13 +1119,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 937997461}
-  - {fileID: 2093314819}
-  - {fileID: 1571502992}
-  - {fileID: 982418182}
-  - {fileID: 849972640}
-  - {fileID: 1225254982}
-  - {fileID: 51583038}
+  - {fileID: 1497741437}
   m_Father: {fileID: 922924600}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1159,6 +1153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d2751be25bbae64aa6ee0600f58b36b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonRingTrigger: {fileID: 51583040}
   rightButtonAction: 0
   canClickForward: 1
   canAbortAnimation: 1
@@ -1188,6 +1183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de783f267d0570645b528696aa32c5a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myPanel: {fileID: 1497741436}
   autoModeIcon: {fileID: 849972639}
   fastForwardModeIcon: {fileID: 1225254981}
   currentDialogueBox: {fileID: 8904821941984626519}
@@ -1512,7 +1508,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 695111632}
+    m_TransformParent: {fileID: 1497741437}
     m_Modifications:
     - target: {fileID: 2124973209742998392, guid: 1af0bb5522ef0274d993606b4e6e866e, type: 3}
       propertyPath: m_Pivot.x
@@ -1807,7 +1803,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.0000798, y: 1.0000798, z: 1.0000798}
   m_Children: []
-  m_Father: {fileID: 695111632}
+  m_Father: {fileID: 1497741437}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -2311,7 +2307,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 695111632}
+  m_Father: {fileID: 1497741437}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2863,7 +2859,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.0000798, y: 1.0000798, z: 1.0000798}
   m_Children: []
-  m_Father: {fileID: 695111632}
+  m_Father: {fileID: 1497741437}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -3258,6 +3254,48 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4003918091626093416, guid: fa21b74de666ce3479067e131ec85ba7, type: 3}
   m_PrefabInstance: {fileID: 4003918090870650449}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1497741436
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1497741437}
+  m_Layer: 5
+  m_Name: GamePanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1497741437
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1497741436}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 937997461}
+  - {fileID: 2093314819}
+  - {fileID: 1571502992}
+  - {fileID: 982418182}
+  - {fileID: 849972640}
+  - {fileID: 1225254982}
+  - {fileID: 51583038}
+  m_Father: {fileID: 695111632}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &1542636874 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4269582755980200, guid: ed28a84bf5bed423a9613c9aefa4dd7b, type: 3}
@@ -4003,7 +4041,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 695111632}
+    m_TransformParent: {fileID: 1497741437}
     m_Modifications:
     - target: {fileID: 6033908931892174897, guid: 22b78f749423d2f4b8c4e7c1bbc6a05a, type: 3}
       propertyPath: m_Pivot.x
@@ -5663,7 +5701,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 695111632}
+    m_TransformParent: {fileID: 1497741437}
     m_Modifications:
     - target: {fileID: 362885691, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: _sectors.Array.data[0].action.m_PersistentCalls.m_Calls.Array.data[0].m_Target

@@ -4,23 +4,25 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class GameViewController : MonoBehaviour, IViewController
+    public class GameViewController : ViewControllerBase
     {
         [SerializeField] private GameObject autoModeIcon;
         [SerializeField] private GameObject fastForwardModeIcon;
         public DialogueBoxController currentDialogueBox;
 
-        public ViewManager viewManager { get; private set; }
         private GameState gameState;
         private DialogueState dialogueState;
 
-        private void Awake()
+        protected override bool Init()
         {
-            viewManager = GetComponentInParent<ViewManager>();
-            viewManager.SetController(this);
+            if (base.Init())
+            {
+                return true;
+            }
             var controller = Utils.FindNovaController();
             dialogueState = controller.DialogueState;
             gameState = controller.GameState;
+            return false;
         }
 
         private void OnEnable()
@@ -47,28 +49,16 @@ namespace Nova
             dialogueState.fastForwardModeStops.RemoveListener(OnFastForwardModeStops);
         }
 
-        public bool active => true;
+        public bool dialogueBoxHidden => (!currentDialogueBox?.active) ?? false;
 
-        public bool dialogueBoxActive => currentDialogueBox?.active ?? false;
-
-        public void Show(Action onFinish)
+        public void ShowDialogue(Action onFinish = null)
         {
             currentDialogueBox?.Show(onFinish);
         }
 
-        public void Hide(Action onFinish)
+        public void HideDialogue(Action onFinish = null)
         {
             currentDialogueBox?.Hide(onFinish);
-        }
-
-        public void ShowImmediate(Action onFinish)
-        {
-            currentDialogueBox?.ShowImmediate(onFinish);
-        }
-
-        public void HideImmediate(Action onFinish)
-        {
-            currentDialogueBox?.HideImmediate(onFinish);
         }
 
         public void Step()
@@ -210,7 +200,7 @@ namespace Nova
             return delay;
         }
 
-        private void Update()
+        protected override void Update()
         {
             if (viewManager.currentView == CurrentViewType.Game && dialogueAvailable)
             {
