@@ -310,13 +310,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myPanel: {fileID: 1572506572459116}
   dialogueUpdateMode: 0
-  backgroundImage: {fileID: 0}
-  hideDialogueButton: {fileID: 0}
-  dialogueFinishIcon: {fileID: 0}
+  backgroundPrefab: {fileID: 0}
+  luaGlobalName: 
   textAnimation: {fileID: 1503052317}
   readColor: {r: 0, g: 0, b: 0, a: 1}
   unreadColor: {r: 0, g: 0, b: 0, a: 1}
   textColorHasSet: 0
+  dialogueEntryLayoutSetting:
+    leftPadding: 0
+    rightPadding: 0
+    nameTextSpacing: 0
+    preferredHeight: -1
 --- !u!114 &387142925
 MonoBehaviour:
   m_ObjectHideFlags: 0
