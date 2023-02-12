@@ -1130,6 +1130,10 @@ PrefabInstance:
       propertyPath: backgroundPrefab
       value: 
       objectReference: {fileID: 7947100264230001980, guid: cd0f204e24e8ba940b699f8fa2b4fb6e, type: 3}
+    - target: {fileID: 114698272224023466, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+      propertyPath: dialogueUpdateMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 224974750847515944, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
