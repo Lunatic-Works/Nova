@@ -41,7 +41,7 @@ namespace Nova
             nodes = _nodes.ToList();
             buttons = nodes.Select(InitButton).ToList();
 
-            returnButton.onClick.AddListener(Hide);
+            returnButton.onClick.AddListener(this.Hide);
             I18n.LocaleChanged.AddListener(UpdateButtons);
         }
 
@@ -52,7 +52,7 @@ namespace Nova
             I18n.LocaleChanged.RemoveListener(UpdateButtons);
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             UpdateNodes();
             if (unlockedNodes.Count == 1 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
@@ -62,7 +62,7 @@ namespace Nova
             }
 
             UpdateButtons();
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
         }
 
         public void UpdateNodes()
@@ -92,7 +92,7 @@ namespace Nova
         {
             var go = Instantiate(chapterButtonPrefab, chapterList);
             var button = go.GetComponent<Button>();
-            button.onClick.AddListener(() => Hide(() => GameStart(nodeName)));
+            button.onClick.AddListener(() => this.Hide(() => GameStart(nodeName)));
             return go;
         }
 

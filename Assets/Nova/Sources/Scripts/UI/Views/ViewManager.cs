@@ -207,24 +207,44 @@ namespace Nova
             );
         }
 
-        public static void Hide(this IPanelController controller)
+        public static void Hide(this IPanelController panel, Action onFinish)
         {
-            controller.Hide(null);
+            panel.Hide(true, onFinish);
         }
 
-        public static void Show(this IPanelController controller)
+        public static void Show(this IPanelController panel, Action onFinish)
         {
-            controller.Show(null);
+            panel.Show(true, onFinish);
         }
 
-        public static void ShowImmediate(this IPanelController controller)
+        public static void Hide(this IPanelController panel)
         {
-            controller.ShowImmediate(null);
+            panel.Hide(true, null);
         }
 
-        public static void HideImmediate(this IPanelController controller)
+        public static void Show(this IPanelController panel)
         {
-            controller.HideImmediate(null);
+            panel.Show(true, null);
+        }
+
+        public static void ShowImmediate(this IPanelController panel, Action onFinish)
+        {
+            panel.Show(false, onFinish);
+        }
+
+        public static void HideImmediate(this IPanelController panel, Action onFinish)
+        {
+            panel.Hide(false, onFinish);
+        }
+
+        public static void ShowImmediate(this IPanelController panel)
+        {
+            panel.Show(false, null);
+        }
+
+        public static void HideImmediate(this IPanelController panel)
+        {
+            panel.Hide(false, null);
         }
     }
 }

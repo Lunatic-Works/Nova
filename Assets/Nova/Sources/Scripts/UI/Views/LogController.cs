@@ -79,8 +79,8 @@ namespace Nova
             scrollRect.dataSource = this;
             scrollRect.sizeHelper = this;
 
-            myPanel.GetComponent<Button>().onClick.AddListener(Hide);
-            closeButton.onClick.AddListener(Hide);
+            myPanel.GetComponent<Button>().onClick.AddListener(this.Hide);
+            closeButton.onClick.AddListener(this.Hide);
 
             gameState.gameStarted.AddListener(Clear);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
@@ -110,8 +110,8 @@ namespace Nova
         {
             base.OnDestroy();
 
-            myPanel.GetComponent<Button>().onClick.RemoveListener(Hide);
-            closeButton.onClick.RemoveListener(Hide);
+            myPanel.GetComponent<Button>().onClick.RemoveListener(this.Hide);
+            closeButton.onClick.RemoveListener(this.Hide);
 
             gameState.gameStarted.RemoveListener(Clear);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
@@ -245,7 +245,7 @@ namespace Nova
         {
             var nodeRecord = checkpointManager.GetNodeRecord(logEntry.nodeOffset);
             gameState.MoveBackTo(nodeRecord, logEntry.checkpointOffset, logEntry.dialogueData.dialogueIndex);
-            Hide(onFinish);
+            this.Hide(onFinish);
         }
 
         private int selectedLogEntryIndex = -1;
@@ -269,7 +269,7 @@ namespace Nova
             }
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             if (configManager.GetInt(LogViewFirstShownKey) == 0)
             {
@@ -277,7 +277,7 @@ namespace Nova
                 configManager.SetInt(LogViewFirstShownKey, 1);
             }
 
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
 
             scrollRect.RefillCellsFromEnd();
             scrollRect.verticalNormalizedPosition = 1f;
@@ -299,7 +299,7 @@ namespace Nova
                 scrollRect.GetVerticalOffsetAndSize(out var contentHeight, out _);
                 if (contentHeight < scrollRect.viewport.rect.height)
                 {
-                    Hide();
+                    this.Hide();
                     return;
                 }
 
@@ -308,7 +308,7 @@ namespace Nova
                 // verticalNormalizedPosition can be > 1
                 if (scrollDownIdleTime > MaxScrollDownIdleTime && scrollRect.verticalNormalizedPosition > 1f - 1e-3f)
                 {
-                    Hide();
+                    this.Hide();
                     return;
                 }
 

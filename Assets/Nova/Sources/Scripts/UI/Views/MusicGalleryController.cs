@@ -106,21 +106,21 @@ namespace Nova
             RefreshContent();
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             PauseOtherAudios();
 
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
 
             RefreshContent();
         }
 
-        public override void Hide(Action onFinish)
+        public override void Hide(bool doTransition, Action onFinish)
         {
             RestoreOtherAudios();
             musicPlayer.Pause();
 
-            base.Hide(onFinish);
+            base.Hide(doTransition, onFinish);
         }
 
         private void RefreshContent()

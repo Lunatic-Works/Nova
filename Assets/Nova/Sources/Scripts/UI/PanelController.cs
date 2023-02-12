@@ -40,7 +40,7 @@ namespace Nova
 
         protected virtual void OnHideComplete() { }
 
-        public virtual void Show(Action onFinish)
+        public virtual void Show(bool doTransition, Action onFinish)
         {
             if (active)
             {
@@ -50,7 +50,7 @@ namespace Nova
 
             myPanel.SetActive(true);
             var transition = transitions.FirstOrDefault(t => t.enabled);
-            if (transition != null)
+            if (doTransition && transition != null)
             {
                 onTransitionBegin();
                 transition.Enter(() =>
@@ -66,7 +66,7 @@ namespace Nova
             }
         }
 
-        public virtual void Hide(Action onFinish)
+        public virtual void Hide(bool doTransition, Action onFinish)
         {
             if (!active)
             {
@@ -75,7 +75,7 @@ namespace Nova
             }
 
             var transition = transitions.FirstOrDefault(t => t.enabled);
-            if (transition != null)
+            if (doTransition && transition != null)
             {
                 onTransitionBegin();
                 transition.Exit(() =>
@@ -91,20 +91,6 @@ namespace Nova
                 myPanel.SetActive(false);
                 onFinish?.Invoke();
             }
-        }
-
-        public void ShowImmediate(Action onFinish)
-        {
-            myPanel.SetActive(true);
-            onShowComplete();
-            onFinish?.Invoke();
-        }
-
-        public void HideImmediate(Action onFinish)
-        {
-            OnHideComplete();
-            myPanel.SetActive(false);
-            onFinish?.Invoke();
         }
 
         protected virtual void Start()

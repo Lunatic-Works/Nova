@@ -6,12 +6,8 @@ namespace Nova
     {
         bool active { get; }
 
-        void Hide(Action onFinish);
+        void Hide(bool doTransition, Action onFinish);
 
-        void Show(Action onFinish);
-
-        void ShowImmediate(Action onFinish);
-
-        void HideImmediate(Action onFinish);
+        void Show(bool doTransition, Action onFinish);
     }
 }

@@ -33,25 +33,25 @@ namespace Nova
                 restoreButton.onClick.AddListener(configManager.Restore);
             }
 
-            backButton.onClick.AddListener(Hide);
+            backButton.onClick.AddListener(this.Hide);
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             fromTitle = false;
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
         }
 
         public void ShowFromTitle()
         {
-            Show();
+            this.Show();
             fromTitle = true;
         }
 
-        public override void Hide(Action onFinish)
+        public override void Hide(bool doTransition, Action onFinish)
         {
             configManager.Apply();
-            base.Hide(onFinish);
+            base.Hide(doTransition, onFinish);
         }
 
         public void ReturnTitleWithCallback(Action onFinish)
@@ -60,7 +60,8 @@ namespace Nova
 
             // TODO: Better transition between any two views
             viewManager.GetController<TitleController>().ShowImmediate();
-            Hide(onFinish);
+            viewManager.GetController<GameViewController>().HideImmediate();
+            this.Hide(onFinish);
         }
 
         private void ReturnTitle()
