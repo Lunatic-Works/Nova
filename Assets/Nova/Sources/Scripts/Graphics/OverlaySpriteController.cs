@@ -32,6 +32,8 @@ namespace Nova
             set => overlay.layer = value;
         }
 
+        public string luaGlobalName;
+
         protected override void Awake()
         {
             if (Quad == null)
@@ -72,12 +74,22 @@ namespace Nova
 
             myTarget = new MyTarget(this);
             myTarget.Awake();
+
+            if (!string.IsNullOrEmpty(luaGlobalName))
+            {
+                LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
+                gameState.AddRestorable(this);
+            }
         }
 
-        protected override void OnDestroy()
+        protected virtual void OnDestroy()
         {
-            base.OnDestroy();
             myTarget.OnDestroy();
+
+            if (!string.IsNullOrEmpty(luaGlobalName))
+            {
+                gameState.RemoveRestorable(this);
+            }
         }
 
         protected virtual void Update()
@@ -85,13 +97,15 @@ namespace Nova
             myTarget.Update();
         }
 
+        public override string restorableName => luaGlobalName;
+
         protected class MyTarget : RenderTarget
         {
             private new const string SUFFIX = "Composite" + RenderTarget.SUFFIX;
 
             private readonly OverlaySpriteController parent;
 
-            public override string textureName => parent == null ? oldConfig.name : parent.luaGlobalName + SUFFIX;
+            public override string textureName => parent == null ? oldConfig.name : parent.restorableName + SUFFIX;
             public override bool isFinal => false;
             public override bool isActive => parent != null && parent.needRender;
 

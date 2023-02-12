@@ -8,7 +8,7 @@ namespace Nova
 {
     public class PanelController : MonoBehaviour, IPanelController
     {
-        public GameObject myPanel;
+        [SerializeField] protected GameObject myPanel;
 
         protected List<UIViewTransitionBase> transitions;
         protected bool inited;

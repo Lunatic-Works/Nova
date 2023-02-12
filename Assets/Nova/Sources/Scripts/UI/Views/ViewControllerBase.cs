@@ -25,6 +25,17 @@ namespace Nova
             return false;
         }
 
+        // Extension method does not work with Unity Action
+        public void Show()
+        {
+            this.Show(true, null);
+        }
+
+        public void Hide()
+        {
+            this.Hide(true, null);
+        }
+
         protected virtual void OnDestroy()
         {
             viewManager.UnsetController(this);
