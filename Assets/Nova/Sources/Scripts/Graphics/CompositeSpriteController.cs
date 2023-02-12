@@ -13,7 +13,6 @@ namespace Nova
         public CompositeSpriteMerger mergerPrimary;
         public CompositeSpriteMerger mergerSub;
         public string imageFolder;
-        public string luaGlobalName;
 
         protected string currentPose;
         private DialogueState dialogueState;
@@ -35,20 +34,6 @@ namespace Nova
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
-
-            if (!string.IsNullOrEmpty(luaGlobalName))
-            {
-                LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
-                gameState.AddRestorable(this);
-            }
-        }
-
-        protected virtual void OnDestroy()
-        {
-            if (!string.IsNullOrEmpty(luaGlobalName))
-            {
-                gameState.RemoveRestorable(this);
-            }
         }
 
         public void SetPose(string pose, bool fade = true)
@@ -114,7 +99,7 @@ namespace Nova
 
         #region Restoration
 
-        public virtual string restorableName => luaGlobalName;
+        public abstract string restorableName { get; }
 
         [Serializable]
         protected class CompositeSpriteControllerRestoreData : IRestoreData

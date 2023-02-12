@@ -8,53 +8,52 @@ function stop_ff()
     end
 end
 
---- DEPRECATED: This may not work in all contexts. In the next version there will be other ways to do this.
-function force_step()
-    __Nova.dialogueBoxController:ForceStep()
+function current_box()
+    return __Nova.gameViewController.currentDialogueBox
 end
 
 --- offset: {left, right, top, bottom}
 function box_offset(offset)
-    __Nova.dialogueBoxController.rect.offsetMin = Vector2(offset[1], offset[4])
-    __Nova.dialogueBoxController.rect.offsetMax = Vector2(-offset[2], -offset[3])
+    current_box().rect.offsetMin = Vector2(offset[1], offset[4])
+    current_box().rect.offsetMax = Vector2(-offset[2], -offset[3])
 end
 
 make_anim_method('box_offset', function(self, offset, duration, easing)
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.OffsetAnimationProperty(__Nova.dialogueBoxController.rect, Vector4(unpack(offset)))
+    local property = Nova.OffsetAnimationProperty(current_box().rect, Vector4(unpack(offset)))
     return self:_then(property):_with(easing):_for(duration)
 end)
 
 --- anchor: {left, right, bottom, top}
 function box_anchor(anchor)
-    __Nova.dialogueBoxController.rect.anchorMin = Vector2(anchor[1], anchor[3])
-    __Nova.dialogueBoxController.rect.anchorMax = Vector2(anchor[2], anchor[4])
+    current_box().rect.anchorMin = Vector2(anchor[1], anchor[3])
+    current_box().rect.anchorMax = Vector2(anchor[2], anchor[4])
 end
 
 make_anim_method('box_anchor', function(self, anchor, duration, easing)
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.AnchorAnimationProperty(__Nova.dialogueBoxController.rect, Vector4(unpack(anchor)))
+    local property = Nova.AnchorAnimationProperty(current_box().rect, Vector4(unpack(anchor)))
     return self:_then(property):_with(easing):_for(duration)
 end)
 
 function box_update_mode(mode)
-    -- __Nova.dialogueBoxController.dialogueUpdateMode = mode
+    -- current_box().dialogueUpdateMode = mode
 end
 
 function box_theme(theme)
-    -- __Nova.dialogueBoxController.theme = theme
+    -- current_box().theme = theme
 end
 
 function box_tint(color)
-    __Nova.dialogueBoxController.backgroundColor = parse_color(color)
+    current_box().backgroundColor = parse_color(color)
 end
 
 make_anim_method('box_tint', function(self, color, duration, easing)
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(__Nova.dialogueBoxController, Nova.DialogueBoxColor.Type.Background), parse_color(color))
+    local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(current_box(), Nova.DialogueBoxColor.Type.Background), parse_color(color))
     return self:_then(property):_with(easing):_for(duration)
 end)
 
@@ -69,27 +68,27 @@ function box_alignment(mode)
         warn('Unknown text alignment: ' .. dump(mode))
         return
     end
-    __Nova.dialogueBoxController.textAlignment = mode
+    current_box().textAlignment = mode
 end
 
 function text_color(color)
     if color then
-        __Nova.dialogueBoxController.textColorHasSet = true
-        __Nova.dialogueBoxController.textColor = parse_color(color)
+        current_box().textColorHasSet = true
+        current_box().textColor = parse_color(color)
     else
-        __Nova.dialogueBoxController.textColorHasSet = false
+        current_box().textColorHasSet = false
     end
 end
 
 make_anim_method('text_color', function(self, color, duration, easing)
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(__Nova.dialogueBoxController, Nova.DialogueBoxColor.Type.Text), parse_color(color))
+    local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(current_box(), Nova.DialogueBoxColor.Type.Text), parse_color(color))
     return self:_then(property):_with(easing):_for(duration)
 end)
 
 function text_material(material_name)
-    __Nova.dialogueBoxController.materialName = material_name
+    current_box().materialName = material_name
 end
 
 box_pos_presets = {
@@ -209,19 +208,19 @@ function set_box(pos_name, style_name, auto_new_page)
     text_color(style['text_color'])
     text_material(style['text_material'])
 
-    __Nova.dialogueBoxController:SetTextScroll(0)
+    current_box():SetTextScroll(0)
 end
 
 function new_page()
-    __Nova.dialogueBoxController:NewPage()
+    current_box():NewPage()
 end
 
 function text_delay(time)
-    __Nova.dialogueBoxController:SetTextAnimationDelay(time)
+    current_box():SetTextAnimationDelay(time)
 end
 
 function text_duration(time)
-    __Nova.dialogueBoxController:OverrideTextDuration(time)
+    current_box():OverrideTextDuration(time)
 end
 
 function box_hide_show(duration, pos_name, style_name)
@@ -234,14 +233,14 @@ function box_hide_show(duration, pos_name, style_name)
 end
 
 function text_scroll(value)
-    __Nova.dialogueBoxController:OverrideTextScroll()
-    __Nova.dialogueBoxController:SetTextScroll(value)
+    current_box():OverrideTextScroll()
+    current_box():SetTextScroll(value)
 end
 
 make_anim_method('text_scroll', function(self, start, target, duration, easing)
     duration = duration or 1
     easing = parse_easing(easing)
-    __Nova.dialogueBoxController:OverrideTextScroll()
-    local property = __Nova.dialogueBoxController:GetTextScrollAnimationProperty(start, target)
+    current_box():OverrideTextScroll()
+    local property = current_box():GetTextScrollAnimationProperty(start, target)
     return self:_then(property):_with(easing):_for(duration)
 end)

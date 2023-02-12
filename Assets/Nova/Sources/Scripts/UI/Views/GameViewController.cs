@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
 {
-    public class GameViewController : ViewControllerBase
+    [ExportCustomType]
+    public class GameViewController : ViewControllerBase, IRestorable
     {
         [SerializeField] private GameObject autoModeIcon;
         [SerializeField] private GameObject fastForwardModeIcon;
@@ -22,7 +24,17 @@ namespace Nova
             var controller = Utils.FindNovaController();
             dialogueState = controller.DialogueState;
             gameState = controller.GameState;
+
+            LuaRuntime.Instance.BindObject("gameViewController", this);
+            gameState.AddRestorable(this);
+
             return false;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            gameState.RemoveRestorable(this);
         }
 
         private void OnEnable()
@@ -273,5 +285,37 @@ namespace Nova
                 fastForwardModeIcon.SetActive(false);
             }
         }
+
+        #region Restoration
+
+        public string restorableName => "GameViewController";
+
+        [Serializable]
+        private class GameViewControllerRestoreData : IRestoreData
+        {
+            public readonly string currentDialogueBox;
+
+            public GameViewControllerRestoreData(GameViewController controller)
+            {
+                this.currentDialogueBox = controller.currentDialogueBox?.luaGlobalName ?? "";
+            }
+        }
+
+        public IRestoreData GetRestoreData()
+        {
+            return new GameViewControllerRestoreData(this);
+        }
+
+        public void Restore(IRestoreData restoreData)
+        {
+            var data = restoreData as GameViewControllerRestoreData;
+            if (!string.IsNullOrEmpty(data.currentDialogueBox))
+            {
+                currentDialogueBox = GetComponentsInChildren<DialogueBoxController>(true)
+                    .First(x => x.luaGlobalName == data.currentDialogueBox);
+            }
+        }
+
+        #endregion
     }
 }

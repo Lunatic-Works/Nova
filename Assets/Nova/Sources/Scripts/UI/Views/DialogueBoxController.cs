@@ -72,12 +72,13 @@ namespace Nova
 
         private GameState gameState;
         private DialogueState dialogueState;
+        private GameViewController gameView;
 
         private ScrollRect dialogueTextScrollRect;
         private DialogueTextController dialogueText;
         private RectTransform dialogueTextRect;
 
-        private AvatarController avatarController;
+        public AvatarController avatar { get; private set; }
 
         // TODO: there are a lot of magic numbers for the current UI
         [ExportCustomType]
@@ -175,6 +176,10 @@ namespace Nova
             }
         }
 
+        public bool isCurrent => gameView.currentDialogueBox == this;
+
+        public string luaGlobalName;
+
         protected override bool Init()
         {
             if (base.Init())
@@ -185,12 +190,13 @@ namespace Nova
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
+            gameView = GetComponentInParent<GameViewController>();
 
             dialogueTextScrollRect = GetComponentInChildren<ScrollRect>();
             dialogueText = GetComponentInChildren<DialogueTextController>();
             dialogueTextRect = dialogueText.transform as RectTransform;
 
-            avatarController = GetComponentInChildren<AvatarController>();
+            avatar = GetComponentInChildren<AvatarController>();
 
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
@@ -204,10 +210,22 @@ namespace Nova
             UpdateColor();
             hideDialogueButton.onClick.AddListener(this.Hide);
 
-            LuaRuntime.Instance.BindObject("dialogueBoxController", this);
-            gameState.AddRestorable(this);
+            if (!string.IsNullOrEmpty(luaGlobalName))
+            {
+                LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
+                gameState.AddRestorable(this);
+            }
 
             return false;
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            if (isCurrent)
+            {
+                this.ShowImmediate();
+            }
         }
 
         private void OnDestroy()
@@ -300,7 +318,7 @@ namespace Nova
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
             Color nowTextColor = textColorHasSet ? textColor : dialogueState.isDialogueReached ? readColor : unreadColor;
-            textLeftExtraPadding = avatarController?.textPaddingOrZero ?? 0;
+            textLeftExtraPadding = avatar?.textPaddingOrZero ?? 0;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
 
@@ -492,11 +510,12 @@ namespace Nova
 
         #region Restoration
 
-        public string restorableName => "DialogueBoxController";
+        public string restorableName => luaGlobalName;
 
         [Serializable]
         private class DialogueBoxControllerRestoreData : IRestoreData
         {
+            public readonly bool active;
             public readonly RectTransformData rectTransformData;
             public readonly Vector4Data backgroundColor;
             public readonly DialogueUpdateMode dialogueUpdateMode;
@@ -508,35 +527,33 @@ namespace Nova
             public readonly bool closeButtonShown;
             public readonly bool dialogueFinishIconShown;
 
-            public DialogueBoxControllerRestoreData(RectTransform rect, Color backgroundColor,
-                DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas,
-                int textAlignment, bool textColorHasSet, Color textColor, string materialName, bool closeButtonShown,
-                bool dialogueFinishIconShown)
+            public DialogueBoxControllerRestoreData(DialogueBoxController controller)
             {
-                rectTransformData = new RectTransformData(rect);
-                this.backgroundColor = backgroundColor;
-                this.dialogueUpdateMode = dialogueUpdateMode;
-                this.displayDatas = displayDatas;
-                this.textAlignment = textAlignment;
-                this.textColorHasSet = textColorHasSet;
-                this.textColor = textColor;
-                this.materialName = materialName;
-                this.closeButtonShown = closeButtonShown;
-                this.dialogueFinishIconShown = dialogueFinishIconShown;
+                this.active = controller.active;
+                this.rectTransformData = new RectTransformData(controller.rect);
+                this.backgroundColor = controller.backgroundColor;
+                this.dialogueUpdateMode = controller.dialogueUpdateMode;
+                this.displayDatas = controller.dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
+                this.textAlignment = (int)controller.textAlignment;
+                this.textColorHasSet = controller.textColorHasSet;
+                this.textColor = controller.textColor;
+                this.materialName = controller.materialName;
+                this.closeButtonShown = controller.closeButtonShown;
+                this.dialogueFinishIconShown = controller.dialogueFinishIconShown;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
-            return new DialogueBoxControllerRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas,
-                (int)textAlignment, textColorHasSet, textColor, materialName, closeButtonShown,
-                dialogueFinishIconShown);
+            return new DialogueBoxControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)
         {
             var data = restoreData as DialogueBoxControllerRestoreData;
+
+            // show current dialogue box no matter what
+            myPanel.SetActive(isCurrent || data.active);
             data.rectTransformData.Restore(rect);
             backgroundColor = data.backgroundColor;
 

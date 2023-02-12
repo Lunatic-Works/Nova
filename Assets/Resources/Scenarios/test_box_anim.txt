@@ -19,7 +19,7 @@ set_box('full', 'dark') -- dialogue_box.lua的box_style_presets中的dark设置�
                         -- 其中的preferredHeight为-1，这时每条对话的高度没有限制
                         -- 否则theme为Default时，preferredHeight为150，这时每条对话的高度限制为2行
 
-__Nova.dialogueBoxController.canRefreshTextProxy = false -- 禁止刷新文字排版
+current_box().canRefreshTextProxy = false -- 禁止刷新文字排版
                                                          -- 在自定义的对话框动画之前要写这一句，否则对话框的位置/大小每改变一下，都要刷新文字排版，就会发生闪烁
 __Nova.gameViewInput.canClickForward = false -- 禁止点击鼠标跳过动画
 
@@ -42,7 +42,7 @@ text_scroll(0)   -- 初始时文字在对话框中的位置为0，这个位置�
 anim:wait(2                           -- 文字滚动动画之前等待2秒，就是对话框移到屏幕内的动画差不多结束的时候
     ):text_scroll(0, 1300, 8, {0, 1}  -- 文字滚动动画，初始位置为0，最终位置为1300（使得文字在对话框的上边缘之外），时间为8秒，开始时从零加速，结束时不用减速
     ):action(function()
-        __Nova.dialogueBoxController.canRefreshTextProxy = true -- 允许刷新文字排版
+        current_box().canRefreshTextProxy = true -- 允许刷新文字排版
         __Nova.gameViewInput.canClickForward = true -- 允许点击鼠标跳过动画
     end)
 |>

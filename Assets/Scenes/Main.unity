@@ -1801,14 +1801,14 @@ RectTransform:
   m_GameObject: {fileID: 849972639}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.0000798, y: 1.0000798, z: 1.0000798}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1497741437}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -800.59753, y: 439.99997}
+  m_AnchoredPosition: {x: -800.5976, y: 440}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &849972641
@@ -2857,14 +2857,14 @@ RectTransform:
   m_GameObject: {fileID: 1225254981}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.0000798, y: 1.0000798, z: 1.0000798}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1497741437}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -800.59753, y: 439.99997}
+  m_AnchoredPosition: {x: -800.5976, y: 440}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1225254983
@@ -3537,11 +3537,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1515438340287766, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114530638897265038, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_Padding.m_Bottom
       value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 114698272224023466, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+      propertyPath: luaGlobalName
+      value: basic_box
       objectReference: {fileID: 0}
     - target: {fileID: 114698272224023466, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: backgroundPrefab
@@ -3549,7 +3553,7 @@ PrefabInstance:
       objectReference: {fileID: 7947100264230001980, guid: cd0f204e24e8ba940b699f8fa2b4fb6e, type: 3}
     - target: {fileID: 224974750847515944, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 120
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224981068127226408, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_Pivot.x
@@ -3757,6 +3761,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3535619004859047374, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -16.999756
+      objectReference: {fileID: 0}
+    - target: {fileID: 3535619004859047374, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -13
+      objectReference: {fileID: 0}
     - target: {fileID: 3535619006079575071, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: audioSource
       value: 
@@ -3767,7 +3779,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3962174862496820371, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 54.72003
+      value: 54.71997
       objectReference: {fileID: 0}
     - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -3775,7 +3787,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -56.299988
+      value: -56.299927
       objectReference: {fileID: 0}
     - target: {fileID: 8049959921000225447, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -4640,6 +4652,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 922924600}
     m_Modifications:
+    - target: {fileID: 779502757, guid: 60803c007c3ce4e5a876197907c5c3aa, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -10
+      objectReference: {fileID: 0}
     - target: {fileID: 1292923931800236, guid: 60803c007c3ce4e5a876197907c5c3aa, type: 3}
       propertyPath: m_Name
       value: LogView
@@ -5597,7 +5613,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -56.299988
+      value: -56.299927
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
@@ -5901,6 +5917,10 @@ PrefabInstance:
     - target: {fileID: 1515438340287766, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: m_Name
       value: DefaultDialogueBox
+      objectReference: {fileID: 0}
+    - target: {fileID: 114698272224023466, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
+      propertyPath: luaGlobalName
+      value: default_box
       objectReference: {fileID: 0}
     - target: {fileID: 114698272224023466, guid: ba2f88a38a7e341dd95278c30faf99d9, type: 3}
       propertyPath: backgroundPrefab

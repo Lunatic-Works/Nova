@@ -22,6 +22,7 @@ namespace Nova
         [SerializeField] private int textPadding;
         [SerializeField] private Camera renderCamera;
 
+        private DialogueBoxController dialogueBox;
         private RawImage image;
         private RectTransform rectTransform;
         private readonly Dictionary<string, AvatarConfig> nameToConfig = new Dictionary<string, AvatarConfig>();
@@ -36,6 +37,7 @@ namespace Nova
         {
             base.Awake();
 
+            dialogueBox = GetComponentInParent<DialogueBoxController>();
             image = GetComponent<RawImage>();
             rectTransform = GetComponent<RectTransform>();
             foreach (var config in avatarConfigs)
@@ -57,10 +59,8 @@ namespace Nova
             renderCamera.enabled = true;
         }
 
-        protected override void OnDestroy()
+        private void OnDestroy()
         {
-            base.OnDestroy();
-
             Destroy(renderCamera.targetTexture);
             gameState.nodeChanged.RemoveListener(OnNodeChanged);
         }
@@ -162,6 +162,8 @@ namespace Nova
         }
 
         #region Restoration
+
+        public override string restorableName => dialogueBox.restorableName + "_avatar";
 
         [Serializable]
         private class AvatarControllerRestoreData : CompositeSpriteControllerRestoreData
