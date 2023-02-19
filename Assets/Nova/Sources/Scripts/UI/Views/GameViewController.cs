@@ -77,6 +77,7 @@ namespace Nova
         {
             if (currentDialogueBox == box)
             {
+                box?.ShowImmediate();
                 return;
             }
             currentDialogueBox?.HideImmediate();

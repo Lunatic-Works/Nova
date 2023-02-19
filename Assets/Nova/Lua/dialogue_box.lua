@@ -169,7 +169,7 @@ function set_box(pos_name, style_name, auto_new_page)
     pos_name = pos_name or 'bottom'
     style_name = style_name or 'light'
     if auto_new_page == nil then
-        auto_new_page = false
+        auto_new_page = true
     end
 
     local pos = box_pos_presets[pos_name]
@@ -206,7 +206,9 @@ function set_box(pos_name, style_name, auto_new_page)
 end
 
 function new_page()
-    current_box():NewPage()
+    if current_box() ~= nil then
+        current_box():NewPage()
+    end
 end
 
 function text_delay(time)
@@ -219,10 +221,12 @@ end
 
 function box_hide_show(duration, pos_name, style_name)
     duration = duration or 1
-
-    box_tint({0, 0})
-    anim:wait(duration):action(set_box, pos_name, style_name)
+    set_box(pos_name, style_name)
+    current_box():Hide(false, nil)
     text_delay(duration)
+    anim:wait(duration):action(function()
+        current_box():Show(false, nil)
+    end)
 end
 
 function text_scroll(value)
