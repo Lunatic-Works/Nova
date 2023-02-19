@@ -61,7 +61,6 @@ namespace Nova
     [ExportCustomType]
     public class DialogueBoxController : PanelController, IRestorable
     {
-        [ExportCustomType]
         public enum DialogueUpdateMode
         {
             Overwrite,
@@ -79,14 +78,6 @@ namespace Nova
         private RectTransform dialogueTextRect;
 
         public AvatarController avatar { get; private set; }
-
-        // TODO: there are a lot of magic numbers for the current UI
-        [ExportCustomType]
-        public enum Theme
-        {
-            Default,
-            Basic
-        }
 
         // private bool themeInited;
         // private Theme _theme;

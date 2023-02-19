@@ -73,6 +73,24 @@ namespace Nova
             currentDialogueBox?.Hide(onFinish);
         }
 
+        public void SwitchDialogueBox(DialogueBoxController box, bool cleanText = true)
+        {
+            if (currentDialogueBox == box)
+            {
+                return;
+            }
+            currentDialogueBox?.HideImmediate();
+            if (box != null)
+            {
+                box.ShowImmediate();
+                if (cleanText)
+                {
+                    box.NewPage();
+                }
+            }
+            currentDialogueBox = box;
+        }
+
         public void Step()
         {
             if (currentDialogueBox != null)

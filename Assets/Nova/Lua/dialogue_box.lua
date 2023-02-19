@@ -38,12 +38,11 @@ make_anim_method('box_anchor', function(self, anchor, duration, easing)
     return self:_then(property):_with(easing):_for(duration)
 end)
 
-function box_update_mode(mode)
-    -- current_box().dialogueUpdateMode = mode
-end
-
-function box_theme(theme)
-    -- current_box().theme = theme
+function box_set_current(box)
+    if type(box) == 'string' then
+        box = _G[box]
+    end
+    __Nova.gameViewController:SwitchDialogueBox(box)
 end
 
 function box_tint(color)
@@ -93,46 +92,37 @@ end
 
 box_pos_presets = {
     bottom = {
+        box = 'default_box',
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.05, 0.35},
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
-        theme = Nova.DialogueBoxController.Theme.Default,
     },
     top = {
+        box = 'default_box',
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.65, 0.95},
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
-        theme = Nova.DialogueBoxController.Theme.Default,
     },
     center = {
+        box = 'default_box',
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.35, 0.65},
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Overwrite,
-        theme = Nova.DialogueBoxController.Theme.Default,
     },
     left = {
+        box = 'basic_box',
         offset = {0, 0, 0, 0},
         anchor = {0, 0.5, 0, 1},
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
-        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     right = {
+        box = 'basic_box',
         offset = {0, 0, 0, 0},
         anchor = {0.5, 1, 0, 1},
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
-        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     full = {
+        box = 'basic_box',
         offset = {0, 0, 0, 0},
         anchor = {0.05, 0.95, 0, 1},
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
-        theme = Nova.DialogueBoxController.Theme.Basic,
     },
     hide = {
-        offset = {0, 0, 0, 0},
-        anchor = {0.1, 0.9, 2.05, 2.35},
-        update_mode = Nova.DialogueBoxController.DialogueUpdateMode.Append,
-        theme = Nova.DialogueBoxController.Theme.Basic,
+        box = nil,
     },
 }
 
@@ -179,7 +169,7 @@ function set_box(pos_name, style_name, auto_new_page)
     pos_name = pos_name or 'bottom'
     style_name = style_name or 'light'
     if auto_new_page == nil then
-        auto_new_page = true
+        auto_new_page = false
     end
 
     local pos = box_pos_presets[pos_name]
@@ -188,27 +178,31 @@ function set_box(pos_name, style_name, auto_new_page)
         return
     end
 
-    local style = box_style_presets[style_name]
-    if style == nil then
-        warn('Unknown box style ' .. dump(style_name))
-        return
+    local style = nil
+    if pos['box'] ~= nil then
+        style = box_style_presets[style_name]
+        if style == nil then
+            warn('Unknown box style ' .. dump(style_name))
+            return
+        end
     end
 
-    if auto_new_page and pos['update_mode'] == Nova.DialogueBoxController.DialogueUpdateMode.Append then
+    if auto_new_page then
         new_page()
     end
 
-    box_offset(pos['offset'])
-    box_anchor(pos['anchor'])
-    box_update_mode(pos['update_mode'])
-    box_theme(pos['theme'])
+    box_set_current(pos['box'])
+    if pos['box'] ~= nil then
+        box_offset(pos['offset'])
+        box_anchor(pos['anchor'])
 
-    box_tint(style['tint'])
-    box_alignment(style['alignment'])
-    text_color(style['text_color'])
-    text_material(style['text_material'])
+        box_tint(style['tint'])
+        box_alignment(style['alignment'])
+        text_color(style['text_color'])
+        text_material(style['text_material'])
 
-    current_box():SetTextScroll(0)
+        current_box():SetTextScroll(0)
+    end
 end
 
 function new_page()
@@ -225,10 +219,9 @@ end
 
 function box_hide_show(duration, pos_name, style_name)
     duration = duration or 1
-    -- set style and new page before animation
-    set_box('hide', style_name, false)
-    new_page()
-    anim:wait(duration):action(set_box, pos_name, style_name, false)
+
+    box_tint({0, 0})
+    anim:wait(duration):action(set_box, pos_name, style_name)
     text_delay(duration)
 end
 

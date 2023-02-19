@@ -1,9 +1,13 @@
 add_action_before_lazy_block(function(name)
-    current_box().avatar:SetCharacterName(name)
+    if current_box() ~= nil then
+        current_box().avatar:SetCharacterName(name)
+    end
 end)
 
 add_action_after_lazy_block(function()
-    current_box().avatar:UpdateImage()
+    if current_box() ~= nil then
+        current_box().avatar:UpdateImage()
+    end
 end)
 
 function avatar_show(pose)
