@@ -207,16 +207,14 @@ namespace Nova
                 gameState.AddRestorable(this);
             }
 
+            this.HideImmediate();
+
             return false;
         }
 
         protected override void Start()
         {
             base.Start();
-            if (isCurrent)
-            {
-                this.ShowImmediate();
-            }
         }
 
         private void OnDestroy()

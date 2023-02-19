@@ -163,6 +163,9 @@ namespace Nova
             }
         }
 
+        private bool needShowDialogueBox => gameViewController.dialogueBoxHidden &&
+            !NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
+
         public void OnPointerDown(PointerEventData _eventData)
         {
             var eventData = (ExtendedPointerEventData)_eventData;
@@ -195,7 +198,7 @@ namespace Nova
                 return;
             }
 
-            if (gameViewController.dialogueBoxHidden)
+            if (needShowDialogueBox)
             {
                 gameViewController.ShowDialogue();
                 return;
@@ -276,7 +279,7 @@ namespace Nova
                 return;
             }
 
-            if (gameViewController.dialogueBoxHidden)
+            if (needShowDialogueBox)
             {
                 gameViewController.ShowDialogue();
                 return;
