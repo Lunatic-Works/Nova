@@ -79,51 +79,6 @@ namespace Nova
 
         public AvatarController avatar { get; private set; }
 
-        // private bool themeInited;
-        // private Theme _theme;
-
-        // public Theme theme
-        // {
-        //     get => _theme;
-        //     set
-        //     {
-        //         if (themeInited && _theme == value)
-        //         {
-        //             return;
-        //         }
-
-        //         themeInited = true;
-        //         _theme = value;
-        //         Init();
-
-        //         var scrollRectTransform = dialogueTextScrollRect.transform as RectTransform;
-
-        //         switch (value)
-        //         {
-        //             case Theme.Default:
-        //                 scrollRectTransform.offsetMin = new Vector2(120f, 0f);
-        //                 scrollRectTransform.offsetMax = new Vector2(-180f, -40f);
-        //                 dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 0);
-        //                 dialogueEntryLayoutSetting = new DialogueEntryLayoutSetting
-        //                 {
-        //                     leftPadding = 0,
-        //                     rightPadding = 0,
-        //                     nameTextSpacing = 16f,
-        //                     preferredHeight = 180f
-        //                 };
-        //                 break;
-        //             case Theme.Basic:
-        //                 scrollRectTransform.offsetMin = new Vector2(60f, 42f);
-        //                 scrollRectTransform.offsetMax = new Vector2(-120f, -42f);
-        //                 dialogueTextVerticalLayoutGroup.padding = new RectOffset(0, 0, 0, 120);
-        //                 dialogueEntryLayoutSetting = DialogueEntryLayoutSetting.Default;
-        //                 break;
-        //             default:
-        //                 throw new ArgumentOutOfRangeException();
-        //         }
-        //     }
-        // }
-
         public RectTransform rect { get; private set; }
 
         [SerializeField] private GameObject backgroundPrefab;
