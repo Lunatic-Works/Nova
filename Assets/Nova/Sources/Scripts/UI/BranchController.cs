@@ -19,13 +19,13 @@ namespace Nova
 
             gameState = Utils.FindNovaController().GameState;
             gameState.selectionOccurs.AddListener(OnSelectionOccurs);
-            gameState.restoreStarts.AddListener(RemoveAllSelections);
+            gameState.restoreStarts.AddListener(OnRestoreStarts);
         }
 
         private void OnDestroy()
         {
             gameState.selectionOccurs.RemoveListener(OnSelectionOccurs);
-            gameState.restoreStarts.RemoveListener(RemoveAllSelections);
+            gameState.restoreStarts.RemoveListener(OnRestoreStarts);
         }
 
         private void OnSelectionOccurs(SelectionOccursData data)
@@ -64,6 +64,11 @@ namespace Nova
         {
             RemoveAllSelections();
             gameState.SignalFence(index);
+        }
+
+        private void OnRestoreStarts(bool isInitial)
+        {
+            RemoveAllSelections();
         }
 
         private void RemoveAllSelections()

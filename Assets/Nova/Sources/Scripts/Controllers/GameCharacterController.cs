@@ -86,7 +86,7 @@ namespace Nova
 
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
-            gameState.restoreStarts.AddListener(StopVoice);
+            gameState.restoreStarts.AddListener(OnRestoreStarts);
         }
 
         protected override void OnDestroy()
@@ -95,7 +95,7 @@ namespace Nova
 
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
-            gameState.restoreStarts.RemoveListener(StopVoice);
+            gameState.restoreStarts.RemoveListener(OnRestoreStarts);
         }
 
         #region Voice
@@ -199,6 +199,11 @@ namespace Nova
             voiceDelay = delay;
             audioSource.clip = audioClip;
             gameState.AddVoice(luaGlobalName, new VoiceEntry(voiceFileName, delay));
+        }
+
+        private void OnRestoreStarts(bool isInitial)
+        {
+            StopVoice();
         }
 
         /// <summary>

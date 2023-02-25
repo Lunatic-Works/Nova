@@ -173,7 +173,7 @@ namespace Nova
         /// </summary>
         public RouteEndedEvent routeEnded;
 
-        public UnityEvent restoreStarts;
+        public UnityEvent<bool> restoreStarts;
 
         #endregion
 
@@ -731,7 +731,7 @@ namespace Nova
         private void RestoreCheckpoint(GameStateCheckpoint entry)
         {
             this.RuntimeAssert(entry != null, "Checkpoint is null.");
-            restoreStarts.Invoke();
+            restoreStarts.Invoke(entry == initialCheckpoint);
 
             currentIndex = entry.dialogueIndex;
             stepsFromLastCheckpoint = 0;
