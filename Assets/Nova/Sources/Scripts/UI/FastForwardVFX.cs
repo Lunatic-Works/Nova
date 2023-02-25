@@ -58,9 +58,9 @@ namespace Nova
             dialogueState.fastForwardModeStops.RemoveListener(RemoveVFX);
         }
 
-        private void OnRestoreStarts()
+        private void OnRestoreStarts(bool isInitial)
         {
-            if (viewManager.currentView == CurrentViewType.Game)
+            if (!isInitial && viewManager.currentView == CurrentViewType.Game)
             {
                 AddVFX();
                 viewManager.uiAnimation.Do(null, vfxDurationOnRestore).Then(new ActionAnimationProperty(RemoveVFX));
