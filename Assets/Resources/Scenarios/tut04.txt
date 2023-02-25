@@ -32,6 +32,16 @@ set_box('full', 'dark')
 
 更新方式包括在位置的预设中，因为设置位置的同时一般也会设置更新方式
 
+`box`是对话框controller在Lua中的名字，可以在`GameView`中创建多个对话框并设置相应的背景Prefab，排版要素等
+
+设为nil表示没有对话框，这个时候只会播放动画
+
+顺便说一句：：在过去的版本中这些是用`theme`来设置的，为了支持多个对话框，这种方式已经淘汰了
+
+目前`set_box`函数只支持操作单个对话框，切换的时候会自动隐藏之前的对话框
+
+如果你想试试多个对话框同时存在，可以探索一下`DialogueBoxController.cs`
+
 <|
 new_page()
 |>
@@ -46,6 +56,8 @@ set_box('left', 'dark')
 set_box('right', 'dark', false)
 |>
 如果不想自动清空，可以把`set_box`的第三个参数设为false
+
+但是如果切换了对话框，对话框会强制清空
 
 <|
 set_box('full', 'dark')
@@ -69,8 +81,6 @@ set_box('full', 'transparent', false)
 set_box('full', 'dark')
 |>
 顺便说一句：：创建material preset的方法详见[Unity官网](https://learn.unity.com/tutorial/textmesh-pro-working-with-material-presets)。在创建之后，还要在`UI` game object里的`I18nFontConfig.config`中设置每种语言对应的字体、材质和材质名称
-
-顺便说一句：：位置预设当中的`theme`的实现详见`DialogueBoxController.cs`，用来控制对话框的更多排版要素，包括背景图片的替换、关闭按钮和对话结束图标的位置、文本与对话框边缘的距离、角色名字与说话内容的距离等等
 
 <|
 set_box('hide')
