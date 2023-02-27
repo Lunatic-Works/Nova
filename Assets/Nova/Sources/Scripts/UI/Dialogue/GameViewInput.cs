@@ -33,7 +33,7 @@ namespace Nova
             configManager = controller.ConfigManager;
             inputManager = controller.InputManager;
 
-            buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
+            buttonRingTrigger = FindObjectOfType<ButtonRingTrigger>();
 
             viewManager = Utils.FindViewManager();
             dialogueBoxController = viewManager.GetController<DialogueBoxController>();
