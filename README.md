@@ -55,6 +55,16 @@
 
 如果你用Nova做出了作品，欢迎来告诉我们，我们可以互相宣传一下
 
+开发工具：
+
+* [VS Code扩展](https://github.com/Lunatic-Works/vscode-nova-script)
+
+本框架的依赖：
+
+* [ToLua#](https://github.com/topameng/tolua)
+* [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
+* [Loop Scroll Rect](https://github.com/qiankanglai/LoopScrollRect)
+
 也可以看一看其他的视觉小说引擎：
 
 * [Ren'Py](https://github.com/renpy/renpy)：如果你没有编程基础但是想学，或者有Python基础，推荐用这个引擎
@@ -71,12 +81,6 @@
 
 * [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家视觉小说引擎的碎片化问题，而定义的通用脚本格式
 * [Yukimi Script](https://github.com/Strrationalism/YukimiScript)：为描述视觉小说而设计的领域专用语言
-
-本框架的依赖：
-
-* [ToLua#](https://github.com/topameng/tolua)
-* [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
-* [Loop Scroll Rect](https://github.com/qiankanglai/LoopScrollRect)
 
 国内镜像（随缘更新）：
 
