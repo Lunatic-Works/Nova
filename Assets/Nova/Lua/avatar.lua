@@ -1,25 +1,43 @@
 add_action_before_lazy_block(function(name)
-    if current_box() ~= nil then
-        current_box().avatar:SetCharacterName(name)
+    local box = current_box()
+    if box and box.avatar then
+        box.avatar:SetCharacterName(name)
     end
 end)
 
 add_action_after_lazy_block(function()
-    if current_box() ~= nil then
-        current_box().avatar:UpdateImage()
+    local box = current_box()
+    if box and box.avatar then
+        box.avatar:UpdateImage()
     end
 end)
 
 function avatar_show(pose)
-    local chara = current_box().avatar:GetCharacterController()
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call avatar_show when the dialogue box is hidden')
+        return
+    end
+
+    local avatar = box.avatar
+    if avatar == nil then
+        warn('No AvatarController on the dialogue box')
+        return
+    end
+
+    local chara = avatar:GetCharacterController()
     if chara == nil then
         return
     end
+
     pose = get_pose(chara, pose)
-    current_box().avatar:SetPoseDelayed(pose)
+    avatar:SetPoseDelayed(pose)
 end
 
 function avatar_hide()
-    current_box().avatar:ClearImageDelayed()
+    local box = current_box()
+    if box and box.avatar then
+        box.avatar:ClearImageDelayed()
+    end
     schedule_gc()
 end
