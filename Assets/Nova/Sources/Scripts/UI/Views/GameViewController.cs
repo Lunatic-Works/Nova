@@ -21,6 +21,7 @@ namespace Nova
             {
                 return true;
             }
+
             var controller = Utils.FindNovaController();
             dialogueState = controller.DialogueState;
             gameState = controller.GameState;
@@ -80,6 +81,7 @@ namespace Nova
                 box?.ShowImmediate();
                 return;
             }
+
             currentDialogueBox?.HideImmediate();
             if (box != null)
             {
@@ -89,6 +91,7 @@ namespace Nova
                     box.NewPage();
                 }
             }
+
             currentDialogueBox = box;
         }
 
@@ -111,6 +114,7 @@ namespace Nova
             {
                 animation |= AnimationType.PerDialogue;
             }
+
             NovaAnimation.StopAll(animation);
             currentDialogueBox?.ShowDialogueFinishIcon(true);
         }
@@ -121,12 +125,14 @@ namespace Nova
             {
                 return false;
             }
+
             var link = currentDialogueBox.FindIntersectingLink(position, camera);
             if (!string.IsNullOrEmpty(link))
             {
                 Application.OpenURL(link);
                 return true;
             }
+
             return false;
         }
 
@@ -228,6 +234,7 @@ namespace Nova
                 delay = Mathf.Max(delay, NovaAnimation.GetTotalTimeRemaining(AnimationType.Text) /
                     currentDialogueBox.characterFadeInDuration * autoDelay * 0.1f);
             }
+
             return delay;
         }
 
@@ -237,7 +244,8 @@ namespace Nova
             {
                 timeAfterDialogueChange += Time.deltaTime;
 
-                if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown && dialogueState.isNormal &&
+                if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown &&
+                    dialogueState.isNormal &&
                     viewManager.currentView != CurrentViewType.InTransition && timeAfterDialogueChange > dialogueTime)
                 {
                     currentDialogueBox.ShowDialogueFinishIcon(true);
@@ -316,7 +324,7 @@ namespace Nova
 
             public GameViewControllerRestoreData(GameViewController controller)
             {
-                this.currentDialogueBox = controller.currentDialogueBox?.luaGlobalName ?? "";
+                currentDialogueBox = controller.currentDialogueBox?.luaGlobalName ?? "";
             }
         }
 

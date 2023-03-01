@@ -96,7 +96,7 @@ namespace Nova
         {
             // Debug.Log("render to texture");
             SetTextures(sprites);
-            var bounds = CompositeSpriteMerger.GetMergedSize(sprites);
+            var bounds = GetMergedSize(sprites);
             var pixelsPerUnit = sprites[0].sprite.pixelsPerUnit;
             var size = bounds.size * pixelsPerUnit;
             var renderTexture = new RenderTexture((int)size.x, (int)size.y, 0, RenderTextureFormat.ARGB32);

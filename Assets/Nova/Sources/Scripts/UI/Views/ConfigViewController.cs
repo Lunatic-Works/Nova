@@ -33,7 +33,7 @@ namespace Nova
                 restoreButton.onClick.AddListener(configManager.Restore);
             }
 
-            backButton.onClick.AddListener(this.Hide);
+            backButton.onClick.AddListener(Hide);
         }
 
         public override void Show(bool doTransition, Action onFinish)
@@ -44,7 +44,7 @@ namespace Nova
 
         public void ShowFromTitle()
         {
-            this.Show();
+            Show();
             fromTitle = true;
         }
 

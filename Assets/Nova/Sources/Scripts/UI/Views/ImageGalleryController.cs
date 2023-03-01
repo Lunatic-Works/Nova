@@ -188,7 +188,7 @@ namespace Nova
             }
             else
             {
-                this.Hide();
+                Hide();
             }
         }
 

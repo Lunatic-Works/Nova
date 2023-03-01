@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Nova
@@ -28,12 +24,12 @@ namespace Nova
         // Extension method does not work with Unity Action
         public void Show()
         {
-            this.Show(true, null);
+            Show(true, null);
         }
 
         public void Hide()
         {
-            this.Hide(true, null);
+            Hide(true, null);
         }
 
         protected virtual void OnDestroy()
@@ -41,12 +37,12 @@ namespace Nova
             viewManager.UnsetController(this);
         }
 
-        protected override void onTransitionBegin()
+        protected override void OnTransitionBegin()
         {
             viewManager.UpdateView(true);
         }
 
-        protected override void onShowComplete()
+        protected override void OnShowComplete()
         {
             viewManager.UpdateView(false);
         }
@@ -58,7 +54,7 @@ namespace Nova
 
         protected virtual void BackHide()
         {
-            this.Hide();
+            Hide();
         }
 
         protected virtual void OnActivatedUpdate()

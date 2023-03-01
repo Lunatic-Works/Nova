@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -167,11 +166,6 @@ namespace Nova
             return false;
         }
 
-        protected override void Start()
-        {
-            base.Start();
-        }
-
         private void OnDestroy()
         {
             gameState.RemoveRestorable(this);
@@ -261,7 +255,8 @@ namespace Nova
 
         private void AppendDialogue(DialogueDisplayData displayData, bool needAnimation = true)
         {
-            Color nowTextColor = textColorHasSet ? textColor : dialogueState.isDialogueReached ? readColor : unreadColor;
+            Color nowTextColor =
+                textColorHasSet ? textColor : dialogueState.isDialogueReached ? readColor : unreadColor;
             textLeftExtraPadding = avatar?.textPaddingOrZero ?? 0;
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
@@ -473,17 +468,17 @@ namespace Nova
 
             public DialogueBoxControllerRestoreData(DialogueBoxController controller)
             {
-                this.active = controller.active;
-                this.rectTransformData = new RectTransformData(controller.rect);
-                this.backgroundColor = controller.backgroundColor;
-                this.dialogueUpdateMode = controller.dialogueUpdateMode;
-                this.displayDatas = controller.dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
-                this.textAlignment = (int)controller.textAlignment;
-                this.textColorHasSet = controller.textColorHasSet;
-                this.textColor = controller.textColor;
-                this.materialName = controller.materialName;
-                this.closeButtonShown = controller.closeButtonShown;
-                this.dialogueFinishIconShown = controller.dialogueFinishIconShown;
+                active = controller.active;
+                rectTransformData = new RectTransformData(controller.rect);
+                backgroundColor = controller.backgroundColor;
+                dialogueUpdateMode = controller.dialogueUpdateMode;
+                displayDatas = controller.dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
+                textAlignment = (int)controller.textAlignment;
+                textColorHasSet = controller.textColorHasSet;
+                textColor = controller.textColor;
+                materialName = controller.materialName;
+                closeButtonShown = controller.closeButtonShown;
+                dialogueFinishIconShown = controller.dialogueFinishIconShown;
             }
         }
 

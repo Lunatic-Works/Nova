@@ -34,9 +34,9 @@ namespace Nova
 
         public bool active => myPanel.activeSelf;
 
-        protected virtual void onTransitionBegin() { }
+        protected virtual void OnTransitionBegin() { }
 
-        protected virtual void onShowComplete() { }
+        protected virtual void OnShowComplete() { }
 
         protected virtual void OnHideComplete() { }
 
@@ -52,16 +52,16 @@ namespace Nova
             var transition = transitions.FirstOrDefault(t => t.enabled);
             if (doTransition && transition != null)
             {
-                onTransitionBegin();
+                OnTransitionBegin();
                 transition.Enter(() =>
                 {
-                    onShowComplete();
+                    OnShowComplete();
                     onFinish?.Invoke();
                 });
             }
             else
             {
-                onShowComplete();
+                OnShowComplete();
                 onFinish?.Invoke();
             }
         }
@@ -77,7 +77,7 @@ namespace Nova
             var transition = transitions.FirstOrDefault(t => t.enabled);
             if (doTransition && transition != null)
             {
-                onTransitionBegin();
+                OnTransitionBegin();
                 transition.Exit(() =>
                 {
                     OnHideComplete();

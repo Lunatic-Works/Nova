@@ -40,7 +40,7 @@ public class SerializableDictionaryPropertyDrawer : PropertyDrawer
 
     private readonly struct PropertyIdentity
     {
-        public readonly UnityEngine.Object instance;
+        public readonly Object instance;
         public readonly string propertyPath;
 
         public PropertyIdentity(SerializedProperty property)
