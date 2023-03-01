@@ -14,27 +14,51 @@ end
 
 --- offset: {left, right, top, bottom}
 function box_offset(offset)
-    current_box().rect.offsetMin = Vector2(offset[1], offset[4])
-    current_box().rect.offsetMax = Vector2(-offset[2], -offset[3])
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call box_offset when the dialogue box is hidden')
+        return
+    end
+
+    box.rect.offsetMin = Vector2(offset[1], offset[4])
+    box.rect.offsetMax = Vector2(-offset[2], -offset[3])
 end
 
 make_anim_method('box_offset', function(self, offset, duration, easing)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call box_offset when the dialogue box is hidden')
+        return
+    end
+
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.OffsetAnimationProperty(current_box().rect, Vector4(unpack(offset)))
+    local property = Nova.OffsetAnimationProperty(box.rect, Vector4(unpack(offset)))
     return self:_then(property):_with(easing):_for(duration)
 end)
 
 --- anchor: {left, right, bottom, top}
 function box_anchor(anchor)
-    current_box().rect.anchorMin = Vector2(anchor[1], anchor[3])
-    current_box().rect.anchorMax = Vector2(anchor[2], anchor[4])
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call box_anchor when the dialogue box is hidden')
+        return
+    end
+
+    box.rect.anchorMin = Vector2(anchor[1], anchor[3])
+    box.rect.anchorMax = Vector2(anchor[2], anchor[4])
 end
 
 make_anim_method('box_anchor', function(self, anchor, duration, easing)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call box_anchor when the dialogue box is hidden')
+        return
+    end
+
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.AnchorAnimationProperty(current_box().rect, Vector4(unpack(anchor)))
+    local property = Nova.AnchorAnimationProperty(box.rect, Vector4(unpack(anchor)))
     return self:_then(property):_with(easing):_for(duration)
 end)
 
@@ -46,17 +70,35 @@ function box_set_current(box)
 end
 
 function box_tint(color)
-    current_box().backgroundColor = parse_color(color)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call box_tint when the dialogue box is hidden')
+        return
+    end
+
+    box.backgroundColor = parse_color(color)
 end
 
 make_anim_method('box_tint', function(self, color, duration, easing)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call box_tint when the dialogue box is hidden')
+        return
+    end
+
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(current_box(), Nova.DialogueBoxColor.Type.Background), parse_color(color))
+    local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(box, Nova.DialogueBoxColor.Type.Background), parse_color(color))
     return self:_then(property):_with(easing):_for(duration)
 end)
 
 function box_alignment(mode)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call box_alignment when the dialogue box is hidden')
+        return
+    end
+
     if mode == 'left' then
         mode = TMPro.TextAlignmentOptions.TopLeft
     elseif mode == 'center' then
@@ -67,27 +109,45 @@ function box_alignment(mode)
         warn('Unknown text alignment: ' .. dump(mode))
         return
     end
-    current_box().textAlignment = mode
+    box.textAlignment = mode
 end
 
 function text_color(color)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call text_color when the dialogue box is hidden')
+        return
+    end
+
     if color then
-        current_box().textColorHasSet = true
-        current_box().textColor = parse_color(color)
+        box.textColorHasSet = true
+        box.textColor = parse_color(color)
     else
-        current_box().textColorHasSet = false
+        box.textColorHasSet = false
     end
 end
 
 make_anim_method('text_color', function(self, color, duration, easing)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call text_color when the dialogue box is hidden')
+        return
+    end
+
     duration = duration or 1
     easing = parse_easing(easing)
-    local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(current_box(), Nova.DialogueBoxColor.Type.Text), parse_color(color))
+    local property = Nova.ColorAnimationProperty(Nova.DialogueBoxColor(box, Nova.DialogueBoxColor.Type.Text), parse_color(color))
     return self:_then(property):_with(easing):_for(duration)
 end)
 
 function text_material(material_name)
-    current_box().materialName = material_name
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call text_material when the dialogue box is hidden')
+        return
+    end
+
+    box.materialName = material_name
 end
 
 box_pos_presets = {
@@ -179,7 +239,7 @@ function set_box(pos_name, style_name, auto_new_page)
     end
 
     local style = nil
-    if pos['box'] ~= nil then
+    if pos['box'] then
         style = box_style_presets[style_name]
         if style == nil then
             warn('Unknown box style ' .. dump(style_name))
@@ -192,7 +252,7 @@ function set_box(pos_name, style_name, auto_new_page)
     end
 
     box_set_current(pos['box'])
-    if pos['box'] ~= nil then
+    if pos['box'] then
         box_offset(pos['offset'])
         box_anchor(pos['anchor'])
 
@@ -206,38 +266,69 @@ function set_box(pos_name, style_name, auto_new_page)
 end
 
 function new_page()
-    if current_box() ~= nil then
-        current_box():NewPage()
+    local box = current_box()
+    if box then
+        box:NewPage()
     end
 end
 
 function text_delay(time)
-    current_box():SetTextAnimationDelay(time)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call text_delay when the dialogue box is hidden')
+        return
+    end
+
+    box:SetTextAnimationDelay(time)
 end
 
 function text_duration(time)
-    current_box():OverrideTextDuration(time)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call text_duration when the dialogue box is hidden')
+        return
+    end
+
+    box:OverrideTextDuration(time)
 end
 
 function box_hide_show(duration, pos_name, style_name)
     duration = duration or 1
     set_box(pos_name, style_name)
-    current_box():Hide(false, nil)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call box_hide_show when the dialogue box is hidden')
+        return
+    end
+
+    box:Hide(false, nil)
     text_delay(duration)
     anim:wait(duration):action(function()
-        current_box():Show(false, nil)
+        box:Show(false, nil)
     end)
 end
 
 function text_scroll(value)
-    current_box():OverrideTextScroll()
-    current_box():SetTextScroll(value)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call text_scroll when the dialogue box is hidden')
+        return
+    end
+
+    box:OverrideTextScroll()
+    box:SetTextScroll(value)
 end
 
 make_anim_method('text_scroll', function(self, start, target, duration, easing)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call text_scroll when the dialogue box is hidden')
+        return
+    end
+
     duration = duration or 1
     easing = parse_easing(easing)
-    current_box():OverrideTextScroll()
-    local property = current_box():GetTextScrollAnimationProperty(start, target)
+    box:OverrideTextScroll()
+    local property = box:GetTextScrollAnimationProperty(start, target)
     return self:_then(property):_with(easing):_for(duration)
 end)
