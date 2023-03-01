@@ -38,9 +38,10 @@
 
 ## 版本说明
 
-* v0.1：兼容《青箱》v1.1.0的版本
-* v0.2：兼容Unity 2019的版本，重要的新功能包括小游戏支持、新的脚本parser、新的存档系统
-* v0.3：`master` branch上滚动更新的版本，重要的新功能包括URP、新的立绘合成系统、Input System，预计的新功能包括Addressables
+* v0.1：兼容《青箱》v1.1.0
+* v0.2：兼容Unity 2019，重要的新功能包括异步的`GameState`、小游戏支持、新的脚本解析系统、新的存档系统
+* v0.3：兼容Unity 2020，重要的新功能包括URP、新的立绘合成系统、Input System
+* v0.4：`master` branch上滚动更新，重要的新功能包括新的对话框，预计的新功能包括Addressables
 
 ## 友情链接
 
@@ -54,6 +55,15 @@
 * [初夏倾语](https://store.steampowered.com/app/2075410)
 
 如果你用Nova做出了作品，欢迎来告诉我们，我们可以互相宣传一下
+
+开发工具：
+
+* [VS Code扩展](https://github.com/Lunatic-Works/vscode-nova-script)
+
+本框架的依赖：
+
+* [ToLua#](https://github.com/topameng/tolua)
+* [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
 
 也可以看一看其他的视觉小说引擎：
 
@@ -71,11 +81,6 @@
 
 * [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家视觉小说引擎的碎片化问题，而定义的通用脚本格式
 * [Yukimi Script](https://github.com/Strrationalism/YukimiScript)：为描述视觉小说而设计的领域专用语言
-
-本框架的依赖：
-
-* [ToLua#](https://github.com/topameng/tolua)
-* [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
 
 国内镜像（随缘更新）：
 
