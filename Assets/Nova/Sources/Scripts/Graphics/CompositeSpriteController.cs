@@ -134,7 +134,7 @@ namespace Nova
         public virtual void Restore(IRestoreData restoreData)
         {
             var data = restoreData as CompositeSpriteControllerRestoreData;
-            data.transform.Restore(this.transform);
+            data.transform.Restore(transform);
             color = data.color;
             gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
             SetPose(data.pose, false);

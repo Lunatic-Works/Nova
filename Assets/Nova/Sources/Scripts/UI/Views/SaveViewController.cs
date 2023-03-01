@@ -168,7 +168,7 @@ namespace Nova
             base.Start();
 
             previewEntry = myPanel.transform.Find("Background/Left/SaveEntry").GetComponent<SaveEntryController>();
-            previewEntry.InitAsPreview(null, this.Hide);
+            previewEntry.InitAsPreview(null, Hide);
             ShowPage();
         }
 
@@ -354,7 +354,7 @@ namespace Nova
                 viewManager.GetController<GameViewController>().ShowImmediate();
             }
 
-            this.Hide();
+            Hide();
             viewManager.TryPlaySound(loadActionSound);
             Alert.Show("bookmark.load.complete");
         }
@@ -574,7 +574,7 @@ namespace Nova
 
         private void ShowPreviewScreen()
         {
-            ShowPreview(screenSprite, this.Hide, I18n.__(
+            ShowPreview(screenSprite, Hide, I18n.__(
                 "bookmark.summary",
                 fromTitle ? "" : DateTime.Now.ToString(DateTimeFormat),
                 gameState.currentNode != null ? I18n.__(gameState.currentNode.displayNames) : "",

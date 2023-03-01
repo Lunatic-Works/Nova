@@ -36,7 +36,7 @@ namespace Nova
             base.Start();
 
             unlockedStartCount = gameState.GetStartNodeNames(StartNodeType.Unlocked).Count();
-            this.Show();
+            Show();
         }
 
         public override void Show(bool doTransition, Action onFinish)

@@ -41,7 +41,7 @@ namespace Nova
             nodes = _nodes.ToList();
             buttons = nodes.Select(InitButton).ToList();
 
-            returnButton.onClick.AddListener(this.Hide);
+            returnButton.onClick.AddListener(Hide);
             I18n.LocaleChanged.AddListener(UpdateButtons);
         }
 

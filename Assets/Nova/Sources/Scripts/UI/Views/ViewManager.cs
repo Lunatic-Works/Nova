@@ -64,7 +64,7 @@ namespace Nova
         }
 
         private readonly Dictionary<Type, IViewController> controllers = new Dictionary<Type, IViewController>();
-        private readonly Type[] overlayViewControllers = { typeof(NotificationController) };
+        private readonly Type[] overlayViewControllers = {typeof(NotificationController)};
 
         private void Awake()
         {

@@ -79,8 +79,8 @@ namespace Nova
             scrollRect.dataSource = this;
             scrollRect.sizeHelper = this;
 
-            myPanel.GetComponent<Button>().onClick.AddListener(this.Hide);
-            closeButton.onClick.AddListener(this.Hide);
+            myPanel.GetComponent<Button>().onClick.AddListener(Hide);
+            closeButton.onClick.AddListener(Hide);
 
             gameState.gameStarted.AddListener(Clear);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
@@ -110,8 +110,8 @@ namespace Nova
         {
             base.OnDestroy();
 
-            myPanel.GetComponent<Button>().onClick.RemoveListener(this.Hide);
-            closeButton.onClick.RemoveListener(this.Hide);
+            myPanel.GetComponent<Button>().onClick.RemoveListener(Hide);
+            closeButton.onClick.RemoveListener(Hide);
 
             gameState.gameStarted.RemoveListener(Clear);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
@@ -299,7 +299,7 @@ namespace Nova
                 scrollRect.GetVerticalOffsetAndSize(out var contentHeight, out _);
                 if (contentHeight < scrollRect.viewport.rect.height)
                 {
-                    this.Hide();
+                    Hide();
                     return;
                 }
 
@@ -308,7 +308,7 @@ namespace Nova
                 // verticalNormalizedPosition can be > 1
                 if (scrollDownIdleTime > MaxScrollDownIdleTime && scrollRect.verticalNormalizedPosition > 1f - 1e-3f)
                 {
-                    this.Hide();
+                    Hide();
                     return;
                 }
 

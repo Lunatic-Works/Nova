@@ -164,7 +164,7 @@ namespace Nova
         }
 
         private bool needShowDialogueBox => gameViewController.dialogueBoxHidden &&
-            !NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
+                                            !NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
 
         public void OnPointerDown(PointerEventData _eventData)
         {
@@ -284,6 +284,7 @@ namespace Nova
                 gameViewController.ShowDialogue();
                 return;
             }
+
             if (scroll > 0)
             {
                 dialogueState.state = DialogueState.State.Normal;

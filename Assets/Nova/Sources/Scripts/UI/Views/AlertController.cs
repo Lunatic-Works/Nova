@@ -93,7 +93,7 @@ namespace Nova
                 });
             }
 
-            this.Show();
+            Show();
         }
 
         private void UpdateText()
