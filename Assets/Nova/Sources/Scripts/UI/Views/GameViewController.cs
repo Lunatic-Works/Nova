@@ -120,6 +120,7 @@ namespace Nova
             currentDialogueBox?.ShowDialogueFinishIcon(true);
         }
 
+        // TODO: Should enumerate all dialogue boxes
         public bool TryClickLink(Vector3 position, Camera camera)
         {
             if (currentDialogueBox == null)
@@ -343,6 +344,7 @@ namespace Nova
                     .First(x => x.luaGlobalName == data.currentDialogueBox);
                 currentDialogueBox.ShowImmediate();
             }
+
             ShowUI();
         }
 
