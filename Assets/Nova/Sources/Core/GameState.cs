@@ -25,6 +25,9 @@ namespace Nova
 
         private void Awake()
         {
+            advancedDialogueHelper = new AdvancedDialogueHelper(this);
+            coroutineHelper = new CoroutineHelper(this);
+
             try
             {
                 scriptLoader.Init(scriptPath);
@@ -41,9 +44,7 @@ namespace Nova
             }
 
             LuaRuntime.Instance.BindObject("variables", variables);
-            advancedDialogueHelper = new AdvancedDialogueHelper(this);
             LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);
-            coroutineHelper = new CoroutineHelper(this);
             LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
         }
 
