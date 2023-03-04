@@ -94,7 +94,7 @@ namespace Nova
 
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
-                gameViewController.HideDialogue();
+                gameViewController.HideUI();
             }
 
             if (inputManager.IsTriggered(AbstractKey.ShowLog))
@@ -124,7 +124,7 @@ namespace Nova
         {
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
-                gameViewController.ShowDialogue();
+                gameViewController.ShowUI();
             }
         }
 
@@ -140,13 +140,13 @@ namespace Nova
             }
             else if (viewManager.currentView == CurrentViewType.Game)
             {
-                if (gameViewController.dialogueBoxHidden)
+                if (gameViewController.uiActive)
                 {
-                    HandleShortcutWhenDialogueHidden();
+                    HandleShortcutWhenDialogueShown();
                 }
                 else
                 {
-                    HandleShortcutWhenDialogueShown();
+                    HandleShortcutWhenDialogueHidden();
                 }
             }
         }
@@ -163,15 +163,14 @@ namespace Nova
             }
         }
 
-        private bool needShowDialogueBox => gameViewController.dialogueBoxHidden &&
-                                            !NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
+        private bool needShowUI => !gameViewController.uiActive && !NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
 
         public void OnPointerDown(PointerEventData _eventData)
         {
             var eventData = (ExtendedPointerEventData)_eventData;
             if (!inputManager.inputEnabled ||
                 viewManager.currentView != CurrentViewType.Game ||
-                gameViewController.dialogueBoxHidden ||
+                !gameViewController.uiActive ||
                 buttonRingTrigger.buttonShowing)
             {
                 return;
@@ -198,9 +197,9 @@ namespace Nova
                 return;
             }
 
-            if (needShowDialogueBox)
+            if (needShowUI)
             {
-                gameViewController.ShowDialogue();
+                gameViewController.ShowUI();
                 return;
             }
 
@@ -241,7 +240,7 @@ namespace Nova
 
                 if (rightButtonAction == RightButtonAction.HideDialoguePanel)
                 {
-                    gameViewController.HideDialogue();
+                    gameViewController.HideUI();
                 }
                 else if (rightButtonAction == RightButtonAction.ShowButtonRing)
                 {
@@ -279,9 +278,9 @@ namespace Nova
                 return;
             }
 
-            if (needShowDialogueBox)
+            if (needShowUI)
             {
-                gameViewController.ShowDialogue();
+                gameViewController.ShowUI();
                 return;
             }
 

@@ -10,6 +10,7 @@ namespace Nova
     {
         [SerializeField] private GameObject autoModeIcon;
         [SerializeField] private GameObject fastForwardModeIcon;
+        [SerializeField] private PanelController gameUIController;
         public DialogueBoxController currentDialogueBox;
 
         private GameState gameState;
@@ -62,16 +63,16 @@ namespace Nova
             dialogueState.fastForwardModeStops.RemoveListener(OnFastForwardModeStops);
         }
 
-        public bool dialogueBoxHidden => (!currentDialogueBox?.active) ?? false;
+        public bool uiActive => gameUIController.active;
 
-        public void ShowDialogue(Action onFinish = null)
+        public void ShowUI(Action onFinish = null)
         {
-            currentDialogueBox?.Show(onFinish);
+            gameUIController.Show();
         }
 
-        public void HideDialogue(Action onFinish = null)
+        public void HideUI(Action onFinish = null)
         {
-            currentDialogueBox?.Hide(onFinish);
+            gameUIController.Hide();
         }
 
         public void SwitchDialogueBox(DialogueBoxController box, bool cleanText = true)
@@ -340,7 +341,9 @@ namespace Nova
             {
                 currentDialogueBox = GetComponentsInChildren<DialogueBoxController>(true)
                     .First(x => x.luaGlobalName == data.currentDialogueBox);
+                currentDialogueBox.ShowImmediate();
             }
+            ShowUI();
         }
 
         #endregion

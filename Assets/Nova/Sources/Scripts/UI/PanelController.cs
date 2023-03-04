@@ -78,12 +78,7 @@ namespace Nova
             if (doTransition && transition != null)
             {
                 OnTransitionBegin();
-                transition.Exit(() =>
-                {
-                    OnHideComplete();
-                    myPanel.SetActive(false);
-                    onFinish?.Invoke();
-                });
+                transition.Exit(OnHideComplete, onFinish);
             }
             else
             {
