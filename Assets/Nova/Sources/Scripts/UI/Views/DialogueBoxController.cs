@@ -153,7 +153,7 @@ namespace Nova
             dialogueFinishIcon = background.transform.Find("DialogueFinishIcon").gameObject;
 
             UpdateColor();
-            hideDialogueButton.onClick.AddListener(this.Hide);
+            hideDialogueButton.onClick.AddListener(OnCloseButtonClick);
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -206,6 +206,11 @@ namespace Nova
         public void NewPage()
         {
             dialogueText.Clear();
+        }
+
+        public void OnCloseButtonClick()
+        {
+            gameView.HideUI();
         }
 
         [SerializeField] private NovaAnimation textAnimation;
@@ -491,8 +496,7 @@ namespace Nova
         {
             var data = restoreData as DialogueBoxControllerRestoreData;
 
-            // show current dialogue box no matter what
-            myPanel.SetActive(isCurrent || data.active);
+            myPanel.SetActive(data.active);
             data.rectTransformData.Restore(rect);
             backgroundColor = data.backgroundColor;
 

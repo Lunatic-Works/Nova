@@ -3488,6 +3488,10 @@ PrefabInstance:
       propertyPath: _sectors.Array.data[6].action.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1123056137}
+    - target: {fileID: 2292503474250039048, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7447712415433603452, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
       propertyPath: avatarConfigs.Array.data[0].characterController
       value: 
@@ -4422,6 +4426,14 @@ PrefabInstance:
     - target: {fileID: 5908642565334599335, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
       propertyPath: m_Name
       value: HelpView
+      objectReference: {fileID: 0}
+    - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -69.3999
+      objectReference: {fileID: 0}
+    - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -56.30005
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
