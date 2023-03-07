@@ -19,7 +19,7 @@ Shader "Nova/UI/Blur"
 
             #include "UnityCG.cginc"
             #include "Assets/Nova/CGInc/Blur.cginc"
- 
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -51,8 +51,7 @@ Shader "Nova/UI/Blur"
 
             fixed4 frag(v2f i) : SV_Target
             {
-            
-                float4 col = tex2DProjGaussianBlur(_MainTex, _MainTex_TexelSize * _GScale, i.grabPos, _Size);  
+                float4 col = tex2DProjGaussianBlur(_MainTex, _MainTex_TexelSize * _GScale, i.grabPos, _Size);
                 col.rgb += _Offset;
                 col.a = 1.0;
                 return col;
