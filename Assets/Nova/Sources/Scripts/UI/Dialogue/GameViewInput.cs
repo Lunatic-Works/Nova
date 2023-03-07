@@ -17,7 +17,7 @@ namespace Nova
         private ConfigManager configManager;
         private InputManager inputManager;
 
-        private ButtonRingTrigger buttonRingTrigger;
+        [SerializeField] private ButtonRingTrigger buttonRingTrigger;
 
         private ViewManager viewManager;
         private DialogueBoxController dialogueBoxController;
@@ -32,8 +32,6 @@ namespace Nova
             dialogueState = controller.DialogueState;
             configManager = controller.ConfigManager;
             inputManager = controller.InputManager;
-
-            buttonRingTrigger = FindObjectOfType<ButtonRingTrigger>();
 
             viewManager = Utils.FindViewManager();
             dialogueBoxController = viewManager.GetController<DialogueBoxController>();
