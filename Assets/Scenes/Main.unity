@@ -626,7 +626,6 @@ GameObject:
   - component: {fileID: 587264674}
   - component: {fileID: 587264673}
   - component: {fileID: 587264671}
-  - component: {fileID: 587264672}
   m_Layer: 9
   m_Name: AfterMainUI
   m_TagString: Untagged
@@ -661,19 +660,6 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
---- !u!114 &587264672
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 587264670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcaf7623bd8542bbb63b932dd5e7124f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  luaGlobalName: uicam_mask
 --- !u!222 &587264673
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3457,15 +3443,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3962174862496820371, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 54.72003
+      value: 54.71997
       objectReference: {fileID: 0}
     - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -69.400024
+      value: -69.3999
       objectReference: {fileID: 0}
     - target: {fileID: 7611828680793600126, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -56.299988
+      value: -56.30005
       objectReference: {fileID: 0}
     - target: {fileID: 8049959921000225447, guid: 68bda17d3044b4344852e02e4c58e8c4, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -5092,11 +5078,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -69.400024
+      value: -69.3999
       objectReference: {fileID: 0}
     - target: {fileID: 6121556775142160381, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -56.299988
+      value: -56.30005
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 673dd4dc9ec3b354399833258b97f5a3, type: 3}
@@ -5234,7 +5220,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 794920417235669879, guid: 79e0957580781694098a70feb271ad8c, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -69.400024
+      value: -69.3999
       objectReference: {fileID: 0}
     - target: {fileID: 8089046609868017880, guid: 79e0957580781694098a70feb271ad8c, type: 3}
       propertyPath: m_Pivot.x
