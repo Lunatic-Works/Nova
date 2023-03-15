@@ -179,6 +179,11 @@ namespace Nova
         // Get localized string with fallback to DefaultLocale
         public static string __(LocalizedStrings dict)
         {
+            if (dict == null)
+            {
+                return null;
+            }
+
             if (dict.ContainsKey(CurrentLocale))
             {
                 return dict[CurrentLocale];
