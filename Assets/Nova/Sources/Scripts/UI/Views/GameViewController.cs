@@ -276,7 +276,7 @@ namespace Nova
 
         private void OnAutoModeStarts()
         {
-            TrySchedule(GetDialogueTimeAuto());
+            TrySchedule(Mathf.Max(GetDialogueTimeAuto() - timeAfterDialogueChange, 0f));
 
             if (autoModeIcon != null)
             {
