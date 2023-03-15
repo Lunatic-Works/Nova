@@ -318,21 +318,17 @@ namespace Nova
             AppendDialogue(displayData);
         }
 
-        public bool NextPageOrStep()
-        {
-            if (dialogueText.Count == 0 || !dialogueText.dialogueEntryControllers.Last().Forward())
-            {
-                gameState.Step();
-                return false;
-            }
+        private DialogueEntryController lastDialogueEntry =>
+            dialogueText.Count == 0 ? null : dialogueText.dialogueEntryControllers.Last();
 
-            return true;
+        public bool Forward()
+        {
+            return lastDialogueEntry?.Forward() ?? false;
         }
 
-        public void ForceStep()
+        public int GetPageCharacterCount()
         {
-            NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-            gameState.Step();
+            return lastDialogueEntry?.contentProxy.GetPageCharacterCount() ?? 0;
         }
 
         #region Properties for dialogue entries

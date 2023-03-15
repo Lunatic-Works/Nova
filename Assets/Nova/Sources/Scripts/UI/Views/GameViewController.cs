@@ -98,11 +98,7 @@ namespace Nova
 
         public void Step()
         {
-            if (currentDialogueBox != null)
-            {
-                currentDialogueBox.NextPageOrStep();
-            }
-            else
+            if (currentDialogueBox == null || !currentDialogueBox.Forward())
             {
                 gameState.Step();
             }
@@ -186,13 +182,18 @@ namespace Nova
             // Give time for rendering and can stop schedule step in time before any unwanted effects occurs
             yield return null;
 
-            if (gameState.canStepForward && currentDialogueBox != null)
+            if (gameState.canStepForward)
             {
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-                if (currentDialogueBox.NextPageOrStep())
+                if (currentDialogueBox == null || !currentDialogueBox.Forward())
                 {
-                    timeAfterDialogueChange = 0f;
-                    TrySchedule(dialogueState.isAuto ? autoDelay : fastForwardDelay);
+                    gameState.Step();
+                }
+                else
+                {
+                    // TODO: Text animation when showing a new page
+                    RestartTimer();
+                    TrySchedule(dialogueState.isAuto ? GetDialogueTimeAutoText() : fastForwardDelay);
                 }
             }
             else
@@ -228,16 +229,15 @@ namespace Nova
             );
         }
 
+        private float GetDialogueTimeAutoText()
+        {
+            return currentDialogueBox == null ? 0f :
+                currentDialogueBox.GetPageCharacterCount() * autoDelay * 0.1f + autoDelay;
+        }
+
         private float GetDialogueTimeAuto()
         {
-            var delay = GetDialogueTime(autoDelay, autoDelay * 0.5f);
-            if (currentDialogueBox != null)
-            {
-                delay = Mathf.Max(delay, NovaAnimation.GetTotalTimeRemaining(AnimationType.Text) /
-                    currentDialogueBox.characterFadeInDuration * autoDelay * 0.1f);
-            }
-
-            return delay;
+            return Mathf.Max(GetDialogueTime(autoDelay, autoDelay * 0.5f), GetDialogueTimeAutoText());
         }
 
         protected override void Update()
@@ -247,8 +247,7 @@ namespace Nova
                 timeAfterDialogueChange += Time.deltaTime;
 
                 if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown &&
-                    dialogueState.isNormal &&
-                    viewManager.currentView != CurrentViewType.InTransition && timeAfterDialogueChange > dialogueTime)
+                    dialogueState.isNormal && timeAfterDialogueChange > dialogueTime)
                 {
                     currentDialogueBox.ShowDialogueFinishIcon(true);
                 }

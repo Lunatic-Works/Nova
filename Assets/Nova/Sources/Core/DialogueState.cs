@@ -142,14 +142,16 @@ namespace Nova
         {
             isDialogueReached = dialogueData.isReachedAnyHistory;
 
-            if (isFastForward && stopFastForward)
-            {
-                state = State.Normal;
-            }
-
             if (isFastForward)
             {
-                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+                if (stopFastForward)
+                {
+                    state = State.Normal;
+                }
+                else
+                {
+                    NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+                }
             }
         }
     }
