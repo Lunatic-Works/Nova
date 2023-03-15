@@ -70,14 +70,10 @@ namespace Nova
                         _state = State.Normal;
                         break;
                     case State.Auto:
-                        this.RuntimeAssert(state == State.Normal, "Dialogue state is not Normal when setting to Auto.");
                         _state = State.Auto;
                         autoModeStarts.Invoke();
                         break;
                     case State.FastForward:
-                        this.RuntimeAssert(state == State.Normal,
-                            "Dialogue state is not Normal when setting to FastForward.");
-
                         if (stopFastForward)
                         {
                             int clicks = configManager.GetInt(FastForwardUnreadFirstShownKey);
