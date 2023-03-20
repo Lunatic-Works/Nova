@@ -42,12 +42,12 @@ namespace Nova
             viewManager.UpdateView(true);
         }
 
-        protected override void OnShowComplete()
+        protected override void OnShowFinish()
         {
             viewManager.UpdateView(false);
         }
 
-        protected override void OnHideComplete()
+        protected override void OnHideFinish()
         {
             viewManager.UpdateView(false);
         }

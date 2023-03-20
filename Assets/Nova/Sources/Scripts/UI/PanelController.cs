@@ -36,9 +36,13 @@ namespace Nova
 
         protected virtual void OnTransitionBegin() { }
 
-        protected virtual void OnShowComplete() { }
+        protected virtual void OnShowFinish() { }
 
+        // this function calls before myPanel inactive
         protected virtual void OnHideComplete() { }
+
+        // this function calls after myPanel inactive but before onFinish
+        protected virtual void OnHideFinish() { }
 
         public virtual void Show(bool doTransition, Action onFinish)
         {
@@ -48,21 +52,21 @@ namespace Nova
                 return;
             }
 
+            Action onFinishAll = () =>
+            {
+                OnShowFinish();
+                onFinish?.Invoke();
+            };
             myPanel.SetActive(true);
             var transition = transitions.FirstOrDefault(t => t.enabled);
             if (doTransition && transition != null)
             {
                 OnTransitionBegin();
-                transition.Enter(() =>
-                {
-                    OnShowComplete();
-                    onFinish?.Invoke();
-                });
+                transition.Enter(onFinishAll);
             }
             else
             {
-                OnShowComplete();
-                onFinish?.Invoke();
+                onFinishAll.Invoke();
             }
         }
 
@@ -74,17 +78,22 @@ namespace Nova
                 return;
             }
 
+            Action onFinishAll = () =>
+            {
+                OnHideFinish();
+                onFinish?.Invoke();
+            };
             var transition = transitions.FirstOrDefault(t => t.enabled);
             if (doTransition && transition != null)
             {
                 OnTransitionBegin();
-                transition.Exit(OnHideComplete, onFinish);
+                transition.Exit(OnHideComplete, onFinishAll);
             }
             else
             {
                 OnHideComplete();
                 myPanel.SetActive(false);
-                onFinish?.Invoke();
+                onFinishAll.Invoke();
             }
         }
 
