@@ -70,7 +70,7 @@ namespace Nova
         {
             currentView = CurrentViewType.UI;
             novaController = Utils.FindNovaController();
-            uiAnimation = novaController.transform.Find("NovaAnimation/UI").GetComponent<NovaAnimation>();
+            uiAnimation = novaController.UIAnimation;
             screenCapturer = GetComponent<ScreenCapturer>();
             this.RuntimeAssert(screenCapturer != null, "Missing ScreenCapturer.");
         }

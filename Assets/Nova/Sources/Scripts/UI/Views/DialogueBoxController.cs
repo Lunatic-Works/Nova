@@ -152,6 +152,8 @@ namespace Nova
             hideDialogueButton = background.transform.Find("CloseButton").GetComponent<Button>();
             dialogueFinishIcon = background.transform.Find("DialogueFinishIcon").gameObject;
 
+            textAnimation = controller.TextAnimation;
+
             UpdateColor();
             hideDialogueButton.onClick.AddListener(OnCloseButtonClick);
 
@@ -213,8 +215,7 @@ namespace Nova
             gameView.HideUI();
         }
 
-        [SerializeField] private NovaAnimation textAnimation;
-
+        private NovaAnimation textAnimation;
         private float textAnimationDelay;
         private float textDurationOverride = -1f;
         private bool textScrollOverriden;

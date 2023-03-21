@@ -5,8 +5,8 @@ namespace Nova
 {
     public class ConfigTextPreviewController : MonoBehaviour
     {
-        [SerializeField] private DialogueTextController dialogueText;
-        [SerializeField] private NovaAnimation textAnimation;
+        private DialogueTextController dialogueText;
+        private NovaAnimation textAnimation;
 
         [HideInInspector] public float characterFadeInDuration;
         [HideInInspector] public float autoDelay;
@@ -18,6 +18,12 @@ namespace Nova
 
         private int textPreviewIndex;
 
+        private void Awake()
+        {
+            dialogueText = GetComponentInChildren<DialogueTextController>(true);
+            textAnimation = Utils.FindNovaController().TextAnimation;
+        }
+
         private DialogueDisplayData GetPreviewDisplayData()
         {
             var displayNames = I18n.GetLocalizedStrings("config.textpreview.name");
@@ -27,8 +33,7 @@ namespace Nova
 
         private void ResetTextPreview()
         {
-            if (textAnimation == null) return;
-            textAnimation.Stop();
+            NovaAnimation.StopAll(AnimationType.Text);
             dialogueText.Clear();
             var entry = dialogueText.AddEntry(
                 GetPreviewDisplayData(),
