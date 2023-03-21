@@ -63,13 +63,15 @@ vfx(fg, 'screen_blink')
 
 <|
 show(gaotian, 'normal', pos_c)
+vfx(gaotian, 'lens_blur', 1, { _Size = 10 })
 hide(fg)
 move(fg, {0, 0, 1})
 vfx(fg, nil)
 |>
-目前不能对角色立绘添加特效，如果需要的话可以把立绘做成一张图片，再用`SpriteController`来显示
+也可以对角色立绘添加特效
 
 <|
+vfx(gaotian, nil)
 vfx(cam, 'lens_blur', 1, { _Size = 10 })
 |>
 也可以对摄像机添加特效，这时立绘和背景一起被模糊了

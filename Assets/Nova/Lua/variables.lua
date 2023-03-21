@@ -36,26 +36,3 @@ function set_nova_variable(name, value, global)
         warn('Variable can only be boolean, number, string, or nil, but found ' .. _type .. ': ' .. dump(value))
     end
 end
-
--- access variable at run time (lazy only)
--- value can be boolean, number, string, or nil
--- get: v(name)
--- set: v(name, value)
-function v(name, value)
-    warn('Function `v` is deprecated. Please use Lua global variable starting with `v_` instead.')
-    if value == nil then
-        return get_nova_variable(name, false)
-    else
-        set_nova_variable(name, value, false)
-    end
-end
-
--- global variable, not calculated in variables hash
-function gv(name, value)
-    warn('Function `gv` is deprecated. Please use Lua global variable starting with `gv_` instead.')
-    if value == nil then
-        return get_nova_variable(name, true)
-    else
-        set_nova_variable(name, value, true)
-    end
-end
