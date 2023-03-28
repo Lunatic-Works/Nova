@@ -8,6 +8,10 @@ function stop_ff()
     end
 end
 
+function force_step()
+    __Nova.gameViewController:ForceStep()
+end
+
 function current_box()
     return __Nova.gameViewController.currentDialogueBox
 end

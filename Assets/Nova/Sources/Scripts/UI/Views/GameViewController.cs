@@ -116,6 +116,12 @@ namespace Nova
             currentDialogueBox?.ShowDialogueFinishIcon(true);
         }
 
+        public void ForceStep()
+        {
+            NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+            gameState.Step();
+        }
+
         // TODO: Should enumerate all dialogue boxes
         public bool TryClickLink(Vector3 position, Camera camera)
         {
