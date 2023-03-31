@@ -3651,6 +3651,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3436857265713307354, guid: be2d40ca56a484f4a94a577ea860a8f5, type: 3}
+      propertyPath: m_Texture
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3731676767286938636, guid: be2d40ca56a484f4a94a577ea860a8f5, type: 3}
       propertyPath: _sectors.Array.data[0].action.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -4017,7 +4021,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
 --- !u!114 &2076122710952862908 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7447712415438681824, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+  m_CorrespondingSourceObject: {fileID: 3936180355493155086, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
   m_PrefabInstance: {fileID: 2076122710952862907}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
