@@ -9,7 +9,9 @@
 1. `git clone`，为了节约时间可以加上`--filter=blob:none`
 2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 在Unity Editor中打开`Assets/Scenes/Main.unity`，运行游戏，把示例作品《Colorless》看一遍
-4. 把游戏中的教程看一遍，同时可以试着改一改脚本，脚本是`Assets/Resources/Scenarios/`文件夹下的`tut01.txt`等文件
+4. 把游戏中的教程看一遍
+    * 同时可以试着改一改脚本，脚本是`Assets/Resources/Scenarios/`文件夹下的`tut01.txt`等文件
+    * 在章节选择界面按Ctrl可以看到更多测试用的脚本
 5. 如果你想修改Colorless的脚本，需要先删除英文版的脚本，否则中文与英文的脚本会对不上
     * `Assets/Resources/LocalizedResources/English/Scenarios/`文件夹下是英文版的脚本，可以全部删除
     * `Assets/Resources/LocalizedResourcePaths.txt`用来记录英文版用到的文件，可以删除
