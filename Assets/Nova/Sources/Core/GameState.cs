@@ -28,6 +28,10 @@ namespace Nova
             advancedDialogueHelper = new AdvancedDialogueHelper(this);
             coroutineHelper = new CoroutineHelper(this);
 
+            LuaRuntime.Instance.BindObject("variables", variables);
+            LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);
+            LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
+
             try
             {
                 scriptLoader.Init(scriptPath);
@@ -42,10 +46,6 @@ namespace Nova
                 Debug.LogException(e);
                 Utils.Quit();
             }
-
-            LuaRuntime.Instance.BindObject("variables", variables);
-            LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);
-            LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
         }
 
         private void Start()
