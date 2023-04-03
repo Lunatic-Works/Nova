@@ -39,7 +39,6 @@ namespace Nova
 
                 checkpointManager = GetComponent<CheckpointManager>();
                 checkpointManager.Init();
-                CheckScriptUpgrade();
             }
             catch (Exception e)
             {
@@ -51,8 +50,10 @@ namespace Nova
         private void Start()
         {
             SaveInitialCheckpoint();
+            CheckScriptUpgrade();
         }
 
+        // It can run any Lua code, so everything that can be used in Lua code should initialize before Start
         private void CheckScriptUpgrade()
         {
             var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);

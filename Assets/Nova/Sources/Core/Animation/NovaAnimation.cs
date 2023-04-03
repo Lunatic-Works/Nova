@@ -71,7 +71,7 @@ namespace Nova
 
         #endregion
 
-        private void Start()
+        private void Awake()
         {
             AnimationEntry.InitFactory();
         }
