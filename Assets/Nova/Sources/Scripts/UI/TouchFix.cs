@@ -44,7 +44,11 @@ namespace Nova
 
         private void OnDestroy()
         {
-            Touch.onFingerDown -= OnFingerDown;
+            // Sometimes EnhancedTouchSupport is disabled in OnDestroy
+            if (EnhancedTouchSupport.enabled)
+            {
+                Touch.onFingerDown -= OnFingerDown;
+            }
         }
 
         private void OnFingerDown(Finger finger)
