@@ -81,7 +81,6 @@ namespace Nova.Editor
         [MenuItem("Assets/Create/Nova/Image Group")]
         public static void CreateImageGroup()
         {
-            // split path name and file name
             var dir = EditorUtils.GetSelectedDirectory();
             CreateImageGroup(dir, EditorUtils.GetSelectedSpritePaths());
         }
