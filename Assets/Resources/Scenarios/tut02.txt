@@ -3,7 +3,6 @@ label('tut02', '教程2 图像')
 is_start()
 |>
 <|
-stop(bgm)
 set_box()
 |>
 教程2 图像

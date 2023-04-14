@@ -4,7 +4,6 @@ label 'test_minigame'
 |>
 <|
 show(bg, 'room')
-stop(bgm)
 set_box()
 |>
 测试小游戏

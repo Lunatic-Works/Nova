@@ -4,7 +4,6 @@ is_start()
 |>
 <|
 show(bg, 'room')
-stop(bgm)
 set_box()
 |>
 教程3 声音

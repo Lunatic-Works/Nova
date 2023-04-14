@@ -4,7 +4,6 @@ is_debug()
 |>
 <|
 show(bg, 'room')
-stop(bgm)
 set_box()
 -- 为了防止玩家每次读档到最后一条对话时都加一周目，在第一条对话时把全局变量round_count加1，然后保存到局部变量里
 -- 在这一周目里，无论玩家怎么读档/回跳，局部变量round_count都是这一周目开始时的全局变量round_count + 1

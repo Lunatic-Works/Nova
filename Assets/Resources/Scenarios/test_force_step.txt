@@ -4,7 +4,6 @@ is_debug()
 |>
 <|
 show(bg, 'room')
-stop(bgm)
 set_box()
 |>
 测试直接进入下一句对话

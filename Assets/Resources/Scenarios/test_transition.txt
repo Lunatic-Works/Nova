@@ -5,7 +5,6 @@ is_debug()
 <|
 show(xiben, 'normal', pos_l)
 show(bg, 'room')
-stop(bgm)
 set_box()
 |>
 测试转场

@@ -4,7 +4,6 @@ is_start()
 |>
 <|
 show(bg, 'room')
-stop(bgm)
 set_box()
 |>
 教程6 特效与转场

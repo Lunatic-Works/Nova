@@ -3,7 +3,6 @@ label('tut01', '教程1 文字与脚本结构')
 is_unlocked_start()
 |>
 <|
-stop(bgm)
 set_box()
 |>
 教程1 文字与脚本结构
