@@ -11,12 +11,14 @@ namespace Nova
         [SerializeField] private AudioController bgmController;
         [SerializeField] private string bgmName;
         [SerializeField] private float bgmVolume = 0.5f;
+        [SerializeField] private float bgmFadeOutDuration = 1.0f;
 
         private const string SelectChapterFirstShownKey = ConfigManager.FirstShownKeyPrefix + "SelectChapter";
 
         private GameState gameState;
         private ConfigManager configManager;
         private CheckpointManager checkpointManager;
+        private NovaAnimation novaAnimation;
         private int unlockedStartCount;
 
         protected override void Awake()
@@ -27,6 +29,7 @@ namespace Nova
             gameState = controller.GameState;
             configManager = controller.ConfigManager;
             checkpointManager = controller.CheckpointManager;
+            novaAnimation = controller.PerDialogueAnimation;
 
             quitButton.onClick.AddListener(() => this.Hide(Utils.Quit));
         }
@@ -63,6 +66,21 @@ namespace Nova
                         configManager.SetInt(SelectChapterFirstShownKey, 1);
                     }
                 }
+
+                onFinish?.Invoke();
+            });
+        }
+
+        public override void Hide(bool doTransition, Action onFinish)
+        {
+            if (bgmController != null && !string.IsNullOrEmpty(bgmName))
+            {
+                novaAnimation.Do(new VolumeAnimationProperty(bgmController, 0.0f), bgmFadeOutDuration)
+                    .Then(new ActionAnimationProperty(bgmController.Stop));
+            }
+
+            base.Hide(doTransition, () =>
+            {
 
                 onFinish?.Invoke();
             });
