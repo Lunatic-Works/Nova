@@ -239,7 +239,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
     local action_begin, action_end, token
     if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
-            __Nova.screenCapturer:CaptureGameTexture()
+            __Nova.screenCapturer:CaptureGameTexture(obj.camera)
 
             auto_fade_off()
             local func = image_name
