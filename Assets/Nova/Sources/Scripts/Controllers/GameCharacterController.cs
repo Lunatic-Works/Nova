@@ -221,16 +221,15 @@ namespace Nova
         {
             public readonly Vector4Data environmentColor;
 
-            public GameCharacterControllerRestoreData(CompositeSpriteController parent, Color environmentColor)
-                : base(parent)
+            public GameCharacterControllerRestoreData(GameCharacterController parent) : base(parent)
             {
-                this.environmentColor = environmentColor;
+                environmentColor = parent.environmentColor;
             }
         }
 
         public override IRestoreData GetRestoreData()
         {
-            return new GameCharacterControllerRestoreData(this as CompositeSpriteController, environmentColor);
+            return new GameCharacterControllerRestoreData(this);
         }
 
         public override void Restore(IRestoreData restoreData)

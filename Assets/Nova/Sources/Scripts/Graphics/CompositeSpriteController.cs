@@ -119,16 +119,16 @@ namespace Nova
         [Serializable]
         protected class CompositeSpriteControllerRestoreData : IRestoreData
         {
-            public readonly TransformData transform;
             public readonly string pose;
+            public readonly TransformData transform;
             public readonly Vector4Data color;
             public readonly int renderQueue;
             public readonly int layer;
 
             public CompositeSpriteControllerRestoreData(CompositeSpriteController parent)
             {
-                transform = new TransformData(parent.transform);
                 pose = parent.currentPose;
+                transform = new TransformData(parent.transform);
                 color = parent.color;
                 renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
                 layer = parent.layer;

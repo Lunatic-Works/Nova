@@ -738,31 +738,25 @@ namespace Nova
             public readonly bool closeButtonShown;
             public readonly bool dialogueFinishIconShown;
 
-            public DialogueBoxControllerRestoreData(RectTransform rect, Color backgroundColor,
-                DialogueUpdateMode dialogueUpdateMode, List<DialogueDisplayData> displayDatas, Theme theme,
-                int textAlignment, bool textColorHasSet, Color textColor, string materialName, bool closeButtonShown,
-                bool dialogueFinishIconShown)
+            public DialogueBoxControllerRestoreData(DialogueBoxController parent)
             {
-                rectTransformData = new RectTransformData(rect);
-                this.backgroundColor = backgroundColor;
-                this.dialogueUpdateMode = dialogueUpdateMode;
-                this.displayDatas = displayDatas;
-                this.theme = theme;
-                this.textAlignment = textAlignment;
-                this.textColorHasSet = textColorHasSet;
-                this.textColor = textColor;
-                this.materialName = materialName;
-                this.closeButtonShown = closeButtonShown;
-                this.dialogueFinishIconShown = dialogueFinishIconShown;
+                rectTransformData = new RectTransformData(parent.rect);
+                backgroundColor = parent.backgroundColor;
+                dialogueUpdateMode = parent.dialogueUpdateMode;
+                displayDatas = parent.dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
+                theme = parent.theme;
+                textAlignment = (int)parent.textAlignment;
+                textColorHasSet = parent.textColorHasSet;
+                textColor = parent.textColor;
+                materialName = parent.materialName;
+                closeButtonShown = parent.closeButtonShown;
+                dialogueFinishIconShown = parent.dialogueFinishIconShown;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            var displayDatas = dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
-            return new DialogueBoxControllerRestoreData(rect, backgroundColor, dialogueUpdateMode, displayDatas, theme,
-                (int)textAlignment, textColorHasSet, textColor, materialName, closeButtonShown,
-                dialogueFinishIconShown);
+            return new DialogueBoxControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

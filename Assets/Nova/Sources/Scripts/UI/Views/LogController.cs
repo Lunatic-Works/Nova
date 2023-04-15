@@ -346,15 +346,15 @@ namespace Nova
         {
             public readonly List<LogEntryRestoreData> logEntriesRestoreData;
 
-            public LogControllerRestoreData(List<LogEntryRestoreData> logEntriesRestoreData)
+            public LogControllerRestoreData(LogController parent)
             {
-                this.logEntriesRestoreData = logEntriesRestoreData;
+                logEntriesRestoreData = parent.logEntriesRestoreData;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new LogControllerRestoreData(logEntriesRestoreData);
+            return new LogControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

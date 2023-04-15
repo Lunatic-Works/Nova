@@ -104,16 +104,16 @@ namespace Nova
             public readonly Dictionary<string, bool> nameToEnabled;
             public readonly Dictionary<string, int> nameToIndex;
 
-            public AutoVoiceRestoreData(Dictionary<string, bool> nameToEnabled, Dictionary<string, int> nameToIndex)
+            public AutoVoiceRestoreData(AutoVoice parent)
             {
-                this.nameToEnabled = nameToEnabled.ToDictionary(x => x.Key, x => x.Value);
-                this.nameToIndex = nameToIndex.ToDictionary(x => x.Key, x => x.Value);
+                nameToEnabled = parent.nameToEnabled.ToDictionary(x => x.Key, x => x.Value);
+                nameToIndex = parent.nameToIndex.ToDictionary(x => x.Key, x => x.Value);
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new AutoVoiceRestoreData(nameToEnabled, nameToIndex);
+            return new AutoVoiceRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

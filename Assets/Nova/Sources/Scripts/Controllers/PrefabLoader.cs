@@ -78,22 +78,16 @@ namespace Nova
             public readonly string currentPrefabName;
             public readonly TransformData transformData;
 
-            public PrefabLoaderRestoreData(string currentPrefabName, Transform transform)
+            public PrefabLoaderRestoreData(PrefabLoader parent)
             {
-                this.currentPrefabName = currentPrefabName;
-                transformData = new TransformData(transform);
-            }
-
-            public PrefabLoaderRestoreData(PrefabLoaderRestoreData baseData)
-            {
-                currentPrefabName = baseData.currentPrefabName;
-                transformData = baseData.transformData;
+                currentPrefabName = parent.currentPrefabName;
+                transformData = new TransformData(parent.transform);
             }
         }
 
         public virtual IRestoreData GetRestoreData()
         {
-            return new PrefabLoaderRestoreData(currentPrefabName, transform);
+            return new PrefabLoaderRestoreData(this);
         }
 
         public virtual void Restore(IRestoreData restoreData)

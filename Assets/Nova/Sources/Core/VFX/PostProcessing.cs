@@ -151,17 +151,16 @@ namespace Nova
         {
             public readonly List<MaterialData> layersData;
 
-            public PostProcessingRestoreData(List<MaterialData> layersData)
+            public PostProcessingRestoreData(PostProcessing parent)
             {
-                this.layersData = layersData;
+                // Materials must be RestorableMaterial
+                layersData = parent.layers.Select(RestorableMaterial.GetRestoreData).ToList();
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            // Materials must be RestorableMaterial
-            var layersData = layers.Select(RestorableMaterial.GetRestoreData).ToList();
-            return new PostProcessingRestoreData(layersData);
+            return new PostProcessingRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

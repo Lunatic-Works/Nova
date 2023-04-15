@@ -204,9 +204,9 @@ namespace Nova
         {
             public readonly Dictionary<AssetCacheType, Dictionary<string, int>> cachedAssetCounts;
 
-            public AssetLoaderRestoreData(Dictionary<AssetCacheType, LRUCache<string, CachedAssetEntry>> cachedAssets)
+            public AssetLoaderRestoreData(AssetLoader parent)
             {
-                cachedAssetCounts = cachedAssets.ToDictionary(
+                cachedAssetCounts = parent.cachedAssets.ToDictionary(
                     pair => pair.Key,
                     pair => pair.Value.ToDictionary(
                         pair2 => pair2.Key,
@@ -218,7 +218,7 @@ namespace Nova
 
         public IRestoreData GetRestoreData()
         {
-            return new AssetLoaderRestoreData(cachedAssets);
+            return new AssetLoaderRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)
