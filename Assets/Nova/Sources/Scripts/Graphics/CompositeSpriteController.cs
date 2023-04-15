@@ -123,6 +123,7 @@ namespace Nova
             public readonly string pose;
             public readonly Vector4Data color;
             public readonly int renderQueue;
+            public readonly int layer;
 
             public CompositeSpriteControllerRestoreData(CompositeSpriteController parent)
             {
@@ -130,14 +131,7 @@ namespace Nova
                 pose = parent.currentPose;
                 color = parent.color;
                 renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
-            }
-
-            public CompositeSpriteControllerRestoreData(CompositeSpriteControllerRestoreData other)
-            {
-                transform = other.transform;
-                pose = other.pose;
-                color = other.color;
-                renderQueue = other.renderQueue;
+                layer = parent.layer;
             }
         }
 
@@ -149,9 +143,10 @@ namespace Nova
         public virtual void Restore(IRestoreData restoreData)
         {
             var data = restoreData as CompositeSpriteControllerRestoreData;
-            data.transform.Restore(this.transform);
+            data.transform.Restore(transform);
             color = data.color;
             gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
+            layer = data.layer;
             SetPose(data.pose, false);
         }
 
