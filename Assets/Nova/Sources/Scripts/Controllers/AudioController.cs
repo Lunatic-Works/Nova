@@ -8,7 +8,6 @@ namespace Nova
     /// This class is used for controlling audio source from external scripts
     /// </summary>
     [ExportCustomType]
-    [RequireComponent(typeof(AudioSource))]
     public class AudioController : MonoBehaviour, IRestorable
     {
         public string luaGlobalName;
