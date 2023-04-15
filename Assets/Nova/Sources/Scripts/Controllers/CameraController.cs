@@ -78,12 +78,14 @@ namespace Nova
         private class CameraControllerRestoreData : IRestoreData
         {
             public readonly TransformData transformData;
+            public readonly bool cameraEnabled;
             public readonly float size;
             public readonly int cullingMask;
 
             public CameraControllerRestoreData(CameraController parent)
             {
                 transformData = new TransformData(parent.transform);
+                cameraEnabled = parent.cameraEnabled;
                 size = parent.size;
                 cullingMask = parent.cullingMask;
             }
@@ -98,6 +100,7 @@ namespace Nova
         {
             var data = restoreData as CameraControllerRestoreData;
             data.transformData.Restore(transform);
+            cameraEnabled = data.cameraEnabled;
             size = data.size;
             cullingMask = data.cullingMask;
         }
