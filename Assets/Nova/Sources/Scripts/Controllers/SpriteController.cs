@@ -196,34 +196,30 @@ namespace Nova
             public readonly int renderQueue;
             public readonly int layer;
 
-            public SpriteControllerRestoreData(string currentImageName, Transform transform, Color color,
-                MaterialData materialData, int renderQueue, int layer)
+            public SpriteControllerRestoreData(SpriteController parent)
             {
-                this.currentImageName = currentImageName;
-                transformData = new TransformData(transform);
-                this.color = color;
-                this.materialData = materialData;
-                this.renderQueue = renderQueue;
-                this.layer = layer;
+                currentImageName = parent.currentImageName;
+                transformData = new TransformData(parent.transform);
+                color = parent.color;
+
+                // Material must be RestorableMaterial or defaultMaterial
+                if (parent.sharedMaterial is RestorableMaterial)
+                {
+                    materialData = RestorableMaterial.GetRestoreData(parent.sharedMaterial);
+                }
+                else
+                {
+                    materialData = null;
+                }
+
+                renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
+                layer = parent.layer;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            // Material must be RestorableMaterial or defaultMaterial
-            MaterialData materialData;
-            if (sharedMaterial is RestorableMaterial)
-            {
-                materialData = RestorableMaterial.GetRestoreData(sharedMaterial);
-            }
-            else
-            {
-                materialData = null;
-            }
-
-            int renderQueue = gameObject.Ensure<RenderQueueOverrider>().renderQueue;
-
-            return new SpriteControllerRestoreData(currentImageName, transform, color, materialData, renderQueue, layer);
+            return new SpriteControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

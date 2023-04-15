@@ -468,19 +468,19 @@ namespace Nova
             public readonly bool closeButtonShown;
             public readonly bool dialogueFinishIconShown;
 
-            public DialogueBoxControllerRestoreData(DialogueBoxController controller)
+            public DialogueBoxControllerRestoreData(DialogueBoxController parent)
             {
-                active = controller.active;
-                rectTransformData = new RectTransformData(controller.rect);
-                backgroundColor = controller.backgroundColor;
-                dialogueUpdateMode = controller.dialogueUpdateMode;
-                displayDatas = controller.dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
-                textAlignment = (int)controller.textAlignment;
-                textColorHasSet = controller.textColorHasSet;
-                textColor = controller.textColor;
-                materialName = controller.materialName;
-                closeButtonShown = controller.closeButtonShown;
-                dialogueFinishIconShown = controller.dialogueFinishIconShown;
+                active = parent.active;
+                rectTransformData = new RectTransformData(parent.rect);
+                backgroundColor = parent.backgroundColor;
+                dialogueUpdateMode = parent.dialogueUpdateMode;
+                displayDatas = parent.dialogueText.dialogueEntryControllers.Select(x => x.displayData).ToList();
+                textAlignment = (int)parent.textAlignment;
+                textColorHasSet = parent.textColorHasSet;
+                textColor = parent.textColor;
+                materialName = parent.materialName;
+                closeButtonShown = parent.closeButtonShown;
+                dialogueFinishIconShown = parent.dialogueFinishIconShown;
             }
         }
 

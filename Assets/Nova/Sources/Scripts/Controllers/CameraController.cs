@@ -70,21 +70,6 @@ namespace Nova
             }
         }
 
-        [Serializable]
-        private class CameraData
-        {
-            public readonly TransformData transformData;
-            public readonly float size;
-            public readonly int cullingMask;
-
-            public CameraData(Transform transform, float size, int cullingMask)
-            {
-                transformData = new TransformData(transform);
-                this.size = size;
-                this.cullingMask = cullingMask;
-            }
-        }
-
         #region Restoration
 
         public string restorableName => luaGlobalName;
@@ -92,12 +77,15 @@ namespace Nova
         [Serializable]
         private class CameraControllerRestoreData : IRestoreData
         {
-            public readonly CameraData cameraData;
+            public readonly TransformData transformData;
+            public readonly float size;
+            public readonly int cullingMask;
 
-            public CameraControllerRestoreData(CameraController cameraController)
+            public CameraControllerRestoreData(CameraController parent)
             {
-                cameraData = new CameraData(cameraController.transform, cameraController.size,
-                    cameraController.cullingMask);
+                transformData = new TransformData(parent.transform);
+                size = parent.size;
+                cullingMask = parent.cullingMask;
             }
         }
 
@@ -109,9 +97,9 @@ namespace Nova
         public void Restore(IRestoreData restoreData)
         {
             var data = restoreData as CameraControllerRestoreData;
-            data.cameraData.transformData.Restore(transform);
-            size = data.cameraData.size;
-            cullingMask = data.cameraData.cullingMask;
+            data.transformData.Restore(transform);
+            size = data.size;
+            cullingMask = data.cullingMask;
         }
 
         #endregion

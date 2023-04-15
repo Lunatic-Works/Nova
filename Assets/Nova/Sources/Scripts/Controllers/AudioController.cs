@@ -231,17 +231,17 @@ namespace Nova
             public readonly bool isPlaying;
             public readonly float scriptVolume;
 
-            public AudioControllerRestoreData(string currentAudioName, bool isPlaying, float scriptVolume)
+            public AudioControllerRestoreData(AudioController parent)
             {
-                this.currentAudioName = currentAudioName;
-                this.isPlaying = isPlaying;
-                this.scriptVolume = scriptVolume;
+                currentAudioName = parent.currentAudioName;
+                isPlaying = parent.isPlaying;
+                scriptVolume = parent.scriptVolume;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new AudioControllerRestoreData(currentAudioName, isPlaying, scriptVolume);
+            return new AudioControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

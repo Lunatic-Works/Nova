@@ -360,16 +360,16 @@ namespace Nova
             public readonly bool canClickForward;
             public readonly bool scriptCanAbortAnimation;
 
-            public GameViewInputRestoreData(bool canClickForward, bool scriptCanAbortAnimation)
+            public GameViewInputRestoreData(GameViewInput parent)
             {
-                this.canClickForward = canClickForward;
-                this.scriptCanAbortAnimation = scriptCanAbortAnimation;
+                canClickForward = parent.canClickForward;
+                scriptCanAbortAnimation = parent.scriptCanAbortAnimation;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new GameViewInputRestoreData(canClickForward, scriptCanAbortAnimation);
+            return new GameViewInputRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

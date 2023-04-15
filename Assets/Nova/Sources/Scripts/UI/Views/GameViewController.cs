@@ -329,9 +329,9 @@ namespace Nova
         {
             public readonly string currentDialogueBox;
 
-            public GameViewControllerRestoreData(GameViewController controller)
+            public GameViewControllerRestoreData(GameViewController parent)
             {
-                currentDialogueBox = controller.currentDialogueBox?.luaGlobalName ?? "";
+                currentDialogueBox = parent.currentDialogueBox?.luaGlobalName ?? "";
             }
         }
 
