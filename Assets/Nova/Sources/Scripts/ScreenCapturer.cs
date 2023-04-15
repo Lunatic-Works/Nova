@@ -18,7 +18,7 @@ namespace Nova
         }
 
         // Will reuse renderTexture if possible, otherwise destroy it
-        public static RenderTexture GetGameTexture(RenderTexture renderTexture = null, bool withUI = true)
+        public static RenderTexture GetGameTexture(RenderTexture renderTexture = null, Camera camera = null)
         {
             RenderTexture oldRenderTexture = null;
             if (renderTexture == null || renderTexture.width != RealScreen.width || renderTexture.height != RealScreen.height)
@@ -30,8 +30,12 @@ namespace Nova
                 };
             }
 
-            var screenCamera = withUI ? UICameraHelper.Active : Camera.main;
-            screenCamera.RenderToTexture(renderTexture);
+            if (camera == null)
+            {
+                camera = Camera.main;
+            }
+
+            camera.RenderToTexture(renderTexture);
 
             // Destroy oldRenderTexture after capturing, because it may be showing on the screen
             Destroy(oldRenderTexture);
@@ -39,9 +43,9 @@ namespace Nova
             return renderTexture;
         }
 
-        public void CaptureGameTexture()
+        public void CaptureGameTexture(Camera camera)
         {
-            capturedGameTexture = GetGameTexture(capturedGameTexture, withUI: false);
+            capturedGameTexture = GetGameTexture(capturedGameTexture, camera);
         }
 
         public static Texture2D GetBookmarkThumbnailTexture()

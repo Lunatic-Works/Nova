@@ -80,7 +80,7 @@ public static class CustomSettings
         // _GT(typeof(TrailRenderer)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
 #else
         // _GT(typeof(AudioSource)),
-        // _GT(typeof(Camera)),
+        _GT(typeof(Camera)),
         // _GT(typeof(Component)),
         // _GT(typeof(Light)),
         // _GT(typeof(Material)),

@@ -10,7 +10,7 @@ namespace Nova
         public string luaGlobalName;
 
         private GameState gameState;
-        private new Camera camera;
+        public new Camera camera { get; private set; }
 
         public bool cameraEnabled
         {
