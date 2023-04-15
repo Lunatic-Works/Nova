@@ -29,7 +29,7 @@ namespace Nova
             gameState = controller.GameState;
             configManager = controller.ConfigManager;
             checkpointManager = controller.CheckpointManager;
-            novaAnimation = controller.PerDialogueAnimation;
+            novaAnimation = controller.UIAnimation;
 
             quitButton.onClick.AddListener(() => this.Hide(Utils.Quit));
         }
