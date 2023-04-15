@@ -225,20 +225,17 @@ namespace Nova
         private class GameCharacterControllerRestoreData : CompositeSpriteControllerRestoreData
         {
             public readonly Vector4Data environmentColor;
-            public readonly int layer;
 
-            public GameCharacterControllerRestoreData(CompositeSpriteControllerRestoreData baseData,
-                Color environmentColor, int layer) : base(baseData)
+            public GameCharacterControllerRestoreData(CompositeSpriteController parent, Color environmentColor)
+                : base(parent)
             {
                 this.environmentColor = environmentColor;
-                this.layer = layer;
             }
         }
 
         public override IRestoreData GetRestoreData()
         {
-            return new GameCharacterControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData,
-                environmentColor, layer);
+            return new GameCharacterControllerRestoreData(this as CompositeSpriteController, environmentColor);
         }
 
         public override void Restore(IRestoreData restoreData)
@@ -246,7 +243,6 @@ namespace Nova
             base.Restore(restoreData);
             var data = restoreData as GameCharacterControllerRestoreData;
             environmentColor = data.environmentColor;
-            layer = data.layer;
         }
 
         #endregion

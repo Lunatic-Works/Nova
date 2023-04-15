@@ -171,8 +171,8 @@ namespace Nova
             // No need to save characterName, because it will be set in the action of the dialogue entry
             public readonly Dictionary<string, string> characterToImageName;
 
-            public AvatarControllerRestoreData(CompositeSpriteControllerRestoreData baseData,
-                Dictionary<string, string> characterToImageName) : base(baseData)
+            public AvatarControllerRestoreData(CompositeSpriteController parent,
+                Dictionary<string, string> characterToImageName) : base(parent)
             {
                 this.characterToImageName = characterToImageName;
             }
@@ -180,8 +180,7 @@ namespace Nova
 
         public override IRestoreData GetRestoreData()
         {
-            return new AvatarControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData,
-                characterToImageName);
+            return new AvatarControllerRestoreData(this as CompositeSpriteController, characterToImageName);
         }
 
         public override void Restore(IRestoreData restoreData)
