@@ -36,7 +36,6 @@ namespace Nova
             NovaAnimation.StopAll();
             dialogueState.state = DialogueState.State.Normal;
             gameState.ReloadScripts();
-            gameState.MoveBackToFirstDialogue();
         }
     }
 }

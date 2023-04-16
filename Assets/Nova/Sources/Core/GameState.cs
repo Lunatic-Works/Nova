@@ -50,18 +50,36 @@ namespace Nova
         private void Start()
         {
             SaveInitialCheckpoint();
-            CheckScriptUpgrade();
+            CheckScriptUpgrade(false);
         }
 
         // It can run any Lua code, so everything that can be used in Lua code should initialize before Start
-        private void CheckScriptUpgrade()
+        private void CheckScriptUpgrade(bool updatePosition)
         {
+            Bookmark curPosition = null;
+            if (updatePosition)
+            {
+                curPosition = new Bookmark(nodeRecord, checkpointOffset, currentIndex);
+            }
+
             var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);
             // Debug.Log($"upgrade {changedNodes.Count} nodes");
             if (changedNodes.Any())
             {
                 var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
                 upgrader.UpgradeSaves();
+                if (updatePosition)
+                {
+                    if (upgrader.UpgradeBookmark(curPosition))
+                    {
+                        LoadBookmark(curPosition);
+                    }
+                    else
+                    {
+                        // if we cannot update the current position, switch to first dialogue
+                        MoveBackToFirstDialogue();
+                    }
+                }
             }
         }
 
@@ -73,6 +91,7 @@ namespace Nova
             LuaRuntime.Instance.Reset();
             scriptLoader.ForceInit(scriptPath);
             flowChartGraph = scriptLoader.GetFlowChartGraph();
+            CheckScriptUpgrade(true);
         }
 
         #region States

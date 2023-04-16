@@ -116,6 +116,11 @@ namespace Nova
             return newOffset;
         }
 
+        public bool UpgradeBookmark(Bookmark bookmark)
+        {
+            return UpgradeBookmark(0, bookmark);
+        }
+
         private bool UpgradeBookmark(int key, Bookmark bookmark)
         {
             if (!nodeRecordMap.TryGetValue(bookmark.nodeOffset, out var newOffset))
