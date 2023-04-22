@@ -324,6 +324,7 @@ namespace Nova
         public Dictionary<string, Differ> CheckScriptUpgrade(ScriptLoader scriptLoader, FlowChartGraph flowChartGraph)
         {
             var changedNode = new Dictionary<string, Differ>();
+            var updateHashes = false;
             if (globalSave.nodeHashes != null)
             {
                 foreach (var node in flowChartGraph)
@@ -332,14 +333,14 @@ namespace Nova
                         globalSave.nodeHashes[node.name] != node.textHash &&
                         reachedDialogues.ContainsKey(node.name))
                     {
-                        Debug.Log($"Nova: Node {node.name} needs upgrading.");
-
+                        updateHashes = true;
                         scriptLoader.AddDeferredDialogueChunks(node);
                         Differ differ = new Differ(node, reachedDialogues[node.name]);
                         differ.GetDiffs();
 
                         if (differ.distance > 0)
                         {
+                            Debug.Log($"Nova: Node {node.name} needs upgrade.");
                             changedNode.Add(node.name, differ);
                         }
                     }
@@ -349,12 +350,14 @@ namespace Nova
                 {
                     if (!flowChartGraph.HasNode(node))
                     {
+                        updateHashes = true;
+                        Debug.Log($"Nova: Node {node} needs delete.");
                         changedNode.Add(node, null);
                     }
                 }
             }
 
-            if (changedNode.Any() || globalSave.nodeHashes == null)
+            if (updateHashes || globalSave.nodeHashes == null)
             {
                 globalSave.identifier = DateTime.Now.ToBinary();
                 globalSave.nodeHashes = flowChartGraph.ToDictionary(node => node.name, node => node.textHash);
