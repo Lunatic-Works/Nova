@@ -16,6 +16,7 @@ namespace Nova
 
         private string savePathBase;
         private string globalSavePath;
+        private string backupPath;
 
         private GlobalSave globalSave;
         private bool globalSaveDirty;
@@ -47,6 +48,7 @@ namespace Nova
 
             savePathBase = Path.Combine(Application.persistentDataPath, "Save", saveFolder);
             globalSavePath = Path.Combine(savePathBase, "global.nsav");
+            backupPath = Path.Combine(savePathBase, "global.nsav.bak");
             Directory.CreateDirectory(savePathBase);
 
             serializer = new CheckpointSerializer(globalSavePath);
@@ -460,6 +462,21 @@ namespace Nova
 
             globalSave = new GlobalSave(serializer);
             globalSaveDirty = true;
+            InitReached();
+        }
+
+        public void BackupGlobalSave()
+        {
+            UpdateGlobalSave();
+            File.Copy(globalSavePath, backupPath, true);
+        }
+
+        public void RestoreGlobalSave()
+        {
+            serializer.Dispose();
+            File.Copy(backupPath, globalSavePath, true);
+            serializer.Open();
+            InitGlobalSave();
             InitReached();
         }
 

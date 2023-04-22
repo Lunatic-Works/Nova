@@ -62,23 +62,45 @@ namespace Nova
                 curPosition = new Bookmark(nodeRecord, checkpointOffset, currentIndex);
             }
 
-            var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);
-            // Debug.Log($"upgrade {changedNodes.Count} nodes");
-            if (changedNodes.Any())
+            var upgradeStarted = false;
+            var success = false;
+            try
             {
-                var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
-                upgrader.UpgradeSaves();
-                if (updatePosition)
+                var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);
+                // Debug.Log($"upgrade {changedNodes.Count} nodes");
+                if (changedNodes.Any())
                 {
-                    if (upgrader.UpgradeBookmark(curPosition))
+                    checkpointManager.BackupGlobalSave();
+                    upgradeStarted = true;
+                    var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
+                    upgrader.UpgradeSaves();
+                    success = true;
+
+                    if (updatePosition)
                     {
-                        LoadBookmark(curPosition);
+                        if (upgrader.UpgradeBookmark(curPosition))
+                        {
+                            LoadBookmark(curPosition);
+                        }
+                        else
+                        {
+                            // if we cannot update the current position, switch to first dialogue
+                            MoveBackToFirstDialogue();
+                        }
                     }
-                    else
-                    {
-                        // if we cannot update the current position, switch to first dialogue
-                        MoveBackToFirstDialogue();
-                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("upgrade failed because of Exception");
+                Debug.LogWarning(e);
+                if (upgradeStarted)
+                {
+                    checkpointManager.RestoreGlobalSave();
+                }
+                if (updatePosition && !success)
+                {
+                    LoadBookmark(curPosition);
                 }
             }
         }
