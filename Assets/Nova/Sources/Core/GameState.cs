@@ -92,7 +92,7 @@ namespace Nova
             }
             catch (Exception e)
             {
-                Debug.LogWarning("upgrade failed because of Exception");
+                Debug.LogWarning("Upgrade failed because of Exception");
                 Debug.LogWarning(e);
                 if (upgradeStarted)
                 {
@@ -114,6 +114,8 @@ namespace Nova
             scriptLoader.ForceInit(scriptPath);
             flowChartGraph = scriptLoader.GetFlowChartGraph();
             CheckScriptUpgrade(true);
+            currentNode = GetNode(nodeRecord.name);
+            Debug.Log("Reload complete.");
         }
 
         #region States
@@ -928,8 +930,6 @@ namespace Nova
             isUpgrading = upgrade;
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
-            this.RuntimeAssert(dialogueIndex >= currentIndex,
-                $"dialogueIndex {dialogueIndex} is before currentIndex {currentIndex}.");
             if (dialogueIndex == currentIndex)
             {
                 isRestoring = false;
