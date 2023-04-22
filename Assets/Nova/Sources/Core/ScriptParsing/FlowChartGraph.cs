@@ -74,6 +74,14 @@ namespace Nova
             Utils.RuntimeAssert(!isFrozen, "Cannot modify a flow chart graph when it is frozen.");
         }
 
+        public void Clear()
+        {
+            CheckFreeze();
+            nodes.Clear();
+            startNodes.Clear();
+            endNodes.Clear();
+        }
+
         /// <summary>
         /// Add a node to the flow chart graph
         /// </summary>
