@@ -89,9 +89,9 @@ namespace Nova
 
         public GameCharacterController GetCharacterController()
         {
-            if (nameToConfig.ContainsKey(characterName))
+            if (nameToConfig.TryGetValue(characterName, out var config))
             {
-                return nameToConfig[characterName].characterController;
+                return config.characterController;
             }
             else
             {

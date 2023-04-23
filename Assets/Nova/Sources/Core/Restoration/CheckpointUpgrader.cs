@@ -139,7 +139,8 @@ namespace Nova
             var newDialogueIndex = changedNodes[nodeRecord.name].leftMap[bookmark.dialogueIndex];
             if (newDialogueIndex < newNodeRecord.beginDialogue || newDialogueIndex >= newNodeRecord.endDialogue)
             {
-                Debug.LogWarning($"Nova: Cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is deleted.");
+                Debug.LogWarning(
+                    $"Nova: Cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is deleted.");
                 return false;
             }
 
