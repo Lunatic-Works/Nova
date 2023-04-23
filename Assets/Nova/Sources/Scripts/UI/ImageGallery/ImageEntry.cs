@@ -17,9 +17,9 @@ namespace Nova
 
         public string GetDisplayName()
         {
-            if (displayNames.ContainsKey(I18n.CurrentLocale))
+            if (displayNames.TryGetValue(I18n.CurrentLocale, out var name))
             {
-                return displayNames[I18n.CurrentLocale];
+                return name;
             }
             else
             {

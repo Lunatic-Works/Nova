@@ -85,9 +85,10 @@ namespace Nova
                 if (pair.locale == I18n.CurrentLocale)
                 {
                     textBox.font = pair.fontAsset;
-                    if (!string.IsNullOrEmpty(materialName) && pair.materials.ContainsKey(materialName))
+                    if (!string.IsNullOrEmpty(materialName) &&
+                        pair.materials.TryGetValue(materialName, out var material))
                     {
-                        textBox.fontSharedMaterial = pair.materials[materialName];
+                        textBox.fontSharedMaterial = material;
                     }
                     else
                     {

@@ -93,9 +93,9 @@ namespace Nova
         public T GetController<T>() where T : ViewControllerBase
         {
             var t = typeof(T);
-            if (controllers.ContainsKey(t))
+            if (controllers.TryGetValue(t, out var value))
             {
-                return controllers[t] as T;
+                return value as T;
             }
 
             var controller = GetComponentInChildren<T>();

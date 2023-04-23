@@ -237,9 +237,9 @@ namespace Nova
                 {
                     if (!string.IsNullOrEmpty(displayName))
                     {
-                        if (hiddenNames.ContainsKey(displayName))
+                        if (hiddenNames.TryGetValue(displayName, out var name))
                         {
-                            hiddenName = hiddenNames[displayName];
+                            hiddenName = name;
                         }
                         else
                         {

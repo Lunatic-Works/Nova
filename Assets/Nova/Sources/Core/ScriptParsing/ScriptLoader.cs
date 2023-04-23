@@ -150,7 +150,7 @@ namespace Nova
             {
                 return Utils.HashList(blocks.SelectMany(x =>
                 {
-                    IEnumerable<object> ret = new object[] { x.type, x.content };
+                    IEnumerable<object> ret = new object[] {x.type, x.content};
                     if (x.attributes != null)
                     {
                         ret = ret.Concat(x.attributes.Cast<object>());

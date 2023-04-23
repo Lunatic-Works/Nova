@@ -24,9 +24,9 @@ namespace Nova
 
         private void UpdateImage()
         {
-            if (sprites.ContainsKey(I18n.CurrentLocale))
+            if (sprites.TryGetValue(I18n.CurrentLocale, out var sprite))
             {
-                image.sprite = sprites[I18n.CurrentLocale];
+                image.sprite = sprite;
             }
             else
             {
@@ -34,9 +34,9 @@ namespace Nova
             }
 
             float scale = defaultScale;
-            if (multipliers.ContainsKey(I18n.CurrentLocale))
+            if (multipliers.TryGetValue(I18n.CurrentLocale, out var multiplier))
             {
-                scale *= multipliers[I18n.CurrentLocale];
+                scale *= multiplier;
             }
 
             rectTransform.localScale = new Vector3(scale, scale, 1.0f);

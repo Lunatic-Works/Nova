@@ -66,9 +66,9 @@ namespace Nova
 
         private void UpdateFontSize()
         {
-            if (multipliers.ContainsKey(I18n.CurrentLocale))
+            if (multipliers.TryGetValue(I18n.CurrentLocale, out var multiplier))
             {
-                fontSize = initFontSize * multipliers[I18n.CurrentLocale];
+                fontSize = initFontSize * multiplier;
             }
             else
             {
