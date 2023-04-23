@@ -331,11 +331,11 @@ namespace Nova
                 {
                     if (globalSave.nodeHashes.ContainsKey(node.name) &&
                         globalSave.nodeHashes[node.name] != node.textHash &&
-                        reachedDialogues.ContainsKey(node.name))
+                        reachedDialogues.TryGetValue(node.name, out var dialogue))
                     {
                         updateHashes = true;
                         scriptLoader.AddDeferredDialogueChunks(node);
-                        Differ differ = new Differ(node, reachedDialogues[node.name]);
+                        Differ differ = new Differ(node, dialogue);
                         differ.GetDiffs();
 
                         if (differ.distance > 0)
@@ -494,9 +494,8 @@ namespace Nova
 
         private Bookmark ReplaceCache(int saveID, Bookmark bookmark)
         {
-            if (cachedSaveSlots.ContainsKey(saveID))
+            if (cachedSaveSlots.TryGetValue(saveID, out var old))
             {
-                var old = cachedSaveSlots[saveID];
                 if (old == bookmark)
                 {
                     return bookmark;

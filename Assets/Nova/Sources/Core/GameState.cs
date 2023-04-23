@@ -92,12 +92,12 @@ namespace Nova
             }
             catch (Exception e)
             {
-                Debug.LogWarning("Upgrade failed because of Exception");
-                Debug.LogWarning(e);
+                Debug.LogWarning($"Nova: Upgrade failed: {e}");
                 if (upgradeStarted)
                 {
                     checkpointManager.RestoreGlobalSave();
                 }
+
                 if (updatePosition && !success)
                 {
                     LoadBookmark(curPosition);
@@ -115,7 +115,7 @@ namespace Nova
             flowChartGraph = scriptLoader.GetFlowChartGraph();
             CheckScriptUpgrade(true);
             currentNode = GetNode(nodeRecord.name);
-            Debug.Log("Reload complete.");
+            Debug.Log("Nova: Reload complete.");
         }
 
         #region States
