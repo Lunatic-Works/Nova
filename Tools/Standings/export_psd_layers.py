@@ -17,12 +17,32 @@ ignored_group_names = []
 
 
 def save_layer(layer, layer_name, size):
-    img = np.zeros((size[1], size[0], 4))
     layer_np = layer.numpy()
+
+    top = layer.top
+    bottom = layer.bottom
+    left = layer.left
+    right = layer.right
+    if top < 0:
+        layer_np = layer_np[-top:, :, :]
+        top = 0
+    if bottom > size[1]:
+        layer_np = layer_np[:size[1] - bottom, :, :]
+        bottom = size[1]
+    if left < 0:
+        layer_np = layer_np[:, -left:, :]
+        left = 0
+    if right > size[0]:
+        layer_np = layer_np[:, :size[0] - right, :]
+        right = size[0]
+
     if layer_np.shape[2] == 3:
         layer_np = np.pad(layer_np, ((0, 0), (0, 0), (0, 1)),
                           constant_values=1)
-    img[layer.top:layer.bottom, layer.left:layer.right, :] = layer_np
+
+    img = np.zeros((size[1], size[0], 4))
+    img[top:bottom, left:right, :] = layer_np
+
     img = skimage.img_as_ubyte(img)
     out_filename = os.path.join(
         out_dir, out_prefix + layer_name.replace('-', '_') + '.png')
