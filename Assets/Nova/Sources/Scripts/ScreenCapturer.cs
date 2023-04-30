@@ -50,16 +50,15 @@ namespace Nova
 
         public static Texture2D GetBookmarkThumbnailTexture()
         {
-            var texture = new Texture2D(Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight, TextureFormat.RGB24,
-                false);
             var fullSizedRenderTexture = RenderTexture.GetTemporary(RealScreen.width, RealScreen.height, 24);
+            GetGameTexture(fullSizedRenderTexture, UICameraHelper.Active);
+
             var renderTexture = RenderTexture.GetTemporary(Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight, 24);
-
-            UICameraHelper.Active.RenderToTexture(fullSizedRenderTexture);
-
             Graphics.Blit(fullSizedRenderTexture, renderTexture);
             RenderTexture.ReleaseTemporary(fullSizedRenderTexture);
 
+            var texture = new Texture2D(Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight, TextureFormat.RGB24,
+                false);
             RenderTexture.active = renderTexture;
             texture.ReadPixels(new Rect(0, 0, Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight), 0, 0, false);
             RenderTexture.active = null;

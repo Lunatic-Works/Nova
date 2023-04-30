@@ -2689,7 +2689,7 @@ GameObject:
   - component: {fileID: 1310353968}
   m_Layer: 0
   m_Name: PostUICamera
-  m_TagString: UICamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
