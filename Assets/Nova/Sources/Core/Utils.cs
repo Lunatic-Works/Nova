@@ -164,7 +164,7 @@ namespace Nova
 
         public static RenderManager FindRenderManager()
         {
-            var go = GameObject.FindGameObjectWithTag("RenderManager");
+            var go = GameObject.FindWithTag("RenderManager");
             if (go == null)
             {
                 throw new InvalidAccessException("Nova: Cannot find RenderManager game object by tag.");
