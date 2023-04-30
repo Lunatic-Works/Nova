@@ -348,8 +348,24 @@ namespace Nova
         }
     }
 
-    public static class UICameraHelper
+    public class UICameraHelper
     {
-        public static Camera Active => GameObject.FindWithTag("UICamera").GetComponent<Camera>();
+        private static UICameraHelper _instance;
+
+        public static Camera Active
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new UICameraHelper();
+                    _instance.camera = GameObject.FindWithTag("UICamera").GetComponent<Camera>();
+                }
+
+                return _instance.camera;
+            }
+        }
+
+        private Camera camera;
     }
 }
