@@ -73,8 +73,8 @@ namespace Nova
 
         private void CaptureToGhost()
         {
-            viewManager.transitionGhost.texture =
-                ScreenCapturer.GetGameTexture(viewManager.transitionGhost.texture as RenderTexture);
+            viewManager.transitionGhost.texture = ScreenCapturer.GetGameTexture(
+                viewManager.transitionGhost.texture as RenderTexture, UICameraHelper.Active);
             viewManager.transitionGhost.gameObject.SetActive(true);
             gameObject.SetActive(false);
         }
