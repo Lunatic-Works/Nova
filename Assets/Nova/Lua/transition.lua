@@ -125,7 +125,7 @@ local function set_mat(obj, mat, layer_id, token)
         return -1
     end
 
-    warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. dump(obj))
+    warn('Cannot find SpriteRenderer or Image or RawImage or PostProcessing for ' .. dump(obj))
     return -1
 end
 
