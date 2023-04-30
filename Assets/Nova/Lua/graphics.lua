@@ -16,8 +16,12 @@ end
 --- usage:
 ---     show(obj, 'image_name', [{x, y, [scale, z, angle]}, {r, g, b, [a]}, fade])
 function show(obj, image_name, coord, color, fade)
+    local duration
     if fade == nil then
         fade = (auto_fade_off_count == 0)
+    elseif type(fade) == 'number' then
+        duration = fade
+        fade = true
     end
 
     if coord then
@@ -35,7 +39,11 @@ function show(obj, image_name, coord, color, fade)
         __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. image_name)
     else
         local pose = get_pose(obj, image_name)
-        obj:SetPose(pose, fade)
+        if duration == nil then
+            obj:SetPose(pose, fade)
+        else
+            obj:SetPose(pose, fade, duration)
+        end
         __Nova.imageUnlockHelper:Unlock(obj.imageFolder .. '/' .. pose)
     end
 end
@@ -47,14 +55,22 @@ end
 add_preload_pattern('show_no_fade')
 
 function hide(obj, fade)
+    local duration
     if fade == nil then
         fade = (auto_fade_off_count == 0)
+    elseif type(fade) == 'number' then
+        duration = fade
+        fade = true
     end
 
     if obj:GetType() == typeof(Nova.PrefabLoader) then
         obj:ClearPrefab()
     else
-        obj:ClearImage(fade)
+        if duration == nil then
+            obj:ClearImage(fade)
+        else
+            obj:ClearImage(fade, duration)
+        end
     end
     schedule_gc()
 end

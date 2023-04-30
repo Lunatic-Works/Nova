@@ -15,7 +15,7 @@ namespace Nova
 
         protected abstract void ResetSize(float width, float height, Vector2 pivot);
 
-        protected void SetTexture(Texture to, float delay)
+        protected void SetTexture(Texture to, float duration)
         {
             if (lastTexture == to)
             {
@@ -39,7 +39,7 @@ namespace Nova
                     ? rendererSize.InverseScale(new Vector2(lastTexture.width, lastTexture.height))
                     : Vector2.zero
             );
-            DoFadeAnimation(delay);
+            DoFadeAnimation(duration);
             lastTexture = to;
         }
 
