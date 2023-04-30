@@ -51,7 +51,7 @@ namespace Nova
             }
         }
 
-        public void SetPose(string pose, bool fade = true)
+        public void SetPose(string pose, bool fade, float duration)
         {
             if (pose == currentPose)
             {
@@ -68,15 +68,25 @@ namespace Nova
             mergerPrimary.SetTextures(sprites);
             if (fade)
             {
-                DoFadeAnimation(fadeDuration);
+                DoFadeAnimation(duration);
             }
 
             currentPose = pose;
         }
 
+        public void SetPose(string pose, bool fade = true)
+        {
+            SetPose(pose, fade, fadeDuration);
+        }
+
+        public void ClearImage(bool fade, float duration)
+        {
+            SetPose("", fade, duration);
+        }
+
         public void ClearImage(bool fade = true)
         {
-            SetPose("", fade);
+            SetPose("", fade, fadeDuration);
         }
 
         public static string ArrayToPose(IEnumerable<string> pose)
