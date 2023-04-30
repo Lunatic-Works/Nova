@@ -287,9 +287,9 @@ end
 ---     tint(obj, {r, g, b, [a]}, [duration, easing])
 make_anim_method('tint', function(self, obj, color, duration, easing)
     local chara = obj:GetComponent(typeof(Nova.GameCharacterController))
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
+    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.FadeController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
     if chara == nil and renderer == nil then
-        warn('Cannot find SpriteRenderer or GameCharacterController or Image or RawImage for ' .. dump(obj))
+        warn('Cannot find GameCharacterController or SpriteRenderer or FadeController or Image or RawImage for ' .. dump(obj))
         return self
     end
 

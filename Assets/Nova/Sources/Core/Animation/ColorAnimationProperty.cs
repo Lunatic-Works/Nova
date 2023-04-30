@@ -9,6 +9,7 @@ namespace Nova
     {
         private readonly CharacterColor characterColor;
         private readonly SpriteRenderer spriteRenderer;
+        private readonly FadeController fadeController;
         private readonly Image image;
         private readonly DialogueBoxColor dialogueBoxColor;
 
@@ -23,6 +24,10 @@ namespace Nova
                 else if (spriteRenderer != null)
                 {
                     return spriteRenderer.color;
+                }
+                else if (fadeController != null)
+                {
+                    return fadeController.color;
                 }
                 else if (image != null)
                 {
@@ -42,6 +47,10 @@ namespace Nova
                 else if (spriteRenderer != null)
                 {
                     spriteRenderer.color = value;
+                }
+                else if (fadeController != null)
+                {
+                    fadeController.color = value;
                 }
                 else if (image != null)
                 {
@@ -81,6 +90,17 @@ namespace Nova
         public ColorAnimationProperty(SpriteRenderer spriteRenderer, Color targetValue) : base(targetValue)
         {
             this.spriteRenderer = spriteRenderer;
+        }
+
+        public ColorAnimationProperty(FadeController fadeController, Color startValue, Color targetValue) : base(
+            startValue, targetValue)
+        {
+            this.fadeController = fadeController;
+        }
+
+        public ColorAnimationProperty(FadeController fadeController, Color targetValue) : base(targetValue)
+        {
+            this.fadeController = fadeController;
         }
 
         public ColorAnimationProperty(Image image, Color startValue, Color targetValue) : base(startValue, targetValue)
