@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Nova.Generate
+namespace Nova.Generated
 {
     public static class ShaderInfoDatabase
     {
