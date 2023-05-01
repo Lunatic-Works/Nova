@@ -1,4 +1,4 @@
-namespace Nova
+namespace Nova.Generated
 {
     /// <summary>
     /// Drop some items from UnityEditor.ShaderUtil.ShaderPropertyType

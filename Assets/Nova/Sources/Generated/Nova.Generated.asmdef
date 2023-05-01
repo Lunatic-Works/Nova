@@ -1,13 +1,6 @@
 {
-    "name": "Nova",
-    "references": [
-        "Unity.InputSystem",
-        "Unity.RenderPipelines.Core.Runtime",
-        "Unity.RenderPipelines.Universal.Runtime",
-        "Unity.TextMeshPro",
-        "LoopScrollRect.Runtime",
-        "Nova.Generated"
-    ],
+    "name": "Nova.Generated",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

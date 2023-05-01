@@ -7,7 +7,7 @@ import re
 shader_proto_dir = '../../Assets/Nova/ShaderProtos/'
 shader_dir = '../../Assets/Resources/Shaders/'
 timestamps_filename = 'shader_timestamps.json'
-shader_info_cs_filename = '../../Assets/Nova/Sources/Generate/ShaderInfoDatabase.cs'
+shader_info_cs_filename = '../../Assets/Nova/Sources/Generated/ShaderInfoDatabase.cs'
 shader_info_lua_filename = '../../Assets/Nova/Lua/shader_info.lua'
 
 
@@ -308,7 +308,7 @@ def write_shader_info_cs(type_data, float_data, color_data, vector_data):
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Nova.Generate
+namespace Nova.Generated
 {
     public static class ShaderInfoDatabase
     {
