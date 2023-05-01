@@ -106,14 +106,17 @@ namespace Nova
 
         public void AbortAnimation(bool perDialogue)
         {
-            var animation = AnimationType.Text;
-            if (perDialogue)
+            if (currentDialogueBox?.active ?? false)
             {
-                animation |= AnimationType.PerDialogue;
+                NovaAnimation.StopAll(AnimationType.Text);
+                currentDialogueBox?.ShowDialogueFinishIcon(true);
             }
 
-            NovaAnimation.StopAll(animation);
-            currentDialogueBox?.ShowDialogueFinishIcon(true);
+            if (perDialogue)
+            {
+                NovaAnimation.StopAll(AnimationType.PerDialogue);
+                currentDialogueBox?.AbortTextAnimationDelay();
+            }
         }
 
         public void ForceStep()
@@ -237,8 +240,9 @@ namespace Nova
 
         private float GetDialogueTimeAutoText()
         {
-            return currentDialogueBox == null ? 0f :
-                currentDialogueBox.GetPageCharacterCount() * autoDelay * 0.1f + autoDelay;
+            return currentDialogueBox == null
+                ? 0f
+                : currentDialogueBox.GetPageCharacterCount() * autoDelay * 0.1f + autoDelay;
         }
 
         private float GetDialogueTimeAuto()
@@ -348,6 +352,10 @@ namespace Nova
                 currentDialogueBox = GetComponentsInChildren<DialogueBoxController>(true)
                     .First(x => x.luaGlobalName == data.currentDialogueBox);
                 currentDialogueBox.ShowImmediate();
+            }
+            else
+            {
+                currentDialogueBox = null;
             }
 
             ShowUI();

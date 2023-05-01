@@ -216,9 +216,22 @@ namespace Nova
         }
 
         private NovaAnimation textAnimation;
+        private AnimationEntry textAnimationDelayEntry;
         private float textAnimationDelay;
         private float textDurationOverride = -1f;
         private bool textScrollOverriden;
+
+        public void AbortTextAnimationDelay()
+        {
+            // Cannot use ?. because textAnimationDelayEntry may be destroyed by Unity
+            if (textAnimationDelayEntry == null)
+            {
+                return;
+            }
+
+            textAnimationDelayEntry.Stop(stopChildren: false);
+            textAnimationDelayEntry = null;
+        }
 
         private void ResetTextAnimationConfig()
         {
@@ -281,13 +294,13 @@ namespace Nova
                     textDuration = characterFadeInDuration * contentProxy.GetPageCharacterCount();
                 }
 
-                var animEntry = textAnimation
+                textAnimationDelayEntry = textAnimation
                     .Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
-                    .Then(null, textAnimationDelay)
-                    .Then(
-                        new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
-                        textDuration
-                    );
+                    .Then(null, textAnimationDelay);
+                var animationEntry = textAnimationDelayEntry.Then(
+                    new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
+                    textDuration
+                );
                 if (!textScrollOverriden)
                 {
                     if (dialogueText.Count == 1)
@@ -296,7 +309,7 @@ namespace Nova
                     }
                     else
                     {
-                        animEntry.And(
+                        animationEntry.And(
                             new VerticalScrollRectAnimationProperty(dialogueTextScrollRect, 0f),
                             textDuration,
                             AnimationEntry.CubicEasing(0f, 1f)
