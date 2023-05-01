@@ -56,7 +56,7 @@ namespace Nova
         private CheckpointManager checkpointManager;
         private ConfigManager configManager;
 
-        private LoopScrollRect scrollRect;
+        private LoopVerticalScrollRectWithSwitch scrollRect;
 
         private LogEntryController logEntryForTest;
         private TMP_Text contentForTest;
@@ -74,7 +74,7 @@ namespace Nova
             checkpointManager = controller.CheckpointManager;
             configManager = controller.ConfigManager;
 
-            scrollRect = myPanel.GetComponentInChildren<LoopScrollRect>();
+            scrollRect = myPanel.GetComponentInChildren<LoopVerticalScrollRectWithSwitch>();
             scrollRect.prefabSource = this;
             scrollRect.dataSource = this;
             scrollRect.sizeHelper = this;
@@ -282,10 +282,13 @@ namespace Nova
             scrollRect.RefillCellsFromEnd();
             scrollRect.verticalNormalizedPosition = 1f;
             selectedLogEntryIndex = -1;
+
+            // Disable scrolling when just showed
+            scrollRect.scrollable = false;
         }
 
-        private const float MaxScrollDownIdleTime = 0.2f;
-        private float scrollDownIdleTime;
+        private const float MaxScrollIdleTime = 0.2f;
+        private float scrollIdleTime;
 
         protected override void OnActivatedUpdate()
         {
@@ -306,34 +309,43 @@ namespace Nova
                 // Otherwise, the first scrolling down stops when reaches the bottom,
                 // and the second scrolling down hides log view
                 // verticalNormalizedPosition can be > 1
-                if (scrollDownIdleTime > MaxScrollDownIdleTime && scrollRect.verticalNormalizedPosition > 1f - 1e-3f)
+                if (scrollIdleTime > MaxScrollIdleTime && scrollRect.verticalNormalizedPosition > 1f - 1e-3f)
                 {
                     Hide();
                     return;
                 }
 
-                scrollDownIdleTime = 0f;
+                scrollIdleTime = 0f;
             }
             else if (delta > 1e-3f)
             {
-                scrollDownIdleTime = 0f;
+                scrollIdleTime = 0f;
             }
             else
             {
-                scrollDownIdleTime += Time.unscaledDeltaTime;
+                scrollIdleTime += Time.unscaledDeltaTime;
             }
 
-            // TODO: fully support keyboard navigation
-            if (Keyboard.current?[Key.UpArrow].isPressed == true)
+            // Enable scrolling after MaxScrollIdleTime
+            if (!scrollRect.scrollable && scrollIdleTime > MaxScrollIdleTime)
             {
-                Cursor.visible = false;
-                scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.down;
+                scrollRect.scrollable = true;
             }
 
-            if (Keyboard.current?[Key.DownArrow].isPressed == true)
+            if (scrollRect.scrollable)
             {
-                Cursor.visible = false;
-                scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.up;
+                // TODO: fully support keyboard navigation
+                if (Keyboard.current?[Key.UpArrow].isPressed == true)
+                {
+                    Cursor.visible = false;
+                    scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.down;
+                }
+
+                if (Keyboard.current?[Key.DownArrow].isPressed == true)
+                {
+                    Cursor.visible = false;
+                    scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.up;
+                }
             }
         }
 
