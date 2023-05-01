@@ -874,14 +874,16 @@ namespace Nova
                 return true;
             }
 
+            isRestoring = false;
+
             if (isUpgrading)
             {
+                isUpgrading = false;
                 throw CheckpointCorruptedException.CannotUpgrade;
             }
 
             Debug.LogWarning("Nova: GameState paused by action when restoring. " +
                              "Maybe a minigame does not have a checkpoint ensured after it.");
-            isRestoring = false;
             return false;
         }
 
@@ -901,6 +903,11 @@ namespace Nova
                 if (!CheckUnlockInRestoring())
                 {
                     return;
+                }
+
+                if (isUpgrading && i == stepCount - 1)
+                {
+                    isRestoring = false;
                 }
             }
         }
