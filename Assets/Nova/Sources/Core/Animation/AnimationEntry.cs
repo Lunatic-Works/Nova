@@ -203,21 +203,28 @@ namespace Nova
             status = AnimationEntryStatus.Paused;
         }
 
-        public void Stop()
+        public void Stop(bool stopChildren = true)
         {
-            // Without this, if property is ActionAnimationProperty(() => Stop()), it will cause a following stack trace:
+            // Without this line, if property is ActionAnimationProperty(Stop), it will cause a following stack trace:
             // Update -> WakeUpChildren -> Terminate (a) -> set Property.value -> Stop (b)
-            // Both a and b will DestroyEntry
-            // And there will be duplicate this in factory...
+            // Both a and b will call DestroyEntry
+            // and this AnimationEntry will be duplicated in factory
             if (isStopped) return;
 
             if (evaluateOnStop) Terminate();
-            // Even if not EvaluateOnStop, set Status = Stopped to avoid Terminate() multiple times
+            // Even if not evaluateOnStop, set status = Stopped to avoid Terminate() multiple times
             status = AnimationEntryStatus.Stopped;
 
-            foreach (Transform child in Utils.GetChildren(transform))
+            if (stopChildren)
             {
-                child.GetComponent<AnimationEntry>().Stop();
+                foreach (Transform child in Utils.GetChildren(transform))
+                {
+                    child.GetComponent<AnimationEntry>().Stop();
+                }
+            }
+            else
+            {
+                WakeUpChildren();
             }
 
             DestroyEntry(this);
@@ -242,8 +249,8 @@ namespace Nova
 
         private void Terminate()
         {
-            if (property == null || isStopped) return;
             status = AnimationEntryStatus.Stopped;
+            if (property == null) return;
             property.value = easing(1.0f);
         }
 
@@ -255,15 +262,11 @@ namespace Nova
 
         private void WakeUpChildren()
         {
-            Terminate();
-
             foreach (Transform child in Utils.GetChildren(transform))
             {
                 child.SetParent(transform.parent, false);
                 child.GetComponent<AnimationEntry>().Play();
             }
-
-            DestroyEntry(this);
         }
 
         private void Update()
@@ -280,7 +283,9 @@ namespace Nova
             // check if need loop
             if (repeatNumRemaining == 0) // no more loop
             {
+                Terminate();
                 WakeUpChildren();
+                DestroyEntry(this);
                 return;
             }
 
