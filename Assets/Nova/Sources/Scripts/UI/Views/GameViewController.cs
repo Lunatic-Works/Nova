@@ -10,11 +10,11 @@ namespace Nova
     {
         [SerializeField] private GameObject autoModeIcon;
         [SerializeField] private GameObject fastForwardModeIcon;
-        [SerializeField] private PanelController gameUIController;
         public DialogueBoxController currentDialogueBox;
 
         private GameState gameState;
         private DialogueState dialogueState;
+        private GameUIController gameUIController;
 
         protected override bool Init()
         {
@@ -24,8 +24,9 @@ namespace Nova
             }
 
             var controller = Utils.FindNovaController();
-            dialogueState = controller.DialogueState;
             gameState = controller.GameState;
+            dialogueState = controller.DialogueState;
+            gameUIController = GetComponentInChildren<GameUIController>();
 
             LuaRuntime.Instance.BindObject("gameViewController", this);
             gameState.AddRestorable(this);
@@ -67,12 +68,12 @@ namespace Nova
 
         public void ShowUI(Action onFinish = null)
         {
-            gameUIController.Show();
+            gameUIController.Show(onFinish);
         }
 
         public void HideUI(Action onFinish = null)
         {
-            gameUIController.Hide();
+            gameUIController.Hide(onFinish);
         }
 
         public void SwitchDialogueBox(DialogueBoxController box, bool cleanText = true)
@@ -80,6 +81,7 @@ namespace Nova
             if (currentDialogueBox == box)
             {
                 box?.ShowImmediate();
+                // Do not clean text
                 return;
             }
 
@@ -351,12 +353,13 @@ namespace Nova
             {
                 currentDialogueBox = GetComponentsInChildren<DialogueBoxController>(true)
                     .First(x => x.luaGlobalName == data.currentDialogueBox);
-                currentDialogueBox.ShowImmediate();
             }
             else
             {
                 currentDialogueBox = null;
             }
+
+            // All DialogueBoxController will restore their show/hide state respectively
 
             ShowUI();
         }

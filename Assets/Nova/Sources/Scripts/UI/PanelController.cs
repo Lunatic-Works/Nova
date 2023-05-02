@@ -99,6 +99,13 @@ namespace Nova
 
         protected virtual void Start()
         {
+            var parent = transform.parent.GetComponentInParent<PanelController>(true);
+            if (parent != null)
+            {
+                // Let the parent init layout for this
+                return;
+            }
+
             myPanel.SetActive(true);
             ForceRebuildLayoutAndResetTransitionTarget();
             myPanel.SetActive(false);
