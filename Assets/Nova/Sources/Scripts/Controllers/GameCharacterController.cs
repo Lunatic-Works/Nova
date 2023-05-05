@@ -222,7 +222,7 @@ namespace Nova
         #region Restoration
 
         [Serializable]
-        private class GameCharacterControllerRestoreData : CompositeSpriteControllerRestoreData
+        private class GameCharacterControllerRestoreData : OverlaySpriteControllerRestoreData
         {
             public readonly Vector4Data environmentColor;
 
@@ -240,6 +240,7 @@ namespace Nova
         public override void Restore(IRestoreData restoreData)
         {
             base.Restore(restoreData);
+
             var data = restoreData as GameCharacterControllerRestoreData;
             environmentColor = data.environmentColor;
         }

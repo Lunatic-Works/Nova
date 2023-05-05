@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Nova
@@ -30,6 +31,12 @@ namespace Nova
         {
             get => overlay.layer;
             set => overlay.layer = value;
+        }
+
+        public int sortingOrder
+        {
+            get => meshRenderer.sortingOrder;
+            set => meshRenderer.sortingOrder = value;
         }
 
         public string luaGlobalName;
@@ -97,7 +104,38 @@ namespace Nova
             myTarget.Update();
         }
 
+        #region Restoration
+
         public override string restorableName => luaGlobalName;
+
+        [Serializable]
+        protected class OverlaySpriteControllerRestoreData : CompositeSpriteControllerRestoreData
+        {
+            public readonly int layer;
+            public readonly int sortingOrder;
+
+            public OverlaySpriteControllerRestoreData(OverlaySpriteController parent) : base(parent)
+            {
+                layer = parent.layer;
+                sortingOrder = parent.sortingOrder;
+            }
+        }
+
+        public override IRestoreData GetRestoreData()
+        {
+            return new OverlaySpriteControllerRestoreData(this);
+        }
+
+        public override void Restore(IRestoreData restoreData)
+        {
+            base.Restore(restoreData);
+
+            var data = restoreData as OverlaySpriteControllerRestoreData;
+            layer = data.layer;
+            sortingOrder = data.sortingOrder;
+        }
+
+        #endregion
 
         protected class MyTarget : RenderTarget
         {

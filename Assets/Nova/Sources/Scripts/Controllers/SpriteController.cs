@@ -111,6 +111,32 @@ namespace Nova
             set => gameObject.layer = value;
         }
 
+        public int sortingOrder
+        {
+            get
+            {
+                if (spriteRenderer != null)
+                {
+                    return spriteRenderer.sortingOrder;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            set
+            {
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.sortingOrder = value;
+                }
+                else
+                {
+                    Debug.LogWarning($"Nova: Cannot set sortingOrder for Image: {Utils.GetPath(this)}");
+                }
+            }
+        }
+
         private void Awake()
         {
             gameState = Utils.FindNovaController().GameState;
@@ -193,8 +219,8 @@ namespace Nova
             public readonly TransformData transformData;
             public readonly Vector4Data color;
             public readonly MaterialData materialData;
-            public readonly int renderQueue;
             public readonly int layer;
+            public readonly int sortingOrder;
 
             public SpriteControllerRestoreData(SpriteController parent)
             {
@@ -212,8 +238,8 @@ namespace Nova
                     materialData = null;
                 }
 
-                renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
                 layer = parent.layer;
+                sortingOrder = parent.sortingOrder;
             }
         }
 
@@ -239,8 +265,11 @@ namespace Nova
                 material = gameObject.Ensure<MaterialPool>().defaultMaterial;
             }
 
-            gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
             layer = data.layer;
+            if (spriteRenderer != null)
+            {
+                sortingOrder = data.sortingOrder;
+            }
 
             if (data.currentImageName == currentImageName)
             {
