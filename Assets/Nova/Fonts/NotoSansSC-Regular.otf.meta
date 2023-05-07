@@ -8,14 +8,16 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: Noto Sans SC
   fontNames:
   - Noto Sans SC
-  fallbackFontReferences: []
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 01c0b9c49e3d1124988a64170800515c, type: 3}
+  - {fileID: 12800000, guid: a82324a5faeee2843ac65c97a3c554b1, type: 3}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1
   useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
   userData: 
   assetBundleName: 
   assetBundleVariant: 
