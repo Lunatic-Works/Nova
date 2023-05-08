@@ -24,23 +24,23 @@ MonoBehaviour:
     m_FaceIndex: 0
     m_FamilyName: Noto Sans SC
     m_StyleName: Regular
-    m_PointSize: 90
+    m_PointSize: 40
     m_Scale: 1
-    m_LineHeight: 130.32
-    m_AscentLine: 104.4
-    m_CapLine: 66
-    m_MeanLine: 49
+    m_LineHeight: 57.92
+    m_AscentLine: 46.4
+    m_CapLine: 29
+    m_MeanLine: 22
     m_Baseline: 0
-    m_DescentLine: -25.92
-    m_SuperscriptOffset: 104.4
+    m_DescentLine: -11.52
+    m_SuperscriptOffset: 46.4
     m_SuperscriptSize: 0.5
-    m_SubscriptOffset: -25.92
+    m_SubscriptOffset: -11.52
     m_SubscriptSize: 0.5
-    m_UnderlineOffset: -13.500001
-    m_UnderlineThickness: 4.5
-    m_StrikethroughOffset: 19.6
-    m_StrikethroughThickness: 4.5
-    m_TabWidth: 20
+    m_UnderlineOffset: -6
+    m_UnderlineThickness: 2
+    m_StrikethroughOffset: 8.8
+    m_StrikethroughThickness: 2
+    m_TabWidth: 9
   m_GlyphTable: []
   m_CharacterTable: []
   m_AtlasTextures:
@@ -52,8 +52,8 @@ MonoBehaviour:
   m_FreeGlyphRects:
   - m_X: 0
     m_Y: 0
-    m_Width: 4095
-    m_Height: 4095
+    m_Width: 2047
+    m_Height: 2047
   m_fontInfo:
     Name: 
     PointSize: 0
@@ -77,9 +77,9 @@ MonoBehaviour:
     AtlasWidth: 0
     AtlasHeight: 0
   atlas: {fileID: 0}
-  m_AtlasWidth: 4096
-  m_AtlasHeight: 4096
-  m_AtlasPadding: 9
+  m_AtlasWidth: 2048
+  m_AtlasHeight: 2048
+  m_AtlasPadding: 5
   m_AtlasRenderMode: 4165
   m_glyphInfoList: []
   m_KerningTable:
@@ -92,11 +92,11 @@ MonoBehaviour:
     sourceFontFileName: 
     sourceFontFileGUID: c4c101891dbff7d4ca2b4f56d2f8e8eb
     pointSizeSamplingMode: 0
-    pointSize: 90
-    padding: 9
+    pointSize: 40
+    padding: 5
     packingMode: 0
-    atlasWidth: 4096
-    atlasHeight: 4096
+    atlasWidth: 2048
+    atlasHeight: 2048
     characterSetSelectionMode: 7
     characterSequence: 
     referencedFontAssetGUID: 
@@ -140,7 +140,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: NotoSansSC-Regular Atlas Material
+  m_Name: NotoSansSC-Regular SDF Dynamic Atlas Material
   m_Shader: {fileID: 4800000, guid: 68e6db2ebdc24f95958faec2be5558d6, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -190,7 +190,7 @@ Material:
     - _GlowOffset: 0
     - _GlowOuter: 0.05
     - _GlowPower: 0.75
-    - _GradientScale: 10
+    - _GradientScale: 6
     - _LightAngle: 3.1416
     - _MaskSoftnessX: 0
     - _MaskSoftnessY: 0
@@ -213,8 +213,8 @@ Material:
     - _StencilOp: 0
     - _StencilReadMask: 255
     - _StencilWriteMask: 255
-    - _TextureHeight: 4096
-    - _TextureWidth: 4096
+    - _TextureHeight: 2048
+    - _TextureWidth: 2048
     - _UnderlayDilate: 0
     - _UnderlayOffsetX: 0
     - _UnderlayOffsetY: 0
@@ -241,7 +241,7 @@ Texture2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: NotoSansSC-Regular Atlas
+  m_Name: NotoSansSC-Regular SDF Dynamic Atlas
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
