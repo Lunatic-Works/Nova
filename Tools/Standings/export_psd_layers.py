@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 
+import json
 import os
-import shutil
+import re
+
 import numpy as np
+import pandas as pd
 import skimage
 import skimage.io
 from psd_tools import PSDImage
 from psd_tools.api.layers import (Group, PixelLayer, ShapeLayer,
                                   SmartObjectLayer, TypeLayer)
-
-import json
-import pandas as pd
-import re
 
 chara_var = None
 
@@ -44,7 +43,7 @@ def save_layer(layer, layer_name, size):
     if layer_np.shape[2] == 3:
         layer_np = np.pad(layer_np, ((0, 0), (0, 0), (0, 1)),
                           constant_values=1)
-    
+
     img = np.zeros((size[1], size[0], 4))
     img[top:bottom, left:right, :] = layer_np
 
@@ -76,13 +75,15 @@ def walk(layer, layer_name, size):
 
 
 def convert_xlsx_to_csv(target, name):
-    pd = pd.read_excel(target + '/' + name + '.xlsx', index_col=None).fillna('')
-    pd.to_csv(target + '/' + name + '.csv', index=False)
+    df = pd.read_excel(target + '/' + name + '.xlsx',
+                       index_col=None).fillna('')
+    df.to_csv(target + '/' + name + '.csv', index=False)
     with open(target + '/' + name + '.csv', 'r', encoding='utf-8') as f:
         lines = f.readlines()
         lines = [re.sub(r',Unnamed: \d', '', line) for line in lines]
     with open(target + '/' + name + '.csv', 'w', encoding='utf-8') as f:
         f.writelines(lines)
+
 
 def main(target):
     print(in_filename)
@@ -93,12 +94,11 @@ def main(target):
     print('size', psd.size)
     walk(psd, '', psd.size)
 
-
     convert_xlsx_to_csv(target, 'layer')
     convert_xlsx_to_csv(target, 'desc')
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     with open('chara_set.json', 'r', encoding='utf-8') as f:
         chara_var = json.load(f)
 

@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
+import hashlib
+import json
 import os
+
 import numpy as np
+import pandas as pd
+from PIL import Image
 from psd_tools import PSDImage
 from psd_tools.api.layers import (Group, PixelLayer, ShapeLayer,
                                   SmartObjectLayer, TypeLayer)
-from PIL import Image
-import json
-import pandas as pd
-import hashlib
 
 chara_var = None
 
@@ -18,11 +19,12 @@ out_prefix = ''
 ignored_layer_names = []
 ignored_group_names = []
 
-
 layers = {}
 
 
 def save_layer(layer, layer_name, size):
+    global layers
+
     layer_np = layer.numpy()
     top = layer.top
     bottom = layer.bottom
@@ -44,11 +46,10 @@ def save_layer(layer, layer_name, size):
     if layer_np.shape[2] == 3:
         layer_np = np.pad(layer_np, ((0, 0), (0, 0), (0, 1)),
                           constant_values=1)
-    
+
     img = np.zeros((size[1], size[0], 4))
     img[top:bottom, left:right, :] = layer_np
 
-    global layers
     layers[layer_name] = img
 
 
@@ -72,15 +73,14 @@ def walk(layer, layer_name, size):
 
 def alpha_composite(back, front):
     result = np.zeros_like(back)
-    result[:, :, :3] = (1 - front[:, :, 3:4]) * back[:, :,
-                                                     :3] + (front[:, :, 3:4]) * front[:, :, :3]
+    result[:, :, :3] = (1 - front[:, :, 3:4]) * back[:, :, :3] + (
+        front[:, :, 3:4]) * front[:, :, :3]
     result[:, :, 3] = front[:, :, 3] + \
         (1 - front[:, :, 3]) * np.squeeze(back[:, :, 3])
     return result
 
 
 def main(target):
-
     global layers
     layers = {}
 
@@ -119,7 +119,6 @@ def main(target):
 
 
 if __name__ == '__main__':
-
     with open('chara_set.json', 'r', encoding='utf8') as f:
         chara_var = json.load(f)
 
@@ -131,8 +130,10 @@ if __name__ == '__main__':
             else:
                 old_hash = ''
 
-            flist = [target + '/in.psd', target +
-                     '/layer.xlsx', target + '/desc.xlsx']
+            flist = [
+                target + '/in.psd', target + '/layer.xlsx',
+                target + '/desc.xlsx'
+            ]
             new_hash = ''
             for f in flist:
                 if os.path.exists(f):
