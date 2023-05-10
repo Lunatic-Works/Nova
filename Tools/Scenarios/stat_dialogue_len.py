@@ -4,9 +4,9 @@ from collections import Counter
 
 from nova_script_parser import normalize_dialogue, parse_chapters
 
-in_filename = 'scenario.txt'
+in_filename = "scenario.txt"
 
-with open(in_filename, 'r', encoding='utf-8') as f:
+with open(in_filename, "r", encoding="utf-8") as f:
     chapters = parse_chapters(f)
 
 counter = Counter()
