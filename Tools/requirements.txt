@@ -1,0 +1,9 @@
+luaparser
+numpy
+openpyxl
+pandas
+Pillow
+psd-tools
+PyHyphen
+scikit-image
+sobol-seq
