@@ -16,11 +16,6 @@ from psd_tools.api.layers import (
     TypeLayer,
 )
 
-chara_var = None
-
-in_filename = "in.psd"
-out_dir = "static"
-out_prefix = ""
 ignored_layer_names = []
 ignored_group_names = []
 
@@ -127,7 +122,7 @@ def merge_file(target):
 
 
 def main():
-    with open("chara_set.json", "r", encoding="utf8") as f:
+    with open("chara_set.json", "r", encoding="utf-8") as f:
         chara_var = json.load(f)
 
     for target in chara_var.values():

@@ -1,6 +1,0 @@
-psd_tools
-numpy
-scikit-image==0.20.0rc8
-pillow
-pandas
-openpyxl

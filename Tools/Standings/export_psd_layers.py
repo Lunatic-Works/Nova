@@ -17,10 +17,8 @@ from psd_tools.api.layers import (
     TypeLayer,
 )
 
-chara_var = None
-
 in_filename = "in.psd"
-out_dir = "static"
+out_dir = "out"
 out_prefix = ""
 ignored_layer_names = []
 ignored_group_names = []
@@ -52,9 +50,8 @@ def save_layer(layer, layer_name, size):
     img[top:bottom, left:right, :] = layer_np
 
     img = skimage.img_as_ubyte(img)
-    out_filename = os.path.join(
-        out_dir, f"{out_prefix}{layer_name.replace('-', '_')}.png"
-    )
+    layer_name = layer_name.replace('-', '_')
+    out_filename = os.path.join(out_dir, f"{out_prefix}{layer_name}.png")
     skimage.io.imsave(out_filename, img, check_contrast=False, compress_level=1)
 
 
