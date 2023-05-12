@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: 114312941846281828}
   - component: {fileID: 8702215254368758180}
   m_Layer: 5
-  m_Name: BranchButton
+  m_Name: ChoiceButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -399,7 +399,7 @@ namespace Nova
         /// <param name="imageInfo"></param>
         /// <param name="mode"></param>
         /// <param name="condition"></param>
-        public void RegisterBranch(string name, string destination, string text, BranchImageInformation imageInfo,
+        public void RegisterBranch(string name, string destination, string text, ChoiceImageInformation imageInfo,
             BranchMode mode, LuaFunction condition)
         {
             if (string.IsNullOrEmpty(destination))

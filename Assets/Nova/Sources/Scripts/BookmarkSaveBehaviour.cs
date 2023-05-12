@@ -14,15 +14,15 @@ namespace Nova
             gameState = Utils.FindNovaController().GameState;
             saveViewController = Utils.FindViewManager().GetController<SaveViewController>();
 
-            gameState.selectionOccurs.AddListener(OnSelectionOccurs);
+            gameState.choiceOccurs.AddListener(OnChoiceOccurs);
         }
 
         private void OnDestroy()
         {
-            gameState.selectionOccurs.RemoveListener(OnSelectionOccurs);
+            gameState.choiceOccurs.RemoveListener(OnChoiceOccurs);
         }
 
-        private void OnSelectionOccurs(SelectionOccursData selectionOccursData)
+        private void OnChoiceOccurs(ChoiceOccursData choiceOccursData)
         {
             if (gameState.currentNode.name == lastSavedNodeName)
             {

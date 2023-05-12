@@ -4,38 +4,38 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class BranchController : MonoBehaviour
+    public class ChoicesController : MonoBehaviour
     {
-        [SerializeField] private BranchButtonController branchButtonPrefab;
+        [SerializeField] private ChoiceButtonController choiceButtonPrefab;
         [SerializeField] private GameObject backPanel;
         [SerializeField] private string imageFolder;
 
         private GameState gameState;
-        [HideInInspector] public int activeSelectionCount;
+        [HideInInspector] public int activeChoiceCount;
 
         private void Awake()
         {
-            RemoveAllSelections();
+            RemoveAllChoices();
 
             gameState = Utils.FindNovaController().GameState;
-            gameState.selectionOccurs.AddListener(OnSelectionOccurs);
+            gameState.choiceOccurs.AddListener(OnChoiceOccurs);
             gameState.restoreStarts.AddListener(OnRestoreStarts);
         }
 
         private void OnDestroy()
         {
-            gameState.selectionOccurs.RemoveListener(OnSelectionOccurs);
+            gameState.choiceOccurs.RemoveListener(OnChoiceOccurs);
             gameState.restoreStarts.RemoveListener(OnRestoreStarts);
         }
 
-        private void OnSelectionOccurs(SelectionOccursData data)
+        private void OnChoiceOccurs(ChoiceOccursData data)
         {
-            RaiseSelections(data.selections);
+            RaiseChoices(data.choices);
         }
 
-        public void RaiseSelections(IReadOnlyList<SelectionOccursData.Selection> selections)
+        public void RaiseChoices(IReadOnlyList<ChoiceOccursData.Choice> choices)
         {
-            if (selections.Count == 0)
+            if (choices.Count == 0)
             {
                 throw new ArgumentException("Nova: No active selection.");
             }
@@ -45,40 +45,40 @@ namespace Nova
                 backPanel.SetActive(true);
             }
 
-            for (var i = 0; i < selections.Count; i++)
+            for (var i = 0; i < choices.Count; i++)
             {
-                var selection = selections[i];
+                var choice = choices[i];
                 var index = i;
-                var button = Instantiate(branchButtonPrefab, transform);
+                var button = Instantiate(choiceButtonPrefab, transform);
                 // Prevent showing the button before init
                 button.gameObject.SetActive(false);
-                button.Init(selection.texts, selection.imageInfo, imageFolder, () => Select(index),
-                    selection.interactable);
+                button.Init(choice.texts, choice.imageInfo, imageFolder, () => Select(index),
+                    choice.interactable);
                 button.gameObject.SetActive(true);
             }
 
-            activeSelectionCount = selections.Count;
+            activeChoiceCount = choices.Count;
         }
 
         public void Select(int index)
         {
-            RemoveAllSelections();
+            RemoveAllChoices();
             gameState.SignalFence(index);
         }
 
         private void OnRestoreStarts(bool isInitial)
         {
-            RemoveAllSelections();
+            RemoveAllChoices();
         }
 
-        private void RemoveAllSelections()
+        private void RemoveAllChoices()
         {
             foreach (Transform child in transform)
             {
                 Destroy(child.gameObject);
             }
 
-            activeSelectionCount = 0;
+            activeChoiceCount = 0;
 
             if (backPanel != null)
             {

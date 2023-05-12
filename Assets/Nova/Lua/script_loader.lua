@@ -90,7 +90,7 @@ function branch(branches)
         if branch.image then
             local image_name, image_coord = unpack(branch.image)
             local pos_x, pos_y, scale = unpack(image_coord)
-            image_info = Nova.BranchImageInformation(image_name, pos_x, pos_y, scale)
+            image_info = Nova.ChoiceImageInformation(image_name, pos_x, pos_y, scale)
         end
 
         local mode = Nova.BranchMode.Normal
