@@ -16,7 +16,7 @@ namespace Nova
             new Regex(@"--\[(=*)\[[^\]]*\]\1\]", RegexOptions.Compiled);
 
         private static readonly Regex NameDialoguePattern =
-            new Regex(@"(?<name>[^/：:]*)(//(?<hidden>[^：:]*))?(：：|::)(?<dialogue>(.|\n)*)",
+            new Regex(@"^(?<name>[^/：:]*)(//(?<hidden>[^：:]*))?(：：|::)(?<dialogue>(.|\n)*)",
                 RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         private static readonly Regex MarkdownCodePattern =
