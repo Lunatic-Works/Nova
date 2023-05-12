@@ -14,14 +14,14 @@ namespace Nova
     }
 
     [ExportCustomType]
-    public class BranchImageInformation
+    public class ChoiceImageInformation
     {
         public readonly string name;
         public readonly float positionX;
         public readonly float positionY;
         public readonly float scale;
 
-        public BranchImageInformation(string name, float positionX, float positionY, float scale)
+        public ChoiceImageInformation(string name, float positionX, float positionY, float scale)
         {
             this.name = name;
             this.positionX = positionX;
@@ -45,7 +45,7 @@ namespace Nova
         public readonly string name;
 
         public readonly Dictionary<SystemLanguage, string> texts;
-        public readonly BranchImageInformation imageInfo;
+        public readonly ChoiceImageInformation imageInfo;
         public readonly BranchMode mode;
         public readonly LuaFunction condition;
 
@@ -62,7 +62,7 @@ namespace Nova
             this.name = name;
         }
 
-        public BranchInformation(string name, string text, BranchImageInformation imageInfo, BranchMode mode,
+        public BranchInformation(string name, string text, ChoiceImageInformation imageInfo, BranchMode mode,
             LuaFunction condition)
         {
             this.name = name;

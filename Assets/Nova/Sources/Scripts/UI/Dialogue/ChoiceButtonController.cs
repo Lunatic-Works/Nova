@@ -5,17 +5,17 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    public class BranchButtonController : MonoBehaviour
+    public class ChoiceButtonController : MonoBehaviour
     {
         public Text text;
         public Image image;
         public Button button;
 
         private Dictionary<SystemLanguage, string> displayTexts;
-        private BranchImageInformation imageInfo;
+        private ChoiceImageInformation imageInfo;
         private string imageFolder;
 
-        public void Init(Dictionary<SystemLanguage, string> displayTexts, BranchImageInformation imageInfo,
+        public void Init(Dictionary<SystemLanguage, string> displayTexts, ChoiceImageInformation imageInfo,
             string imageFolder, UnityAction onClick, bool interactable)
         {
             this.displayTexts = displayTexts;

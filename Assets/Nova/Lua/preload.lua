@@ -1,4 +1,4 @@
--- TODO: preload video, avatar, branch image
+-- TODO: preload video, avatar, choice image
 
 add_preload_pattern = Nova.DialogueEntryPreprocessor.AddPattern
 add_preload_pattern_with_obj = Nova.DialogueEntryPreprocessor.AddPatternWithObject

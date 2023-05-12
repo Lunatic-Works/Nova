@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2124973209742998150}
   - component: {fileID: 2124973209742998393}
   m_Layer: 5
-  m_Name: BranchPanel
+  m_Name: ChoicePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 7457833994865627875}
   - component: {fileID: 7453781340294473581}
   m_Layer: 5
-  m_Name: Branch
+  m_Name: Choices
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -125,10 +125,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb72d3f5a6c0241f6b42bf974d360877, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  branchButtonPrefab: {fileID: 8702215254368758180, guid: 715673b90003e4c0a97eeaa9141dc935, type: 3}
+  choiceButtonPrefab: {fileID: 8702215254368758180, guid: 715673b90003e4c0a97eeaa9141dc935, type: 3}
   backPanel: {fileID: 2124973209742998395}
-  imageFolder: Branches
-  activeSelectionCount: 0
+  imageFolder: Choices
+  activeChoiceCount: 0
 --- !u!114 &7453781340294473581
 MonoBehaviour:
   m_ObjectHideFlags: 0

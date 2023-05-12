@@ -208,10 +208,10 @@ namespace Nova
         public DialogueChangedEvent dialogueChanged;
 
         /// <summary>
-        /// This event will be triggered if a selection occurs, either when branches occur or when a selection is
+        /// This event will be triggered if choices occur, either when branches occur or when choices are
         /// triggered from the script.
         /// </summary>
-        public SelectionOccursEvent selectionOccurs;
+        public ChoiceOccursEvent choiceOccurs;
 
         /// <summary>
         /// This event will be triggered if the story route has reached an end.
@@ -520,8 +520,8 @@ namespace Nova
 
         private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos)
         {
-            var selections = new List<SelectionOccursData.Selection>();
-            var selectionNames = new List<string>();
+            var choices = new List<ChoiceOccursData.Choice>();
+            var choiceNames = new List<string>();
             foreach (var branchInfo in branchInfos)
             {
                 if (branchInfo.mode == BranchMode.Jump)
@@ -540,15 +540,15 @@ namespace Nova
                     continue;
                 }
 
-                var selection = new SelectionOccursData.Selection(branchInfo.texts, branchInfo.imageInfo,
+                var choice = new ChoiceOccursData.Choice(branchInfo.texts, branchInfo.imageInfo,
                     interactable: branchInfo.mode != BranchMode.Enable || branchInfo.condition.Invoke<bool>());
-                selections.Add(selection);
-                selectionNames.Add(branchInfo.name);
+                choices.Add(choice);
+                choiceNames.Add(branchInfo.name);
             }
 
             AcquireActionPause();
 
-            RaiseSelections(selections);
+            RaiseChoices(choices);
             while (coroutineHelper.fence == null)
             {
                 yield return null;
@@ -557,7 +557,7 @@ namespace Nova
             ReleaseActionPause();
 
             var index = (int)coroutineHelper.TakeFence();
-            SelectBranch(selectionNames[index]);
+            SelectBranch(choiceNames[index]);
         }
 
         private void SelectBranch(string branchName)
@@ -665,9 +665,9 @@ namespace Nova
             }
         }
 
-        public void RaiseSelections(IReadOnlyList<SelectionOccursData.Selection> selections)
+        public void RaiseChoices(IReadOnlyList<ChoiceOccursData.Choice> choices)
         {
-            selectionOccurs.Invoke(new SelectionOccursData(selections));
+            choiceOccurs.Invoke(new ChoiceOccursData(choices));
         }
 
         #region Restoration

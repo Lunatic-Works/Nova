@@ -42,16 +42,16 @@ namespace Nova
     [Serializable]
     public class DialogueChangedEvent : UnityEvent<DialogueChangedData> { }
 
-    public class SelectionOccursData
+    public class ChoiceOccursData
     {
         [ExportCustomType]
-        public class Selection
+        public class Choice
         {
             public readonly Dictionary<SystemLanguage, string> texts;
-            public readonly BranchImageInformation imageInfo;
+            public readonly ChoiceImageInformation imageInfo;
             public readonly bool interactable;
 
-            public Selection(Dictionary<SystemLanguage, string> texts, BranchImageInformation imageInfo,
+            public Choice(Dictionary<SystemLanguage, string> texts, ChoiceImageInformation imageInfo,
                 bool interactable)
             {
                 this.texts = texts;
@@ -59,21 +59,21 @@ namespace Nova
                 this.interactable = interactable;
             }
 
-            public Selection(string text, BranchImageInformation imageInfo, bool interactable) : this(
+            public Choice(string text, ChoiceImageInformation imageInfo, bool interactable) : this(
                 new Dictionary<SystemLanguage, string> { [I18n.DefaultLocale] = text }, imageInfo, interactable)
             { }
         }
 
-        public readonly IReadOnlyList<Selection> selections;
+        public readonly IReadOnlyList<Choice> choices;
 
-        public SelectionOccursData(IReadOnlyList<Selection> selections)
+        public ChoiceOccursData(IReadOnlyList<Choice> choices)
         {
-            this.selections = selections;
+            this.choices = choices;
         }
     }
 
     [Serializable]
-    public class SelectionOccursEvent : UnityEvent<SelectionOccursData> { }
+    public class ChoiceOccursEvent : UnityEvent<ChoiceOccursData> { }
 
     public class RouteEndedData
     {
