@@ -102,7 +102,7 @@ namespace Nova
             {
                 contentProxy.text = value;
                 // Update character count
-                contentBox.ForceMeshUpdate();
+                contentBox.ForceMeshUpdate(ignoreActiveState: true);
             }
         }
 
