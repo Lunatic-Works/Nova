@@ -677,7 +677,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2124973209742998395, guid: 1af0bb5522ef0274d993606b4e6e866e, type: 3}
       propertyPath: m_Name
-      value: BranchPanel
+      value: ChoicePanel
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1af0bb5522ef0274d993606b4e6e866e, type: 3}

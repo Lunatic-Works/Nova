@@ -367,7 +367,7 @@ public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, S
                     1,
                 )
             )
-        f.write(indent_lines("};", 8) + "\n\n")
+        f.write(indent_lines("};", 8, 2))
 
         # Float
         f.write(
@@ -406,7 +406,7 @@ public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, f
                     1,
                 )
             )
-        f.write(indent_lines("};", 8) + "\n\n")
+        f.write(indent_lines("};", 8, 2))
 
         # Color
         f.write(
@@ -445,7 +445,7 @@ public static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, C
                     1,
                 )
             )
-        f.write(indent_lines("};", 8) + "\n\n")
+        f.write(indent_lines("};", 8, 2))
 
         # Vector
         f.write(
