@@ -6,6 +6,7 @@ namespace Nova
 {
     public class InputFieldMinigameController : MonoBehaviour
     {
+        public TMP_Text text;
         public TMP_InputField inputField;
         public Button closeButton;
 
@@ -27,7 +28,7 @@ namespace Nova
 
         private void OnClick()
         {
-            variables.Set("v_input_tmp", inputField.text);
+            variables.Set("input_tmp", inputField.text);
             gameState.SignalFence(true);
         }
     }
