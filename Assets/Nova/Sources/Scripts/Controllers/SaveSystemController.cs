@@ -145,6 +145,7 @@ namespace Nova
             {
                 var tmp = saveSystemController.LoadBookmark(id);
                 gameState.LoadBookmark(tmp);
+                gameState.coroutineHelper.AcquireActionPause();
             }
             else
             {

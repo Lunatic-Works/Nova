@@ -21,7 +21,7 @@ namespace Nova
         private GameStateCheckpoint initialCheckpoint;
 
         private AdvancedDialogueHelper advancedDialogueHelper;
-        private CoroutineHelper coroutineHelper;
+        internal CoroutineHelper coroutineHelper;
 
         private void Awake()
         {
