@@ -1,0 +1,27 @@
+@<|
+label 'test_luaSave'
+is_debug()
+|>
+<|
+set_box()
+|>
+这里是Save System的Lua测试。
+
+<|
+slSystem:SaveBookmark("t1")
+|>
+保存完毕。
+
+这句话时，会尝试通过 slSystem:SaveBookmark("t1")保存存档。
+
+保存了吗？等会看看吧。
+
+准备开始读取原先的存档了哦。
+
+<|
+slSystem:LoadBookmark("t1")
+|>
+正在读取……
+@<|
+is_end()
+|>

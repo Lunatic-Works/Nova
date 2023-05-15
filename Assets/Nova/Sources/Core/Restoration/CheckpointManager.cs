@@ -489,7 +489,7 @@ namespace Nova
 
         private string GetBookmarkFileName(int saveID)
         {
-            return Path.Combine(savePathBase, $"sav{saveID:D3}.nsav");
+            return Path.Combine(savePathBase, $"sav{saveID:D4}.nsav"); //扩展到四位数，1000+为后台使用。
         }
 
         private Bookmark ReplaceCache(int saveID, Bookmark bookmark)

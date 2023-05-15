@@ -14,6 +14,8 @@ namespace Nova
         public ConfigManager ConfigManager { get; private set; }
         public InputManager InputManager { get; private set; }
         public CheckpointHelper CheckpointHelper { get; private set; }
+        
+        public SaveSystemController SaveSystemController { get; private set; }
 
         public NovaAnimation PerDialogueAnimation { get; private set; }
         public NovaAnimation HoldingAnimation { get; private set; }
@@ -28,6 +30,7 @@ namespace Nova
             ConfigManager = FindComponent<ConfigManager>();
             InputManager = FindComponent<InputManager>();
             CheckpointHelper = FindComponent<CheckpointHelper>();
+            SaveSystemController = FindComponent<SaveSystemController>();
 
             var animations = GetComponentsInChildren<NovaAnimation>();
             PerDialogueAnimation = Array.Find(animations, x => x.type == AnimationType.PerDialogue);

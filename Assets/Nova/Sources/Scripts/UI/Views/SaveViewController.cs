@@ -28,7 +28,8 @@ namespace Nova
 
         private GameState gameState;
         private CheckpointManager checkpointManager;
-
+        private SaveSystemController saveSystemController;
+        
         private Button backgroundButton;
         private SaveEntryController previewEntry;
         private TextProxy thumbnailTextProxy;
@@ -57,7 +58,8 @@ namespace Nova
 
         private int maxSaveEntry;
         private int page = 1;
-
+        private const int MaxUISaveEntry = 99; 
+        
         // maxPage is updated when ShowPage is called
         private int maxPage = 1;
 
@@ -110,9 +112,14 @@ namespace Nova
             base.Awake();
 
             maxSaveEntry = maxRow * maxCol;
+            if (maxSaveEntry > MaxUISaveEntry)
+            {
+                maxSaveEntry = MaxUISaveEntry;
+            }
 
             gameState = Utils.FindNovaController().GameState;
             checkpointManager = Utils.FindNovaController().CheckpointManager;
+            saveSystemController = Utils.FindNovaController().SaveSystemController;
 
             backgroundButton = myPanel.transform.Find("Background").GetComponent<Button>();
             thumbnailTextProxy = myPanel.transform.Find("Background/Left/TextBox/Text").GetComponent<TextProxy>();
@@ -312,12 +319,11 @@ namespace Nova
 
         public void SaveBookmark(int saveID)
         {
-            var bookmark = gameState.GetBookmark();
-            bookmark.description = currentDialogue;
-            bookmark.screenshot = screenSprite.texture;
+            var description = currentDialogue;
+            var screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
-            checkpointManager.SaveBookmark(saveID, bookmark);
-
+            saveSystemController.SaveBookmark(saveID, description, screenshot);
+            
             ShowPage();
             ShowPreviewBookmark(saveID);
             viewManager.TryPlaySound(saveActionSound);
@@ -336,7 +342,7 @@ namespace Nova
 
         public void LoadBookmark(int saveID)
         {
-            var bookmark = checkpointManager.LoadBookmark(saveID);
+            var bookmark = saveSystemController.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
             if (bookmark == null)
             {
@@ -371,7 +377,7 @@ namespace Nova
         private void DeleteBookmark(int saveID)
         {
             DeleteCachedThumbnailSprite(saveID);
-            checkpointManager.DeleteBookmark(saveID);
+            saveSystemController.DeleteBookmark(saveID);
 
             ShowPage();
             selectedSaveID = -1;

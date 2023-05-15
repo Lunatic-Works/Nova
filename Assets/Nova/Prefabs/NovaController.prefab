@@ -138,6 +138,7 @@ GameObject:
   - component: {fileID: 8771533738423406258}
   - component: {fileID: 114014151699594742}
   - component: {fileID: 6935519797362669510}
+  - component: {fileID: 7630468717622980100}
   m_Layer: 0
   m_Name: NovaController
   m_TagString: NovaController
@@ -200,7 +201,7 @@ MonoBehaviour:
   dialogueChanged:
     m_PersistentCalls:
       m_Calls: []
-  selectionOccurs:
+  choiceOccurs:
     m_PersistentCalls:
       m_Calls: []
   routeEnded:
@@ -362,6 +363,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configKeyName: FastForwardUnread
+--- !u!114 &7630468717622980100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737081535048956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ace3322b79867446b3c9dfc46b70474, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1963475629363514
 GameObject:
   m_ObjectHideFlags: 0

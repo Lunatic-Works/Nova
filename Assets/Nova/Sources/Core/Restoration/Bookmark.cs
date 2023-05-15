@@ -86,7 +86,8 @@ namespace Nova
                 _saveID = value;
             }
         }
-
+        
+        public string name = "";
         public BookmarkType type { get; private set; }
 
         public DateTime modifiedTime;
