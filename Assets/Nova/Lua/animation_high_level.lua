@@ -182,9 +182,9 @@ function move(obj, coord)
         transform.localPosition = transform.localPosition + pos
         transform.localRotation = transform.localRotation * Quaternion.Euler(angle)
         if camera then
-            camera.size = camera.size.CloneScale(scale)
+            camera.size = camera.size:Scale(scale)
         else
-            transform.localScale = transform.localScale.CloneScale(scale)
+            transform.localScale = transform.localScale:Scale(scale)
         end
     else
         transform.localPosition = pos
