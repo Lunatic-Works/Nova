@@ -103,7 +103,7 @@ namespace Nova
             {
                 if (slider != null)
                 {
-                    slider.value = 1.0f * audioSource.timeSamples / audioSource.clip.samples;
+                    slider.value = (float)audioSource.timeSamples / audioSource.clip.samples;
                 }
 
                 if (text != null)
