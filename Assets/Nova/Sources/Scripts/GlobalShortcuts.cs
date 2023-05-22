@@ -6,10 +6,12 @@ namespace Nova
     public class GlobalShortcuts : MonoBehaviour
     {
         private InputManager inputManager;
+        private RenderManager renderManager;
 
         private void Awake()
         {
             inputManager = Utils.FindNovaController().InputManager;
+            renderManager = Utils.FindRenderManager();
 
             I18n.LocaleChanged.AddListener(OnLocaleChanged);
         }
@@ -23,7 +25,7 @@ namespace Nova
         {
             if (inputManager.IsTriggered(AbstractKey.ToggleFullScreen))
             {
-                RenderManager.SwitchFullScreen();
+                renderManager.SwitchFullScreen();
             }
 
             if (inputManager.IsTriggered(AbstractKey.SwitchLanguage))

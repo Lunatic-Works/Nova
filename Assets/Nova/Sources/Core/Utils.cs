@@ -358,7 +358,7 @@ namespace Nova
 
         public static int ConvertSamples(AudioClip source, AudioClip target)
         {
-            return Mathf.RoundToInt(1.0f * target.frequency / source.frequency * source.samples);
+            return Mathf.RoundToInt((float)target.frequency / source.frequency * source.samples);
         }
 
         // Avoid mutating the enumerable in the loop

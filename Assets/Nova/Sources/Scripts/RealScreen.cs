@@ -11,7 +11,8 @@ namespace Nova
         public static float fHeight = Screen.height;
         public static float fWidth = Screen.width;
 
-        public static float scale => fWidth / 1920;
+        private const int referenceWidth = 1920;
+        public static float scale => fWidth / referenceWidth;
         public static Vector2 offset =>
             new Vector2(((float)Screen.width - width) / 2, ((float)Screen.height - height) / 2);
 
