@@ -149,7 +149,7 @@ namespace Nova
 
         private void OnDisable()
         {
-            Apply();
+            Flush();
         }
 
         private void RefreshCompositeBindings()
@@ -164,9 +164,9 @@ namespace Nova
             inputBindingList.Refresh();
         }
 
-        public void Apply()
+        public void Flush()
         {
-            inputManager.Save();
+            inputManager.Flush();
             oldActionAsset = actionAsset.Clone();
         }
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class BookmarkSaveBehaviour : MonoBehaviour
+    public class AutoSaveBookmark : MonoBehaviour
     {
         private GameState gameState;
         private SaveViewController saveViewController;
