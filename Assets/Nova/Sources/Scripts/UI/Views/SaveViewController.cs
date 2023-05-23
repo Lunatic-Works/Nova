@@ -68,7 +68,7 @@ namespace Nova
 
             set
             {
-                this.RuntimeAssert(checkpointManager.saveSlotsMetadata.ContainsKey(value) || value == -1,
+                this.RuntimeAssert(checkpointManager.bookmarksMetadata.ContainsKey(value) || value == -1,
                     "selectedSaveID must be a saveID with existing bookmark, or -1.");
 
                 if (_selectedSaveID >= 0)
@@ -209,12 +209,12 @@ namespace Nova
                 int saveID;
                 if (saveViewMode == SaveViewMode.Save)
                 {
-                    // Locate to the first unused slot
+                    // Locate the first unused slot
                     saveID = checkpointManager.QueryMinUnusedSaveID((int)BookmarkType.NormalSave, int.MaxValue);
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
-                    // Locate to the latest slot
+                    // Locate the latest bookmark
                     saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue,
                         SaveIDQueryType.Latest);
                 }
@@ -443,7 +443,7 @@ namespace Nova
 
         public void QuickLoadBookmarkWithAlert()
         {
-            if (checkpointManager.saveSlotsMetadata.Values.Any(m =>
+            if (checkpointManager.bookmarksMetadata.Values.Any(m =>
                     m.saveID >= (int)BookmarkType.QuickSave && m.saveID < (int)BookmarkType.QuickSave + maxSaveEntry))
             {
                 Alert.Show(null, "bookmark.quickload.confirm", QuickLoadBookmark, null, "BookmarkQuickLoad");
@@ -464,7 +464,7 @@ namespace Nova
             {
                 if (saveViewMode == SaveViewMode.Save)
                 {
-                    if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                    if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                     {
                         SaveBookmarkWithAlert(saveID);
                     }
@@ -476,7 +476,7 @@ namespace Nova
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
-                    if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                    if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                     {
                         LoadBookmarkWithAlert(saveID);
                     }
@@ -492,7 +492,7 @@ namespace Nova
                     }
                     else // Another bookmark selected
                     {
-                        if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                        if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                         {
                             selectedSaveID = saveID;
                         }
@@ -512,7 +512,7 @@ namespace Nova
                     }
                     else // Another bookmark selected
                     {
-                        if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                        if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                         {
                             selectedSaveID = saveID;
                         }
@@ -534,7 +534,7 @@ namespace Nova
 
             if (Input.touchCount == 0) // Mouse
             {
-                if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                 {
                     selectedSaveID = saveID;
                 }
@@ -584,7 +584,7 @@ namespace Nova
                 var displayName = I18n.__(gameState.GetNode(nodeName, false).displayNames);
                 ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",
-                    checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
+                    checkpointManager.bookmarksMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
                     displayName,
                     bookmark.description.FormatNameDialogue()
                 ));
@@ -661,7 +661,7 @@ namespace Nova
             if (saveViewBookmarkType == BookmarkType.NormalSave)
             {
                 int maxSaveID = checkpointManager.QueryMaxSaveID((int)BookmarkType.NormalSave);
-                if (checkpointManager.saveSlotsMetadata.ContainsKey(maxSaveID))
+                if (checkpointManager.bookmarksMetadata.ContainsKey(maxSaveID))
                 {
                     maxPage = SaveIDToPage(maxSaveID);
                     if (saveViewMode == SaveViewMode.Save)
@@ -719,7 +719,7 @@ namespace Nova
                 UnityAction onDeleteButtonClicked;
                 UnityAction onThumbnailButtonClicked;
 
-                if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                 {
                     try
                     {
@@ -780,7 +780,7 @@ namespace Nova
 
         private Sprite GetThumbnailSprite(int saveID)
         {
-            this.RuntimeAssert(checkpointManager.saveSlotsMetadata.ContainsKey(saveID),
+            this.RuntimeAssert(checkpointManager.bookmarksMetadata.ContainsKey(saveID),
                 "GetThumbnailSprite must use a saveID with existing bookmark.");
             if (!cachedThumbnailSprites.ContainsKey(saveID))
             {

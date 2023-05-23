@@ -27,8 +27,8 @@ namespace Nova
 
         private readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
-        private readonly Dictionary<int, Bookmark> cachedSaveSlots = new Dictionary<int, Bookmark>();
-        public readonly Dictionary<int, BookmarkMetadata> saveSlotsMetadata = new Dictionary<int, BookmarkMetadata>();
+        private readonly Dictionary<int, Bookmark> cachedBookmarks = new Dictionary<int, Bookmark>();
+        public readonly Dictionary<int, BookmarkMetadata> bookmarksMetadata = new Dictionary<int, BookmarkMetadata>();
 
         private CheckpointSerializer serializer;
 
@@ -68,7 +68,7 @@ namespace Nova
                 var result = Regex.Match(fileName, @"sav([0-9]+)\.nsav");
                 if (result.Groups.Count > 1 && int.TryParse(result.Groups[1].Value, out int id))
                 {
-                    saveSlotsMetadata.Add(id, new BookmarkMetadata
+                    bookmarksMetadata.Add(id, new BookmarkMetadata
                     {
                         saveID = id,
                         modifiedTime = File.GetLastWriteTime(fileName)
@@ -89,7 +89,7 @@ namespace Nova
         {
             UpdateGlobalSave();
 
-            foreach (var bookmark in cachedSaveSlots.Values)
+            foreach (var bookmark in cachedBookmarks.Values)
             {
                 bookmark.DestroyTexture();
             }
@@ -494,7 +494,7 @@ namespace Nova
 
         private Bookmark ReplaceCache(int saveID, Bookmark bookmark)
         {
-            if (cachedSaveSlots.TryGetValue(saveID, out var old))
+            if (cachedBookmarks.TryGetValue(saveID, out var old))
             {
                 if (old == bookmark)
                 {
@@ -506,11 +506,11 @@ namespace Nova
 
             if (bookmark == null)
             {
-                cachedSaveSlots.Remove(saveID);
+                cachedBookmarks.Remove(saveID);
             }
             else
             {
-                cachedSaveSlots[saveID] = bookmark;
+                cachedBookmarks[saveID] = bookmark;
             }
 
             return bookmark;
@@ -532,7 +532,7 @@ namespace Nova
             serializer.WriteBookmark(GetBookmarkFileName(saveID), cache ? ReplaceCache(saveID, bookmark) : bookmark);
             UpdateGlobalSave();
 
-            var metadata = saveSlotsMetadata.Ensure(saveID);
+            var metadata = bookmarksMetadata.Ensure(saveID);
             metadata.saveID = saveID;
             metadata.modifiedTime = DateTime.Now;
         }
@@ -552,7 +552,7 @@ namespace Nova
         public void DeleteBookmark(int saveID)
         {
             File.Delete(GetBookmarkFileName(saveID));
-            saveSlotsMetadata.Remove(saveID);
+            bookmarksMetadata.Remove(saveID);
             ReplaceCache(saveID, null);
         }
 
@@ -565,7 +565,7 @@ namespace Nova
         {
             for (; beginSaveID < endSaveID; beginSaveID++)
             {
-                if (saveSlotsMetadata.ContainsKey(beginSaveID))
+                if (bookmarksMetadata.ContainsKey(beginSaveID))
                     LoadBookmark(beginSaveID);
             }
         }
@@ -579,11 +579,11 @@ namespace Nova
         {
             get
             {
-                if (!saveSlotsMetadata.ContainsKey(saveID))
+                if (!bookmarksMetadata.ContainsKey(saveID))
                     return null;
-                if (!cachedSaveSlots.ContainsKey(saveID))
+                if (!cachedBookmarks.ContainsKey(saveID))
                     LoadBookmark(saveID);
-                return cachedSaveSlots[saveID];
+                return cachedBookmarks[saveID];
             }
 
             set => SaveBookmark(saveID, value);
@@ -598,7 +598,7 @@ namespace Nova
         /// <returns>The ID to query. If no bookmark is found in range, the return value will be "begin".</returns>
         public int QuerySaveIDByTime(int begin, int end, SaveIDQueryType type)
         {
-            var filtered = saveSlotsMetadata.Values.Where(m => m.saveID >= begin && m.saveID < end).ToList();
+            var filtered = bookmarksMetadata.Values.Where(m => m.saveID >= begin && m.saveID < end).ToList();
             if (!filtered.Any())
                 return begin;
             if (type == SaveIDQueryType.Earliest)
@@ -609,18 +609,18 @@ namespace Nova
 
         public int QueryMaxSaveID(int begin)
         {
-            if (!saveSlotsMetadata.Any())
+            if (!bookmarksMetadata.Any())
             {
                 return begin;
             }
 
-            return Math.Max(saveSlotsMetadata.Keys.Max(), begin);
+            return Math.Max(bookmarksMetadata.Keys.Max(), begin);
         }
 
         public int QueryMinUnusedSaveID(int begin, int end = int.MaxValue)
         {
             int saveID = begin;
-            while (saveID < end && saveSlotsMetadata.ContainsKey(saveID))
+            while (saveID < end && bookmarksMetadata.ContainsKey(saveID))
             {
                 ++saveID;
             }
