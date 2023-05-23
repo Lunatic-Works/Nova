@@ -1535,6 +1535,7 @@ MonoBehaviour:
   saveActionSound: {fileID: 8300000, guid: ef594f8463dbc1e498be799f0eaf269f, type: 3}
   loadActionSound: {fileID: 8300000, guid: ef594f8463dbc1e498be799f0eaf269f, type: 3}
   deleteActionSound: {fileID: 8300000, guid: ef594f8463dbc1e498be799f0eaf269f, type: 3}
+  blurMaterial: {fileID: 2100000, guid: 33a7950f5de599d4c831e47498908418, type: 2}
 --- !u!114 &3745355648971507450
 MonoBehaviour:
   m_ObjectHideFlags: 0
