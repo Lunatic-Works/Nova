@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
 {
+    [Obsolete]
     public abstract class TextureFadeController : FadeController
     {
         private static readonly int PrimaryTextureID = Shader.PropertyToID("_PrimaryTex");

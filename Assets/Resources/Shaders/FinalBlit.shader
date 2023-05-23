@@ -4,7 +4,7 @@ Shader "Nova/VFX/Final Blit"
 {
     Properties
     {
-        _MainTex ("Main Texture", 2D) = "white" {}
+        [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
         _Color ("Margin Color", Color) = (0, 0, 0, 1)
     }
     SubShader

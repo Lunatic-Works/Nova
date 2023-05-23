@@ -4,8 +4,10 @@ Shader "Nova/Premul/Fade Global"
 {
     Properties
     {
-        [HideInInspector] _MainTex ("Dummy Texture Providing Size", 2D) = "black" {}
-        _Offsets ("Offsets (MainX, MainY, SecX, SecY)", Vector) = (0, 0, 0, 0)
+        [HideInInspector] _MainTex ("Dummy Texture Providing Size", 2D) = "white" {}
+        [NoScaleOffset] _PrimaryTex ("Primary Texture", 2D) = "clear" {}
+        [NoScaleOffset] _SubTex ("Secondary Texture", 2D) = "clear" {}
+        _Offsets ("Offsets (x1, y1, x2, y2)", Vector) = (0, 0, 0, 0)
         _Color ("Primary Texture Color", Color) = (1, 1, 1, 1)
         _SubColor ("Secondary Texture Color", Color) = (1, 1, 1, 1)
         _T ("Time", Range(0.0, 1.0)) = 0.0

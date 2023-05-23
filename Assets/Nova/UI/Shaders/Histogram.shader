@@ -3,8 +3,8 @@ Shader "Nova/UI/Histogram"
     Properties
     {
         [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
-        _Color ("Tint", Color) = (1, 1, 1, 1)
-        _Scale ("Multiplier", Float) = 1.0
+        _Color ("Color", Color) = (1, 1, 1, 1)
+        _Scale ("Scale", Float) = 1.0
     }
     SubShader
     {

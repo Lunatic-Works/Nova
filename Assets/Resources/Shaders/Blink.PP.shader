@@ -4,7 +4,7 @@ Shader "Nova/Post Processing/Blink"
 {
     Properties
     {
-        _MainTex ("Main Texture", 2D) = "white" {}
+        [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
         _T ("Time", Range(0.0, 1.0)) = 0.0
         _Mul ("Multiplier", Float) = 1.0
         _Offset ("Offset", Float) = 0.0

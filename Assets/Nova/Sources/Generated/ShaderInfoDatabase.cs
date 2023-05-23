@@ -108,7 +108,9 @@ namespace Nova.Generated
                 {
                     {"_Color", ShaderPropertyType.Color},
                     {"_Offsets", ShaderPropertyType.Vector},
+                    {"_PrimaryTex", ShaderPropertyType.TexEnv},
                     {"_SubColor", ShaderPropertyType.Color},
+                    {"_SubTex", ShaderPropertyType.TexEnv},
                     {"_T", ShaderPropertyType.Float},
                 }
             },

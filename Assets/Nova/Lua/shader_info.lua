@@ -58,7 +58,9 @@ shader_type_data = {
     ['Fade Global'] = {
         _Color = 'Color',
         _Offsets = 'Vector',
+        _PrimaryTex = '2D',
         _SubColor = 'Color',
+        _SubTex = '2D',
         _T = 'Float',
     },
     ['Fade Radial Blur'] = {
