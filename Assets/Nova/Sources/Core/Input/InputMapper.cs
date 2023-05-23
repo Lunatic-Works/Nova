@@ -119,7 +119,7 @@ namespace Nova
             File.WriteAllText(KeyboardMappingFilePath, keyboard.Json());
         }
 
-        public void Save()
+        public void Flush()
         {
             if (!inited)
             {
@@ -166,7 +166,7 @@ namespace Nova
 
         private void OnDestroy()
         {
-            Save();
+            Flush();
         }
 
         public bool GetKey(AbstractKey key)

@@ -2,9 +2,10 @@ using UnityEngine;
 
 namespace Nova
 {
-    public class AutoSave : MonoBehaviour
+    // Flush data in memory to disk at intervals
+    public class AutoFlush : MonoBehaviour
     {
-        public float maxTime = 10.0f;
+        [SerializeField] private float maxTime = 10.0f;
 
         private bool isPaused;
         private float time;
@@ -22,23 +23,23 @@ namespace Nova
         private void OnApplicationFocus(bool hasFocus)
         {
             isPaused = !hasFocus;
-            TrySave();
+            TryFlush();
         }
 
         private void OnApplicationPause(bool pauseStatus)
         {
             isPaused = pauseStatus;
-            TrySave();
+            TryFlush();
         }
 
-        private void TrySave()
+        private void TryFlush()
         {
             if (!isPaused || time < maxTime)
             {
                 return;
             }
 
-            Utils.SaveAll();
+            Utils.FlushAll();
             time = 0.0f;
         }
     }

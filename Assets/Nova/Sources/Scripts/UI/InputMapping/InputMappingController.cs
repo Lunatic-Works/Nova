@@ -92,7 +92,7 @@ namespace Nova
 
         private void OnDisable()
         {
-            Apply();
+            Flush();
         }
 
         private void RefreshData()
@@ -100,10 +100,10 @@ namespace Nova
             keyboardData = inputMapper.keyboard.Data.GetCopy();
         }
 
-        public void Apply()
+        public void Flush()
         {
             inputMapper.keyboard.Data = keyboardData;
-            inputMapper.Save();
+            inputMapper.Flush();
         }
 
         public void RestoreAll()

@@ -50,7 +50,7 @@ namespace Nova
 
         public override void Hide(Action onFinish)
         {
-            configManager.Apply();
+            configManager.Flush();
             base.Hide(onFinish);
         }
 
@@ -84,9 +84,9 @@ namespace Nova
         private void ResetDefault()
         {
             configManager.ResetDefault();
-            configManager.Apply();
+            configManager.Flush();
             inputMappingController.ResetDefault();
-            inputMappingController.Apply();
+            inputMappingController.Flush();
             I18n.CurrentLocale = Application.systemLanguage;
         }
 
