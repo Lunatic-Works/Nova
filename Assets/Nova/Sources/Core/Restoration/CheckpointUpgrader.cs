@@ -176,7 +176,7 @@ namespace Nova
             }
 
             checkpointManager.beginNodeOffset = UpgradeNodeTree(checkpointManager.beginNodeOffset);
-            foreach (var id in checkpointManager.saveSlotsMetadata.Keys)
+            foreach (var id in checkpointManager.bookmarksMetadata.Keys)
             {
                 var bookmark = checkpointManager.LoadBookmark(id, false);
                 if (UpgradeBookmark(id, bookmark))
