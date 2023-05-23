@@ -48,13 +48,13 @@ namespace Nova
             capturedGameTexture = GetGameTexture(capturedGameTexture, camera);
         }
 
-        public static Texture2D GetBookmarkThumbnailTexture()
+        public static Texture2D GetBookmarkThumbnailTexture(Material material = null)
         {
             var fullSizedRenderTexture = RenderTexture.GetTemporary(RealScreen.width, RealScreen.height, 24);
             GetGameTexture(fullSizedRenderTexture, UICameraHelper.Active);
 
             var renderTexture = RenderTexture.GetTemporary(Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight, 24);
-            Graphics.Blit(fullSizedRenderTexture, renderTexture);
+            Graphics.Blit(fullSizedRenderTexture, renderTexture, material);
             RenderTexture.ReleaseTemporary(fullSizedRenderTexture);
 
             var texture = new Texture2D(Bookmark.ScreenshotWidth, Bookmark.ScreenshotHeight, TextureFormat.RGB24,

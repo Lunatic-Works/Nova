@@ -26,6 +26,8 @@ namespace Nova
         [SerializeField] private AudioClip loadActionSound;
         [SerializeField] private AudioClip deleteActionSound;
 
+        [SerializeField] private Material blurMaterial;
+
         private GameState gameState;
         private CheckpointManager checkpointManager;
 
@@ -243,7 +245,7 @@ namespace Nova
                     Destroy(screenTexture);
                 }
 
-                screenTexture = ScreenCapturer.GetBookmarkThumbnailTexture();
+                screenTexture = ScreenCapturer.GetBookmarkThumbnailTexture(blurMaterial);
                 screenSprite = Utils.Texture2DToSprite(screenTexture);
             }
 
@@ -393,7 +395,7 @@ namespace Nova
         {
             var bookmark = gameState.GetBookmark();
             bookmark.description = currentDialogue;
-            var texture = ScreenCapturer.GetBookmarkThumbnailTexture();
+            var texture = ScreenCapturer.GetBookmarkThumbnailTexture(blurMaterial);
             bookmark.screenshot = texture;
 
             int saveID = checkpointManager.QueryMinUnusedSaveID(beginSaveID, beginSaveID + maxSaveEntry);
