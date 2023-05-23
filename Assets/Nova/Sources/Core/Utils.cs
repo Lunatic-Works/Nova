@@ -299,12 +299,12 @@ namespace Nova
             return color;
         }
 
-        public static void SaveAll()
+        public static void FlushAll()
         {
             var controller = FindNovaController();
             controller.CheckpointManager.UpdateGlobalSave();
-            controller.ConfigManager.Apply();
-            controller.InputManager.Save();
+            controller.ConfigManager.Flush();
+            controller.InputManager.Flush();
         }
 
         public static void QuitWithAlert()
@@ -319,7 +319,7 @@ namespace Nova
             NovaAnimation.StopAll();
 
 #if UNITY_EDITOR
-            SaveAll();
+            FlushAll();
             UnityEditor.EditorApplication.isPlaying = false;
 #else
             ForceQuit = true;

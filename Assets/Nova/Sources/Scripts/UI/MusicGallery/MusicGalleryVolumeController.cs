@@ -40,7 +40,7 @@ namespace Nova
         private void OnDisable()
         {
             configManager.SetFloat(configKey, Mathf.Clamp01(slider.value));
-            configManager.Apply();
+            configManager.Flush();
         }
 
         private void OnValueChanged(float value)

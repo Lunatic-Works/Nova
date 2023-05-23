@@ -89,7 +89,7 @@ namespace Nova
                 ignoreToggle.onValueChanged.AddListener(value =>
                 {
                     configManager.SetInt(param.ignoreKey, value ? 0 : 1);
-                    configManager.Apply();
+                    configManager.Flush();
                 });
             }
 

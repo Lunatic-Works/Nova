@@ -30,7 +30,7 @@ namespace Nova
 
         private void OnDestroy()
         {
-            Save();
+            Flush();
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Nova
             }
         }
 
-        public void Save()
+        public void Flush()
         {
             var json = actionAsset.data.ToJson();
             Directory.CreateDirectory(InputFilesDirectory);

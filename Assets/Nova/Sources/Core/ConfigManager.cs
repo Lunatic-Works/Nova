@@ -39,10 +39,10 @@ namespace Nova
 
         private void OnDestroy()
         {
-            Apply();
+            Flush();
         }
 
-        public void Apply()
+        public void Flush()
         {
             foreach (var entry in tmpStrCache)
             {
