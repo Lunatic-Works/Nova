@@ -334,7 +334,7 @@ namespace Nova
                         reachedDialogues.TryGetValue(node.name, out var dialogue))
                     {
                         updateHashes = true;
-                        scriptLoader.AddDeferredDialogueChunks(node);
+                        ScriptLoader.AddDeferredDialogueChunks(node);
                         Differ differ = new Differ(node, dialogue);
                         differ.GetDiffs();
 

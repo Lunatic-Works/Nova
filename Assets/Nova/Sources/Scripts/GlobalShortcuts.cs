@@ -41,7 +41,7 @@ namespace Nova
             I18n.CurrentLocale = I18n.SupportedLocales[i];
         }
 
-        private void OnLocaleChanged()
+        private static void OnLocaleChanged()
         {
             NovaAnimation.StopAll(AnimationType.Text);
         }

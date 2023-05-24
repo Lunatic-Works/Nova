@@ -275,7 +275,7 @@ namespace Nova
             }
         }
 
-        public void AddDeferredDialogueChunks(FlowChartNode node)
+        public static void AddDeferredDialogueChunks(FlowChartNode node)
         {
             if (node.deferredChunks.Count == 0)
             {

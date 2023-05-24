@@ -245,8 +245,8 @@ public class SerializableDictionaryPropertyDrawer : PropertyDrawer
             }
             else
             {
-                var keyLabel = keyCanBeExpanded ? ("Key " + index.ToString()) : "";
-                var valueLabel = valueCanBeExpanded ? ("Value " + index.ToString()) : "";
+                var keyLabel = keyCanBeExpanded ? "Key " + index : "";
+                var valueLabel = valueCanBeExpanded ? "Value " + index : "";
                 return DrawKeyValueLineSimple(keyProperty, valueProperty, keyLabel, valueLabel, linePosition);
             }
         }
@@ -399,7 +399,7 @@ public class SerializableDictionaryPropertyDrawer : PropertyDrawer
 
     static SerializableDictionaryPropertyDrawer()
     {
-        var serializedPropertyValueAccessorsNameDict = new Dictionary<SerializedPropertyType, string>()
+        var serializedPropertyValueAccessorsNameDict = new Dictionary<SerializedPropertyType, string>
         {
             {SerializedPropertyType.Integer, "intValue"},
             {SerializedPropertyType.Boolean, "boolValue"},

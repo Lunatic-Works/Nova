@@ -17,7 +17,7 @@ namespace Nova.Script
         WhiteSpace,
         CommentStart,
         EndOfFile
-    };
+    }
 
     public class Token
     {
@@ -29,7 +29,7 @@ namespace Nova.Script
 
         public Token Clone()
         {
-            return new Token()
+            return new Token
             {
                 index = index,
                 length = length,
