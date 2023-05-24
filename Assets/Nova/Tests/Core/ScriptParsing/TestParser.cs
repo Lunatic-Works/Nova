@@ -1,4 +1,4 @@
-using Nova.Script;
+using Nova.Parser;
 using NUnit.Framework;
 
 namespace Tests
@@ -8,7 +8,7 @@ namespace Tests
         [Test]
         public void TestParseTextBlock()
         {
-            var parsed = Parser.Parse(@"
+            var blocks = Parser.ParseBlocks(@"
 Text1
 Text2
 
@@ -16,8 +16,7 @@ Text3
 
 ");
 
-            Assert.NotNull(parsed);
-            var blocks = parsed.blocks;
+            Assert.NotNull(blocks);
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
@@ -36,7 +35,7 @@ Text3
         [Test]
         public void TestParseExecutionBlock()
         {
-            var parsed = Parser.Parse(@"
+            var blocks = Parser.ParseBlocks(@"
 <| code1() |>
 <| code2() |>
 
@@ -45,8 +44,7 @@ Text3
 
 ");
 
-            Assert.NotNull(parsed);
-            var blocks = parsed.blocks;
+            Assert.NotNull(blocks);
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
@@ -65,7 +63,7 @@ Text3
         [Test]
         public void TestParseComment()
         {
-            var parsed = Parser.Parse(@"
+            var blocks = Parser.ParseBlocks(@"
 <|-- Comment |>
 code1() |>
 <| code2() |>
@@ -73,8 +71,7 @@ code1() |>
 @<| --[[ Comment |> ]] code3() |>
 ");
 
-            Assert.NotNull(parsed);
-            var blocks = parsed.blocks;
+            Assert.NotNull(blocks);
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
@@ -93,7 +90,7 @@ code1() |>
         [Test]
         public void TestParserSimple()
         {
-            var parsed = Parser.Parse(@"
+            var blocks = Parser.ParseBlocks(@"
 @<| hello_world |>
 
 <|
@@ -101,8 +98,8 @@ code1() |>
 Text
 
 ");
-            Assert.NotNull(parsed);
-            var blocks = parsed.blocks;
+
+            Assert.NotNull(blocks);
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
@@ -121,7 +118,7 @@ Text
         [Test]
         public void TestBlockWithEmptyLine()
         {
-            var parsed = Parser.Parse(@"
+            var blocks = Parser.ParseBlocks(@"
 <| code1() |>
 <| code2()
 
@@ -132,8 +129,7 @@ code2_2() |>
 
 ");
 
-            Assert.NotNull(parsed);
-            var blocks = parsed.blocks;
+            Assert.NotNull(blocks);
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
@@ -154,7 +150,7 @@ code2_2() |>
         {
             try
             {
-                var parsed = Parser.Parse("<| code_unpaired");
+                Parser.ParseBlocks("<| code_unpaired");
             }
             catch (ParserException)
             {
@@ -168,7 +164,7 @@ code2_2() |>
         [Test]
         public void TestString()
         {
-            var parsed = Parser.Parse(@"
+            var blocks = Parser.ParseBlocks(@"
 <| print 'hello\' |>' |>
 <| code2()
 
@@ -183,8 +179,7 @@ code2_2() |>
 
 ");
 
-            Assert.NotNull(parsed);
-            var blocks = parsed.blocks;
+            Assert.NotNull(blocks);
             Assert.AreEqual(4, blocks.Count);
             foreach (var block in blocks)
             {
@@ -203,7 +198,7 @@ code2_2() |>
         [Test]
         public void TestAttribute()
         {
-            var parsed = Parser.Parse(@"
+            var blocks = Parser.ParseBlocks(@"
 [label = entry, '$name' = 'hello\' world']<|
 print 'hello\' |>' |>
 <| code2()
@@ -219,8 +214,7 @@ code2_2() |>
 
 ");
 
-            Assert.NotNull(parsed);
-            var blocks = parsed.blocks;
+            Assert.NotNull(blocks);
             Assert.AreEqual(4, blocks.Count);
 
             Assert.AreEqual(BlockType.LazyExecution, blocks[0].type);

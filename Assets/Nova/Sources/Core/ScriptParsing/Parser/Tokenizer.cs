@@ -1,8 +1,8 @@
 using System;
 using System.Text;
-using UnityEngine.Assertions;
+// using UnityEngine.Assertions;
 
-namespace Nova.Script
+namespace Nova.Parser
 {
     public class Tokenizer
     {
@@ -152,7 +152,7 @@ namespace Nova.Script
 
         public void AdvanceQuoted(bool allowMultiline = true)
         {
-            Assert.IsTrue(Peek().type == TokenType.Quote);
+            // Assert.IsTrue(Peek().type == TokenType.Quote);
             var quoteChar = text[Peek().index];
 
             if (Peek().length == 1 && quoteChar == '\'' || quoteChar == '\"')
@@ -204,7 +204,7 @@ namespace Nova.Script
 
         public void AdvanceComment()
         {
-            Assert.IsTrue(Peek().type == TokenType.CommentStart);
+            // Assert.IsTrue(Peek().type == TokenType.CommentStart);
             var blockCommentPattern = IsBlockComment();
             if (blockCommentPattern < 0)
             {
@@ -340,7 +340,7 @@ namespace Nova.Script
             type = TokenType.Character;
         }
 
-        private void ParseNextImpl()
+        public void ParseNext()
         {
             var tokenStartIndex = index;
             var tokenStartLine = line;
@@ -354,11 +354,6 @@ namespace Nova.Script
             next.column = tokenStartColumn;
             next.line = tokenStartLine;
             next.type = tokenType;
-        }
-
-        public void ParseNext()
-        {
-            ParseNextImpl();
         }
 
         /// <returns>null if no more tokens</returns>

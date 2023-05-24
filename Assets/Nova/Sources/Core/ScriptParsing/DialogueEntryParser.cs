@@ -1,5 +1,5 @@
 using LuaInterface;
-using Nova.Script;
+using Nova.Parser;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
 
 namespace Nova
 {
+    using ParsedBlocks = IReadOnlyList<ParsedBlock>;
+    using ParsedChunks = IReadOnlyList<IReadOnlyList<ParsedBlock>>;
+
     public static class DialogueEntryParser
     {
         private static readonly Regex LuaCommentPattern =
@@ -57,11 +60,11 @@ namespace Nova
         /// <remarks>
         /// There can be multiple dialogue texts in the same chunk. They are concatenated into one, separated with newlines.
         /// </remarks>
-        private static string GetText(ScriptLoader.Chunk chunk)
+        private static string GetText(ParsedBlocks chunk)
         {
             var sb = new StringBuilder();
             var first = true;
-            foreach (var block in chunk.blocks)
+            foreach (var block in chunk)
             {
                 if (block.type == BlockType.Text)
                 {
@@ -105,12 +108,12 @@ namespace Nova
             }
         }
 
-        private static string GetCode(ScriptLoader.Chunk chunk, DialogueActionStage stage)
+        private static string GetCode(ParsedBlocks chunk, DialogueActionStage stage)
         {
             var sb = new StringBuilder();
             var stageName = GetStageName(stage);
             const string stageKey = "stage";
-            foreach (var block in chunk.blocks)
+            foreach (var block in chunk)
             {
                 if (block.type == BlockType.LazyExecution)
                 {
@@ -211,7 +214,7 @@ namespace Nova
             }
         }
 
-        public static IReadOnlyList<DialogueEntry> ParseDialogueEntries(IReadOnlyList<ScriptLoader.Chunk> chunks)
+        public static IReadOnlyList<DialogueEntry> ParseDialogueEntries(ParsedChunks chunks)
         {
             var codes = new Dictionary<DialogueActionStage, string[]>();
             foreach (DialogueActionStage stage in Enum.GetValues(typeof(DialogueActionStage)))
@@ -290,14 +293,14 @@ namespace Nova
                     actions.Add(stage, action);
                 }
 
-                results.Add(new DialogueEntry(characterName, displayName, dialogue, actions, chunks[i].GetHashUlong()));
+                results.Add(new DialogueEntry(characterName, displayName, dialogue, actions,
+                    ScriptLoader.GetChunkHash(chunks[i])));
             }
 
             return results;
         }
 
-        public static IReadOnlyList<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(
-            IEnumerable<ScriptLoader.Chunk> chunks)
+        public static IReadOnlyList<LocalizedDialogueEntry> ParseLocalizedDialogueEntries(ParsedChunks chunks)
         {
             var results = new List<LocalizedDialogueEntry>();
             foreach (var chunk in chunks)

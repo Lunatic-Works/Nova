@@ -1,10 +1,13 @@
 using Nova.Exceptions;
+using Nova.Parser;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Nova
 {
+    using ParsedChunks = IReadOnlyList<IReadOnlyList<ParsedBlock>>;
+
     public enum FlowChartNodeType
     {
         Normal,
@@ -109,8 +112,8 @@ namespace Nova
 
         public int dialogueEntryCount => dialogueEntries.Count;
 
-        public readonly Dictionary<SystemLanguage, IReadOnlyList<ScriptLoader.Chunk>> deferredChunks =
-            new Dictionary<SystemLanguage, IReadOnlyList<ScriptLoader.Chunk>>();
+        public readonly Dictionary<SystemLanguage, ParsedChunks> deferredChunks =
+            new Dictionary<SystemLanguage, ParsedChunks>();
 
         public void SetDialogueEntries(IReadOnlyList<DialogueEntry> entries)
         {

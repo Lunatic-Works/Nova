@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Nova.Script
+namespace Nova.Parser
 {
     [Serializable]
     public class ParserException : Exception
