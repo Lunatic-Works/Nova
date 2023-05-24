@@ -303,7 +303,7 @@ namespace Nova
         {
             if (variables.hash != variablesHashBeforeInterrupt)
             {
-                AppendSameNode();
+                appendNodeEnsured = true;
             }
         }
 
@@ -422,8 +422,9 @@ namespace Nova
                 stepsFromLastCheckpoint++;
             }
 
-            if (atEndOfNodeRecord || (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
-                                      !checkpointManager.CanAppendCheckpoint(checkpointOffset)))
+            if (atEndOfNodeRecord || appendNodeEnsured ||
+                (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
+                 !checkpointManager.CanAppendCheckpoint(checkpointOffset)))
             {
                 AppendSameNode();
             }
@@ -497,9 +498,11 @@ namespace Nova
 
         private void AppendSameNode()
         {
+            Debug.Log("append same node");
             nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
             checkpointOffset = nodeRecord.offset;
             checkpointEnsured = true;
+            appendNodeEnsured = false;
         }
 
         private void MoveToNextNode(FlowChartNode nextNode)
@@ -751,6 +754,9 @@ namespace Nova
         {
             checkpointEnsured = true;
         }
+
+        // ensure a new nodeRecord + checkpoint at next UpdateDialouge
+        private bool appendNodeEnsured;
 
         private bool atEndOfNodeRecord =>
             !isUpgrading && nodeRecord.child != 0 && currentIndex >= nodeRecord.endDialogue;
