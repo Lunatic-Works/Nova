@@ -1,188 +1,58 @@
 # TODO: proper way to split chapters
 
+import os
 import re
 
+import clr
 from luaparser import ast, astnodes
 
-
-# now_entries may be None
-# now_code and now_dialogue may be ''
-def commit_eager_code(
-    chapters,
-    now_chapter_name,
-    now_entries,
-    now_head_eager_code,
-    now_eager_code,
-    now_code,
-    now_dialogue,
-    keep_line_num,
-    line_num,
-):
-    if now_head_eager_code is None:
-        match = re.compile(r"label[ \(]\'(.*?)\'").search(now_eager_code)
-        if not match:
-            raise ValueError(f"label() not found in head eager code:\n{now_eager_code}")
-        now_chapter_name = match.group(1)
-        now_entries = []
-        now_head_eager_code = now_eager_code
-    else:
-        now_code, now_dialogue = commit_dialogue(
-            now_entries, now_code, now_dialogue, keep_line_num, line_num
-        )
-        chapters.append(
-            (now_chapter_name, now_entries, now_head_eager_code, now_eager_code)
-        )
-        now_chapter_name = None
-        now_entries = None
-        now_head_eager_code = None
-    return (
-        now_chapter_name,
-        now_entries,
-        now_head_eager_code,
-        "",
-        now_code,
-        now_dialogue,
-    )
+nova_parser_dll_path = "../../Library/ScriptAssemblies/Nova.Parser.dll"
+clr.AddReference(os.path.abspath(nova_parser_dll_path))
 
 
-# Assume now_entries is not None
-# now_code and now_dialogue may be ''
-def commit_dialogue(now_entries, now_code, now_dialogue, keep_line_num, line_num):
-    if now_dialogue:
-        match = re.compile("(.*?)(：：|::)(.*?)", re.DOTALL).fullmatch(now_dialogue)
-        if match:
-            chara_name = match.group(1)
-            dialogue = match.group(3)
-        else:
-            chara_name = None
-            dialogue = now_dialogue
-    else:
-        chara_name = None
-        dialogue = None
+def parse_nodes(text):
+    from Nova.Parser import NodeParser
 
-    if now_code or now_dialogue:
-        if keep_line_num:
-            now_entries.append((now_code, chara_name, dialogue, line_num))
-        else:
-            now_entries.append((now_code, chara_name, dialogue))
-
-    return "", ""
+    return NodeParser.ParseNodes(text)
 
 
-# Return a list of chapters
-# chapter: (chapter_name, list of entries, head_eager_code, tail_eager_code)
-# entry: (code, chara_name, dialogue)
-# If keep_line_num is True, entry: (code, chara_name, dialogue, line_num)
-def parse_chapters(lines, keep_line_num=False):
-    STATE_TEXT = 0
-    STATE_EAGER_CODE = 1
-    STATE_LAZY_CODE = 2
-
-    state = STATE_TEXT
-    chapters = []
-
-    # Between a tail eager code block and a head eager code block,
-    # now_chapter_name, now_entries and now_head_eager_code are None
-    now_chapter_name = None
-    now_entries = None
-    now_head_eager_code = None
-
-    now_eager_code = ""
-    now_code = ""
-    now_dialogue = ""
-
-    for line_num, line in enumerate(lines):
-        line = line.rstrip()
-
-        if state == STATE_TEXT:
-            if line.startswith("@<|"):
-                if line.endswith("|>"):
-                    now_eager_code = line[3:-2].strip()
-                    (
-                        now_chapter_name,
-                        now_entries,
-                        now_head_eager_code,
-                        now_eager_code,
-                        now_code,
-                        now_dialogue,
-                    ) = commit_eager_code(
-                        chapters,
-                        now_chapter_name,
-                        now_entries,
-                        now_head_eager_code,
-                        now_eager_code,
-                        now_code,
-                        now_dialogue,
-                        keep_line_num,
-                        line_num,
-                    )
-                else:
-                    now_eager_code = line[3:].lstrip()
-                    state = STATE_EAGER_CODE
-            elif line.startswith("<|"):
-                if line.endswith("|>"):
-                    now_code = line[3:-2].strip()
-                else:
-                    now_code = line[3:].lstrip()
-                    state = STATE_LAZY_CODE
-            elif line:
-                if now_dialogue:
-                    now_dialogue += "\n"
-                now_dialogue += line
-            else:  # Empty line
-                if now_entries is not None:
-                    now_code, now_dialogue = commit_dialogue(
-                        now_entries, now_code, now_dialogue, keep_line_num, line_num
-                    )
-
-        elif state == STATE_EAGER_CODE:
-            if line.endswith("|>"):
-                line = line[:-2].rstrip()
-                if line:
-                    if now_eager_code:
-                        now_eager_code += "\n"
-                    now_eager_code += line
+# DEPRECATED
+def parse_chapters(f):
+    nodes = parse_nodes(f.read())
+    return [
+        (
+            node.name,
+            [
                 (
-                    now_chapter_name,
-                    now_entries,
-                    now_head_eager_code,
-                    now_eager_code,
-                    now_code,
-                    now_dialogue,
-                ) = commit_eager_code(
-                    chapters,
-                    now_chapter_name,
-                    now_entries,
-                    now_head_eager_code,
-                    now_eager_code,
-                    now_code,
-                    now_dialogue,
-                    keep_line_num,
-                    line_num,
+                    "\n".join([block.content for block in entry.codeBlocks]),
+                    entry.characterName,
+                    entry.dialogue,
+                    entry.line,
                 )
-                state = STATE_TEXT
-            else:
-                if now_eager_code:
-                    now_eager_code += "\n"
-                now_eager_code += line
+                for entry in node.dialogueEntries
+            ],
+            node.headEagerBlock.content,
+            node.tailEagerBlock.content,
+        )
+        for node in nodes
+    ]
 
-        elif state == STATE_LAZY_CODE:
-            if line.endswith("|>"):
-                line = line[:-2].rstrip()
-                if line:
-                    if now_code:
-                        now_code += "\n"
-                    now_code += line
-                state = STATE_TEXT
-            else:
-                if now_code:
-                    now_code += "\n"
-                now_code += line
 
-        else:
-            raise ValueError(f"Unknown state: {state}")
+def format_attrs(attrs):
+    if not attrs:
+        return ""
+    s = ", ".join(f"{k} = {v}" for k, v in sorted(attrs.items()))
+    s = f"[{s}]"
+    return s
 
-    return chapters
+
+def format_code_block(block):
+    from Nova.Parser import BlockType
+
+    at = "@" if block.type == BlockType.EagerExecution else ""
+    attrs = format_attrs(block.attributes)
+    s = f"{at}{attrs}<|{block.content}|>"
+    return s
 
 
 def get_node_name(node):
@@ -195,10 +65,6 @@ def get_node_name(node):
     else:
         # raise ValueError(f'Unknown node: {type(node)}')
         return None
-
-
-def isinstance_any(obj, classes):
-    return any(isinstance(obj, c) for c in classes)
 
 
 def walk_functions_block(nodes, env):
@@ -237,9 +103,9 @@ def walk_functions_block(nodes, env):
                         )
         elif isinstance(node, astnodes.Assign):
             nodes.extend(reversed(node.values))
-        elif isinstance_any(
+        elif isinstance(
             node,
-            [
+            (
                 astnodes.Index,
                 astnodes.While,
                 astnodes.If,
@@ -257,7 +123,7 @@ def walk_functions_block(nodes, env):
                 astnodes.AnonymousFunction,
                 astnodes.BinaryOp,
                 astnodes.UnaryOp,
-            ],
+            ),
         ):
             pass
         else:
@@ -324,18 +190,36 @@ def normalize_dialogue(
     return s
 
 
-def test():
+def test_roundtrip():
     in_filename = "scenario.txt"
 
     with open(in_filename, "r", encoding="utf-8") as f:
-        chapters = parse_chapters(f)
+        nodes = parse_nodes(f.read())
 
-    for chapter_name, entries in chapters:
-        print("chapter_name:", chapter_name)
-        for code, chara_name, dialogue in entries:
-            if code:
-                print(f"begin code\n{code}\nend code")
-            print(chara_name, dialogue)
+    for node_count, node in enumerate(nodes):
+        if node_count > 0:
+            print()
+
+        print(format_code_block(node.headEagerBlock))
+        for entry_count, entry in enumerate(node.dialogueEntries):
+            if entry_count > 0:
+                print()
+
+            for block in entry.codeBlocks:
+                print(format_code_block(block))
+
+            chara_name = entry.characterName
+            disp_name = entry.displayName
+            dialogue = entry.dialogue
+
+            if chara_name:
+                if disp_name == chara_name:
+                    print(f"{chara_name}：：{dialogue}")
+                else:
+                    print(f"{disp_name}//{chara_name}：：{dialogue}")
+            else:
+                print(dialogue)
+        print(format_code_block(node.tailEagerBlock))
 
 
 def test_lua():

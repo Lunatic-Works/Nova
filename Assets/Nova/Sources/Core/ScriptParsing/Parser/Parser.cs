@@ -10,8 +10,8 @@ namespace Nova.Parser
 
     public enum BlockType
     {
-        LazyExecution,
         EagerExecution,
+        LazyExecution,
         Text,
         Separator
     }
