@@ -60,7 +60,7 @@ v_test_double = 7.89
 
 接下来显示小游戏
 
-<|
+[stage = before_checkpoint]<|
 minigame(__Nova.uiPrefabLoader, 'ExampleMinigame')
 |>
 小游戏结束
