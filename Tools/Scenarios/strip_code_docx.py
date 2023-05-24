@@ -44,7 +44,7 @@ def main():
         print(chapter_name)
 
         doc.add_heading(chapter_name)
-        for code, chara_name, dialogue in entries:
+        for code, chara_name, dialogue, _ in entries:
             bg_name, bgm_name = parse_code(code, f)
             if bg_name:
                 para = doc.add_paragraph()

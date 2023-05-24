@@ -4,7 +4,7 @@ import numpy as np
 import skimage.io
 import sobol_seq
 from luaparser import astnodes
-from nova_script_parser import get_node_name, parse_chapters, walk_functions
+from nova_script_parser import get_node_name, is_start, parse_chapters, walk_functions
 
 in_filename = "scenario.txt"
 out_filename = "scenario.png"
@@ -52,14 +52,12 @@ def normalize_bg_name(s):
     return out
 
 
-def chapter_to_tape(entries, chara_set, bg_set, timeline_set, bgm_set):
-    tape = []
-
+def chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set):
     dialogue_color = MONOLOGUE_COLOR
     bg_color = BG_NONE_COLOR
     timeline_color = BG_NONE_COLOR
     bgm_color = BGM_NONE_COLOR
-    for code, chara_name, _ in entries:
+    for code, chara_name, _, _ in entries:
         if chara_name:
             chara_set.add(chara_name)
             dialogue_color = str_to_color(chara_name)
@@ -124,8 +122,6 @@ def chapter_to_tape(entries, chara_set, bg_set, timeline_set, bgm_set):
             _bg_color = timeline_color
         tape.append((dialogue_color, _bg_color, bgm_color))
 
-    return tape
-
 
 def tapes_to_img(tapes):
     tape_width = dialogue_width + bg_width + bgm_width
@@ -145,14 +141,19 @@ def main():
         chapters = parse_chapters(f)
 
     tapes = []
+    tape = []
     chara_set = set()
     bg_set = set()
     timeline_set = set()
     bgm_set = set()
-    for chapter_name, entries, _, _ in chapters:
+    for chapter_name, entries, head_eager_code, _ in chapters:
         print(chapter_name)
-        tapes.append(chapter_to_tape(entries, chara_set, bg_set, timeline_set, bgm_set))
+        if tape and is_start(head_eager_code):
+            tapes.append(tape)
+            tape = []
+        chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set)
     print()
+    tapes.append(tape)
 
     print("Characters:")
     for x in sorted(chara_set):

@@ -6,7 +6,9 @@ resources_dir = "../../Assets/Resources/"
 out_filename = os.path.join(resources_dir, "LocalizedResourcePaths.txt")
 
 with open(out_filename, "w", encoding="utf-8", newline="\n") as f:
-    for root, dirs, files in os.walk(os.path.join(resources_dir, "LocalizedResources")):
+    for root, _dirs, files in os.walk(
+        os.path.join(resources_dir, "LocalizedResources")
+    ):
         for file in sorted(files):
             if file.endswith(".asset") or file.endswith(".meta"):
                 continue

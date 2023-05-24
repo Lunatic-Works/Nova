@@ -1,3 +1,4 @@
+joblib
 luaparser
 numpy
 openpyxl
@@ -5,6 +6,7 @@ pandas
 Pillow
 psd-tools
 PyHyphen
+python-docx
 pythonnet
 scikit-image
 sobol-seq

@@ -10,6 +10,10 @@ nova_parser_dll_path = "../../Library/ScriptAssemblies/Nova.Parser.dll"
 clr.AddReference(os.path.abspath(nova_parser_dll_path))
 
 
+def is_start(head_eager_code):
+    return any(x in head_eager_code for x in ["is_start", "is_unlocked_start"])
+
+
 def parse_nodes(text):
     from Nova.Parser import NodeParser
 
@@ -161,6 +165,9 @@ def parse_table(node):
 def normalize_dialogue(
     s, remove_rich=True, keep_rich=None, remove_todo=True, keep_todo=None
 ):
+    if not s:
+        return s
+
     if remove_rich:
 
         def func(m):

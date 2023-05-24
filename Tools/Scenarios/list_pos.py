@@ -89,7 +89,7 @@ def main():
         now_bg_name = None
         now_bg_pos = update_pos(None, None, DEFAULT_BG_POS)
         now_cam_pos = update_pos(None, None, DEFAULT_CAM_POS)
-        for code, _, _ in entries:
+        for code, _, _, _ in entries:
             if not code:
                 continue
             for func_name, args, _ in walk_functions(code):
