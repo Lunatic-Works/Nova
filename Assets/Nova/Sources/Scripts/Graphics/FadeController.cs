@@ -30,7 +30,6 @@ namespace Nova
         {
             materialPool = gameObject.Ensure<MaterialPool>();
             fadeMaterial = materialPool.Get(fadeShader);
-            materialPool.defaultMaterial = fadeMaterial;
             novaAnimation = Utils.FindNovaController().PerDialogueAnimation;
         }
 
