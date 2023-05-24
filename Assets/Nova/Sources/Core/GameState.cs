@@ -498,7 +498,6 @@ namespace Nova
 
         private void AppendSameNode()
         {
-            Debug.Log("append same node");
             nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
             checkpointOffset = nodeRecord.offset;
             checkpointEnsured = true;
