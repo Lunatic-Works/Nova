@@ -34,6 +34,8 @@ namespace Nova
 
         protected override void Awake()
         {
+            base.Awake();
+
             if (Quad == null)
             {
                 Quad = new Mesh
@@ -55,7 +57,7 @@ namespace Nova
                     triangles = new[]
                     {
                         0, 2, 1,
-                        2, 3, 1
+                        2, 3, 1,
                     },
                     // some very large bound to disable culling
                     bounds = new Bounds(Vector3.zero, 1e6f * Vector3.one)
@@ -65,9 +67,7 @@ namespace Nova
             meshFilter = overlay.Ensure<MeshFilter>();
             meshFilter.mesh = Quad;
             meshRenderer = overlay.Ensure<MeshRenderer>();
-            base.Awake();
             overlayMaterial = materialPool.Get(OverlayShader);
-            materialPool.defaultMaterial = null;
             meshRenderer.material = overlayMaterial;
 
             myTarget = new MyTarget(this);
