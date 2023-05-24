@@ -1,5 +1,5 @@
 {
-    "name": "Nova.Generated",
+    "name": "Nova.Parser",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -9,5 +9,5 @@
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": false
+    "noEngineReferences": true
 }

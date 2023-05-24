@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Nova.Script
+namespace Nova.Parser
 {
-    using AttributeDict = Dictionary<string, string>;
+    using AttributeDict = IReadOnlyDictionary<string, string>;
+    using ParsedBlocks = IReadOnlyList<ParsedBlock>;
+    using ParsedChunks = IReadOnlyList<IReadOnlyList<ParsedBlock>>;
 
     public enum BlockType
     {
@@ -26,15 +28,16 @@ namespace Nova.Script
             this.content = content?.Replace("\r", "");
             this.attributes = attributes;
         }
-    }
 
-    public class ParsedScript
-    {
-        public readonly IReadOnlyList<ParsedBlock> blocks;
-
-        public ParsedScript(IReadOnlyList<ParsedBlock> blocks)
+        public IEnumerable<object> ToList()
         {
-            this.blocks = blocks;
+            IEnumerable<object> ret = new object[] {type, content};
+            if (attributes != null)
+            {
+                ret = ret.Concat(attributes.Cast<object>());
+            }
+
+            return ret;
         }
     }
 
@@ -187,7 +190,7 @@ namespace Nova.Script
         {
             ParserException.ExpectToken(tokenizer.Peek(), TokenType.AttrStart, "[");
             tokenizer.ParseNext();
-            var attrs = new AttributeDict();
+            var attributes = new Dictionary<string, string>();
 
             while (tokenizer.Peek().type != TokenType.EndOfFile)
             {
@@ -222,7 +225,7 @@ namespace Nova.Script
                     throw new ParserException(token, "Expect , or ]");
                 }
 
-                attrs.Add(UnQuote(key.Trim()), value == null ? null : UnQuote(value.Trim()));
+                attributes.Add(UnQuote(key.Trim()), value == null ? null : UnQuote(value.Trim()));
 
                 if (token.type == TokenType.AttrEnd)
                 {
@@ -230,7 +233,7 @@ namespace Nova.Script
                 }
             }
 
-            return ParseCodeBlock(tokenizer, type, attrs);
+            return ParseCodeBlock(tokenizer, type, attributes);
         }
 
         private static ParsedBlock ParseTextBlock(Tokenizer tokenizer, int startIndex)
@@ -286,11 +289,9 @@ namespace Nova.Script
             return ParseTextBlock(tokenizer, startIndex);
         }
 
-        private static IReadOnlyList<ParsedBlock> MergeConsecutiveSeparators(IReadOnlyList<ParsedBlock> oldBlocks)
+        private static ParsedBlocks MergeConsecutiveSeparators(ParsedBlocks oldBlocks)
         {
-            var blocks = new List<ParsedBlock>();
-
-            blocks.Add(new ParsedBlock(BlockType.Separator, null, null));
+            var blocks = new List<ParsedBlock> {new ParsedBlock(BlockType.Separator, null, null)};
 
             foreach (var block in oldBlocks)
             {
@@ -309,17 +310,60 @@ namespace Nova.Script
             return blocks;
         }
 
-        public static ParsedScript Parse(string text)
+        public static ParsedBlocks ParseBlocks(string text)
         {
             var tokenizer = new Tokenizer(text);
             var blocks = new List<ParsedBlock>();
-
             while (tokenizer.Peek().type != TokenType.EndOfFile)
             {
                 blocks.Add(ParseBlock(tokenizer));
             }
 
-            return new ParsedScript(MergeConsecutiveSeparators(blocks));
+            return MergeConsecutiveSeparators(blocks);
+        }
+
+        /// <summary>
+        /// Split blocks at separators and eager execution blocks. Each chunk contain at least one block.
+        /// </summary>
+        private static ParsedChunks SplitBlocksToChunks(ParsedBlocks blocks)
+        {
+            var chunks = new List<ParsedBlocks>();
+            var chunk = new List<ParsedBlock>();
+
+            void FlushChunk()
+            {
+                if (chunk.Count > 0)
+                {
+                    chunks.Add(chunk);
+                    chunk = new List<ParsedBlock>();
+                }
+            }
+
+            foreach (var block in blocks)
+            {
+                if (block.type == BlockType.Separator)
+                {
+                    FlushChunk();
+                }
+                else if (block.type == BlockType.EagerExecution)
+                {
+                    FlushChunk();
+                    chunk.Add(block);
+                    FlushChunk();
+                }
+                else
+                {
+                    chunk.Add(block);
+                }
+            }
+
+            FlushChunk();
+            return chunks;
+        }
+
+        public static ParsedChunks ParseChunks(string text)
+        {
+            return SplitBlocksToChunks(ParseBlocks(text));
         }
     }
 }

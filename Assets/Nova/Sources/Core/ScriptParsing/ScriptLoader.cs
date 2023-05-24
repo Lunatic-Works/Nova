@@ -1,5 +1,5 @@
 using LuaInterface;
-using Nova.Script;
+using Nova.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace Nova
 {
+    using ParsedBlocks = IReadOnlyList<ParsedBlock>;
+    using ParsedChunks = IReadOnlyList<IReadOnlyList<ParsedBlock>>;
+
     /// <summary>
     /// The class that loads scripts and constructs the flow chart graph.
     /// </summary>
@@ -142,70 +145,14 @@ namespace Nova
             return flowChartGraph;
         }
 
-        public class Chunk
+        public static ulong GetChunkHash(ParsedBlocks chunk)
         {
-            public readonly List<ParsedBlock> blocks = new List<ParsedBlock>();
-
-            public ulong GetHashUlong()
-            {
-                return Utils.HashList(blocks.SelectMany(x =>
-                {
-                    IEnumerable<object> ret = new object[] {x.type, x.content};
-                    if (x.attributes != null)
-                    {
-                        ret = ret.Concat(x.attributes.Cast<object>());
-                    }
-
-                    return ret;
-                }));
-            }
+            return Utils.HashList(chunk.SelectMany(block => block.ToList()));
         }
 
-        /// <summary>
-        /// Split blocks at separator and eager execution blocks. All chunks in the result contain
-        /// at least one ParsedBlock.
-        /// </summary>
-        private static IReadOnlyList<Chunk> DivideBlocksToChunks(IReadOnlyList<ParsedBlock> blocks)
+        private static ulong GetNodeHash(ParsedChunks nodeChunks)
         {
-            var res = new List<Chunk>();
-            var chunk = new Chunk();
-
-            void FlushChunk()
-            {
-                if (chunk.blocks.Count > 0)
-                {
-                    res.Add(chunk);
-                    chunk = new Chunk();
-                }
-            }
-
-            foreach (var block in blocks)
-            {
-                if (block.type == BlockType.Separator)
-                {
-                    FlushChunk();
-                }
-                else if (block.type == BlockType.EagerExecution)
-                {
-                    FlushChunk();
-                    var item = new Chunk();
-                    item.blocks.Add(block);
-                    res.Add(item);
-                }
-                else
-                {
-                    chunk.blocks.Add(block);
-                }
-            }
-
-            FlushChunk();
-
-            return res;
-        }
-
-        private static ulong GetNodeHash(IReadOnlyList<Chunk> nodeChunks)
-        {
-            return Utils.HashList(nodeChunks.Select(x => x.GetHashUlong()));
+            return Utils.HashList(nodeChunks.SelectMany(chunk => chunk.SelectMany(block => block.ToList())));
         }
 
         /// <summary>
@@ -215,17 +162,11 @@ namespace Nova
         {
             LuaRuntime.Instance.GetFunction("action_new_file").Call(script.name);
 
-            var blocks = Parser.Parse(script.text).blocks;
-            if (blocks.Count == 0)
-            {
-                return;
-            }
-
-            var chunks = DivideBlocksToChunks(blocks);
-            var nodeChunks = new List<Chunk>();
+            var chunks = Parser.Parser.ParseChunks(script.text);
+            var nodeChunks = new List<ParsedBlocks>();
             foreach (var chunk in chunks)
             {
-                var firstBlock = chunk.blocks[0];
+                var firstBlock = chunk[0];
                 if (firstBlock.type == BlockType.EagerExecution)
                 {
                     if (nodeChunks.Count > 0)
@@ -244,7 +185,7 @@ namespace Nova
                             AddDialogueChunks(nodeChunks);
                         }
 
-                        nodeChunks = new List<Chunk>();
+                        nodeChunks = new List<ParsedBlocks>();
                     }
 
                     DoEagerExecutionBlock(firstBlock.content);
@@ -256,7 +197,7 @@ namespace Nova
             }
         }
 
-        private void AddDialogueChunks(IReadOnlyList<Chunk> chunks)
+        private void AddDialogueChunks(ParsedChunks chunks)
         {
             if (currentNode == null)
             {

@@ -1,4 +1,4 @@
-namespace Nova.Script
+namespace Nova.Parser
 {
     public enum TokenType
     {
