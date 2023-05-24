@@ -19,7 +19,6 @@ namespace Nova.Editor
         private static string GetResourcePath(string path)
         {
             path = Utils.ConvertPathSeparator(path);
-
             var index = path.IndexOf(ResourcesFolderName, StringComparison.Ordinal);
             if (index == -1)
             {

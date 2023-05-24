@@ -10,16 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ac395c1b78e415688aa2aa3f0b8122a, type: 3}
-  m_Name: room_group
+  m_Name: corridor_group
   m_EditorClassIdentifier: 
   entries:
-  - id: room
+  - id: toilet
     displayNames:
       keys: 28000000
       values:
-      - room
+      - toilet
     composite: 0
     poseString: 
-    resourcePath: Backgrounds/room
+    resourcePath: Backgrounds/toilet
+    snapshotOffset: {x: 0, y: 0}
+    snapshotScale: {x: 1, y: 1}
+  - id: corridor
+    displayNames:
+      keys: 28000000
+      values:
+      - corridor
+    composite: 0
+    poseString: 
+    resourcePath: Backgrounds/corridor
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}

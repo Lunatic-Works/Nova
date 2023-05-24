@@ -9,6 +9,8 @@ namespace Nova.Editor
     public class MusicEntryEditor : UnityEditor.Editor
     {
         private const string AudioPreviewerName = "_musicEntryPreviewer";
+        private const string ResourcesFolderName = ImageGroupEditor.ResourcesFolderName;
+
         private GameObject gameObject;
         private AudioLooperOld audioLooper;
         private AudioSource audioSource;
@@ -272,20 +274,17 @@ namespace Nova.Editor
 
         private static void CreateMusicEntry(string path)
         {
-            const string resFolderName = "/Resources/";
-            var index = path.LastIndexOf(resFolderName, StringComparison.Ordinal);
+            path = Utils.ConvertPathSeparator(path);
+            var index = path.LastIndexOf(ResourcesFolderName, StringComparison.Ordinal);
             if (index != -1)
             {
-                index += resFolderName.Length;
-            }
-            else
-            {
-                index = 0;
+                throw new ArgumentException();
             }
 
-            var assetPath = path.Substring(index);
-            var fileName = Path.GetFileNameWithoutExtension(assetPath);
-            var loadPath = Path.Combine(Path.GetDirectoryName(assetPath), fileName);
+            var loadPath = path.Substring(index + ResourcesFolderName.Length);
+            var dirName = Path.GetDirectoryName(loadPath);
+            var fileName = Path.GetFileNameWithoutExtension(loadPath);
+            loadPath = Path.Combine(dirName, fileName);
             var entryPath = Path.Combine(Path.GetDirectoryName(path), fileName + "_entry.asset");
 
             // create asset
