@@ -146,7 +146,7 @@ namespace Nova
 
         #region Methods called by external scripts
 
-        public void SetImage(string imageName, bool fade = true)
+        public void SetImage(string imageName)
         {
             if (imageName == currentImageName)
             {
@@ -158,7 +158,7 @@ namespace Nova
             currentImageName = imageName;
         }
 
-        public void ClearImage(bool fade = true)
+        public void ClearImage()
         {
             if (string.IsNullOrEmpty(currentImageName))
             {
@@ -249,11 +249,11 @@ namespace Nova
 
             if (!string.IsNullOrEmpty(data.currentImageName))
             {
-                SetImage(data.currentImageName, fade: false);
+                SetImage(data.currentImageName);
             }
             else
             {
-                ClearImage(fade: false);
+                ClearImage();
             }
         }
 
