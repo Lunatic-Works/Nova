@@ -18,12 +18,14 @@ namespace Nova.Parser
 
     public class ParsedBlock
     {
+        public readonly int line;
         public readonly BlockType type;
         public readonly string content;
         public readonly AttributeDict attributes;
 
-        public ParsedBlock(BlockType type, string content, AttributeDict attributes)
+        public ParsedBlock(int line, BlockType type, string content, AttributeDict attributes)
         {
+            this.line = line;
             this.type = type;
             this.content = content?.Replace("\r", "");
             this.attributes = attributes;
@@ -34,7 +36,7 @@ namespace Nova.Parser
             IEnumerable<object> ret = new object[] {type, content};
             if (attributes != null)
             {
-                ret = ret.Concat(attributes.Cast<object>());
+                ret = ret.Concat(attributes.OrderBy(x => x.Key).Cast<object>());
             }
 
             return ret;
@@ -43,7 +45,8 @@ namespace Nova.Parser
 
     public static class Parser
     {
-        private static ParsedBlock ParseCodeBlock(Tokenizer tokenizer, BlockType type, AttributeDict attributes)
+        private static ParsedBlock ParseCodeBlock(Tokenizer tokenizer, int line, BlockType type,
+            AttributeDict attributes)
         {
             ParserException.ExpectToken(tokenizer.Peek(), TokenType.BlockStart, "<|");
             var startToken = tokenizer.Peek().Clone();
@@ -93,10 +96,10 @@ namespace Nova.Parser
                 "new line or end of file after |>");
             tokenizer.ParseNext();
 
-            return new ParsedBlock(type, content, attributes);
+            return new ParsedBlock(line, type, content, attributes);
         }
 
-        private static ParsedBlock ParseEagerExecutionBlock(Tokenizer tokenizer)
+        private static ParsedBlock ParseEagerExecutionBlock(Tokenizer tokenizer, int line)
         {
             var at = tokenizer.Peek();
             ParserException.ExpectToken(at, TokenType.At, "@");
@@ -104,12 +107,12 @@ namespace Nova.Parser
             var token = tokenizer.Peek();
             if (token.type == TokenType.AttrStart)
             {
-                return ParseCodeBlockWithAttributes(tokenizer, BlockType.EagerExecution);
+                return ParseCodeBlockWithAttributes(tokenizer, line, BlockType.EagerExecution);
             }
 
             if (token.type == TokenType.BlockStart)
             {
-                return ParseCodeBlock(tokenizer, BlockType.EagerExecution, null);
+                return ParseCodeBlock(tokenizer, line, BlockType.EagerExecution, null);
             }
 
             throw new ParserException(token, $"Except [ or <| after @, found {token.type}");
@@ -186,7 +189,7 @@ namespace Nova.Parser
             return str;
         }
 
-        private static ParsedBlock ParseCodeBlockWithAttributes(Tokenizer tokenizer, BlockType type)
+        private static ParsedBlock ParseCodeBlockWithAttributes(Tokenizer tokenizer, int line, BlockType type)
         {
             ParserException.ExpectToken(tokenizer.Peek(), TokenType.AttrStart, "[");
             tokenizer.ParseNext();
@@ -233,10 +236,10 @@ namespace Nova.Parser
                 }
             }
 
-            return ParseCodeBlock(tokenizer, type, attributes);
+            return ParseCodeBlock(tokenizer, line, type, attributes);
         }
 
-        private static ParsedBlock ParseTextBlock(Tokenizer tokenizer, int startIndex)
+        private static ParsedBlock ParseTextBlock(Tokenizer tokenizer, int line, int startIndex)
         {
             while (tokenizer.Peek().type != TokenType.EndOfFile && tokenizer.Peek().type != TokenType.NewLine)
             {
@@ -249,7 +252,7 @@ namespace Nova.Parser
             // eat up the last newline
             tokenizer.ParseNext();
 
-            return new ParsedBlock(BlockType.Text, content, null);
+            return new ParsedBlock(line, BlockType.Text, content, null);
         }
 
         private static ParsedBlock ParseBlock(Tokenizer tokenizer)
@@ -263,35 +266,36 @@ namespace Nova.Parser
             }
 
             int endIndex = token.index;
+            int line = token.line;
 
             if (token.type == TokenType.NewLine || token.type == TokenType.EndOfFile)
             {
                 string content = tokenizer.SubString(startIndex, endIndex - startIndex);
                 tokenizer.ParseNext();
-                return new ParsedBlock(BlockType.Separator, content, null);
+                return new ParsedBlock(line, BlockType.Separator, content, null);
             }
 
             if (token.type == TokenType.At)
             {
-                return ParseEagerExecutionBlock(tokenizer);
+                return ParseEagerExecutionBlock(tokenizer, line);
             }
 
             if (token.type == TokenType.AttrStart)
             {
-                return ParseCodeBlockWithAttributes(tokenizer, BlockType.LazyExecution);
+                return ParseCodeBlockWithAttributes(tokenizer, line, BlockType.LazyExecution);
             }
 
             if (token.type == TokenType.BlockStart)
             {
-                return ParseCodeBlock(tokenizer, BlockType.LazyExecution, null);
+                return ParseCodeBlock(tokenizer, line, BlockType.LazyExecution, null);
             }
 
-            return ParseTextBlock(tokenizer, startIndex);
+            return ParseTextBlock(tokenizer, line, startIndex);
         }
 
         private static ParsedBlocks MergeConsecutiveSeparators(ParsedBlocks oldBlocks)
         {
-            var blocks = new List<ParsedBlock> {new ParsedBlock(BlockType.Separator, null, null)};
+            var blocks = new List<ParsedBlock> {new ParsedBlock(0, BlockType.Separator, null, null)};
 
             foreach (var block in oldBlocks)
             {
