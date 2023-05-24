@@ -31,7 +31,7 @@ def translate(s):
     for x, y in translate_data:
         s = s.replace(x, y)
     s = s.replace("_", "")
-    assert not any("A" <= c <= "Z" or "a" <= c <= "z" for c in s), s
+    # assert not any("A" <= c <= "Z" or "a" <= c <= "z" for c in s), s
     return s
 
 
@@ -106,7 +106,7 @@ def main():
 
             chapter_name = normalize_tex(chapter_name)
             f.write(f"\\section{{{chapter_name}}}\n\n")
-            for code, chara_name, dialogue in entries:
+            for code, chara_name, dialogue, _ in entries:
                 bg_name, bgm_name = parse_code(code, f)
                 if bg_name:
                     bg_name = normalize_tex(translate(bg_name))

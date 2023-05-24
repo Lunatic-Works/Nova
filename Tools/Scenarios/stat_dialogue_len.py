@@ -13,7 +13,7 @@ counter = Counter()
 for chapter_name, entries, _, _ in chapters:
     print(chapter_name)
 
-    for _, _, dialogue in entries:
+    for _, _, dialogue, _ in entries:
         dialogue = normalize_dialogue(dialogue)
         if dialogue:
             counter[len(dialogue)] += 1

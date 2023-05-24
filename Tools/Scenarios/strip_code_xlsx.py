@@ -14,7 +14,7 @@ for chapter_name, entries, _, _ in chapters:
     print(chapter_name)
 
     ws = wb.create_sheet(chapter_name)
-    for _, chara_name, dialogue in entries:
+    for _, chara_name, dialogue, _ in entries:
         dialogue = normalize_dialogue(dialogue, remove_rich=False, remove_todo=False)
         if dialogue:
             if chara_name:
@@ -22,4 +22,5 @@ for chapter_name, entries, _, _ in chapters:
             else:
                 ws.append([dialogue])
 
+del wb["Sheet"]
 wb.save(out_filename)

@@ -13,7 +13,7 @@ with open(out_filename, "w", encoding="utf-8", newline="\n") as f:
         print(chapter_name)
 
         f.write(chapter_name + "\n\n")
-        for _, chara_name, dialogue in entries:
+        for _, chara_name, dialogue, _ in entries:
             dialogue = normalize_dialogue(dialogue, remove_todo=False)
             if dialogue:
                 if chara_name:

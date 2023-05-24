@@ -112,9 +112,13 @@ def check_dialogue(chara_name, dialogue, line_num):
 
     if chara_name:
         if not dialogue.startswith("“"):
-            print(f"Line {line_num}: dialogue not start with quotation mark")
+            print(f"Line {line_num}: dialogue not start with quote mark")
         if not dialogue.endswith("”"):
-            print(f"Line {line_num}: dialogue not end with quotation mark")
+            print(f"Line {line_num}: dialogue not end with quote mark")
+        if "“" in dialogue[1:-1]:
+            print(f"Line {line_num}: double left quote mark inside dialogue")
+        if "”" in dialogue[1:-1]:
+            print(f"Line {line_num}: double right quote mark inside dialogue")
     else:
         match = re.compile(".*?：“.*?”").fullmatch(dialogue)
         if match:

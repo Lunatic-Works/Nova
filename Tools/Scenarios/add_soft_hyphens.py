@@ -54,7 +54,7 @@ def main():
 
             f.write(f"@<|\n{head_eager_code}\n|>\n")
 
-            for entry_idx, (code, chara_name, dialogue) in enumerate(entries):
+            for entry_idx, (code, chara_name, dialogue, _) in enumerate(entries):
                 if code:
                     f.write(f"<|\n{code}\n|>\n")
                 if dialogue:

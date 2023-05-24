@@ -27,8 +27,8 @@ def sort_lines(lines, idx_begin, idx_end):
 
     for i, row in enumerate(rows):
         name, tokens = row
-        value = ", ".join([f"'{x}'" for x in tokens])
-        lines[idx_begin + i] = f"        ['{name}'] = {{{value}}},\n"
+        tokens = ", ".join([f"'{x}'" for x in tokens])
+        lines[idx_begin + i] = f"        ['{name}'] = {{{tokens}}},\n"
 
 
 def main():

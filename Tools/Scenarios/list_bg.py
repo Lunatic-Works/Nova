@@ -7,7 +7,7 @@ in_filename = "scenario.txt"
 
 
 def do_chapter(entries, bg_list):
-    for code, _, _ in entries:
+    for code, _, _, _ in entries:
         if not code:
             continue
         for func_name, args, _ in walk_functions(code):
