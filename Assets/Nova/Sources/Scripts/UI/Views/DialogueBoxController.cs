@@ -145,7 +145,7 @@ namespace Nova
 
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
-            var background = Instantiate(backgroundPrefab, myPanel.transform, false) as GameObject;
+            var background = Instantiate(backgroundPrefab, myPanel.transform, false);
             background.transform.SetSiblingIndex(0);
             backgroundImage = background.GetComponent<Image>();
             backgroundCanvasGroup = background.GetComponent<CanvasGroup>();

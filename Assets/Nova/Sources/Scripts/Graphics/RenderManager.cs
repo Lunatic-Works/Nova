@@ -265,7 +265,6 @@ namespace Nova
                 isSmoothResizing = true;
             }
 
-            RealScreen.aspectRatio = desiredAspectRatio;
             var aspectRatio = (float)lastScreenWidth / lastScreenHeight;
             if (aspectRatio < desiredAspectRatio)
             {
@@ -308,14 +307,14 @@ namespace Nova
             // Debug.Log($"Update screen {lastScreenWidth}x{lastScreenHeight} -> {RealScreen.width}x{RealScreen.height} {isSmoothResizing}");
         }
 
-        private void UpdateTexture(IRenderTargetConfig rt)
+        private static void UpdateTexture(IRenderTargetConfig rt)
         {
             var texture = RenderTexture.GetTemporary(RealScreen.width, RealScreen.height, 0, rt.textureFormat);
             texture.name = rt.textureName;
             UpdateTexture(rt, texture);
         }
 
-        private void UpdateTexture(IRenderTargetConfig rt, RenderTexture texture)
+        private static void UpdateTexture(IRenderTargetConfig rt, RenderTexture texture)
         {
             var oldTexture = rt.targetTexture;
             rt.targetTexture = texture;

@@ -29,7 +29,7 @@ namespace Nova
         public readonly Dictionary<string, float> floatDatas = new Dictionary<string, float>();
 
         /// <summary>
-        /// binded texture names
+        /// bound texture names
         /// </summary>
         public readonly Dictionary<string, string> textureNames = new Dictionary<string, string>();
 

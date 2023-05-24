@@ -506,7 +506,7 @@ namespace Nova
 
         private void MoveToNextNode(FlowChartNode nextNode)
         {
-            scriptLoader.AddDeferredDialogueChunks(nextNode);
+            ScriptLoader.AddDeferredDialogueChunks(nextNode);
             // in case of empty node, do not change any of these
             // so the bookmark is left at the end of last node
             if (nextNode.dialogueEntryCount > 0)
@@ -602,7 +602,7 @@ namespace Nova
             var node = flowChartGraph.GetNode(name);
             if (addDeferred)
             {
-                scriptLoader.AddDeferredDialogueChunks(node);
+                ScriptLoader.AddDeferredDialogueChunks(node);
             }
 
             return node;
@@ -754,7 +754,7 @@ namespace Nova
             checkpointEnsured = true;
         }
 
-        // ensure a new nodeRecord + checkpoint at next UpdateDialouge
+        // ensure a new nodeRecord + checkpoint at next UpdateDialogue
         private bool appendNodeEnsured;
 
         private bool atEndOfNodeRecord =>

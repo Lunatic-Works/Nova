@@ -155,7 +155,7 @@ namespace Nova.Editor
 
         private void DrawPreview(ImageEntry entry, SerializedProperty entryProperty)
         {
-            Texture previewTexture = null;
+            Texture previewTexture;
             if (entry.composite)
             {
                 if (capturer.renderTexture == null || previewEntryKey != entry.unlockKey)

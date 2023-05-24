@@ -79,11 +79,7 @@ namespace Nova
                     .Then(new ActionAnimationProperty(bgmController.Stop));
             }
 
-            base.Hide(doTransition, () =>
-            {
-
-                onFinish?.Invoke();
-            });
+            base.Hide(doTransition, () => { onFinish?.Invoke(); });
         }
 
         // Disable BackHide
