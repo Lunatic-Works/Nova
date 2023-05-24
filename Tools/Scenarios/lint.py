@@ -129,7 +129,7 @@ def check_dialogue(chara_name, dialogue, line_num):
 
 def lint_file(in_filename):
     with open(in_filename, "r", encoding="utf-8") as f:
-        chapters = parse_chapters(f, keep_line_num=True)
+        chapters = parse_chapters(f)
 
     for chapter_name, entries, _, _ in chapters:
         print(chapter_name)

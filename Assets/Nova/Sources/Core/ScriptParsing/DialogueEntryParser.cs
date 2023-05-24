@@ -18,10 +18,6 @@ namespace Nova
         private static readonly Regex LuaMultilineCommentPattern =
             new Regex(@"--\[(=*)\[[^\]]*\]\1\]", RegexOptions.Compiled);
 
-        private static readonly Regex NameDialoguePattern =
-            new Regex(@"^(?<name>[^/：:]*)(//(?<hidden>[^：:]*))?(：：|::)(?<dialogue>(.|\n)*)",
-                RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-
         private static readonly Regex MarkdownCodePattern =
             new Regex(@"`([^`]*)`", RegexOptions.Compiled);
 
@@ -30,68 +26,6 @@ namespace Nova
 
         private const string ActionBeforeLazyBlock = "action_before_lazy_block('{0}')\n";
         private const string ActionAfterLazyBlock = "action_after_lazy_block('{0}')\n";
-
-        private static void ParseNameDialogue(string text, out string displayName, out string hiddenName,
-            out string dialogue)
-        {
-            if (text.IndexOf("：：", StringComparison.Ordinal) < 0 && text.IndexOf("::", StringComparison.Ordinal) < 0)
-            {
-                displayName = "";
-                hiddenName = "";
-                dialogue = text;
-                return;
-            }
-
-            var m = NameDialoguePattern.Match(text);
-            if (m.Success)
-            {
-                displayName = m.Groups["name"].Value;
-                hiddenName = m.Groups["hidden"].Value;
-                dialogue = m.Groups["dialogue"].Value;
-            }
-            else
-            {
-                displayName = "";
-                hiddenName = "";
-                dialogue = text;
-            }
-        }
-
-        /// <remarks>
-        /// There can be multiple dialogue texts in the same chunk. They are concatenated into one, separated with newlines.
-        /// </remarks>
-        private static string GetText(ParsedBlocks chunk)
-        {
-            var sb = new StringBuilder();
-            var first = true;
-            foreach (var block in chunk)
-            {
-                if (block.type == BlockType.Text)
-                {
-                    if (first)
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        sb.Append('\n');
-                    }
-
-                    sb.Append(block.content);
-                }
-            }
-
-            var text = sb.ToString();
-
-            // Markdown syntaxes used in tutorials
-            // They are not in the NovaScript spec. If they interfere with your scenarios or you have performance concern,
-            // you can comment out them.
-            text = MarkdownCodePattern.Replace(text, @"<style=Code>$1</style>");
-            text = MarkdownLinkPattern.Replace(text, @"<link=""$2""><style=Link>$1</style></link>");
-
-            // Debug.Log($"text: <color=green>{text}</color>");
-            return text;
-        }
 
         private static string GetStageName(DialogueActionStage stage)
         {
@@ -233,33 +167,18 @@ namespace Nova
                     codes[stage][i] = GetCode(chunks[i], stage);
                 }
 
-                var text = GetText(chunks[i]);
-                ParseNameDialogue(text, out var displayName, out var hiddenName, out dialogues[i]);
+                var text = NodeParser.GetText(chunks[i]);
 
-                if (string.IsNullOrEmpty(hiddenName))
-                {
-                    if (!string.IsNullOrEmpty(displayName))
-                    {
-                        if (hiddenNames.TryGetValue(displayName, out var name))
-                        {
-                            hiddenName = name;
-                        }
-                        else
-                        {
-                            hiddenName = displayName;
-                        }
-                    }
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(displayName))
-                    {
-                        hiddenNames[displayName] = hiddenName;
-                    }
-                }
+                // Markdown syntaxes used in tutorials
+                // They are not in the NovaScript spec. If they interfere with your scenarios or you have performance concern,
+                // you can comment out them
+                text = MarkdownCodePattern.Replace(text, @"<style=Code>$1</style>");
+                text = MarkdownLinkPattern.Replace(text, @"<link=""$2""><style=Link>$1</style></link>");
 
-                characterNames[i] = hiddenName;
-                displayNames[i] = displayName;
+                // Debug.Log($"text: <color=green>{text}</color>");
+
+                NodeParser.ParseNameDialogue(text, out displayNames[i], out characterNames[i], out dialogues[i],
+                    hiddenNames);
             }
 
             GenerateActions(codes, characterNames);
@@ -305,8 +224,8 @@ namespace Nova
             var results = new List<LocalizedDialogueEntry>();
             foreach (var chunk in chunks)
             {
-                var text = GetText(chunk);
-                ParseNameDialogue(text, out var displayName, out var hiddenName, out var dialogue);
+                var text = NodeParser.GetText(chunk);
+                NodeParser.ParseNameDialogue(text, out var displayName, out var hiddenName, out var dialogue, null);
                 if (!string.IsNullOrEmpty(hiddenName))
                 {
                     throw new ParserException(
