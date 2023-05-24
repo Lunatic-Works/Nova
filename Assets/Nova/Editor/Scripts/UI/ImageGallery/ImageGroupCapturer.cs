@@ -11,8 +11,9 @@ namespace Nova.Editor
         private const int SnapshotWidth = ImageGroupEditor.SnapshotWidth;
         private const int SnapshotHeight = ImageGroupEditor.SnapshotHeight;
         private const string ResourcesFolderName = ImageGroupEditor.ResourcesFolderName;
+        private const string BlurMaterialPath = "Assets/Nova/UI/Materials/ImageGallerySnapshotBlur.mat";
 
-        private static string GetAssetFullPath(UnityEngine.Object asset)
+        private static string GetAbsoluteAssetPath(UnityEngine.Object asset)
         {
             return Path.Combine(Path.GetDirectoryName(Application.dataPath), AssetDatabase.GetAssetPath(asset));
         }
@@ -20,7 +21,6 @@ namespace Nova.Editor
         private static string GetResourcesFolder(string path)
         {
             path = Utils.ConvertPathSeparator(path);
-
             var index = path.IndexOf(ResourcesFolderName, StringComparison.Ordinal);
             if (index == -1)
             {
@@ -95,7 +95,7 @@ namespace Nova.Editor
                 return false;
             }
 
-            resourcePath = GetResourcesFolder(GetAssetFullPath(sprites[0]));
+            resourcePath = GetResourcesFolder(GetAbsoluteAssetPath(sprites[0]));
             if (renderTexture != null)
             {
                 UnityEngine.Object.DestroyImmediate(renderTexture);
@@ -113,6 +113,7 @@ namespace Nova.Editor
         private void GenerateSnapshot(ImageEntry entry)
         {
             if (entry == null) return;
+
             Texture tex;
             string resourcePath;
             if (entry.composite)
@@ -125,14 +126,31 @@ namespace Nova.Editor
                 var sprite = Resources.Load<Sprite>(entry.resourcePath);
                 if (sprite == null) return;
                 tex = sprite.texture;
-                resourcePath = GetResourcesFolder(GetAssetFullPath(sprite));
+                resourcePath = GetResourcesFolder(GetAbsoluteAssetPath(sprite));
             }
 
-            Graphics.Blit(tex, snapshotTexture, entry.snapshotScale, entry.snapshotOffset);
+            // blurMaterial should use a VFX shader and not scale with RealScreen
+            var blurMaterial = AssetDatabase.LoadAssetAtPath<Material>(BlurMaterialPath);
+            var blurTexture = RenderTexture.GetTemporary(tex.width, tex.height, 0);
+            Graphics.Blit(tex, blurTexture, blurMaterial);
+            Graphics.Blit(blurTexture, snapshotTexture, entry.snapshotScale, entry.snapshotOffset);
+            RenderTexture.ReleaseTemporary(blurTexture);
+
             var data = GetSnapshotPNGData();
-            var snapshotFullPath = Path.Combine(resourcePath, entry.snapshotResourcePath + ".png");
-            Directory.CreateDirectory(Path.GetDirectoryName(snapshotFullPath));
-            File.WriteAllBytes(snapshotFullPath, data);
+            var snapshotPath = Path.Combine(resourcePath, entry.snapshotResourcePath + ".png");
+            snapshotPath = Utils.ConvertPathSeparator(snapshotPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(snapshotPath));
+            File.WriteAllBytes(snapshotPath, data);
+
+            var index = snapshotPath.IndexOf("Assets/Resources/", StringComparison.Ordinal);
+            var assetPath = snapshotPath.Substring(index);
+            AssetDatabase.ImportAsset(assetPath);
+            var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            if (importer.textureType != TextureImporterType.Sprite)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.SaveAndReimport();
+            }
         }
 
         public void GenerateSnapshot(ImageGroup group)

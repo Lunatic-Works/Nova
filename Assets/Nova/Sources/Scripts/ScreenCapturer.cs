@@ -48,6 +48,7 @@ namespace Nova
             capturedGameTexture = GetGameTexture(capturedGameTexture, camera);
         }
 
+        // material should use a PP shader and scale with RealScreen
         public static Texture2D GetBookmarkThumbnailTexture(Material material = null)
         {
             var fullSizedRenderTexture = RenderTexture.GetTemporary(RealScreen.width, RealScreen.height, 24);
