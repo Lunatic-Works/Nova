@@ -241,6 +241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   marginColor: {r: 0, g: 0, b: 0, a: 0}
   desiredAspectRatio: 1.7777778
+  smoothTime: 0.1
   gameRenderTarget: {fileID: 937997459}
   fullScreenToggle: {fileID: 255584305}
 --- !u!4 &339668545
@@ -4001,6 +4002,30 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6539693649535954780, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6539693649535954780, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6539693649535954780, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6539693649535954780, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6539693649535954780, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6539693649535954780, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7447712415433603452, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
       propertyPath: avatarConfigs.Array.data[0].characterController
       value: 
@@ -4017,6 +4042,30 @@ PrefabInstance:
       propertyPath: avatarConfigs.Array.data[3].characterController
       value: 
       objectReference: {fileID: 1285618328}
+    - target: {fileID: 8469791344066619980, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8469791344066619980, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8469791344066619980, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8469791344066619980, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8469791344066619980, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8469791344066619980, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
 --- !u!114 &2076122710952862908 stripped
