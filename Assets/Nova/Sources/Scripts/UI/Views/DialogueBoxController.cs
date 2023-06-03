@@ -80,7 +80,7 @@ namespace Nova
 
         public RectTransform rect { get; private set; }
 
-        [SerializeField] private GameObject backgroundPrefab;
+        public GameObject background;
         private Image backgroundImage;
         private CanvasGroup backgroundCanvasGroup;
         private Button hideDialogueButton;
@@ -145,8 +145,6 @@ namespace Nova
 
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
-            var background = Instantiate(backgroundPrefab, myPanel.transform);
-            background.transform.SetSiblingIndex(0);
             backgroundImage = background.GetComponent<Image>();
             backgroundCanvasGroup = background.GetComponent<CanvasGroup>();
             hideDialogueButton = background.transform.Find("CloseButton").GetComponent<Button>();
