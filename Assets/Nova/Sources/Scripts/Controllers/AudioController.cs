@@ -134,7 +134,7 @@ namespace Nova
                 }
                 else
                 {
-                    clip = AssetLoader.LoadOrNull<AudioClip>(audioPath);
+                    clip = AssetLoader.Load<AudioClip>(audioPath);
                 }
             }
 
