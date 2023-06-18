@@ -213,7 +213,7 @@ resharper_use_object_or_collection_initializer_highlighting=warning
 resharper_use_string_interpolation_highlighting=warning
 resharper_wrong_indent_size_highlighting=warning
 
-[*.{prefab, unity, meta, mat, asset}]
+[*.{prefab,unity,meta,mat,asset}]
 
 insert_final_newline=false
 trim_trailing_whitespace=false
