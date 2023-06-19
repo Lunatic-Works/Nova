@@ -25,6 +25,9 @@ namespace Nova
         /// </summary>
         public IAnimationProperty property { get; private set; }
 
+        // For debug
+        [SerializeField] private string propertyName;
+
         private float _duration;
         private float _invDuration; // Cached value for optimization.
 
@@ -106,11 +109,19 @@ namespace Nova
             int repeatNum)
         {
             this.property = property;
+            propertyName = property?.GetType().ToString() ?? "wait";
             For(duration);
             With(easing);
             Repeat(repeatNum);
             status = AnimationEntryStatus.Paused;
             evaluateOnStop = true;
+
+            if (duration > 0.0f && duration < 0.1f)
+            {
+                Debug.LogWarning($"Nova: AnimationEntry duration {duration} is too small for {propertyName}. " +
+                                 "Parallel animations may not play as expected when the frame duration is " +
+                                 "comparable with the animation duration.");
+            }
         }
 
         private static GameObject CreateEntryGameObject()
