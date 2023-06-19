@@ -366,8 +366,10 @@ function vfx(obj, shader_layer, t, properties)
         local mat, base_shader_name, _ = get_mat(obj, shader_name)
         t = t or 1
         properties = properties or {}
-        set_mat_default_properties(mat, base_shader_name, properties)
-        set_mat_properties(mat, base_shader_name, properties)
+        if properties ~= 'cont' then
+            set_mat_default_properties(mat, base_shader_name, properties)
+            set_mat_properties(mat, base_shader_name, properties)
+        end
         mat:SetFloat('_T', t)
         set_mat(obj, mat, layer_id)
     else
@@ -389,8 +391,10 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
     properties = properties or {}
 
     local action_begin = function()
-        set_mat_default_properties(mat, base_shader_name, properties)
-        set_mat_properties(mat, base_shader_name, properties)
+        if properties ~= 'cont' then
+            set_mat_default_properties(mat, base_shader_name, properties)
+            set_mat_properties(mat, base_shader_name, properties)
+        end
         mat:SetFloat('_T', start_t)
         set_mat(obj, mat, layer_id)
     end
@@ -422,8 +426,10 @@ make_anim_method('vfx_multi', function(self, obj, shader_layer, times, anim_prop
     properties = properties or {}
 
     local action_begin = function()
-        set_mat_default_properties(mat, base_shader_name, properties)
-        set_mat_properties(mat, base_shader_name, properties)
+        if properties ~= 'cont' then
+            set_mat_default_properties(mat, base_shader_name, properties)
+            set_mat_properties(mat, base_shader_name, properties)
+        end
         for name, value in pairs(anim_properties) do
             mat:SetFloat(name, value[1])
         end
