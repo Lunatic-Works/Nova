@@ -39,20 +39,27 @@ function volume(obj, value)
     obj.scriptVolume = value
 end
 
-make_anim_method('volume', function(self, obj, value, duration)
+make_anim_method('volume', function(self, obj, value, duration, easing)
     duration = duration or 1
-    return self:_then(Nova.VolumeAnimationProperty(obj, value)):_for(duration)
+    easing = parse_easing(easing or 1)
+    return self:_then(Nova.VolumeAnimationProperty(obj, value)):_with(easing):_for(duration)
 end)
 
-make_anim_method('fade_in', function(self, obj, audio_name, volume, duration)
+make_anim_method('fade_in', function(self, obj, audio_name, volume, duration, easing)
     volume = volume or 0.5
-    local entry = self:action(play, obj, audio_name, 0):volume(obj, volume, duration)
+    local entry = self:action(play, obj, audio_name, 0):volume(obj, volume, duration, easing)
     entry.head = self
     return entry
 end)
 
-make_anim_method('fade_out', function(self, obj, duration)
-    local entry = self:volume(obj, 0, duration):action(stop, obj)
+make_anim_method('fade_out', function(self, obj, duration, easing)
+    local entry = self:volume(obj, 0, duration, easing):action(stop, obj)
     entry.head = self
     return entry
+end)
+
+make_anim_method('pitch', function(self, obj, value, duration, easing)
+    duration = duration or 1
+    easing = parse_easing(easing or 1)
+    return self:_then(Nova.PitchAnimationProperty(obj, value)):_with(easing):_for(duration)
 end)

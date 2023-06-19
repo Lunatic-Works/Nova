@@ -54,6 +54,12 @@ namespace Nova
             }
         }
 
+        public float pitch
+        {
+            get => audioSource.pitch;
+            set => audioSource.pitch = value;
+        }
+
         private bool inited;
 
         private void Init()
@@ -229,12 +235,14 @@ namespace Nova
             public readonly string currentAudioName;
             public readonly bool isPlaying;
             public readonly float scriptVolume;
+            public readonly float pitch;
 
             public AudioControllerRestoreData(AudioController parent)
             {
                 currentAudioName = parent.currentAudioName;
                 isPlaying = parent.isPlaying;
                 scriptVolume = parent.scriptVolume;
+                pitch = parent.pitch;
             }
         }
 
@@ -249,6 +257,7 @@ namespace Nova
             currentAudioName = data.currentAudioName;
             isPlaying = data.isPlaying;
             scriptVolume = data.scriptVolume;
+            pitch = data.pitch;
         }
 
         #endregion
