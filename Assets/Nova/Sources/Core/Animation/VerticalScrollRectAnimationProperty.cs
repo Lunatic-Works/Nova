@@ -2,6 +2,7 @@ using UnityEngine.UI;
 
 namespace Nova
 {
+    [ExportCustomType]
     public class VerticalScrollRectAnimationProperty : FloatBaseAnimationProperty
     {
         private readonly ScrollRect scrollRect;
