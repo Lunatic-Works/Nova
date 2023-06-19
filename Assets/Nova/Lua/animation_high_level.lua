@@ -78,10 +78,16 @@ local function parse_coord(obj, camera, coord)
         coord = coord(obj)
     end
 
-    if coord and coord[#coord] == RELATIVE then
-        relative = RELATIVE
-        coord[#coord] = nil
+    -- When there is nil in coord, #coord may be wrong
+    for i = 6, 3, -1 do
+        if coord[i] == RELATIVE then
+            relative = RELATIVE
+            coord[i] = nil
+            break
+        end
+    end
 
+    if relative then
         if coord[1] or coord[2] or coord[4] then
             local x = coord[1] or 0
             local y = coord[2] or 0
