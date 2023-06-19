@@ -41,6 +41,16 @@ namespace Nova
             }
         }
 
+        public float pitch
+        {
+            get => audioLooper != null ? audioLooper.pitch : audioSource.pitch;
+            set
+            {
+                if (audioLooper != null) audioLooper.pitch = value;
+                else audioSource.pitch = value;
+            }
+        }
+
         public int timeSamples => audioLooper != null ? audioLooper.timeSamples : audioSource.timeSamples;
 
         public bool isPlaying => audioLooper != null ? audioLooper.isPlaying : audioSource.isPlaying;

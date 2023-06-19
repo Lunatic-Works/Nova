@@ -21,6 +21,16 @@ namespace Nova
             }
         }
 
+        public float pitch
+        {
+            get => audioSource.pitch;
+            set
+            {
+                audioSource.pitch = value;
+                headAudioSource.pitch = value;
+            }
+        }
+
         public int timeSamples => audioSource.timeSamples;
 
         public bool isPlaying => audioSource.isPlaying || headAudioSource.isPlaying;
