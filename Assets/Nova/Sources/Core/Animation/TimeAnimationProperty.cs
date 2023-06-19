@@ -9,16 +9,31 @@ namespace Nova
 
         protected override float currentValue
         {
-            get => (float)timeline.playableDirector.time;
+            get
+            {
+                var playableDirector = timeline.playableDirector;
+                if (playableDirector == null)
+                {
+                    return 0.0f;
+                }
+
+                return (float)playableDirector.time;
+            }
             set
             {
-                timeline.playableDirector.time = value;
-                timeline.playableDirector.Evaluate();
+                var playableDirector = timeline.playableDirector;
+                if (playableDirector == null)
+                {
+                    return;
+                }
+
+                playableDirector.time = value;
+                playableDirector.Evaluate();
             }
         }
 
         protected override float CombineDelta(float a, float b) =>
-            Mathf.Clamp(a + b, 0f, (float)timeline.playableDirector.duration);
+            Mathf.Clamp(a + b, 0.0f, (float)timeline.playableDirector.duration);
 
         public TimeAnimationProperty(TimelineController timeline, float startValue, float targetValue) : base(
             startValue, targetValue)
