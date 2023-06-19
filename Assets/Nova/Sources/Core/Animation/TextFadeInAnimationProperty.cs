@@ -1,5 +1,6 @@
 namespace Nova
 {
+    [ExportCustomType]
     public class TextFadeInAnimationProperty : IAnimationProperty
     {
         private readonly TextProxy text;
