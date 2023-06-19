@@ -92,7 +92,7 @@ namespace Nova
         private void UpdateColor()
         {
             backgroundImage.color = new Color(_backgroundColor.r, _backgroundColor.g, _backgroundColor.b, 1f);
-            backgroundCanvasGroup.alpha = _backgroundColor.a * configOpacity;
+            backgroundCanvasGroup.alpha = _backgroundColor.a * _configOpacity;
         }
 
         public Color backgroundColor

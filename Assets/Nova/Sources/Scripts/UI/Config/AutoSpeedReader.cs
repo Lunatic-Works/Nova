@@ -15,8 +15,7 @@ namespace Nova
 
         private void Awake()
         {
-            var controller = Utils.FindNovaController();
-            configManager = controller.ConfigManager;
+            configManager = Utils.FindNovaController().ConfigManager;
             gameViewController = GetComponent<GameViewController>();
             configTextPreviewController = GetComponent<ConfigTextPreviewController>();
             this.RuntimeAssert(
@@ -40,13 +39,13 @@ namespace Nova
         {
             // Convert speed to duration
             float val = 10f * Mathf.Pow(0.2f, configManager.GetFloat(configKeyName));
-            if (configTextPreviewController != null)
+            if (gameViewController != null)
             {
-                configTextPreviewController.autoDelay = val;
+                gameViewController.autoDelay = val;
             }
             else
             {
-                gameViewController.autoDelay = val;
+                configTextPreviewController.autoDelay = val;
             }
         }
     }

@@ -306,6 +306,8 @@ namespace Nova
                     screenSprite = null;
                 }
             }
+
+            base.OnHideComplete();
         }
 
         #endregion
