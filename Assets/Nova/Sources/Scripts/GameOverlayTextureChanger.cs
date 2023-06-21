@@ -16,7 +16,7 @@ namespace Nova
             if (actualImageObject == null)
             {
                 actualImageObject = new GameObject();
-                actualImageObject.transform.SetParent(transform);
+                actualImageObject.transform.SetParent(transform, false);
             }
             else
             {

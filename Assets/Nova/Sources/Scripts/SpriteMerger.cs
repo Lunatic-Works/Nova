@@ -58,7 +58,7 @@ namespace Nova
                 for (int i = layers.Count; i < count; i++)
                 {
                     var go = new GameObject("MergingSprite" + i);
-                    go.transform.SetParent(transform);
+                    go.transform.SetParent(transform, false);
                     go.transform.localPosition = Vector3.zero;
                     go.transform.localScale = Vector3.one;
                     go.layer = layer;
