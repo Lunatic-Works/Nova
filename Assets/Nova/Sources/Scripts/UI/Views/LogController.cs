@@ -57,6 +57,7 @@ namespace Nova
         private ConfigManager configManager;
 
         private LoopVerticalScrollRectWithSwitch scrollRect;
+        private VerticalLayoutGroup scrollLayout;
 
         private LogEntryController logEntryForTest;
         private TMP_Text contentForTest;
@@ -78,6 +79,7 @@ namespace Nova
             scrollRect.prefabSource = this;
             scrollRect.dataSource = this;
             scrollRect.sizeHelper = this;
+            scrollLayout = scrollRect.GetComponentInChildren<VerticalLayoutGroup>();
 
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
@@ -195,7 +197,12 @@ namespace Nova
         {
             if (itemsCount <= 0) return new Vector2(0, 0);
             itemsCount = Mathf.Min(itemsCount, logEntries.Count);
-            return new Vector2(0, logEntries[itemsCount - 1].prefixHeight);
+            var height = logEntries[itemsCount - 1].prefixHeight;
+            if (itemsCount == logEntries.Count)
+            {
+                height += scrollLayout.padding.top + scrollLayout.padding.bottom;
+            }
+            return new Vector2(0, height);
         }
 
         private readonly Stack<Transform> pool = new Stack<Transform>();
@@ -289,10 +296,13 @@ namespace Nova
 
         private const float MaxScrollIdleTime = 0.2f;
         private float scrollIdleTime;
+        private float lastScrollPosition;
 
         protected override void OnActivatedUpdate()
         {
             base.OnActivatedUpdate();
+
+            scrollRect.verticalNormalizedPosition = Mathf.Clamp01(scrollRect.verticalNormalizedPosition);
 
             var delta = Mouse.current?.scroll.ReadValue().y ?? 0f;
             if (delta < -1e-3f)
@@ -309,7 +319,7 @@ namespace Nova
                 // Otherwise, the first scrolling down stops when reaches the bottom,
                 // and the second scrolling down hides log view
                 // verticalNormalizedPosition can be > 1
-                if (scrollIdleTime > MaxScrollIdleTime && scrollRect.verticalNormalizedPosition > 1f - 1e-3f)
+                if (scrollIdleTime > MaxScrollIdleTime && lastScrollPosition > 1f - 1e-3f)
                 {
                     Hide();
                     return;
@@ -324,6 +334,11 @@ namespace Nova
             else
             {
                 scrollIdleTime += Time.unscaledDeltaTime;
+            }
+
+            if (scrollIdleTime > MaxScrollIdleTime)
+            {
+                lastScrollPosition = scrollRect.verticalNormalizedPosition;
             }
 
             // Enable scrolling after MaxScrollIdleTime
