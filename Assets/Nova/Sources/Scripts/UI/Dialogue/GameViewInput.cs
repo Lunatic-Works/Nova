@@ -163,7 +163,8 @@ namespace Nova
             }
         }
 
-        private bool needShowUI => !gameViewController.uiActive && !NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
+        private bool needShowUI =>
+            !gameViewController.uiActive && !NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
 
         public void OnPointerDown(PointerEventData _eventData)
         {

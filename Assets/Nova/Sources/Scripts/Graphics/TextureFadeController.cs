@@ -25,7 +25,7 @@ namespace Nova
             }
 
             var offsets =
-                GetTextureOffsetsAlignedOnAnchor(out Vector2 rendererSize, out Vector2 pivot, new[] { to, lastTexture });
+                GetTextureOffsetsAlignedOnAnchor(out Vector2 rendererSize, out Vector2 pivot, new[] {to, lastTexture});
 
             ResetSize(rendererSize.x, rendererSize.y, pivot);
 

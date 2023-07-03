@@ -21,7 +21,8 @@ namespace Nova
         public static RenderTexture GetGameTexture(RenderTexture renderTexture = null, Camera camera = null)
         {
             RenderTexture oldRenderTexture = null;
-            if (renderTexture == null || renderTexture.width != RealScreen.width || renderTexture.height != RealScreen.height)
+            if (renderTexture == null || renderTexture.width != RealScreen.width ||
+                renderTexture.height != RealScreen.height)
             {
                 oldRenderTexture = renderTexture;
                 renderTexture = new RenderTexture(RealScreen.width, RealScreen.height, 24)

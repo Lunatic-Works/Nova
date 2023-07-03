@@ -71,7 +71,7 @@ namespace Nova.Editor
         {
             var dir = EditorUtils.GetSelectedDirectory();
             var paths = EditorUtils.GetSelectedSpritePaths();
-            foreach(var spritePath in paths)
+            foreach (var spritePath in paths)
             {
                 var meta = CreateInstance<SpriteWithOffset>();
                 meta.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
