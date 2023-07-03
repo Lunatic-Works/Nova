@@ -202,6 +202,7 @@ namespace Nova
             {
                 height += scrollLayout.padding.top + scrollLayout.padding.bottom;
             }
+
             return new Vector2(0, height);
         }
 

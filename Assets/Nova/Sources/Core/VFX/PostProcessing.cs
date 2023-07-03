@@ -109,7 +109,7 @@ namespace Nova
                 return;
             }
 
-            RenderTargetIdentifier[] buffers = { TempBlitID, renderTarget };
+            RenderTargetIdentifier[] buffers = {TempBlitID, renderTarget};
             var from = 1;
 
             foreach (var mat in EnabledMaterials())
@@ -124,7 +124,8 @@ namespace Nova
             }
         }
 
-        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context,
+            ref RenderingData renderingData)
         {
             if (!EnabledMaterials().Any())
             {

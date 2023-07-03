@@ -82,10 +82,7 @@ namespace Nova
 
         public void GameStart(string nodeName)
         {
-            viewManager.GetController<TitleController>().SwitchView<DialogueBoxController>(() =>
-            {
-                gameState.GameStart(nodeName);
-            });
+            viewManager.SwitchView<TitleController, DialogueBoxController>(() => { gameState.GameStart(nodeName); });
         }
 
         private GameObject InitButton(string nodeName)

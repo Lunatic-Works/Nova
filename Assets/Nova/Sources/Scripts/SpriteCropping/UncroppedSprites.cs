@@ -8,6 +8,7 @@ namespace Nova
         // relative to the project folder, e.g., "Assets/path/to/image"
         public string outputDirectory;
 
-        public string absoluteOutputDirectory => Path.Combine(Path.GetDirectoryName(Application.dataPath), outputDirectory);
+        public string absoluteOutputDirectory =>
+            Path.Combine(Path.GetDirectoryName(Application.dataPath), outputDirectory);
     }
 }
