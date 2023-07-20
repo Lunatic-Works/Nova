@@ -8,9 +8,10 @@ function stop_ff()
     end
 end
 
---- DEPRECATED: This may not work in all contexts. In the next version there will be other ways to do this.
 function force_step()
-    __Nova.dialogueBoxController:ForceStep()
+    if (not __Nova.executionContext.isRestoring) and __Nova.dialogueState.isNormal then
+        __Nova.dialogueBoxController:ForceStep()
+    end
 end
 
 --- offset: {left, right, top, bottom}
