@@ -9,7 +9,9 @@ function stop_ff()
 end
 
 function force_step()
-    __Nova.gameViewController:ForceStep()
+    if (not __Nova.executionContext.isRestoring) and __Nova.dialogueState.isNormal then
+        __Nova.gameViewController:ForceStep()
+    end
 end
 
 function current_box()
