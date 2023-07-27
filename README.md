@@ -87,6 +87,6 @@
 
 国内镜像（随缘更新）：
 
-* https://gitee.com/woctordho/Nova
+* https://gitee.com/Lunatic-Works/Nova
 
 国内的小伙伴也可以用各种GitHub镜像网站来访问这个repo
