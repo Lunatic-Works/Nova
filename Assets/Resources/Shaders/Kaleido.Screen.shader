@@ -69,7 +69,7 @@ Shader "Nova/VFX Screen/Kaleido"
                 col = lerp(col, col2, _T) * i.color;
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

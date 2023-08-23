@@ -87,7 +87,7 @@ Shader "Nova/VFX Screen/Water"
                 float4 col = tex2D(_MainTex, i.uv + uvDelta) * i.color;
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

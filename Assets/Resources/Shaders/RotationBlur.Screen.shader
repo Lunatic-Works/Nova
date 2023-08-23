@@ -58,7 +58,7 @@ Shader "Nova/VFX Screen/Rotation Blur"
                 col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

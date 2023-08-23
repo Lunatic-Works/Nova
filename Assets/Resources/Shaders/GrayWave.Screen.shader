@@ -57,7 +57,7 @@ Shader "Nova/VFX Screen/Gray Wave"
                 col.rgb /= (1.0 + _Size * delta * delta);
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

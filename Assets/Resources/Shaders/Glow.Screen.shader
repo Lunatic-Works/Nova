@@ -62,7 +62,7 @@ Shader "Nova/VFX Screen/Glow"
                 col.rgb = col.rgb + glow - col.rgb * glow;
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

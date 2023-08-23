@@ -74,7 +74,7 @@ Shader "Nova/VFX Screen/Mix Add"
                 col = saturate(col + _T * maskColor);
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

@@ -116,7 +116,7 @@ Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
             def_iadd_rgba="#define IADD_RGBA(x, y) (x) += (y);",
             variant_rgb="""
 col.rgb *= col.a;
-col.a = 1.0;
+col.a = 0.0;
 """,
             def_gscale="",
             gscale="1.0",
