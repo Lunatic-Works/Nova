@@ -9,7 +9,7 @@ Shader "Nova/VFX/Show Second Texture"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -43,7 +43,11 @@ Shader "Nova/VFX/Show Second Texture"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                return tex2D(_SubTex, i.uv);
+                float4 col = tex2D(_SubTex, i.uv);
+
+                col.rgb *= col.a;
+
+                return col;
             }
             ENDCG
         }

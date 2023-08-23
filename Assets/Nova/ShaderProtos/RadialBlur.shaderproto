@@ -53,6 +53,7 @@ Shader "Nova/$VARIANT_NAME$/Radial Blur"
                 float4 col = tex2DMotionBlur(_MainTex, _MainTex_TexelSize * $GSCALE$, i.uv, uvShift * _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * length(uvShift) * _T;
+                col.rgb = saturate(col.rgb);
 
                 $VARIANT_RGB$
 

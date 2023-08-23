@@ -1,4 +1,4 @@
-VARIANTS: Default
+VARIANTS: Premul
 Shader "Nova/$VARIANT_NAME$/Final Blit"
 {
     Properties
@@ -56,6 +56,8 @@ Shader "Nova/$VARIANT_NAME$/Final Blit"
                 {
                     col = _Color;
                 }
+
+                $VARIANT_RGB$
 
                 return col;
             }

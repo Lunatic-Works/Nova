@@ -25,8 +25,6 @@ Shader "Nova/VFX Screen/Fade"
 
             #include "UnityCG.cginc"
 
-            #define smoothStep(x) ((x) * (x) * (3.0 - 2.0 * (x)))
-
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -56,7 +54,7 @@ Shader "Nova/VFX Screen/Fade"
             }
 
             sampler2D _MainTex, _SubTex;
-            float4 _MainTex_TexelSize, _SubColor;
+            float4 _SubColor;
             float _T, _Vague, _Offset, _InvertMask;
 
             fixed4 frag(v2f i) : SV_Target
@@ -65,10 +63,11 @@ Shader "Nova/VFX Screen/Fade"
                 t0 = _InvertMask + t0 - 2 * _InvertMask * t0;
                 t0 = t0 * (1.0 - 2.0 * _Vague) + _Vague;
                 float slope = 0.5 / (_Vague + 0.001);
-                float mask = smoothStep(saturate(0.5 + slope * (_T - t0)));
+                float mask = smoothstep(0.0, 1.0, 0.5 + slope * (_T - t0));
 
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
                 float4 col2 = tex2D(_SubTex, i.uv) * _SubColor;
                 col = lerp(col, col2, mask);
 

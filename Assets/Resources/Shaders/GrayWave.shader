@@ -11,7 +11,7 @@ Shader "Nova/VFX/Gray Wave"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -55,6 +55,8 @@ Shader "Nova/VFX/Gray Wave"
                 float n = noise(_Freq * _Time.y);
                 float3 delta = col.rgb - n;
                 col.rgb /= (1.0 + _Size * delta * delta);
+
+                col.rgb *= col.a;
 
                 return col;
             }

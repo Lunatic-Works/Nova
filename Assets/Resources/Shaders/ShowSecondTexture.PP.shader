@@ -42,7 +42,9 @@ Shader "Nova/Post Processing/Show Second Texture"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                return tex2D(_SubTex, i.uv);
+                float4 col = tex2D(_SubTex, i.uv);
+
+                return col;
             }
             ENDCG
         }

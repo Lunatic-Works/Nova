@@ -8,7 +8,7 @@ Shader "Nova/UI/Histogram"
     }
     SubShader
     {
-        Cull Off ZWrite Off ZTest [unity_GUIZTestMode] Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off ZTest [unity_GUIZTestMode] Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 
         Pass
@@ -107,6 +107,7 @@ Shader "Nova/UI/Histogram"
             {
                 float4 col = i.color;
                 col.a *= histogram(i.uv);
+                col.rgb *= col.a;
                 return col;
             }
             ENDCG

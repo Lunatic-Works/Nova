@@ -14,7 +14,7 @@ Shader "Nova/VFX/Change Texture With Fade"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -52,12 +52,15 @@ Shader "Nova/VFX/Change Texture With Fade"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                // TODO: normally textures are not premul, so this blending is wrong
-                return lerp(
+                float4 col = lerp(
                     clamped2D(_PrimaryTex, i.uv - _Offsets.xy) * _Color,
                     clamped2D(_SubTex, i.uv - _Offsets.zw) * _SubColor,
                     _T
                 );
+
+                col.rgb *= col.a;
+
+                return col;
             }
             ENDCG
         }

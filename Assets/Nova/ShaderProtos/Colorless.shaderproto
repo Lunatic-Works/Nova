@@ -58,6 +58,9 @@ Shader "Nova/$VARIANT_NAME$/Colorless"
                 col.g = tex2D(_MainTex, i.uv - v).g;
 
                 col *= i.color;
+
+                $VARIANT_RGB$
+
                 return col;
             }
             ENDCG

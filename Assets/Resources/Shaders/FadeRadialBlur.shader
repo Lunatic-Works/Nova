@@ -14,7 +14,7 @@ Shader "Nova/VFX/Fade Radial Blur"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -60,6 +60,8 @@ Shader "Nova/VFX/Fade Radial Blur"
                 float2 uvZoom2 = uvShift * (1.0 - _Zoom * (1.0 - _T) * (1.0 - _Dir)) + 0.5;
                 float4 col2 = tex2DMotionBlur(_SubTex, _MainTex_TexelSize * 1.0, uvZoom2, uvShift * _Size * (1.0 - _T)) * _SubColor;
                 col = lerp(col, col2, _T);
+
+                col.rgb *= col.a;
 
                 return col;
             }

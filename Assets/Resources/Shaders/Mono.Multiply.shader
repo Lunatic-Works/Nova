@@ -21,6 +21,8 @@ Shader "Nova/VFX Multiply/Mono"
 
             #include "UnityCG.cginc"
 
+            #define IADD_RGBA(x, y) (x) += (y);
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -50,11 +52,16 @@ Shader "Nova/VFX Multiply/Mono"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float4 col = tex2D(_MainTex, i.uv);
+                float4 col = tex2D(_MainTex, i.uv) * i.color;
                 float gray = Luminance(col.rgb);
-                float3 mono = gray * _ColorMul.rgb + _ColorAdd.rgb;
-                col.rgb = lerp(col.rgb, mono, _T);
-                col *= i.color;
+
+                float4 mono;
+                mono.rgb = gray;
+                mono.a = col.a;
+                mono *= _ColorMul;
+                IADD_RGBA(mono, _ColorAdd)
+
+                col = lerp(col, mono, _T);
 
                 col.rgb = 1.0 - (1.0 - col.rgb) * col.a;
                 col.a = 1.0;

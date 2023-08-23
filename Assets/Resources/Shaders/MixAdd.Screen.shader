@@ -24,6 +24,8 @@ Shader "Nova/VFX Screen/Mix Add"
 
             #include "UnityCG.cginc"
 
+            #define IADD_RGBA(x, y) (x) += (y);
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -61,8 +63,14 @@ Shader "Nova/VFX Screen/Mix Add"
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
                 float mask = tex2D(_Mask, i.uvMask).r;
                 mask = _InvertMask + mask - 2 * _InvertMask * mask;
-                float4 maskColor = mask * _ColorMul + _ColorAdd;
+
+                float4 maskColor;
+                maskColor.rgb = mask;
+                maskColor.a = col.a;
+                maskColor *= _ColorMul;
+                IADD_RGBA(maskColor, _ColorAdd)
                 maskColor.a *= _AlphaFactor;
+
                 col = saturate(col + _T * maskColor);
 
                 col.rgb *= col.a;

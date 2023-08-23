@@ -340,6 +340,7 @@ namespace Nova.Generated
                 new Dictionary<string, ShaderPropertyType>
                 {
                     {"_Size", ShaderPropertyType.Float},
+                    {"_Strength", ShaderPropertyType.Float},
                     {"_T", ShaderPropertyType.Float},
                 }
             },
@@ -667,6 +668,7 @@ namespace Nova.Generated
                 new Dictionary<string, float>
                 {
                     {"_Size", 1.0f},
+                    {"_Strength", 1.0f},
                     {"_T", 0.0f},
                 }
             },

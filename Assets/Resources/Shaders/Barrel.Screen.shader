@@ -111,8 +111,10 @@ Shader "Nova/VFX Screen/Barrel"
                 {
                     col = getColor(i.uv, sigma);
                 }
+
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
                 col.a = 1.0;

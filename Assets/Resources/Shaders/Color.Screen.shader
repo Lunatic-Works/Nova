@@ -21,6 +21,8 @@ Shader "Nova/VFX Screen/Color"
 
             #include "UnityCG.cginc"
 
+            #define IADD_RGBA(x, y) (x) += (y);
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -51,7 +53,8 @@ Shader "Nova/VFX Screen/Color"
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
-                float4 col2 = col * _ColorMul + _ColorAdd;
+                float4 col2 = col * _ColorMul;
+                IADD_RGBA(col2, _ColorAdd)
                 col = lerp(col, col2, _T);
 
                 col.rgb *= col.a;

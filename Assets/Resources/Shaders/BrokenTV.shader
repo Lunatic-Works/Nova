@@ -10,7 +10,7 @@ Shader "Nova/VFX/Broken TV"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -84,6 +84,8 @@ Shader "Nova/VFX/Broken TV"
 
                 // Snow noise
                 col.rgb += srand(uv * 100.0 + _Time.y) * 0.04 * powerT * col.a;
+
+                col.rgb *= col.a;
 
                 return col;
             }

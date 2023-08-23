@@ -1,15 +1,17 @@
 // This file is generated. Do not edit it manually. Please edit .shaderproto files.
 
-Shader "Nova/VFX/Final Blit"
+Shader "Nova/Premul/Gaussian Blur"
 {
     Properties
     {
         [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
-        _Color ("Margin Color", Color) = (0, 0, 0, 1)
+        _T ("Time", Range(0.0, 1.0)) = 0.0
+        _Size ("Size", Float) = 1.0
+        _Offset ("Offset", Float) = 0.0
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -18,17 +20,20 @@ Shader "Nova/VFX/Final Blit"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+            #include "Assets/Nova/CGInc/Blur.cginc"
 
             struct appdata
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                float4 color : COLOR;
             };
 
             struct v2f
             {
                 float4 vertex : SV_POSITION;
                 float2 uv : TEXCOORD0;
+                float4 color : COLOR;
             };
 
             v2f vert(appdata v)
@@ -36,28 +41,20 @@ Shader "Nova/VFX/Final Blit"
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
+                o.color = v.color;
                 return o;
             }
 
             sampler2D _MainTex;
-            float4 _Color;
-            float _GW, _GH;
+            float4 _MainTex_TexelSize;
+            float _T, _Size, _Offset;
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float2 pivot = float2(0.5, 0.5);
-                float2 uv = (i.uv - pivot) / float2(_GW, _GH) * _ScreenParams.xy + pivot;
-                float eps = 1e-6;
-                float4 col;
-
-                if (uv.x > -eps && uv.x < 1 + eps && uv.y > -eps && uv.y < 1 + eps)
-                {
-                    col = tex2D(_MainTex, clamp(uv, 0, 1));
-                }
-                else
-                {
-                    col = _Color;
-                }
+                float4 col = tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, _Size * _T);
+                col *= i.color;
+                col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 return col;
             }

@@ -11,7 +11,7 @@ Shader "Nova/VFX/Gaussian Blur"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -54,6 +54,9 @@ Shader "Nova/VFX/Gaussian Blur"
                 float4 col = tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
+
+                col.rgb *= col.a;
 
                 return col;
             }

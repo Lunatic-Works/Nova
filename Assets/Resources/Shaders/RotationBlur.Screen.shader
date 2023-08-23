@@ -55,6 +55,7 @@ Shader "Nova/VFX Screen/Rotation Blur"
                 float4 col = tex2DMotionBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, float2(uvShift.y, -uvShift.x) * _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * length(uvShift) * _T;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
                 col.a = 1.0;

@@ -12,7 +12,7 @@ Shader "Nova/VFX/Shake"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -53,6 +53,8 @@ Shader "Nova/VFX/Shake"
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
+
+                col.rgb *= col.a;
 
                 return col;
             }

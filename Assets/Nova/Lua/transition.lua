@@ -9,13 +9,16 @@ local function get_base_shader_name(s)
     return string.upper(string.sub(s, 1, 1)) .. string.gsub(string.sub(s, 2), '_(.)', function(x) return ' ' .. string.upper(x) end)
 end
 
-local function get_full_shader_name(shader_name, pp)
+local function get_full_shader_name(shader_name, obj, pp)
     local raw_shader_name = shader_name
 
-    local variant
-    variant, shader_name = pop_prefix(shader_name, 'multiply', 1)
-    if not variant then
-        variant, shader_name = pop_prefix(shader_name, 'screen', 1)
+    local variant = false
+    local all_variants = {'default', 'multiply', 'screen', 'premul'}
+    for _, prefix in ipairs(all_variants) do
+        variant, shader_name = pop_prefix(shader_name, prefix, 1)
+        if variant then
+            break
+        end
     end
 
     if shader_name == '' then
@@ -35,9 +38,16 @@ local function get_full_shader_name(shader_name, pp)
             full_shader_name = 'Nova/VFX Multiply/' .. base_shader_name
         elseif variant == 'screen' then
             full_shader_name = 'Nova/VFX Screen/' .. base_shader_name
+        elseif variant == 'premul' then
+            full_shader_name = 'Nova/Premul/' .. base_shader_name
         else
-            full_shader_name = 'Nova/VFX/' .. base_shader_name
-            variant = 'default'
+            if obj:GetType() == typeof(Nova.RawImageController) then
+                full_shader_name = 'Nova/Premul/' .. base_shader_name
+                variant = 'premul'
+            else
+                full_shader_name = 'Nova/VFX/' .. base_shader_name
+                variant = 'default'
+            end
         end
     end
 
@@ -72,7 +82,7 @@ local function get_mat(obj, shader_name, restorable)
         return nil
     end
 
-    local full_shader_name, base_shader_name, variant = get_full_shader_name(shader_name, pp)
+    local full_shader_name, base_shader_name, variant = get_full_shader_name(shader_name, obj, pp)
 
     -- Overriding cameras do not have MaterialPool, otherwise their
     -- materials may be disposed before some animations finish

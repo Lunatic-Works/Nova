@@ -7,6 +7,7 @@ Shader "Nova/Post Processing/Sharpen"
         [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
         _T ("Time", Range(0.0, 1.0)) = 0.0
         _Size ("Size", Float) = 1.0
+        _Strength ("Strength", Float) = 1.0
     }
     SubShader
     {
@@ -45,13 +46,13 @@ Shader "Nova/Post Processing/Sharpen"
 
             sampler2D _MainTex;
             float4 _MainTex_TexelSize;
-            float _T, _Size;
+            float _T, _Size, _Strength;
             float _GScale;
 
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv);
-                col = 2.0 * col - tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * _GScale, i.uv, _Size * _T);
+                col += _Strength * _T * (col - tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * _GScale, i.uv, _Size * _T));
                 col *= i.color;
 
                 return col;

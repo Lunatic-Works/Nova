@@ -11,7 +11,7 @@ Shader "Nova/VFX/Rain"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -138,6 +138,8 @@ Shader "Nova/VFX/Rain"
                 float4 col = tex2D(_MainTex, UV + n);
                 float4 col2 = tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * 1.0, UV, 3.0 * _T) * (1.0 - 0.1 * _T);
                 col = lerp(col2, col, saturate(c.x + c.y)) * i.color;
+
+                col.rgb *= col.a;
 
                 return col;
             }

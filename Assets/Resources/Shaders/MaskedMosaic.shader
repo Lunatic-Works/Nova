@@ -12,7 +12,7 @@ Shader "Nova/VFX/Masked Mosaic"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -61,6 +61,8 @@ Shader "Nova/VFX/Masked Mosaic"
 
                 float mask = tex2D(_Mask, i.uv).r * _T;
                 col = lerp(col, col2, mask) * i.color;
+
+                col.rgb *= col.a;
 
                 return col;
             }

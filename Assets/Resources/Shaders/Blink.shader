@@ -13,7 +13,7 @@ Shader "Nova/VFX/Blink"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -59,6 +59,8 @@ Shader "Nova/VFX/Blink"
                 float n = noise(_Freq * _Time.y);
                 col.rgb += _Amp * n * n * _T;
                 col.rgb = saturate(col.rgb);
+
+                col.rgb *= col.a;
 
                 return col;
             }

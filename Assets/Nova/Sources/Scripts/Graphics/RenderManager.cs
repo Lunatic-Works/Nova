@@ -39,7 +39,7 @@ namespace Nova
         private static readonly int GlobalRealScreenHeightID = Shader.PropertyToID("_GH");
         private static readonly int GlobalRealScreenWidthID = Shader.PropertyToID("_GW");
         private static readonly int GlobalRealScreenScaleID = Shader.PropertyToID("_GScale");
-        private const string SHADER = "Nova/VFX/Final Blit";
+        private const string SHADER = "Nova/Premul/Final Blit";
         private const string ChangeWindowSizeFirstShownKey = ConfigManager.FirstShownKeyPrefix + "ChangeWindowSize";
 
         [SerializeField] private Color marginColor;

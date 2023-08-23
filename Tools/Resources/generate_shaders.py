@@ -3,12 +3,15 @@
 import json
 import os
 import re
+from glob import glob
 
 shader_proto_dir = "../../Assets/Nova/ShaderProtos/"
 shader_dir = "../../Assets/Resources/Shaders/"
 timestamps_filename = "shader_timestamps.json"
 shader_info_cs_filename = "../../Assets/Nova/Sources/Generated/ShaderInfoDatabase.cs"
 shader_info_lua_filename = "../../Assets/Nova/Lua/shader_info.lua"
+
+all_variants = ["Default", "Multiply", "Screen", "PP", "Premul"]
 
 
 def indent_lines(s, indent, newline=0):
@@ -38,6 +41,7 @@ def write_shader(
     ext_name,
     variant_name,
     variant_tags,
+    def_iadd_rgba,
     variant_rgb,
     def_gscale,
     gscale,
@@ -46,6 +50,7 @@ def write_shader(
 
     text = text.replace("$VARIANT_NAME$", variant_name)
     text = replace_indented(text, "$VARIANT_TAGS$", variant_tags)
+    text = replace_indented(text, "$DEF_IADD_RGBA$", def_iadd_rgba)
     text = replace_indented(text, "$VARIANT_RGB$", variant_rgb)
     text = replace_indented(text, "$DEF_GSCALE$", def_gscale)
     text = text.replace("$GSCALE$", gscale)
@@ -68,10 +73,13 @@ def generate_shader(filename, text, variant):
             ext_name=".shader",
             variant_name="VFX",
             variant_tags="""
-Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+Cull Off ZWrite Off Blend One OneMinusSrcAlpha
 Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 """,
-            variant_rgb="",
+            def_iadd_rgba="#define IADD_RGBA(x, y) (x) += (y);",
+            variant_rgb="""
+col.rgb *= col.a;
+""",
             def_gscale="",
             gscale="1.0",
         )
@@ -86,6 +94,7 @@ Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 Cull Off ZWrite Off Blend DstColor Zero
 Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 """,
+            def_iadd_rgba="#define IADD_RGBA(x, y) (x) += (y);",
             variant_rgb="""
 col.rgb = 1.0 - (1.0 - col.rgb) * col.a;
 col.a = 1.0;
@@ -104,6 +113,7 @@ col.a = 1.0;
 Cull Off ZWrite Off Blend OneMinusDstColor One
 Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 """,
+            def_iadd_rgba="#define IADD_RGBA(x, y) (x) += (y);",
             variant_rgb="""
 col.rgb *= col.a;
 col.a = 1.0;
@@ -121,6 +131,7 @@ col.a = 1.0;
             variant_tags="""
 Cull Off ZWrite Off ZTest Always
 """,
+            def_iadd_rgba="#define IADD_RGBA(x, y) (x).rgb += (x).a * (y).rgb; (x).a += (y).a;",
             variant_rgb="",
             def_gscale="float _GScale;",
             gscale="_GScale",
@@ -136,6 +147,7 @@ Cull Off ZWrite Off ZTest Always
 Cull Off ZWrite Off Blend One OneMinusSrcAlpha
 Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 """,
+            def_iadd_rgba="#define IADD_RGBA(x, y) (x).rgb += (x).a * (y).rgb; (x).a += (y).a;",
             variant_rgb="",
             def_gscale="",
             gscale="1.0",
@@ -171,10 +183,32 @@ def generate_shaders(filenames):
             line = line.replace("VARIANTS:", "")
             variants = [x.strip() for x in line.split(",")]
         else:
-            variants = ["Default", "Multiply", "Screen", "PP"]
+            variants = all_variants
 
         for variant in variants:
             generate_shader(filename, text, variant)
+
+        name = filename.replace(".shaderproto", "")
+        for variant in set(all_variants) - set(variants):
+            if variant == "Default":
+                ext = ".shader"
+            else:
+                ext = f".{variant}.shader"
+
+            path = os.path.join(shader_dir, f"{name}{ext}")
+            if os.path.exists(path):
+                os.remove(path)
+            if os.path.exists(f"{path}.meta"):
+                os.remove(f"{path}.meta")
+
+    all_shaders = glob(f"{shader_dir}/*.shader")
+    for shader_path in all_shaders:
+        shader_proto_filename = os.path.basename(shader_path)
+        shader_proto_filename = shader_proto_filename.split(".")[0] + ".shaderproto"
+        if shader_proto_filename not in filenames:
+            os.remove(shader_path)
+            if os.path.exists(f"{shader_path}.meta"):
+                os.remove(f"{shader_path}.meta")
 
     print()
 

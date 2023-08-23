@@ -52,11 +52,13 @@ Shader "Nova/Premul/Fade Global"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                return lerp(
+                float4 col = lerp(
                     clamped2D(_PrimaryTex, i.uv - _Offsets.xy) * _Color,
                     clamped2D(_SubTex, i.uv - _Offsets.zw) * _SubColor,
                     _T
                 );
+
+                return col;
             }
             ENDCG
         }

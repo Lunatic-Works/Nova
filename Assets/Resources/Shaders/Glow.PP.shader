@@ -52,12 +52,14 @@ Shader "Nova/Post Processing/Glow"
             fixed4 frag(v2f i) : SV_Target
             {
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
+
                 float3 glow = tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * _GScale, i.uv, _Size * _T).rgb * i.color.rgb;
                 glow = glow * glow;
                 glow = glow * glow;
                 glow *= _Strength * _T;
+                glow = saturate(glow);
+
                 col.rgb = col.rgb + glow - col.rgb * glow;
-                col.rgb = saturate(col.rgb);
 
                 return col;
             }
