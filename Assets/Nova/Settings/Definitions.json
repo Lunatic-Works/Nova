@@ -89,14 +89,5 @@
         "min": 0.1,
         "defaultValue": 0.9,
         "max": 1
-    },
-    "_GameFirstShown": {
-        "defaultValue": 0
-    },
-    "_LogViewFirstShown": {
-        "defaultValue": 0
-    },
-    "_ConfigViewFirstShown": {
-        "defaultValue": 0
     }
 }
