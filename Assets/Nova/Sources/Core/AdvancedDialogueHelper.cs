@@ -31,7 +31,7 @@ namespace Nova
             jumpingDestination = to;
         }
 
-        public string GetJump()
+        public string PopJump()
         {
             string last = jumpingDestination;
             jumpingDestination = null;
@@ -43,7 +43,7 @@ namespace Nova
             fallThrough = true;
         }
 
-        public bool GetFallThrough()
+        public bool PopFallThrough()
         {
             bool last = fallThrough;
             fallThrough = false;

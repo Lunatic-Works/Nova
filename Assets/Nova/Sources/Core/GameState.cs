@@ -384,13 +384,13 @@ namespace Nova
             currentDialogueEntry.ExecuteAction(DialogueActionStage.AfterDialogue, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
-            if (advancedDialogueHelper.GetFallThrough())
+            if (advancedDialogueHelper.PopFallThrough())
             {
                 Step();
                 yield break;
             }
 
-            var pendingJumpTarget = advancedDialogueHelper.GetJump();
+            var pendingJumpTarget = advancedDialogueHelper.PopJump();
             if (pendingJumpTarget != null)
             {
                 var node = GetNode(pendingJumpTarget);
