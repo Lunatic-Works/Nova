@@ -55,7 +55,12 @@ namespace Nova
         public override void Show(Action onFinish)
         {
             UpdateNodes();
-            if (unlockedNodes.Count == 1 && !inputMapper.GetKey(AbstractKey.EditorUnlock))
+            if (unlockedNodes.Count == 0)
+            {
+                Debug.LogWarning("Nova: No node is unlocked so the game cannot start. " +
+                                 "Please use is_unlocked_start() rather than is_start() in your first node.");
+            }
+            else if (unlockedNodes.Count == 1 && !inputMapper.GetKey(AbstractKey.EditorUnlock))
             {
                 GameStart(unlockedNodes.First());
                 return;
