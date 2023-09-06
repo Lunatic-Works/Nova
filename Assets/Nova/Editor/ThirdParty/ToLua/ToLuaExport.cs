@@ -165,8 +165,25 @@ public static class ToLuaExport
         "Dictionary.TryAdd",
         "KeyValuePair.Deconstruct",
         "ParticleSystem.SetJob",
-        "ParticleSystem.subEmitters", /*2019.09 ios编译出错，也可能是unity版本问题*/
-        "Type.IsSZArray"
+        "ParticleSystem.subEmitters", /*2019.09 iOS编译出错，也可能是Unity版本问题*/
+        "Type.IsSZArray",
+        //Unity 2022新增
+        "Transform.TransformDirections",
+        "Transform.InverseTransformDirections",
+        "Transform.TransformVectors",
+        "Transform.InverseTransformVectors",
+        "Transform.TransformPoints",
+        "Transform.InverseTransformPoints",
+        "Material.IsChildOf",
+        "Material.RevertAllPropertyOverrides",
+        "Material.IsPropertyOverriden",
+        "Material.IsPropertyLocked",
+        "Material.IsPropertyLockedByAncestor",
+        "Material.SetPropertyLock",
+        "Material.ApplyPropertyOverride",
+        "Material.RevertPropertyOverride",
+        "Material.parent",
+        "Material.isVariant"
     };
 
     class _MethodBase
