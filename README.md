@@ -84,6 +84,7 @@
 
 * [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家视觉小说引擎的碎片化问题，而定义的通用脚本格式
 * [Yukimi Script](https://github.com/Strrationalism/YukimiScript)：为描述视觉小说而设计的领域专用语言
+* [语涵编译器](https://github.com/PrepPipe)：视觉小说的编译器框架
 
 国内镜像（随缘更新）：
 
