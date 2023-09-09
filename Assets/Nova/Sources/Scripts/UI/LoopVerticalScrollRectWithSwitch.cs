@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -14,6 +15,16 @@ namespace Nova
             {
                 base.OnScroll(data);
             }
+        }
+
+        protected override float GetSize(RectTransform item, bool includeSpacing)
+        {
+            var logEntry = item.GetComponent<LogEntryController>();
+            if (logEntry != null)
+            {
+                return logEntry.height + (includeSpacing ? contentSpacing : 0);
+            }
+            return base.GetSize(item, includeSpacing);
         }
     }
 }
