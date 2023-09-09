@@ -140,58 +140,52 @@ namespace Nova
             }
         }
 
+        private static GameObject FindSingletonWithTag(string tag, string hint = "")
+        {
+            var gos = GameObject.FindGameObjectsWithTag(tag);
+            if (gos.Length == 0)
+            {
+                throw new InvalidAccessException($"Nova: Cannot find game object with tag {tag}. {hint}");
+            }
+
+            if (gos.Length > 1)
+            {
+                throw new InvalidAccessException(
+                    $"Nova: Found multiple game objects with tag {tag}:\n" + string.Join("\n", gos.Select(GetPath)));
+            }
+
+            return gos[0];
+        }
+
+        private static T FindSingletonComponentWithTag<T>(string tag, string hint = "")
+        {
+            var go = FindSingletonWithTag(tag, hint);
+            if (!go.TryGetComponent<T>(out var component))
+            {
+                throw new InvalidAccessException($"Nova: No {typeof(T)} component in {tag} game object.");
+            }
+
+            return component;
+        }
+
         /// <remarks>
         /// This is usually called in Awake or Start
         /// Do not call this when the game is quitting, because NovaController may be already destroyed
         /// </remarks>
         public static NovaController FindNovaController()
         {
-            var go = GameObject.FindWithTag("NovaController");
-            if (go == null)
-            {
-                throw new InvalidAccessException(
-                    "Nova: Cannot find NovaController game object by tag. " +
-                    "Maybe you should put NovaCreator prefab in your scene.");
-            }
-
-            if (!go.TryGetComponent<NovaController>(out var controller))
-            {
-                throw new InvalidAccessException("Nova: No NovaController component in NovaController game object.");
-            }
-
-            return controller;
+            return FindSingletonComponentWithTag<NovaController>("NovaController",
+                "Maybe you should put NovaCreator prefab in your scene.");
         }
 
         public static RenderManager FindRenderManager()
         {
-            var go = GameObject.FindWithTag("RenderManager");
-            if (go == null)
-            {
-                throw new InvalidAccessException("Nova: Cannot find RenderManager game object by tag.");
-            }
-
-            if (!go.TryGetComponent<RenderManager>(out var renderManager))
-            {
-                throw new InvalidAccessException("Nova: No RenderManager component in RenderManager game object.");
-            }
-
-            return renderManager;
+            return FindSingletonComponentWithTag<RenderManager>("RenderManager");
         }
 
         public static ViewManager FindViewManager()
         {
-            var go = GameObject.FindWithTag("UIRoot");
-            if (go == null)
-            {
-                throw new InvalidAccessException("Nova: Cannot find UI root game object by tag.");
-            }
-
-            if (!go.TryGetComponent<ViewManager>(out var viewManager))
-            {
-                throw new InvalidAccessException("Nova: No ViewManager component in UI root game object.");
-            }
-
-            return viewManager;
+            return FindSingletonComponentWithTag<ViewManager>("UIRoot");
         }
 
         public static Vector3 WorldToCanvasPosition(this Canvas canvas, Vector3 worldPosition, Camera camera = null)
@@ -371,6 +365,11 @@ namespace Nova
         {
             var parent = current.parent;
             return (parent == null ? "" : GetPath(parent) + "/") + current.name;
+        }
+
+        public static string GetPath(GameObject go)
+        {
+            return GetPath(go.transform);
         }
 
         public static string GetPath(Component component)
