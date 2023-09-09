@@ -4,7 +4,6 @@ namespace Nova
 {
     public abstract class ViewControllerBase : PanelController, IViewController
     {
-        public ViewManager viewManager { get; private set; }
         protected InputManager inputManager;
 
         protected override bool Init()
@@ -14,8 +13,6 @@ namespace Nova
                 return true;
             }
 
-            viewManager = GetComponentInParent<ViewManager>();
-            this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");
             viewManager.SetController(this);
             inputManager = Utils.FindNovaController().InputManager;
             return false;

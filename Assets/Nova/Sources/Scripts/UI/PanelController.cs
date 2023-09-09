@@ -12,6 +12,7 @@ namespace Nova
 
         protected List<UIViewTransitionBase> transitions;
         protected bool inited;
+        public ViewManager viewManager { get; private set; }
 
         protected virtual bool Init()
         {
@@ -22,6 +23,8 @@ namespace Nova
 
             this.RuntimeAssert(myPanel != null, "Missing myPanel.");
             transitions = myPanel.GetComponents<UIViewTransitionBase>().ToList();
+
+            viewManager = Utils.FindViewManager();
 
             inited = true;
             return false;
