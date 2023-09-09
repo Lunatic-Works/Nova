@@ -781,6 +781,7 @@ namespace Nova
         private void RestoreCheckpoint(GameStateCheckpoint entry)
         {
             this.RuntimeAssert(entry != null, "Checkpoint is null.");
+            restoreStarts.Invoke();
 
             currentIndex = entry.dialogueIndex;
             stepsFromLastCheckpoint = 0;
@@ -939,7 +940,6 @@ namespace Nova
 
             isRestoring = true;
             isUpgrading = upgrade;
-            restoreStarts.Invoke();
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
             if (dialogueIndex == currentIndex)
