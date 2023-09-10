@@ -144,7 +144,7 @@ namespace Nova.Editor
             if (sprite == null) return true;
             var tex = sprite.texture;
             var size = entry.snapshotScale * new Vector2(tex.width, tex.height);
-            return Math.Abs(ImageGroupEditor.SnapshotAspectRatio - size.y / size.x) < 3 * float.Epsilon;
+            return Mathf.Abs(ImageGroupEditor.SnapshotAspectRatio - size.y / size.x) < 1e-6f;
         }
 
         private static bool GroupIsEmpty(ImageGroup group)

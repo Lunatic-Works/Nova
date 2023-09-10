@@ -163,7 +163,7 @@ namespace Nova
             Assert.IsTrue(isPlaying);
             // Out of sync happens when the clip finishes playing, or the application loses focus
             // Check the time to ensure that the clip finishes playing
-            if (audioSource.time < float.Epsilon || Mathf.Approximately(audioSource.time, audioSource.clip.length))
+            if (audioSource.time < 1e-6f || Mathf.Abs(audioSource.time - audioSource.clip.length) < 1e-6f)
             {
                 Step();
             }

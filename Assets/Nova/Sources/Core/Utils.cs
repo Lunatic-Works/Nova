@@ -278,7 +278,7 @@ namespace Nova
         public static float InverseSlerp(Quaternion a, Quaternion b, Quaternion value)
         {
             float angle = Quaternion.Angle(a, b);
-            return angle < float.Epsilon ? 0.0f : Quaternion.Angle(a, value) / angle;
+            return angle < 1e-6f ? 0.0f : Quaternion.Angle(a, value) / angle;
         }
 
         public static Color SetAlpha(Color color, float a)

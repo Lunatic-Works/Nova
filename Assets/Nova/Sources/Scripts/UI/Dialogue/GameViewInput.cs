@@ -274,7 +274,7 @@ namespace Nova
             }
 
             float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
-            if (Math.Abs(scroll) < float.Epsilon)
+            if (Mathf.Abs(scroll) < 1e-3f)
             {
                 return;
             }

@@ -22,7 +22,7 @@ namespace Nova
 
         public override void ModifyMesh(VertexHelper vh)
         {
-            if (!IsActive() || effectDistance.sqrMagnitude < float.Epsilon)
+            if (!IsActive() || effectDistance.sqrMagnitude < 1e-6f)
                 return;
             vh.GetUIVertexStream(uiVerticesList);
             var num = uiVerticesList.Count * 9;

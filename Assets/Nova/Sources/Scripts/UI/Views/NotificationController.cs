@@ -74,7 +74,7 @@ namespace Nova
         protected override void Update()
         {
             var delta = deadPercentage;
-            if (delta < float.Epsilon)
+            if (delta < 1e-6f)
             {
                 deadPercentage = 0f;
             }

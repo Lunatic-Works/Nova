@@ -121,7 +121,7 @@ namespace Nova.Editor
                     audioClip.GetData(sampleData, 0);
 
                     downSampleTo = audioClip.frequency / 60;
-                    downSampledData = new float[(int)Math.Ceiling(1.0f * audioClip.samples / downSampleTo)];
+                    downSampledData = new float[Mathf.CeilToInt((float)audioClip.samples / downSampleTo)];
                     for (int i = 0; i < sampleData.Length; i += downSampleTo)
                     {
                         float ssum = 0;
@@ -131,7 +131,7 @@ namespace Nova.Editor
                             ssum += sampleData[j] * sampleData[j];
                         }
 
-                        float rms = (float)Math.Sqrt(ssum / (j - i));
+                        float rms = Mathf.Sqrt(ssum / (j - i));
                         downSampledData[i / downSampleTo] = rms;
                     }
 
