@@ -106,7 +106,7 @@ namespace Nova
             get => textBox.fontSize;
             set
             {
-                if (Mathf.Approximately(textBox.fontSize, value)) return;
+                if (Mathf.Abs(value - textBox.fontSize) < 1e-6f) return;
                 textBox.fontSize = value;
                 needRefreshLineBreak = true;
             }
