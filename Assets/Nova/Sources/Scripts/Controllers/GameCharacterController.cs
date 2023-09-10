@@ -105,6 +105,7 @@ namespace Nova
         private float voiceDelay;
 
         private bool dontPlaySound => gameState.isRestoring;
+        private bool zeroVolume => audioSource.volume < 1e-3f;
 
         /// <summary>
         /// Stop the voice when the dialogue will change
@@ -132,7 +133,7 @@ namespace Nova
         /// <param name="dialogueChangedData"></param>
         private void OnDialogueChanged(DialogueChangedData dialogueChangedData)
         {
-            if (willSaySomething && !dontPlaySound)
+            if (willSaySomething && !dontPlaySound && !zeroVolume)
             {
                 audioSource.PlayDelayed(voiceDelay);
             }
@@ -272,7 +273,7 @@ namespace Nova
 
             foreach (var voice in voices)
             {
-                if (Characters.TryGetValue(voice.Key, out var character) && character.audioSource.volume > 1e-3f)
+                if (Characters.TryGetValue(voice.Key, out var character) && !character.zeroVolume)
                 {
                     return true;
                 }
@@ -300,7 +301,7 @@ namespace Nova
                     delay -= bias;
                 }
 
-                if (!Characters.TryGetValue(characterName, out var character)) continue;
+                if (!Characters.TryGetValue(characterName, out var character) || character.zeroVolume) continue;
                 var voicePath = System.IO.Path.Combine(character.voiceFolder, voiceEntry.voiceFileName);
                 var clip = AssetLoader.Load<AudioClip>(voicePath);
                 character.SayImmediately(clip, delay);
@@ -314,7 +315,7 @@ namespace Nova
                 float maxLength = 0.0f;
                 foreach (var character in Characters.Values)
                 {
-                    if (!character.willSaySomething) continue;
+                    if (!character.willSaySomething || character.zeroVolume) continue;
                     var clip = character.audioSource.clip;
                     if (clip == null) continue;
                     float length = clip.length + character.voiceDelay;
