@@ -10,7 +10,7 @@ namespace Nova
     }
 
     /// <summary>
-    /// Play animation for one shot. This component will destroy itself when animation finishes.
+    /// Play a segment of animation. The game object will be recycled in the factory when it finishes.
     /// </summary>
     [ExportCustomType]
     public class AnimationEntry : MonoBehaviour
@@ -20,8 +20,7 @@ namespace Nova
         private static PrefabFactory PrefabFactory;
 
         /// <summary>
-        /// The property to animate with. If the Property is null, this animation entry will do nothing, which can
-        /// be used as waiting behaviour.
+        /// The property to animate. If property is null, this entry will do nothing, which can be used as waiting.
         /// </summary>
         public IAnimationProperty property { get; private set; }
 
@@ -56,17 +55,17 @@ namespace Nova
         public EasingFunction easing = LinearEasing();
 
         /// <summary>
-        /// If RepeatNum = 0, no loop, play once.
-        /// If RepeatNum > 0, this value indicates how many times this track will be repeated, with current playing
-        /// round uncounted. Set RepeatNum = n, the track will be played for actually n + 1 times.
-        /// If RepeatNum == -1, infinite loop.
+        /// If repeatNum == 0, no loop, play once.
+        /// If repeatNum > 0, this value indicates how many times this entry will repeat, excluding the current one.
+        /// In other words, if repeatNum == n, this entry will play for n + 1 times in total.
+        /// If repeatNum == -1, infinite loop.
         /// </summary>
         public int repeatNum { get; private set; }
 
-        public int repeatNumRemaining { get; private set; }
+        public int repeatNumElapsed { get; private set; }
 
         /// <summary>
-        /// Total duration of this entry and all its children, accounting for the repeat num.
+        /// Total duration of this entry and all its children, accounting for repeatNum.
         /// </summary>
         public float totalDuration
         {
@@ -111,8 +110,10 @@ namespace Nova
             this.property = property;
             propertyName = property?.GetType().ToString() ?? "wait";
             For(duration);
+            timeElapsed = 0.0f;
             With(easing);
             Repeat(repeatNum);
+            repeatNumElapsed = 0;
             status = AnimationEntryStatus.Paused;
             evaluateOnStop = true;
 
@@ -183,20 +184,18 @@ namespace Nova
         public AnimationEntry For(float duration)
         {
             this.duration = duration;
-            timeElapsed = 0.0f;
             return this;
         }
 
-        public AnimationEntry With(EasingFunction function)
+        public AnimationEntry With(EasingFunction easing)
         {
-            easing = function ?? LinearEasing();
+            this.easing = easing ?? LinearEasing();
             return this;
         }
 
         public AnimationEntry Repeat(int repeatNum)
         {
             this.repeatNum = repeatNum;
-            repeatNumRemaining = repeatNum;
             return this;
         }
 
@@ -204,9 +203,13 @@ namespace Nova
 
         #region Playback control
 
-        public void Play()
+        public void Play(float time = -1.0f)
         {
             status = AnimationEntryStatus.Playing;
+            if (time >= 0.0f)
+            {
+                timeElapsed = time;
+            }
         }
 
         public void Pause()
@@ -271,12 +274,12 @@ namespace Nova
             property.value = easing(timeElapsed * _invDuration);
         }
 
-        private void WakeUpChildren()
+        private void WakeUpChildren(float time = -1.0f)
         {
             foreach (Transform child in Utils.GetChildren(transform))
             {
                 child.SetParent(transform.parent, false);
-                child.GetComponent<AnimationEntry>().Play();
+                child.GetComponent<AnimationEntry>().Play(time);
             }
         }
 
@@ -291,18 +294,18 @@ namespace Nova
                 return;
             }
 
-            // check if need loop
-            if (repeatNumRemaining == 0) // no more loop
+            if (repeatNumElapsed >= repeatNum)
             {
+                // No more loop
                 Terminate();
-                WakeUpChildren();
+                WakeUpChildren(timeElapsed - duration);
                 DestroyEntry(this);
                 return;
             }
 
-            if (repeatNumRemaining > 0) repeatNumRemaining--;
+            // Do the next loop
             timeElapsed -= duration;
-
+            ++repeatNumElapsed;
             Evaluate();
         }
 
@@ -310,7 +313,8 @@ namespace Nova
 
         /// <summary>
         /// Input is the normalized time in [0, 1].
-        /// Output is a float used to interpolate between Property's startValue and targetValue. 0 means startValue, and 1 means targetValue.
+        /// Output is a float used to interpolate between property's startValue and targetValue.
+        /// 0 means startValue, and 1 means targetValue.
         /// Output may be outside [0, 1], and it may not start with 0 or end with 1.
         /// </summary>
         public delegate float EasingFunction(float t);
