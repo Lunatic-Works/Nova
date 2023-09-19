@@ -217,7 +217,7 @@ namespace LuaInterface
                 return;
             }
 
-            float delta = Time.deltaTime;
+            float delta = Time.unscaledDeltaTime;
 
             for (int i = gcList.Count - 1; i >= 0; i--)
             {
