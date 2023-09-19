@@ -17,7 +17,7 @@ namespace Nova
                 return;
             }
 
-            time += Time.deltaTime;
+            time += Time.unscaledDeltaTime;
         }
 
         private void OnApplicationFocus(bool hasFocus)
