@@ -11,11 +11,14 @@ namespace Nova
         {
             textProxy = GetComponent<TextProxy>();
             textProxy.Init();
+        }
 
 #if UNITY_EDITOR
+        private void Start()
+        {
             textProxy.CheckFontInConfig();
-#endif
         }
+#endif
 
         private void OnEnable()
         {
