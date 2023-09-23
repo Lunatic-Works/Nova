@@ -21,7 +21,7 @@ namespace Nova
             rectTransform = GetComponent<RectTransform>();
             currentCanvas = GetComponentInParent<Canvas>();
             backgroundBlur = transform.Find("BackgroundBlur").GetComponent<RectTransform>();
-            buttonRing = GetComponentInChildren<ButtonRing>();
+            buttonRing = GetComponentInChildren<ButtonRing>(true);
         }
 
         private void ForceHideChildren()
