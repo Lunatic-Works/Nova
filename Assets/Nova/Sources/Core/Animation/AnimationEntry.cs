@@ -298,7 +298,8 @@ namespace Nova
             {
                 // No more loop
                 Terminate();
-                WakeUpChildren(timeElapsed - duration);
+                // If duration is too small, we assume that it takes a frame
+                WakeUpChildren(timeElapsed - Mathf.Max(duration, Time.smoothDeltaTime));
                 DestroyEntry(this);
                 return;
             }
