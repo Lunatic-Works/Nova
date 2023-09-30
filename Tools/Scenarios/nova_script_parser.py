@@ -62,13 +62,29 @@ def format_code_block(block):
 def get_node_name(node):
     if isinstance(node, astnodes.Name):
         return node.id
-    elif isinstance(node, astnodes.String):
-        return node.s
     elif isinstance(node, astnodes.Index):
         return f"{get_node_name(node.value)}.{get_node_name(node.idx)}"
+    elif isinstance(node, astnodes.Call):
+        return get_node_name(node.func)
+    elif isinstance(node, astnodes.Invoke):
+        return f"{get_node_name(node.source)}:{get_node_name(node.func)}"
+    elif isinstance(node, astnodes.Number):
+        return f"{node.n}"
+    elif isinstance(node, astnodes.String):
+        return node.s
+    elif isinstance(
+        node,
+        (
+            astnodes.Nil,
+            astnodes.Table,
+            astnodes.AnonymousFunction,
+            astnodes.BinaryOp,
+            astnodes.UnaryOp,
+        ),
+    ):
+        return node._name
     else:
-        # raise ValueError(f'Unknown node: {type(node)}')
-        return None
+        raise ValueError(f"Unknown node: {type(node)}")
 
 
 def walk_functions_block(nodes, env):
@@ -77,7 +93,7 @@ def walk_functions_block(nodes, env):
     while nodes:
         node = nodes.pop()
         if isinstance(node, astnodes.Call):
-            yield get_node_name(node.func), node.args, env
+            yield get_node_name(node), node.args, env
             for _node in node.args:
                 if isinstance(_node, astnodes.AnonymousFunction):
                     yield from walk_functions_block(_node.body.body, env)
@@ -91,7 +107,7 @@ def walk_functions_block(nodes, env):
 
             while invoke_stack:
                 node = invoke_stack.pop()
-                func_name = get_node_name(node.func)
+                func_name = get_node_name(node)
                 args = node.args
                 if func_name == "action" and not isinstance(
                     args[0], astnodes.AnonymousFunction
