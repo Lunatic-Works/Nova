@@ -156,7 +156,7 @@ function text_material(material_name)
     box.materialName = material_name
 end
 
-box_pos_presets = {
+local box_pos_presets = {
     bottom = {
         box = 'default_box',
         offset = {0, 0, 0, 0},
@@ -192,7 +192,7 @@ box_pos_presets = {
     },
 }
 
-box_style_presets = {
+local box_style_presets = {
     light = {
         tint = 1,
         alignment = 'left',
