@@ -92,7 +92,7 @@ function text_material(material_name)
     __Nova.dialogueBoxController.materialName = material_name
 end
 
-box_pos_presets = {
+local box_pos_presets = {
     bottom = {
         offset = {0, 0, 0, 0},
         anchor = {0.1, 0.9, 0.05, 0.35},
@@ -137,7 +137,7 @@ box_pos_presets = {
     },
 }
 
-box_style_presets = {
+local box_style_presets = {
     light = {
         tint = 1,
         alignment = 'left',
