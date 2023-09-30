@@ -927,6 +927,8 @@ namespace Nova
             // Animation should stop
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
 
+            LuaRuntime.Instance.GetFunction("action_before_move").Call();
+
             // Restore history
             nodeRecord = newNodeRecord;
             checkpointOffset = newCheckpointOffset;
