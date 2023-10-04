@@ -3,7 +3,7 @@ label 'test_video'
 is_debug()
 |>
 <|
-show(xiben, 'normal', pos_c)
+show(孙西本, 'normal', pos_c)
 show(bg, 'room')
 set_box()
 |>

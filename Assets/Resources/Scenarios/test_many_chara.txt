@@ -9,27 +9,27 @@ set_box()
 测试很多角色
 
 <|
-show(ergong, 'normal', {-6, 0, 0.5})
+show(王二宫, 'normal', {-6, 0, 0.5})
 |>
 111
 
 <|
-show(qianye, 'normal', {-2, 0, 0.5})
+show(张浅野, 'normal', {-2, 0, 0.5})
 |>
 222
 
 <|
-show(xiben, 'normal', {2, 0, 0.5})
+show(孙西本, 'normal', {2, 0, 0.5})
 |>
 333
 
 <|
-show(gaotian, 'normal', {6, 0, 0.5})
+show(陈高天, 'normal', {6, 0, 0.5})
 |>
 444
 
 <|
-show(gaotian, 'cry')
+show(陈高天, 'cry')
 |>
 555
 
