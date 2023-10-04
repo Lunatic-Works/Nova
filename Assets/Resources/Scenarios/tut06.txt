@@ -61,8 +61,8 @@ vfx(fg, 'screen_blink')
 大多数特效都有multiply和screen的版本
 
 <|
-show(gaotian, 'normal', pos_c)
-vfx(gaotian, 'lens_blur', 1, { _Size = 10 })
+show(陈高天, 'normal', pos_c)
+vfx(陈高天, 'lens_blur', 1, { _Size = 10 })
 hide(fg)
 move(fg, {0, 0, 1})
 vfx(fg, nil)
@@ -70,7 +70,7 @@ vfx(fg, nil)
 也可以对角色立绘添加特效
 
 <|
-vfx(gaotian, nil)
+vfx(陈高天, nil)
 vfx(cam, 'lens_blur', 1, { _Size = 10 })
 |>
 也可以对摄像机添加特效，这时立绘和背景一起被模糊了
@@ -129,8 +129,8 @@ anim:trans2(bg, 'room', 'color', 1, { _ColorAdd = 1 })
 
 <|
 anim:trans(cam, function()
-        hide(gaotian)
-        show(xiben, 'normal', pos_c)
+        hide(陈高天)
+        show(孙西本, 'normal', pos_c)
         show(bg, 'corridor')
     end, 'fade', 1, { _Mask = 'Masks/wipe_left' })
 |>
@@ -146,7 +146,7 @@ anim:trans_left(bg, 'room'):trans_right(bg, 'corridor')
 `animation_presets.lua`中定义了`trans_left`、`trans_right`等函数，就是把转场加上一些常用的参数
 
 <|
-hide(xiben)
+hide(孙西本)
 |>
 教程6 特效与转场 到此结束
 

@@ -42,7 +42,7 @@ stop(bgs)
 顺便说一句：：标题界面已经有背景音乐了，所以这些教程的开头都有`stop(bgm)`
 
 <|
-show(xiben, 'normal', pos_c)
+show(孙西本, 'normal', pos_c)
 sound('clap')
 |>
 `sound`函数用来播放音效
@@ -53,14 +53,14 @@ sound('clap', 0.5)
 `sound`的第二个参数是音量，默认为1（与`play`的音量默认值不同）
 
 <|
-say(xiben, '003007')
+say(孙西本, '003007')
 |>
 `say`函数用来播放语音
 
 顺便说一句：：Colorless的脚本中用到的都是自动语音，这个以后再讲
 
 <|
-hide(xiben)
+hide(孙西本)
 |>
 西本同学出来骂了你一顿之后又回去了
 

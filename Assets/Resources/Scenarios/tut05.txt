@@ -9,13 +9,13 @@ set_box()
 教程5 动画
 
 <|
-show(gaotian, 'normal', pos_l)
-anim:move(gaotian, pos_r)
+show(陈高天, 'normal', pos_l)
+anim:move(陈高天, pos_r)
 |>
 `anim:move`函数用来创建移动动画
 
 <|
-move(gaotian, pos_l)
+move(陈高天, pos_l)
 |>
 如果没有`anim`，`move`就是瞬间完成的
 
@@ -24,7 +24,7 @@ move(gaotian, pos_l)
 顺便说一句：：具体可以看`animation.lua`和`animation_high_level.lua`
 
 <|
-anim:move(gaotian, pos_r, 2)
+anim:move(陈高天, pos_r, 2)
 |>
 `anim:move`的第三个参数是动画的时长，单位为秒，默认为1秒
 
@@ -35,56 +35,56 @@ anim:move(gaotian, pos_r, 2)
 移动动画的easing默认为`{0, 0}`，看起来会有比较自然的加减速。接下来举几个例子
 
 <|
-show(gaotian, 'normal', {-5, 3.5, 0.1})
-show(xiben, 'normal', {-5, 0.5, 0.1})
-anim:move(gaotian, {5}, 2, {0, 2})
-anim:move(xiben, {5}, 2, {1, 1})
+show(陈高天, 'normal', {-5, 3.5, 0.1})
+show(孙西本, 'normal', {-5, 0.5, 0.1})
+anim:move(陈高天, {5}, 2, {0, 2})
+anim:move(孙西本, {5}, 2, {1, 1})
 |>
 上面的小人先慢后快
 
 <|
-move(gaotian, {-5})
-move(xiben, {-5})
-anim:move(gaotian, {5}, 2, {2, 0})
-anim:move(xiben, {5}, 2, {1, 1})
+move(陈高天, {-5})
+move(孙西本, {-5})
+anim:move(陈高天, {5}, 2, {2, 0})
+anim:move(孙西本, {5}, 2, {1, 1})
 |>
 上面的小人先快后慢
 
 <|
-move(gaotian, {-5})
-move(xiben, {-5})
-anim:move(gaotian, {5}, 2, {0, -1})
-anim:move(xiben, {5}, 2, {1, 1})
+move(陈高天, {-5})
+move(孙西本, {-5})
+anim:move(陈高天, {5}, 2, {0, -1})
+anim:move(孙西本, {5}, 2, {1, 1})
 |>
 上面的小人跑出去一段再回来（结束时的速度为-1）
 
 顺便说一句：：上面这些非线性动画用的都是三次曲线，如果想用其他种类的曲线，可以把easing的第一个参数设为曲线的名字，这些名字在`animation_high_level.lua`中的`easing_func_name_map`里定义
 
 <|
-move(gaotian, {-5})
-move(xiben, {-5})
-anim:move(gaotian, {5}, 2, {'bezier', 0, 1})
-anim:move(xiben, {5}, 2, {1, 1})
+move(陈高天, {-5})
+move(孙西本, {-5})
+anim:move(陈高天, {5}, 2, {'bezier', 0, 1})
+anim:move(孙西本, {5}, 2, {1, 1})
 |>
 顺便说一句：：比如`bezier`可以做出更加夸张的加减速
 
 <|
-move(gaotian, {0})
-move(xiben, {-5})
-anim:move(gaotian, {5}, 2, {'shake', 20, 0.5})
-anim:move(xiben, {5}, 2, {1, 1})
+move(陈高天, {0})
+move(孙西本, {-5})
+anim:move(陈高天, {5}, 2, {'shake', 20, 0.5})
+anim:move(孙西本, {5}, 2, {1, 1})
 |>
 顺便说一句：：`shake`可以做出晃动，注意它最后不会停在`move`定义的目标位置，而是停在初始位置
 
 <|
-move(gaotian, pos_c)
-hide(xiben)
-anim:tint(gaotian, {0.5, 1, 0.5}, 2)
+move(陈高天, pos_c)
+hide(孙西本)
+anim:tint(陈高天, {0.5, 1, 0.5}, 2)
 |>
 `anim:tint`函数用来创建变色动画
 
 <|
-tint(gaotian, 1)
+tint(陈高天, 1)
 play(bgm, 'gaotian', 0)
 anim:volume(bgm, 0.5, 3)
 |>
@@ -101,15 +101,15 @@ anim:fade_out(bgm, 3)
 `anim:fade_out`函数则是淡出音乐
 
 <|
-anim:move(gaotian, pos_r):move(gaotian, pos_l)
+anim:move(陈高天, pos_r):move(陈高天, pos_l)
 |>
 在一段动画的后面继续用`move`等方法创建动画，就能把动画串联起来
 
 <|
-anim:move(gaotian, pos_r
-    ):_and():tint(gaotian, {0.5, 1, 0.5}
-    ):move(gaotian, pos_l
-    ):_and():tint(gaotian, 1)
+anim:move(陈高天, pos_r
+    ):_and():tint(陈高天, {0.5, 1, 0.5}
+    ):move(陈高天, pos_l
+    ):_and():tint(陈高天, 1)
 |>
 要让两段动画并行，可以用`_and()`函数
 
@@ -120,48 +120,48 @@ anim:move(gaotian, pos_r
 顺便说一句：：Lua不允许在冒号之前换行，所以用Lua写fluent interface的换行看起来很蛋疼。。
 
 <|
-show(xiben, 'normal', pos_r)
-local entry = anim:move(gaotian, pos_c)
-entry:move(gaotian, pos_l)
-entry:tint(gaotian, {0.5, 1, 0.5})
-entry:move(xiben, pos_c)
-entry:tint(xiben, {1, 0.5, 0.5})
+show(孙西本, 'normal', pos_r)
+local entry = anim:move(陈高天, pos_c)
+entry:move(陈高天, pos_l)
+entry:tint(陈高天, {0.5, 1, 0.5})
+entry:move(孙西本, pos_c)
+entry:tint(孙西本, {1, 0.5, 0.5})
 |>
 想要创建更复杂的树状结构，可以把一段动画的终点保存到一个局部变量里，再把这个变量作为多段动画的起点
 
 <|
-move(gaotian, pos_l)
-tint(gaotian, 1)
-hide(xiben)
-tint(xiben, 1)
-anim:move(gaotian, pos_r
+move(陈高天, pos_l)
+tint(陈高天, 1)
+hide(孙西本)
+tint(孙西本, 1)
+anim:move(陈高天, pos_r
     ):wait(1
-    ):move(gaotian, pos_l)
+    ):move(陈高天, pos_l)
 |>
 `anim:wait`函数用来延时，单位仍然是秒
 
 显示/隐藏角色、改变表情等操作是瞬间完成的，想要把它们放到动画里，就要用`anim:action`函数把它们转换成一段（时长为0的）动画
 
 <|
-anim:move(gaotian, pos_r
-    ):action(show, gaotian, 'cry'
-    ):move(gaotian, pos_l
-    ):action(hide, gaotian)
+anim:move(陈高天, pos_r
+    ):action(show, 陈高天, 'cry'
+    ):move(陈高天, pos_l
+    ):action(hide, 陈高天)
 |>
 `anim:action`的第一个参数是一个瞬间完成的函数，后面的参数则是那个函数的参数
 
 <|
-show(gaotian, 'normal', pos_l)
-anim:move(gaotian, pos_r
+show(陈高天, 'normal', pos_l)
+anim:move(陈高天, pos_r
     ):action(function()
-        show(gaotian, 'cry')
-        show(xiben, 'normal', pos_l)
+        show(陈高天, 'cry')
+        show(孙西本, 'normal', pos_l)
         sound('clap')
     end
-    ):move(gaotian, pos_l
+    ):move(陈高天, pos_l
     ):action(function()
-        show(gaotian, 'normal')
-        hide(xiben)
+        show(陈高天, 'normal')
+        hide(孙西本)
     end)
 |>
 也可以把`anim:action`的第一个参数设为一个匿名函数，里面可以写任何代码
@@ -169,7 +169,7 @@ anim:move(gaotian, pos_r
 顺便说一句：：虽然`action`里可以写任何代码，但是最好不要在`action`里创建新的动画，这个需求一般可以用动画的串行和并行来实现
 
 <|
-anim_hold:move(gaotian, pos_r, 10)
+anim_hold:move(陈高天, pos_r, 10)
 |>
 上面说的动画都是在一条对话之内的，如果想让动画跨越很多条对话，就要用`anim_hold`代替`anim`
 
@@ -185,15 +185,15 @@ anim_hold_end()
 持续动画结束之后要写`anim_hold_end()`
 
 <|
-show(gaotian, 'normal', pos_l)
-show(xiben, 'normal', pos_c)
+show(陈高天, 'normal', pos_l)
+show(孙西本, 'normal', pos_c)
 anim_hold:loop(function(entry)
-    return entry:move(gaotian, pos_c
-        ):move(gaotian, pos_l)
+    return entry:move(陈高天, pos_c
+        ):move(陈高天, pos_l)
 end)
 anim_hold:loop(function(entry)
-    return entry:move(xiben, pos_r, 1.414
-        ):move(xiben, pos_c, 1.414)
+    return entry:move(孙西本, pos_r, 1.414
+        ):move(孙西本, pos_c, 1.414)
 end)
 |>
 `anim_hold:loop`函数用来创建无限循环的动画
@@ -203,8 +203,8 @@ end)
 因为是无限循环，它只能作为持续动画，而不能作为对话内动画
 
 <|
-hide(gaotian)
-hide(xiben)
+hide(陈高天)
+hide(孙西本)
 anim_hold_end()
 |>
 教程5 动画 到此结束

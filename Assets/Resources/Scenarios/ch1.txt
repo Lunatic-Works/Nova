@@ -4,7 +4,7 @@ is_unlocked_start()
 |>
 <|
 anim:trans_fade(cam, function()
-        show(ergong, 'normal', pos_c)
+        show(王二宫, 'normal', pos_c)
         show(bg, 'room')
     end, 2)
 play(bgm, 'prelude')
@@ -24,14 +24,14 @@ set_auto_voice_delay(2)
 秋天的雨似乎让她心情不佳。
 
 <|
-hide(ergong)
+hide(王二宫)
 |>
 大家坐在学生会室之中，都选择了沉默。
 
 耳畔只能听见淅淅沥沥的雨声枯燥地重复着。
 
 <|
-show(qianye, 'normal', pos_c)
+show(张浅野, 'normal', pos_c)
 sound('flap', 0.5)
 |>
 浅野学长靠在椅背上，像是无聊似的耸了耸肩。
@@ -41,14 +41,14 @@ sound('flap', 0.5)
 他是个有着一头白发的消瘦青年，在学生会里担任书记。
 
 <|
-hide(qianye)
+hide(张浅野)
 |>
 老师和校工今天都不会来，或许整个学校只剩下我们几个学生会干事。
 
 想到这一点，我不禁叹了口气。
 
 <|
-show(xiben, 'normal', pos_c)
+show(孙西本, 'normal', pos_c)
 |>
 孙西本：：“没有人带伞么？”
 
@@ -61,14 +61,14 @@ show(xiben, 'normal', pos_c)
 不过她若是多笑笑，想必能迷倒不少男生。
 
 <|
-hide(xiben)
+hide(孙西本)
 |>
 我是真心这样觉得的。
 
 西本成为学生会干事的理由是成绩突出，这也是我能坐在这里的原因。
 
 <|
-show(gaotian, 'normal', pos_c)
+show(陈高天, 'normal', pos_c)
 anim:fade_out(bgs, 2)
 |>
 陈高天：：“大家来得太匆忙了呀！”
@@ -78,14 +78,14 @@ anim:fade_out(bgs, 2)
 陈高天：：“突然通知我们要来，连原因也不说明。我早上买的奶茶都忘记喝了。”
 
 <|
-show(ergong, 'normal', pos_l)
-anim:move(gaotian, pos_r)
+show(王二宫, 'normal', pos_l)
+anim:move(陈高天, pos_r)
 |>
 王二宫：：“我也不想这样啊，都是浅野说那个文件送到了嘛。”
 
 <|
-hide(gaotian)
-show(qianye, 'normal', pos_r)
+hide(陈高天)
+show(张浅野, 'normal', pos_r)
 |>
 张浅野：：“结果还是因为暴雨延期了，这不是我的错。”
 
@@ -104,8 +104,8 @@ show(qianye, 'normal', pos_r)
 不过看着他们一直吵来吵去，旁人或许会觉得他们关系很好。
 
 <|
-hide(ergong)
-hide(qianye)
+hide(王二宫)
+hide(张浅野)
 anim:fade_out(bgm)
 |>
 我木然地看着两个人的互动。
@@ -113,7 +113,7 @@ anim:fade_out(bgm)
 这是学生会日常的一部分。
 
 <|
-show(gaotian, 'normal', pos_c)
+show(陈高天, 'normal', pos_c)
 play(bgm, 'gaotian')
 |>
 这时，高天从书包的侧面抽出了便利店之中常见的包装瓶。
@@ -145,14 +145,14 @@ play(bgm, 'gaotian')
 或许是她的心境受到了秋雨的影响，故而提出了这样的请求。
 
 <|
-hide(gaotian)
+hide(陈高天)
 |>
 学生会所有的人都看着我，他们对高天的过去都略知一二。
 
 我不可能拒绝。
 
 <|
-show(gaotian, 'normal')
+show(陈高天, 'normal')
 |>
 李竹内：：“好的。”
 
@@ -171,7 +171,7 @@ show(gaotian, 'normal')
 陈高天：：“对像我这样毫无特点的笨女孩也很体贴……”
 
 <|
-show(gaotian, 'cry')
+show(陈高天, 'cry')
 |>
 陈高天：：“果然竹内君接受我的告白，只是因为同情我吧。”
 
@@ -180,21 +180,21 @@ show(gaotian, 'cry')
 高天还是一个十分爱哭的女孩。
 
 <|
-hide(gaotian)
+hide(陈高天)
 |>
 我的身体僵硬。因为我察觉到，西本和会长在用尖锐的眼神瞪着我。
 
 幸好，这时浅野转移了话题。
 
 <|
-show(qianye, 'normal', pos_c)
+show(张浅野, 'normal', pos_c)
 |>
 张浅野：：“啊，对了，储物室有一次性的杯子。奶茶要是凉了呀……还是慢点喝为好。”
 
 浅野一边说着，一边对我摇了摇小指。
 
 <|
-hide(qianye)
+hide(张浅野)
 |>
 我心领神会。
 
