@@ -67,7 +67,7 @@ def get_node_name(node):
     elif isinstance(node, astnodes.Call):
         return get_node_name(node.func)
     elif isinstance(node, astnodes.Invoke):
-        return f"{get_node_name(node.source)}:{get_node_name(node.func)}"
+        return get_node_name(node.func)
     elif isinstance(node, astnodes.Number):
         return f"{node.n}"
     elif isinstance(node, astnodes.String):
@@ -193,7 +193,7 @@ def normalize_dialogue(
                 return m.group(3)
 
         while True:
-            s_new = re.compile(r"<(.*?)(=.*?)?>(.*?)</\1>", re.DOTALL).sub(func, s)
+            s_new = re.compile(r"<([^=>]*)(=[^>]*)?>(.*?)</\1>", re.DOTALL).sub(func, s)
             if s_new == s:
                 break
             s = s_new
@@ -201,12 +201,14 @@ def normalize_dialogue(
     if remove_todo:
 
         def func(m):
-            if keep_todo and m.group(2) in keep_todo:
+            if keep_todo and m.group(1)[:-1] in keep_todo:
                 return m.group(0)
             else:
                 return ""
 
-        s = re.compile(r"\r?\n?（TODO：((.*?)：)?.*?）", re.DOTALL).sub(func, s)
+        s = re.compile(r"\r?\n?（TODO：([^：]*：)?([^（）]*（[^）]*）)*[^）]*）", re.DOTALL).sub(
+            func, s
+        )
 
     s = re.compile(" +").sub(" ", s)
 
