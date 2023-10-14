@@ -856,6 +856,7 @@ namespace Nova
                 }
 
                 newCheckpointOffset = nextCheckpoint;
+                checkpointDialogue = nextCheckpointDialogue;
             }
 
             // Debug.Log($"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
