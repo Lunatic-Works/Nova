@@ -24,7 +24,7 @@ namespace Nova.Editor
             var index = path.IndexOf(ResourcesFolderName, StringComparison.Ordinal);
             if (index == -1)
             {
-                throw new ArgumentException();
+                throw new ArgumentException($"Nova: Path {path} not in Resources folder {ResourcesFolderName}");
             }
 
             return path.Substring(0, index + ResourcesFolderName.Length);

@@ -276,9 +276,9 @@ namespace Nova.Editor
         {
             path = Utils.ConvertPathSeparator(path);
             var index = path.LastIndexOf(ResourcesFolderName, StringComparison.Ordinal);
-            if (index != -1)
+            if (index == -1)
             {
-                throw new ArgumentException();
+                throw new ArgumentException($"Nova: Path {path} not in Resources folder {ResourcesFolderName}");
             }
 
             var loadPath = path.Substring(index + ResourcesFolderName.Length);
