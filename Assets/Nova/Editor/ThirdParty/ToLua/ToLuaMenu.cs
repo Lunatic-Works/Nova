@@ -803,13 +803,11 @@ public static class ToLuaMenu
             list.Add(obj);
         }
 
-        BuildAssetBundleOptions options = BuildAssetBundleOptions.CollectDependencies | BuildAssetBundleOptions.CompleteAssets | BuildAssetBundleOptions.DeterministicAssetBundle;
-
         if (files.Length > 0)
         {
             string output = string.Format("{0}/{1}/" + bundleName, Application.streamingAssetsPath, GetOS());
             File.Delete(output);
-            BuildPipeline.BuildAssetBundle(null, list.ToArray(), output, options, EditorUserBuildSettings.activeBuildTarget);
+            BuildPipeline.BuildAssetBundle(null, list.ToArray(), output, BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
         }
 #else
         for (int i = 0; i < files.Length; i++)
@@ -1148,7 +1146,7 @@ public static class ToLuaMenu
 
         AssetDatabase.SaveAssets();
         string output = string.Format("{0}/{1}", Application.streamingAssetsPath, GetOS());
-        BuildPipeline.BuildAssetBundles(output, BuildAssetBundleOptions.DeterministicAssetBundle, EditorUserBuildSettings.activeBuildTarget);
+        BuildPipeline.BuildAssetBundles(output, BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
 
         //Directory.Delete(Application.dataPath + "/temp/", true);
 #else
@@ -1206,7 +1204,7 @@ public static class ToLuaMenu
 
         AssetDatabase.Refresh();
         string output = string.Format("{0}/{1}", Application.streamingAssetsPath, GetOS());
-        BuildPipeline.BuildAssetBundles(output, BuildAssetBundleOptions.DeterministicAssetBundle, EditorUserBuildSettings.activeBuildTarget);
+        BuildPipeline.BuildAssetBundles(output, BuildAssetBundleOptions.None, EditorUserBuildSettings.activeBuildTarget);
         Directory.Delete(Application.dataPath + "/temp/", true);
 #else
         for (int i = 0; i < dirs.Count; i++)
