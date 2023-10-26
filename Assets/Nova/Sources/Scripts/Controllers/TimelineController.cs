@@ -86,8 +86,7 @@ namespace Nova
 
         public override void Restore(IRestoreData restoreData)
         {
-            var baseData = restoreData as PrefabLoaderRestoreData;
-            base.Restore(baseData);
+            base.Restore(restoreData);
 
             var data = restoreData as TimelineControllerRestoreData;
             if (playableDirector != null)

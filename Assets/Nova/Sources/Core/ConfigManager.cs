@@ -219,7 +219,7 @@ namespace Nova
 
         public IEnumerable<string> GetAllTrackedKeys()
         {
-            return GetString(TrackedKeysKey).Split(new[] {','}, System.StringSplitOptions.RemoveEmptyEntries);
+            return GetString(TrackedKeysKey).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }
