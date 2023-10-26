@@ -168,6 +168,9 @@ public static class ToLuaExport
         "ParticleSystem.subEmitters", /*2019.09 iOS编译出错，也可能是Unity版本问题*/
         "Type.IsSZArray",
         //Unity 2022新增
+        "Type.IsCollectible",
+        "Type.MakeGenericSignatureType",
+        "GameObject.SetGameObjectsActive",
         "Transform.TransformDirections",
         "Transform.InverseTransformDirections",
         "Transform.TransformVectors",
