@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+// using LuaInterface;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -21,21 +23,32 @@ namespace Nova.Editor
             GetWindow(typeof(CharacterPoseComposer), false, "Character Pose Composer");
         }
 
-        private string imageFolder;
-        private bool uncropped;
+        private const string StandingsFolderPrefix = "Assets/Resources/";
+        private const string DefaultStandingsFolder = "Assets/Resources/Standings";
 
+        private string imageFolder = DefaultStandingsFolder;
+        private bool uncropped;
+        private string newImageFolder = DefaultStandingsFolder;
+        private bool newUncropped;
+        private int selectedCharacterIndex = -1;
+        private GameCharacterController selectedCharacter;
+        private string poseString;
+        // private int selectedPoseIndex = -1;
+        private string selectedPoseString;
         private readonly List<Layer> layers = new List<Layer>();
         private ReorderableList reorderableList;
-        private bool dirty;
+        private bool useCaptureBox;
+        private RectInt captureBox = new RectInt(0, 0, 400, 400);
+        private float previewScale = 2.0f;
 
         private GameObject root;
         private CompositeSpriteMerger merger;
         private Camera renderCamera;
-        private RenderTexture renderTexture;
-
-        private bool useCaptureBox;
-        private RectInt captureBox = new RectInt(0, 0, 400, 400);
-        private string captureDest;
+        private bool dirty;
+        private RenderTexture previewTexture;
+        private List<SpriteWithOffset> previewSprites;
+        private Rect previewBounds;
+        // private LuaState lua;
 
         private void OnEnable()
         {
@@ -48,6 +61,11 @@ namespace Nova.Editor
             reorderableList.onAddCallback += AddItem;
             reorderableList.onRemoveCallback += RemoveItem;
             reorderableList.onReorderCallback += ReorderItem;
+
+            // new LuaResLoader();
+            // lua = new LuaState();
+            // lua.Start();
+            // lua.AddSearchPath(Application.dataPath + "/Nova/Lua");
         }
 
         private void OnDisable()
@@ -59,10 +77,13 @@ namespace Nova.Editor
             reorderableList.onReorderCallback -= ReorderItem;
 
             DestroyImmediate(root);
-            if (renderTexture != null)
+            if (previewTexture != null)
             {
-                DestroyImmediate(renderTexture);
+                DestroyImmediate(previewTexture);
             }
+
+            // lua.Dispose();
+            // lua = null;
         }
 
         private static void DrawHeader(Rect rect)
@@ -81,56 +102,44 @@ namespace Nova.Editor
                 return;
             }
 
-            if (EditorGUI.DropdownButton(
-                    new Rect(rect.x + rect.width / 3, rect.y, rect.width * 2 / 3, rect.height),
-                    new GUIContent(item.name ?? "Sprite"),
-                    FocusType.Keyboard
-                ))
+            if (EditorGUI.DropdownButton(rect, new GUIContent(item.name ?? "Sprite"), FocusType.Keyboard))
             {
                 var menu = new GenericMenu();
-
                 foreach (var guid in guids)
                 {
                     var path = AssetDatabase.GUIDToAssetPath(guid);
                     var layerName = Path.GetFileNameWithoutExtension(path);
 
+                    SpriteWithOffset sprite;
                     if (uncropped)
                     {
                         // Use Sprite
-                        var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-                        if (sprite == null)
+                        var _sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                        if (_sprite == null)
                         {
                             continue;
                         }
 
-                        var so = CreateInstance<SpriteWithOffset>();
-                        so.sprite = sprite;
-                        so.offset = Vector3.zero;
-
-                        menu.AddItem(new GUIContent(layerName), false, () =>
-                        {
-                            item.name = layerName;
-                            item.sprite = so;
-                            dirty = true;
-                        });
+                        sprite = CreateInstance<SpriteWithOffset>();
+                        sprite.sprite = _sprite;
+                        sprite.offset = Vector3.zero;
                     }
                     else
                     {
                         // Use SpriteWithOffset
-                        var sprite =
-                            AssetDatabase.LoadAssetAtPath<SpriteWithOffset>(Path.ChangeExtension(path, "asset"));
+                        sprite = AssetDatabase.LoadAssetAtPath<SpriteWithOffset>(Path.ChangeExtension(path, "asset"));
                         if (sprite == null)
                         {
                             continue;
                         }
-
-                        menu.AddItem(new GUIContent(layerName), false, () =>
-                        {
-                            item.name = layerName;
-                            item.sprite = sprite;
-                            dirty = true;
-                        });
                     }
+
+                    menu.AddItem(new GUIContent(CreateSubMenu(layerName)), false, () =>
+                    {
+                        item.name = layerName;
+                        item.sprite = sprite;
+                        dirty = true;
+                    });
                 }
 
                 menu.ShowAsContext();
@@ -154,137 +163,244 @@ namespace Nova.Editor
             dirty = true;
         }
 
-        private static string LayersToLuaTable(IEnumerable<Layer> layers)
+        private bool RenderLayers(ref Rect previewRect, float scale)
         {
-            var luaTable = layers
-                .Where(p => !string.IsNullOrEmpty(p.name))
-                .Select(p => "'" + p.name + "'")
-                .Aggregate((r, s) => r + ", " + s);
-            luaTable = "{" + luaTable + "}";
-            return luaTable;
-        }
-
-        private void OnGUI()
-        {
-            imageFolder = EditorGUILayout.TextField("Character Image Folder", imageFolder);
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load Selected Folder"))
+            renderCamera.targetTexture = null;
+            if (previewSprites == null || dirty)
             {
-                imageFolder = EditorUtils.GetSelectedDirectory();
-                uncropped = imageFolder.ToLower().Contains("uncrop");
-                layers.Clear();
-                dirty = true;
+                previewSprites = layers.Where(p => !string.IsNullOrEmpty(p.name)).Select(p => p.sprite).ToList();
+                previewBounds = CompositeSpriteMerger.GetMergedSize(previewSprites);
+                poseString = CompositeSpriteController.ArrayToPose(layers.Select(x => x.name));
+                if (poseString != selectedPoseString)
+                {
+                    // selectedPoseIndex = -1;
+                }
             }
 
-            uncropped = GUILayout.Toggle(uncropped, "Uncropped");
-            GUILayout.EndHorizontal();
-
-            reorderableList.DoLayoutList();
-
-            if (GUILayout.Button("Refresh"))
+            if (previewSprites.Count == 0)
             {
+                return false;
+            }
+
+            previewRect.size =
+                Utils.GetContentSize(previewRect.size, previewBounds.width / previewBounds.height);
+            var previewWidth = Mathf.Max(1, (int)(previewRect.width * scale));
+            var previewHeight = Mathf.Max(1, (int)(previewRect.height * scale));
+
+            if (previewTexture == null || previewTexture.width != previewWidth ||
+                previewTexture.height != previewHeight)
+            {
+                if (previewTexture != null)
+                {
+                    DestroyImmediate(previewTexture);
+                }
+
+                previewTexture = new RenderTexture(previewWidth, previewHeight, 0, RenderTextureFormat.ARGB32);
                 dirty = true;
             }
 
             if (dirty)
             {
-                dirty = false;
-
-                renderCamera.targetTexture = null;
-                if (renderTexture != null)
-                {
-                    DestroyImmediate(renderTexture);
-                }
-
-                var sprites = layers.Where(p => !string.IsNullOrEmpty(p.name)).Select(p => p.sprite).ToList();
-                if (sprites.Count == 0)
-                {
-                    renderTexture = null;
-                }
-                else
-                {
-                    renderTexture = merger.RenderToTexture(sprites, renderCamera);
-                }
+                previewTexture.Clear();
+                merger.RenderToTexture(previewSprites, renderCamera, previewBounds, previewTexture);
             }
 
-            if (renderTexture == null)
+            return true;
+        }
+
+        private IEnumerable<Layer> PoseToLayers(string pose)
+        {
+            return CompositeSpriteController.PoseToArray(pose)
+                .Select(x => new Layer
+                {
+                    name = x,
+                    sprite = AssetDatabase.LoadAssetAtPath<SpriteWithOffset>(
+                        Path.ChangeExtension(Path.Combine(imageFolder, x), "asset"))
+                });
+        }
+
+        private void LoadPoseString()
+        {
+            layers.Clear();
+            layers.AddRange(PoseToLayers(poseString));
+            dirty = true;
+        }
+
+        // You may edit these according to your conventions
+        private static string[] SubMenus = {"eyebrow", "eye", "mouth"};
+
+        private string CreateSubMenu(string s)
+        {
+            foreach (var prefix in SubMenus)
             {
-                return;
+                s = Regex.Replace(s, $"^{prefix}_", $"{prefix}/");
             }
+
+            return s;
+        }
+
+        private void OnGUI()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(8);
+
+            // Begin left panel
+            GUILayout.BeginVertical(GUILayout.Width(360));
+            GUILayout.Space(8);
 
             GUILayout.BeginHorizontal();
-
-            GUILayout.BeginVertical();
-            GUILayout.BeginHorizontal();
-            var luaTable = LayersToLuaTable(layers);
-            GUILayout.Label("Pose Lua Table", EditorStyles.boldLabel);
-            if (GUILayout.Button("Copy"))
-            {
-                EditorGUIUtility.systemCopyBuffer = luaTable;
-            }
-
+            GUILayout.Label("Character Image Folder", EditorStyles.boldLabel);
+            GUILayout.FlexibleSpace();
+            newUncropped = GUILayout.Toggle(newUncropped, "Uncropped");
             GUILayout.EndHorizontal();
-            EditorGUILayout.SelectableLabel(luaTable);
-            GUILayout.EndVertical();
 
-            GUILayout.BeginVertical();
+            newImageFolder = EditorGUILayout.TextField(newImageFolder);
+
             GUILayout.BeginHorizontal();
-            var poseString = CompositeSpriteController.ArrayToPose(layers.Select(x => x.name));
+            var refreshFolder = false;
+            if (GUILayout.Button("Load Selected Folder", GUILayout.Width(180)))
+            {
+                newImageFolder = EditorUtils.GetSelectedDirectory();
+                newUncropped = imageFolder.ToLower().Contains("uncrop");
+                refreshFolder = true;
+            }
+
+            refreshFolder |= GUILayout.Button("Refresh Folder", GUILayout.Width(180));
+            GUILayout.EndHorizontal();
+
+            var characters = GameObject.FindGameObjectsWithTag("Character")
+                .Select(go => go.GetComponent<GameCharacterController>())
+                .Where(x => x != null).ToList();
+            var menus = characters.Select(x => x.luaGlobalName).ToArray();
+            var oldSelectedCharacterIndex = selectedCharacterIndex;
+
+            selectedCharacterIndex = EditorGUILayout.Popup("Select Character", selectedCharacterIndex, menus);
+            selectedCharacter = characters.Any() && selectedCharacterIndex >= 0
+                ? characters[selectedCharacterIndex]
+                : null;
+
+            if (selectedCharacter != null && selectedCharacterIndex != oldSelectedCharacterIndex)
+            {
+                newImageFolder = StandingsFolderPrefix + selectedCharacter.imageFolder;
+                newUncropped = false;
+                refreshFolder = true;
+            }
+
+            if (refreshFolder)
+            {
+                imageFolder = newImageFolder;
+                uncropped = newUncropped;
+                if (selectedCharacter != null && imageFolder != StandingsFolderPrefix + selectedCharacter.imageFolder)
+                {
+                    selectedCharacter = null;
+                    selectedCharacterIndex = -1;
+                }
+
+                layers.Clear();
+                // selectedPoseIndex = -1;
+                dirty = true;
+            }
+
+            // if (selectedCharacter != null)
+            // {
+            //     var characterName = selectedCharacter.luaGlobalName;
+            //     lua.Require("pose");
+            //     var poses = lua.GetFunction("get_all_poses_by_name")
+            //         .Invoke<string, LuaTable>(characterName)
+            //         .ToArrayTable()
+            //         .Cast<string>()
+            //         .ToList();
+            //     var oldSelectedPose = selectedPoseIndex;
+            //
+            //     selectedPoseIndex = EditorGUILayout.Popup("Select Pose", selectedPoseIndex,
+            //         poses.Select(CreateSubMenu).ToArray());
+            //
+            //     if (poses.Any() && selectedPoseIndex >= 0 && selectedPoseIndex != oldSelectedPose)
+            //     {
+            //         selectedPoseString = lua.GetFunction("get_pose_by_name")
+            //             .Invoke<string, string, string>(characterName, poses[selectedPoseIndex]);
+            //         if (poseString != selectedPoseString)
+            //         {
+            //             poseString = selectedPoseString;
+            //             LoadPoseString();
+            //         }
+            //     }
+            // }
+
+            GUILayout.Space(20);
+
+            reorderableList.DoLayoutList();
+
+            GUILayout.Space(20);
+
+            GUILayout.BeginHorizontal();
             GUILayout.Label("Pose String", EditorStyles.boldLabel);
-            if (GUILayout.Button("Copy"))
+            if (GUILayout.Button("Copy", GUILayout.Width(120)))
             {
                 EditorGUIUtility.systemCopyBuffer = poseString;
             }
 
             GUILayout.EndHorizontal();
-            EditorGUILayout.SelectableLabel(poseString);
-            GUILayout.EndVertical();
+
+            poseString = EditorGUILayout.TextField(poseString);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Load Pose String", GUILayout.Width(180)))
+            {
+                LoadPoseString();
+            }
+
+            if (GUILayout.Button("Refresh Preview", GUILayout.Width(180)))
+            {
+                dirty = true;
+            }
 
             GUILayout.EndHorizontal();
 
-            GUILayout.Label("Preview", EditorStyles.boldLabel);
+            GUILayout.Space(20);
 
+            previewScale = EditorGUILayout.FloatField("Preview Scale", previewScale);
             useCaptureBox = GUILayout.Toggle(useCaptureBox, "Use Capture Box");
             if (useCaptureBox)
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Capture Box");
                 captureBox = EditorGUILayout.RectIntField(captureBox);
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                captureDest = EditorGUILayout.TextField("Capture Destination", captureDest);
-
-                if (GUILayout.Button("Capture"))
-                {
-                    Texture2D tex = new Texture2D(captureBox.width, captureBox.height, TextureFormat.ARGB32, false);
-                    RenderTexture.active = renderTexture;
-                    tex.ReadPixels(new Rect(captureBox.x, captureBox.y, captureBox.width, captureBox.height), 0, 0);
-                    RenderTexture.active = null;
-                    tex.Apply();
-
-                    var absoluteCaptureDest = Path.Combine(Path.GetDirectoryName(Application.dataPath), captureDest);
-                    Directory.CreateDirectory(Path.GetDirectoryName(absoluteCaptureDest));
-                    File.WriteAllBytes(absoluteCaptureDest, tex.EncodeToPNG());
-                    Utils.DestroyObject(tex);
-                    EditorUtility.DisplayDialog("Capture Finished", $"Saved at {absoluteCaptureDest}", "OK");
-                }
-
-                GUILayout.EndHorizontal();
             }
+
+            GUILayout.EndVertical();
+            // End left panel
+
+            if (dirty)
+            {
+                GUI.FocusControl(null);
+            }
+
+            GUILayout.Space(20);
+
+            // Begin right panel
+            GUILayout.BeginVertical();
+
+            GUILayout.Space(8);
+
+            GUILayout.Label("Preview", EditorStyles.boldLabel);
 
             var previewRect =
                 EditorGUILayout.GetControlRect(false, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            previewRect.size =
-                Utils.GetContentSize(previewRect.size, (float)renderTexture.width / renderTexture.height);
-            var scale = previewRect.width / renderTexture.width;
-            EditorGUI.DrawTextureTransparent(previewRect, renderTexture);
-
-            if (useCaptureBox)
+            var shouldDraw = RenderLayers(ref previewRect, previewScale);
+            dirty = false;
+            if (shouldDraw)
             {
-                EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, false, Color.red);
+                EditorGUI.DrawTextureTransparent(previewRect, previewTexture);
+                if (useCaptureBox)
+                {
+                    var scale = previewRect.width / (previewBounds.width * previewSprites[0].sprite.pixelsPerUnit);
+                    EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, false, Color.red);
+                }
             }
+
+            GUILayout.EndVertical();
+            // End right panel
+
+            GUILayout.EndHorizontal();
         }
     }
 }
