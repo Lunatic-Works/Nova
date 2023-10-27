@@ -82,8 +82,7 @@
     "ButtonRingSize": {
         "min": 100,
         "defaultValue": 200,
-        "max": 300,
-        "whole": true
+        "max": 300
     },
     "DialogueOpacity": {
         "min": 0.1,
