@@ -1,0 +1,17 @@
+@<|
+label 'test_input'
+is_debug()
+|>
+<|
+show(bg, 'room')
+set_box()
+|>
+测试输入框
+
+[stage = before_checkpoint]<|
+minigame(__Nova.uiPrefabLoader, 'InputField')
+|>
+111
+
+刚才输入的v_input_tmp是{{v_input_tmp}}
+@<| is_end() |>

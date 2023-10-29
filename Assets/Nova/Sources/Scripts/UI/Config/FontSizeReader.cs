@@ -43,9 +43,9 @@ namespace Nova
         private void UpdateValue()
         {
             float fontSize = configManager.GetFloat(configKeyName);
-            if (multipliers.ContainsKey(I18n.CurrentLocale))
+            if (multipliers.TryGetValue(I18n.CurrentLocale, out var multiplier))
             {
-                fontSize *= multipliers[I18n.CurrentLocale];
+                fontSize *= multiplier;
             }
 
             if (textProxy != null)

@@ -75,15 +75,15 @@ namespace Nova
         {
             public readonly string currentVideoName;
 
-            public VideoControllerRestoreData(string currentVideoName)
+            public VideoControllerRestoreData(VideoController parent)
             {
-                this.currentVideoName = currentVideoName;
+                currentVideoName = parent.currentVideoName;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new VideoControllerRestoreData(currentVideoName);
+            return new VideoControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

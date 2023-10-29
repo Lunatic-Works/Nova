@@ -140,7 +140,7 @@ Shader "Nova/VFX Screen/Rain"
                 col = lerp(col2, col, saturate(c.x + c.y)) * i.color;
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

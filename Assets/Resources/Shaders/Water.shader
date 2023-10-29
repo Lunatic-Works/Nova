@@ -13,7 +13,7 @@ Shader "Nova/VFX/Water"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -85,6 +85,8 @@ Shader "Nova/VFX/Water"
             {
                 float2 uvDelta = _Distort * waterNormal(i.uvEffect);
                 float4 col = tex2D(_MainTex, i.uv + uvDelta) * i.color;
+
+                col.rgb *= col.a;
 
                 return col;
             }

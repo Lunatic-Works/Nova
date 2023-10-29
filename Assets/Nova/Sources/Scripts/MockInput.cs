@@ -22,11 +22,11 @@ namespace Nova
         private GameState gameState;
         private CheckpointManager checkpointManager;
         private ViewManager viewManager;
-        private DialogueBoxController dialogueBox;
+        private GameViewController gameView;
         private SaveViewController saveView;
         private LogController logView;
         private ConfigViewController configView;
-        private BranchController branchController;
+        private ChoicesController choicesController;
         private HelpViewController helpView;
         private ChapterSelectViewController chapterSelectView;
         private AlertController alert;
@@ -39,11 +39,11 @@ namespace Nova
             gameState = controller.GameState;
             checkpointManager = controller.CheckpointManager;
             viewManager = Utils.FindViewManager();
-            dialogueBox = viewManager.GetController<DialogueBoxController>();
+            gameView = viewManager.GetController<GameViewController>();
             saveView = viewManager.GetController<SaveViewController>();
             logView = viewManager.GetController<LogController>();
             configView = viewManager.GetController<ConfigViewController>();
-            branchController = viewManager.GetComponentInChildren<BranchController>(true);
+            choicesController = viewManager.GetComponentInChildren<ChoicesController>(true);
             helpView = viewManager.GetController<HelpViewController>();
             chapterSelectView = viewManager.GetController<ChapterSelectViewController>();
             alert = viewManager.GetController<AlertController>();
@@ -80,12 +80,12 @@ namespace Nova
             return new WaitWhile(() => inTransition);
         }
 
-        private static WaitWhile Show(ViewControllerBase view)
+        private static WaitWhile Show(IViewController view)
         {
             return DoTransition(view.Show);
         }
 
-        private static WaitWhile Hide(ViewControllerBase view)
+        private static WaitWhile Hide(IViewController view)
         {
             return DoTransition(view.Hide);
         }
@@ -122,7 +122,7 @@ namespace Nova
             }
 
             yield return WaitForView(CurrentViewType.UI);
-            if (helpView.myPanel.activeSelf)
+            if (helpView.active)
             {
                 yield return Hide(helpView);
             }
@@ -251,9 +251,9 @@ namespace Nova
                 if (!gameState.canStepForward)
                 {
                     // TODO: Handle minigames
-                    yield return new WaitUntil(() => branchController.activeSelectionCount > 0);
-                    // TODO: Only select from interactable selections
-                    branchController.Select(random.Next(branchController.activeSelectionCount));
+                    yield return new WaitUntil(() => choicesController.activeChoiceCount > 0);
+                    // TODO: Only select from interactable choices
+                    choicesController.Select(random.Next(choicesController.activeChoiceCount));
                     steps--;
                 }
                 else if (!NovaAnimation.IsPlayingAny(AnimationType.PerDialogue | AnimationType.Text))
@@ -278,7 +278,7 @@ namespace Nova
                     }
                     else
                     {
-                        dialogueBox.NextPageOrStep();
+                        gameView.Step();
                     }
 
                     steps--;

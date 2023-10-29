@@ -56,7 +56,8 @@ namespace Nova
         private CheckpointManager checkpointManager;
         private ConfigManager configManager;
 
-        private LoopScrollRect scrollRect;
+        private LoopVerticalScrollRectWithSwitch scrollRect;
+        private VerticalLayoutGroup scrollLayout;
 
         private LogEntryController logEntryForTest;
         private TMP_Text contentForTest;
@@ -74,10 +75,11 @@ namespace Nova
             checkpointManager = controller.CheckpointManager;
             configManager = controller.ConfigManager;
 
-            scrollRect = myPanel.GetComponentInChildren<LoopScrollRect>();
+            scrollRect = myPanel.GetComponentInChildren<LoopVerticalScrollRectWithSwitch>();
             scrollRect.prefabSource = this;
             scrollRect.dataSource = this;
             scrollRect.sizeHelper = this;
+            scrollLayout = scrollRect.GetComponentInChildren<VerticalLayoutGroup>();
 
             myPanel.GetComponent<Button>().onClick.AddListener(Hide);
             closeButton.onClick.AddListener(Hide);
@@ -195,7 +197,13 @@ namespace Nova
         {
             if (itemsCount <= 0) return new Vector2(0, 0);
             itemsCount = Mathf.Min(itemsCount, logEntries.Count);
-            return new Vector2(0, logEntries[itemsCount - 1].prefixHeight);
+            var height = logEntries[itemsCount - 1].prefixHeight;
+            if (itemsCount == logEntries.Count)
+            {
+                height += scrollLayout.padding.top + scrollLayout.padding.bottom;
+            }
+
+            return new Vector2(0, height);
         }
 
         private readonly Stack<Transform> pool = new Stack<Transform>();
@@ -245,7 +253,7 @@ namespace Nova
         {
             var nodeRecord = checkpointManager.GetNodeRecord(logEntry.nodeOffset);
             gameState.MoveBackTo(nodeRecord, logEntry.checkpointOffset, logEntry.dialogueData.dialogueIndex);
-            Hide(onFinish);
+            this.Hide(onFinish);
         }
 
         private int selectedLogEntryIndex = -1;
@@ -269,7 +277,7 @@ namespace Nova
             }
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             if (configManager.GetInt(LogViewFirstShownKey) == 0)
             {
@@ -277,19 +285,25 @@ namespace Nova
                 configManager.SetInt(LogViewFirstShownKey, 1);
             }
 
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
 
             scrollRect.RefillCellsFromEnd();
             scrollRect.verticalNormalizedPosition = 1f;
             selectedLogEntryIndex = -1;
+
+            // Disable scrolling when just showed
+            scrollRect.scrollable = false;
         }
 
-        private const float MaxScrollDownIdleTime = 0.2f;
-        private float scrollDownIdleTime;
+        private const float MaxScrollIdleTime = 0.2f;
+        private float scrollIdleTime;
+        private float lastScrollPosition;
 
         protected override void OnActivatedUpdate()
         {
             base.OnActivatedUpdate();
+
+            scrollRect.verticalNormalizedPosition = Mathf.Clamp01(scrollRect.verticalNormalizedPosition);
 
             var delta = Mouse.current?.scroll.ReadValue().y ?? 0f;
             if (delta < -1e-3f)
@@ -306,34 +320,48 @@ namespace Nova
                 // Otherwise, the first scrolling down stops when reaches the bottom,
                 // and the second scrolling down hides log view
                 // verticalNormalizedPosition can be > 1
-                if (scrollDownIdleTime > MaxScrollDownIdleTime && scrollRect.verticalNormalizedPosition > 1f - 1e-3f)
+                if (scrollIdleTime > MaxScrollIdleTime && lastScrollPosition > 1f - 1e-3f)
                 {
                     Hide();
                     return;
                 }
 
-                scrollDownIdleTime = 0f;
+                scrollIdleTime = 0f;
             }
             else if (delta > 1e-3f)
             {
-                scrollDownIdleTime = 0f;
+                scrollIdleTime = 0f;
             }
             else
             {
-                scrollDownIdleTime += Time.unscaledDeltaTime;
+                scrollIdleTime += Time.unscaledDeltaTime;
             }
 
-            // TODO: fully support keyboard navigation
-            if (Keyboard.current?[Key.UpArrow].isPressed == true)
+            if (scrollIdleTime > MaxScrollIdleTime)
             {
-                Cursor.visible = false;
-                scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.down;
+                lastScrollPosition = scrollRect.verticalNormalizedPosition;
             }
 
-            if (Keyboard.current?[Key.DownArrow].isPressed == true)
+            // Enable scrolling after MaxScrollIdleTime
+            if (!scrollRect.scrollable && scrollIdleTime > MaxScrollIdleTime)
             {
-                Cursor.visible = false;
-                scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.up;
+                scrollRect.scrollable = true;
+            }
+
+            if (scrollRect.scrollable)
+            {
+                // TODO: fully support keyboard navigation
+                if (Keyboard.current?[Key.UpArrow].isPressed == true)
+                {
+                    Cursor.visible = false;
+                    scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.down;
+                }
+
+                if (Keyboard.current?[Key.DownArrow].isPressed == true)
+                {
+                    Cursor.visible = false;
+                    scrollRect.velocity += scrollRect.scrollSensitivity * Vector2.up;
+                }
             }
         }
 
@@ -346,15 +374,15 @@ namespace Nova
         {
             public readonly List<LogEntryRestoreData> logEntriesRestoreData;
 
-            public LogControllerRestoreData(List<LogEntryRestoreData> logEntriesRestoreData)
+            public LogControllerRestoreData(LogController parent)
             {
-                this.logEntriesRestoreData = logEntriesRestoreData;
+                logEntriesRestoreData = parent.logEntriesRestoreData;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new LogControllerRestoreData(logEntriesRestoreData);
+            return new LogControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

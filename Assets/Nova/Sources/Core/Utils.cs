@@ -106,7 +106,7 @@ namespace Nova
 
         public static string Dump<T>(this IEnumerable<T> list)
         {
-            return "[ " + String.Join(", ", list.Select(x => x.ToString())) + " ]";
+            return "[ " + string.Join(", ", list.Select(x => x.ToString())) + " ]";
         }
 
         public static Rect ToRect(this RectInt rectInt)
@@ -140,58 +140,52 @@ namespace Nova
             }
         }
 
+        private static GameObject FindSingletonWithTag(string tag, string hint = "")
+        {
+            var gos = GameObject.FindGameObjectsWithTag(tag);
+            if (gos.Length == 0)
+            {
+                throw new InvalidAccessException($"Nova: Cannot find game object with tag {tag}. {hint}");
+            }
+
+            if (gos.Length > 1)
+            {
+                throw new InvalidAccessException(
+                    $"Nova: Found multiple game objects with tag {tag}:\n" + string.Join("\n", gos.Select(GetPath)));
+            }
+
+            return gos[0];
+        }
+
+        private static T FindSingletonComponentWithTag<T>(string tag, string hint = "")
+        {
+            var go = FindSingletonWithTag(tag, hint);
+            if (!go.TryGetComponent<T>(out var component))
+            {
+                throw new InvalidAccessException($"Nova: No {typeof(T)} component in {tag} game object.");
+            }
+
+            return component;
+        }
+
         /// <remarks>
         /// This is usually called in Awake or Start
         /// Do not call this when the game is quitting, because NovaController may be already destroyed
         /// </remarks>
         public static NovaController FindNovaController()
         {
-            var go = GameObject.FindWithTag("NovaController");
-            if (go == null)
-            {
-                throw new InvalidAccessException(
-                    "Nova: Cannot find NovaController game object by tag. " +
-                    "Maybe you should put NovaCreator prefab in your scene.");
-            }
-
-            if (!go.TryGetComponent<NovaController>(out var controller))
-            {
-                throw new InvalidAccessException("Nova: No NovaController component in NovaController game object.");
-            }
-
-            return controller;
+            return FindSingletonComponentWithTag<NovaController>("NovaController",
+                "Maybe you should put NovaCreator prefab in your scene.");
         }
 
         public static RenderManager FindRenderManager()
         {
-            var go = GameObject.FindGameObjectWithTag("RenderManager");
-            if (go == null)
-            {
-                throw new InvalidAccessException("Nova: Cannot find RenderManager game object by tag.");
-            }
-
-            if (!go.TryGetComponent<RenderManager>(out var renderManager))
-            {
-                throw new InvalidAccessException("Nova: No RenderManager component in RenderManager game object.");
-            }
-
-            return renderManager;
+            return FindSingletonComponentWithTag<RenderManager>("RenderManager");
         }
 
         public static ViewManager FindViewManager()
         {
-            var go = GameObject.FindWithTag("UIRoot");
-            if (go == null)
-            {
-                throw new InvalidAccessException("Nova: Cannot find UI root game object by tag.");
-            }
-
-            if (!go.TryGetComponent<ViewManager>(out var viewManager))
-            {
-                throw new InvalidAccessException("Nova: No ViewManager component in UI root game object.");
-            }
-
-            return viewManager;
+            return FindSingletonComponentWithTag<ViewManager>("UIRoot");
         }
 
         public static Vector3 WorldToCanvasPosition(this Canvas canvas, Vector3 worldPosition, Camera camera = null)
@@ -284,7 +278,7 @@ namespace Nova
         public static float InverseSlerp(Quaternion a, Quaternion b, Quaternion value)
         {
             float angle = Quaternion.Angle(a, b);
-            return angle < float.Epsilon ? 0.0f : Quaternion.Angle(a, value) / angle;
+            return angle < 1e-6f ? 0.0f : Quaternion.Angle(a, value) / angle;
         }
 
         public static Color SetAlpha(Color color, float a)
@@ -299,12 +293,12 @@ namespace Nova
             return color;
         }
 
-        public static void SaveAll()
+        public static void FlushAll()
         {
             var controller = FindNovaController();
             controller.CheckpointManager.UpdateGlobalSave();
-            controller.ConfigManager.Apply();
-            controller.InputManager.Save();
+            controller.ConfigManager.Flush();
+            controller.InputManager.Flush();
         }
 
         public static void QuitWithAlert()
@@ -319,7 +313,7 @@ namespace Nova
             NovaAnimation.StopAll();
 
 #if UNITY_EDITOR
-            SaveAll();
+            FlushAll();
             UnityEditor.EditorApplication.isPlaying = false;
 #else
             ForceQuit = true;
@@ -358,7 +352,7 @@ namespace Nova
 
         public static int ConvertSamples(AudioClip source, AudioClip target)
         {
-            return Mathf.RoundToInt(1.0f * target.frequency / source.frequency * source.samples);
+            return Mathf.RoundToInt((float)target.frequency / source.frequency * source.samples);
         }
 
         // Avoid mutating the enumerable in the loop
@@ -371,6 +365,11 @@ namespace Nova
         {
             var parent = current.parent;
             return (parent == null ? "" : GetPath(parent) + "/") + current.name;
+        }
+
+        public static string GetPath(GameObject go)
+        {
+            return GetPath(go.transform);
         }
 
         public static string GetPath(Component component)

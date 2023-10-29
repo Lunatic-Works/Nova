@@ -4,7 +4,7 @@ Shader "Nova/VFX Screen/Blink"
 {
     Properties
     {
-        _MainTex ("Main Texture", 2D) = "white" {}
+        [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
         _T ("Time", Range(0.0, 1.0)) = 0.0
         _Mul ("Multiplier", Float) = 1.0
         _Offset ("Offset", Float) = 0.0
@@ -61,7 +61,7 @@ Shader "Nova/VFX Screen/Blink"
                 col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

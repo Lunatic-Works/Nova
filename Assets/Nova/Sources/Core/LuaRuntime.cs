@@ -189,7 +189,7 @@ namespace Nova
                     else
                     {
                         Debug.LogError("Nova: [Singleton] There should never be more than one instance of " +
-                            $"{typeof(LuaRuntime)}! Reopening the scene might fix it.");
+                                       $"{typeof(LuaRuntime)}! Reopening the scene might fix it.");
                         _instance = instances[0];
                     }
 

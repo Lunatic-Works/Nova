@@ -1,0 +1,47 @@
+@<|
+label 'test_force_step'
+is_debug()
+|>
+<|
+show(bg, 'room')
+set_box()
+|>
+测试直接进入下一句对话
+
+<|
+show(fg, 'moon_halo', {0, 0, 0.5})
+anim:wait(2):action(function()
+        hide(fg)
+        force_step()
+    end)
+|>
+2秒后会直接进入下一句对话
+
+111
+
+<|
+show(fg, 'moon_halo')
+anim:wait(0.1):action(function()
+        hide(fg)
+        force_step()
+    end)
+|>
+0.1秒后会直接进入下一句对话，文本动画即使没有播放完也会终止
+
+222
+
+<|
+show(fg, 'moon_halo')
+__Nova.gameViewInput.scriptCanAbortAnimation = false
+anim:wait(2):action(function()
+        hide(fg)
+        __Nova.gameViewInput.scriptCanAbortAnimation = true
+        force_step()
+    end)
+|>
+2秒后会直接进入下一句对话，即使在设置界面里选中了点击终止动画也不能跳过
+
+333
+
+测试结束
+@<| is_end() |>

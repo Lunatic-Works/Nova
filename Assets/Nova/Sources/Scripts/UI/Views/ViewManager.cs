@@ -10,7 +10,6 @@ namespace Nova
     {
         UI,
         Game,
-        DialogueHidden,
         InTransition,
         Alert
     }
@@ -64,38 +63,34 @@ namespace Nova
             }
         }
 
-        private readonly Dictionary<Type, ViewControllerBase> controllers = new Dictionary<Type, ViewControllerBase>();
+        private readonly Dictionary<Type, IViewController> controllers = new Dictionary<Type, IViewController>();
         private readonly Type[] overlayViewControllers = {typeof(NotificationController)};
-
-        public GameObject dialoguePanel => GetController<DialogueBoxController>().myPanel;
-        public GameObject titlePanel => GetController<TitleController>().myPanel;
-        public GameObject alertPanel => GetController<AlertController>().myPanel;
 
         private void Awake()
         {
             currentView = CurrentViewType.UI;
             novaController = Utils.FindNovaController();
-            uiAnimation = novaController.transform.Find("NovaAnimation/UI").GetComponent<NovaAnimation>();
+            uiAnimation = novaController.UIAnimation;
             screenCapturer = GetComponent<ScreenCapturer>();
             this.RuntimeAssert(screenCapturer != null, "Missing ScreenCapturer.");
         }
 
-        public void SetController(ViewControllerBase controller)
+        public void SetController(IViewController controller)
         {
             controllers[controller.GetType()] = controller;
         }
 
-        public void UnsetController(ViewControllerBase controller)
+        public void UnsetController(IViewController controller)
         {
             controllers.Remove(controller.GetType());
         }
 
-        public T GetController<T>() where T : ViewControllerBase
+        public T GetController<T>() where T : class, IViewController
         {
             var t = typeof(T);
-            if (controllers.ContainsKey(t))
+            if (controllers.TryGetValue(t, out var value))
             {
-                return controllers[t] as T;
+                return value as T;
             }
 
             var controller = GetComponentInChildren<T>();
@@ -147,10 +142,12 @@ namespace Nova
         }
 
         public void SwitchView<FromController, TargetController>(Action onFinish = null)
-            where FromController : ViewControllerBase
-            where TargetController : ViewControllerBase
+            where FromController : class, IViewController
+            where TargetController : class, IViewController
         {
-            GetController<FromController>().SwitchView<TargetController>(onFinish);
+            var from = GetController<FromController>();
+            var target = GetController<TargetController>();
+            from.Hide(() => target.Show(onFinish));
         }
 
         public void StopAllAnimations()
@@ -168,29 +165,18 @@ namespace Nova
                 return CurrentViewType.InTransition;
             }
 
-            if (alertPanel.activeSelf)
+            if (GetController<AlertController>().active)
             {
                 return CurrentViewType.Alert;
             }
 
-            var activeNonGameControllerCount = controllers.Values.Count(c =>
+            var hasUI = controllers.Values.Any(c =>
                 overlayViewControllers.All(t => !t.IsInstanceOfType(c)) &&
-                !(c is DialogueBoxController) &&
-                c.myPanel.activeSelf
+                !(c is GameViewController) &&
+                c.active
             );
-            if (activeNonGameControllerCount == 0)
-            {
-                if (dialoguePanel.activeSelf)
-                {
-                    return CurrentViewType.Game;
-                }
-                else
-                {
-                    return CurrentViewType.DialogueHidden;
-                }
-            }
 
-            return CurrentViewType.UI;
+            return hasUI ? CurrentViewType.UI : CurrentViewType.Game;
         }
 
         public void TryPlaySound(AudioClip clip)
@@ -213,12 +199,52 @@ namespace Nova
 
     public static class ViewHelper
     {
-        public static void SwitchView<TargetController>(this ViewControllerBase controller, Action onFinish = null)
-            where TargetController : ViewControllerBase
+        public static void SwitchView<TargetController>(this IViewController controller, Action onFinish = null)
+            where TargetController : class, IViewController
         {
             controller.Hide(() =>
                 controller.viewManager.GetController<TargetController>().Show(onFinish)
             );
+        }
+
+        public static void Hide(this IPanelController panel, Action onFinish)
+        {
+            panel.Hide(true, onFinish);
+        }
+
+        public static void Show(this IPanelController panel, Action onFinish)
+        {
+            panel.Show(true, onFinish);
+        }
+
+        public static void Hide(this IPanelController panel)
+        {
+            panel.Hide(true, null);
+        }
+
+        public static void Show(this IPanelController panel)
+        {
+            panel.Show(true, null);
+        }
+
+        public static void ShowImmediate(this IPanelController panel, Action onFinish)
+        {
+            panel.Show(false, onFinish);
+        }
+
+        public static void HideImmediate(this IPanelController panel, Action onFinish)
+        {
+            panel.Hide(false, onFinish);
+        }
+
+        public static void ShowImmediate(this IPanelController panel)
+        {
+            panel.Show(false, null);
+        }
+
+        public static void HideImmediate(this IPanelController panel)
+        {
+            panel.Hide(false, null);
         }
     }
 }

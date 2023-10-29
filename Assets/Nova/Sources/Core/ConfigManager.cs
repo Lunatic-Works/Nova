@@ -39,10 +39,10 @@ namespace Nova
 
         private void OnDestroy()
         {
-            Apply();
+            Flush();
         }
 
-        public void Apply()
+        public void Flush()
         {
             foreach (var entry in tmpStrCache)
             {
@@ -219,7 +219,7 @@ namespace Nova
 
         public IEnumerable<string> GetAllTrackedKeys()
         {
-            return GetString(TrackedKeysKey).Split(new[] {','}, System.StringSplitOptions.RemoveEmptyEntries);
+            return GetString(TrackedKeysKey).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

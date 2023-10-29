@@ -30,22 +30,26 @@ namespace Nova
         {
             materialPool = gameObject.Ensure<MaterialPool>();
             fadeMaterial = materialPool.Get(fadeShader);
-            materialPool.defaultMaterial = fadeMaterial;
             novaAnimation = Utils.FindNovaController().PerDialogueAnimation;
         }
 
-        protected void DoFadeAnimation(float delay)
+        protected void DoFadeAnimation(float duration)
         {
             fadeMaterial.SetColor(SubColorID, fadeMaterial.GetColor(ColorID));
-            if (delay < EPS)
+            if (duration < EPS)
             {
                 fadeMaterial.SetFloat(TimeID, 0.0f);
             }
             else
             {
                 fadeMaterial.SetFloat(TimeID, 1.0f);
-                novaAnimation.Do(new MaterialFloatAnimationProperty(fadeMaterial, TIME, 0.0f), fadeDuration);
+                novaAnimation.Do(new MaterialFloatAnimationProperty(fadeMaterial, TIME, 0.0f), duration);
             }
+        }
+
+        protected void DoFadeAnimation()
+        {
+            DoFadeAnimation(fadeDuration);
         }
     }
 }

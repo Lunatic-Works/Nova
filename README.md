@@ -9,7 +9,9 @@
 1. `git clone`，为了节约时间可以加上`--filter=blob:none`
 2. 将`ProjectSettings/ProjectVersion.txt`中的Unity版本号改为你的版本号
 3. 在Unity Editor中打开`Assets/Scenes/Main.unity`，运行游戏，把示例作品《Colorless》看一遍
-4. 把游戏中的教程看一遍，同时可以试着改一改脚本，脚本是`Assets/Resources/Scenarios/`文件夹下的`tut01.txt`等文件
+4. 把游戏中的教程看一遍
+    * 同时可以试着改一改脚本，脚本是`Assets/Resources/Scenarios/`文件夹下的`tut01.txt`等文件
+    * 在章节选择界面按Ctrl可以看到更多测试用的脚本
 5. 如果你想修改Colorless的脚本，需要先删除英文版的脚本，否则中文与英文的脚本会对不上
     * `Assets/Resources/LocalizedResources/English/Scenarios/`文件夹下是英文版的脚本，可以全部删除
     * `Assets/Resources/LocalizedResourcePaths.txt`用来记录英文版用到的文件，可以删除
@@ -34,13 +36,14 @@
 
 * **Unity已死，Godot万岁！**
 
-    我们打算在手头上的一部长篇作品做完之后迁移到Godot，也许会在2024年开始。
+    我们打算迁移到Godot，但是要先等Godot对手机的支持更加完善。
 
 ## 版本说明
 
-* v0.1：兼容《青箱》v1.1.0的版本
-* v0.2：兼容Unity 2019的版本，重要的新功能包括小游戏支持、新的脚本parser、新的存档系统
-* v0.3：`master` branch上滚动更新的版本，重要的新功能包括URP、新的立绘合成系统、Input System，预计的新功能包括Addressables
+* v0.1：兼容《青箱》v1.1.0
+* v0.2：兼容Unity 2019，重要的新功能包括异步的`GameState`、小游戏支持、新的脚本解析系统、新的存档系统
+* v0.3：兼容Unity 2020，重要的新功能包括URP、新的立绘合成系统、Input System
+* v0.4：`master` branch上滚动更新，重要的新功能包括新的对话框，预计的新功能包括Addressables
 
 ## 友情链接
 
@@ -54,6 +57,16 @@
 * [初夏倾语](https://store.steampowered.com/app/2075410)
 
 如果你用Nova做出了作品，欢迎来告诉我们，我们可以互相宣传一下
+
+开发工具：
+
+* [VS Code扩展](https://github.com/Lunatic-Works/vscode-nova-script)
+
+本框架的依赖：
+
+* [ToLua#](https://github.com/topameng/tolua)
+* [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
+* [Loop Scroll Rect](https://github.com/qiankanglai/LoopScrollRect)
 
 也可以看一看其他的视觉小说引擎：
 
@@ -71,15 +84,10 @@
 
 * [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家视觉小说引擎的碎片化问题，而定义的通用脚本格式
 * [Yukimi Script](https://github.com/Strrationalism/YukimiScript)：为描述视觉小说而设计的领域专用语言
-
-本框架的依赖：
-
-* [ToLua#](https://github.com/topameng/tolua)
-* [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
-* [Loop Scroll Rect](https://github.com/qiankanglai/LoopScrollRect)
+* [语涵编译器](https://github.com/PrepPipe)：视觉小说的编译器框架
 
 国内镜像（随缘更新）：
 
-* https://gitee.com/woctordho/Nova
+* https://gitee.com/Lunatic-Works/Nova
 
 国内的小伙伴也可以用各种GitHub镜像网站来访问这个repo

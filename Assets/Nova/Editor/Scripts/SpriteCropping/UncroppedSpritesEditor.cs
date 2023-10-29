@@ -66,6 +66,27 @@ namespace Nova.Editor
             return AssetDatabase.GetMainAssetTypeAtPath(path) == typeof(Texture2D);
         }
 
+        [MenuItem("Assets/Create/Nova/Sprite With Offset")]
+        public static void CreateSpriteWithOffset()
+        {
+            var dir = EditorUtils.GetSelectedDirectory();
+            var paths = EditorUtils.GetSelectedSpritePaths();
+            foreach (var spritePath in paths)
+            {
+                var meta = CreateInstance<SpriteWithOffset>();
+                meta.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+                meta.offset = Vector3.zero;
+                var metaPath = Path.Combine(dir, Path.GetFileNameWithoutExtension(spritePath) + ".asset");
+                AssetDatabase.CreateAsset(meta, metaPath);
+            }
+        }
+
+        [MenuItem("Assets/Create/Nova/Sprite With Offset", true)]
+        public static bool CreateSpriteWithOffsetValidation()
+        {
+            return CreateUncroppedSpritesValidation();
+        }
+
         private bool useCaptureBox;
         private RectInt captureBox = new RectInt(0, 0, 400, 400);
 
@@ -122,8 +143,6 @@ namespace Nova.Editor
             {
                 WriteCroppedTexture(sprites, cropper);
             }
-
-            AssetDatabase.Refresh();
         }
 
         private static void WriteCroppedTexture(UncroppedSprites sprites, SpriteCropper cropper)

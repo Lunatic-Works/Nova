@@ -3,14 +3,14 @@ using System.Collections.Generic;
 namespace Nova
 {
     [ExportCustomType]
-    public class SelectionList
+    public class ChoiceList
     {
-        private readonly List<SelectionOccursData.Selection> _selections = new List<SelectionOccursData.Selection>();
-        public IReadOnlyList<SelectionOccursData.Selection> selections => _selections;
+        private readonly List<ChoiceOccursData.Choice> _choices = new List<ChoiceOccursData.Choice>();
+        public IReadOnlyList<ChoiceOccursData.Choice> choices => _choices;
 
-        public void Add(SelectionOccursData.Selection selection)
+        public void Add(ChoiceOccursData.Choice choice)
         {
-            _selections.Add(selection);
+            _choices.Add(choice);
         }
     }
 
@@ -31,7 +31,7 @@ namespace Nova
             jumpingDestination = to;
         }
 
-        public string GetJump()
+        public string PopJump()
         {
             string last = jumpingDestination;
             jumpingDestination = null;
@@ -43,7 +43,7 @@ namespace Nova
             fallThrough = true;
         }
 
-        public bool GetFallThrough()
+        public bool PopFallThrough()
         {
             bool last = fallThrough;
             fallThrough = false;
@@ -56,9 +56,9 @@ namespace Nova
             fallThrough = false;
         }
 
-        public void RaiseSelections(SelectionList selections)
+        public void RaiseChoices(ChoiceList choices)
         {
-            gameState.RaiseSelections(selections.selections);
+            gameState.RaiseChoices(choices.choices);
         }
     }
 }

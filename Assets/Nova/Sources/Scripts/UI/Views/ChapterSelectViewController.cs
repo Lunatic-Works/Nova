@@ -52,17 +52,22 @@ namespace Nova
             I18n.LocaleChanged.RemoveListener(UpdateButtons);
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             UpdateNodes();
-            if (unlockedNodes.Count == 1 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
+            if (unlockedNodes.Count == 0)
+            {
+                Debug.LogWarning("Nova: No node is unlocked so the game cannot start. " +
+                                 "Please use is_unlocked_start() rather than is_start() in your first node.");
+            }
+            else if (unlockedNodes.Count == 1 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
             {
                 GameStart(unlockedNodes.First());
                 return;
             }
 
             UpdateButtons();
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
         }
 
         public void UpdateNodes()
@@ -82,17 +87,14 @@ namespace Nova
 
         public void GameStart(string nodeName)
         {
-            viewManager.GetController<TitleController>().SwitchView<DialogueBoxController>(() =>
-            {
-                gameState.GameStart(nodeName);
-            });
+            viewManager.SwitchView<TitleController, GameViewController>(() => { gameState.GameStart(nodeName); });
         }
 
         private GameObject InitButton(string nodeName)
         {
             var go = Instantiate(chapterButtonPrefab, chapterList);
             var button = go.GetComponent<Button>();
-            button.onClick.AddListener(() => Hide(() => GameStart(nodeName)));
+            button.onClick.AddListener(() => this.Hide(() => GameStart(nodeName)));
             return go;
         }
 

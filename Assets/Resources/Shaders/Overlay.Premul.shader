@@ -4,13 +4,14 @@ Shader "Nova/Premul/Overlay"
 {
     Properties
     {
-        _MainTex ("Main Texture", 2D) = "white" {}
+        [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
     }
     SubShader
     {
         Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         ZTest Always
+
         Pass
         {
             CGPROGRAM
@@ -39,8 +40,9 @@ Shader "Nova/Premul/Overlay"
                 // render directly to clip space
                 o.vertex = v.vertex;
                 o.uv = v.uv;
-                if (_ProjectionParams.x < 0)
-                    o.uv.y = 1 - o.uv.y;
+            #ifdef UNITY_UV_STARTS_AT_TOP
+                o.uv.y = 1.0 - o.uv.y;
+            #endif
                 return o;
             }
 

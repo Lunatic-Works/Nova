@@ -22,7 +22,7 @@ v_flag_xiben = true
 回想起来，那段时光或许是我人生里最快乐的日子。
 
 <|
-show(xiben, 'normal', pos_r)
+show(孙西本, 'normal', pos_r)
 play(bgm, 'xiben')
 |>
 我看了看走廊，果然孙西本也在。
@@ -88,7 +88,7 @@ anim:move(cam, {3, 1.5, 3})
 李竹内：：“是的，西本同学。”
 
 <|
-hide(xiben)
+hide(孙西本)
 sound('clap')
 |>
 孙西本：：“你混蛋！”

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Nova
@@ -32,8 +33,18 @@ namespace Nova
             set => overlay.layer = value;
         }
 
+        public int sortingOrder
+        {
+            get => meshRenderer.sortingOrder;
+            set => meshRenderer.sortingOrder = value;
+        }
+
+        public string luaGlobalName;
+
         protected override void Awake()
         {
+            base.Awake();
+
             if (Quad == null)
             {
                 Quad = new Mesh
@@ -55,7 +66,7 @@ namespace Nova
                     triangles = new[]
                     {
                         0, 2, 1,
-                        2, 3, 1
+                        2, 3, 1,
                     },
                     // some very large bound to disable culling
                     bounds = new Bounds(Vector3.zero, 1e6f * Vector3.one)
@@ -65,19 +76,27 @@ namespace Nova
             meshFilter = overlay.Ensure<MeshFilter>();
             meshFilter.mesh = Quad;
             meshRenderer = overlay.Ensure<MeshRenderer>();
-            base.Awake();
             overlayMaterial = materialPool.Get(OverlayShader);
-            materialPool.defaultMaterial = null;
             meshRenderer.material = overlayMaterial;
 
             myTarget = new MyTarget(this);
             myTarget.Awake();
+
+            if (!string.IsNullOrEmpty(luaGlobalName))
+            {
+                LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
+                gameState.AddRestorable(this);
+            }
         }
 
-        protected override void OnDestroy()
+        protected virtual void OnDestroy()
         {
-            base.OnDestroy();
             myTarget.OnDestroy();
+
+            if (!string.IsNullOrEmpty(luaGlobalName))
+            {
+                gameState.RemoveRestorable(this);
+            }
         }
 
         protected virtual void Update()
@@ -85,13 +104,46 @@ namespace Nova
             myTarget.Update();
         }
 
+        #region Restoration
+
+        public override string restorableName => luaGlobalName;
+
+        [Serializable]
+        protected class OverlaySpriteControllerRestoreData : CompositeSpriteControllerRestoreData
+        {
+            public readonly int layer;
+            public readonly int sortingOrder;
+
+            public OverlaySpriteControllerRestoreData(OverlaySpriteController parent) : base(parent)
+            {
+                layer = parent.layer;
+                sortingOrder = parent.sortingOrder;
+            }
+        }
+
+        public override IRestoreData GetRestoreData()
+        {
+            return new OverlaySpriteControllerRestoreData(this);
+        }
+
+        public override void Restore(IRestoreData restoreData)
+        {
+            base.Restore(restoreData);
+
+            var data = restoreData as OverlaySpriteControllerRestoreData;
+            layer = data.layer;
+            sortingOrder = data.sortingOrder;
+        }
+
+        #endregion
+
         protected class MyTarget : RenderTarget
         {
             private new const string SUFFIX = "Composite" + RenderTarget.SUFFIX;
 
             private readonly OverlaySpriteController parent;
 
-            public override string textureName => parent == null ? oldConfig.name : parent.luaGlobalName + SUFFIX;
+            public override string textureName => parent == null ? oldConfig.name : parent.restorableName + SUFFIX;
             public override bool isFinal => false;
             public override bool isActive => parent != null && parent.needRender;
 

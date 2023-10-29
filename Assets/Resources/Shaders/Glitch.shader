@@ -9,7 +9,7 @@ Shader "Nova/VFX/Glitch"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -107,6 +107,9 @@ Shader "Nova/VFX/Glitch"
                 blockOffset += blockOffsetPass(uv, 0.5, 5.0, 0.1, 0.06 * powerT, -0.5);
                 blockOffset += blockOffsetPass(uv, 2.0, 4.0, 0.1, 0.002 * powerT, 1.0);
                 col.rgb += blockOffset;
+                col.rgb = saturate(col.rgb);
+
+                col.rgb *= col.a;
 
                 return col;
             }

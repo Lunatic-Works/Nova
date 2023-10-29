@@ -110,8 +110,10 @@ Shader "Nova/Post Processing/Barrel"
                 {
                     col = getColor(i.uv, sigma);
                 }
+
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 return col;
             }

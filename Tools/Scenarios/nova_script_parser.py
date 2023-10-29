@@ -1,167 +1,90 @@
 # TODO: proper way to split chapters
 
+import os
 import re
 
+import clr
 from luaparser import ast, astnodes
 
-
-# now_entries may be None
-# now_code and now_dialogue may be ''
-def commit_eager_code(chapters, now_chapter_name, now_entries,
-                      now_head_eager_code, now_eager_code, now_code,
-                      now_dialogue, keep_line_num, line_num):
-    if now_head_eager_code is None:
-        match = re.compile(r'label[ \(]\'(.*?)\'').search(now_eager_code)
-        if not match:
-            raise ValueError(
-                f'label() not found in head eager code:\n{now_eager_code}')
-        now_chapter_name = match.group(1)
-        now_entries = []
-        now_head_eager_code = now_eager_code
-    else:
-        now_code, now_dialogue = commit_dialogue(now_entries, now_code,
-                                                 now_dialogue, keep_line_num,
-                                                 line_num)
-        chapters.append((now_chapter_name, now_entries, now_head_eager_code,
-                         now_eager_code))
-        now_chapter_name = None
-        now_entries = None
-        now_head_eager_code = None
-    return (now_chapter_name, now_entries, now_head_eager_code, '', now_code,
-            now_dialogue)
+nova_parser_dll_path = "../../Library/ScriptAssemblies/Nova.Parser.dll"
+clr.AddReference(os.path.abspath(nova_parser_dll_path))
 
 
-# Assume now_entries is not None
-# now_code and now_dialogue may be ''
-def commit_dialogue(now_entries, now_code, now_dialogue, keep_line_num,
-                    line_num):
-    if now_dialogue:
-        match = re.compile('(.*?)(：：|::)(.*?)',
-                           re.DOTALL).fullmatch(now_dialogue)
-        if match:
-            chara_name = match.group(1)
-            dialogue = match.group(3)
-        else:
-            chara_name = None
-            dialogue = now_dialogue
-    else:
-        chara_name = None
-        dialogue = None
-
-    if now_code or now_dialogue:
-        if keep_line_num:
-            now_entries.append((now_code, chara_name, dialogue, line_num))
-        else:
-            now_entries.append((now_code, chara_name, dialogue))
-
-    return '', ''
+def is_start(head_eager_code):
+    return any(x in head_eager_code for x in ["is_start", "is_unlocked_start"])
 
 
-# Return a list of chapters
-# chapter: (chapter_name, list of entries, head_eager_code, tail_eager_code)
-# entry: (code, chara_name, dialogue)
-# If keep_line_num is True, entry: (code, chara_name, dialogue, line_num)
-def parse_chapters(lines, keep_line_num=False):
-    STATE_TEXT = 0
-    STATE_EAGER_CODE = 1
-    STATE_LAZY_CODE = 2
+def parse_nodes(text):
+    from Nova.Parser import NodeParser
 
-    state = STATE_TEXT
-    chapters = []
+    return NodeParser.ParseNodes(text)
 
-    # Between a tail eager code block and a head eager code block,
-    # now_chapter_name, now_entries and now_head_eager_code are None
-    now_chapter_name = None
-    now_entries = None
-    now_head_eager_code = None
 
-    now_eager_code = ''
-    now_code = ''
-    now_dialogue = ''
+# DEPRECATED
+def parse_chapters(f):
+    nodes = parse_nodes(f.read())
+    return [
+        (
+            node.name,
+            [
+                (
+                    "\n".join([block.content for block in entry.codeBlocks]),
+                    entry.characterName,
+                    entry.dialogue,
+                    entry.line,
+                )
+                for entry in node.dialogueEntries
+            ],
+            node.headEagerBlock.content,
+            node.tailEagerBlock.content,
+        )
+        for node in nodes
+    ]
 
-    for line_num, line in enumerate(lines):
-        line = line.rstrip()
 
-        if state == STATE_TEXT:
-            if line.startswith('@<|'):
-                if line.endswith('|>'):
-                    now_eager_code = line[3:-2].strip()
-                    (now_chapter_name, now_entries, now_head_eager_code,
-                     now_eager_code,
-                     now_code, now_dialogue) = commit_eager_code(
-                         chapters, now_chapter_name, now_entries,
-                         now_head_eager_code, now_eager_code, now_code,
-                         now_dialogue, keep_line_num, line_num)
-                else:
-                    now_eager_code = line[3:].lstrip()
-                    state = STATE_EAGER_CODE
-            elif line.startswith('<|'):
-                if line.endswith('|>'):
-                    now_code = line[3:-2].strip()
-                else:
-                    now_code = line[3:].lstrip()
-                    state = STATE_LAZY_CODE
-            elif line:
-                if now_dialogue:
-                    now_dialogue += '\n'
-                now_dialogue += line
-            else:    # Empty line
-                if now_entries is not None:
-                    now_code, now_dialogue = commit_dialogue(
-                        now_entries, now_code, now_dialogue, keep_line_num,
-                        line_num)
+def format_attrs(attrs):
+    if not attrs:
+        return ""
+    s = ", ".join(f"{k} = {v}" for k, v in sorted(attrs.items()))
+    s = f"[{s}]"
+    return s
 
-        elif state == STATE_EAGER_CODE:
-            if line.endswith('|>'):
-                line = line[:-2].rstrip()
-                if line:
-                    if now_eager_code:
-                        now_eager_code += '\n'
-                    now_eager_code += line
-                (now_chapter_name, now_entries, now_head_eager_code,
-                 now_eager_code, now_code, now_dialogue) = commit_eager_code(
-                     chapters, now_chapter_name, now_entries,
-                     now_head_eager_code, now_eager_code, now_code,
-                     now_dialogue, keep_line_num, line_num)
-                state = STATE_TEXT
-            else:
-                if now_eager_code:
-                    now_eager_code += '\n'
-                now_eager_code += line
 
-        elif state == STATE_LAZY_CODE:
-            if line.endswith('|>'):
-                line = line[:-2].rstrip()
-                if line:
-                    if now_code:
-                        now_code += '\n'
-                    now_code += line
-                state = STATE_TEXT
-            else:
-                if now_code:
-                    now_code += '\n'
-                now_code += line
+def format_code_block(block):
+    from Nova.Parser import BlockType
 
-        else:
-            raise ValueError(f'Unknown state: {state}')
-
-    return chapters
+    at = "@" if block.type == BlockType.EagerExecution else ""
+    attrs = format_attrs(block.attributes)
+    s = f"{at}{attrs}<|{block.content}|>"
+    return s
 
 
 def get_node_name(node):
     if isinstance(node, astnodes.Name):
         return node.id
+    elif isinstance(node, astnodes.Index):
+        return f"{get_node_name(node.value)}.{get_node_name(node.idx)}"
+    elif isinstance(node, astnodes.Call):
+        return get_node_name(node.func)
+    elif isinstance(node, astnodes.Invoke):
+        return get_node_name(node.func)
+    elif isinstance(node, astnodes.Number):
+        return f"{node.n}"
     elif isinstance(node, astnodes.String):
         return node.s
-    elif isinstance(node, astnodes.Index):
-        return f'{get_node_name(node.value)}.{get_node_name(node.idx)}'
+    elif isinstance(
+        node,
+        (
+            astnodes.Nil,
+            astnodes.Table,
+            astnodes.AnonymousFunction,
+            astnodes.BinaryOp,
+            astnodes.UnaryOp,
+        ),
+    ):
+        return node._name
     else:
-        # raise ValueError(f'Unknown node: {type(node)}')
-        return None
-
-
-def isinstance_any(obj, classes):
-    return any(isinstance(obj, c) for c in classes)
+        raise ValueError(f"Unknown node: {type(node)}")
 
 
 def walk_functions_block(nodes, env):
@@ -170,7 +93,7 @@ def walk_functions_block(nodes, env):
     while nodes:
         node = nodes.pop()
         if isinstance(node, astnodes.Call):
-            yield get_node_name(node.func), node.args, env
+            yield get_node_name(node), node.args, env
             for _node in node.args:
                 if isinstance(_node, astnodes.AnonymousFunction):
                     yield from walk_functions_block(_node.body.body, env)
@@ -184,10 +107,11 @@ def walk_functions_block(nodes, env):
 
             while invoke_stack:
                 node = invoke_stack.pop()
-                func_name = get_node_name(node.func)
+                func_name = get_node_name(node)
                 args = node.args
-                if (func_name == 'action' and
-                        not isinstance(args[0], astnodes.AnonymousFunction)):
+                if func_name == "action" and not isinstance(
+                    args[0], astnodes.AnonymousFunction
+                ):
                     yield get_node_name(args[0]), args[1:], env
                 else:
                     yield func_name, args, env
@@ -195,20 +119,35 @@ def walk_functions_block(nodes, env):
                 for _node in args:
                     if isinstance(_node, astnodes.AnonymousFunction):
                         yield from walk_functions_block(
-                            _node.body.body, env + (source, ))
+                            _node.body.body, env + (source,)
+                        )
         elif isinstance(node, astnodes.Assign):
             nodes.extend(reversed(node.values))
-        elif isinstance_any(node, [
-                astnodes.Index, astnodes.While, astnodes.If, astnodes.Return,
-                astnodes.Fornum, astnodes.Forin, astnodes.Function,
-                astnodes.LocalFunction, astnodes.Nil, astnodes.TrueExpr,
-                astnodes.FalseExpr, astnodes.Number, astnodes.String,
-                astnodes.Table, astnodes.AnonymousFunction, astnodes.BinaryOp,
-                astnodes.UnaryOp
-        ]):
+        elif isinstance(
+            node,
+            (
+                astnodes.Index,
+                astnodes.While,
+                astnodes.If,
+                astnodes.Return,
+                astnodes.Fornum,
+                astnodes.Forin,
+                astnodes.Function,
+                astnodes.LocalFunction,
+                astnodes.Nil,
+                astnodes.TrueExpr,
+                astnodes.FalseExpr,
+                astnodes.Number,
+                astnodes.String,
+                astnodes.Table,
+                astnodes.AnonymousFunction,
+                astnodes.BinaryOp,
+                astnodes.UnaryOp,
+            ),
+        ):
             pass
         else:
-            raise ValueError(f'Unknown node: {type(node)}')
+            raise ValueError(f"Unknown node: {type(node)}")
 
 
 def walk_functions(code):
@@ -234,16 +173,17 @@ def parse_table(node):
     elif isinstance(node, astnodes.UMinusOp):
         return -parse_table(node.operand)
     elif isinstance(node, (astnodes.UnaryOp, astnodes.BinaryOp)):
-        return 'expr'
+        return "expr"
     else:
-        raise ValueError(f'Unknown node: {type(node)}')
+        raise ValueError(f"Unknown node: {type(node)}")
 
 
-def normalize_dialogue(s,
-                       remove_rich=True,
-                       keep_rich=None,
-                       remove_todo=True,
-                       keep_todo=None):
+def normalize_dialogue(
+    s, remove_rich=True, keep_rich=None, remove_todo=True, keep_todo=None
+):
+    if not s:
+        return s
+
     if remove_rich:
 
         def func(m):
@@ -253,8 +193,7 @@ def normalize_dialogue(s,
                 return m.group(3)
 
         while True:
-            s_new = re.compile(r'<(.*?)(=.*?)?>(.*?)</\1>',
-                               re.DOTALL).sub(func, s)
+            s_new = re.compile(r"<([^=>]*)(=[^>]*)?>(.*?)</\1>", re.DOTALL).sub(func, s)
             if s_new == s:
                 break
             s = s_new
@@ -262,30 +201,50 @@ def normalize_dialogue(s,
     if remove_todo:
 
         def func(m):
-            if keep_todo and m.group(2) in keep_todo:
+            if keep_todo and m.group(1)[:-1] in keep_todo:
                 return m.group(0)
             else:
-                return ''
+                return ""
 
-        s = re.compile(r'\r?\n?（TODO：((.*?)：)?.*?）', re.DOTALL).sub(func, s)
+        s = re.compile(r"\r?\n?（TODO：([^：]*：)?([^（）]*（[^）]*）)*[^）]*）", re.DOTALL).sub(
+            func, s
+        )
 
-    s = re.compile(' +').sub(' ', s)
+    s = re.compile(" +").sub(" ", s)
 
     return s
 
 
-def test():
-    in_filename = 'scenario.txt'
+def test_roundtrip():
+    in_filename = "scenario.txt"
 
-    with open(in_filename, 'r', encoding='utf-8') as f:
-        chapters = parse_chapters(f)
+    with open(in_filename, "r", encoding="utf-8") as f:
+        nodes = parse_nodes(f.read())
 
-    for chapter_name, entries in chapters:
-        print('chapter_name:', chapter_name)
-        for code, chara_name, dialogue in entries:
-            if code:
-                print(f'begin code\n{code}\nend code')
-            print(chara_name, dialogue)
+    for node_count, node in enumerate(nodes):
+        if node_count > 0:
+            print()
+
+        print(format_code_block(node.headEagerBlock))
+        for entry_count, entry in enumerate(node.dialogueEntries):
+            if entry_count > 0:
+                print()
+
+            for block in entry.codeBlocks:
+                print(format_code_block(block))
+
+            chara_name = entry.characterName
+            disp_name = entry.displayName
+            dialogue = entry.dialogue
+
+            if chara_name:
+                if disp_name == chara_name:
+                    print(f"{chara_name}：：{dialogue}")
+                else:
+                    print(f"{disp_name}//{chara_name}：：{dialogue}")
+            else:
+                print(dialogue)
+        print(format_code_block(node.tailEagerBlock))
 
 
 def test_lua():
@@ -303,5 +262,5 @@ x = f6()
         print(x)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_lua()

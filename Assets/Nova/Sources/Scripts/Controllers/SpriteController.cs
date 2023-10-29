@@ -111,6 +111,32 @@ namespace Nova
             set => gameObject.layer = value;
         }
 
+        public int sortingOrder
+        {
+            get
+            {
+                if (spriteRenderer != null)
+                {
+                    return spriteRenderer.sortingOrder;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            set
+            {
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.sortingOrder = value;
+                }
+                else
+                {
+                    Debug.LogWarning($"Nova: Cannot set sortingOrder for Image: {Utils.GetPath(this)}");
+                }
+            }
+        }
+
         private void Awake()
         {
             gameState = Utils.FindNovaController().GameState;
@@ -146,7 +172,7 @@ namespace Nova
 
         #region Methods called by external scripts
 
-        public void SetImage(string imageName, bool fade = true)
+        public void SetImage(string imageName)
         {
             if (imageName == currentImageName)
             {
@@ -158,7 +184,7 @@ namespace Nova
             currentImageName = imageName;
         }
 
-        public void ClearImage(bool fade = true)
+        public void ClearImage()
         {
             if (string.IsNullOrEmpty(currentImageName))
             {
@@ -193,37 +219,33 @@ namespace Nova
             public readonly TransformData transformData;
             public readonly Vector4Data color;
             public readonly MaterialData materialData;
-            public readonly int renderQueue;
             public readonly int layer;
+            public readonly int sortingOrder;
 
-            public SpriteControllerRestoreData(string currentImageName, Transform transform, Color color,
-                MaterialData materialData, int renderQueue, int layer)
+            public SpriteControllerRestoreData(SpriteController parent)
             {
-                this.currentImageName = currentImageName;
-                transformData = new TransformData(transform);
-                this.color = color;
-                this.materialData = materialData;
-                this.renderQueue = renderQueue;
-                this.layer = layer;
+                currentImageName = parent.currentImageName;
+                transformData = new TransformData(parent.transform);
+                color = parent.color;
+
+                // Material must be RestorableMaterial or defaultMaterial
+                if (parent.sharedMaterial is RestorableMaterial)
+                {
+                    materialData = RestorableMaterial.GetRestoreData(parent.sharedMaterial);
+                }
+                else
+                {
+                    materialData = null;
+                }
+
+                layer = parent.layer;
+                sortingOrder = parent.sortingOrder;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            // Material must be RestorableMaterial or defaultMaterial
-            MaterialData materialData;
-            if (sharedMaterial is RestorableMaterial)
-            {
-                materialData = RestorableMaterial.GetRestoreData(sharedMaterial);
-            }
-            else
-            {
-                materialData = null;
-            }
-
-            int renderQueue = gameObject.Ensure<RenderQueueOverrider>().renderQueue;
-
-            return new SpriteControllerRestoreData(currentImageName, transform, color, materialData, renderQueue, layer);
+            return new SpriteControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)
@@ -243,8 +265,11 @@ namespace Nova
                 material = gameObject.Ensure<MaterialPool>().defaultMaterial;
             }
 
-            gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
             layer = data.layer;
+            if (spriteRenderer != null)
+            {
+                sortingOrder = data.sortingOrder;
+            }
 
             if (data.currentImageName == currentImageName)
             {
@@ -253,11 +278,11 @@ namespace Nova
 
             if (!string.IsNullOrEmpty(data.currentImageName))
             {
-                SetImage(data.currentImageName, fade: false);
+                SetImage(data.currentImageName);
             }
             else
             {
-                ClearImage(fade: false);
+                ClearImage();
             }
         }
 

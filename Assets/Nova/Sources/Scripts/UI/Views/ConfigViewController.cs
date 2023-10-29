@@ -36,10 +36,10 @@ namespace Nova
             backButton.onClick.AddListener(Hide);
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             fromTitle = false;
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
         }
 
         public void ShowFromTitle()
@@ -48,10 +48,10 @@ namespace Nova
             fromTitle = true;
         }
 
-        public override void Hide(Action onFinish)
+        public override void Hide(bool doTransition, Action onFinish)
         {
-            configManager.Apply();
-            base.Hide(onFinish);
+            configManager.Flush();
+            base.Hide(doTransition, onFinish);
         }
 
         public void ReturnTitleWithCallback(Action onFinish)
@@ -59,9 +59,9 @@ namespace Nova
             NovaAnimation.StopAll();
 
             // TODO: Better transition between any two views
-            viewManager.titlePanel.SetActive(true);
-
-            this.SwitchView<TitleController>(onFinish);
+            viewManager.GetController<TitleController>().ShowImmediate();
+            viewManager.GetController<GameViewController>().HideImmediate();
+            this.Hide(onFinish);
         }
 
         private void ReturnTitle()
@@ -84,9 +84,9 @@ namespace Nova
         private void ResetDefault()
         {
             configManager.ResetDefault();
-            configManager.Apply();
+            configManager.Flush();
             inputMappingController.ResetDefault();
-            inputMappingController.Apply();
+            inputMappingController.Flush();
             I18n.CurrentLocale = Application.systemLanguage;
         }
 

@@ -5,7 +5,9 @@
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.TextMeshPro",
-        "LoopScrollRect.Runtime"
+        "LoopScrollRect.Runtime",
+        "Nova.Generated",
+        "Nova.Parser"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

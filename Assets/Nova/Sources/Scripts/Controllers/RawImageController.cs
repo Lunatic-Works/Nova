@@ -49,26 +49,23 @@ namespace Nova
         {
             public readonly MaterialData materialData;
 
-            public RawImageControllerRestoreData(MaterialData materialData)
+            public RawImageControllerRestoreData(RawImageController parent)
             {
-                this.materialData = materialData;
+                // Material must be RestorableMaterial or DefaultMaterial
+                if (parent.sharedMaterial is RestorableMaterial)
+                {
+                    materialData = RestorableMaterial.GetRestoreData(parent.sharedMaterial);
+                }
+                else
+                {
+                    materialData = null;
+                }
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            // Material must be RestorableMaterial or DefaultMaterial
-            MaterialData materialData;
-            if (sharedMaterial is RestorableMaterial)
-            {
-                materialData = RestorableMaterial.GetRestoreData(sharedMaterial);
-            }
-            else
-            {
-                materialData = null;
-            }
-
-            return new RawImageControllerRestoreData(materialData);
+            return new RawImageControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

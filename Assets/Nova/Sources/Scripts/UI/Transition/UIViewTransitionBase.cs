@@ -73,8 +73,8 @@ namespace Nova
 
         private void CaptureToGhost()
         {
-            viewManager.transitionGhost.texture =
-                ScreenCapturer.GetGameTexture(viewManager.transitionGhost.texture as RenderTexture);
+            viewManager.transitionGhost.texture = ScreenCapturer.GetGameTexture(
+                viewManager.transitionGhost.texture as RenderTexture, UICameraHelper.Active);
             viewManager.transitionGhost.gameObject.SetActive(true);
             gameObject.SetActive(false);
         }
@@ -105,6 +105,10 @@ namespace Nova
         protected void SetToTransitionTarget()
         {
             rectTransform.position = pos0;
+            Vector3 localPosition = rectTransform.localPosition;
+            localPosition.z = 0f;
+            rectTransform.localPosition = localPosition;
+
             Vector3 scale = size0.InverseScale(rectTransform.rect.size);
             scale.x *= scale0.x;
             scale.y *= scale0.y;
@@ -168,7 +172,8 @@ namespace Nova
             viewManager.TryPlaySound(enterSound);
         }
 
-        public void Exit(Action onFinish, float withDelay = 0f)
+        // onComplete is invoked before the GO is set to inactive
+        public void Exit(Action onComplete, Action onFinish, float withDelay = 0f)
         {
             delayOffset = withDelay;
             if (useGhost)
@@ -181,6 +186,7 @@ namespace Nova
             inAnimation = true;
             OnExit(() =>
             {
+                onComplete?.Invoke();
                 viewManager.transitionGhost.gameObject.SetActive(false);
                 gameObject.SetActive(false);
                 if (canvasGroup != null)
@@ -193,6 +199,11 @@ namespace Nova
             });
 
             viewManager.TryPlaySound(exitSound);
+        }
+
+        public void Exit(Action onFinish, float withDelay = 0f)
+        {
+            Exit(null, onFinish, withDelay);
         }
     }
 }

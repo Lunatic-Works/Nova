@@ -54,9 +54,10 @@ Shader "Nova/VFX Screen/Lens Blur"
                 float4 col = tex2DLensBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

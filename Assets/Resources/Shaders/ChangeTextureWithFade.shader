@@ -4,17 +4,17 @@ Shader "Nova/VFX/Change Texture With Fade"
 {
     Properties
     {
-        [HideInInspector] _MainTex ("Dummy Texture Providing Size", 2D) = "black" {}
-        [NoScaleOffset] _PrimaryTex ("Primary Texture", 2D) = "black" {}
+        [HideInInspector] _MainTex ("Dummy Texture Providing Size", 2D) = "white" {}
+        [NoScaleOffset] _PrimaryTex ("Primary Texture", 2D) = "white" {}
         [NoScaleOffset] _SubTex ("Secondary Texture", 2D) = "black" {}
-        _Offsets ("Offsets (MainX, MainY, SecX, SecY)", Vector) = (0, 0, 0, 0)
+        _Offsets ("Offsets (x1, y1, x2, y2)", Vector) = (0, 0, 0, 0)
         _Color ("Primary Texture Color", Color) = (1, 1, 1, 1)
         _SubColor ("Secondary Texture Color", Color) = (1, 1, 1, 1)
         _T ("Time", Range(0.0, 1.0)) = 0.0
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -52,12 +52,15 @@ Shader "Nova/VFX/Change Texture With Fade"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                // TODO: normally textures are not premul, so this blending is wrong
-                return lerp(
+                float4 col = lerp(
                     clamped2D(_PrimaryTex, i.uv - _Offsets.xy) * _Color,
                     clamped2D(_SubTex, i.uv - _Offsets.zw) * _SubColor,
                     _T
                 );
+
+                col.rgb *= col.a;
+
+                return col;
             }
             ENDCG
         }

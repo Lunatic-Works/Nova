@@ -15,7 +15,7 @@ Shader "Nova/VFX/Barrel Hyper"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -94,8 +94,12 @@ Shader "Nova/VFX/Barrel Hyper"
                 {
                     col = getColor(i.uv, sigma);
                 }
+
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
+
+                col.rgb *= col.a;
 
                 return col;
             }

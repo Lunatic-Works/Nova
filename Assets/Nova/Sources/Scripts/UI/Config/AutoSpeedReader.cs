@@ -10,17 +10,17 @@ namespace Nova
         [SerializeField] private string configKeyName;
 
         private ConfigManager configManager;
-        private DialogueBoxController dialogueBoxController;
+        private GameViewController gameViewController;
         private ConfigTextPreviewController configTextPreviewController;
 
         private void Awake()
         {
             configManager = Utils.FindNovaController().ConfigManager;
-            dialogueBoxController = GetComponent<DialogueBoxController>();
+            gameViewController = GetComponent<GameViewController>();
             configTextPreviewController = GetComponent<ConfigTextPreviewController>();
             this.RuntimeAssert(
-                dialogueBoxController != null || configTextPreviewController != null,
-                "Missing DialogueBoxController or ConfigTextPreviewController."
+                gameViewController != null || configTextPreviewController != null,
+                "Missing GameViewController or ConfigTextPreviewController."
             );
         }
 
@@ -39,9 +39,9 @@ namespace Nova
         {
             // Convert speed to duration
             float val = 10f * Mathf.Pow(0.2f, configManager.GetFloat(configKeyName));
-            if (dialogueBoxController != null)
+            if (gameViewController != null)
             {
-                dialogueBoxController.autoDelay = val;
+                gameViewController.autoDelay = val;
             }
             else
             {

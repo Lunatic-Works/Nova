@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Nova
 {
+    [Obsolete]
     public abstract class TextureFadeController : FadeController
     {
         private static readonly int PrimaryTextureID = Shader.PropertyToID("_PrimaryTex");
@@ -15,7 +17,7 @@ namespace Nova
 
         protected abstract void ResetSize(float width, float height, Vector2 pivot);
 
-        protected void SetTexture(Texture to, float delay)
+        protected void SetTexture(Texture to, float duration)
         {
             if (lastTexture == to)
             {
@@ -23,7 +25,7 @@ namespace Nova
             }
 
             var offsets =
-                GetTextureOffsetsAlignedOnAnchor(out Vector2 rendererSize, out Vector2 pivot, new[] { to, lastTexture });
+                GetTextureOffsetsAlignedOnAnchor(out Vector2 rendererSize, out Vector2 pivot, new[] {to, lastTexture});
 
             ResetSize(rendererSize.x, rendererSize.y, pivot);
 
@@ -39,7 +41,7 @@ namespace Nova
                     ? rendererSize.InverseScale(new Vector2(lastTexture.width, lastTexture.height))
                     : Vector2.zero
             );
-            DoFadeAnimation(delay);
+            DoFadeAnimation(duration);
             lastTexture = to;
         }
 

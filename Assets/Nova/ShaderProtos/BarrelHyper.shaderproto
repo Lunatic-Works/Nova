@@ -91,8 +91,10 @@ Shader "Nova/$VARIANT_NAME$/Barrel Hyper"
                 {
                     col = getColor(i.uv, sigma);
                 }
+
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 $VARIANT_RGB$
 

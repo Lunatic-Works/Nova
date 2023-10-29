@@ -68,7 +68,7 @@ namespace Nova
             ignoreToggle.gameObject.SetActive(hasIgnoreKey);
 
             confirmButton.onClick.RemoveAllListeners();
-            confirmButton.onClick.AddListener(() => Hide(param.onConfirm));
+            confirmButton.onClick.AddListener(() => this.Hide(param.onConfirm));
 
             cancelButton.onClick.RemoveAllListeners();
             cancelButton.onClick.AddListener(() =>
@@ -78,7 +78,7 @@ namespace Nova
                     configManager.SetInt(param.ignoreKey, 1);
                 }
 
-                Hide(param.onCancel);
+                this.Hide(param.onCancel);
             });
 
             ignoreToggle.onValueChanged.RemoveAllListeners();
@@ -89,7 +89,7 @@ namespace Nova
                 ignoreToggle.onValueChanged.AddListener(value =>
                 {
                     configManager.SetInt(param.ignoreKey, value ? 0 : 1);
-                    configManager.Apply();
+                    configManager.Flush();
                 });
             }
 
@@ -115,7 +115,7 @@ namespace Nova
                     configManager.SetInt(param.ignoreKey, 1);
                 }
 
-                Hide(param.onCancel);
+                this.Hide(param.onCancel);
             }
         }
 
@@ -129,7 +129,7 @@ namespace Nova
 
         public void Confirm(Action onFinish = null)
         {
-            Hide(() =>
+            this.Hide(() =>
             {
                 param.onConfirm?.Invoke();
                 onFinish?.Invoke();

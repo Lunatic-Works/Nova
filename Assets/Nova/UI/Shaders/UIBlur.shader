@@ -11,8 +11,6 @@ Shader "Nova/UI/Blur"
         Cull Off ZWrite Off ZTest [unity_GUIZTestMode] Blend Off
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 
-        GrabPass { "_UIBlur" }
-
         Pass
         {
             CGPROGRAM
@@ -35,25 +33,25 @@ Shader "Nova/UI/Blur"
                 float4 grabPos : TEXCOORD1;
             };
 
-            sampler2D _UIBlur;
-            float4 _UIBlur_ST;
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
 
             v2f vert(appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _UIBlur);
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.grabPos = ComputeGrabScreenPos(o.vertex);
                 return o;
             }
 
-            float4 _UIBlur_TexelSize;
+            float4 _MainTex_TexelSize;
             float _Size, _Offset;
             float _GScale;
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float4 col = tex2DProjGaussianBlur(_UIBlur, _UIBlur_TexelSize * _GScale, i.grabPos, _Size);
+                float4 col = tex2DProjGaussianBlur(_MainTex, _MainTex_TexelSize * _GScale, i.grabPos, _Size);
                 col.rgb += _Offset;
                 col.a = 1.0;
                 return col;

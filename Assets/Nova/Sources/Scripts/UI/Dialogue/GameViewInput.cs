@@ -17,10 +17,10 @@ namespace Nova
         private ConfigManager configManager;
         private InputManager inputManager;
 
-        private ButtonRingTrigger buttonRingTrigger;
+        [SerializeField] private ButtonRingTrigger buttonRingTrigger;
 
         private ViewManager viewManager;
-        private DialogueBoxController dialogueBoxController;
+        private GameViewController gameViewController;
         private SaveViewController saveViewController;
         private LogController logController;
         private ConfigViewController configViewController;
@@ -33,10 +33,8 @@ namespace Nova
             configManager = controller.ConfigManager;
             inputManager = controller.InputManager;
 
-            buttonRingTrigger = GetComponentInChildren<ButtonRingTrigger>();
-
             viewManager = Utils.FindViewManager();
-            dialogueBoxController = viewManager.GetController<DialogueBoxController>();
+            gameViewController = viewManager.GetController<GameViewController>();
             saveViewController = viewManager.GetController<SaveViewController>();
             logController = viewManager.GetController<LogController>();
             configViewController = viewManager.GetController<ConfigViewController>();
@@ -96,7 +94,7 @@ namespace Nova
 
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
-                dialogueBoxController.Hide();
+                gameViewController.HideUI();
             }
 
             if (inputManager.IsTriggered(AbstractKey.ShowLog))
@@ -126,7 +124,7 @@ namespace Nova
         {
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
-                dialogueBoxController.Show();
+                gameViewController.ShowUI();
             }
         }
 
@@ -140,13 +138,13 @@ namespace Nova
                     buttonRingTrigger.Hide(false);
                 }
             }
-            else
+            else if (viewManager.currentView == CurrentViewType.Game)
             {
-                if (viewManager.currentView == CurrentViewType.Game)
+                if (gameViewController.uiActive)
                 {
                     HandleShortcutWhenDialogueShown();
                 }
-                else if (viewManager.currentView == CurrentViewType.DialogueHidden)
+                else
                 {
                     HandleShortcutWhenDialogueHidden();
                 }
@@ -165,11 +163,15 @@ namespace Nova
             }
         }
 
+        private bool needShowUI =>
+            !gameViewController.uiActive && !NovaAnimation.IsPlayingAny(AnimationType.PerDialogue);
+
         public void OnPointerDown(PointerEventData _eventData)
         {
             var eventData = (ExtendedPointerEventData)_eventData;
             if (!inputManager.inputEnabled ||
                 viewManager.currentView != CurrentViewType.Game ||
+                !gameViewController.uiActive ||
                 buttonRingTrigger.buttonShowing)
             {
                 return;
@@ -191,6 +193,17 @@ namespace Nova
         {
             var eventData = (ExtendedPointerEventData)_eventData;
 
+            if (viewManager.currentView != CurrentViewType.Game)
+            {
+                return;
+            }
+
+            if (needShowUI)
+            {
+                gameViewController.ShowUI();
+                return;
+            }
+
             // When the input is not enabled, the user can only click forward
             if (!inputManager.inputEnabled)
             {
@@ -199,18 +212,6 @@ namespace Nova
                     ClickForward();
                 }
 
-                return;
-            }
-
-            var view = viewManager.currentView;
-            if (view == CurrentViewType.DialogueHidden)
-            {
-                dialogueBoxController.Show();
-                return;
-            }
-
-            if (view != CurrentViewType.Game)
-            {
                 return;
             }
 
@@ -225,10 +226,8 @@ namespace Nova
             {
                 buttonRingTrigger.NoShowIfPointerMoved();
 
-                var link = dialogueBoxController.FindIntersectingLink(RealInput.pointerPosition, UICameraHelper.Active);
-                if (!string.IsNullOrEmpty(link))
+                if (gameViewController.TryClickLink(RealInput.pointerPosition, UICameraHelper.Active))
                 {
-                    Application.OpenURL(link);
                     return;
                 }
 
@@ -242,7 +241,7 @@ namespace Nova
 
                 if (rightButtonAction == RightButtonAction.HideDialoguePanel)
                 {
-                    dialogueBoxController.Hide();
+                    gameViewController.HideUI();
                 }
                 else if (rightButtonAction == RightButtonAction.ShowButtonRing)
                 {
@@ -269,23 +268,33 @@ namespace Nova
                 return;
             }
 
-            if (buttonRingTrigger.buttonShowing)
+            if (buttonRingTrigger.buttonShowing || viewManager.currentView != CurrentViewType.Game)
             {
                 return;
             }
 
-            if (viewManager.currentView == CurrentViewType.Game)
+            float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
+            if (Mathf.Abs(scroll) < 1e-3f)
             {
-                float scroll = Mouse.current?.scroll.ReadValue().y ?? 0f;
-                if (scroll > float.Epsilon)
-                {
-                    dialogueState.state = DialogueState.State.Normal;
-                    logController.Show();
-                }
-                else if (scroll < -float.Epsilon)
-                {
-                    ClickForward();
-                }
+                return;
+            }
+
+            if (needShowUI)
+            {
+                gameViewController.ShowUI();
+                return;
+            }
+
+            if (scroll > 0)
+            {
+                dialogueState.state = DialogueState.State.Normal;
+                // TODO: Should we abort animation here?
+                gameViewController.AbortAnimation(false);
+                logController.Show();
+            }
+            else
+            {
+                ClickForward();
             }
         }
 
@@ -307,18 +316,7 @@ namespace Nova
 
             if (!isAnimating && !textIsAnimating)
             {
-                dialogueBoxController.NextPageOrStep();
-                return;
-            }
-
-            // When user clicks, text animation should stop, regardless of canAbortAnimation
-            if (textIsAnimating)
-            {
-                NovaAnimation.StopAll(AnimationType.Text);
-            }
-
-            if (!scriptCanAbortAnimation)
-            {
+                gameViewController.Step();
                 return;
             }
 
@@ -334,15 +332,9 @@ namespace Nova
                     Alert.Show("dialogue.hint.clickstopanimation");
                     configManager.SetInt(AbortAnimationFirstShownKey, clicks + 1);
                 }
-
-                return;
             }
 
-            if (isAnimating)
-            {
-                NovaAnimation.StopAll(AnimationType.PerDialogue);
-                dialogueBoxController.ShowDialogueFinishIcon(true);
-            }
+            gameViewController.AbortAnimation(scriptCanAbortAnimation && canAbortAnimation);
         }
 
         private void ReturnTitle()
@@ -352,7 +344,7 @@ namespace Nova
             // TODO: Use a faster transition from game view to title view
             // viewManager.titlePanel.SetActive(true);
 
-            dialogueBoxController.SwitchView<TitleController>();
+            gameViewController.SwitchView<TitleController>();
         }
 
         private void ReturnTitleWithAlert()
@@ -370,16 +362,16 @@ namespace Nova
             public readonly bool canClickForward;
             public readonly bool scriptCanAbortAnimation;
 
-            public GameViewInputRestoreData(bool canClickForward, bool scriptCanAbortAnimation)
+            public GameViewInputRestoreData(GameViewInput parent)
             {
-                this.canClickForward = canClickForward;
-                this.scriptCanAbortAnimation = scriptCanAbortAnimation;
+                canClickForward = parent.canClickForward;
+                scriptCanAbortAnimation = parent.scriptCanAbortAnimation;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new GameViewInputRestoreData(canClickForward, scriptCanAbortAnimation);
+            return new GameViewInputRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

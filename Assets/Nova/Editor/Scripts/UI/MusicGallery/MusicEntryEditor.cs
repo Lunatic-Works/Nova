@@ -9,6 +9,8 @@ namespace Nova.Editor
     public class MusicEntryEditor : UnityEditor.Editor
     {
         private const string AudioPreviewerName = "_musicEntryPreviewer";
+        private const string ResourcesFolderName = ImageGroupEditor.ResourcesFolderName;
+
         private GameObject gameObject;
         private AudioLooperOld audioLooper;
         private AudioSource audioSource;
@@ -119,7 +121,7 @@ namespace Nova.Editor
                     audioClip.GetData(sampleData, 0);
 
                     downSampleTo = audioClip.frequency / 60;
-                    downSampledData = new float[(int)Math.Ceiling(1.0f * audioClip.samples / downSampleTo)];
+                    downSampledData = new float[Mathf.CeilToInt((float)audioClip.samples / downSampleTo)];
                     for (int i = 0; i < sampleData.Length; i += downSampleTo)
                     {
                         float ssum = 0;
@@ -129,7 +131,7 @@ namespace Nova.Editor
                             ssum += sampleData[j] * sampleData[j];
                         }
 
-                        float rms = (float)Math.Sqrt(ssum / (j - i));
+                        float rms = Mathf.Sqrt(ssum / (j - i));
                         downSampledData[i / downSampleTo] = rms;
                     }
 
@@ -272,20 +274,17 @@ namespace Nova.Editor
 
         private static void CreateMusicEntry(string path)
         {
-            const string resFolderName = "/Resources/";
-            var index = path.LastIndexOf(resFolderName, StringComparison.Ordinal);
-            if (index != -1)
+            path = Utils.ConvertPathSeparator(path);
+            var index = path.LastIndexOf(ResourcesFolderName, StringComparison.Ordinal);
+            if (index == -1)
             {
-                index += resFolderName.Length;
-            }
-            else
-            {
-                index = 0;
+                throw new ArgumentException($"Nova: Path {path} not in Resources folder {ResourcesFolderName}");
             }
 
-            var assetPath = path.Substring(index);
-            var fileName = Path.GetFileNameWithoutExtension(assetPath);
-            var loadPath = Path.Combine(Path.GetDirectoryName(assetPath), fileName);
+            var loadPath = path.Substring(index + ResourcesFolderName.Length);
+            var dirName = Path.GetDirectoryName(loadPath);
+            var fileName = Path.GetFileNameWithoutExtension(loadPath);
+            loadPath = Path.Combine(dirName, fileName);
             var entryPath = Path.Combine(Path.GetDirectoryName(path), fileName + "_entry.asset");
 
             // create asset

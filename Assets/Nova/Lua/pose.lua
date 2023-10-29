@@ -1,15 +1,15 @@
 local poses = {
-    ['ergong'] = {
+    ['王二宫'] = {
         ['normal'] = 'body+mouth_smile+eye_normal+eyebrow_normal+hair',
     },
-    ['gaotian'] = {
+    ['陈高天'] = {
         ['normal'] = 'body+mouth_smile+eye_normal+eyebrow_normal+hair',
         ['cry'] = 'body+mouth_smile+eye_cry+eyebrow_normal+hair',
     },
-    ['qianye'] = {
+    ['张浅野'] = {
         ['normal'] = 'body+mouth_close+eye_normal+eyebrow_normal+hair',
     },
-    ['xiben'] = {
+    ['孙西本'] = {
         ['normal'] = 'body+mouth_close+eye_normal+eyebrow_normal+hair',
     },
 
@@ -19,16 +19,32 @@ local poses = {
     },
 }
 
-function get_pose(obj, pose_name)
+function get_all_poses_by_name(obj_name)
+    local ret = {}
+    if poses[obj_name] then
+        for k, _ in pairs(poses[obj_name]) do
+            ret[#ret + 1] = k
+        end
+        table.sort(ret)
+    end
+    return ret
+end
+
+function get_pose_by_name(obj_name, pose_name)
+    -- Not alias
     if string.find(pose_name, '+') then
         return pose_name
     end
 
-    local pose = poses[obj.luaGlobalName] and poses[obj.luaGlobalName][pose_name]
+    local pose = poses[obj_name] and poses[obj_name][pose_name]
     if pose then
         return pose
     end
 
-    warn('Unknown pose ' .. dump(pose_name) .. ' for composite sprite ' .. dump(obj))
+    warn('Unknown pose ' .. dump(pose_name) .. ' for composite sprite ' .. dump(obj_name))
     return pose_name
+end
+
+function get_pose(obj, pose_name)
+    return get_pose_by_name(obj.luaGlobalName, pose_name)
 end

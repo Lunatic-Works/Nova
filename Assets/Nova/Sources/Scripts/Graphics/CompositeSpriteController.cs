@@ -13,7 +13,6 @@ namespace Nova
         public CompositeSpriteMerger mergerPrimary;
         public CompositeSpriteMerger mergerSub;
         public string imageFolder;
-        public string luaGlobalName;
 
         protected string currentPose;
         private DialogueState dialogueState;
@@ -35,23 +34,9 @@ namespace Nova
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
-
-            if (!string.IsNullOrEmpty(luaGlobalName))
-            {
-                LuaRuntime.Instance.BindObject(luaGlobalName, this, "_G");
-                gameState.AddRestorable(this);
-            }
         }
 
-        protected virtual void OnDestroy()
-        {
-            if (!string.IsNullOrEmpty(luaGlobalName))
-            {
-                gameState.RemoveRestorable(this);
-            }
-        }
-
-        public void SetPose(string pose, bool fade = true)
+        public void SetPose(string pose, bool fade, float duration)
         {
             if (pose == currentPose)
             {
@@ -68,15 +53,25 @@ namespace Nova
             mergerPrimary.SetTextures(sprites);
             if (fade)
             {
-                DoFadeAnimation(fadeDuration);
+                DoFadeAnimation(duration);
             }
 
             currentPose = pose;
         }
 
+        public void SetPose(string pose, bool fade = true)
+        {
+            SetPose(pose, fade, fadeDuration);
+        }
+
+        public void ClearImage(bool fade, float duration)
+        {
+            SetPose("", fade, duration);
+        }
+
         public void ClearImage(bool fade = true)
         {
-            SetPose("", fade);
+            SetPose("", fade, fadeDuration);
         }
 
         public static string ArrayToPose(IEnumerable<string> pose)
@@ -114,30 +109,20 @@ namespace Nova
 
         #region Restoration
 
-        public virtual string restorableName => luaGlobalName;
+        public abstract string restorableName { get; }
 
         [Serializable]
         protected class CompositeSpriteControllerRestoreData : IRestoreData
         {
-            public readonly TransformData transform;
             public readonly string pose;
+            public readonly TransformData transform;
             public readonly Vector4Data color;
-            public readonly int renderQueue;
 
             public CompositeSpriteControllerRestoreData(CompositeSpriteController parent)
             {
-                transform = new TransformData(parent.transform);
                 pose = parent.currentPose;
+                transform = new TransformData(parent.transform);
                 color = parent.color;
-                renderQueue = parent.gameObject.Ensure<RenderQueueOverrider>().renderQueue;
-            }
-
-            public CompositeSpriteControllerRestoreData(CompositeSpriteControllerRestoreData other)
-            {
-                transform = other.transform;
-                pose = other.pose;
-                color = other.color;
-                renderQueue = other.renderQueue;
             }
         }
 
@@ -149,9 +134,8 @@ namespace Nova
         public virtual void Restore(IRestoreData restoreData)
         {
             var data = restoreData as CompositeSpriteControllerRestoreData;
-            data.transform.Restore(this.transform);
+            data.transform.Restore(transform);
             color = data.color;
-            gameObject.Ensure<RenderQueueOverrider>().renderQueue = data.renderQueue;
             SetPose(data.pose, false);
         }
 

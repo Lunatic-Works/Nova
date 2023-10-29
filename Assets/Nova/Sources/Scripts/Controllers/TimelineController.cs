@@ -66,31 +66,27 @@ namespace Nova
         {
             public readonly float time;
 
-            public TimelineControllerRestoreData(PrefabLoaderRestoreData baseData, float time) : base(baseData)
+            public TimelineControllerRestoreData(TimelineController parent) : base(parent)
             {
-                this.time = time;
+                if (parent.playableDirector != null)
+                {
+                    time = (float)parent.playableDirector.time;
+                }
+                else
+                {
+                    time = 0.0f;
+                }
             }
         }
 
         public override IRestoreData GetRestoreData()
         {
-            float time;
-            if (playableDirector != null)
-            {
-                time = (float)playableDirector.time;
-            }
-            else
-            {
-                time = 0.0f;
-            }
-
-            return new TimelineControllerRestoreData(base.GetRestoreData() as PrefabLoaderRestoreData, time);
+            return new TimelineControllerRestoreData(this);
         }
 
         public override void Restore(IRestoreData restoreData)
         {
-            var baseData = restoreData as PrefabLoaderRestoreData;
-            base.Restore(baseData);
+            base.Restore(restoreData);
 
             var data = restoreData as TimelineControllerRestoreData;
             if (playableDirector != null)

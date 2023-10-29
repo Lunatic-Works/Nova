@@ -3,7 +3,7 @@ label('ch4', '终章')
 |>
 <|
 anim:trans_fade(cam, function()
-        show(ergong, 'normal', pos_c)
+        show(王二宫, 'normal', pos_c)
         show(bg, 'room')
     end)
 play(bgm, 'prelude')
@@ -23,7 +23,7 @@ set_auto_voice_delay(1)
 我推了推我的墨镜。会长勉强接受了这个借口。
 
 <|
-hide(ergong)
+hide(王二宫)
 |>
 我将杯子放到桌上，然后慢慢地倒出了奶茶。
 
@@ -32,13 +32,13 @@ hide(ergong)
 但是杯子总有装满的时候。
 
 <|
-show(gaotian, 'normal', pos_l)
+show(陈高天, 'normal', pos_l)
 |>
 高天看上去很高兴，我对她回以僵硬的笑。
 
 <|
-hide(gaotian)
-show(qianye, 'normal', pos_r)
+hide(陈高天)
+show(张浅野, 'normal', pos_r)
 |>
 这时，我的余光看到浅野的脸色一变。
 
@@ -52,8 +52,8 @@ branch {
 
 @<| label 'l_true' |>
 <|
-hide(qianye)
-show(xiben, 'normal', pos_r)
+hide(张浅野)
+show(孙西本, 'normal', pos_r)
 |>
 孙西本：：“我也要喝。”
 
@@ -62,19 +62,19 @@ show(xiben, 'normal', pos_r)
 她弯下腰的时候，头发上的缎带擦过我的鼻翼。
 
 <|
-show(gaotian, 'normal', pos_l)
+show(陈高天, 'normal', pos_l)
 |>
 陈高天：：“……西本同学……”
 
 高天露出了不知所措的表情，看上去像是受伤的小鹿。
 
 <|
-hide(gaotian)
+hide(陈高天)
 |>
 西本的手一顿，但是她装作没看见，依旧将奶茶往杯子里倒。
 
 <|
-show(ergong, 'normal', pos_l)
+show(王二宫, 'normal', pos_l)
 |>
 西本在这个高中一直不和他人有所接触，她的异状引起了会长的警觉。
 
@@ -87,8 +87,8 @@ show(ergong, 'normal', pos_l)
 王二宫：：“说不定西本同学也有些口渴呢。”
 
 <|
-hide(xiben)
-show(qianye, 'normal', pos_r)
+hide(孙西本)
+show(张浅野, 'normal', pos_r)
 |>
 张浅野：：“但、但是……竹内和高天不是……”
 
@@ -101,44 +101,44 @@ show(qianye, 'normal', pos_r)
 浅野偷偷扫了一眼被我扔到垃圾堆的空玻璃瓶，露出了绝望的表情。
 
 <|
-hide(qianye)
+hide(张浅野)
 |>
 王二宫：：“竹内君，不如你先请吧。大家一起喝，高天同学和西本同学也没意见吧？”
 
 <|
-hide(ergong)
+hide(王二宫)
 anim:fade_out(bgm)
 |>
 有意见。
 
 <|
-show(gaotian, 'cry', pos_l)
+show(陈高天, 'cry', pos_l)
 |>
 高天何止有意见，她的眼泪都要涌出来了。
 
 但是太过着急的她却无法将自己的意思表达出来。
 
 <|
-hide(gaotian)
-show(xiben, 'normal', pos_r)
+hide(陈高天)
+show(孙西本, 'normal', pos_r)
 |>
 西本呆立着，好像丢了魂。
 
 <|
-hide(xiben)
-show(ergong, 'normal', pos_l)
+hide(孙西本)
+show(王二宫, 'normal', pos_l)
 |>
 学生会长笑着看着我，她似乎猜到了什么。
 
 <|
-hide(ergong)
-show(qianye, 'normal', pos_r)
+hide(王二宫)
+show(张浅野, 'normal', pos_r)
 |>
 浅野也看着我。
 
 <|
 anim_hold_begin()
-hide(qianye)
+hide(张浅野)
 play(bgm, 'final', 0.1)
 anim_hold:volume(bgm, 0.5, 6.4)
 |>

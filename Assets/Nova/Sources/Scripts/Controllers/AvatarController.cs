@@ -9,7 +9,6 @@ namespace Nova
     [Serializable]
     public class AvatarConfig
     {
-        public string characterName;
         public GameCharacterController characterController;
         public string prefix;
     }
@@ -22,6 +21,7 @@ namespace Nova
         [SerializeField] private int textPadding;
         [SerializeField] private Camera renderCamera;
 
+        private DialogueBoxController dialogueBox;
         private RawImage image;
         private RectTransform rectTransform;
         private readonly Dictionary<string, AvatarConfig> nameToConfig = new Dictionary<string, AvatarConfig>();
@@ -36,11 +36,12 @@ namespace Nova
         {
             base.Awake();
 
+            dialogueBox = GetComponentInParent<DialogueBoxController>();
             image = GetComponent<RawImage>();
             rectTransform = GetComponent<RectTransform>();
             foreach (var config in avatarConfigs)
             {
-                nameToConfig[config.characterName] = config;
+                nameToConfig[config.characterController.luaGlobalName] = config;
             }
 
             gameState.nodeChanged.AddListener(OnNodeChanged);
@@ -57,10 +58,8 @@ namespace Nova
             renderCamera.enabled = true;
         }
 
-        protected override void OnDestroy()
+        private void OnDestroy()
         {
-            base.OnDestroy();
-
             Destroy(renderCamera.targetTexture);
             gameState.nodeChanged.RemoveListener(OnNodeChanged);
         }
@@ -89,9 +88,9 @@ namespace Nova
 
         public GameCharacterController GetCharacterController()
         {
-            if (nameToConfig.ContainsKey(characterName))
+            if (nameToConfig.TryGetValue(characterName, out var config))
             {
-                return nameToConfig[characterName].characterController;
+                return config.characterController;
             }
             else
             {
@@ -163,23 +162,23 @@ namespace Nova
 
         #region Restoration
 
+        public override string restorableName => dialogueBox.restorableName + "_avatar";
+
         [Serializable]
         private class AvatarControllerRestoreData : CompositeSpriteControllerRestoreData
         {
             // No need to save characterName, because it will be set in the action of the dialogue entry
             public readonly Dictionary<string, string> characterToImageName;
 
-            public AvatarControllerRestoreData(CompositeSpriteControllerRestoreData baseData,
-                Dictionary<string, string> characterToImageName) : base(baseData)
+            public AvatarControllerRestoreData(AvatarController parent) : base(parent)
             {
-                this.characterToImageName = characterToImageName;
+                characterToImageName = parent.characterToImageName;
             }
         }
 
         public override IRestoreData GetRestoreData()
         {
-            return new AvatarControllerRestoreData(base.GetRestoreData() as CompositeSpriteControllerRestoreData,
-                characterToImageName);
+            return new AvatarControllerRestoreData(this);
         }
 
         public override void Restore(IRestoreData restoreData)

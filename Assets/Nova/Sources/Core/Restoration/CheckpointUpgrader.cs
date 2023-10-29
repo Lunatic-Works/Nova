@@ -116,6 +116,11 @@ namespace Nova
             return newOffset;
         }
 
+        public bool UpgradeBookmark(Bookmark bookmark)
+        {
+            return UpgradeBookmark(0, bookmark);
+        }
+
         private bool UpgradeBookmark(int key, Bookmark bookmark)
         {
             if (!nodeRecordMap.TryGetValue(bookmark.nodeOffset, out var newOffset))
@@ -134,7 +139,8 @@ namespace Nova
             var newDialogueIndex = changedNodes[nodeRecord.name].leftMap[bookmark.dialogueIndex];
             if (newDialogueIndex < newNodeRecord.beginDialogue || newDialogueIndex >= newNodeRecord.endDialogue)
             {
-                Debug.LogWarning($"Nova: Cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is deleted.");
+                Debug.LogWarning(
+                    $"Nova: Cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is deleted.");
                 return false;
             }
 
@@ -170,7 +176,7 @@ namespace Nova
             }
 
             checkpointManager.beginNodeOffset = UpgradeNodeTree(checkpointManager.beginNodeOffset);
-            foreach (var id in checkpointManager.saveSlotsMetadata.Keys)
+            foreach (var id in checkpointManager.bookmarksMetadata.Keys)
             {
                 var bookmark = checkpointManager.LoadBookmark(id, false);
                 if (UpgradeBookmark(id, bookmark))

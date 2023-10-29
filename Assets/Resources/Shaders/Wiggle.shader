@@ -23,7 +23,7 @@ Shader "Nova/VFX/Wiggle"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -78,6 +78,8 @@ Shader "Nova/VFX/Wiggle"
                 float noiseA = _AAmp * noise(xyt);
                 col.rgb *= 1.0 - noiseA;
                 col.rgb = saturate(col.rgb);
+
+                col.rgb *= col.a;
 
                 return col;
             }

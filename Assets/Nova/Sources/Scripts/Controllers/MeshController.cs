@@ -48,15 +48,15 @@ namespace Nova
         {
             public readonly bool meshEnabled;
 
-            public MeshControllerRestoreData(bool meshEnabled)
+            public MeshControllerRestoreData(MeshController parent)
             {
-                this.meshEnabled = meshEnabled;
+                meshEnabled = parent.meshEnabled;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new MeshControllerRestoreData(meshEnabled);
+            return new MeshControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

@@ -11,12 +11,14 @@ namespace Nova
         [SerializeField] private AudioController bgmController;
         [SerializeField] private string bgmName;
         [SerializeField] private float bgmVolume = 0.5f;
+        [SerializeField] private float bgmFadeOutDuration = 1.0f;
 
         private const string SelectChapterFirstShownKey = ConfigManager.FirstShownKeyPrefix + "SelectChapter";
 
         private GameState gameState;
         private ConfigManager configManager;
         private CheckpointManager checkpointManager;
+        private NovaAnimation novaAnimation;
         private int unlockedStartCount;
 
         protected override void Awake()
@@ -27,8 +29,9 @@ namespace Nova
             gameState = controller.GameState;
             configManager = controller.ConfigManager;
             checkpointManager = controller.CheckpointManager;
+            novaAnimation = controller.UIAnimation;
 
-            quitButton.onClick.AddListener(() => Hide(Utils.Quit));
+            quitButton.onClick.AddListener(() => this.Hide(Utils.Quit));
         }
 
         protected override void Start()
@@ -36,14 +39,14 @@ namespace Nova
             base.Start();
 
             unlockedStartCount = gameState.GetStartNodeNames(StartNodeType.Unlocked).Count();
-            Show(null);
+            Show();
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
-            base.Show(() =>
+            base.Show(doTransition, () =>
             {
-                viewManager.dialoguePanel.SetActive(false);
+                viewManager.GetController<GameViewController>().HideImmediate();
                 viewManager.StopAllAnimations();
                 gameState.ResetGameState();
 
@@ -66,6 +69,17 @@ namespace Nova
 
                 onFinish?.Invoke();
             });
+        }
+
+        public override void Hide(bool doTransition, Action onFinish)
+        {
+            if (bgmController != null && !string.IsNullOrEmpty(bgmName))
+            {
+                novaAnimation.Do(new VolumeAnimationProperty(bgmController, 0.0f), bgmFadeOutDuration)
+                    .Then(new ActionAnimationProperty(bgmController.Stop));
+            }
+
+            base.Hide(doTransition, onFinish);
         }
 
         // Disable BackHide

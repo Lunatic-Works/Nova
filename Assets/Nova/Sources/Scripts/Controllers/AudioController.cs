@@ -8,7 +8,6 @@ namespace Nova
     /// This class is used for controlling audio source from external scripts
     /// </summary>
     [ExportCustomType]
-    [RequireComponent(typeof(AudioSource))]
     public class AudioController : MonoBehaviour, IRestorable
     {
         public string luaGlobalName;
@@ -53,6 +52,12 @@ namespace Nova
                 Init();
                 audioSource.volume = _scriptVolume * _configVolume;
             }
+        }
+
+        public float pitch
+        {
+            get => audioSource.pitch;
+            set => audioSource.pitch = value;
         }
 
         private bool inited;
@@ -104,7 +109,7 @@ namespace Nova
             {
                 if (slider != null)
                 {
-                    slider.value = 1.0f * audioSource.timeSamples / audioSource.clip.samples;
+                    slider.value = (float)audioSource.timeSamples / audioSource.clip.samples;
                 }
 
                 if (text != null)
@@ -134,7 +139,7 @@ namespace Nova
                 }
                 else
                 {
-                    clip = AssetLoader.LoadOrNull<AudioClip>(audioPath);
+                    clip = AssetLoader.Load<AudioClip>(audioPath);
                 }
             }
 
@@ -230,18 +235,20 @@ namespace Nova
             public readonly string currentAudioName;
             public readonly bool isPlaying;
             public readonly float scriptVolume;
+            public readonly float pitch;
 
-            public AudioControllerRestoreData(string currentAudioName, bool isPlaying, float scriptVolume)
+            public AudioControllerRestoreData(AudioController parent)
             {
-                this.currentAudioName = currentAudioName;
-                this.isPlaying = isPlaying;
-                this.scriptVolume = scriptVolume;
+                currentAudioName = parent.currentAudioName;
+                isPlaying = parent.isPlaying;
+                scriptVolume = parent.scriptVolume;
+                pitch = parent.pitch;
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            return new AudioControllerRestoreData(currentAudioName, isPlaying, scriptVolume);
+            return new AudioControllerRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)
@@ -250,6 +257,7 @@ namespace Nova
             currentAudioName = data.currentAudioName;
             isPlaying = data.isPlaying;
             scriptVolume = data.scriptVolume;
+            pitch = data.pitch;
         }
 
         #endregion

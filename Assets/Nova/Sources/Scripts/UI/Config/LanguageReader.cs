@@ -34,7 +34,7 @@ namespace Nova
             I18n.LocaleChanged.RemoveListener(OnLocaleChanged);
         }
 
-        private void SetLocale(bool value, SystemLanguage locale)
+        private static void SetLocale(bool value, SystemLanguage locale)
         {
             if (!value) return;
             I18n.CurrentLocale = locale;

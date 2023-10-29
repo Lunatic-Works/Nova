@@ -58,7 +58,9 @@ shader_type_data = {
     ['Fade Global'] = {
         _Color = 'Color',
         _Offsets = 'Vector',
+        _PrimaryTex = '2D',
         _SubColor = 'Color',
+        _SubTex = '2D',
         _T = 'Float',
     },
     ['Fade Radial Blur'] = {
@@ -190,6 +192,7 @@ shader_type_data = {
     },
     ['Sharpen'] = {
         _Size = 'Float',
+        _Strength = 'Float',
         _T = 'Float',
     },
     ['Show Second Texture'] = {
@@ -379,6 +382,7 @@ shader_float_data = {
     },
     ['Sharpen'] = {
         _Size = 1,
+        _Strength = 1,
         _T = 0,
     },
     ['Water'] = {

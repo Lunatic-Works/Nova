@@ -11,7 +11,7 @@ Shader "Nova/VFX/Mono"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -20,6 +20,8 @@ Shader "Nova/VFX/Mono"
             #pragma fragment frag
 
             #include "UnityCG.cginc"
+
+            #define IADD_RGBA(x, y) (x) += (y);
 
             struct appdata
             {
@@ -50,11 +52,18 @@ Shader "Nova/VFX/Mono"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float4 col = tex2D(_MainTex, i.uv);
+                float4 col = tex2D(_MainTex, i.uv) * i.color;
                 float gray = Luminance(col.rgb);
-                float3 mono = gray * _ColorMul.rgb + _ColorAdd.rgb;
-                col.rgb = lerp(col.rgb, mono, _T);
-                col *= i.color;
+
+                float4 mono;
+                mono.rgb = gray;
+                mono.a = col.a;
+                mono *= _ColorMul;
+                IADD_RGBA(mono, _ColorAdd)
+
+                col = lerp(col, mono, _T);
+
+                col.rgb *= col.a;
 
                 return col;
             }

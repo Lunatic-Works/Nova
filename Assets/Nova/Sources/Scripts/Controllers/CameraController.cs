@@ -10,7 +10,7 @@ namespace Nova
         public string luaGlobalName;
 
         private GameState gameState;
-        private new Camera camera;
+        public new Camera camera { get; private set; }
 
         public bool cameraEnabled
         {
@@ -52,8 +52,8 @@ namespace Nova
 
         private void Awake()
         {
-            camera = GetComponent<Camera>();
             gameState = Utils.FindNovaController().GameState;
+            camera = GetComponent<Camera>();
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {
@@ -70,21 +70,6 @@ namespace Nova
             }
         }
 
-        [Serializable]
-        private class CameraData
-        {
-            public readonly TransformData transformData;
-            public readonly float size;
-            public readonly int cullingMask;
-
-            public CameraData(Transform transform, float size, int cullingMask)
-            {
-                transformData = new TransformData(transform);
-                this.size = size;
-                this.cullingMask = cullingMask;
-            }
-        }
-
         #region Restoration
 
         public string restorableName => luaGlobalName;
@@ -92,12 +77,17 @@ namespace Nova
         [Serializable]
         private class CameraControllerRestoreData : IRestoreData
         {
-            public readonly CameraData cameraData;
+            public readonly TransformData transformData;
+            public readonly bool cameraEnabled;
+            public readonly float size;
+            public readonly int cullingMask;
 
-            public CameraControllerRestoreData(CameraController cameraController)
+            public CameraControllerRestoreData(CameraController parent)
             {
-                cameraData = new CameraData(cameraController.transform, cameraController.size,
-                    cameraController.cullingMask);
+                transformData = new TransformData(parent.transform);
+                cameraEnabled = parent.cameraEnabled;
+                size = parent.size;
+                cullingMask = parent.cullingMask;
             }
         }
 
@@ -109,9 +99,10 @@ namespace Nova
         public void Restore(IRestoreData restoreData)
         {
             var data = restoreData as CameraControllerRestoreData;
-            data.cameraData.transformData.Restore(transform);
-            size = data.cameraData.size;
-            cullingMask = data.cameraData.cullingMask;
+            data.transformData.Restore(transform);
+            cameraEnabled = data.cameraEnabled;
+            size = data.size;
+            cullingMask = data.cullingMask;
         }
 
         #endregion

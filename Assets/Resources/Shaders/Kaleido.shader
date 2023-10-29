@@ -11,7 +11,7 @@ Shader "Nova/VFX/Kaleido"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -67,6 +67,8 @@ Shader "Nova/VFX/Kaleido"
                 float4 col2 = tex2D(_MainTex, uv);
 
                 col = lerp(col, col2, _T) * i.color;
+
+                col.rgb *= col.a;
 
                 return col;
             }

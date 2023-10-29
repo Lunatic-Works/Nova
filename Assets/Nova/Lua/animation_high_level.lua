@@ -78,56 +78,74 @@ local function parse_coord(obj, camera, coord)
         coord = coord(obj)
     end
 
-    if coord and coord[#coord] == RELATIVE then
-        relative = RELATIVE
-        coord[#coord] = nil
+    -- When there is nil in coord, #coord may be wrong
+    for i = 6, 3, -1 do
+        if coord[i] == RELATIVE then
+            relative = RELATIVE
+            coord[i] = nil
+            break
+        end
+    end
 
-        local x = coord[1] or 0
-        local y = coord[2] or 0
-        local z = coord[4] or 0
-        pos = Vector3(x, y, z)
-
-        angle = coord[5] or 0
-        if type(angle) == 'number' then
-            angle = Vector3(0, 0, angle)
-        else -- type(angle) == 'table'
-            angle = Vector3(angle[1], angle[2], angle[3])
+    if relative then
+        if coord[1] or coord[2] or coord[4] then
+            local x = coord[1] or 0
+            local y = coord[2] or 0
+            local z = coord[4] or 0
+            pos = Vector3(x, y, z)
         end
 
-        scale = coord[3] or 1
-        if camera == nil then
-            if type(scale) == 'number' then
-                scale = Vector3(scale, scale, 1)
+        if coord[5] then
+            angle = coord[5]
+            if type(angle) == 'number' then
+                angle = Vector3(0, 0, angle)
             else -- type(angle) == 'table'
-                scale = Vector3(scale[1], scale[2], scale[3])
+                angle = Vector3(angle[1], angle[2], angle[3])
+            end
+        end
+
+        if coord[3] then
+            scale = coord[3]
+            if camera == nil then
+                if type(scale) == 'number' then
+                    scale = Vector3(scale, scale, 1)
+                else -- type(angle) == 'table'
+                    scale = Vector3(scale[1], scale[2], scale[3])
+                end
             end
         end
     else
-        local x0, y0, scale0, z0, angle0
-        if camera then
-            x0, y0, scale0, z0, angle0 = get_coord_cam(camera)
-        else
-            x0, y0, scale0, z0, angle0 = get_coord(obj)
+        if coord[1] or coord[2] or coord[4] then
+            local x0, y0, z0
+            if camera then
+                x0, y0, _, z0, _ = get_coord_cam(camera)
+            else
+                x0, y0, _, z0, _ = get_coord(obj)
+            end
+
+            local x = coord[1] or x0
+            local y = coord[2] or y0
+            local z = coord[4] or z0
+            pos = Vector3(x, y, z)
         end
 
-        local x = coord[1] or x0
-        local y = coord[2] or y0
-        local z = coord[4] or z0
-        pos = Vector3(x, y, z)
-
-        angle = coord[5] or angle0
-        if type(angle) == 'number' then
-            angle = Vector3(0, 0, angle)
-        else -- type(angle) == 'table'
-            angle = Vector3(angle[1], angle[2], angle[3])
-        end
-
-        scale = coord[3] or scale0
-        if camera == nil then
-            if type(scale) == 'number' then
-                scale = Vector3(scale, scale, 1)
+        if coord[5] then
+            angle = coord[5]
+            if type(angle) == 'number' then
+                angle = Vector3(0, 0, angle)
             else -- type(angle) == 'table'
-                scale = Vector3(scale[1], scale[2], scale[3])
+                angle = Vector3(angle[1], angle[2], angle[3])
+            end
+        end
+
+        if coord[3] then
+            scale = coord[3]
+            if camera == nil then
+                if type(scale) == 'number' then
+                    scale = Vector3(scale, scale, 1)
+                else -- type(angle) == 'table'
+                    scale = Vector3(scale[1], scale[2], scale[3])
+                end
             end
         end
     end
@@ -179,20 +197,32 @@ function move(obj, coord)
 
     local transform = obj.transform
     if relative then
-        transform.localPosition = transform.localPosition + pos
-        transform.localRotation = transform.localRotation * Quaternion.Euler(angle)
-        if camera then
-            camera.size = camera.size.CloneScale(scale)
-        else
-            transform.localScale = transform.localScale.CloneScale(scale)
+        if pos then
+            transform.localPosition = transform.localPosition + pos
+        end
+        if angle then
+            transform.localRotation = transform.localRotation * Quaternion.Euler(angle)
+        end
+        if scale then
+            if camera then
+                camera.size = camera.size:Scale(scale)
+            else
+                transform.localScale = transform.localScale:Scale(scale)
+            end
         end
     else
-        transform.localPosition = pos
-        transform.localEulerAngles = angle
-        if camera then
-            camera.size = scale
-        else
-            transform.localScale = scale
+        if pos then
+            transform.localPosition = pos
+        end
+        if angle then
+            transform.localEulerAngles = angle
+        end
+        if scale then
+            if camera then
+                camera.size = scale
+            else
+                transform.localScale = scale
+            end
         end
     end
 end
@@ -206,27 +236,41 @@ make_anim_method('move', function(self, obj, coord, duration, easing)
     easing = parse_easing(easing)
 
     local transform = obj.transform
+    local head = self
     if relative then
-        self:_then(Nova.PositionAnimationProperty(transform, pos, relative)):_with(easing):_for(duration)
-        self:_then(Nova.RotationAnimationProperty(transform, angle, relative)):_with(easing):_for(duration)
-        local property
-        if camera then
-            property = Nova.CameraSizeAnimationProperty(camera, scale, relative)
-        else
-            property = Nova.ScaleAnimationProperty(transform, scale, relative)
+        if pos then
+            head = self:_then(Nova.PositionAnimationProperty(transform, pos, relative)):_with(easing):_for(duration)
         end
-        return self:_then(property):_with(easing):_for(duration)
+        if angle then
+            head = self:_then(Nova.RotationAnimationProperty(transform, angle, relative)):_with(easing):_for(duration)
+        end
+        if scale then
+            local property
+            if camera then
+                property = Nova.CameraSizeAnimationProperty(camera, scale, relative)
+            else
+                property = Nova.ScaleAnimationProperty(transform, scale, relative)
+            end
+            head = self:_then(property):_with(easing):_for(duration)
+        end
     else
-        self:_then(Nova.PositionAnimationProperty(transform, pos)):_with(easing):_for(duration)
-        self:_then(Nova.RotationAnimationProperty(transform, angle)):_with(easing):_for(duration)
-        local property
-        if camera then
-            property = Nova.CameraSizeAnimationProperty(camera, scale)
-        else
-            property = Nova.ScaleAnimationProperty(transform, scale)
+        if pos then
+            head = self:_then(Nova.PositionAnimationProperty(transform, pos)):_with(easing):_for(duration)
         end
-        return self:_then(property):_with(easing):_for(duration)
+        if angle then
+            head = self:_then(Nova.RotationAnimationProperty(transform, angle)):_with(easing):_for(duration)
+        end
+        if scale then
+            local property
+            if camera then
+                property = Nova.CameraSizeAnimationProperty(camera, scale)
+            else
+                property = Nova.ScaleAnimationProperty(transform, scale)
+            end
+            head = self:_then(property):_with(easing):_for(duration)
+        end
     end
+    return head
 end)
 
 function get_color(obj)
@@ -287,9 +331,9 @@ end
 ---     tint(obj, {r, g, b, [a]}, [duration, easing])
 make_anim_method('tint', function(self, obj, color, duration, easing)
     local chara = obj:GetComponent(typeof(Nova.GameCharacterController))
-    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
+    local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(Nova.FadeController)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
     if chara == nil and renderer == nil then
-        warn('Cannot find SpriteRenderer or GameCharacterController or Image or RawImage for ' .. dump(obj))
+        warn('Cannot find GameCharacterController or SpriteRenderer or FadeController or Image or RawImage for ' .. dump(obj))
         return self
     end
 

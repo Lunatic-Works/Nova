@@ -55,9 +55,10 @@ Shader "Nova/VFX Screen/Radial Blur"
                 float4 col = tex2DMotionBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, uvShift * _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * length(uvShift) * _T;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

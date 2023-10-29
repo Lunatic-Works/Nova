@@ -4,7 +4,7 @@ Shader "Nova/VFX/Blink"
 {
     Properties
     {
-        _MainTex ("Main Texture", 2D) = "white" {}
+        [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
         _T ("Time", Range(0.0, 1.0)) = 0.0
         _Mul ("Multiplier", Float) = 1.0
         _Offset ("Offset", Float) = 0.0
@@ -13,7 +13,7 @@ Shader "Nova/VFX/Blink"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -59,6 +59,8 @@ Shader "Nova/VFX/Blink"
                 float n = noise(_Freq * _Time.y);
                 col.rgb += _Amp * n * n * _T;
                 col.rgb = saturate(col.rgb);
+
+                col.rgb *= col.a;
 
                 return col;
             }

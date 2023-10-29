@@ -14,7 +14,7 @@ namespace Nova
 
         #region Layout
 
-        private float height;
+        public float height { get; private set; }
         public float minWidth => -1;
         public float preferredWidth => -1;
         public float flexibleWidth => -1;

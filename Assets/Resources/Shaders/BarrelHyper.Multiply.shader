@@ -94,8 +94,10 @@ Shader "Nova/VFX Multiply/Barrel Hyper"
                 {
                     col = getColor(i.uv, sigma);
                 }
+
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb = 1.0 - (1.0 - col.rgb) * col.a;
                 col.a = 1.0;

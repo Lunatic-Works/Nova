@@ -55,7 +55,8 @@ namespace Nova
         }
 
         public DialogueEntryController AddEntry(DialogueDisplayData displayData, TextAlignmentOptions alignment,
-            Color characterNameColor, Color textColor, string materialName, DialogueEntryLayoutSetting layoutSetting, int textLeftExtraPadding)
+            Color characterNameColor, Color textColor, string materialName, DialogueEntryLayoutSetting layoutSetting,
+            int textLeftExtraPadding)
         {
             var dec = prefabFactory.Get<DialogueEntryController>();
             var _transform = dec.transform;

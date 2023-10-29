@@ -17,6 +17,8 @@ namespace Nova
 
         public NovaAnimation PerDialogueAnimation { get; private set; }
         public NovaAnimation HoldingAnimation { get; private set; }
+        public NovaAnimation UIAnimation { get; private set; }
+        public NovaAnimation TextAnimation { get; private set; }
 
         private void Awake()
         {
@@ -29,9 +31,13 @@ namespace Nova
 
             var animations = GetComponentsInChildren<NovaAnimation>();
             PerDialogueAnimation = Array.Find(animations, x => x.type == AnimationType.PerDialogue);
-            AssertNotNull(PerDialogueAnimation, "PerDialogueAnimation");
             HoldingAnimation = Array.Find(animations, x => x.type == AnimationType.Holding);
+            UIAnimation = Array.Find(animations, x => x.type == AnimationType.UI);
+            TextAnimation = Array.Find(animations, x => x.type == AnimationType.Text);
+            AssertNotNull(PerDialogueAnimation, "PerDialogueAnimation");
             AssertNotNull(HoldingAnimation, "HoldingAnimation");
+            AssertNotNull(UIAnimation, "UIAnimation");
+            AssertNotNull(TextAnimation, "TextAnimation");
         }
 
         private static void AssertNotNull(MonoBehaviour component, string name)

@@ -107,9 +107,10 @@ Shader "Nova/VFX Screen/Glitch"
                 blockOffset += blockOffsetPass(uv, 0.5, 5.0, 0.1, 0.06 * powerT, -0.5);
                 blockOffset += blockOffsetPass(uv, 2.0, 4.0, 0.1, 0.002 * powerT, 1.0);
                 col.rgb += blockOffset;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

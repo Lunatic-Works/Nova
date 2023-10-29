@@ -18,6 +18,8 @@ Shader "Nova/$VARIANT_NAME$/Mono"
 
             #include "UnityCG.cginc"
 
+            $DEF_IADD_RGBA$
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -47,11 +49,16 @@ Shader "Nova/$VARIANT_NAME$/Mono"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float4 col = tex2D(_MainTex, i.uv);
+                float4 col = tex2D(_MainTex, i.uv) * i.color;
                 float gray = Luminance(col.rgb);
-                float3 mono = gray * _ColorMul.rgb + _ColorAdd.rgb;
-                col.rgb = lerp(col.rgb, mono, _T);
-                col *= i.color;
+
+                float4 mono;
+                mono.rgb = gray;
+                mono.a = col.a;
+                mono *= _ColorMul;
+                IADD_RGBA(mono, _ColorAdd)
+
+                col = lerp(col, mono, _T);
 
                 $VARIANT_RGB$
 

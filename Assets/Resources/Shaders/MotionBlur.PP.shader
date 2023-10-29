@@ -55,6 +55,7 @@ Shader "Nova/Post Processing/Motion Blur"
                 float4 col = tex2DMotionBlur(_MainTex, _MainTex_TexelSize * _GScale, i.uv, float2(cos(_Theta), sin(_Theta)) * _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 return col;
             }

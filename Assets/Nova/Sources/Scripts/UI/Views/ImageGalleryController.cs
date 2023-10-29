@@ -64,12 +64,12 @@ namespace Nova
             ShowPage();
         }
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             imageViewer.Hide();
             ShowPage();
 
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
         }
 
         private void ShowPage()

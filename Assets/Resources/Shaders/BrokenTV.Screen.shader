@@ -86,7 +86,7 @@ Shader "Nova/VFX Screen/Broken TV"
                 col.rgb += srand(uv * 100.0 + _Time.y) * 0.04 * powerT * col.a;
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

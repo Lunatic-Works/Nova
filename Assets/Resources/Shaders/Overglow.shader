@@ -13,7 +13,7 @@ Shader "Nova/VFX/Overglow"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -57,6 +57,8 @@ Shader "Nova/VFX/Overglow"
                 float4 col2 = tex2D(_MainTex, uv2) * i.color;
                 col.rgb += col2.rgb * _Mul * (1.0 - _T);
                 col.rgb = saturate(col.rgb);
+
+                col.rgb *= col.a;
 
                 return col;
             }

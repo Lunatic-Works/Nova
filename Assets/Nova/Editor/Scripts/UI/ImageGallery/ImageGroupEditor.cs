@@ -19,11 +19,10 @@ namespace Nova.Editor
         private static string GetResourcePath(string path)
         {
             path = Utils.ConvertPathSeparator(path);
-
             var index = path.IndexOf(ResourcesFolderName, StringComparison.Ordinal);
             if (index == -1)
             {
-                throw new ArgumentException();
+                throw new ArgumentException($"Nova: Path {path} not in Resources folder {ResourcesFolderName}");
             }
 
             var resourcePath = path.Substring(index + ResourcesFolderName.Length);
@@ -81,7 +80,6 @@ namespace Nova.Editor
         [MenuItem("Assets/Create/Nova/Image Group")]
         public static void CreateImageGroup()
         {
-            // split path name and file name
             var dir = EditorUtils.GetSelectedDirectory();
             CreateImageGroup(dir, EditorUtils.GetSelectedSpritePaths());
         }
@@ -157,7 +155,7 @@ namespace Nova.Editor
 
         private void DrawPreview(ImageEntry entry, SerializedProperty entryProperty)
         {
-            Texture previewTexture = null;
+            Texture previewTexture;
             if (entry.composite)
             {
                 if (capturer.renderTexture == null || previewEntryKey != entry.unlockKey)

@@ -350,12 +350,12 @@ namespace Nova
             if (compress)
             {
                 using var compressor = new DeflateStream(mem, CompressionMode.Compress, true);
-                using var sw = new StreamWriter(compressor, Encoding.Default, 1024, true);
+                using var sw = new StreamWriter(compressor, Encoding.UTF8, 1024, true);
                 jsonSerializer.Serialize(sw, data, typeof(T));
             }
             else
             {
-                using var sw = new StreamWriter(mem, Encoding.Default, 1024, true);
+                using var sw = new StreamWriter(mem, Encoding.UTF8, 1024, true);
                 jsonSerializer.Serialize(sw, data, typeof(T));
             }
 
@@ -369,23 +369,21 @@ namespace Nova
             {
                 var record = GetRecord(offset);
                 // Debug.Log($"deserialize type={typeof(T)} json={record.ReadString(0)})");
+
                 using var mem = record.ToStream();
-                T obj;
                 if (compress)
                 {
                     using var decompressor = new DeflateStream(mem, CompressionMode.Decompress);
-                    using var sr = new StreamReader(decompressor);
+                    using var sr = new StreamReader(decompressor, Encoding.UTF8);
                     using var jr = new JsonTextReader(sr);
-                    obj = jsonSerializer.Deserialize<T>(jr);
+                    return jsonSerializer.Deserialize<T>(jr);
                 }
                 else
                 {
-                    using var sr = new StreamReader(mem);
+                    using var sr = new StreamReader(mem, Encoding.UTF8);
                     using var jr = new JsonTextReader(sr);
-                    obj = jsonSerializer.Deserialize<T>(jr);
+                    return jsonSerializer.Deserialize<T>(jr);
                 }
-
-                return obj;
             }
             catch (Exception e)
             {
@@ -409,36 +407,50 @@ namespace Nova
             // Debug.Log($"flush {start}->{end}");
         }
 
-        public Bookmark ReadBookmark(string path)
+        public Bookmark ReadBookmark(string path, bool compress = DefaultCompress)
         {
             using var fs = File.OpenRead(path);
             using var r = new BinaryReader(fs);
             var fileHeader = r.ReadBytes(FileHeader.Length);
             var version = r.ReadInt32();
-
             if (!fileHeader.SequenceEqual(FileHeader) || version != Version)
             {
                 throw CheckpointCorruptedException.BadHeader;
             }
 
-            var data = r.ReadString();
-            using var sr = new StringReader(data);
-            using var jr = new JsonTextReader(sr);
-            return jsonSerializer.Deserialize<Bookmark>(jr);
+            if (compress)
+            {
+                using var decompressor = new DeflateStream(fs, CompressionMode.Decompress);
+                using var sr = new StreamReader(decompressor, Encoding.UTF8);
+                using var jr = new JsonTextReader(sr);
+                return jsonSerializer.Deserialize<Bookmark>(jr);
+            }
+            else
+            {
+                using var sr = new StreamReader(fs, Encoding.UTF8);
+                using var jr = new JsonTextReader(sr);
+                return jsonSerializer.Deserialize<Bookmark>(jr);
+            }
         }
 
-        public void WriteBookmark(string path, Bookmark obj)
+        public void WriteBookmark(string path, Bookmark obj, bool compress = DefaultCompress)
         {
             using var fs = File.OpenWrite(path);
-            using var r = new BinaryWriter(fs);
-            r.Write(FileHeader);
-            r.Write(Version);
-            using var sr = new StringWriter();
-            using var jr = new JsonTextWriter(sr);
-            jsonSerializer.Serialize(jr, obj);
-            jr.Flush();
-            jr.Close();
-            r.Write(sr.ToString());
+            using var w = new BinaryWriter(fs);
+            w.Write(FileHeader);
+            w.Write(Version);
+
+            if (compress)
+            {
+                using var compressor = new DeflateStream(fs, CompressionMode.Compress);
+                using var sw = new StreamWriter(compressor, Encoding.UTF8);
+                jsonSerializer.Serialize(sw, obj);
+            }
+            else
+            {
+                using var sw = new StreamWriter(fs, Encoding.UTF8);
+                jsonSerializer.Serialize(sw, obj);
+            }
         }
     }
 }

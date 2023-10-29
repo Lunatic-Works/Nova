@@ -26,6 +26,8 @@ namespace Nova
         [SerializeField] private AudioClip loadActionSound;
         [SerializeField] private AudioClip deleteActionSound;
 
+        [SerializeField] private Material blurMaterial;
+
         private GameState gameState;
         private CheckpointManager checkpointManager;
 
@@ -70,7 +72,7 @@ namespace Nova
 
             set
             {
-                this.RuntimeAssert(checkpointManager.saveSlotsMetadata.ContainsKey(value) || value == -1,
+                this.RuntimeAssert(checkpointManager.bookmarksMetadata.ContainsKey(value) || value == -1,
                     "selectedSaveID must be a saveID with existing bookmark, or -1.");
 
                 if (_selectedSaveID >= 0)
@@ -193,10 +195,10 @@ namespace Nova
 
         #region Show and hide
 
-        public override void Show(Action onFinish)
+        public override void Show(bool doTransition, Action onFinish)
         {
             // Initialize page
-            if (myPanel.activeSelf)
+            if (active)
             {
                 // Cannot see auto save and quick save in save mode
                 if (saveViewMode == SaveViewMode.Save && saveViewBookmarkType != BookmarkType.NormalSave)
@@ -211,12 +213,12 @@ namespace Nova
                 int saveID;
                 if (saveViewMode == SaveViewMode.Save)
                 {
-                    // Locate to the first unused slot
+                    // Locate the first unused slot
                     saveID = checkpointManager.QueryMinUnusedSaveID((int)BookmarkType.NormalSave, int.MaxValue);
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
-                    // Locate to the latest slot
+                    // Locate the latest bookmark
                     saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue,
                         SaveIDQueryType.Latest);
                 }
@@ -236,34 +238,34 @@ namespace Nova
                 saveButtonCanvasGroup.alpha = 1.0f;
             }
 
-            if (!myPanel.activeSelf)
+            if (!active)
             {
                 if (screenTexture != null)
                 {
                     Destroy(screenTexture);
                 }
 
-                screenTexture = ScreenCapturer.GetBookmarkThumbnailTexture();
+                screenTexture = ScreenCapturer.GetBookmarkThumbnailTexture(blurMaterial);
                 screenSprite = Utils.Texture2DToSprite(screenTexture);
             }
 
             selectedSaveID = -1;
             ShowPage();
 
-            base.Show(onFinish);
+            base.Show(doTransition, onFinish);
         }
 
         public void ShowSaveWithCallback(Action onFinish)
         {
             // Cannot enter save mode if from title
-            if (myPanel.activeSelf && fromTitle)
+            if (active && fromTitle)
             {
                 return;
             }
 
             saveViewMode = SaveViewMode.Save;
             fromTitle = false;
-            Show(onFinish);
+            this.Show(onFinish);
         }
 
         public void ShowSave()
@@ -275,7 +277,7 @@ namespace Nova
         {
             saveViewMode = SaveViewMode.Load;
             this.fromTitle = fromTitle;
-            Show(onFinish);
+            this.Show(onFinish);
         }
 
         public void ShowLoad()
@@ -290,7 +292,7 @@ namespace Nova
 
         protected override void OnHideComplete()
         {
-            if (myPanel.activeSelf)
+            if (active)
             {
                 if (screenTexture != null)
                 {
@@ -347,10 +349,11 @@ namespace Nova
 
             gameState.LoadBookmark(bookmark);
 
-            if (viewManager.titlePanel.activeSelf)
+            var titleController = viewManager.GetController<TitleController>();
+            if (titleController.active)
             {
-                viewManager.titlePanel.SetActive(false);
-                viewManager.dialoguePanel.SetActive(true);
+                titleController.HideImmediate();
+                viewManager.GetController<GameViewController>().ShowImmediate();
             }
 
             Hide();
@@ -394,7 +397,7 @@ namespace Nova
         {
             var bookmark = gameState.GetBookmark();
             bookmark.description = currentDialogue;
-            var texture = ScreenCapturer.GetBookmarkThumbnailTexture();
+            var texture = ScreenCapturer.GetBookmarkThumbnailTexture(blurMaterial);
             bookmark.screenshot = texture;
 
             int saveID = checkpointManager.QueryMinUnusedSaveID(beginSaveID, beginSaveID + maxSaveEntry);
@@ -444,7 +447,7 @@ namespace Nova
 
         public void QuickLoadBookmarkWithAlert()
         {
-            if (checkpointManager.saveSlotsMetadata.Values.Any(m =>
+            if (checkpointManager.bookmarksMetadata.Values.Any(m =>
                     m.saveID >= (int)BookmarkType.QuickSave && m.saveID < (int)BookmarkType.QuickSave + maxSaveEntry))
             {
                 Alert.Show(null, "bookmark.quickload.confirm", QuickLoadBookmark, null, "BookmarkQuickLoad");
@@ -467,7 +470,7 @@ namespace Nova
             {
                 if (saveViewMode == SaveViewMode.Save)
                 {
-                    if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                    if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                     {
                         SaveBookmarkWithAlert(saveID);
                     }
@@ -479,7 +482,7 @@ namespace Nova
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
-                    if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                    if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                     {
                         LoadBookmarkWithAlert(saveID);
                     }
@@ -495,7 +498,7 @@ namespace Nova
                     }
                     else // Another bookmark selected
                     {
-                        if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                        if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                         {
                             selectedSaveID = saveID;
                         }
@@ -515,7 +518,7 @@ namespace Nova
                     }
                     else // Another bookmark selected
                     {
-                        if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                        if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                         {
                             selectedSaveID = saveID;
                         }
@@ -539,7 +542,7 @@ namespace Nova
             isMouse = !TouchFix.IsTouch(eventData);
             if (isMouse)
             {
-                if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                 {
                     selectedSaveID = saveID;
                 }
@@ -590,7 +593,7 @@ namespace Nova
                 var displayName = I18n.__(gameState.GetNode(nodeName, false).displayNames);
                 ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",
-                    checkpointManager.saveSlotsMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
+                    checkpointManager.bookmarksMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
                     displayName,
                     bookmark.description.FormatNameDialogue()
                 ));
@@ -667,7 +670,7 @@ namespace Nova
             if (saveViewBookmarkType == BookmarkType.NormalSave)
             {
                 int maxSaveID = checkpointManager.QueryMaxSaveID((int)BookmarkType.NormalSave);
-                if (checkpointManager.saveSlotsMetadata.ContainsKey(maxSaveID))
+                if (checkpointManager.bookmarksMetadata.ContainsKey(maxSaveID))
                 {
                     maxPage = SaveIDToPage(maxSaveID);
                     if (saveViewMode == SaveViewMode.Save)
@@ -725,7 +728,7 @@ namespace Nova
                 UnityAction onDeleteButtonClicked;
                 UnityAction onThumbnailButtonClicked;
 
-                if (checkpointManager.saveSlotsMetadata.ContainsKey(saveID))
+                if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
                 {
                     try
                     {
@@ -788,7 +791,7 @@ namespace Nova
 
         private Sprite GetThumbnailSprite(int saveID)
         {
-            this.RuntimeAssert(checkpointManager.saveSlotsMetadata.ContainsKey(saveID),
+            this.RuntimeAssert(checkpointManager.bookmarksMetadata.ContainsKey(saveID),
                 "GetThumbnailSprite must use a saveID with existing bookmark.");
             if (!cachedThumbnailSprites.ContainsKey(saveID))
             {

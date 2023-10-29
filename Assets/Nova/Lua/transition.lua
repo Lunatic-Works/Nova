@@ -9,13 +9,16 @@ local function get_base_shader_name(s)
     return string.upper(string.sub(s, 1, 1)) .. string.gsub(string.sub(s, 2), '_(.)', function(x) return ' ' .. string.upper(x) end)
 end
 
-local function get_full_shader_name(shader_name, pp)
+local function get_full_shader_name(shader_name, obj, pp)
     local raw_shader_name = shader_name
 
-    local variant
-    variant, shader_name = pop_prefix(shader_name, 'multiply', 1)
-    if not variant then
-        variant, shader_name = pop_prefix(shader_name, 'screen', 1)
+    local variant = false
+    local all_variants = {'default', 'multiply', 'screen', 'premul'}
+    for _, prefix in ipairs(all_variants) do
+        variant, shader_name = pop_prefix(shader_name, prefix, 1)
+        if variant then
+            break
+        end
     end
 
     if shader_name == '' then
@@ -35,9 +38,16 @@ local function get_full_shader_name(shader_name, pp)
             full_shader_name = 'Nova/VFX Multiply/' .. base_shader_name
         elseif variant == 'screen' then
             full_shader_name = 'Nova/VFX Screen/' .. base_shader_name
+        elseif variant == 'premul' then
+            full_shader_name = 'Nova/Premul/' .. base_shader_name
         else
-            full_shader_name = 'Nova/VFX/' .. base_shader_name
-            variant = 'default'
+            if obj:GetType() == typeof(Nova.RawImageController) then
+                full_shader_name = 'Nova/Premul/' .. base_shader_name
+                variant = 'premul'
+            else
+                full_shader_name = 'Nova/VFX/' .. base_shader_name
+                variant = 'default'
+            end
         end
     end
 
@@ -47,7 +57,8 @@ end
 local function get_renderer_pp(obj)
     local go = obj.gameObject
     local renderer, pp
-    if obj:GetType() == typeof(Nova.CameraController) or obj:GetType() == typeof(Nova.GameCharacterController) then
+    local _type = obj:GetType()
+    if _type == typeof(Nova.CameraController) or _type == typeof(Nova.GameCharacterController) or _type == typeof(Nova.OverlaySpriteController) then
         pp = go:GetComponent(typeof(Nova.PostProcessing))
     else
         renderer = go:GetComponent(typeof(UnityEngine.SpriteRenderer)) or go:GetComponent(typeof(UnityEngine.UI.Image)) or go:GetComponent(typeof(UnityEngine.UI.RawImage))
@@ -71,7 +82,7 @@ local function get_mat(obj, shader_name, restorable)
         return nil
     end
 
-    local full_shader_name, base_shader_name, variant = get_full_shader_name(shader_name, pp)
+    local full_shader_name, base_shader_name, variant = get_full_shader_name(shader_name, obj, pp)
 
     -- Overriding cameras do not have MaterialPool, otherwise their
     -- materials may be disposed before some animations finish
@@ -124,7 +135,7 @@ local function set_mat(obj, mat, layer_id, token)
         return -1
     end
 
-    warn('Cannot find SpriteRenderer or Image or PostProcessing for ' .. dump(obj))
+    warn('Cannot find SpriteRenderer or Image or RawImage or PostProcessing for ' .. dump(obj))
     return -1
 end
 
@@ -238,7 +249,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
     local action_begin, action_end, token
     if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
-            __Nova.screenCapturer:CaptureGameTexture()
+            __Nova.screenCapturer:CaptureGameTexture(obj.camera)
 
             auto_fade_off()
             local func = image_name
@@ -365,8 +376,10 @@ function vfx(obj, shader_layer, t, properties)
         local mat, base_shader_name, _ = get_mat(obj, shader_name)
         t = t or 1
         properties = properties or {}
-        set_mat_default_properties(mat, base_shader_name, properties)
-        set_mat_properties(mat, base_shader_name, properties)
+        if properties ~= 'cont' then
+            set_mat_default_properties(mat, base_shader_name, properties)
+            set_mat_properties(mat, base_shader_name, properties)
+        end
         mat:SetFloat('_T', t)
         set_mat(obj, mat, layer_id)
     else
@@ -388,8 +401,10 @@ make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times,
     properties = properties or {}
 
     local action_begin = function()
-        set_mat_default_properties(mat, base_shader_name, properties)
-        set_mat_properties(mat, base_shader_name, properties)
+        if properties ~= 'cont' then
+            set_mat_default_properties(mat, base_shader_name, properties)
+            set_mat_properties(mat, base_shader_name, properties)
+        end
         mat:SetFloat('_T', start_t)
         set_mat(obj, mat, layer_id)
     end
@@ -421,8 +436,10 @@ make_anim_method('vfx_multi', function(self, obj, shader_layer, times, anim_prop
     properties = properties or {}
 
     local action_begin = function()
-        set_mat_default_properties(mat, base_shader_name, properties)
-        set_mat_properties(mat, base_shader_name, properties)
+        if properties ~= 'cont' then
+            set_mat_default_properties(mat, base_shader_name, properties)
+            set_mat_properties(mat, base_shader_name, properties)
+        end
         for name, value in pairs(anim_properties) do
             mat:SetFloat(name, value[1])
         end

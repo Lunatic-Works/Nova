@@ -14,7 +14,7 @@ Shader "Nova/VFX/Flip Grid"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -109,6 +109,8 @@ Shader "Nova/VFX/Flip Grid"
                         col = tex2D(_SubTex, realUV) * _SubColor;
                     }
                 }
+
+                col.rgb *= col.a;
 
                 return col;
             }

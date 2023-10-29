@@ -54,6 +54,7 @@ Shader "Nova/VFX Multiply/Gaussian Blur"
                 float4 col = tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 col.rgb = 1.0 - (1.0 - col.rgb) * col.a;
                 col.a = 1.0;

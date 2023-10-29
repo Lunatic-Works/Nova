@@ -59,6 +59,7 @@ Shader "Nova/Post Processing/Colorless"
                 col.g = tex2D(_MainTex, i.uv - v).g;
 
                 col *= i.color;
+
                 return col;
             }
             ENDCG

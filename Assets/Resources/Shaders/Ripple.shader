@@ -14,7 +14,7 @@ Shader "Nova/VFX/Ripple"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -75,6 +75,8 @@ Shader "Nova/VFX/Ripple"
                     col = tex2D(_MainTex, uv);
                 }
                 col *= i.color;
+
+                col.rgb *= col.a;
 
                 return col;
             }

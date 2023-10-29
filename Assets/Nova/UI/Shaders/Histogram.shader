@@ -3,12 +3,12 @@ Shader "Nova/UI/Histogram"
     Properties
     {
         [HideInInspector] _MainTex ("Main Texture", 2D) = "white" {}
-        _Color ("Tint", Color) = (1, 1, 1, 1)
-        _Scale ("Multiplier", Float) = 1.0
+        _Color ("Color", Color) = (1, 1, 1, 1)
+        _Scale ("Scale", Float) = 1.0
     }
     SubShader
     {
-        Cull Off ZWrite Off ZTest [unity_GUIZTestMode] Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off ZTest [unity_GUIZTestMode] Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
 
         Pass
@@ -107,6 +107,7 @@ Shader "Nova/UI/Histogram"
             {
                 float4 col = i.color;
                 col.a *= histogram(i.uv);
+                col.rgb *= col.a;
                 return col;
             }
             ENDCG

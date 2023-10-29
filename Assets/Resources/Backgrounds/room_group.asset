@@ -13,16 +13,6 @@ MonoBehaviour:
   m_Name: room_group
   m_EditorClassIdentifier: 
   entries:
-  - id: corridor
-    displayNames:
-      keys: 28000000
-      values:
-      - corridor
-    composite: 0
-    poseString: 
-    resourcePath: Backgrounds/corridor
-    snapshotOffset: {x: 0, y: 0}
-    snapshotScale: {x: 1, y: 1}
   - id: room
     displayNames:
       keys: 28000000
@@ -31,15 +21,5 @@ MonoBehaviour:
     composite: 0
     poseString: 
     resourcePath: Backgrounds/room
-    snapshotOffset: {x: 0, y: 0}
-    snapshotScale: {x: 1, y: 1}
-  - id: toilet
-    displayNames:
-      keys: 28000000
-      values:
-      - toilet
-    composite: 0
-    poseString: 
-    resourcePath: Backgrounds/toilet
     snapshotOffset: {x: 0, y: 0}
     snapshotScale: {x: 1, y: 1}

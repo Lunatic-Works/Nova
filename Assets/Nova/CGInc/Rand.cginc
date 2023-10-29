@@ -3,10 +3,10 @@
 // The input of rand() is any float, and the output is in (0, 1)
 // float works on Android, but half does not work
 
-#define MAGIC1 0.1009
-#define MAGIC2 0.1013
-#define MAGIC3 0.1019
-#define MAGIC4 0.1021
+#define MAGIC1 0.1031
+#define MAGIC2 0.1030
+#define MAGIC3 0.0973
+#define MAGIC4 0.1099
 #define MAGIC5 33.33
 
 float rand(float p)
@@ -31,6 +31,13 @@ float rand(float3 p3)
     return frac((p3.x + p3.y) * p3.z);
 }
 
+float rand(float4 p4)
+{
+    p4 = frac(p4 * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
+    p4 += dot(p4, p4.wzxy + MAGIC5);
+    return frac((p4.x + p4.y) * (p4.z + p4.w));
+}
+
 float2 rand2(float p)
 {
     float3 p3 = frac(float3(p, p, p) * float3(MAGIC1, MAGIC2, MAGIC3));
@@ -52,6 +59,13 @@ float2 rand2(float3 p3)
     return frac((p3.xx + p3.yz) * p3.zy);
 }
 
+float2 rand2(float4 p4)
+{
+    p4 = frac(p4 * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
+    p4 += dot(p4, p4.wzxy + MAGIC5);
+    return frac((p4.xy + p4.zw) * p4.wx);
+}
+
 float3 rand3(float p)
 {
    float3 p3 = frac(float3(p, p, p) * float3(MAGIC1, MAGIC2, MAGIC3));
@@ -71,6 +85,13 @@ float3 rand3(float3 p3)
     p3 = frac(p3 * float3(MAGIC1, MAGIC2, MAGIC3));
     p3 += dot(p3, p3.yzx + MAGIC5);
     return frac((p3.xxy + p3.yzz) * p3.zyx);
+}
+
+float3 rand3(float4 p4)
+{
+    p4 = frac(p4 * float4(MAGIC1, MAGIC2, MAGIC3, MAGIC4));
+    p4 += dot(p4, p4.wzxy + MAGIC5);
+    return frac((p4.xxy + p4.zww) * p4.wzx);
 }
 
 float4 rand4(float p)

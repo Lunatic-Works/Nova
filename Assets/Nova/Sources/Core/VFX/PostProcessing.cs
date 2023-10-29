@@ -109,7 +109,7 @@ namespace Nova
                 return;
             }
 
-            RenderTargetIdentifier[] buffers = { TempBlitID, renderTarget };
+            RenderTargetIdentifier[] buffers = {TempBlitID, renderTarget};
             var from = 1;
 
             foreach (var mat in EnabledMaterials())
@@ -124,7 +124,8 @@ namespace Nova
             }
         }
 
-        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void ExecuteOnRenderImageFeature(ScriptableRenderContext context,
+            ref RenderingData renderingData)
         {
             if (!EnabledMaterials().Any())
             {
@@ -151,17 +152,16 @@ namespace Nova
         {
             public readonly List<MaterialData> layersData;
 
-            public PostProcessingRestoreData(List<MaterialData> layersData)
+            public PostProcessingRestoreData(PostProcessing parent)
             {
-                this.layersData = layersData;
+                // Materials must be RestorableMaterial
+                layersData = parent.layers.Select(RestorableMaterial.GetRestoreData).ToList();
             }
         }
 
         public IRestoreData GetRestoreData()
         {
-            // Materials must be RestorableMaterial
-            var layersData = layers.Select(RestorableMaterial.GetRestoreData).ToList();
-            return new PostProcessingRestoreData(layersData);
+            return new PostProcessingRestoreData(this);
         }
 
         public void Restore(IRestoreData restoreData)

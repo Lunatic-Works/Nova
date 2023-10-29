@@ -26,7 +26,7 @@ namespace Nova
 
         private static readonly List<NovaAnimation> Animations = new List<NovaAnimation>();
 
-        // _animations may be mutated when some animation stops
+        // When some animation stops, it may create new animations
         public static void StopAll(AnimationType type = AnimationType.All)
         {
             while (true)
@@ -71,7 +71,7 @@ namespace Nova
 
         #endregion
 
-        private void Start()
+        private void Awake()
         {
             AnimationEntry.InitFactory();
         }

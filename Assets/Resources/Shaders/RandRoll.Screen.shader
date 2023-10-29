@@ -54,7 +54,7 @@ Shader "Nova/VFX Screen/Rand Roll"
                 float4 col = tex2D(_MainTex, frac(i.uv)) * i.color;
 
                 col.rgb *= col.a;
-                col.a = 1.0;
+                col.a = 0.0;
 
                 return col;
             }

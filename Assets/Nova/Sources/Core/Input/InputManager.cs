@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -32,7 +30,7 @@ namespace Nova
 
         private void OnDestroy()
         {
-            Save();
+            Flush();
         }
 
         /// <summary>
@@ -56,7 +54,7 @@ namespace Nova
             }
         }
 
-        public void Save()
+        public void Flush()
         {
             var json = actionAsset.data.ToJson();
             Directory.CreateDirectory(InputFilesDirectory);

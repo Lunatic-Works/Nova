@@ -185,6 +185,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scriptPath: Scenarios
+  gameStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  nodeChanged:
+    m_PersistentCalls:
+      m_Calls: []
   dialogueWillChange:
     m_PersistentCalls:
       m_Calls: []
@@ -194,16 +200,16 @@ MonoBehaviour:
   dialogueChanged:
     m_PersistentCalls:
       m_Calls: []
-  nodeChanged:
-    m_PersistentCalls:
-      m_Calls: []
   selectionOccurs:
     m_PersistentCalls:
       m_Calls: []
   routeEnded:
     m_PersistentCalls:
       m_Calls: []
-  maxStepNumFromLastCheckpoint: 10
+  restoreStarts:
+    m_PersistentCalls:
+      m_Calls: []
+  maxStepsFromLastCheckpoint: 10
 --- !u!114 &8579560473595589777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,8 +234,6 @@ MonoBehaviour:
   fastForwardModeStops:
     m_PersistentCalls:
       m_Calls: []
-  isReadDialogue: 0
-  fastForwardUnread: 0
 --- !u!114 &114045275974384532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,8 +272,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbb0ef2eaa610da4ea5cf74855d85f5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultActionAsset: {fileID: -944628639613478452, guid: 1702af3a5691a8b42a8c171528f43c46,
-    type: 3}
+  defaultActionAsset: {fileID: -944628639613478452, guid: 1702af3a5691a8b42a8c171528f43c46, type: 3}
+  inputEnabled: 1
+  isRebinding: 0
 --- !u!114 &114593149028580010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -387,6 +392,7 @@ Transform:
   - {fileID: 4892531040896684}
   - {fileID: 4140035967412336}
   - {fileID: 4864075243387791687}
+  - {fileID: 7796401233984648369}
   m_Father: {fileID: 4466698426868420}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -434,3 +440,47 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 4
+--- !u!1 &5086404199069267772
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7796401233984648369}
+  - component: {fileID: 917451233117768309}
+  m_Layer: 0
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7796401233984648369
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5086404199069267772}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4704473396539670}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &917451233117768309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5086404199069267772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ade50ec3207a47e8b690d9fa1f2799f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 8

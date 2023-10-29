@@ -54,6 +54,7 @@ Shader "Nova/Post Processing/Lens Blur"
                 float4 col = tex2DLensBlur(_MainTex, _MainTex_TexelSize * _GScale, i.uv, _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
 
                 return col;
             }

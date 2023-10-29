@@ -12,7 +12,7 @@ Shader "Nova/VFX/Motion Blur"
     }
     SubShader
     {
-        Cull Off ZWrite Off Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off ZWrite Off Blend One OneMinusSrcAlpha
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" }
         Pass
         {
@@ -55,6 +55,9 @@ Shader "Nova/VFX/Motion Blur"
                 float4 col = tex2DMotionBlur(_MainTex, _MainTex_TexelSize * 1.0, i.uv, float2(cos(_Theta), sin(_Theta)) * _Size * _T);
                 col *= i.color;
                 col.rgb += _Offset * _T;
+                col.rgb = saturate(col.rgb);
+
+                col.rgb *= col.a;
 
                 return col;
             }

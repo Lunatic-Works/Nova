@@ -1,4 +1,4 @@
-using Nova.Generate;
+using Nova.Generated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,8 +46,9 @@ namespace Nova
 
         public new void SetTexture(string propertyName, Texture value)
         {
-            Debug.LogWarning($"Nova: Setting a texture to {shader.name}:{propertyName} without a path to the texture. " +
-                             "The material will not be restored correctly. Please use SetTexturePath instead.");
+            Debug.LogWarning(
+                $"Nova: Setting a texture to {shader.name}:{propertyName} without a path to the texture. " +
+                "The material will not be restored correctly. Please use SetTexturePath instead.");
             base.SetTexture(propertyName, value);
         }
 

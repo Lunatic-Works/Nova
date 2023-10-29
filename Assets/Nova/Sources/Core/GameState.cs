@@ -25,6 +25,13 @@ namespace Nova
 
         private void Awake()
         {
+            advancedDialogueHelper = new AdvancedDialogueHelper(this);
+            coroutineHelper = new CoroutineHelper(this);
+
+            LuaRuntime.Instance.BindObject("variables", variables);
+            LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);
+            LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
+
             try
             {
                 scriptLoader.Init(scriptPath);
@@ -32,34 +39,69 @@ namespace Nova
 
                 checkpointManager = GetComponent<CheckpointManager>();
                 checkpointManager.Init();
-                CheckScriptUpgrade();
             }
             catch (Exception e)
             {
                 Debug.LogException(e);
                 Utils.Quit();
             }
-
-            LuaRuntime.Instance.BindObject("variables", variables);
-            advancedDialogueHelper = new AdvancedDialogueHelper(this);
-            LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);
-            coroutineHelper = new CoroutineHelper(this);
-            LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
         }
 
         private void Start()
         {
             SaveInitialCheckpoint();
+            CheckScriptUpgrade(false);
         }
 
-        private void CheckScriptUpgrade()
+        // It can run any Lua code, so everything that can be used in Lua code should initialize before Start
+        private void CheckScriptUpgrade(bool updatePosition)
         {
-            var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);
-            // Debug.Log($"upgrade {changedNodes.Count} nodes");
-            if (changedNodes.Any())
+            Bookmark curPosition = null;
+            if (updatePosition)
             {
-                var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
-                upgrader.UpgradeSaves();
+                curPosition = new Bookmark(nodeRecord, checkpointOffset, currentIndex);
+            }
+
+            var upgradeStarted = false;
+            var success = false;
+            try
+            {
+                var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);
+                // Debug.Log($"upgrade {changedNodes.Count} nodes");
+                if (changedNodes.Any())
+                {
+                    checkpointManager.BackupGlobalSave();
+                    upgradeStarted = true;
+                    var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
+                    upgrader.UpgradeSaves();
+                    success = true;
+
+                    if (updatePosition)
+                    {
+                        if (upgrader.UpgradeBookmark(curPosition))
+                        {
+                            LoadBookmark(curPosition);
+                        }
+                        else
+                        {
+                            // if we cannot update the current position, switch to first dialogue
+                            MoveBackToFirstDialogue();
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Nova: Upgrade failed: {e}");
+                if (upgradeStarted)
+                {
+                    checkpointManager.RestoreGlobalSave();
+                }
+
+                if (updatePosition && !success)
+                {
+                    LoadBookmark(curPosition);
+                }
             }
         }
 
@@ -71,6 +113,9 @@ namespace Nova
             LuaRuntime.Instance.Reset();
             scriptLoader.ForceInit(scriptPath);
             flowChartGraph = scriptLoader.GetFlowChartGraph();
+            CheckScriptUpgrade(true);
+            currentNode = GetNode(nodeRecord.name);
+            Debug.Log("Nova: Reload complete.");
         }
 
         #region States
@@ -163,17 +208,17 @@ namespace Nova
         public DialogueChangedEvent dialogueChanged;
 
         /// <summary>
-        /// This event will be triggered if a selection occurs, either when branches occur or when a selection is
+        /// This event will be triggered if choices occur, either when branches occur or when choices are
         /// triggered from the script.
         /// </summary>
-        public SelectionOccursEvent selectionOccurs;
+        public ChoiceOccursEvent choiceOccurs;
 
         /// <summary>
         /// This event will be triggered if the story route has reached an end.
         /// </summary>
         public RouteEndedEvent routeEnded;
 
-        public UnityEvent restoreStarts;
+        public UnityEvent<bool> restoreStarts;
 
         #endregion
 
@@ -258,7 +303,7 @@ namespace Nova
         {
             if (variables.hash != variablesHashBeforeInterrupt)
             {
-                AppendSameNode();
+                appendNodeEnsured = true;
             }
         }
 
@@ -339,13 +384,13 @@ namespace Nova
             currentDialogueEntry.ExecuteAction(DialogueActionStage.AfterDialogue, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
-            if (advancedDialogueHelper.GetFallThrough())
+            if (advancedDialogueHelper.PopFallThrough())
             {
                 Step();
                 yield break;
             }
 
-            var pendingJumpTarget = advancedDialogueHelper.GetJump();
+            var pendingJumpTarget = advancedDialogueHelper.PopJump();
             if (pendingJumpTarget != null)
             {
                 var node = GetNode(pendingJumpTarget);
@@ -377,8 +422,9 @@ namespace Nova
                 stepsFromLastCheckpoint++;
             }
 
-            if (atEndOfNodeRecord || (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
-                                      !checkpointManager.CanAppendCheckpoint(checkpointOffset)))
+            if (atEndOfNodeRecord || appendNodeEnsured ||
+                (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue &&
+                 !checkpointManager.CanAppendCheckpoint(checkpointOffset)))
             {
                 AppendSameNode();
             }
@@ -455,11 +501,12 @@ namespace Nova
             nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
             checkpointOffset = nodeRecord.offset;
             checkpointEnsured = true;
+            appendNodeEnsured = false;
         }
 
         private void MoveToNextNode(FlowChartNode nextNode)
         {
-            scriptLoader.AddDeferredDialogueChunks(nextNode);
+            ScriptLoader.AddDeferredDialogueChunks(nextNode);
             // in case of empty node, do not change any of these
             // so the bookmark is left at the end of last node
             if (nextNode.dialogueEntryCount > 0)
@@ -475,8 +522,8 @@ namespace Nova
 
         private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos)
         {
-            var selections = new List<SelectionOccursData.Selection>();
-            var selectionNames = new List<string>();
+            var choices = new List<ChoiceOccursData.Choice>();
+            var choiceNames = new List<string>();
             foreach (var branchInfo in branchInfos)
             {
                 if (branchInfo.mode == BranchMode.Jump)
@@ -495,15 +542,15 @@ namespace Nova
                     continue;
                 }
 
-                var selection = new SelectionOccursData.Selection(branchInfo.texts, branchInfo.imageInfo,
+                var choice = new ChoiceOccursData.Choice(branchInfo.texts, branchInfo.imageInfo,
                     interactable: branchInfo.mode != BranchMode.Enable || branchInfo.condition.Invoke<bool>());
-                selections.Add(selection);
-                selectionNames.Add(branchInfo.name);
+                choices.Add(choice);
+                choiceNames.Add(branchInfo.name);
             }
 
             AcquireActionPause();
 
-            RaiseSelections(selections);
+            RaiseChoices(choices);
             while (coroutineHelper.fence == null)
             {
                 yield return null;
@@ -512,7 +559,7 @@ namespace Nova
             ReleaseActionPause();
 
             var index = (int)coroutineHelper.TakeFence();
-            SelectBranch(selectionNames[index]);
+            SelectBranch(choiceNames[index]);
         }
 
         private void SelectBranch(string branchName)
@@ -555,7 +602,7 @@ namespace Nova
             var node = flowChartGraph.GetNode(name);
             if (addDeferred)
             {
-                scriptLoader.AddDeferredDialogueChunks(node);
+                ScriptLoader.AddDeferredDialogueChunks(node);
             }
 
             return node;
@@ -620,9 +667,9 @@ namespace Nova
             }
         }
 
-        public void RaiseSelections(IReadOnlyList<SelectionOccursData.Selection> selections)
+        public void RaiseChoices(IReadOnlyList<ChoiceOccursData.Choice> choices)
         {
-            selectionOccurs.Invoke(new SelectionOccursData(selections));
+            choiceOccurs.Invoke(new ChoiceOccursData(choices));
         }
 
         #region Restoration
@@ -707,6 +754,9 @@ namespace Nova
             checkpointEnsured = true;
         }
 
+        // ensure a new nodeRecord + checkpoint at next UpdateDialogue
+        private bool appendNodeEnsured;
+
         private bool atEndOfNodeRecord =>
             !isUpgrading && nodeRecord.child != 0 && currentIndex >= nodeRecord.endDialogue;
 
@@ -731,6 +781,7 @@ namespace Nova
         private void RestoreCheckpoint(GameStateCheckpoint entry)
         {
             this.RuntimeAssert(entry != null, "Checkpoint is null.");
+            restoreStarts.Invoke(entry == initialCheckpoint);
 
             currentIndex = entry.dialogueIndex;
             stepsFromLastCheckpoint = 0;
@@ -805,6 +856,7 @@ namespace Nova
                 }
 
                 newCheckpointOffset = nextCheckpoint;
+                checkpointDialogue = nextCheckpointDialogue;
             }
 
             // Debug.Log($"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
@@ -829,14 +881,16 @@ namespace Nova
                 return true;
             }
 
+            isRestoring = false;
+
             if (isUpgrading)
             {
+                isUpgrading = false;
                 throw CheckpointCorruptedException.CannotUpgrade;
             }
 
             Debug.LogWarning("Nova: GameState paused by action when restoring. " +
                              "Maybe a minigame does not have a checkpoint ensured after it.");
-            isRestoring = false;
             return false;
         }
 
@@ -857,6 +911,11 @@ namespace Nova
                 {
                     return;
                 }
+
+                if (isUpgrading && i == stepCount - 1)
+                {
+                    isRestoring = false;
+                }
             }
         }
 
@@ -868,6 +927,8 @@ namespace Nova
 
             // Animation should stop
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
+
+            LuaRuntime.Instance.GetFunction("action_before_move").Call();
 
             // Restore history
             nodeRecord = newNodeRecord;
@@ -882,11 +943,8 @@ namespace Nova
 
             isRestoring = true;
             isUpgrading = upgrade;
-            restoreStarts.Invoke();
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
-            this.RuntimeAssert(dialogueIndex >= currentIndex,
-                $"dialogueIndex {dialogueIndex} is before currentIndex {currentIndex}.");
             if (dialogueIndex == currentIndex)
             {
                 isRestoring = false;
