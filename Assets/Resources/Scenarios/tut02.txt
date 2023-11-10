@@ -147,7 +147,7 @@ show(bg, 'room', {0, 0}, 1)
 <|
 show(陈高天, 'normal', {0, -0.3, 0.4})
 |>
-`show`也可以显示角色立绘，`陈高天`对应的就是Hierarchy里的`Characters/Gaotian`的`GameCharacterController.luaGlobalName`
+`show`也可以显示角色立绘，`gaotian`对应的就是Hierarchy里的`Characters/Gaotian`
 
 角色立绘通常是由几个部件组合而成的，称为一个pose，上面的`normal`是pose的名称
 
