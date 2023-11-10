@@ -9,6 +9,7 @@ namespace Nova
     [Serializable]
     public class AvatarConfig
     {
+        public string characterName;
         public GameCharacterController characterController;
         public string prefix;
     }
@@ -41,7 +42,7 @@ namespace Nova
             rectTransform = GetComponent<RectTransform>();
             foreach (var config in avatarConfigs)
             {
-                nameToConfig[config.characterController.luaGlobalName] = config;
+                nameToConfig[config.characterName] = config;
             }
 
             gameState.nodeChanged.AddListener(OnNodeChanged);
