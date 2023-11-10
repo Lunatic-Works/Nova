@@ -1,15 +1,15 @@
 local poses = {
-    ['王二宫'] = {
+    ['ergong'] = {
         ['normal'] = 'body+mouth_smile+eye_normal+eyebrow_normal+hair',
     },
-    ['陈高天'] = {
+    ['gaotian'] = {
         ['normal'] = 'body+mouth_smile+eye_normal+eyebrow_normal+hair',
         ['cry'] = 'body+mouth_smile+eye_cry+eyebrow_normal+hair',
     },
-    ['张浅野'] = {
+    ['qianye'] = {
         ['normal'] = 'body+mouth_close+eye_normal+eyebrow_normal+hair',
     },
-    ['孙西本'] = {
+    ['xiben'] = {
         ['normal'] = 'body+mouth_close+eye_normal+eyebrow_normal+hair',
     },
 

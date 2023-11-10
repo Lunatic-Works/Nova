@@ -1115,7 +1115,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: luaGlobalName
-      value: "\u9648\u9AD8\u5929"
+      value: gaotian
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
@@ -1406,7 +1406,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: luaGlobalName
-      value: "\u5F20\u6D45\u91CE"
+      value: qianye
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
@@ -1555,13 +1555,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   luaName: autoVoice
   autoVoiceConfigs:
-  - characterController: {fileID: 319595391}
+  - characterName: "\u738B\u4E8C\u5BAB"
+    characterController: {fileID: 319595391}
     prefix: 
-  - characterController: {fileID: 1952131526}
+  - characterName: "\u5F20\u6D45\u91CE"
+    characterController: {fileID: 1952131526}
     prefix: 
-  - characterController: {fileID: 2058258575}
+  - characterName: "\u5B59\u897F\u672C"
+    characterController: {fileID: 2058258575}
     prefix: 
-  - characterController: {fileID: 1285618328}
+  - characterName: "\u9648\u9AD8\u5929"
+    characterController: {fileID: 1285618328}
     prefix: 
   padWidth: 6
 --- !u!4 &880587543 stripped
@@ -1864,7 +1868,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: luaGlobalName
-      value: "\u5B59\u897F\u672C"
+      value: xiben
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
@@ -2214,7 +2218,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: luaGlobalName
-      value: "\u738B\u4E8C\u5BAB"
+      value: ergong
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
@@ -3970,22 +3974,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameView
       objectReference: {fileID: 0}
-    - target: {fileID: 2076122712185952433, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
-      propertyPath: avatarConfigs.Array.data[0].characterController
-      value: 
-      objectReference: {fileID: 319595391}
-    - target: {fileID: 2076122712185952433, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
-      propertyPath: avatarConfigs.Array.data[1].characterController
-      value: 
-      objectReference: {fileID: 1952131526}
-    - target: {fileID: 2076122712185952433, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
-      propertyPath: avatarConfigs.Array.data[2].characterController
-      value: 
-      objectReference: {fileID: 2058258575}
-    - target: {fileID: 2076122712185952433, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
-      propertyPath: avatarConfigs.Array.data[3].characterController
-      value: 
-      objectReference: {fileID: 1285618328}
     - target: {fileID: 2076122712400733067, guid: 3c27b5526c09db84e89cdd483dd6af66, type: 3}
       propertyPath: _sectors.Array.data[0].action.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 

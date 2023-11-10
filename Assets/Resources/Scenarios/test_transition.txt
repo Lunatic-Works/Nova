@@ -3,7 +3,7 @@ label 'test_transition'
 is_debug()
 |>
 <|
-show(孙西本, 'normal', pos_l)
+show(xiben, 'normal', pos_l)
 show(bg, 'room')
 set_box()
 |>
@@ -11,8 +11,8 @@ set_box()
 
 <|
 anim:trans(cam, function()
-        hide(孙西本)
-        show(陈高天, 'normal', pos_r)
+        hide(xiben)
+        show(gaotian, 'normal', pos_r)
         show(bg, 'corridor')
     end, 'fade', 1, { _Mask = 'Masks/eye' })
 |>
@@ -21,8 +21,8 @@ anim:trans(cam, function()
 
 <|
 anim:trans2(cam, function()
-        hide(陈高天)
-        show(孙西本, 'normal', pos_l)
+        hide(gaotian)
+        show(xiben, 'normal', pos_l)
         show(bg, 'room')
     end, 'broken_tv', 1)
 |>
@@ -39,9 +39,9 @@ anim:vfx(cam, 'color', {0, 1}, 1, { _ColorMul = 0 })
 -- 不在trans里的时候，角色的show和hide默认有零点几秒的淡入淡出动画
 -- 现在我们不需要这个动画，就要用auto_fade_off()和auto_fade_on()
 auto_fade_off()
-hide(孙西本)
-show(陈高天, 'normal', pos_r)
-show(孙西本, 'normal', pos_l)
+hide(xiben)
+show(gaotian, 'normal', pos_r)
+show(xiben, 'normal', pos_l)
 show(bg, 'corridor')
 auto_fade_on()
 anim:vfx(cam, 'color', {1, 0}, 1, { _ColorMul = 0 })
@@ -61,14 +61,14 @@ anim:vfx(bg, 'mix_add', {1, 0}, 1, { _Mask = 'Masks/vertical' })
 背景特效结束
 
 <|
-anim:vfx(陈高天, 'lens_blur', {0, 1}, 1, { _Size = 4 })
+anim:vfx(gaotian, 'lens_blur', {0, 1}, 1, { _Size = 4 })
 |>
 给立绘加特效
 
 立绘特效持续
 
 <|
-anim:vfx(陈高天, 'lens_blur', {1, 0}, 1, { _Size = 4 })
+anim:vfx(gaotian, 'lens_blur', {1, 0}, 1, { _Size = 4 })
 |>
 立绘特效结束
 
@@ -85,12 +85,12 @@ anim:vfx(cam, 'lens_blur', {1, 0}, 1, { _Size = 4 })
 摄像机特效结束
 
 <|
--- 先把陈高天和fg的layer设为cam2的layer，再给cam_mask加vfx
-陈高天.layer = cam2_overlay
+-- 先把gaotian和fg的layer设为cam2的layer，再给cam_mask加vfx
+gaotian.layer = cam2_overlay
 fg.layer = cam2_layer
-show(孙西本, 'normal', pos_l)
+show(xiben, 'normal', pos_l)
 show(bg, 'room')
-show(陈高天, 'normal', pos_r)
+show(gaotian, 'normal', pos_r)
 show(fg, 'moon_halo')
 cam2.cameraEnabled = true
 anim:vfx(cam_mask, 'fade', {0, 0.5}, 1, { _SubTex = 'RenderTargets/GameCamera2Texture', _Mask = 'Masks/wipe_left', _Vague = 0.1 })
@@ -118,8 +118,8 @@ anim:vfx(cam2, 'broken_tv', {0.5, 0}, 1)
 摄像机2特效结束
 
 <|
--- 把陈高天和fg的layer重置为cam1的layer，并把cam2的cullingMask设为cam1的cullingMask
-陈高天.layer = cam1_overlay
+-- 把gaotian和fg的layer重置为cam1的layer，并把cam2的cullingMask设为cam1的cullingMask
+gaotian.layer = cam1_overlay
 fg.layer = cam1_layer
 cam2.cullingMask = (2^cam1_layer) + (2^cam1_overlay)
 hide(fg)
