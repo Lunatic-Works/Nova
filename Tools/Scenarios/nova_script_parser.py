@@ -76,6 +76,8 @@ def get_node_name(node):
         node,
         (
             astnodes.Nil,
+            astnodes.TrueExpr,
+            astnodes.FalseExpr,
             astnodes.Table,
             astnodes.AnonymousFunction,
             astnodes.BinaryOp,
