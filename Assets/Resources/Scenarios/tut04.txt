@@ -111,14 +111,14 @@ set_box()
 顺便说一句：：为了方便写这些教程，我们还parse了Markdown的超链接和代码块，但是一般的游戏里应该不会用到吧
 
 <|
-show(孙西本, 'normal', pos_c)
+show(xiben, 'normal', pos_c)
 sound('clap')
 box_hide_show(2)
 |>
 `box_hide_show`用来让对话框消失几秒再出现，这个技巧可以把空间留给演出
 
 <|
-hide(孙西本)
+hide(xiben)
 stop_ff()
 |>
 `stop_ff`函数用来停止快进，`stop_auto_ff`则用来停止自动播放和快进

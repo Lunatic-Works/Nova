@@ -145,7 +145,7 @@ show(bg, 'room', {0, 0}, 1)
 好了，把背景恢复正常
 
 <|
-show(陈高天, 'normal', {0, -0.3, 0.4})
+show(gaotian, 'normal', {0, -0.3, 0.4})
 |>
 `show`也可以显示角色立绘，`gaotian`对应的就是Hierarchy里的`Characters/Gaotian`
 
@@ -156,55 +156,55 @@ show(陈高天, 'normal', {0, -0.3, 0.4})
 顺便说一句：：把立绘素材导入到Nova的方法详见[Wiki：立绘导入](https://github.com/Lunatic-Works/Nova/wiki/Standing-Import)
 
 <|
-show(陈高天, 'cry')
+show(gaotian, 'cry')
 |>
 改变一下立绘的表情
 
 <|
-show(陈高天, 'body+mouth_smile+eye_normal+eyebrow_normal+hair')
+show(gaotian, 'body+mouth_smile+eye_normal+eyebrow_normal+hair')
 |>
 也可以把pose字符串直接写在`show`里，调试完之后再写到`pose.lua`中
 
 <|
-show(陈高天, 'cry')
+show(gaotian, 'cry')
 |>
 立绘改变的时候默认有零点几秒的淡入淡出
 
 <|
-show(陈高天, 'normal')
+show(gaotian, 'normal')
 |>
 顺便说一句：：教程5会讲更复杂的动画
 
 <|
-move(陈高天, {-4, nil})
+move(gaotian, {-4, nil})
 |>
 `move`也可以移动立绘
 
 <|
-move(陈高天, pos_r)
+move(gaotian, pos_r)
 |>
 可以把`move`用到的坐标定义成一个变量`pos_r`，避免把同一个坐标输很多遍。这样的变量一般在`animation_presets.lua`中定义
 
 <|
-tint(陈高天, {0.5, 1, 0.5})
+tint(gaotian, {0.5, 1, 0.5})
 |>
 `tint`也可以改变立绘的颜色
 
 <|
-env_tint(陈高天, color_sunset)
-tint(陈高天, 1)
+env_tint(gaotian, color_sunset)
+tint(gaotian, 1)
 |>
 还有一个函数`env_tint`，也用来改变立绘的颜色（不能用在普通图片上面）。这里的`color_sunset`也是定义在`animation_presets.lua`中的变量
 
 <|
-tint(陈高天, 0.5)
+tint(gaotian, 0.5)
 |>
 `env_tint`与`tint`的效果可以叠加。`env_tint`一般用于黄昏、夜晚等环境引起的长时间的颜色变化，`tint`则用于短时间的演出效果
 
 <|
-move(陈高天, pos_c)
-env_tint(陈高天, 1)
-tint(陈高天, 1)
+move(gaotian, pos_c)
+env_tint(gaotian, 1)
+tint(gaotian, 1)
 |>
 好了，恢复立绘的位置和颜色
 
@@ -230,7 +230,7 @@ move(cam, {0, 0, 5})
 恢复摄像机位置
 
 <|
-hide(陈高天)
+hide(gaotian)
 |>
 教程2 图像 到此结束
 @<| jump_to 'tut03' |>

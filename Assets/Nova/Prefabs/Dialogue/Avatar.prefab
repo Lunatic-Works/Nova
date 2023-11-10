@@ -300,14 +300,19 @@ MonoBehaviour:
   mergerPrimary: {fileID: 9095240965259948810}
   mergerSub: {fileID: 8279322227598488837}
   imageFolder: Faces
+  luaGlobalName: avatar
   avatarConfigs:
-  - characterController: {fileID: 0}
+  - characterName: "\u738B\u4E8C\u5BAB"
+    characterController: {fileID: 0}
     prefix: Ergong/
-  - characterController: {fileID: 0}
+  - characterName: "\u5F20\u6D45\u91CE"
+    characterController: {fileID: 0}
     prefix: Qianye/
-  - characterController: {fileID: 0}
+  - characterName: "\u5B59\u897F\u672C"
+    characterController: {fileID: 0}
     prefix: Xiben/
-  - characterController: {fileID: 0}
+  - characterName: "\u9648\u9AD8\u5929"
+    characterController: {fileID: 0}
     prefix: Gaotian/
   textPadding: 200
   renderCamera: {fileID: 4498232183032504786}

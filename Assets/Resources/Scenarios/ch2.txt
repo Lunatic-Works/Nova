@@ -20,7 +20,7 @@ auto_voice_off('陈高天')
 洗手池的水龙头开着，花花的水声几乎要淹没我的声音。
 
 <|
-show(张浅野, 'normal', pos_c, 0)
+show(qianye, 'normal', pos_c, 0)
 anim:cam_punch()
 anim:vfx(cam, 'mono', {0, 0.9}, 0.3)
 sound('flap', 0.5)
@@ -81,8 +81,8 @@ sound('flap', 0.5)
 ？？？：：“哼，蠢货。”
 
 <|
-hide(张浅野)
-tint(张浅野, 1)
+hide(qianye)
+tint(qianye, 1)
 |>
 在我离开厕所的时候，那个人依旧对着我的背影骂着。
 
