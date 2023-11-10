@@ -8,6 +8,7 @@ namespace Nova
     [Serializable]
     public class AutoVoiceConfig
     {
+        public string characterName;
         public GameCharacterController characterController;
         public string prefix;
     }
@@ -34,7 +35,7 @@ namespace Nova
 
             foreach (var config in autoVoiceConfigs)
             {
-                var name = config.characterController.luaGlobalName;
+                var name = config.characterName;
                 nameToConfig[name] = config;
                 nameToEnabled[name] = false;
                 nameToIndex[name] = 0;
