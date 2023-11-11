@@ -31,6 +31,7 @@ def check_code(code, line_num, anim_hold_tracked):
     check_anim_hold_override = False
     check_show = False
     check_trans = False
+    wait_time = 0
     try:
         for func_name, args, env in walk_functions(code):
             arg_names = [get_node_name(x) for x in args]
@@ -61,10 +62,14 @@ def check_code(code, line_num, anim_hold_tracked):
                         print(f"Line {line_num}: anim_hold_end() in anim_hold")
 
             if func_name == "anim":
+                wait_time = 0
+
                 if env:
                     print(f"Line {line_num}: anim in anon function")
 
             elif func_name == "anim_hold":
+                wait_time = 0
+
                 if not anim_hold_tracked:
                     print(f"Line {line_num}: anim_hold not tracked")
 
@@ -77,16 +82,22 @@ def check_code(code, line_num, anim_hold_tracked):
                     print(f"Line {line_num}: anim_hold in anim_hold")
 
             elif func_name == "show":
-                if not env and args and arg_names[0] != "extra_text":
+                if not env and not any(
+                    arg_names[0].startswith(x) for x in ["bg", "fg", "ui_img"]
+                ):
                     check_show = True
 
-            elif "trans" in func_name:
+            elif func_name.startswith("trans"):
                 if (
                     len(args) >= 2
-                    and arg_names[0] == "cam"
+                    and arg_names[0].startswith("cam")
                     and not isinstance(args[1], astnodes.Nil)
+                    and wait_time <= 0.1
                 ):
                     check_trans = True
+
+            elif func_name == "wait":
+                wait_time += args[0].n
 
     except Exception as e:
         print(f"Line {line_num}: error when parsing code: {e}")
