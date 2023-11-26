@@ -213,6 +213,7 @@ def normalize_dialogue(
         )
 
     s = re.compile(" +").sub(" ", s)
+    s = s.strip()
 
     return s
 
