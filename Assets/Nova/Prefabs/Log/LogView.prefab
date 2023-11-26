@@ -70,6 +70,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+  scrollable: 1
 --- !u!1 &1103733773944472
 GameObject:
   m_ObjectHideFlags: 0
@@ -81,7 +82,7 @@ GameObject:
   - component: {fileID: 224229718639157664}
   - component: {fileID: 222749072976799108}
   - component: {fileID: 114560839380638554}
-  - component: {fileID: 1205116029}
+  - component: {fileID: 3405815014620780478}
   - component: {fileID: 1205116031}
   - component: {fileID: 1205116030}
   m_Layer: 5
@@ -149,7 +150,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1205116029
+--- !u!114 &3405815014620780478
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -158,7 +159,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1103733773944472}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a98125502f715b4b83cfb77b434e436, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -186,10 +187,13 @@ MonoBehaviour:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
-    m_SelectedTrigger: Highlighted
+    m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 0
   m_TargetGraphic: {fileID: 114560839380638554}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &1205116031
 CanvasGroup:
   m_ObjectHideFlags: 0
