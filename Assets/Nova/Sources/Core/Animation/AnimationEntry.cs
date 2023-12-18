@@ -13,7 +13,7 @@ namespace Nova
     /// Play a segment of animation. The game object will be recycled in the factory when it finishes.
     /// </summary>
     [ExportCustomType]
-    public class AnimationEntry : MonoBehaviour
+    public class AnimationEntry : MonoBehaviour, IAnimationParent
     {
         #region Fields
 
@@ -117,7 +117,7 @@ namespace Nova
             status = AnimationEntryStatus.Paused;
             evaluateOnStop = true;
 
-            if (duration > 0.0f && duration < 0.1f)
+            if (duration > 0.0f && duration < 0.1f && !(property is TextFadeInAnimationProperty))
             {
                 Debug.LogWarning($"Nova: AnimationEntry duration {duration} is too small for {propertyName}. " +
                                  "Parallel animations may not play as expected when the frame duration is " +

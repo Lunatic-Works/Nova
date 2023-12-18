@@ -43,7 +43,7 @@ namespace Nova
             else
             {
                 fadeMaterial.SetFloat(TimeID, 1.0f);
-                novaAnimation.Do(new MaterialFloatAnimationProperty(fadeMaterial, TIME, 0.0f), duration);
+                novaAnimation.Then(new MaterialFloatAnimationProperty(fadeMaterial, TIME, 0.0f), duration);
             }
         }
 

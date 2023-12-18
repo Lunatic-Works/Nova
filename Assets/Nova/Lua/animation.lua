@@ -29,30 +29,15 @@ function AnimationEntry:_and(args)
     end
 
     if self.head then
-        -- self has head, so the new entry will be head's child
-        if self.head.entry then
-            -- self.head is AnimationEntry
-            return AnimationEntry:new {
-                entry = self.head.entry:Then(
-                    args.property,
-                    args.duration or 0,
-                    args.easing,
-                    args.repeat_num or 0
-                )
-            }
-        else
-            -- self.head is NovaAnimation
-            return AnimationEntry:new {
-                entry = self.head.anim:Do(
-                    args.property,
-                    args.duration or 0,
-                    args.easing,
-                    args.repeat_num or 0
-                )
-            }
-        end
+        return AnimationEntry:new {
+            entry = self.head.entry:Then(
+                args.property,
+                args.duration or 0,
+                args.easing,
+                args.repeat_num or 0
+            )
+        }
     else
-        -- self doesn't have head, so the new entry will be self's child
         return AnimationEntry:new {
             entry = self.entry:And(
                 args.property,
@@ -94,28 +79,13 @@ function NovaAnimation:new(o)
     return setmetatable(o or {}, self)
 end
 
-function NovaAnimation:_do(args)
-    if type(args) ~= 'table' then
-        args = { property = args }
-    end
-    return AnimationEntry:new {
-        entry = self.anim:Do(
-            args.property,
-            args.duration or 0,
-            args.easing,
-            args.repeat_num or 0
-        )
-    }
-end
+NovaAnimation._then = AnimationEntry._then
 
 function NovaAnimation:stop()
-    self.anim:Stop()
+    self.entry:Stop()
 end
 
 --- NovaAnimation wrapper end
-
---- alias for defining methods for both AnimationEntry and NovaAnimation
-NovaAnimation._then = NovaAnimation._do
 
 function make_anim_method(func_name, func, preload_func, preload_param)
     if AnimationEntry[func_name] then

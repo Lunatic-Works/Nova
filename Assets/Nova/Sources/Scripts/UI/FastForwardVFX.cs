@@ -63,7 +63,7 @@ namespace Nova
             if (!isInitial && viewManager.currentView == CurrentViewType.Game)
             {
                 AddVFX();
-                viewManager.uiAnimation.Do(null, vfxDurationOnRestore).Then(new ActionAnimationProperty(RemoveVFX));
+                viewManager.uiAnimation.Then(null, vfxDurationOnRestore).Then(new ActionAnimationProperty(RemoveVFX));
             }
         }
 

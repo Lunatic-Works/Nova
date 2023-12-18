@@ -75,7 +75,7 @@ namespace Nova
         {
             if (bgmController != null && !string.IsNullOrEmpty(bgmName))
             {
-                novaAnimation.Do(new VolumeAnimationProperty(bgmController, 0.0f), bgmFadeOutDuration)
+                novaAnimation.Then(new VolumeAnimationProperty(bgmController, 0.0f), bgmFadeOutDuration)
                     .Then(new ActionAnimationProperty(bgmController.Stop));
             }
 

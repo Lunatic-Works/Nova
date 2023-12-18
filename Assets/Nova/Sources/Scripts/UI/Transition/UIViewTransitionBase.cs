@@ -81,7 +81,7 @@ namespace Nova
 
         protected AnimationEntry GetBaseAnimationEntry()
         {
-            return viewManager.uiAnimation.Do(null, delayOffset);
+            return viewManager.uiAnimation.Then(null, delayOffset);
         }
 
         private void OnEnable()

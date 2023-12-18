@@ -292,26 +292,55 @@ namespace Nova
                     textDuration = characterFadeInDuration * contentProxy.GetPageCharacterCount();
                 }
 
-                textAnimationDelayEntry = textAnimation
-                    .Do(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
-                    .Then(null, textAnimationDelay);
-                var animationEntry = textAnimationDelayEntry.Then(
-                    new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
-                    textDuration
-                );
-                if (!textScrollOverriden)
+                IAnimationParent textAnimationParent;
+                if (textAnimationDelay > 1e-3f)
                 {
-                    if (dialogueText.Count == 1)
+                    textAnimationDelayEntry = textAnimation
+                        .Then(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
+                        .Then(null, textAnimationDelay);
+                    textAnimationParent = textAnimationDelayEntry;
+                }
+                else
+                {
+                    textAnimationDelayEntry = null;
+                    textAnimationParent = textAnimation;
+                }
+
+                if (textDuration > 1e-3f)
+                {
+                    textAnimationParent.Then(
+                        new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
+                        textDuration
+                    );
+
+                    if (!textScrollOverriden)
+                    {
+                        if (dialogueText.Count == 1)
+                        {
+                            SetTextScroll(0f);
+                        }
+                        else
+                        {
+                            textAnimationParent.Then(
+                                new VerticalScrollRectAnimationProperty(dialogueTextScrollRect, 0f),
+                                textDuration,
+                                AnimationEntry.CubicEasing(0f, 1f)
+                            );
+                        }
+                    }
+                }
+                else
+                {
+                    if (textAnimationDelay > 1e-3f)
+                    {
+                        textAnimationParent.Then(
+                            new ActionAnimationProperty(() => contentProxy.SetTextAlpha((byte)(255 * nowTextColor.a)))
+                        );
+                    }
+
+                    if (!textScrollOverriden)
                     {
                         SetTextScroll(0f);
-                    }
-                    else
-                    {
-                        animationEntry.And(
-                            new VerticalScrollRectAnimationProperty(dialogueTextScrollRect, 0f),
-                            textDuration,
-                            AnimationEntry.CubicEasing(0f, 1f)
-                        );
                     }
                 }
             }
