@@ -54,8 +54,8 @@ Shader "Nova/Post Processing/Glow"
                 float4 col = tex2D(_MainTex, i.uv) * i.color;
 
                 float3 glow = tex2DGaussianBlur(_MainTex, _MainTex_TexelSize * _GScale, i.uv, _Size * _T).rgb * i.color.rgb;
-                glow = glow * glow;
-                glow = glow * glow;
+                glow *= glow;
+                glow *= glow;
                 glow *= _Strength * _T;
                 glow = saturate(glow);
 

@@ -47,8 +47,8 @@ Shader "Nova/VFX Multiply/Broken TV"
             float power(float x)
             {
                 x += 1.0;
-                x = x * x;
-                x = x * x;
+                x *= x;
+                x *= x;
                 x -= 1.0;
                 return x;
             }
