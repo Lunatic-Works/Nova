@@ -1,5 +1,6 @@
 @<|
 label('ch4', '终章')
+is_chapter()
 |>
 <|
 anim:trans_fade(cam, function()
@@ -9,9 +10,9 @@ anim:trans_fade(cam, function()
 play(bgm, 'prelude')
 box_hide_show()
 auto_voice_on('王二宫', 004001)
-auto_voice_on('张浅野', 004001)
-auto_voice_on('孙西本', 004001)
-auto_voice_on('陈高天', 004001)
+auto_voice_off('张浅野')
+auto_voice_off('孙西本')
+auto_voice_off('陈高天')
 set_auto_voice_delay(1)
 |>
 王二宫：：“嗯？为什么拿个杯子会花这么长时间？”
@@ -54,6 +55,10 @@ branch {
 <|
 hide(qianye)
 show(xiben, 'normal', pos_r)
+auto_voice_on('王二宫', 004002)
+auto_voice_on('张浅野', 004001)
+auto_voice_on('孙西本', 004001)
+auto_voice_on('陈高天', 004001)
 |>
 孙西本：：“我也要喝。”
 
@@ -219,6 +224,12 @@ stop_auto_ff()
 @<| is_end 'true_end' |>
 
 @<| label 'l_bad' |>
+<|
+auto_voice_off('王二宫')
+auto_voice_off('张浅野')
+auto_voice_off('孙西本')
+auto_voice_off('陈高天')
+|>
 因为你没有获得西本的flag，剧情编不下去了……
 
 <|
