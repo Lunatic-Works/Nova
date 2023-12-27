@@ -4,13 +4,8 @@ import os
 import re
 import unicodedata
 
-from luaparser import astnodes
-from nova_script_parser import (
-    get_node_name,
-    normalize_dialogue,
-    parse_chapters,
-    walk_functions,
-)
+from lua_parser import is_nil, walk_functions
+from nova_script_parser import normalize_dialogue, parse_chapters
 
 in_dir = "../../Assets/Resources/Scenarios/"
 template_filename = "template.txt"
@@ -34,9 +29,7 @@ def check_code(code, line_num, anim_hold_tracked):
     wait_time = 0
     try:
         for func_name, args, env in walk_functions(code):
-            arg_names = [get_node_name(x) for x in args]
-
-            for name in [func_name] + arg_names:
+            for name in (func_name,) + args:
                 if name == "anim_hold_begin":
                     if anim_hold_tracked:
                         print(f"Line {line_num}: anim_hold_begin() not match")
@@ -83,21 +76,22 @@ def check_code(code, line_num, anim_hold_tracked):
 
             elif func_name == "show":
                 if not env and not any(
-                    arg_names[0].startswith(x) for x in ["bg", "fg", "ui_img"]
+                    args[0].startswith(x) for x in ["bg", "fg", "ui_img"]
                 ):
                     check_show = True
 
             elif func_name.startswith("trans"):
                 if (
                     len(args) >= 2
-                    and arg_names[0].startswith("cam")
-                    and not isinstance(args[1], astnodes.Nil)
+                    and args[0].startswith("cam")
+                    and not is_nil(args[1])
                     and wait_time <= 0.1
                 ):
                     check_trans = True
 
             elif func_name == "wait":
-                wait_time += args[0].n
+                if isinstance(args[0], (int, float)):
+                    wait_time += args[0]
 
     except Exception as e:
         print(f"Line {line_num}: error when parsing code: {e}")

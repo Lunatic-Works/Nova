@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from luaparser import astnodes
-from nova_script_parser import get_node_name, parse_chapters, walk_functions
+from lua_parser import walk_functions
+from nova_script_parser import parse_chapters
 
 in_filename = "scenario.txt"
 
@@ -23,20 +23,14 @@ def do_chapter(entries, bg_list):
                     "trans_up",
                     "trans_down",
                 ]
-                and args
-                and get_node_name(args[0]).startswith("bg")
-                and isinstance(args[1], astnodes.String)
+                and args[0].startswith("bg")
+                and isinstance(args[1], str)
             ):
-                bg_name = args[1].s
+                bg_name = args[1]
                 if bg_name not in bg_list:
                     bg_list.append(bg_name)
-            elif (
-                func_name == "show_loop"
-                and args
-                and get_node_name(args[0]).startswith("bg")
-            ):
-                for field in args[1].fields:
-                    bg_name = field.value.s
+            elif func_name == "show_loop" and args[0].startswith("bg"):
+                for bg_name in args[1]:
                     if bg_name not in bg_list:
                         bg_list.append(bg_name)
 
@@ -56,4 +50,7 @@ def main():
 
 
 if __name__ == "__main__":
+    import subprocess
+
+    subprocess.run("python merge.py", shell=True)
     main()

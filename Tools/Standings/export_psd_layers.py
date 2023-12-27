@@ -50,7 +50,7 @@ def save_layer(layer, layer_name, size):
     img[top:bottom, left:right, :] = layer_np
 
     img = skimage.img_as_ubyte(img)
-    layer_name = layer_name.replace('-', '_')
+    layer_name = layer_name.replace("-", "_")
     out_filename = os.path.join(out_dir, f"{out_prefix}{layer_name}.png")
     skimage.io.imsave(out_filename, img, check_contrast=False, compress_level=1)
 
@@ -69,7 +69,7 @@ def walk(layer, layer_name, size):
                 child_name += child.name
             walk(child, child_name, size)
     else:
-        raise ValueError(f"Unknown layer {type(layer)}: {layer_name}")
+        print(f"Unknown layer {type(layer)}: {layer_name}")
 
 
 def convert_xlsx_to_csv(target, name):

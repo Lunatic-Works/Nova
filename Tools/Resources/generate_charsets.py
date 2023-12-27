@@ -46,8 +46,9 @@ def main():
             print(filename)
             with open(filename, "r", encoding="utf-8") as f:
                 s = f.read()
-            check_control_char(dedup(s))
-            check_nfc(dedup(s))
+            s = dedup(s)
+            check_control_char(s)
+            check_nfc(s)
             text += s
 
     print("-" * 80)
@@ -56,8 +57,6 @@ def main():
 
     text = dedup(text)
     text_bold = dedup(text_bold)
-
-    check_control_char(text)
 
     if all(x in old_text for x in text):
         print("Need to rebuild font asset: NO")

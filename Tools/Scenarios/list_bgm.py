@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from nova_script_parser import get_node_name, parse_chapters, walk_functions
+from lua_parser import walk_functions
+from nova_script_parser import parse_chapters
 
 in_filename = "scenario.txt"
 
@@ -10,12 +11,8 @@ def do_chapter(entries, bgm_list):
         if not code:
             continue
         for func_name, args, _ in walk_functions(code):
-            if (
-                func_name in ["play", "fade_in"]
-                and args
-                and get_node_name(args[0]) == "bgm"
-            ):
-                bgm_name = args[1].s
+            if func_name in ["play", "fade_in"] and args[0] == "bgm":
+                bgm_name = args[1]
                 if bgm_name not in bgm_list:
                     bgm_list.append(bgm_name)
 
@@ -35,4 +32,7 @@ def main():
 
 
 if __name__ == "__main__":
+    import subprocess
+
+    subprocess.run("python merge.py", shell=True)
     main()

@@ -9,6 +9,7 @@ from strip_code_tex import parse_code, translate
 
 in_filename = "scenario.txt"
 out_filename = "scenario_no_code.docx"
+need_parse_code = True
 
 
 def main():
@@ -45,13 +46,17 @@ def main():
 
         doc.add_heading(chapter_name)
         for code, chara_name, dialogue, _ in entries:
-            bg_name, bgm_name = parse_code(code, f)
-            if bg_name:
-                para = doc.add_paragraph()
-                para.add_run("场景：" + translate(bg_name), "BG")
-            if bgm_name:
-                para = doc.add_paragraph()
-                para.add_run("音乐：" + translate(bgm_name), "BGM")
+            if need_parse_code:
+                bg_name, bgm_name = parse_code(code, f)
+                if bg_name:
+                    para = doc.add_paragraph()
+                    para.add_run("场景：" + translate(bg_name), "BG")
+                if bgm_name:
+                    if bg_name:
+                        para.add_run("\t")
+                    else:
+                        para = doc.add_paragraph()
+                    para.add_run("音乐：" + translate(bgm_name), "BGM")
 
             dialogue = normalize_dialogue(dialogue, keep_todo=["配音"])
             if dialogue:
@@ -67,4 +72,7 @@ def main():
 
 
 if __name__ == "__main__":
+    import subprocess
+
+    subprocess.run("python merge.py", shell=True)
     main()

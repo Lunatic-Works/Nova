@@ -4,10 +4,15 @@ import os
 import re
 
 import clr
-from luaparser import ast, astnodes
 
 nova_parser_dll_path = "../../Library/ScriptAssemblies/Nova.Parser.dll"
 clr.AddReference(os.path.abspath(nova_parser_dll_path))
+
+
+def is_chapter(head_eager_code):
+    return any(
+        x in head_eager_code for x in ["is_chapter", "is_start", "is_unlocked_start"]
+    )
 
 
 def is_start(head_eager_code):
@@ -59,125 +64,14 @@ def format_code_block(block):
     return s
 
 
-def get_node_name(node):
-    if isinstance(node, astnodes.Name):
-        return node.id
-    elif isinstance(node, astnodes.Index):
-        return f"{get_node_name(node.value)}.{get_node_name(node.idx)}"
-    elif isinstance(node, astnodes.Call):
-        return get_node_name(node.func)
-    elif isinstance(node, astnodes.Invoke):
-        return get_node_name(node.func)
-    elif isinstance(node, astnodes.Number):
-        return f"{node.n}"
-    elif isinstance(node, astnodes.String):
-        return node.s
-    elif isinstance(
-        node,
-        (
-            astnodes.Nil,
-            astnodes.TrueExpr,
-            astnodes.FalseExpr,
-            astnodes.Table,
-            astnodes.AnonymousFunction,
-            astnodes.BinaryOp,
-            astnodes.UnaryOp,
-        ),
-    ):
-        return node._name
-    else:
-        raise ValueError(f"Unknown node: {type(node)}")
-
-
-def walk_functions_block(nodes, env):
-    nodes = list(reversed(nodes))
-    invoke_stack = []
-    while nodes:
-        node = nodes.pop()
-        if isinstance(node, astnodes.Call):
-            yield get_node_name(node), node.args, env
-            for _node in node.args:
-                if isinstance(_node, astnodes.AnonymousFunction):
-                    yield from walk_functions_block(_node.body.body, env)
-        elif isinstance(node, astnodes.Invoke):
-            while isinstance(node, astnodes.Invoke):
-                invoke_stack.append(node)
-                node = node.source
-
-            source = get_node_name(node)
-            yield source, [], env
-
-            while invoke_stack:
-                node = invoke_stack.pop()
-                func_name = get_node_name(node)
-                args = node.args
-                if func_name == "action" and not isinstance(
-                    args[0], astnodes.AnonymousFunction
-                ):
-                    yield get_node_name(args[0]), args[1:], env
-                else:
-                    yield func_name, args, env
-
-                for _node in args:
-                    if isinstance(_node, astnodes.AnonymousFunction):
-                        yield from walk_functions_block(
-                            _node.body.body, env + (source,)
-                        )
-        elif isinstance(node, astnodes.Assign):
-            nodes.extend(reversed(node.values))
-        elif isinstance(
-            node,
-            (
-                astnodes.Index,
-                astnodes.While,
-                astnodes.If,
-                astnodes.Return,
-                astnodes.Fornum,
-                astnodes.Forin,
-                astnodes.Function,
-                astnodes.LocalFunction,
-                astnodes.Nil,
-                astnodes.TrueExpr,
-                astnodes.FalseExpr,
-                astnodes.Number,
-                astnodes.String,
-                astnodes.Table,
-                astnodes.AnonymousFunction,
-                astnodes.BinaryOp,
-                astnodes.UnaryOp,
-            ),
-        ):
-            pass
+def format_name_dialogue(chara_name, disp_name, dialogue):
+    if chara_name:
+        if disp_name == chara_name:
+            return f"{chara_name}：：{dialogue}"
         else:
-            raise ValueError(f"Unknown node: {type(node)}")
-
-
-def walk_functions(code):
-    tree = ast.parse(code)
-    try:
-        yield from walk_functions_block(tree.body.body, ())
-    except Exception as e:
-        print(e)
-        print(code)
-
-
-def parse_table(node):
-    if isinstance(node, astnodes.Table):
-        return tuple(parse_table(x.value) for x in node.fields)
-    elif isinstance(node, astnodes.Number):
-        return node.n
-    elif isinstance(node, astnodes.Name):
-        return node.id
-    elif isinstance(node, astnodes.String):
-        return node.s
-    elif isinstance(node, astnodes.Nil):
-        return None
-    elif isinstance(node, astnodes.UMinusOp):
-        return -parse_table(node.operand)
-    elif isinstance(node, (astnodes.UnaryOp, astnodes.BinaryOp)):
-        return "expr"
+            return f"{disp_name}//{chara_name}：：{dialogue}"
     else:
-        raise ValueError(f"Unknown node: {type(node)}")
+        return dialogue
 
 
 def normalize_dialogue(
@@ -236,34 +130,13 @@ def test_roundtrip():
             for block in entry.codeBlocks:
                 print(format_code_block(block))
 
-            chara_name = entry.characterName
-            disp_name = entry.displayName
-            dialogue = entry.dialogue
-
-            if chara_name:
-                if disp_name == chara_name:
-                    print(f"{chara_name}：：{dialogue}")
-                else:
-                    print(f"{disp_name}//{chara_name}：：{dialogue}")
-            else:
-                print(dialogue)
+            print(
+                format_name_dialogue(
+                    entry.characterName, entry.displayName, entry.dialogue
+                )
+            )
         print(format_code_block(node.tailEagerBlock))
 
 
-def test_lua():
-    code = """
-f1()
-a1:a2(t1):a3(t2, t3)
-a4:f2(function()
-        a5:f3(t4)
-    end)
-x = f6()
-"""
-    tree = ast.parse(code)
-    print(ast.to_pretty_str(tree))
-    for x in walk_functions(code):
-        print(x)
-
-
 if __name__ == "__main__":
-    test_lua()
+    test_roundtrip()

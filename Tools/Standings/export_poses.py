@@ -50,7 +50,7 @@ def export_pose(pose_name, layer_names):
 
 
 def main():
-    with open(pose_filename, encoding="utf-8") as f:
+    with open(pose_filename, "r", encoding="utf-8") as f:
         code = f.read()
 
     lua = LuaRuntime(unpack_returned_tuples=True)

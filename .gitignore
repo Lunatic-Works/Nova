@@ -17,7 +17,16 @@
 /Assets/Nova/Sources/ThirdParty/ToLua/Source/Generate/*
 /Assets/Resources/Lua*
 /Tools/Resources/shader_timestamps.json
+/Tools/Scenarios/scenario*.aux
+/Tools/Scenarios/scenario*.docx
+/Tools/Scenarios/scenario*.log
+/Tools/Scenarios/scenario*.out
+/Tools/Scenarios/scenario*.pdf
+/Tools/Scenarios/scenario*.png
+/Tools/Scenarios/scenario*.tex
 /Tools/Scenarios/scenario*.txt
+/Tools/Scenarios/scenario*.xls
+/Tools/Standings/out*
 
 # Visual Studio cache directory
 .vs/

@@ -1,6 +1,5 @@
 joblib
 lupa
-luaparser
 numpy
 openpyxl
 pandas
@@ -9,5 +8,7 @@ psd-tools
 PyHyphen
 python-docx
 pythonnet
+pytoshop
 scikit-image
 sobol-seq
+speedy-antlr-lua-parser

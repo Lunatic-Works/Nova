@@ -2,9 +2,9 @@
 
 import numpy as np
 import skimage.io
-import sobol_seq
-from luaparser import astnodes
-from nova_script_parser import get_node_name, is_start, parse_chapters, walk_functions
+from lua_parser import walk_functions
+from nova_script_parser import is_chapter, parse_chapters
+from scipy.stats.qmc import Sobol
 
 in_filename = "scenario.txt"
 out_filename = "scenario.png"
@@ -25,19 +25,17 @@ str_to_color_config = {
 bg_suffixes = ["blur"]
 
 str_to_color_cache = {}
-str_to_color_seed = 2
+sobol = Sobol(d=3, seed=0)
 
 
 def str_to_color(s):
-    global str_to_color_seed
-
     if s in str_to_color_config:
         return str_to_color_config[s]
     if s in str_to_color_cache:
         return str_to_color_cache[s]
 
-    rgb, str_to_color_seed = sobol_seq.i4_sobol(3, str_to_color_seed)
-    rgb = (rgb * 192).astype(int) + 64
+    rgb = sobol.random()[0]
+    rgb = (rgb * 128).astype(int) + 64
     rgb = rgb.tolist()
     str_to_color_cache[s] = rgb
 
@@ -78,42 +76,31 @@ def chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set):
                         "trans_up",
                         "trans_down",
                     ]
-                    and args
-                    and get_node_name(args[0]) == "bg"
-                    and isinstance(args[1], astnodes.String)
+                    and args[0] == "bg"
+                    and isinstance(args[1], str)
                 ):
-                    bg_name = normalize_bg_name(args[1].s)
+                    bg_name = normalize_bg_name(args[1])
                     bg_set.add(bg_name)
                     bg_color = str_to_color(bg_name)
-                elif (
-                    func_name == "show_loop" and args and get_node_name(args[0]) == "bg"
-                ):
-                    bg_name = normalize_bg_name(args[1].fields[0].value.s)
+                elif func_name == "show_loop" and args[0] == "bg":
+                    bg_name = normalize_bg_name(args[1][0])
                     bg_set.add(bg_name)
                     bg_color = str_to_color(bg_name)
-                elif func_name == "hide" and args and get_node_name(args[0]) == "bg":
+                elif func_name == "hide" and args[0] == "bg":
                     bg_color = BG_NONE_COLOR
 
                 elif func_name == "timeline":
-                    timeline_name = args[0].s
+                    timeline_name = args[0]
                     timeline_set.add(timeline_name)
                     timeline_color = str_to_color(timeline_name)
                 elif func_name == "timeline_hide":
                     timeline_color = BG_NONE_COLOR
 
-                elif (
-                    func_name in ["play", "fade_in"]
-                    and args
-                    and get_node_name(args[0]) == "bgm"
-                ):
-                    bgm_name = args[1].s
+                elif func_name in ["play", "fade_in"] and args[0] == "bgm":
+                    bgm_name = args[1]
                     bgm_set.add(bgm_name)
                     bgm_color = str_to_color(bgm_name)
-                elif (
-                    func_name in ["stop", "fade_out"]
-                    and args
-                    and get_node_name(args[0]) == "bgm"
-                ):
+                elif func_name in ["stop", "fade_out"] and args and args[0] == "bgm":
                     bgm_color = BGM_NONE_COLOR
 
         if bg_color != BG_NONE_COLOR:
@@ -148,7 +135,7 @@ def main():
     bgm_set = set()
     for chapter_name, entries, head_eager_code, _ in chapters:
         print(chapter_name)
-        if tape and is_start(head_eager_code):
+        if tape and is_chapter(head_eager_code):
             tapes.append(tape)
             tape = []
         chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set)
@@ -177,4 +164,7 @@ def main():
 
 
 if __name__ == "__main__":
+    import subprocess
+
+    subprocess.run("python merge.py", shell=True)
     main()
