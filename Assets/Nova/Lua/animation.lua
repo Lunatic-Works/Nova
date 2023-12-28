@@ -43,7 +43,7 @@ function AnimationEntry:_and(args)
         else
             -- self.head is NovaAnimation
             return AnimationEntry:new {
-                entry = self.head.anim:Do(
+                entry = self.head.anim:Then(
                     args.property,
                     args.duration or 0,
                     args.easing,
@@ -99,7 +99,7 @@ function NovaAnimation:_do(args)
         args = { property = args }
     end
     return AnimationEntry:new {
-        entry = self.anim:Do(
+        entry = self.anim:Then(
             args.property,
             args.duration or 0,
             args.easing,

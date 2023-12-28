@@ -18,7 +18,7 @@ namespace Nova
     }
 
     [ExportCustomType]
-    public class NovaAnimation : MonoBehaviour
+    public class NovaAnimation : MonoBehaviour, IAnimationParent
     {
         public AnimationType type = AnimationType.PerDialogue;
 
@@ -87,7 +87,7 @@ namespace Nova
             RemoveAnimation(this);
         }
 
-        public AnimationEntry Do(IAnimationProperty property, float duration = 0,
+        public AnimationEntry Then(IAnimationProperty property, float duration = 0.0f,
             AnimationEntry.EasingFunction easing = null, int repeatNum = 0)
         {
             var entry = AnimationEntry.CreateEntry(property, duration, easing, repeatNum, transform);

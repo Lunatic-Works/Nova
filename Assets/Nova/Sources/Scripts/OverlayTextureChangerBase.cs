@@ -72,7 +72,7 @@ namespace Nova
             else
             {
                 material.SetFloat(TimeID, 1.0f);
-                novaAnimation.Do(new MaterialFloatAnimationProperty(material, TIME, 0.0f), fadeDuration);
+                novaAnimation.Then(new MaterialFloatAnimationProperty(material, TIME, 0.0f), fadeDuration);
             }
 
             lastTexture = to;
