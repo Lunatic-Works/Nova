@@ -320,7 +320,7 @@ namespace Nova
             bookmark.description = currentDialogue;
             bookmark.screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
-            checkpointManager.SaveBookmark(saveID, bookmark);
+            checkpointManager[saveID] = bookmark;
 
             ShowPage();
             ShowPreviewBookmark(saveID);
@@ -340,7 +340,7 @@ namespace Nova
 
         public void LoadBookmark(int saveID)
         {
-            var bookmark = checkpointManager.LoadBookmark(saveID);
+            var bookmark = checkpointManager[saveID];
             DeleteCachedThumbnailSprite(saveID);
             if (bookmark == null)
             {
@@ -407,7 +407,7 @@ namespace Nova
                     SaveIDQueryType.Earliest);
             }
 
-            checkpointManager.SaveBookmark(saveID, bookmark);
+            checkpointManager[saveID] = bookmark;
             Destroy(texture);
         }
 
@@ -432,7 +432,7 @@ namespace Nova
         {
             int saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.QuickSave,
                 (int)BookmarkType.NormalSave, SaveIDQueryType.Latest);
-            var bookmark = checkpointManager.LoadBookmark(saveID);
+            var bookmark = checkpointManager[saveID];
             DeleteCachedThumbnailSprite(saveID);
             if (bookmark == null)
             {
