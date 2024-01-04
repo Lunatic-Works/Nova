@@ -61,7 +61,12 @@ namespace Nova
                 ClickForward();
             }
 
-            // When the input is not enabled, the user can only click forward
+            if (inputManager.fastForwardShortcutEnabled)
+            {
+                dialogueState.fastForwardShortcutHolding = inputManager.IsPressed(AbstractKey.FastForward);
+            }
+
+            // When the input is not enabled, the user can still click forward
             if (!inputManager.inputEnabled)
             {
                 return;
@@ -116,8 +121,6 @@ namespace Nova
             {
                 Utils.QuitWithAlert();
             }
-
-            dialogueState.fastForwardHotKeyHolding = inputManager.IsPressed(AbstractKey.FastForward);
         }
 
         private void HandleShortcutWhenDialogueHidden()
@@ -204,7 +207,7 @@ namespace Nova
                 return;
             }
 
-            // When the input is not enabled, the user can only click forward
+            // When the input is not enabled, the user can still click forward
             if (!inputManager.inputEnabled)
             {
                 if (TouchFix.IsTouch(eventData) || eventData.button == PointerEventData.InputButton.Left)

@@ -113,8 +113,35 @@ namespace Nova
 
         // When the input is disabled, the user can still close alert box, hide button ring, show dialogue box,
         // step forward, and trigger global shortcuts
-        // inputEnabled is not in RestoreData, because the user cannot save when the input is disabled
-        [HideInInspector] public bool inputEnabled = true;
+        // inputEnabled and fastForwardShortcutEnabled are not in RestoreData, because the user cannot save when the input is disabled
+        private bool _inputEnabled = true;
+        private bool _fastForwardShortcutEnabled = true;
+
+        public bool inputEnabled
+        {
+            get => _inputEnabled;
+            set
+            {
+                _inputEnabled = value;
+                _fastForwardShortcutEnabled = value;
+            }
+        }
+
+        public bool fastForwardShortcutEnabled
+        {
+            get => _fastForwardShortcutEnabled;
+            set
+            {
+                if (inputEnabled)
+                {
+                    Debug.LogWarning($"Nova: fastForwardShortcutEnabled can be set only when inputEnabled == false");
+                }
+                else
+                {
+                    _fastForwardShortcutEnabled = value;
+                }
+            }
+        }
 
         [HideInInspector] public bool isRebinding;
     }

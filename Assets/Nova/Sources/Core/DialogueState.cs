@@ -28,7 +28,7 @@ namespace Nova
             gameState.dialogueChangedEarly.RemoveListener(OnDialogueChangedEarly);
         }
 
-        private bool stopFastForward => !isDialogueReached && !fastForwardUnread && !fastForwardHotKeyHolding;
+        private bool stopFastForward => !isDialogueReached && !fastForwardUnread && !fastForwardShortcutHolding;
 
         [ExportCustomType]
         public enum State
@@ -116,19 +116,19 @@ namespace Nova
         public bool isDialogueReached { get; private set; }
         public bool fastForwardUnread { get; set; }
 
-        private bool _fastForwardHotKeyHolding;
+        private bool _fastForwardShortcutHolding;
 
-        public bool fastForwardHotKeyHolding
+        public bool fastForwardShortcutHolding
         {
-            get => _fastForwardHotKeyHolding;
+            get => _fastForwardShortcutHolding;
             set
             {
-                if (_fastForwardHotKeyHolding == value)
+                if (_fastForwardShortcutHolding == value)
                 {
                     return;
                 }
 
-                _fastForwardHotKeyHolding = value;
+                _fastForwardShortcutHolding = value;
                 state = value ? State.FastForward : State.Normal;
             }
         }

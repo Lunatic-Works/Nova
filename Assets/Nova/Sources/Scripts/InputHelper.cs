@@ -18,5 +18,11 @@ namespace Nova
             get => inputManager.inputEnabled;
             set => inputManager.inputEnabled = value;
         }
+
+        public bool fastForwardShortcutEnabled
+        {
+            get => inputManager.fastForwardShortcutEnabled;
+            set => inputManager.fastForwardShortcutEnabled = value;
+        }
     }
 }

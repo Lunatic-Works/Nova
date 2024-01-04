@@ -26,6 +26,7 @@ function minigame(prefab_loader, prefab_name)
         return
     end
 
+    stop_auto_ff()
     input_off()
     __Nova.coroutineHelper:StartInterrupt()
 
