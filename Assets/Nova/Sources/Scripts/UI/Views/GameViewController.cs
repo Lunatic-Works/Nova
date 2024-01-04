@@ -145,6 +145,13 @@ namespace Nova
             return false;
         }
 
+        private float autoTimeOverride = -1f;
+
+        public void OverrideAutoTime(float secs)
+        {
+            autoTimeOverride = Mathf.Max(secs, 0f);
+        }
+
         public float autoDelay { get; set; }
         public float fastForwardDelay { get; set; }
         private float timeAfterDialogueChange;
@@ -249,6 +256,11 @@ namespace Nova
 
         private float GetDialogueTimeAuto()
         {
+            if (autoTimeOverride >= 0f)
+            {
+                return autoTimeOverride;
+            }
+
             return Mathf.Max(GetDialogueTime(autoDelay, autoDelay * 0.5f), GetDialogueTimeAutoText());
         }
 
@@ -269,6 +281,7 @@ namespace Nova
         private void OnDialogueWillChange()
         {
             StopTimer();
+            autoTimeOverride = -1f;
             currentDialogueBox?.OnDialogueWillChange();
         }
 

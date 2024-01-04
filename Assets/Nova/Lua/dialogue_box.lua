@@ -338,3 +338,7 @@ make_anim_method('text_scroll', function(self, start, target, duration, easing)
     local property = box:GetTextScrollAnimationProperty(start, target)
     return self:_then(property):_with(easing):_for(duration)
 end)
+
+function auto_time(time)
+    __Nova.gameViewController:OverrideAutoTime(time)
+end
