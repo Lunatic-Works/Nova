@@ -131,12 +131,9 @@ GameObject:
   - component: {fileID: 114045275974384532}
   - component: {fileID: 114842112916876254}
   - component: {fileID: 5381135131129481220}
-  - component: {fileID: 114593149028580010}
   - component: {fileID: 114174511625809554}
   - component: {fileID: 4085662085105365225}
   - component: {fileID: 7273781188685514655}
-  - component: {fileID: 8771533738423406258}
-  - component: {fileID: 114014151699594742}
   - component: {fileID: 6935519797362669510}
   m_Layer: 0
   m_Name: NovaController
@@ -200,7 +197,7 @@ MonoBehaviour:
   dialogueChanged:
     m_PersistentCalls:
       m_Calls: []
-  selectionOccurs:
+  choiceOccurs:
     m_PersistentCalls:
       m_Calls: []
   routeEnded:
@@ -273,21 +270,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultActionAsset: {fileID: -944628639613478452, guid: 1702af3a5691a8b42a8c171528f43c46, type: 3}
-  inputEnabled: 1
   isRebinding: 0
---- !u!114 &114593149028580010
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1737081535048956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a87d00e059b428b86d1e0191320d9c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hideAfterSeconds: 5
 --- !u!114 &114174511625809554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -322,31 +305,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c2de00a754c42c9867fb7895cd4819b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &8771533738423406258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1737081535048956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c6a0d2492556b84a889823c01b96669, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxTime: 10
---- !u!114 &114014151699594742
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1737081535048956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c4e083754c55b948af4935ce557d097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &6935519797362669510
@@ -386,7 +344,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1963475629363514}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4892531040896684}
