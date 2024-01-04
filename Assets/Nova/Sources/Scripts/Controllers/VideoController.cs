@@ -10,17 +10,21 @@ namespace Nova
     {
         public string luaName;
         public string videoFolder;
+        public float volume;
 
         public string currentVideoName { get; private set; }
 
         private GameState gameState;
+        private VideoPlayer videoPlayer;
 
-        public VideoPlayer videoPlayer { get; private set; }
+        public double duration => videoPlayer.clip.length;
+        public bool isPlaying => videoPlayer.isPlaying;
 
         private void Awake()
         {
             gameState = Utils.FindNovaController().GameState;
             videoPlayer = GetComponent<VideoPlayer>();
+            videoPlayer.errorReceived += OnError;
 
             if (!string.IsNullOrEmpty(luaName))
             {
@@ -31,16 +35,24 @@ namespace Nova
 
         private void OnDestroy()
         {
+            videoPlayer.errorReceived -= OnError;
+
             if (!string.IsNullOrEmpty(luaName))
             {
                 gameState.RemoveRestorable(this);
             }
         }
 
+        private void OnError(VideoPlayer player, string message)
+        {
+            Debug.LogWarning(message);
+        }
+
         #region Methods called by external scripts
 
         public void SetVideo(string videoName)
         {
+            videoPlayer.Stop();
             if (videoName == currentVideoName)
             {
                 return;
@@ -52,9 +64,9 @@ namespace Nova
             currentVideoName = videoName;
         }
 
-        // Use after animation entry of TimeAnimationProperty is destroyed
         public void ClearVideo()
         {
+            videoPlayer.Stop();
             if (string.IsNullOrEmpty(currentVideoName))
             {
                 return;
@@ -62,6 +74,17 @@ namespace Nova
 
             videoPlayer.clip = null;
             currentVideoName = null;
+        }
+
+        public void Play()
+        {
+            // Call Stop in case something strange is not reset by Play
+            videoPlayer.Stop();
+            videoPlayer.Play();
+            if (videoPlayer.canSetDirectAudioVolume && videoPlayer.audioTrackCount > 0)
+            {
+                videoPlayer.SetDirectAudioVolume(0, volume);
+            }
         }
 
         #endregion

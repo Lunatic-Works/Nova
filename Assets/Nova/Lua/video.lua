@@ -7,8 +7,10 @@ function video_hide()
     schedule_gc()
 end
 
-make_anim_method('video_play', function(self, duration)
-    local videoPlayer = __Nova.videoController.videoPlayer
-    duration = duration or videoPlayer.clip.length
-    return self:action(function() videoPlayer:Play() end):wait(duration)
-end)
+function video_play()
+    __Nova.videoController:Play()
+end
+
+function video_duration()
+    return __Nova.videoController.duration
+end
