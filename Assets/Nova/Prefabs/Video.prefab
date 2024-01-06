@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2087345229537114260}
   - component: {fileID: 2087345229537114259}
   - component: {fileID: 5554027902280503249}
+  - component: {fileID: -73938223869665634}
   m_Layer: 5
   m_Name: Video
   m_TagString: Untagged
@@ -49,7 +50,7 @@ VideoPlayer:
   m_TargetMaterialRenderer: {fileID: 0}
   m_TargetMaterialProperty: _MainTex
   m_RenderMode: 1
-  m_AspectRatio: 2
+  m_AspectRatio: 3
   m_DataSource: 0
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 2
@@ -66,6 +67,7 @@ VideoPlayer:
   m_Looping: 0
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
+  m_VideoShaders: []
 --- !u!114 &5554027902280503249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,3 +82,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   luaName: videoController
   videoFolder: Videos
+  volume: 1
+--- !u!114 &-73938223869665634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2087345229537114258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e86e2a28eac4229bc517299f864191b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  configKeyName: BGMVolume
+  secondaryConfigKeyName: 
+  multiplier: 1
+  gamma: 1

@@ -18,6 +18,7 @@ namespace Nova
         private AudioController audioController;
         private SoundController soundController;
         private AudioSource audioSource;
+        private VideoController videoController;
 
         private void Awake()
         {
@@ -25,8 +26,11 @@ namespace Nova
             audioController = GetComponent<AudioController>();
             soundController = GetComponent<SoundController>();
             audioSource = GetComponent<AudioSource>();
-            this.RuntimeAssert(audioController != null || soundController != null || audioSource != null,
-                "Missing AudioController or SoundController or AudioSource.");
+            videoController = GetComponent<VideoController>();
+            this.RuntimeAssert(
+                audioController != null || soundController != null || audioSource != null || videoController != null,
+                "Missing AudioController or SoundController or AudioSource or VideoController."
+            );
         }
 
         private void OnEnable()
@@ -71,9 +75,13 @@ namespace Nova
             {
                 soundController.configVolume = value;
             }
-            else
+            else if (audioSource != null)
             {
                 audioSource.volume = value;
+            }
+            else
+            {
+                videoController.volume = value;
             }
         }
     }
