@@ -24,6 +24,7 @@ namespace Nova
             {
                 return logEntry.height + (includeSpacing ? contentSpacing : 0);
             }
+
             return base.GetSize(item, includeSpacing);
         }
     }

@@ -4,8 +4,6 @@ namespace Nova.Parser
     {
         BlockStart,
         BlockEnd,
-        LeftBrace,
-        RightBrace,
         AttrStart,
         AttrEnd,
         At,

@@ -315,20 +315,6 @@ namespace Nova.Parser
                 return;
             }
 
-            if (c == '{')
-            {
-                type = TokenType.LeftBrace;
-                length = 1;
-                return;
-            }
-
-            if (c == '}')
-            {
-                type = TokenType.RightBrace;
-                length = 1;
-                return;
-            }
-
             if (c == '-' && c2 == '-')
             {
                 type = TokenType.CommentStart;
