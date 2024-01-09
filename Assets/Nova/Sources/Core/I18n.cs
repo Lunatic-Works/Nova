@@ -104,7 +104,15 @@ namespace Nova
             foreach (var locale in SupportedLocales)
             {
                 var textAsset = Resources.Load(LocalizedStringsPath + locale) as TextAsset;
-                TranslationBundles[locale] = JsonConvert.DeserializeObject<TranslationBundle>(textAsset.text);
+                if (textAsset == null)
+                {
+                    Debug.LogWarning($"Nova: {locale} not found in {LocalizedStringsPath} . " +
+                                     "If you don't need the locale, please delete it in I18n.SupportedLocales.");
+                }
+                else
+                {
+                    TranslationBundles[locale] = JsonConvert.DeserializeObject<TranslationBundle>(textAsset.text);
+                }
             }
         }
 
