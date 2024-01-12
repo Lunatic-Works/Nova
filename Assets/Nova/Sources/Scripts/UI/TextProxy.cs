@@ -217,9 +217,6 @@ namespace Nova
         // and before each opening punctuation at line beginning if left aligned
         private void ApplyKerning(ref string text, ref TMP_TextInfo textInfo)
         {
-            bool isLeftAligned = ((int)textBox.alignment &
-                                  ((int)HorizontalAlignmentOptions.Left |
-                                   (int)HorizontalAlignmentOptions.Justified)) > 0;
             var characterInfos = textInfo.characterInfo;
             bool dirty = false;
 
@@ -255,6 +252,9 @@ namespace Nova
                     }
                 }
 
+                bool isLeftAligned = ((int)lineInfo.alignment &
+                                      ((int)HorizontalAlignmentOptions.Left |
+                                       (int)HorizontalAlignmentOptions.Justified)) > 0;
                 if (isLeftAligned)
                 {
                     int firstIdx = characterInfos[firstCharIdx].index;
