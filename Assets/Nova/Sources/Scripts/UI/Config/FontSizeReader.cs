@@ -40,7 +40,7 @@ namespace Nova
             I18n.LocaleChanged.RemoveListener(UpdateValue);
         }
 
-        private void UpdateValue()
+        public void UpdateValue()
         {
             float fontSize = configManager.GetFloat(configKeyName);
             if (multipliers.TryGetValue(I18n.CurrentLocale, out var multiplier))

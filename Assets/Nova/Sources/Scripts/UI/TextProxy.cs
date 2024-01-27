@@ -277,12 +277,19 @@ namespace Nova
         // TODO: advanced English hyphenation can be implemented here
         // Now we use Tools/Scenarios/add_soft_hyphens.py to pre-calculate hyphenation,
         // and Unity supports \u00ad as soft hyphen
-        private void Typeset(string text)
+        private string Typeset(string text)
         {
             var textInfo = textBox.GetTextInfo(text);
             ApplyKerning(ref text, ref textInfo);
             ApplyLineBreak(ref text, textInfo);
-            textBox.text = text;
+            return text;
+        }
+
+        public float GetPreferredHeight(string text, float width)
+        {
+            text = Typeset(text);
+            var height = textBox.GetPreferredValues(text, width, 0f).y;
+            return height;
         }
 
         #endregion
@@ -308,6 +315,20 @@ namespace Nova
             }
 
             return textBox.text.Length;
+        }
+
+        public float GetFirstCharacterCenterY()
+        {
+            var textInfo = textBox.textInfo;
+            if (textInfo.characterCount <= 0)
+            {
+                return 0f;
+            }
+
+            var lineInfo = textInfo.lineInfo[0];
+            var characterInfo = textInfo.characterInfo[0];
+            var y = -lineInfo.ascender + (characterInfo.ascender + characterInfo.descender) / 2;
+            return y;
         }
 
         #region Fade
@@ -403,7 +424,7 @@ namespace Nova
                 }
                 else
                 {
-                    Typeset(text);
+                    textBox.text = Typeset(text);
                 }
             }
 

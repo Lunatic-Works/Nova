@@ -8,25 +8,11 @@ namespace Nova
     {
         private TextProxy textProxy;
         private Button goBackButton;
+        private RectTransform buttons;
         private Button playVoiceButton;
         private DialogueDisplayData displayData;
-        private bool inited;
-
-        #region Layout
-
         public float height { get; private set; }
-        public float minWidth => -1;
-        public float preferredWidth => -1;
-        public float flexibleWidth => -1;
-        public float minHeight => -1;
-        public float preferredHeight => height;
-        public float flexibleHeight => -1;
-        public int layoutPriority => 1; // override VerticalLayoutGroup
-
-        public void CalculateLayoutInputHorizontal() { }
-        public void CalculateLayoutInputVertical() { }
-
-        #endregion
+        private bool inited;
 
         private void InitReferences()
         {
@@ -34,7 +20,7 @@ namespace Nova
             textProxy = transform.Find("Text").GetComponent<TextProxy>();
             textProxy.Init();
             goBackButton = transform.Find("Text/GoBackButton").GetComponent<Button>();
-            var buttons = transform.Find("Buttons");
+            buttons = transform.Find("Buttons").GetComponent<RectTransform>();
             playVoiceButton = buttons.Find("PlayVoiceButton").GetComponent<Button>();
             inited = true;
         }
@@ -69,21 +55,29 @@ namespace Nova
             this.height = height;
         }
 
+        // OnEnable and I18n.LocaleChanged are handled by LogController
         private void UpdateText()
         {
             if (!inited) return;
             textProxy.text = displayData.FormatNameDialogue();
+
+            if (playVoiceButton.gameObject.activeSelf)
+            {
+                needUpdateButtonsPosition = true;
+            }
         }
 
-        private void OnEnable()
-        {
-            UpdateText();
-            I18n.LocaleChanged.AddListener(UpdateText);
-        }
+        bool needUpdateButtonsPosition;
 
-        private void OnDisable()
+        private void LateUpdate()
         {
-            I18n.LocaleChanged.RemoveListener(UpdateText);
+            if (needUpdateButtonsPosition)
+            {
+                float y = textProxy.GetFirstCharacterCenterY();
+                buttons.offsetMin = new Vector2(0f, y);
+                buttons.offsetMax = new Vector2(100f, y);
+                needUpdateButtonsPosition = false;
+            }
         }
     }
 }

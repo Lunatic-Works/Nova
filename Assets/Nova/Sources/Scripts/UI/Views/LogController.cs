@@ -11,7 +11,7 @@ namespace Nova
 {
     public class LogEntry
     {
-        public readonly float height;
+        public float height;
         public float prefixHeight;
         public readonly long nodeOffset;
         public readonly long checkpointOffset;
@@ -51,6 +51,7 @@ namespace Nova
         [SerializeField] private Button closeButton;
 
         private const string LogViewFirstShownKey = ConfigManager.FirstShownKeyPrefix + "LogView";
+        private const string FontSizeKey = "FontSize";
 
         private GameState gameState;
         private CheckpointManager checkpointManager;
@@ -60,8 +61,9 @@ namespace Nova
         private VerticalLayoutGroup scrollLayout;
 
         private LogEntryController logEntryForTest;
-        private TMP_Text contentForTest;
+        private TextProxy contentForTest;
         private float contentDefaultWidth;
+        private bool needRefreshEntryHeight;
 
         private readonly List<LogEntry> logEntries = new List<LogEntry>();
         private readonly List<LogEntryRestoreData> logEntriesRestoreData = new List<LogEntryRestoreData>();
@@ -87,6 +89,9 @@ namespace Nova
             gameState.gameStarted.AddListener(Clear);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
             gameState.AddRestorable(this);
+
+            I18n.LocaleChanged.AddListener(OnFontSizeChanged);
+            configManager.AddValueChangeListener(FontSizeKey, OnFontSizeChanged);
         }
 
         protected override void ForceRebuildLayoutAndResetTransitionTarget()
@@ -95,7 +100,6 @@ namespace Nova
             if (logEntryForTest == null)
             {
                 logEntryForTest = Instantiate(logEntryPrefab, scrollRect.content);
-                contentForTest = logEntryForTest.transform.Find("Text").GetComponent<TMP_Text>();
             }
 
             logEntryForTest.transform.SetParent(scrollRect.content, false);
@@ -103,6 +107,7 @@ namespace Nova
 
             base.ForceRebuildLayoutAndResetTransitionTarget();
 
+            contentForTest = logEntryForTest.transform.Find("Text").GetComponent<TextProxy>();
             contentDefaultWidth = contentForTest.GetComponent<RectTransform>().rect.width;
             logEntryForTest.gameObject.SetActive(false);
             logEntryForTest.transform.SetParent(scrollRect.transform, false);
@@ -118,6 +123,9 @@ namespace Nova
             gameState.gameStarted.RemoveListener(Clear);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
             gameState.RemoveRestorable(this);
+
+            I18n.LocaleChanged.RemoveListener(OnFontSizeChanged);
+            configManager.RemoveValueChangeListener(FontSizeKey, OnFontSizeChanged);
         }
 
         private void OnDialogueChanged(DialogueChangedData data)
@@ -133,6 +141,20 @@ namespace Nova
             }
         }
 
+        private void UpdateContentForTest()
+        {
+            if (scrollRect.content.childCount > 0)
+            {
+                var newContentForTest = scrollRect.content.GetChild(0).GetComponent<TextProxy>();
+                if (newContentForTest != null)
+                {
+                    contentForTest = newContentForTest;
+                }
+            }
+
+            contentForTest.GetComponent<FontSizeReader>().UpdateValue();
+        }
+
         private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
             DialogueDisplayData displayData)
         {
@@ -142,8 +164,8 @@ namespace Nova
                 return;
             }
 
-            // TODO: Refresh heights when locale changes
-            var height = contentForTest.GetPreferredValues(text, contentDefaultWidth, 0).y;
+            UpdateContentForTest();
+            var height = contentForTest.GetPreferredHeight(text, contentDefaultWidth);
             var cnt = logEntries.Count;
             var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
             logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData,
@@ -153,6 +175,45 @@ namespace Nova
             {
                 scrollRect.totalCount = logEntries.Count;
             }
+        }
+
+        private void OnFontSizeChanged()
+        {
+            if (active && scrollRect.totalCount > 0)
+            {
+                var firstIdx = scrollRect.GetFirstItem(out var _);
+                var lastIdx = scrollRect.GetLastItem(out _);
+                RefreshEntryHeight();
+                if (lastIdx >= scrollRect.totalCount - 1)
+                {
+                    scrollRect.RefillCellsFromEnd();
+                }
+                else
+                {
+                    scrollRect.RefillCells(firstIdx);
+                }
+            }
+            else
+            {
+                needRefreshEntryHeight = true;
+            }
+        }
+
+        // TODO: Use multiple frames to refresh heights of all entries if it lags
+        private void RefreshEntryHeight()
+        {
+            UpdateContentForTest();
+            for (var i = 0; i < logEntries.Count; i++)
+            {
+                var text = logEntries[i].displayData.FormatNameDialogue();
+                var height = contentForTest.GetPreferredHeight(text, contentDefaultWidth);
+                var prefixHeight = height + (i > 0 ? logEntries[i - 1].prefixHeight : 0);
+
+                logEntries[i].height = height;
+                logEntries[i].prefixHeight = prefixHeight;
+            }
+
+            needRefreshEntryHeight = false;
         }
 
         private bool RestrainLogEntryNum(int num)
@@ -197,10 +258,10 @@ namespace Nova
         {
             if (itemsCount <= 0) return new Vector2(0, 0);
             itemsCount = Mathf.Min(itemsCount, logEntries.Count);
-            var height = logEntries[itemsCount - 1].prefixHeight;
+            var height = scrollLayout.padding.top + logEntries[itemsCount - 1].prefixHeight;
             if (itemsCount == logEntries.Count)
             {
-                height += scrollLayout.padding.top + scrollLayout.padding.bottom;
+                height += scrollLayout.padding.bottom;
             }
 
             return new Vector2(0, height);
@@ -287,6 +348,11 @@ namespace Nova
 
             base.Show(doTransition, onFinish);
 
+            if (needRefreshEntryHeight)
+            {
+                RefreshEntryHeight();
+            }
+
             scrollRect.RefillCellsFromEnd();
             scrollRect.verticalNormalizedPosition = 1f;
             selectedLogEntryIndex = -1;
@@ -302,8 +368,6 @@ namespace Nova
         protected override void OnActivatedUpdate()
         {
             base.OnActivatedUpdate();
-
-            scrollRect.verticalNormalizedPosition = Mathf.Clamp01(scrollRect.verticalNormalizedPosition);
 
             var delta = Mouse.current?.scroll.ReadValue().y ?? 0f;
             if (delta < -1e-3f)
