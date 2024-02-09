@@ -279,9 +279,13 @@ namespace Nova
         // and Unity supports \u00ad as soft hyphen
         private string Typeset(string text)
         {
-            var textInfo = textBox.GetTextInfo(text);
-            ApplyKerning(ref text, ref textInfo);
-            ApplyLineBreak(ref text, textInfo);
+            if (I18n.CurrentLocale == SystemLanguage.ChineseSimplified)
+            {
+                var textInfo = textBox.GetTextInfo(text);
+                ApplyKerning(ref text, ref textInfo);
+                ApplyLineBreak(ref text, textInfo);
+            }
+
             return text;
         }
 
