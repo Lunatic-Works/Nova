@@ -44,8 +44,7 @@ namespace Nova
                 return;
             }
 
-            viewManager = GetComponentInParent<ViewManager>();
-            this.RuntimeAssert(viewManager != null, "Missing ViewManager in parents.");
+            viewManager = Utils.FindViewManager();
             delayOffset = 0f;
 
             if (useGhost)

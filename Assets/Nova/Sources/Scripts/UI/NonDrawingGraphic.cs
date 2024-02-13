@@ -1,13 +1,11 @@
 // https://gist.github.com/capnslipp/349c18283f2fea316369
 
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace Nova
 {
     // A concrete subclass of the Unity UI `Graphic` class that just skips drawing.
     // Useful for providing a raycast target without actually drawing anything.
-    [RequireComponent(typeof(CanvasRenderer))]
     public class NonDrawingGraphic : Graphic
     {
         public override void SetMaterialDirty() { }

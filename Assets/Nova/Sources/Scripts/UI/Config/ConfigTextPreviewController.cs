@@ -33,7 +33,8 @@ namespace Nova
 
         private void ResetTextPreview()
         {
-            NovaAnimation.StopAll(AnimationType.Text);
+            if (textAnimation == null) return;
+            textAnimation.Stop();
             dialogueText.Clear();
             var entry = dialogueText.AddEntry(
                 GetPreviewDisplayData(),
