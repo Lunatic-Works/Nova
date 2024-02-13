@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,29 +9,21 @@ namespace Nova
         [SerializeField] private Button returnButton;
         [SerializeField] private Button returnButton2;
 
-        private const string GameFirstShownKey = ConfigManager.FirstShownKeyPrefix + "Game";
-
-        private ConfigManager configManager;
-
         protected override void Awake()
         {
             base.Awake();
 
             returnButton.onClick.AddListener(Hide);
             returnButton2.onClick.AddListener(Hide);
-
-            configManager = Utils.FindNovaController().ConfigManager;
         }
 
-        protected override void Start()
+        public override void Hide(bool doTransition, Action onFinish)
         {
-            base.Start();
-
-            if (configManager.GetInt(GameFirstShownKey) == 0)
+            base.Hide(doTransition, () =>
             {
-                configManager.SetInt(GameFirstShownKey, 1);
-                Show();
-            }
+                viewManager.GetController<TitleController>().ShowHints();
+                onFinish?.Invoke();
+            });
         }
     }
 }

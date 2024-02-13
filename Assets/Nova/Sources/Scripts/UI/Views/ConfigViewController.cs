@@ -57,11 +57,7 @@ namespace Nova
         public void ReturnTitleWithCallback(Action onFinish)
         {
             NovaAnimation.StopAll();
-
-            // TODO: Better transition between any two views
-            viewManager.GetController<TitleController>().ShowImmediate();
-            viewManager.GetController<GameViewController>().HideImmediate();
-            this.Hide(onFinish);
+            this.SwitchView<TitleController>(onFinish);
         }
 
         private void ReturnTitle()

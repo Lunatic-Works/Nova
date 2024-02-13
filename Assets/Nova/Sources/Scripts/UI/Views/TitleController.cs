@@ -13,6 +13,7 @@ namespace Nova
         [SerializeField] private float bgmVolume = 0.5f;
         [SerializeField] private float bgmFadeOutDuration = 1.0f;
 
+        private const string GameFirstShownKey = ConfigManager.FirstShownKeyPrefix + "Game";
         private const string SelectChapterFirstShownKey = ConfigManager.FirstShownKeyPrefix + "SelectChapter";
 
         private GameState gameState;
@@ -46,27 +47,8 @@ namespace Nova
         {
             base.Show(doTransition, () =>
             {
-                viewManager.GetController<GameViewController>().HideImmediate();
-                viewManager.StopAllAnimations();
-                gameState.ResetGameState();
-
-                if (bgmController != null && !string.IsNullOrEmpty(bgmName))
-                {
-                    bgmController.scriptVolume = bgmVolume;
-                    bgmController.Play(bgmName);
-                }
-
-                if (configManager.GetInt(SelectChapterFirstShownKey) == 0)
-                {
-                    var reachedChapterCount = gameState.GetStartNodeNames()
-                        .Count(name => checkpointManager.IsReachedAnyHistory(name, 0));
-                    if (unlockedStartCount == 1 && reachedChapterCount > 1)
-                    {
-                        Alert.Show("title.first.selectchapter");
-                        configManager.SetInt(SelectChapterFirstShownKey, 1);
-                    }
-                }
-
+                // You can add some check for login before OnLoginSucceeded
+                OnLoginSucceeded();
                 onFinish?.Invoke();
             });
         }
@@ -84,5 +66,42 @@ namespace Nova
 
         // Disable BackHide
         protected override void Update() { }
+
+        private void OnLoginSucceeded()
+        {
+            viewManager.GetController<GameViewController>().HideImmediate();
+            viewManager.StopAllAnimations();
+            gameState.ResetGameState();
+
+            if (bgmController != null && !string.IsNullOrEmpty(bgmName))
+            {
+                bgmController.scriptVolume = bgmVolume;
+                bgmController.Play(bgmName);
+            }
+
+            ShowHints();
+        }
+
+        // One hint at a time
+        public void ShowHints()
+        {
+            if (configManager.GetInt(GameFirstShownKey) == 0)
+            {
+                viewManager.GetController<HelpViewController>().Show();
+                configManager.SetInt(GameFirstShownKey, 1);
+                return;
+            }
+
+            if (configManager.GetInt(SelectChapterFirstShownKey) == 0)
+            {
+                var reachedChapterCount = gameState.GetStartNodeNames()
+                    .Count(name => checkpointManager.IsReachedAnyHistory(name, 0));
+                if (unlockedStartCount == 1 && reachedChapterCount > 1)
+                {
+                    Alert.Show("title.first.selectchapter");
+                    configManager.SetInt(SelectChapterFirstShownKey, 1);
+                }
+            }
+        }
     }
 }
