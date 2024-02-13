@@ -19,7 +19,7 @@ move(gaotian, pos_l)
 |>
 如果没有`anim`，`move`就是瞬间完成的
 
-顺便说一句：：`anim`是一个Lua对象`WrapAnim`，其中封装了Hierarchy中的`DontDestroyOnLoad/​NovaGameController/​NovaAnimation/​PerDialogue`，而`move`是`anim`的一个方法
+顺便说一句：：`anim`是一个Lua对象`NovaAnimation`，其中封装了Hierarchy中的`DontDestroyOnLoad/​NovaController/​NovaAnimation/​PerDialogue`，而`move`是`anim`的一个方法
 
 顺便说一句：：具体可以看`animation.lua`和`animation_high_level.lua`
 
@@ -113,7 +113,7 @@ anim:move(gaotian, pos_r
 |>
 要让两段动画并行，可以用`_and()`函数
 
-上面的动画开始播放时，暂停游戏，在Hierarchy中的`DontDestroyOnLoad/​NovaGameController/​NovaAnimation`里可以看到多段动画的树状结构
+上面的动画开始播放时，暂停游戏，在Hierarchy中的`DontDestroyOnLoad/​NovaController/​NovaAnimation`里可以看到多段动画的树状结构
 
 顺便说一句：：`anim:move`当中其实有三个`AnimationEntry`，分别控制位置、旋转、缩放
 
@@ -175,7 +175,7 @@ anim_hold:move(gaotian, pos_r, 10)
 
 持续动画开始时要写`anim_hold_begin()`，它会处理动画系统和存档系统的一些状态
 
-顺便说一句：：`anim_hold`当中封装了Hierarchy中的`DontDestroyOnLoad/​NovaGameController/​NovaAnimation/​Holding`
+顺便说一句：：`anim_hold`当中封装了Hierarchy中的`DontDestroyOnLoad/​NovaController/​NovaAnimation/​Holding`
 
 顺便说一句：：如果担心忘了写`anim_hold_begin`和`anim_hold_end`，可以用`Tools/Scenarios/lint.py`来检查
 
