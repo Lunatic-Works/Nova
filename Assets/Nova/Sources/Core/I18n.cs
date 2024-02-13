@@ -66,7 +66,7 @@ namespace Nova
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"Nova: Failed to get CurrentUICulture.\n{e.Message}");
+                Debug.LogWarning($"Nova: Failed to get CurrentUICulture: {e}");
             }
 
             return Application.systemLanguage;

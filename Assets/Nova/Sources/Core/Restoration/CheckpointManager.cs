@@ -51,19 +51,23 @@ namespace Nova
             backupPath = Path.Combine(savePathBase, "global.nsav.bak");
             Directory.CreateDirectory(savePathBase);
 
-            serializer = new CheckpointSerializer(globalSavePath);
+            serializer = new CheckpointSerializer(globalSavePath, frozen);
             if (!File.Exists(globalSavePath))
             {
                 ResetGlobalSave();
             }
             else
             {
-                serializer.Open();
-                InitGlobalSave();
-                InitReached();
+                TryInitGlobalSaveReached();
+                if (globalSave == null)
+                {
+                    Debug.LogError("Nova: Failed to init global save. Trying to restore...");
+                    RestoreGlobalSave();
+                }
             }
 
-            foreach (string fileName in Directory.GetFiles(savePathBase, "sav*.nsav*"))
+            bookmarksMetadata.Clear();
+            foreach (string fileName in Directory.GetFiles(savePathBase, "sav*.nsav"))
             {
                 var result = Regex.Match(fileName, @"sav([0-9]+)\.nsav");
                 if (result.Groups.Count > 1 && int.TryParse(result.Groups[1].Value, out int id))
@@ -321,7 +325,7 @@ namespace Nova
 
         #region Checkpoint upgrade
 
-        public Dictionary<string, Differ> CheckScriptUpgrade(ScriptLoader scriptLoader, FlowChartGraph flowChartGraph)
+        public Dictionary<string, Differ> CheckScriptUpgrade(FlowChartGraph flowChartGraph)
         {
             var changedNode = new Dictionary<string, Differ>();
             var updateHashes = false;
@@ -430,6 +434,21 @@ namespace Nova
             globalSave = serializer.DeserializeRecord<GlobalSave>(CheckpointSerializer.GlobalSaveOffset);
         }
 
+        private void TryInitGlobalSaveReached()
+        {
+            try
+            {
+                serializer.Open();
+                InitGlobalSave();
+                InitReached();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Nova: Failed to init global save: {e}");
+                globalSave = null;
+            }
+        }
+
         public void UpdateGlobalSave()
         {
             if (frozen)
@@ -444,6 +463,8 @@ namespace Nova
             }
 
             serializer.Flush();
+            // backup now
+            File.Copy(globalSavePath, backupPath, true);
         }
 
         /// <summary>
@@ -468,19 +489,25 @@ namespace Nova
             InitReached();
         }
 
-        public void BackupGlobalSave()
-        {
-            UpdateGlobalSave();
-            File.Copy(globalSavePath, backupPath, true);
-        }
-
         public void RestoreGlobalSave()
         {
             serializer.Dispose();
-            File.Copy(backupPath, globalSavePath, true);
-            serializer.Open();
-            InitGlobalSave();
-            InitReached();
+            if (File.Exists(backupPath))
+            {
+                File.Copy(backupPath, globalSavePath, true);
+                TryInitGlobalSaveReached();
+                if (globalSave == null)
+                {
+                    Debug.LogError("Nova: Failed to restore global save. Trying to reset...");
+                    serializer.Dispose();
+                    ResetGlobalSave();
+                }
+            }
+            else
+            {
+                Debug.LogError("Nova: Global save backup not found. Trying to reset...");
+                ResetGlobalSave();
+            }
         }
 
         #endregion

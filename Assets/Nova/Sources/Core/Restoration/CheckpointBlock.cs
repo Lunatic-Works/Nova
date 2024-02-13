@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
+using UnityEngine.Events;
 // using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Nova
@@ -47,29 +47,24 @@ namespace Nova
 
         public ByteSegment segment => new ByteSegment(data, HeaderSize, DataSize);
 
-        private bool dirty = true;
+        public bool dirty { get; private set; } = true;
+
+        private readonly UnityEvent onFlush = new UnityEvent();
 
         private readonly Stream stream;
         private readonly byte[] data = new byte[BlockSize];
 
         // initialize existing block from file
-        public static CheckpointBlock FromFile(Stream stream, long id)
+        public static CheckpointBlock FromFile(Stream stream, long id, UnityAction onFlush)
         {
             // var start = Stopwatch.GetTimestamp();
 
-            var block = new CheckpointBlock(stream, id);
+            var block = new CheckpointBlock(stream, id, onFlush);
             stream.Seek(block.offset, SeekOrigin.Begin);
             stream.Read(block.data, 0, BlockSize);
             var index = 0;
             if (id == 0)
             {
-                var header = CheckpointSerializer.FileHeader;
-                var version = BitConverter.ToInt32(block.data, header.Length);
-                if (version != CheckpointSerializer.Version || !header.SequenceEqual(block.data.Take(header.Length)))
-                {
-                    throw CheckpointCorruptedException.BadHeader;
-                }
-
                 index += CheckpointSerializer.FileHeaderSize;
             }
 
@@ -82,10 +77,11 @@ namespace Nova
             return block;
         }
 
-        public CheckpointBlock(Stream stream, long id)
+        public CheckpointBlock(Stream stream, long id, UnityAction onFlush)
         {
             this.stream = stream;
             this.id = id;
+            this.onFlush.AddListener(onFlush);
             _nextBlock = 0;
         }
 
@@ -94,7 +90,7 @@ namespace Nova
             dirty = true;
         }
 
-        public void Flush()
+        public void Flush(bool callback = true)
         {
             if (!dirty || stream == null)
             {
@@ -104,21 +100,23 @@ namespace Nova
             // Debug.Log($"flush block {id}");
             // var start = Stopwatch.GetTimestamp();
 
+            var startIndex = 0;
             var index = 0;
             if (id == 0)
             {
-                var version = BitConverter.GetBytes(CheckpointSerializer.Version);
-                var header = CheckpointSerializer.FileHeader;
-                Buffer.BlockCopy(header, 0, data, 0, header.Length);
-                Buffer.BlockCopy(version, 0, data, header.Length, 4);
+                startIndex += CheckpointSerializer.FileHeaderSize;
                 index += CheckpointSerializer.FileHeaderSize;
             }
 
             var x = BitConverter.GetBytes(_nextBlock);
             Buffer.BlockCopy(x, 0, data, index, HeaderSize);
-            stream.Seek(offset, SeekOrigin.Begin);
-            stream.Write(data, 0, BlockSize);
+            stream.Seek(offset + startIndex, SeekOrigin.Begin);
+            stream.Write(data, startIndex, BlockSize - startIndex);
             dirty = false;
+            if (callback)
+            {
+                onFlush.Invoke();
+            }
 
             // var end = Stopwatch.GetTimestamp();
             // Debug.Log($"write {start}->{end}");
@@ -127,6 +125,7 @@ namespace Nova
         public void Dispose()
         {
             Flush();
+            onFlush.RemoveAllListeners();
         }
     }
 }

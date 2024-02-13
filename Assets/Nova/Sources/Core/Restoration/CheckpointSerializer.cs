@@ -168,6 +168,7 @@ namespace Nova
         public const int Version = 4;
 
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
+        private static readonly byte[] CorruptFileHeader = Enumerable.Repeat((byte)254, FileHeader.Length).ToArray();
         public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
         public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
 
@@ -179,10 +180,13 @@ namespace Nova
         private FileStream file;
         private long endBlock;
         private readonly LRUCache<long, CheckpointBlock> cachedBlocks;
+        private readonly bool frozen;
+        private bool headerCorrupted = false;
 
-        public CheckpointSerializer(string path)
+        public CheckpointSerializer(string path, bool frozen)
         {
             this.path = path;
+            this.frozen = frozen;
             // 1M block cache
             cachedBlocks = new LRUCache<long, CheckpointBlock>(256, true);
             jsonSerializer = new CheckpointJsonSerializer();
@@ -196,6 +200,14 @@ namespace Nova
             {
                 AppendBlock();
             }
+            else
+            {
+                ReadFileHeader(file, out var matchHeader, out var version);
+                if (!matchHeader || version != Version)
+                {
+                    throw CheckpointCorruptedException.BadHeader;
+                }
+            }
         }
 
         public void Dispose()
@@ -203,6 +215,7 @@ namespace Nova
             cachedBlocks.Clear();
             if (file != null)
             {
+                UpdateFileHeader(false);
                 file.Close();
                 file.Dispose();
             }
@@ -212,7 +225,7 @@ namespace Nova
         {
             if (!cachedBlocks.TryGetValue(id, out var block))
             {
-                block = CheckpointBlock.FromFile(file, id);
+                block = CheckpointBlock.FromFile(file, id, OnBlockFlush);
                 cachedBlocks[id] = block;
             }
 
@@ -271,7 +284,7 @@ namespace Nova
         private CheckpointBlock AppendBlock()
         {
             var id = endBlock++;
-            var block = new CheckpointBlock(file, id);
+            var block = new CheckpointBlock(file, id, OnBlockFlush);
             cachedBlocks[id] = block;
             return block;
         }
@@ -398,9 +411,10 @@ namespace Nova
 
             foreach (var block in cachedBlocks)
             {
-                block.Value.Flush();
+                block.Value.Flush(false);
             }
 
+            UpdateFileHeader(false);
             file.Flush();
 
             // var end = Stopwatch.GetTimestamp();
@@ -451,6 +465,38 @@ namespace Nova
                 using var sw = new StreamWriter(fs, Encoding.UTF8);
                 jsonSerializer.Serialize(sw, obj);
             }
+        }
+
+        public void ReadFileHeader(Stream fs, out bool matchHeader, out int version)
+        {
+            var header = new byte[FileHeaderSize];
+            fs.Read(header, 0, FileHeaderSize);
+
+            matchHeader = FileHeader.SequenceEqual(header.Take(FileHeader.Length));
+            version = BitConverter.ToInt32(header, FileHeader.Length);
+        }
+
+        private void OnBlockFlush()
+        {
+            bool corrupt = cachedBlocks.Any(pair => pair.Value.dirty);
+            UpdateFileHeader(corrupt);
+        }
+
+        public void UpdateFileHeader(bool corrupt)
+        {
+            if (frozen || corrupt == headerCorrupted)
+            {
+                return;
+            }
+
+            // Debug.Log($"update header: {corrupt}");
+            file.Seek(0, SeekOrigin.Begin);
+            var header = corrupt ? CorruptFileHeader : FileHeader;
+            var version = BitConverter.GetBytes(Version);
+            file.Write(header, 0, FileHeader.Length);
+            file.Write(version, 0, 4);
+            file.Flush();
+            headerCorrupted = corrupt;
         }
     }
 }

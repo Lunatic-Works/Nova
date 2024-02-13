@@ -66,11 +66,11 @@ namespace Nova
             var success = false;
             try
             {
-                var changedNodes = checkpointManager.CheckScriptUpgrade(scriptLoader, flowChartGraph);
+                var changedNodes = checkpointManager.CheckScriptUpgrade(flowChartGraph);
                 // Debug.Log($"upgrade {changedNodes.Count} nodes");
                 if (changedNodes.Any())
                 {
-                    checkpointManager.BackupGlobalSave();
+                    checkpointManager.UpdateGlobalSave();
                     upgradeStarted = true;
                     var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
                     upgrader.UpgradeSaves();
@@ -92,7 +92,7 @@ namespace Nova
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"Nova: Upgrade failed: {e}");
+                Debug.LogError($"Nova: Script upgrade failed: {e}");
                 if (upgradeStarted)
                 {
                     checkpointManager.RestoreGlobalSave();
@@ -624,7 +624,7 @@ namespace Nova
             {
                 if (currentNode == null)
                 {
-                    Debug.LogWarning("Nova: Cannot step forward before the game starts.");
+                    Debug.LogError("Nova: Cannot step forward before the game starts.");
                     return false;
                 }
 
