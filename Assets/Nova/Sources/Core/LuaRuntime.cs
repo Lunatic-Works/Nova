@@ -40,7 +40,7 @@ namespace Nova
         public void Reset()
         {
             ClearCachedLuaFunctions();
-            lua.Require("requires");
+            lua.DoFile("requires.lua");
         }
 
         private void CheckInit()
