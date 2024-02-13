@@ -15,12 +15,11 @@ namespace Nova
         public AudioClip exitSound;
 
         private ViewManager viewManager;
-        protected float delayOffset { get; private set; }
 
+        private RawImage rawImage;
         protected CanvasGroup canvasGroup;
         protected RectTransform rectTransform;
         protected Vector2 pos0, size0, scale0, uiSize0;
-        private RawImage rawImage;
 
         protected AnimationEntry.EasingFunction enterFunction => cubic
             ? AnimationEntry.CubicEasing(CubicSlopeStart, CubicSlopeTarget)
@@ -32,7 +31,8 @@ namespace Nova
 
         public abstract float enterDuration { get; }
         public abstract float exitDuration { get; }
-        public bool inAnimation { get; protected set; }
+        public bool inAnimation { get; private set; }
+        protected float delayOffset { get; private set; }
 
         private bool inited;
         private bool targetInited;
@@ -45,7 +45,6 @@ namespace Nova
             }
 
             viewManager = Utils.FindViewManager();
-            delayOffset = 0f;
 
             if (useGhost)
             {
@@ -57,9 +56,9 @@ namespace Nova
             }
             else
             {
+                rectTransform = GetComponent<RectTransform>();
                 canvasGroup = GetComponent<CanvasGroup>();
                 this.RuntimeAssert(canvasGroup != null, "Missing CanvasGroup when not using ghost.");
-                rectTransform = GetComponent<RectTransform>();
             }
 
             inited = true;
@@ -147,6 +146,7 @@ namespace Nova
         {
             delayOffset = withDelay;
             OnBeforeEnter();
+
             if (useGhost)
             {
                 CaptureToGhost();
@@ -175,27 +175,30 @@ namespace Nova
         public void Exit(Action onComplete, Action onFinish, float withDelay = 0f)
         {
             delayOffset = withDelay;
+            ResetTransitionTarget();
+            inAnimation = true;
+
             if (useGhost)
             {
                 CaptureToGhost();
-                gameObject.SetActive(false);
-            }
-
-            ResetTransitionTarget();
-            inAnimation = true;
-            OnExit(() =>
-            {
-                onComplete?.Invoke();
-                viewManager.transitionGhost.gameObject.SetActive(false);
-                gameObject.SetActive(false);
-                if (canvasGroup != null)
+                OnExit(() =>
                 {
-                    canvasGroup.alpha = 1f;
-                }
-
-                inAnimation = false;
-                onFinish?.Invoke();
-            });
+                    onComplete?.Invoke();
+                    viewManager.transitionGhost.gameObject.SetActive(false);
+                    inAnimation = false;
+                    onFinish?.Invoke();
+                });
+            }
+            else
+            {
+                OnExit(() =>
+                {
+                    onComplete?.Invoke();
+                    gameObject.SetActive(false);
+                    inAnimation = false;
+                    onFinish?.Invoke();
+                });
+            }
 
             viewManager.TryPlaySound(exitSound);
         }

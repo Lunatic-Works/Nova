@@ -126,6 +126,11 @@ namespace Nova
 
             current.Then(new ActionAnimationProperty(() =>
             {
+                if (!useGhost && fade)
+                {
+                    canvasGroup.alpha = 1f;
+                }
+
                 onFinish?.Invoke();
                 SetToTransitionTarget();
             }));

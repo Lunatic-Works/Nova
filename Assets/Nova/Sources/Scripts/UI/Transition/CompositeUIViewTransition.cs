@@ -121,5 +121,19 @@ namespace Nova
         {
             RunSequence(false, onFinish);
         }
+
+        public override void ResetTransitionTarget()
+        {
+            base.ResetTransitionTarget();
+            foreach (var child in forwardChildTransitions)
+            {
+                child.transition.ResetTransitionTarget();
+            }
+
+            foreach (var child in backwardChildTransitions)
+            {
+                child.transition.ResetTransitionTarget();
+            }
+        }
     }
 }
