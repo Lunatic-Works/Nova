@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using UnityEngine.Events;
 // using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Nova
@@ -49,13 +48,13 @@ namespace Nova
 
         public bool dirty { get; private set; } = true;
 
-        private readonly UnityEvent onFlush = new UnityEvent();
+        private readonly Action onFlush;
 
         private readonly Stream stream;
         private readonly byte[] data = new byte[BlockSize];
 
         // initialize existing block from file
-        public static CheckpointBlock FromFile(Stream stream, long id, UnityAction onFlush)
+        public static CheckpointBlock FromFile(Stream stream, long id, Action onFlush)
         {
             // var start = Stopwatch.GetTimestamp();
 
@@ -77,11 +76,11 @@ namespace Nova
             return block;
         }
 
-        public CheckpointBlock(Stream stream, long id, UnityAction onFlush)
+        public CheckpointBlock(Stream stream, long id, Action onFlush)
         {
             this.stream = stream;
             this.id = id;
-            this.onFlush.AddListener(onFlush);
+            this.onFlush = onFlush;
             _nextBlock = 0;
         }
 
@@ -92,7 +91,7 @@ namespace Nova
 
         public void Flush(bool callback = true)
         {
-            if (!dirty || stream == null)
+            if (!dirty || stream == null || !stream.CanRead)
             {
                 return;
             }
@@ -125,7 +124,6 @@ namespace Nova
         public void Dispose()
         {
             Flush();
-            onFlush.RemoveAllListeners();
         }
     }
 }

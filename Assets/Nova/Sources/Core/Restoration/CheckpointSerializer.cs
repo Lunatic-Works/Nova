@@ -181,7 +181,7 @@ namespace Nova
         private long endBlock;
         private readonly LRUCache<long, CheckpointBlock> cachedBlocks;
         private readonly bool frozen;
-        private bool headerCorrupted = false;
+        private bool headerCorrupted = true;
 
         public CheckpointSerializer(string path, bool frozen)
         {
@@ -207,6 +207,8 @@ namespace Nova
                 {
                     throw CheckpointCorruptedException.BadHeader;
                 }
+
+                headerCorrupted = false;
             }
         }
 
@@ -482,7 +484,7 @@ namespace Nova
             UpdateFileHeader(corrupt);
         }
 
-        public void UpdateFileHeader(bool corrupt)
+        private void UpdateFileHeader(bool corrupt)
         {
             if (frozen || corrupt == headerCorrupted)
             {
