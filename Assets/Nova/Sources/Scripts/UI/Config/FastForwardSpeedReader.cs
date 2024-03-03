@@ -5,7 +5,7 @@ namespace Nova
     /// <summary>
     /// Control fast forward speed based on the value in ConfigManager
     /// </summary>
-    [RequireComponent(typeof(DialogueBoxController))]
+    [RequireComponent(typeof(GameViewController))]
     public class FastForwardSpeedReader : MonoBehaviour
     {
         [SerializeField] private string configKeyName;
