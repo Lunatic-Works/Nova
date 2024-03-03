@@ -5,6 +5,15 @@ namespace Nova
 {
     public class TransitionInputBlocker : NonDrawingGraphic, IPointerClickHandler
     {
+        private int framesToDisableKeyboard;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+
+            framesToDisableKeyboard = 2;
+        }
+
         public void OnPointerClick(PointerEventData eventData)
         {
             NovaAnimation.StopAll(AnimationType.UI);
@@ -12,7 +21,13 @@ namespace Nova
 
         private void Update()
         {
-            if (Keyboard.current?.anyKey.isPressed == true)
+            if (framesToDisableKeyboard > 0)
+            {
+                --framesToDisableKeyboard;
+                return;
+            }
+
+            if (Keyboard.current?.anyKey.wasReleasedThisFrame ?? false)
             {
                 NovaAnimation.StopAll(AnimationType.UI);
             }

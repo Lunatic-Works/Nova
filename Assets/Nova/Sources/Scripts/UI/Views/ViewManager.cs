@@ -202,9 +202,7 @@ namespace Nova
         public static void SwitchView<TargetController>(this IViewController controller, Action onFinish = null)
             where TargetController : class, IViewController
         {
-            controller.Hide(() =>
-                controller.viewManager.GetController<TargetController>().Show(onFinish)
-            );
+            controller.Hide(() => controller.viewManager.GetController<TargetController>().Show(onFinish));
         }
 
         public static void Hide(this IPanelController panel, Action onFinish)
