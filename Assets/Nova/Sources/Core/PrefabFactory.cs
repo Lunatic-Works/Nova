@@ -12,9 +12,9 @@ namespace Nova
 
         private readonly Stack<GameObject> buffer = new Stack<GameObject>();
 
-        // For Debug
-        [SerializeField] private int bufferCount;
-        [SerializeField] private int historyMaxCount;
+        // For debug
+        [ReadOnly] [SerializeField] private int bufferCount;
+        [ReadOnly] [SerializeField] private int historyMaxCount;
 
         /// <summary>
         /// Get a instantiated prefab

@@ -25,7 +25,7 @@ namespace Nova
         public IAnimationProperty property { get; private set; }
 
         // For debug
-        [SerializeField] private string propertyName;
+        [ReadOnly] [SerializeField] private string propertyName;
 
         private float _duration;
         private float _invDuration; // Cached value for optimization.
