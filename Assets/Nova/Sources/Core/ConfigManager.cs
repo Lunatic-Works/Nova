@@ -21,9 +21,12 @@ namespace Nova
             public string defaultValue;
         }
 
-        public TextAsset defaultSettingsJson;
+        [SerializeField] private TextAsset defaultSettingsJson;
 
         private Dictionary<string, SettingDefinition> definitions;
+        private readonly Dictionary<string, string> tmpStrCache = new Dictionary<string, string>();
+        private readonly Dictionary<string, int> tmpIntCache = new Dictionary<string, int>();
+        private readonly Dictionary<string, float> tmpFloatCache = new Dictionary<string, float>();
 
         private void Awake()
         {
@@ -49,26 +52,25 @@ namespace Nova
                 PlayerPrefs.SetString(entry.Key, entry.Value);
             }
 
-            foreach (var entry in tmpFloatCache)
-            {
-                PlayerPrefs.SetString(entry.Key, $"{entry.Value:0.###}");
-            }
-
             foreach (var entry in tmpIntCache)
             {
                 PlayerPrefs.SetString(entry.Key, $"{entry.Value}");
             }
 
-            ClearCache();
+            foreach (var entry in tmpFloatCache)
+            {
+                PlayerPrefs.SetString(entry.Key, $"{entry.Value:0.###}");
+            }
 
+            ClearCache();
             PlayerPrefs.Save();
         }
 
         private void ClearCache()
         {
             tmpStrCache.Clear();
-            tmpFloatCache.Clear();
             tmpIntCache.Clear();
+            tmpFloatCache.Clear();
         }
 
         public void Restore()
@@ -116,22 +118,6 @@ namespace Nova
             return defaultValue;
         }
 
-        public float GetFloat(string key, float defaultValue = 0)
-        {
-            if (tmpFloatCache.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            var str = GetString(key, null);
-            if (str == null)
-            {
-                return defaultValue;
-            }
-
-            return !float.TryParse(str, out value) ? defaultValue : value;
-        }
-
         public int GetInt(string key, int defaultValue = 0)
         {
             if (tmpIntCache.TryGetValue(key, out var value))
@@ -145,12 +131,24 @@ namespace Nova
                 return defaultValue;
             }
 
-            return !int.TryParse(str, out value) ? defaultValue : value;
+            return int.TryParse(str, out value) ? value : defaultValue;
         }
 
-        private readonly Dictionary<string, string> tmpStrCache = new Dictionary<string, string>();
-        private readonly Dictionary<string, int> tmpIntCache = new Dictionary<string, int>();
-        private readonly Dictionary<string, float> tmpFloatCache = new Dictionary<string, float>();
+        public float GetFloat(string key, float defaultValue = 0)
+        {
+            if (tmpFloatCache.TryGetValue(key, out var value))
+            {
+                return value;
+            }
+
+            var str = GetString(key, null);
+            if (str == null)
+            {
+                return defaultValue;
+            }
+
+            return float.TryParse(str, out value) ? value : defaultValue;
+        }
 
         private void TryTrack(string key)
         {
@@ -211,9 +209,9 @@ namespace Nova
 
         private void NotifyAll()
         {
-            foreach (var entry in valueChangeListeners)
+            foreach (var action in valueChangeListeners.Values)
             {
-                entry.Value?.Invoke();
+                action?.Invoke();
             }
         }
 
