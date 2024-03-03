@@ -72,7 +72,7 @@ namespace Nova
                 return false;
             }
 
-#if !UNITY_EDITOR
+#if !(UNITY_EDITOR || DEVELOPMENT_BUILD)
             if (ActionAssetData.IsEditorOnly(key))
             {
                 return false;
@@ -95,7 +95,7 @@ namespace Nova
                 return false;
             }
 
-#if !UNITY_EDITOR
+#if !(UNITY_EDITOR || DEVELOPMENT_BUILD)
             if (ActionAssetData.IsEditorOnly(key))
             {
                 return false;
