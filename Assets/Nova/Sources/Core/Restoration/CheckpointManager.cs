@@ -691,6 +691,11 @@ namespace Nova
             globalSaveDirty = true;
         }
 
+        public IReadOnlyDictionary<string, object> GetAllData()
+        {
+            return globalSave.data;
+        }
+
         #endregion
     }
 }

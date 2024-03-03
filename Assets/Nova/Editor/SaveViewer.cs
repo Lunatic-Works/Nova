@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using Newtonsoft.Json;
 
 namespace Nova.Editor
 {
@@ -154,6 +155,7 @@ namespace Nova.Editor
         private NodeRecord selectedNodeRecord;
         private SelectedCheckpoint selectedCheckpoint = new SelectedCheckpoint { offset = -1 };
         private Vector2 scrollPos;
+        private bool showGlobalSave;
         private bool showNodeRecord;
         private bool showCheckpoint;
         private readonly HashSet<string> showCheckpointDetails = new HashSet<string>();
@@ -235,6 +237,14 @@ namespace Nova.Editor
 
             scrollPos = GUILayout.BeginScrollView(scrollPos);
             GUILayout.BeginVertical();
+
+            showGlobalSave = EditorGUILayout.Foldout(showGlobalSave, "GlobalSave");
+            if (showGlobalSave)
+            {
+                var value = checkpointManager.GetAllData();
+                GUILayout.TextArea(JsonConvert.SerializeObject(value, Formatting.Indented));
+            }
+
 
             if (selectedNodeRecord != null)
             {
