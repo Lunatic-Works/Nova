@@ -75,7 +75,7 @@ namespace Nova
             // Material must be RestorableMaterial or DefaultMaterial
             if (data.materialData != null)
             {
-                MaterialFactory factory = gameObject.Ensure<MaterialPool>().factory;
+                var factory = gameObject.Ensure<MaterialPool>().factory;
                 material = RestorableMaterial.Restore(data.materialData, factory);
             }
             else

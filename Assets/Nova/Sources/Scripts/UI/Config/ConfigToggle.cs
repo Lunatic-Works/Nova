@@ -9,7 +9,7 @@ namespace Nova
     [RequireComponent(typeof(Toggle))]
     public class ConfigToggle : MonoBehaviour
     {
-        [SerializeField] private string configKeyName;
+        public string configKeyName;
 
         private Toggle toggle;
         private ConfigManager configManager;
