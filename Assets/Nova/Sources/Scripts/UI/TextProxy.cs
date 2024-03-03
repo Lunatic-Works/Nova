@@ -68,6 +68,14 @@ namespace Nova
             {
                 if (textBox.font == pair.fontAsset)
                 {
+                    if (textBox.fontSharedMaterial != pair.fontAsset.material &&
+                        !pair.materials.Values.Contains(textBox.fontSharedMaterial))
+                    {
+                        Debug.LogWarning(
+                            $"Nova：Font material {textBox.font}:{textBox.fontSharedMaterial} not in I18nFontConfig, " +
+                            $"found in {Utils.GetPath(this)}");
+                    }
+
                     return;
                 }
             }
