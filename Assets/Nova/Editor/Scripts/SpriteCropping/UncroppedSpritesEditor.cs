@@ -106,8 +106,14 @@ namespace Nova.Editor
 
             if (GUILayout.Button("Auto Crop All"))
             {
-                foreach (var cropper in sprites.GetComponentsInChildren<SpriteCropper>())
+                var croppers = sprites.GetComponentsInChildren<SpriteCropper>();
+                int count = 0;
+                foreach (var cropper in croppers)
                 {
+                    ++count;
+                    EditorUtility.DisplayCancelableProgressBar(
+                        "Auto Cropping Sprites", cropper.sprite.name, (float)count / croppers.Length);
+
                     var texture = cropper.sprite.texture;
                     if (useCaptureBox)
                     {
@@ -124,6 +130,8 @@ namespace Nova.Editor
 
                     SpriteCropperEditor.AutoCrop(cropper);
                 }
+
+                EditorUtility.ClearProgressBar();
             }
 
             if (GUILayout.Button("Write Cropped Textures"))
