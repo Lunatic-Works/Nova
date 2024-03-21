@@ -8,7 +8,11 @@ namespace Nova.URP
     {
         public static RenderTargetIdentifier GetCurrentTarget(ref RenderingData renderingData)
         {
+#if UNITY_2022_OR_NEWER
+            return renderingData.cameraData.renderer.cameraColorTargetHandle;
+#else
             return renderingData.cameraData.renderer.cameraColorTarget;
+#endif
         }
 
         private class CustomRenderPass : ScriptableRenderPass
