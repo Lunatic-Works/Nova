@@ -36,7 +36,7 @@
 
 * **Unity已死，Godot万岁！**
 
-    我们打算迁移到Godot，但是要先等Godot对手机的支持更加完善。
+    [Nova2](https://github.com/Lunatic-Works/Nova2)在做了，欢迎来帮忙！
 
 ## 版本说明
 
