@@ -36,7 +36,7 @@
 
 * **Unity已死，Godot万岁！**
 
-    [Nova2](https://github.com/Lunatic-Works/Nova2)在做了，欢迎来帮忙！
+    [Nova2](https://github.com/Lunatic-Works/Nova2/issues/1)在做了，欢迎来帮忙！
 
 ## 版本说明
 
