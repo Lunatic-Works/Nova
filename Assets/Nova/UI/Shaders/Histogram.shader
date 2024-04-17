@@ -62,7 +62,7 @@ Shader "Nova/UI/Histogram"
             // [0, inf) -> [0, 1)
             float activate(float v)
             {
-                return 1.0 - exp(-sqrt(v));
+                return 1.0 - exp(-sqrt(max(v, 0.0)));
             }
 
             int _SegmentCount;
