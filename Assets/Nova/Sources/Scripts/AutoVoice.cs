@@ -94,6 +94,11 @@ namespace Nova
             ++nameToIndex[name];
         }
 
+        public void SetPrefix(string name, string value)
+        {
+            nameToConfig[name].prefix = value;
+        }
+
         #region Restoration
 
         public string restorableName => luaName;
@@ -103,11 +108,13 @@ namespace Nova
         {
             public readonly Dictionary<string, bool> nameToEnabled;
             public readonly Dictionary<string, int> nameToIndex;
+            public readonly Dictionary<string, string> nameToPrefix;
 
             public AutoVoiceRestoreData(AutoVoice parent)
             {
                 nameToEnabled = parent.nameToEnabled.ToDictionary(x => x.Key, x => x.Value);
                 nameToIndex = parent.nameToIndex.ToDictionary(x => x.Key, x => x.Value);
+                nameToPrefix = parent.nameToConfig.ToDictionary(x => x.Key, x => x.Value.prefix);
             }
         }
 
@@ -121,6 +128,10 @@ namespace Nova
             var data = restoreData as AutoVoiceRestoreData;
             nameToEnabled = data.nameToEnabled.ToDictionary(x => x.Key, x => x.Value);
             nameToIndex = data.nameToIndex.ToDictionary(x => x.Key, x => x.Value);
+            foreach (var kv in data.nameToPrefix)
+            {
+                nameToConfig[kv.Key].prefix = kv.Value;
+            }
         }
 
         #endregion

@@ -1,4 +1,9 @@
 function auto_voice_on(name, index)
+    if type(index) == 'table' then
+        __Nova.autoVoice:SetPrefix(name, index[1])
+        index = index[2]
+    end
+
     __Nova.autoVoice:SetEnabled(name, true)
     __Nova.autoVoice:SetIndex(name, index)
 end
