@@ -135,6 +135,8 @@ namespace Nova
                 {
                     ac.Pause();
                 }
+
+                GameCharacterController.StopVoiceAll();
             }
 
             currentView = newView;
