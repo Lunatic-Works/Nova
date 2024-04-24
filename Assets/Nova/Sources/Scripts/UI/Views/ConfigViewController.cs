@@ -56,7 +56,6 @@ namespace Nova
 
         public void ReturnTitleWithCallback(Action onFinish)
         {
-            NovaAnimation.StopAll();
             this.SwitchView<TitleController>(onFinish);
         }
 

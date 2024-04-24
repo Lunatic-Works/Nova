@@ -150,6 +150,8 @@ namespace Nova
             from.Hide(() => target.Show(onFinish));
         }
 
+        // By default equivalent to NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Holding) and used in UI
+        // while NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text) is usually used in game view
         public void StopAllAnimations()
         {
             foreach (var anim in allAnimationsToPause)

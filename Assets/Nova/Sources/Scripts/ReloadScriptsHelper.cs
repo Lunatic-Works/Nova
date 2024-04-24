@@ -33,7 +33,7 @@ namespace Nova
 
         private void ReloadScripts()
         {
-            NovaAnimation.StopAll();
+            NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             dialogueState.state = DialogueState.State.Normal;
             gameState.ReloadScripts();
         }

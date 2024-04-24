@@ -342,8 +342,6 @@ namespace Nova
 
         private void ReturnTitle()
         {
-            NovaAnimation.StopAll();
-
             // TODO: Use a faster transition from game view to title view
             // viewManager.titlePanel.SetActive(true);
 

@@ -62,7 +62,7 @@ namespace Nova
 
         private void MoveBackward()
         {
-            NovaAnimation.StopAll();
+            NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             dialogueState.state = DialogueState.State.Normal;
 
             gameState.SeekBackStep(1, out var nodeRecord, out var checkpointOffset, out var dialogueIndex);
