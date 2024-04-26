@@ -26,11 +26,25 @@ namespace Nova
             set => fadeMaterial.SetColor(ColorID, value);
         }
 
-        protected virtual void Awake()
+        protected bool inited;
+
+        protected virtual void Init()
         {
+            if (inited)
+            {
+                return;
+            }
+
             materialPool = gameObject.Ensure<MaterialPool>();
             fadeMaterial = materialPool.Get(fadeShader);
             novaAnimation = Utils.FindNovaController().PerDialogueAnimation;
+
+            inited = true;
+        }
+
+        protected virtual void Awake()
+        {
+            Init();
         }
 
         protected void DoFadeAnimation(float duration)

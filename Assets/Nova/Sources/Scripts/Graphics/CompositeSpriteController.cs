@@ -27,13 +27,18 @@ namespace Nova
         // if layer = -1, render without considering camera's culling mask
         public virtual int layer { get; set; } = -1;
 
-        protected override void Awake()
+        protected override void Init()
         {
-            base.Awake();
+            if (inited)
+            {
+                return;
+            }
 
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
+
+            base.Init();
         }
 
         public void SetPose(string pose, bool fade, float duration)
@@ -43,6 +48,7 @@ namespace Nova
                 return;
             }
 
+            Init();
             fade = fade && !gameState.isRestoring && !dialogueState.isFastForward;
             if (fade)
             {
