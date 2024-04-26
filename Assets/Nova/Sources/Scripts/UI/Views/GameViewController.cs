@@ -249,9 +249,9 @@ namespace Nova
 
         private float GetDialogueTimeAutoText()
         {
-            return currentDialogueBox == null
-                ? 0f
-                : currentDialogueBox.GetPageCharacterCount() * autoDelay * 0.1f + autoDelay;
+            int characterCount = currentDialogueBox?.GetPageCharacterCount() ?? 0;
+            float factor = 0.1f * characterCount + 0.5f + 0.5f / (1 + characterCount);
+            return autoDelay * factor;
         }
 
         private float GetDialogueTimeAuto()
