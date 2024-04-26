@@ -215,7 +215,7 @@ namespace Nova
 
         private NovaAnimation textAnimation;
         private AnimationEntry textAnimationDelayEntry;
-        private float textAnimationDelay;
+        public float textAnimationDelay { get; private set; }
         private float textDurationOverride = -1f;
         private bool textScrollOverriden;
 
