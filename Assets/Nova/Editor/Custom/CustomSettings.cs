@@ -12,7 +12,6 @@ public static class CustomSettings
 {
     public static string saveDir = Application.dataPath + "/Nova/Sources/ThirdParty/ToLua/Source/Generate/";
     public static string toluaBaseType = Application.dataPath + "/Nova/Sources/ThirdParty/ToLua/ToLua/BaseType/";
-    public static string baseLuaDir = Application.dataPath + "/Nova/Lua/";
 
     // 导出时强制做为静态类的类型（注意customTypeList还要添加这个类型才能导出）
     // Unity有些类作为sealed class，其实完全等价于静态类

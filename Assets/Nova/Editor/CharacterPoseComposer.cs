@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-// using LuaInterface;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -33,7 +32,7 @@ namespace Nova.Editor
         private int selectedCharacterIndex = -1;
         private GameCharacterController selectedCharacter;
         private string poseString;
-        // private int selectedPoseIndex = -1;
+        private int selectedPoseIndex = -1;
         private string selectedPoseString;
         private readonly List<Layer> layers = new List<Layer>();
         private ReorderableList reorderableList;
@@ -48,7 +47,8 @@ namespace Nova.Editor
         private RenderTexture previewTexture;
         private List<SpriteWithOffset> previewSprites;
         private Rect previewBounds;
-        // private LuaState lua;
+
+        private readonly EditorLuaRuntime lua = new EditorLuaRuntime();
 
         private void OnEnable()
         {
@@ -62,10 +62,7 @@ namespace Nova.Editor
             reorderableList.onRemoveCallback += RemoveItem;
             reorderableList.onReorderCallback += ReorderItem;
 
-            // new LuaResLoader();
-            // lua = new LuaState();
-            // lua.Start();
-            // lua.AddSearchPath(Application.dataPath + "/Nova/Lua");
+            lua.Init();
         }
 
         private void OnDisable()
@@ -82,8 +79,7 @@ namespace Nova.Editor
                 DestroyImmediate(previewTexture);
             }
 
-            // lua.Dispose();
-            // lua = null;
+            lua.Dispose();
         }
 
         private static void DrawHeader(Rect rect)
@@ -173,7 +169,7 @@ namespace Nova.Editor
                 poseString = CompositeSpriteController.ArrayToPose(layers.Select(x => x.name));
                 if (poseString != selectedPoseString)
                 {
-                    // selectedPoseIndex = -1;
+                    selectedPoseIndex = -1;
                 }
             }
 
@@ -297,35 +293,30 @@ namespace Nova.Editor
                 }
 
                 layers.Clear();
-                // selectedPoseIndex = -1;
+                selectedPoseIndex = -1;
                 dirty = true;
             }
 
-            // if (selectedCharacter != null)
-            // {
-            //     var characterName = selectedCharacter.luaGlobalName;
-            //     lua.Require("pose");
-            //     var poses = lua.GetFunction("get_all_poses_by_name")
-            //         .Invoke<string, LuaTable>(characterName)
-            //         .ToArrayTable()
-            //         .Cast<string>()
-            //         .ToList();
-            //     var oldSelectedPose = selectedPoseIndex;
-            //
-            //     selectedPoseIndex = EditorGUILayout.Popup("Select Pose", selectedPoseIndex,
-            //         poses.Select(CreateSubMenu).ToArray());
-            //
-            //     if (poses.Any() && selectedPoseIndex >= 0 && selectedPoseIndex != oldSelectedPose)
-            //     {
-            //         selectedPoseString = lua.GetFunction("get_pose_by_name")
-            //             .Invoke<string, string, string>(characterName, poses[selectedPoseIndex]);
-            //         if (poseString != selectedPoseString)
-            //         {
-            //             poseString = selectedPoseString;
-            //             LoadPoseString();
-            //         }
-            //     }
-            // }
+            if (selectedCharacter != null)
+            {
+                var characterName = selectedCharacter.luaGlobalName;
+                lua.Reload();
+                var poses = lua.GetAllPosesByName(characterName);
+                var oldSelectedPose = selectedPoseIndex;
+
+                selectedPoseIndex = EditorGUILayout.Popup("Select Pose", selectedPoseIndex,
+                    poses.Select(CreateSubMenu).ToArray());
+
+                if (poses.Any() && selectedPoseIndex >= 0 && selectedPoseIndex != oldSelectedPose)
+                {
+                    selectedPoseString = lua.GetPoseByName(characterName, poses[selectedPoseIndex]);
+                    if (poseString != selectedPoseString)
+                    {
+                        poseString = selectedPoseString;
+                        LoadPoseString();
+                    }
+                }
+            }
 
             GUILayout.Space(20);
 
