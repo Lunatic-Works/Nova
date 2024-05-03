@@ -56,6 +56,7 @@
 * [东北之夏](https://store.steampowered.com/app/2121360)
 * [初夏倾语](https://store.steampowered.com/app/2075410)
 * [溢爱](https://store.steampowered.com/app/2663600)
+* [完美恋人](https://store.steampowered.com/app/2773520)
 
 如果你用Nova做出了作品，欢迎来告诉我们，我们可以互相宣传一下
 
