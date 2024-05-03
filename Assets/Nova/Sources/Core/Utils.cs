@@ -318,7 +318,7 @@ namespace Nova
 #else
             ForceQuit = true;
             Application.Quit();
-            // All components write to disk in OnDestroy
+            // All components should flush themselves in OnDestroy
 #endif
         }
 
