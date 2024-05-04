@@ -201,6 +201,11 @@ namespace Nova
             ForceUpdate();
         }
 
+        public void ResetTime()
+        {
+            audioSource.timeSamples = 0;
+        }
+
         public void Preload(string audioName)
         {
             // To reduce the possibility of discontinuity between head and loop,

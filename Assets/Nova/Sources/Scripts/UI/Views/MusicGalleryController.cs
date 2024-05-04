@@ -91,6 +91,14 @@ namespace Nova
             }
         }
 
+        public void ResetOtherAudios()
+        {
+            foreach (var ac in audioControllersToDisable)
+            {
+                ac.ResetTime();
+            }
+        }
+
         protected override void Awake()
         {
             base.Awake();

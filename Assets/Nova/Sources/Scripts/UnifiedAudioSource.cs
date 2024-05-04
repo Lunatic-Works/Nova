@@ -51,7 +51,15 @@ namespace Nova
             }
         }
 
-        public int timeSamples => audioLooper != null ? audioLooper.timeSamples : audioSource.timeSamples;
+        public int timeSamples
+        {
+            get => audioLooper != null ? audioLooper.timeSamples : audioSource.timeSamples;
+            set
+            {
+                if (audioLooper != null) audioLooper.timeSamples = value;
+                else audioSource.timeSamples = value;
+            }
+        }
 
         public bool isPlaying => audioLooper != null ? audioLooper.isPlaying : audioSource.isPlaying;
 

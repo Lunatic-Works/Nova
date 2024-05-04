@@ -31,7 +31,50 @@ namespace Nova
             }
         }
 
-        public int timeSamples => audioSource.timeSamples;
+        public int timeSamples
+        {
+            get
+            {
+                if (headAudioSource.isPlaying)
+                {
+                    return headAudioSource.timeSamples;
+                }
+                else
+                {
+                    return (headAudioSource.clip?.samples ?? 0) + audioSource.timeSamples;
+                }
+            }
+            set
+            {
+                var headClip = headAudioSource.clip;
+                if (headClip == null)
+                {
+                    audioSource.timeSamples = value;
+                }
+                else
+                {
+                    bool oldIsPlaying = isPlaying;
+                    if (value < headClip.samples)
+                    {
+                        headAudioSource.timeSamples = value;
+                        if (oldIsPlaying)
+                        {
+                            headAudioSource.UnPause();
+                            PlayScheduledBody();
+                        }
+                    }
+                    else
+                    {
+                        audioSource.timeSamples = value - headClip.samples;
+                        headAudioSource.Stop();
+                        if (oldIsPlaying)
+                        {
+                            audioSource.UnPause();
+                        }
+                    }
+                }
+            }
+        }
 
         public bool isPlaying => audioSource.isPlaying || headAudioSource.isPlaying;
 
@@ -54,12 +97,10 @@ namespace Nova
 
         public void Play()
         {
-            AudioClip headClip = headAudioSource.clip;
-            if (headClip != null)
+            if (headAudioSource.clip != null)
             {
                 headAudioSource.Play();
-                double timeLeft = (double)headClip.samples / headClip.frequency;
-                audioSource.PlayScheduled(AudioSettings.dspTime + timeLeft);
+                PlayScheduledBody();
             }
             else
             {
@@ -92,15 +133,20 @@ namespace Nova
         {
             if (headPaused)
             {
-                AudioClip headClip = headAudioSource.clip;
                 headAudioSource.UnPause();
-                double timeLeft = (double)(headClip.samples - headAudioSource.timeSamples) / headClip.frequency;
-                audioSource.PlayScheduled(AudioSettings.dspTime + timeLeft);
+                PlayScheduledBody();
             }
             else
             {
                 audioSource.UnPause();
             }
+        }
+
+        private void PlayScheduledBody()
+        {
+            AudioClip headClip = headAudioSource.clip;
+            double timeLeft = (double)(headClip.samples - headAudioSource.timeSamples) / headClip.frequency;
+            audioSource.PlayScheduled(AudioSettings.dspTime + timeLeft);
         }
     }
 }

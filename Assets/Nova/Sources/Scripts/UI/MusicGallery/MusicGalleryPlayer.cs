@@ -119,6 +119,8 @@ namespace Nova
 
             playButton.SetActive(false);
             pauseButton.SetActive(true);
+
+            Utils.FindViewManager().GetController<MusicGalleryController>().ResetOtherAudios();
         }
 
         public void Pause()
