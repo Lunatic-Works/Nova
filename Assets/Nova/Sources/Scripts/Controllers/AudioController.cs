@@ -8,12 +8,11 @@ namespace Nova
     /// This class is used for controlling audio source from external scripts
     /// </summary>
     [ExportCustomType]
+    [RequireComponent(typeof(AudioSource))]
     public class AudioController : MonoBehaviour, IRestorable
     {
         public string luaGlobalName;
         public string audioFolder;
-
-        [SerializeField] private MusicEntryList musicEntryList;
 
         // For debug
         [SerializeField] private Slider slider;
@@ -71,13 +70,14 @@ namespace Nova
 
             gameState = Utils.FindNovaController().GameState;
 
-            if (musicEntryList != null)
+            var _audioSource = GetComponent<AudioSource>();
+            if (_audioSource.loop)
             {
                 audioSource = gameObject.AddComponent<AudioLooper>();
             }
             else
             {
-                audioSource = GetComponent<AudioSource>();
+                audioSource = _audioSource;
             }
 
             if (!string.IsNullOrEmpty(luaGlobalName))
