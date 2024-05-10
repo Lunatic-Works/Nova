@@ -217,32 +217,32 @@ namespace LuaInterface
         /*
         ** third party library
         */
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_pb(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_pb(IntPtr L);
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_ffi(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_ffi(IntPtr L);
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_bit(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_bit(IntPtr L);
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_struct(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_struct(IntPtr L);
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_lpeg(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_lpeg(IntPtr L);
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_socket_core(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_socket_core(IntPtr L);
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_mime_core(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_mime_core(IntPtr L);
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_cjson(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_cjson(IntPtr L);
 
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_cjson_safe(IntPtr L);
+        // [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern int luaopen_cjson_safe(IntPtr L);
 
         /*
          ** pseudo-indices
