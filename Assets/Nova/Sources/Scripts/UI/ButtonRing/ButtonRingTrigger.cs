@@ -73,7 +73,16 @@ namespace Nova
 
         private void AdjustAnchorPosition()
         {
-            var targetPosition = lastPointerPosition ?? RealInput.pointerPosition;
+            Vector2 targetPosition;
+            if (lastPointerPosition == null)
+            {
+                targetPosition = RealInput.pointerPosition;
+            }
+            else
+            {
+                targetPosition = (RealInput.pointerPosition + lastPointerPosition.Value) / 2;
+            }
+
             rectTransform.anchoredPosition = currentCanvas.ScreenToCanvasPosition(targetPosition);
             Vector2 v = currentCanvas.ViewportToCanvasPosition(Vector3.one) * 2.0f;
             backgroundBlur.offsetMin = -v;
