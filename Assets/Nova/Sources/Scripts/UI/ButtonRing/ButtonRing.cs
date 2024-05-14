@@ -134,7 +134,7 @@ namespace Nova
             actionNameText.fontSize = (int)(_sectorRadius / 6);
         }
 
-        private bool suppressNextAction = true;
+        private bool suppressNextAction;
 
         private void OnDisable()
         {
