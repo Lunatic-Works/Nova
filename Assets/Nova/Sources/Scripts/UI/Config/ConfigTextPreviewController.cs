@@ -48,7 +48,7 @@ namespace Nova
             var contentProxy = entry.contentProxy;
             var textDuration = characterFadeInDuration * contentProxy.GetPageCharacterCount();
             currentTextPreviewTimeLeft = textDuration + autoDelay;
-            textAnimation.Then(new TextFadeInAnimationProperty(contentProxy, 255), textDuration);
+            textAnimation.Then(new TextFadeInAnimationProperty(contentProxy), textDuration);
             textPreviewIndex = (textPreviewIndex + 1) % TextPreviewKeys.Length;
         }
 

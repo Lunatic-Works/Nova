@@ -17,6 +17,7 @@ namespace Nova
         private bool needRefreshLineBreak;
         private bool needRefreshFade;
 
+        // TODO: Is this deprecated?
         [HideInInspector] public bool canRefreshLineBreak = true;
 
         protected override void Awake()
@@ -30,7 +31,15 @@ namespace Nova
             if (inited) return;
             textBox = GetComponent<TMP_Text>();
             rectTransform = GetComponent<RectTransform>();
+
+            textBox.OnPreRenderText += ApplyFade;
+
             inited = true;
+        }
+
+        protected override void OnDestroy()
+        {
+            textBox.OnPreRenderText -= ApplyFade;
         }
 
         private string _text;
@@ -68,8 +77,8 @@ namespace Nova
             {
                 if (textBox.font == pair.fontAsset)
                 {
-                    if (textBox.fontSharedMaterial != pair.fontAsset.material &&
-                        !pair.materials.Values.Contains(textBox.fontSharedMaterial))
+                    if (textBox.fontSharedMaterial.name != pair.fontAsset.material.name &&
+                        !pair.materials.Values.Select(x => x.name).Contains(textBox.fontSharedMaterial.name))
                     {
                         Debug.LogWarning(
                             $"Nova：Font material {textBox.font}:{textBox.fontSharedMaterial} not in I18nFontConfig, " +
@@ -345,70 +354,83 @@ namespace Nova
 
         #region Fade
 
-        private byte targetAlpha = 255;
+        private bool canFade;
         private float fadeValue = 1.0f;
 
-        public void SetFade(byte targetAlpha, float fadeValue)
+        public void SetFade(float fadeValue)
         {
-            this.targetAlpha = targetAlpha;
-            this.fadeValue = fadeValue;
+            canFade = true;
+            this.fadeValue = Mathf.Clamp01(fadeValue);
             needRefreshFade = true;
         }
 
-        public void SetTextAlpha(byte a)
+        private static void ApplyAlphaToCharAtIndex(TMP_TextInfo textInfo, int index, byte alpha)
         {
-            textBox.color = Utils.SetAlpha32(textBox.color, a);
-        }
-
-        private void ApplyAlphaToCharAtIndex(int index, byte alpha)
-        {
-            var characterInfos = textBox.textInfo.characterInfo;
+            var characterInfos = textInfo.characterInfo;
             // Boundary check in case characterInfo.Length is wrong
             if (characterInfos.Length <= index) return;
 
             var characterInfo = characterInfos[index];
-            // TODO: skip animation for invisible characters?
             if (!characterInfo.isVisible) return;
 
             // Characters at different indices may have different materials
-            var meshInfos = textBox.textInfo.meshInfo;
+            var meshInfos = textInfo.meshInfo;
             var materialIndex = characterInfo.materialReferenceIndex;
-            var newVertexColors = meshInfos[materialIndex].colors32;
+            var vertexColors = meshInfos[materialIndex].colors32;
             var vertexIndex = characterInfo.vertexIndex;
-            newVertexColors[vertexIndex + 0].a = alpha;
-            newVertexColors[vertexIndex + 1].a = alpha;
-            newVertexColors[vertexIndex + 2].a = alpha;
-            newVertexColors[vertexIndex + 3].a = alpha;
+            for (var i = 0; i < 4; ++i)
+            {
+                vertexColors[vertexIndex + i].a = alpha;
+            }
         }
 
-        private void ApplyFade()
+        private void ApplyFade(TMP_TextInfo textInfo)
         {
-            // due to some strange behaviour of TMP, manually check special case
-            if (fadeValue >= 1.0f - 1e-3f)
+            if (!canFade || textInfo.characterCount == 0)
             {
-                SetTextAlpha(targetAlpha);
                 return;
             }
 
-            SetTextAlpha(0);
-
-            var characterCount = GetPageCharacterCount();
-            var fadingCharacterIndex = Mathf.FloorToInt(characterCount * fadeValue);
-            // handle fully revealed characters
-            for (var i = 0; i < fadingCharacterIndex; ++i)
+            int beginIdx = 0;
+            int endIdx = 0;
+            if (textInfo.pageCount > 1)
             {
-                ApplyAlphaToCharAtIndex(i, targetAlpha);
+                var pageInfo = textInfo.pageInfo[textBox.pageToDisplay - 1];
+                if (pageInfo.lastCharacterIndex > 0)
+                {
+                    beginIdx = pageInfo.firstCharacterIndex;
+                    endIdx = pageInfo.lastCharacterIndex + 1;
+                }
+            }
+
+            if (endIdx == 0)
+            {
+                endIdx = textInfo.characterCount;
+            }
+
+            var floatFadingIdx = beginIdx + fadeValue * (endIdx - beginIdx);
+            var fadingIdx = Mathf.FloorToInt(floatFadingIdx);
+            var alpha = textBox.color.a;
+
+            // handle fully revealed characters
+            for (var i = beginIdx; i < fadingIdx; ++i)
+            {
+                ApplyAlphaToCharAtIndex(textInfo, i, (byte)(255 * alpha));
+            }
+
+            if (fadingIdx == endIdx)
+            {
+                return;
             }
 
             // handle fading character
-            var tint = Mathf.Clamp01(characterCount * fadeValue - fadingCharacterIndex);
-            var alpha = (byte)(targetAlpha * tint);
-            ApplyAlphaToCharAtIndex(fadingCharacterIndex, alpha);
+            var tint = Mathf.Clamp01(floatFadingIdx - fadingIdx);
+            ApplyAlphaToCharAtIndex(textInfo, fadingIdx, (byte)(255 * tint * alpha));
 
             // handle hidden characters
-            for (var i = fadingCharacterIndex + 1; i < characterCount; i++)
+            for (var i = fadingIdx + 1; i < endIdx; ++i)
             {
-                ApplyAlphaToCharAtIndex(i, 0);
+                ApplyAlphaToCharAtIndex(textInfo, i, 0);
             }
         }
 
@@ -421,28 +443,14 @@ namespace Nova
                 return;
             }
 
-            if (!gameObject.activeInHierarchy)
-            {
-                textBox.text = text;
-                return;
-            }
-
             if (needRefreshLineBreak)
             {
-                if (string.IsNullOrEmpty(text))
-                {
-                    // TODO: the text may not update if we set an empty string. It may be a bug of TMP.
-                    textBox.text = " ";
-                }
-                else
-                {
-                    textBox.text = Typeset(text);
-                }
+                textBox.text = Typeset(text);
             }
 
             if (needRefreshFade)
             {
-                ApplyFade();
+                ApplyFade(textBox.textInfo);
             }
 
             if (needRefreshLineBreak)

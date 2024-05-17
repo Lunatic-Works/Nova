@@ -4,12 +4,10 @@ namespace Nova
     public class TextFadeInAnimationProperty : IAnimationProperty
     {
         private readonly TextProxy text;
-        private readonly byte targetAlpha;
 
-        public TextFadeInAnimationProperty(TextProxy text, byte targetAlpha)
+        public TextFadeInAnimationProperty(TextProxy text)
         {
             this.text = text;
-            this.targetAlpha = targetAlpha;
             // Avoid undesired flash on the first frame
             value = 0f;
         }
@@ -22,7 +20,7 @@ namespace Nova
             set
             {
                 _value = value;
-                text.SetFade(targetAlpha, value);
+                text.SetFade(value);
             }
         }
     }

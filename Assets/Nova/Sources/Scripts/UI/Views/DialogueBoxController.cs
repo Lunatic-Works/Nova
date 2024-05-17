@@ -296,7 +296,7 @@ namespace Nova
                 if (textAnimationDelay > 1e-3f)
                 {
                     textAnimationDelayEntry = textAnimation
-                        .Then(new ActionAnimationProperty(() => contentProxy.SetTextAlpha(0))) // hide text
+                        .Then(new ActionAnimationProperty(() => contentProxy.SetFade(0f))) // hide text
                         .Then(null, textAnimationDelay);
                     textAnimationParent = textAnimationDelayEntry;
                 }
@@ -308,10 +308,7 @@ namespace Nova
 
                 if (textDuration > 1e-3f)
                 {
-                    textAnimationParent.Then(
-                        new TextFadeInAnimationProperty(contentProxy, (byte)(255 * nowTextColor.a)),
-                        textDuration
-                    );
+                    textAnimationParent.Then(new TextFadeInAnimationProperty(contentProxy), textDuration);
 
                     if (!textScrollOverriden)
                     {
@@ -329,13 +326,11 @@ namespace Nova
                         }
                     }
                 }
-                else
+                else // No textDuration
                 {
                     if (textAnimationDelay > 1e-3f)
                     {
-                        textAnimationParent.Then(
-                            new ActionAnimationProperty(() => contentProxy.SetTextAlpha((byte)(255 * nowTextColor.a)))
-                        );
+                        textAnimationParent.Then(new ActionAnimationProperty(() => contentProxy.SetFade(1f)));
                     }
 
                     if (!textScrollOverriden)
@@ -344,7 +339,7 @@ namespace Nova
                     }
                 }
             }
-            else
+            else // No animation
             {
                 if (!textScrollOverriden)
                 {
