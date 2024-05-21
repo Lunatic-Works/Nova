@@ -221,6 +221,8 @@ namespace Nova
                 file.Close();
                 file.Dispose();
             }
+
+            headerCorrupted = true;
         }
 
         private CheckpointBlock GetBlock(long id)
