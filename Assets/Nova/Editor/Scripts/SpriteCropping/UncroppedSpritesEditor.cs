@@ -171,9 +171,24 @@ namespace Nova.Editor
             var assetPath = Path.Combine(sprites.outputDirectory, fileName);
             AssetDatabase.ImportAsset(assetPath);
             var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            var needReimport = false;
             if (importer.textureType != TextureImporterType.Sprite)
             {
                 importer.textureType = TextureImporterType.Sprite;
+                needReimport = true;
+            }
+
+            var settings = new TextureImporterSettings();
+            importer.ReadTextureSettings(settings);
+            if (settings.spriteMeshType != SpriteMeshType.FullRect)
+            {
+                settings.spriteMeshType = SpriteMeshType.FullRect;
+                needReimport = true;
+            }
+
+            if (needReimport)
+            {
+                importer.SetTextureSettings(settings);
                 importer.SaveAndReimport();
             }
         }
