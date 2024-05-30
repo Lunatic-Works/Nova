@@ -211,7 +211,7 @@ namespace Nova
                 {
                     // TODO: Text animation when showing a new page
                     RestartTimer();
-                    TrySchedule(dialogueState.isAuto ? GetDialogueTimeAutoText() : fastForwardDelay);
+                    TrySchedule(dialogueState.isAuto ? GetDialogueTimeAuto() : fastForwardDelay);
                 }
             }
             else
@@ -239,11 +239,11 @@ namespace Nova
             }
         }
 
-        private static float GetDialogueTime(float offset = 0.0f, float voiceOffset = 0.0f)
+        private float GetDialogueTimeTextVoice(float offset = 0.0f, float voiceOffset = 0.0f)
         {
             return Mathf.Max(
                 NovaAnimation.GetTotalTimeRemaining(AnimationType.PerDialogue | AnimationType.Text) + offset,
-                GameCharacterController.MaxVoiceDuration + voiceOffset
+                Mathf.Max(GameCharacterController.MaxVoiceDuration - timeAfterDialogueChange, 0f) + voiceOffset
             );
         }
 
@@ -252,7 +252,7 @@ namespace Nova
             float textAnimationDelay = currentDialogueBox?.textAnimationDelay ?? 0f;
             int characterCount = currentDialogueBox?.GetPageCharacterCount() ?? 0;
             float factor = 0.1f * characterCount + 0.5f + 0.5f / (1 + characterCount);
-            return textAnimationDelay + autoDelay * factor;
+            return Mathf.Max(textAnimationDelay + autoDelay * factor - timeAfterDialogueChange, 0f);
         }
 
         private float GetDialogueTimeAuto()
@@ -262,7 +262,7 @@ namespace Nova
                 return autoTimeOverride;
             }
 
-            return Mathf.Max(GetDialogueTime(autoDelay, autoDelay * 0.5f), GetDialogueTimeAutoText());
+            return Mathf.Max(GetDialogueTimeTextVoice(autoDelay, autoDelay), GetDialogueTimeAutoText());
         }
 
         protected override void Update()
@@ -283,6 +283,7 @@ namespace Nova
         {
             StopTimer();
             autoTimeOverride = -1f;
+            // TODO: Call OnDialogueWillChange for each currentDialogueBox
             currentDialogueBox?.OnDialogueWillChange();
         }
 
@@ -291,7 +292,7 @@ namespace Nova
             RestartTimer();
             currentDialogueBox?.DisplayDialogue(dialogueData.displayData);
             SetSchedule();
-            dialogueTime = GetDialogueTime();
+            dialogueTime = GetDialogueTimeTextVoice();
         }
 
         private void OnRouteEnded(RouteEndedData routeEndedData)
