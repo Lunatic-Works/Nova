@@ -1,6 +1,8 @@
+cupy
 joblib
 lupa
 numpy
+opencv-python
 openpyxl
 pandas
 Pillow
@@ -10,5 +12,6 @@ python-docx
 pythonnet
 pytoshop
 scikit-image
-sobol-seq
+scipy
 speedy-antlr-lua-parser
+tqdm
