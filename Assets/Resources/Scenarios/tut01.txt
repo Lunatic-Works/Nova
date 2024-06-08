@@ -59,7 +59,7 @@ print('222')
 
 一行文本的结尾不能出现<noparse>|</noparse><noparse>></noparse>
 
-<noparse>：</noparse><noparse>：</noparse>和<noparse>:</noparse><noparse>:</noparse>不能出现在文本中
+<noparse>：</noparse><size=0> </size><noparse>：</noparse>和<noparse>:</noparse><noparse>:</noparse>不能出现在文本中
 
 它们都是Nova脚本的保留字，如果一定要出现，可以用XML标记把它们拆开（因为Nova先来parse这些保留字，TextMeshPro再来parse XML）
 

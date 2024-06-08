@@ -34,6 +34,9 @@ namespace Nova
             rectTransform = GetComponent<RectTransform>();
             fontSize = textBox.fontSize;
 
+            // Use character spacing almost only if no word spacing
+            textBox.wordWrappingRatios = 0.999f;
+
             textBox.OnPreRenderText += ApplyFade;
 
             inited = true;

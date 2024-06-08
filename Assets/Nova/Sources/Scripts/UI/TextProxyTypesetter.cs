@@ -14,6 +14,13 @@ namespace Nova
         private static readonly HashSet<char> ChineseFollowingPunctuations = new HashSet<char>(
             ChineseOpeningPunctuations.Concat(ChineseClosingPunctuations).Concat(ChineseMiddlePunctuations));
 
+        private static readonly HashSet<char> EnglishChars = new HashSet<char>(
+            "0123456789" +
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "abcdefghijklmnopqrstuvwxyz" +
+            " ([{<)]}>"
+        );
+
         private static bool IsChineseCharacter(char c)
         {
             return c >= 0x4e00 && c <= 0x9fff;
@@ -94,7 +101,7 @@ namespace Nova
         }
 
         private static void ScanKern(string text, TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo,
-            List<int> idxs, List<float> kerns, out int flexibleWidthCount)
+            List<int> idxs, List<float> kerns, out int flexibleWidthCount, out int englishCharCount)
         {
             const float chinesePunctuationKerning = -0.5f;
             const float chinesePunctuationSubKerning = -0.3333f;
@@ -102,6 +109,7 @@ namespace Nova
             idxs.Clear();
             kerns.Clear();
             flexibleWidthCount = 0;
+            englishCharCount = 0;
 
             if (lineInfo.characterCount < 2)
             {
@@ -117,17 +125,22 @@ namespace Nova
             var leftOpen = ChineseOpeningPunctuations.Contains(text[leftIdx]);
             var leftClose = ChineseClosingPunctuations.Contains(text[leftIdx]);
             var leftChinese = IsChineseCharacter(text[leftIdx]);
+            var leftEnglish = EnglishChars.Contains(text[leftIdx]);
+            englishCharCount += leftEnglish ? 1 : 0;
             while (charIdx > firstCharIdx)
             {
                 var rightIdx = leftIdx;
                 var rightOpen = leftOpen;
                 var rightClose = leftClose;
                 var rightChinese = leftChinese;
+                var rightEnglish = leftEnglish;
                 --charIdx;
                 leftIdx = characterInfos[charIdx].index;
                 leftOpen = ChineseOpeningPunctuations.Contains(text[leftIdx]);
                 leftClose = ChineseClosingPunctuations.Contains(text[leftIdx]);
                 leftChinese = IsChineseCharacter(text[leftIdx]);
+                leftEnglish = EnglishChars.Contains(text[leftIdx]);
+                englishCharCount += leftEnglish ? 1 : 0;
                 if (leftClose && rightOpen)
                 {
                     idxs.Add(rightIdx);
@@ -138,9 +151,13 @@ namespace Nova
                     idxs.Add(rightIdx);
                     kerns.Add(chinesePunctuationSubKerning);
                 }
-                else if ((leftChinese && rightOpen) || (leftClose && rightChinese))
+                else if ((leftChinese && rightOpen) || (leftClose && rightChinese) ||
+                         (leftEnglish && rightOpen) || (leftClose && rightEnglish) ||
+                         (leftEnglish && rightClose) || (leftOpen && rightEnglish) ||
+                         (leftChinese && rightEnglish) || (leftEnglish && rightChinese))
                 {
                     // Add flexible width
+                    // TODO: Only positive width between Chinese and English
                     idxs.Add(rightIdx);
                     kerns.Add(0f);
                     ++flexibleWidthCount;
@@ -155,8 +172,8 @@ namespace Nova
         }
 
         private static float GetFlexibleWidth(TMP_Text textBox, RectTransform rectTransform, string text,
-            TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo, int flexibleWidthCount, out float endMargin,
-            out bool canAvoidOrphan)
+            TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo, int flexibleWidthCount, float extraWidth,
+            out float endMargin, out bool canAvoidOrphan)
         {
             endMargin = 0f;
             canAvoidOrphan = true;
@@ -189,7 +206,7 @@ namespace Nova
                 else
                 {
                     // Justified line may be already compressed by 1em
-                    if (flexibleWidth > 1f)
+                    if (flexibleWidth > extraWidth + 1f)
                     {
                         canAvoidOrphan = false;
                         return 0f;
@@ -198,7 +215,7 @@ namespace Nova
             }
             else
             {
-                if (flexibleWidth > 0f)
+                if (flexibleWidth > extraWidth)
                 {
                     canAvoidOrphan = false;
                     return 0f;
@@ -240,10 +257,16 @@ namespace Nova
         {
             var characterInfos = textInfo.characterInfo;
             var lineInfo = textInfo.lineInfo[lineIdx];
-            ScanKern(text, characterInfos, lineInfo, idxs, kerns, out var flexibleWidthCount);
+            ScanKern(text, characterInfos, lineInfo, idxs, kerns, out var flexibleWidthCount, out var englishCharCount);
 
-            var flexibleWidth = GetFlexibleWidth(textBox, rectTransform, text, characterInfos, lineInfo,
-                flexibleWidthCount, out var endMargin, out canAvoidOrphan);
+            var flexibleWidth = 0f;
+            var endMargin = 0f;
+            canAvoidOrphan = false;
+            if (lineIdx < textInfo.lineCount - 1)
+            {
+                flexibleWidth = GetFlexibleWidth(textBox, rectTransform, text, characterInfos, lineInfo,
+                    flexibleWidthCount, (float)englishCharCount, out endMargin, out canAvoidOrphan);
+            }
 
             var dirty = false;
 
@@ -267,7 +290,7 @@ namespace Nova
                     idxs.Insert(0, lastIdx);
                     kerns.Insert(0, endMargin);
                     // Prevent ignoring kern at line end
-                    text = text.Insert(lastIdx, " ");
+                    text = text.Insert(lastIdx, "\u00A0");
                 }
 
                 dirty = true;

@@ -106,7 +106,7 @@ set_box()
 |>
 文本中可以使用TextMeshPro提供的rich text XML标记（详见[Unity官方文档](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.2/manual/RichText.html)）
 
-比如<b>粗体</b>、<i>斜体</i>、<s>删除线</s>、<color=#FF0000>改变颜色</color>、<size=150%>改变大小</size>
+比如<b>粗体</b>、<i>斜体</i>、<color=#FF0000>改变颜色</color>、<size=150%>改变大小</size>
 
 顺便说一句：：为了方便写这些教程，我们还parse了Markdown的超链接和代码块，但是一般的游戏里应该不会用到吧
 
