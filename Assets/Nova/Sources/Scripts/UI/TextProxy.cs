@@ -29,8 +29,10 @@ namespace Nova
         public void Init()
         {
             if (inited) return;
+
             textBox = GetComponent<TMP_Text>();
             rectTransform = GetComponent<RectTransform>();
+            fontSize = textBox.fontSize;
 
             textBox.OnPreRenderText += ApplyFade;
 
@@ -51,8 +53,8 @@ namespace Nova
             {
                 if (_text == value) return;
                 _text = value;
-                textBox.text = value;
                 needRefreshLineBreak = true;
+                Refresh();
             }
         }
 
@@ -118,13 +120,15 @@ namespace Nova
 
         #endregion
 
+        private float _fontSize;
+
         public float fontSize
         {
-            get => textBox.fontSize;
+            get => _fontSize;
             set
             {
-                if (Mathf.Abs(value - textBox.fontSize) < 1e-6f) return;
-                textBox.fontSize = value;
+                if (Mathf.Abs(value - _fontSize) < 1e-6f) return;
+                _fontSize = value;
                 needRefreshLineBreak = true;
             }
         }
@@ -445,6 +449,8 @@ namespace Nova
 
             if (needRefreshLineBreak)
             {
+                // Update fontSize before Typeset
+                textBox.fontSize = fontSize;
                 textBox.text = Typeset(text);
             }
 
