@@ -32,34 +32,25 @@ namespace Nova
         // If the last line is one Chinese character and some (or zero) Chinese punctuations,
         // and the second last line's last character is Chinese character,
         // then add a line break before the second last line's last character
-        // No need to update textInfo
-        private static void AvoidOrphan(TMP_Text textBox, ref string text, ref TMP_TextInfo textInfo, int lineIdx)
+        private static bool ScanAvoidOrphan(string text, TMP_TextInfo textInfo, int lineIdx)
         {
             if (lineIdx >= textInfo.lineCount - 1)
             {
-                return;
+                return false;
             }
 
-            var lineInfo = textInfo.lineInfo[lineIdx];
-            if (lineInfo.characterCount < 3)
+            var nextLineInfo = textInfo.lineInfo[lineIdx + 1];
+            if (nextLineInfo.characterCount < 1)
             {
-                return;
+                return false;
             }
 
             var characterInfos = textInfo.characterInfo;
             // characterInfo.index is the index in the original text with XML tags
-            var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
-            // If the line ends with hard line break, text[lastIdx] will be \n
-            if (!IsChineseCharacter(text[lastIdx]))
-            {
-                return;
-            }
-
-            var nextLineInfo = textInfo.lineInfo[lineIdx + 1];
             var nextLineFirstIdx = characterInfos[nextLineInfo.firstCharacterIndex].index;
             if (!IsChineseCharacter(text[nextLineFirstIdx]))
             {
-                return;
+                return false;
             }
 
             if (lineIdx < textInfo.lineCount - 2)
@@ -67,7 +58,7 @@ namespace Nova
                 var nextLineLastIdx = characterInfos[nextLineInfo.lastCharacterIndex].index;
                 if (text[nextLineLastIdx] != '\n')
                 {
-                    return;
+                    return false;
                 }
             }
 
@@ -77,12 +68,29 @@ namespace Nova
                 var idx = characterInfos[charIdx].index;
                 if (!ChineseFollowingPunctuations.Contains(text[idx]))
                 {
-                    return;
+                    return false;
                 }
             }
 
-            text = text.Insert(lastIdx, "\v");
-            textInfo = textBox.GetTextInfo(text);
+            var lineInfo = textInfo.lineInfo[lineIdx];
+            if (lineInfo.characterCount < 3)
+            {
+                return false;
+            }
+
+            var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
+            if (text[lastIdx] == '\v')
+            {
+                lastIdx = characterInfos[lineInfo.lastCharacterIndex - 1].index;
+            }
+
+            // If the line ends with hard line break, text[lastIdx] will be \n
+            if (!IsChineseCharacter(text[lastIdx]))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private static void ScanKern(string text, TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo,
@@ -91,11 +99,17 @@ namespace Nova
             const float chinesePunctuationKerning = -0.5f;
             const float chinesePunctuationSubKerning = -0.3333f;
 
-            var firstCharIdx = lineInfo.firstCharacterIndex;
-            var lastCharIdx = lineInfo.lastCharacterIndex;
             idxs.Clear();
             kerns.Clear();
             flexibleWidthCount = 0;
+
+            if (lineInfo.characterCount < 2)
+            {
+                return;
+            }
+
+            var firstCharIdx = lineInfo.firstCharacterIndex;
+            var lastCharIdx = lineInfo.lastCharacterIndex;
 
             // From right to left
             var charIdx = lastCharIdx;
@@ -141,9 +155,12 @@ namespace Nova
         }
 
         private static float GetFlexibleWidth(TMP_Text textBox, RectTransform rectTransform, string text,
-            TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo, int flexibleWidthCount, out float endMargin)
+            TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo, int flexibleWidthCount, out float endMargin,
+            out bool canAvoidOrphan)
         {
             endMargin = 0f;
+            canAvoidOrphan = true;
+
             if (flexibleWidthCount <= 0)
             {
                 return 0f;
@@ -167,17 +184,14 @@ namespace Nova
             {
                 if (text[lastIdx] == '\v')
                 {
-                    // Allow more width if avoiding orphan
-                    if (flexibleWidth > 2f)
-                    {
-                        return 0f;
-                    }
+                    // Allow any width when avoiding orphan
                 }
                 else
                 {
                     // Justified line may be already compressed by 1em
                     if (flexibleWidth > 1f)
                     {
+                        canAvoidOrphan = false;
                         return 0f;
                     }
                 }
@@ -186,6 +200,7 @@ namespace Nova
             {
                 if (flexibleWidth > 0f)
                 {
+                    canAvoidOrphan = false;
                     return 0f;
                 }
             }
@@ -220,6 +235,122 @@ namespace Nova
 
         // Add a negative space between each punctuation pair,
         // and before each opening punctuation at line beginning if left aligned
+        private static void ApplyKerningLine(TMP_Text textBox, RectTransform rectTransform, ref string text,
+            ref TMP_TextInfo textInfo, int lineIdx, List<int> idxs, List<float> kerns, out bool canAvoidOrphan)
+        {
+            var characterInfos = textInfo.characterInfo;
+            var lineInfo = textInfo.lineInfo[lineIdx];
+            ScanKern(text, characterInfos, lineInfo, idxs, kerns, out var flexibleWidthCount);
+
+            var flexibleWidth = GetFlexibleWidth(textBox, rectTransform, text, characterInfos, lineInfo,
+                flexibleWidthCount, out var endMargin, out canAvoidOrphan);
+
+            var dirty = false;
+
+            // Exact float zero
+            var needFlush = flexibleWidth != 0f && IsLeftAligned((int)lineInfo.alignment);
+            if (needFlush)
+            {
+                var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
+                if (text[lastIdx] == '\v')
+                {
+                    text = text.Insert(lastIdx, "</align>");
+                }
+                else
+                {
+                    lastIdx += 1;
+                    text = text.Insert(lastIdx, "</align>\v");
+                }
+
+                if (endMargin != 0f)
+                {
+                    idxs.Insert(0, lastIdx);
+                    kerns.Insert(0, endMargin);
+                    // Prevent ignoring kern at line end
+                    text = text.Insert(lastIdx, " ");
+                }
+
+                dirty = true;
+            }
+
+            for (var i = 0; i < idxs.Count; ++i)
+            {
+                var kern = kerns[i];
+                // Exact float zero
+                if (kern == 0f)
+                {
+                    kern = flexibleWidth;
+                }
+
+                if (kern != 0f)
+                {
+                    text = text.Insert(idxs[i], GetKernStr(kern));
+                    dirty = true;
+                }
+            }
+
+            if (needFlush)
+            {
+                var firstIdx = characterInfos[lineInfo.firstCharacterIndex].index;
+                text = text.Insert(firstIdx, "<align=\"flush\">");
+            }
+
+            if (dirty)
+            {
+                textInfo = textBox.GetTextInfo(text);
+            }
+        }
+
+        // Visible character count is unchanged when typesetting
+        private static int GetVisibleCharCountUntil(TMP_TextInfo textInfo, int lineIdx)
+        {
+            var count = 0;
+            for (var i = 0; i <= lineIdx; ++i)
+            {
+                count += textInfo.lineInfo[i].visibleCharacterCount;
+            }
+
+            return count;
+        }
+
+        private static int GetIdxForVisibleChar(TMP_TextInfo textInfo, int count)
+        {
+            var characterInfos = textInfo.characterInfo;
+            for (var i = 0; i < textInfo.lineCount; ++i)
+            {
+                var lineInfo = textInfo.lineInfo[i];
+                if (count > lineInfo.visibleCharacterCount)
+                {
+                    count -= lineInfo.visibleCharacterCount;
+                }
+                else if (count == lineInfo.visibleCharacterCount)
+                {
+                    return characterInfos[lineInfo.lastVisibleCharacterIndex].index;
+                }
+                else
+                {
+                    var lastCharIdx = lineInfo.lastVisibleCharacterIndex;
+                    for (var charIdx = lineInfo.firstVisibleCharacterIndex; charIdx < lastCharIdx; ++charIdx)
+                    {
+                        var charInfo = characterInfos[charIdx];
+                        if (!charInfo.isVisible)
+                        {
+                            continue;
+                        }
+
+                        --count;
+                        if (count == 0)
+                        {
+                            return charInfo.index;
+                        }
+                    }
+                }
+            }
+
+            // Should not happen
+            return -1;
+        }
+
         public static void ApplyKerning(TMP_Text textBox, RectTransform rectTransform, ref string text,
             ref TMP_TextInfo textInfo)
         {
@@ -231,65 +362,32 @@ namespace Nova
             // That's also why we don't apply kerning at line ending
             for (var lineIdx = 0; lineIdx < textInfo.lineCount; ++lineIdx)
             {
-                AvoidOrphan(textBox, ref text, ref textInfo, lineIdx);
-
-                var characterInfos = textInfo.characterInfo;
-                var lineInfo = textInfo.lineInfo[lineIdx];
-                ScanKern(text, characterInfos, lineInfo, idxs, kerns, out var flexibleWidthCount);
-
-                var flexibleWidth = GetFlexibleWidth(textBox, rectTransform, text, characterInfos, lineInfo,
-                    flexibleWidthCount, out var endMargin);
-
-                // Exact float zero
-                var needFlush = flexibleWidth != 0f && IsLeftAligned((int)lineInfo.alignment);
-                if (needFlush)
+                var oldText = text;
+                ApplyKerningLine(textBox, rectTransform, ref text, ref textInfo, lineIdx, idxs, kerns,
+                    out var canAvoidOrphan);
+                if (!canAvoidOrphan)
                 {
-                    var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
-                    if (text[lastIdx] == '\v')
-                    {
-                        text = text.Insert(lastIdx, "</align>");
-                    }
-                    else
-                    {
-                        text = text.Insert(lastIdx + 1, "</align>\v");
-                    }
-
-                    if (endMargin != 0f)
-                    {
-                        idxs.Insert(0, lastIdx);
-                        kerns.Insert(0, endMargin);
-                        // Prevent ignoring kern at line end
-                        text = text.Insert(lastIdx, " ");
-                    }
+                    continue;
                 }
 
-                var dirty = false;
-                for (var i = 0; i < idxs.Count; ++i)
+                canAvoidOrphan = ScanAvoidOrphan(text, textInfo, lineIdx);
+                if (!canAvoidOrphan)
                 {
-                    var kern = kerns[i];
-                    // Exact float zero
-                    if (kern == 0f)
-                    {
-                        kern = flexibleWidth;
-                    }
-
-                    if (kern != 0f)
-                    {
-                        text = text.Insert(idxs[i], GetKernStr(kern));
-                        dirty = true;
-                    }
+                    continue;
                 }
 
-                if (needFlush)
-                {
-                    var firstIdx = characterInfos[lineInfo.firstCharacterIndex].index;
-                    text = text.Insert(firstIdx, "<align=\"flush\">");
-                }
+                var count = GetVisibleCharCountUntil(textInfo, lineIdx);
 
-                if (dirty)
-                {
-                    textInfo = textBox.GetTextInfo(text);
-                }
+                // Rollback
+                // There may be bugs if we save oldTextInfo
+                text = oldText;
+                textInfo = textBox.GetTextInfo(text);
+
+                var idx = GetIdxForVisibleChar(textInfo, count);
+                text = text.Insert(idx, "\v");
+                textInfo = textBox.GetTextInfo(text);
+                ApplyKerningLine(textBox, rectTransform, ref text, ref textInfo, lineIdx, idxs, kerns,
+                    out canAvoidOrphan);
             }
         }
     }
