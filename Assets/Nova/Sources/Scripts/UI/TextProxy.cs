@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -319,6 +320,13 @@ namespace Nova
 
         #endregion
 
+        private static readonly Regex XmlPattern = new Regex(@"<[^\n>]+>", RegexOptions.Compiled);
+
+        private static string RemoveXml(string s)
+        {
+            return XmlPattern.Replace(s, "");
+        }
+
         // Character count of the parsed text without XML tags
         // TODO: sometimes textInfo.characterCount or pageInfo.lastCharacterIndex returns 0, which may be a bug of TMP
         // In this case, we need to remove XML tags when counting the text length
@@ -339,7 +347,7 @@ namespace Nova
                 return textInfo.characterCount;
             }
 
-            return textBox.text.Length;
+            return RemoveXml(textBox.text).Length;
         }
 
         public float GetFirstCharacterCenterY()
