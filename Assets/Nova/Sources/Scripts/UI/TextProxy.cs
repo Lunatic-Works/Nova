@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
@@ -162,150 +161,28 @@ namespace Nova
             Refresh();
         }
 
-        #region Line break and kerning
-
-        private const string ChinesePunctuationKerning = "<space=-0.5em>";
-        private const string ChinesePunctuationSubKerning = "<space=-0.33em>";
-
-        private static readonly HashSet<char> ChineseOpeningPunctuations = new HashSet<char>("‘“（【《");
-        private static readonly HashSet<char> ChineseClosingPunctuations = new HashSet<char>("，。、；：？！’”）】》");
-        private static readonly HashSet<char> ChineseMiddlePunctuations = new HashSet<char>("…—·");
-
-        private static readonly HashSet<char> ChineseFollowingPunctuations = new HashSet<char>(
-            ChineseOpeningPunctuations.Concat(ChineseClosingPunctuations).Concat(ChineseMiddlePunctuations));
-
-        private static bool IsChineseCharacter(char c)
-        {
-            return c >= 0x4e00 && c <= 0x9fff;
-        }
-
-        // If the last line is one Chinese character and some (or zero) Chinese punctuations,
-        // and the second last line's last character is Chinese character,
-        // then add a line break before the second last line's last character
-        // No need to update textInfo
-        private void ApplyLineBreak(ref string text, TMP_TextInfo textInfo)
-        {
-            if (textInfo.lineCount < 2)
-            {
-                return;
-            }
-
-            var secondLineInfo = textInfo.lineInfo[textInfo.lineCount - 2];
-            if (secondLineInfo.characterCount < 3)
-            {
-                return;
-            }
-
-            var lineInfo = textInfo.lineInfo[textInfo.lineCount - 1];
-            int firstCharIdx = lineInfo.firstCharacterIndex;
-            var characterInfos = textInfo.characterInfo;
-            // characterInfo.index is the index in the original text with XML tags
-            int firstIdx = characterInfos[firstCharIdx].index;
-            if (firstIdx < 1 || !IsChineseCharacter(text[firstIdx]))
-            {
-                return;
-            }
-
-            int lastCharIdx = lineInfo.lastCharacterIndex;
-            for (int charIdx = firstCharIdx + 1; charIdx <= lastCharIdx; ++charIdx)
-            {
-                var idx = characterInfos[charIdx].index;
-                if (!ChineseFollowingPunctuations.Contains(text[idx]))
-                {
-                    return;
-                }
-            }
-
-            int secondLineLastIdx = characterInfos[secondLineInfo.lastCharacterIndex].index;
-            if (!IsChineseCharacter(text[secondLineLastIdx]))
-            {
-                return;
-            }
-
-            if (textInfo.lineCount > 2 && ((int)textBox.alignment & (int)HorizontalAlignmentOptions.Justified) > 0)
-            {
-                // Justify the second last line
-                int secondLineFirstIdx = characterInfos[secondLineInfo.firstCharacterIndex].index;
-                text = text.Insert(secondLineLastIdx, "</align>\v");
-                text = text.Insert(secondLineFirstIdx, "<align=\"flush\">");
-            }
-            else
-            {
-                text = text.Insert(secondLineLastIdx, "\v");
-            }
-        }
-
-        // Add a negative space between each punctuation pair,
-        // and before each opening punctuation at line beginning if left aligned
-        private void ApplyKerning(ref string text, ref TMP_TextInfo textInfo)
-        {
-            var characterInfos = textInfo.characterInfo;
-            bool dirty = false;
-
-            // Each line is updated only once. Even if some character is pulled to the previous line and forms a
-            // punctuation pair, the previous line will not be updated again
-            // That's also why we don't apply kerning at line ending
-            for (int lineIdx = 0; lineIdx < textInfo.lineCount; ++lineIdx)
-            {
-                var lineInfo = textInfo.lineInfo[lineIdx];
-                int firstCharIdx = lineInfo.firstCharacterIndex;
-
-                int charIdx = lineInfo.lastCharacterIndex;
-                int leftIdx = characterInfos[charIdx].index;
-                bool leftOpen = ChineseOpeningPunctuations.Contains(text[leftIdx]);
-                bool leftClose = ChineseClosingPunctuations.Contains(text[leftIdx]);
-                for (; charIdx > firstCharIdx; --charIdx)
-                {
-                    int rightIdx = leftIdx;
-                    bool rightOpen = leftOpen;
-                    bool rightClose = leftClose;
-                    leftIdx = characterInfos[charIdx - 1].index;
-                    leftOpen = ChineseOpeningPunctuations.Contains(text[leftIdx]);
-                    leftClose = ChineseClosingPunctuations.Contains(text[leftIdx]);
-                    if (leftClose && rightOpen)
-                    {
-                        text = text.Insert(rightIdx, ChinesePunctuationKerning);
-                        dirty = true;
-                    }
-                    else if ((leftOpen && rightOpen) || (leftClose && rightClose))
-                    {
-                        text = text.Insert(rightIdx, ChinesePunctuationSubKerning);
-                        dirty = true;
-                    }
-                }
-
-                bool isLeftAligned = ((int)lineInfo.alignment &
-                                      ((int)HorizontalAlignmentOptions.Left |
-                                       (int)HorizontalAlignmentOptions.Justified)) > 0;
-                if (isLeftAligned)
-                {
-                    int firstIdx = characterInfos[firstCharIdx].index;
-                    if (ChineseOpeningPunctuations.Contains(text[firstIdx]))
-                    {
-                        text = text.Insert(firstIdx, ChinesePunctuationKerning);
-                        dirty = true;
-                    }
-                }
-
-                if (dirty)
-                {
-                    textInfo = textBox.GetTextInfo(text);
-                    characterInfos = textInfo.characterInfo;
-                    dirty = false;
-                }
-            }
-        }
-
         // TODO: advanced English hyphenation can be implemented here
         // Now we use Tools/Scenarios/add_soft_hyphens.py to pre-calculate hyphenation,
-        // and Unity supports \u00ad as soft hyphen
+        // and Unity supports \u00AD as soft hyphen
         private string Typeset(string text)
         {
             if (I18n.CurrentLocale == SystemLanguage.ChineseSimplified)
             {
+                // Justified alignment for Chinese and left alignment for English
+                if (textBox.alignment == TextAlignmentOptions.TopLeft)
+                {
+                    textBox.alignment = TextAlignmentOptions.TopJustified;
+                }
+
                 var textInfo = textBox.GetTextInfo(text);
-                ApplyKerning(ref text, ref textInfo);
-                ApplyLineBreak(ref text, textInfo);
+                TextProxyTypesetter.ApplyKerning(textBox, rectTransform, ref text, ref textInfo);
+            }
+            else
+            {
+                if (textBox.alignment == TextAlignmentOptions.TopJustified)
+                {
+                    textBox.alignment = TextAlignmentOptions.TopLeft;
+                }
             }
 
             return text;
@@ -317,8 +194,6 @@ namespace Nova
             var height = textBox.GetPreferredValues(text, width, 0f).y;
             return height;
         }
-
-        #endregion
 
         private static readonly Regex XmlPattern = new Regex(@"<[^\n>]+>", RegexOptions.Compiled);
 
