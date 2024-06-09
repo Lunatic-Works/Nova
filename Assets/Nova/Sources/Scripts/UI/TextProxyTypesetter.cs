@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -34,6 +35,259 @@ namespace Nova
         private static bool IsLeftAligned(int alignment)
         {
             return (alignment & ((int)HorizontalAlignmentOptions.Left | (int)HorizontalAlignmentOptions.Justified)) > 0;
+        }
+
+        private const float ChinesePunctuationKerning = -0.5f;
+        private const float ChinesePunctuationSubKerning = -0.3333f;
+
+        // The values are used as tags and will be replaced by actual widths
+        private const float FlexibleKerning = -1f;
+        private const float FlexibleSubKerning = -2f;
+
+        private static void ScanKern(string text, TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo,
+            List<int> idxs, List<float> kerns, out float kernSum, out int flexibleCount, out int flexibleSubCount,
+            out int englishCount)
+        {
+            idxs.Clear();
+            kerns.Clear();
+            kernSum = 0f;
+            flexibleCount = 0;
+            flexibleSubCount = 0;
+            englishCount = 0;
+
+            if (lineInfo.characterCount < 2)
+            {
+                return;
+            }
+
+            var firstCharIdx = lineInfo.firstCharacterIndex;
+            var lastCharIdx = lineInfo.lastCharacterIndex;
+
+            // From right to left
+            var charIdx = lastCharIdx;
+            var leftIdx = characterInfos[charIdx].index;
+            var leftOpen = ChineseOpeningPunctuations.Contains(text[leftIdx]);
+            var leftClose = ChineseClosingPunctuations.Contains(text[leftIdx]);
+            var leftChinese = IsChineseCharacter(text[leftIdx]);
+            var leftEnglish = EnglishChars.Contains(text[leftIdx]);
+            englishCount += leftEnglish ? 1 : 0;
+            while (charIdx > firstCharIdx)
+            {
+                var rightIdx = leftIdx;
+                var rightOpen = leftOpen;
+                var rightClose = leftClose;
+                var rightChinese = leftChinese;
+                var rightEnglish = leftEnglish;
+                --charIdx;
+                leftIdx = characterInfos[charIdx].index;
+                leftOpen = ChineseOpeningPunctuations.Contains(text[leftIdx]);
+                leftClose = ChineseClosingPunctuations.Contains(text[leftIdx]);
+                leftChinese = IsChineseCharacter(text[leftIdx]);
+                leftEnglish = EnglishChars.Contains(text[leftIdx]);
+                englishCount += leftEnglish ? 1 : 0;
+                if (leftClose && rightOpen)
+                {
+                    idxs.Add(rightIdx);
+                    kerns.Add(ChinesePunctuationKerning);
+                    kernSum += ChinesePunctuationKerning;
+                }
+                else if ((leftOpen && rightOpen) || (leftClose && rightClose))
+                {
+                    idxs.Add(rightIdx);
+                    kerns.Add(ChinesePunctuationSubKerning);
+                    kernSum += ChinesePunctuationSubKerning;
+                }
+                else if ((leftChinese && rightOpen) || (leftClose && rightChinese) ||
+                         (leftEnglish && rightOpen) || (leftClose && rightEnglish))
+                {
+                    idxs.Add(rightIdx);
+                    kerns.Add(FlexibleKerning);
+                    ++flexibleCount;
+                }
+                else if ((leftEnglish && rightClose) || (leftOpen && rightEnglish) ||
+                         (leftChinese && rightEnglish) || (leftEnglish && rightChinese))
+                {
+                    idxs.Add(rightIdx);
+                    kerns.Add(FlexibleSubKerning);
+                    ++flexibleSubCount;
+                }
+            }
+
+            if (leftOpen && IsLeftAligned((int)lineInfo.alignment))
+            {
+                idxs.Add(leftIdx);
+                kerns.Add(ChinesePunctuationKerning);
+            }
+        }
+
+        // Round toward zero
+        private static float RoundKern(float kern)
+        {
+            return Mathf.Sign(kern) * Mathf.Floor(Mathf.Abs(kern) * 1e4f) / 1e4f;
+        }
+
+        private static void GetFlexibleWidth(TMP_Text textBox, RectTransform rectTransform, string text,
+            TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo, float kernSum, int flexibleCount,
+            int flexibleSubCount, float extraWidth, out float flexibleWidth, out float flexibleSubWidth,
+            out float endMargin, out bool needFlush)
+        {
+            const float subRatio = 0.5f;
+
+            flexibleWidth = 0f;
+            flexibleSubWidth = 0f;
+            endMargin = 0f;
+            needFlush = false;
+
+            if (flexibleCount <= 0 && flexibleSubCount <= 0)
+            {
+                return;
+            }
+
+            var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
+            if (text[lastIdx] == '\n')
+            {
+                // No need to add flexible width when end with hard line break
+                return;
+            }
+
+            var totalFlexibleWidth = (rectTransform.rect.width - (lineInfo.length + kernSum)) / textBox.fontSize;
+            var oldTotalFlexibleWidth = totalFlexibleWidth;
+            if (totalFlexibleWidth > 1f)
+            {
+                totalFlexibleWidth %= 1f;
+            }
+
+            // Evenly distribute flexible width, and add 1 for character spacing
+            flexibleWidth = totalFlexibleWidth / (flexibleCount + subRatio * flexibleSubCount + 1);
+            flexibleSubWidth = subRatio * flexibleWidth;
+
+            flexibleWidth = RoundKern(Mathf.Clamp(flexibleWidth, -0.3333f, 0.5f));
+            flexibleSubWidth = RoundKern(Mathf.Clamp(flexibleSubWidth, 0f, 0.5f));
+
+            var newTotalFlexibleWidth = (flexibleCount + 1) * flexibleWidth + flexibleSubCount * flexibleSubWidth;
+            endMargin = totalFlexibleWidth - newTotalFlexibleWidth;
+
+            Debug.Log(
+                $"{characterInfos[lineInfo.firstVisibleCharacterIndex].character} {characterInfos[lineInfo.lastVisibleCharacterIndex].character} " +
+                $"{oldTotalFlexibleWidth} {totalFlexibleWidth} | {flexibleCount} {flexibleWidth} {flexibleSubCount} {flexibleSubWidth} | {endMargin} " +
+                $"{text} {Utils.GetPath(textBox)}"
+            );
+
+            // Exact float equal
+            if (endMargin > -0.01f && oldTotalFlexibleWidth == totalFlexibleWidth)
+            {
+                needFlush = true;
+            }
+
+            if (endMargin < 0.01f)
+            {
+                endMargin = 0f;
+            }
+            else
+            {
+                endMargin = RoundKern(endMargin);
+            }
+        }
+
+        private static readonly Dictionary<float, string> KernStrCache = new Dictionary<float, string>();
+
+        private static string GetKernStr(float kern)
+        {
+            if (KernStrCache.TryGetValue(kern, out var str))
+            {
+                return str;
+            }
+
+            str = $"<space={kern:F4}em>";
+            KernStrCache[kern] = str;
+            return str;
+        }
+
+        // Add a negative space between each punctuation pair,
+        // and before each opening punctuation at line beginning if left aligned
+        private static void ApplyKerningLine(TMP_Text textBox, RectTransform rectTransform, ref string text,
+            ref TMP_TextInfo textInfo, int lineIdx, List<int> idxs, List<float> kerns, out bool canAvoidOrphan)
+        {
+            var characterInfos = textInfo.characterInfo;
+            var lineInfo = textInfo.lineInfo[lineIdx];
+            ScanKern(text, characterInfos, lineInfo, idxs, kerns, out var kernSum, out var flexibleCount,
+                out var flexibleSubCount, out var englishCount);
+
+            var flexibleWidth = 0f;
+            var flexibleSubWidth = 0f;
+            var endMargin = 0f;
+            var needFlush = false;
+            canAvoidOrphan = false;
+            if (lineIdx < textInfo.lineCount - 1)
+            {
+                GetFlexibleWidth(textBox, rectTransform, text, characterInfos, lineInfo, kernSum, flexibleCount,
+                    flexibleSubCount, englishCount, out flexibleWidth, out flexibleSubWidth, out endMargin,
+                    out needFlush);
+                if (needFlush && endMargin < 0.5f)
+                {
+                    // canAvoidOrphan = true;
+                }
+            }
+
+            var dirty = false;
+
+            needFlush &= IsLeftAligned((int)lineInfo.alignment);
+            if (needFlush)
+            {
+                var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
+                if (text[lastIdx] == '\v')
+                {
+                    text = text.Insert(lastIdx, "</align>");
+                }
+                else
+                {
+                    lastIdx += 1;
+                    text = text.Insert(lastIdx, "</align>\v");
+                }
+
+                // Exact float equal
+                if (endMargin != 0f)
+                {
+                    idxs.Insert(0, lastIdx);
+                    kerns.Insert(0, endMargin);
+                    // Prevent ignoring kern at line end
+                    text = text.Insert(lastIdx, "\u00A0");
+                }
+
+                dirty = true;
+            }
+
+            for (var i = 0; i < idxs.Count; ++i)
+            {
+                var kern = kerns[i];
+                // Exact float equal
+                if (kern == FlexibleKerning)
+                {
+                    kern = flexibleWidth;
+                }
+                else if (kern == FlexibleSubKerning)
+                {
+                    kern = flexibleSubWidth;
+                }
+
+                // Exact float equal
+                if (kern != 0f)
+                {
+                    text = text.Insert(idxs[i], GetKernStr(kern));
+                    dirty = true;
+                }
+            }
+
+            if (needFlush)
+            {
+                var firstIdx = characterInfos[lineInfo.firstCharacterIndex].index;
+                text = text.Insert(firstIdx, "<align=\"flush\">");
+            }
+
+            if (dirty)
+            {
+                textInfo = textBox.GetTextInfo(text);
+            }
         }
 
         // If the last line is one Chinese character and some (or zero) Chinese punctuations,
@@ -100,230 +354,6 @@ namespace Nova
             return true;
         }
 
-        private static void ScanKern(string text, TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo,
-            List<int> idxs, List<float> kerns, out int flexibleWidthCount, out int englishCharCount)
-        {
-            const float chinesePunctuationKerning = -0.5f;
-            const float chinesePunctuationSubKerning = -0.3333f;
-
-            idxs.Clear();
-            kerns.Clear();
-            flexibleWidthCount = 0;
-            englishCharCount = 0;
-
-            if (lineInfo.characterCount < 2)
-            {
-                return;
-            }
-
-            var firstCharIdx = lineInfo.firstCharacterIndex;
-            var lastCharIdx = lineInfo.lastCharacterIndex;
-
-            // From right to left
-            var charIdx = lastCharIdx;
-            var leftIdx = characterInfos[charIdx].index;
-            var leftOpen = ChineseOpeningPunctuations.Contains(text[leftIdx]);
-            var leftClose = ChineseClosingPunctuations.Contains(text[leftIdx]);
-            var leftChinese = IsChineseCharacter(text[leftIdx]);
-            var leftEnglish = EnglishChars.Contains(text[leftIdx]);
-            englishCharCount += leftEnglish ? 1 : 0;
-            while (charIdx > firstCharIdx)
-            {
-                var rightIdx = leftIdx;
-                var rightOpen = leftOpen;
-                var rightClose = leftClose;
-                var rightChinese = leftChinese;
-                var rightEnglish = leftEnglish;
-                --charIdx;
-                leftIdx = characterInfos[charIdx].index;
-                leftOpen = ChineseOpeningPunctuations.Contains(text[leftIdx]);
-                leftClose = ChineseClosingPunctuations.Contains(text[leftIdx]);
-                leftChinese = IsChineseCharacter(text[leftIdx]);
-                leftEnglish = EnglishChars.Contains(text[leftIdx]);
-                englishCharCount += leftEnglish ? 1 : 0;
-                if (leftClose && rightOpen)
-                {
-                    idxs.Add(rightIdx);
-                    kerns.Add(chinesePunctuationKerning);
-                }
-                else if ((leftOpen && rightOpen) || (leftClose && rightClose))
-                {
-                    idxs.Add(rightIdx);
-                    kerns.Add(chinesePunctuationSubKerning);
-                }
-                else if ((leftChinese && rightOpen) || (leftClose && rightChinese) ||
-                         (leftEnglish && rightOpen) || (leftClose && rightEnglish) ||
-                         (leftEnglish && rightClose) || (leftOpen && rightEnglish) ||
-                         (leftChinese && rightEnglish) || (leftEnglish && rightChinese))
-                {
-                    // Add flexible width
-                    // TODO: Only positive width between Chinese and English
-                    idxs.Add(rightIdx);
-                    kerns.Add(0f);
-                    ++flexibleWidthCount;
-                }
-            }
-
-            if (IsLeftAligned((int)lineInfo.alignment) && leftOpen)
-            {
-                idxs.Add(leftIdx);
-                kerns.Add(chinesePunctuationKerning);
-            }
-        }
-
-        private static float GetFlexibleWidth(TMP_Text textBox, RectTransform rectTransform, string text,
-            TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo, int flexibleWidthCount, float extraWidth,
-            out float endMargin, out bool canAvoidOrphan)
-        {
-            endMargin = 0f;
-            canAvoidOrphan = true;
-
-            if (flexibleWidthCount <= 0)
-            {
-                return 0f;
-            }
-
-            var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
-            if (text[lastIdx] == '\n')
-            {
-                // No need to add flexible width when end with hard line break
-                return 0f;
-            }
-
-            var flexibleWidth = (rectTransform.rect.width - lineInfo.length) / textBox.fontSize;
-
-            if (flexibleWidth < -0.5f)
-            {
-                return 0f;
-            }
-
-            if (IsJustified((int)lineInfo.alignment))
-            {
-                if (text[lastIdx] == '\v')
-                {
-                    // Allow any width when avoiding orphan
-                }
-                else
-                {
-                    // Justified line may be already compressed by 1em
-                    if (flexibleWidth > extraWidth + 1f)
-                    {
-                        canAvoidOrphan = false;
-                        return 0f;
-                    }
-                }
-            }
-            else
-            {
-                if (flexibleWidth > extraWidth)
-                {
-                    canAvoidOrphan = false;
-                    return 0f;
-                }
-            }
-
-            var totalFlexibleWidth = flexibleWidth;
-            // Evenly distribute flexible width on punctuations, and add 1 for flexible character spacing
-            flexibleWidth /= flexibleWidthCount + 1;
-            if (flexibleWidth > 0.5f)
-            {
-                flexibleWidth = 0.5f;
-                endMargin = totalFlexibleWidth - (flexibleWidthCount + 1) * flexibleWidth;
-            }
-
-            // Round toward zero
-            flexibleWidth = Mathf.Sign(flexibleWidth) * Mathf.Floor(Mathf.Abs(flexibleWidth) * 1e4f) / 1e4f;
-            return flexibleWidth;
-        }
-
-        private static readonly Dictionary<float, string> KernStrCache = new Dictionary<float, string>();
-
-        private static string GetKernStr(float kern)
-        {
-            if (KernStrCache.TryGetValue(kern, out var str))
-            {
-                return str;
-            }
-
-            str = $"<space={kern:F4}em>";
-            KernStrCache[kern] = str;
-            return str;
-        }
-
-        // Add a negative space between each punctuation pair,
-        // and before each opening punctuation at line beginning if left aligned
-        private static void ApplyKerningLine(TMP_Text textBox, RectTransform rectTransform, ref string text,
-            ref TMP_TextInfo textInfo, int lineIdx, List<int> idxs, List<float> kerns, out bool canAvoidOrphan)
-        {
-            var characterInfos = textInfo.characterInfo;
-            var lineInfo = textInfo.lineInfo[lineIdx];
-            ScanKern(text, characterInfos, lineInfo, idxs, kerns, out var flexibleWidthCount, out var englishCharCount);
-
-            var flexibleWidth = 0f;
-            var endMargin = 0f;
-            canAvoidOrphan = false;
-            if (lineIdx < textInfo.lineCount - 1)
-            {
-                flexibleWidth = GetFlexibleWidth(textBox, rectTransform, text, characterInfos, lineInfo,
-                    flexibleWidthCount, (float)englishCharCount, out endMargin, out canAvoidOrphan);
-            }
-
-            var dirty = false;
-
-            // Exact float zero
-            var needFlush = flexibleWidth != 0f && IsLeftAligned((int)lineInfo.alignment);
-            if (needFlush)
-            {
-                var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
-                if (text[lastIdx] == '\v')
-                {
-                    text = text.Insert(lastIdx, "</align>");
-                }
-                else
-                {
-                    lastIdx += 1;
-                    text = text.Insert(lastIdx, "</align>\v");
-                }
-
-                if (endMargin != 0f)
-                {
-                    idxs.Insert(0, lastIdx);
-                    kerns.Insert(0, endMargin);
-                    // Prevent ignoring kern at line end
-                    text = text.Insert(lastIdx, "\u00A0");
-                }
-
-                dirty = true;
-            }
-
-            for (var i = 0; i < idxs.Count; ++i)
-            {
-                var kern = kerns[i];
-                // Exact float zero
-                if (kern == 0f)
-                {
-                    kern = flexibleWidth;
-                }
-
-                if (kern != 0f)
-                {
-                    text = text.Insert(idxs[i], GetKernStr(kern));
-                    dirty = true;
-                }
-            }
-
-            if (needFlush)
-            {
-                var firstIdx = characterInfos[lineInfo.firstCharacterIndex].index;
-                text = text.Insert(firstIdx, "<align=\"flush\">");
-            }
-
-            if (dirty)
-            {
-                textInfo = textBox.GetTextInfo(text);
-            }
-        }
-
         // Visible character count is unchanged when typesetting
         private static int GetVisibleCharCountUntil(TMP_TextInfo textInfo, int lineIdx)
         {
@@ -367,11 +397,12 @@ namespace Nova
                             return charInfo.index;
                         }
                     }
+
+                    throw new ArgumentOutOfRangeException();
                 }
             }
 
-            // Should not happen
-            return -1;
+            throw new ArgumentOutOfRangeException();
         }
 
         public static void ApplyKerning(TMP_Text textBox, RectTransform rectTransform, ref string text,
@@ -413,5 +444,17 @@ namespace Nova
                     out canAvoidOrphan);
             }
         }
+
+        // private static void DebugPrint(TMP_TextInfo textInfo, int lineIdx)
+        // {
+        //     var characterInfos = textInfo.characterInfo;
+        //     var lineInfo = textInfo.lineInfo[lineIdx];
+        //     Debug.Log($"{characterInfos[lineInfo.firstVisibleCharacterIndex].character} {lineInfo.length}");
+        //     for (var i = lineInfo.firstCharacterIndex; i <= lineInfo.lastCharacterIndex; ++i)
+        //     {
+        //         var c = characterInfos[i];
+        //         Debug.Log($"{c.character} {c.origin} {c.xAdvance} {c.xAdvance - c.origin} {c.pointSize}");
+        //     }
+        // }
     }
 }

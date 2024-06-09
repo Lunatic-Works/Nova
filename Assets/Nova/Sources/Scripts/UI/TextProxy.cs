@@ -10,6 +10,9 @@ namespace Nova
     [RequireComponent(typeof(TMP_Text))]
     public class TextProxy : UIBehaviour
     {
+        [SerializeField] private bool disableTypeset;
+        private bool lastDisableTypeset;
+
         private TMP_Text textBox;
         private RectTransform rectTransform;
 
@@ -161,6 +164,12 @@ namespace Nova
 
         private void LateUpdate()
         {
+            if (lastDisableTypeset != disableTypeset)
+            {
+                lastDisableTypeset = disableTypeset;
+                needRefreshLineBreak = true;
+            }
+
             Refresh();
         }
 
@@ -177,8 +186,11 @@ namespace Nova
                     textBox.alignment = TextAlignmentOptions.TopJustified;
                 }
 
-                var textInfo = textBox.GetTextInfo(text);
-                TextProxyTypesetter.ApplyKerning(textBox, rectTransform, ref text, ref textInfo);
+                if (!disableTypeset)
+                {
+                    var textInfo = textBox.GetTextInfo(text);
+                    TextProxyTypesetter.ApplyKerning(textBox, rectTransform, ref text, ref textInfo);
+                }
             }
             else
             {
