@@ -268,17 +268,19 @@ namespace Nova
             }
         }
 
-        private static readonly Dictionary<float, string> KernStrCache = new Dictionary<float, string>();
+        private static readonly Dictionary<ValueTuple<string, float>, string> XmlTagCache =
+            new Dictionary<ValueTuple<string, float>, string>();
 
-        private static string GetKernStr(float kern)
+        private static string GetXmlTag(string tag, float num)
         {
-            if (KernStrCache.TryGetValue(kern, out var str))
+            var key = (tag, num);
+            if (XmlTagCache.TryGetValue(key, out var str))
             {
                 return str;
             }
 
-            str = $"<space={kern:F4}em>";
-            KernStrCache[kern] = str;
+            str = $"<{tag}={num:F4}em>";
+            XmlTagCache[key] = str;
             return str;
         }
 
@@ -310,26 +312,21 @@ namespace Nova
             needFlush &= IsLeftAligned((int)lineInfo.alignment);
             if (needFlush)
             {
-                var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
-                if (text[lastIdx] == '\v')
-                {
-                    text = text.Insert(lastIdx, "</align>");
-                }
-                else
-                {
-                    lastIdx += 1;
-                    text = text.Insert(lastIdx, "</align>\v");
-                }
-
+                var tag = "</align>";
                 // Exact float equal
                 if (endMargin != 0f)
                 {
-                    idxs.Insert(0, lastIdx);
-                    kerns.Insert(0, endMargin);
-                    // Prevent ignoring kern at line end
-                    text = text.Insert(lastIdx, "\u00A0");
+                    tag = "</margin>" + tag;
                 }
 
+                var lastIdx = characterInfos[lineInfo.lastCharacterIndex].index;
+                if (text[lastIdx] != '\v')
+                {
+                    lastIdx += 1;
+                    tag += '\v';
+                }
+
+                text = text.Insert(lastIdx, tag);
                 dirty = true;
             }
 
@@ -349,15 +346,22 @@ namespace Nova
                 // Exact float equal
                 if (kern != 0f)
                 {
-                    text = text.Insert(idxs[i], GetKernStr(kern));
+                    text = text.Insert(idxs[i], GetXmlTag("space", kern));
                     dirty = true;
                 }
             }
 
             if (needFlush)
             {
+                var tag = "<align=\"flush\">";
+                // Exact float equal
+                if (endMargin != 0f)
+                {
+                    tag += GetXmlTag("margin-right", endMargin);
+                }
+
                 var firstIdx = characterInfos[lineInfo.firstCharacterIndex].index;
-                text = text.Insert(firstIdx, "<align=\"flush\">");
+                text = text.Insert(firstIdx, tag);
             }
 
             if (dirty)
