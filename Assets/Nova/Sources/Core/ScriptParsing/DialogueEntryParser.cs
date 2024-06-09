@@ -148,6 +148,28 @@ namespace Nova
             }
         }
 
+        private static string AddZeroWidthSpaces(string s)
+        {
+            s = s.Replace(".", ".\u200B");
+            s = s.Replace("-", "-\u200B");
+            s = s.Replace("_", "_\u200B");
+            s = s.Replace("/", "/\u200B");
+            return s;
+        }
+
+        private static string ReplaceMarkdownCode(Match match)
+        {
+            var s = AddZeroWidthSpaces(match.Groups[1].Value);
+            return $"<style=Code>{s}</style>";
+        }
+
+        private static string ReplaceMarkdownLink(Match match)
+        {
+            var s = AddZeroWidthSpaces(match.Groups[1].Value);
+            var t = match.Groups[2].Value;
+            return $"<link=\"{t}\"><style=Link>{s}</style></link>";
+        }
+
         public static IReadOnlyList<DialogueEntry> ParseDialogueEntries(ParsedChunks chunks)
         {
             var codes = new Dictionary<DialogueActionStage, string[]>();
@@ -172,8 +194,8 @@ namespace Nova
                 // Markdown syntaxes used in tutorials
                 // They are not in the NovaScript spec. If they interfere with your scenarios or you have performance concern,
                 // you can comment out them
-                text = MarkdownCodePattern.Replace(text, @"<style=Code>$1</style>");
-                text = MarkdownLinkPattern.Replace(text, @"<link=""$2""><style=Link>$1</style></link>");
+                text = MarkdownCodePattern.Replace(text, ReplaceMarkdownCode);
+                text = MarkdownLinkPattern.Replace(text, ReplaceMarkdownLink);
 
                 // Debug.Log($"text: <color=green>{text}</color>");
 

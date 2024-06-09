@@ -10,7 +10,7 @@ namespace Nova
     {
         private static readonly HashSet<char> ChineseOpeningPunctuations = new HashSet<char>("‘“（【《");
         private static readonly HashSet<char> ChineseClosingPunctuations = new HashSet<char>("，。、；：？！’”）】》");
-        private static readonly HashSet<char> ChineseMiddlePunctuations = new HashSet<char>("….·—⸺");
+        private static readonly HashSet<char> ChineseMiddlePunctuations = new HashSet<char>("….·—-⸺_/");
 
         private static readonly HashSet<char> ChineseFollowingPunctuations =
             new HashSet<char>(ChineseClosingPunctuations.Concat(ChineseMiddlePunctuations));
@@ -19,7 +19,7 @@ namespace Nova
             "0123456789" +
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
             "abcdefghijklmnopqrstuvwxyz" +
-            " ([{<)]}>"
+            " \u200B([{<)]}>"
         );
 
         private static bool IsChineseCharacter(char c)
