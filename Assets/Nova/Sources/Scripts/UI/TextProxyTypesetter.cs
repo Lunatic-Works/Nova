@@ -238,11 +238,15 @@ namespace Nova
             // Evenly distribute flexible width, and add 1 for character spacing
             flexibleWidth = totalFlexibleWidth / (flexibleCount + subRatio * flexibleSubCount + 1);
             flexibleSubWidth = subRatio * flexibleWidth;
+            var charSpaceCount = lineInfo.characterCount - 1;
+            var charSpace = flexibleWidth / charSpaceCount;
 
-            flexibleWidth = RoundKern(Mathf.Clamp(flexibleWidth, -0.3333f, hasAvoidedOrphan ? 0.5f : 0.3333f));
-            flexibleSubWidth = RoundKern(Mathf.Clamp(flexibleSubWidth, 0f, hasAvoidedOrphan ? 0.5f : 0.3333f));
+            flexibleWidth = RoundKern(Mathf.Clamp(flexibleWidth, -0.3333f, hasAvoidedOrphan ? 0.5f : 0.25f));
+            flexibleSubWidth = RoundKern(Mathf.Clamp(flexibleSubWidth, 0f, hasAvoidedOrphan ? 0.5f : 0.25f));
+            charSpace = Mathf.Clamp(charSpace, -0.05f, hasAvoidedOrphan ? 0.1f : 0.05f);
 
-            var newTotalFlexibleWidth = (flexibleCount + 1) * flexibleWidth + flexibleSubCount * flexibleSubWidth;
+            var newTotalFlexibleWidth = flexibleCount * flexibleWidth + flexibleSubCount * flexibleSubWidth +
+                                        charSpaceCount * charSpace;
             endMargin = totalFlexibleWidth - newTotalFlexibleWidth;
 
             // Debug.Log(
@@ -261,7 +265,8 @@ namespace Nova
             }
 
             // When stretching as much as possible, do not consider subRatio
-            if ((totalFlexibleWidth + 1f) / (flexibleCount + flexibleSubCount + 1) > 0.5f)
+            if (totalFlexibleWidth + 1f >
+                flexibleCount * 0.5f + flexibleSubCount * 0.5f + charSpaceCount * 0.1f + 0.25f)
             {
                 // Too much width
                 canAvoidOrphan = false;
