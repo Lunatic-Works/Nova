@@ -127,6 +127,7 @@ namespace Nova
             var leftChar = characterInfos[charIdx].character;
             var leftOpen = ChineseOpeningPunctuations.Contains(leftChar);
             var leftClose = ChineseClosingPunctuations.Contains(leftChar);
+            var leftMiddle = ChineseMiddlePunctuations.Contains(leftChar);
             var leftChinese = IsChineseCharacter(leftChar);
             var leftEnglish = EnglishChars.Contains(leftChar);
             englishCount += leftEnglish ? 1 : 0;
@@ -135,6 +136,7 @@ namespace Nova
                 var rightIdx = leftIdx;
                 var rightOpen = leftOpen;
                 var rightClose = leftClose;
+                var rightMiddle = leftMiddle;
                 var rightChinese = leftChinese;
                 var rightEnglish = leftEnglish;
                 --charIdx;
@@ -142,6 +144,7 @@ namespace Nova
                 leftChar = characterInfos[charIdx].character;
                 leftOpen = ChineseOpeningPunctuations.Contains(leftChar);
                 leftClose = ChineseClosingPunctuations.Contains(leftChar);
+                leftMiddle = ChineseMiddlePunctuations.Contains(leftChar);
                 leftChinese = IsChineseCharacter(leftChar);
                 leftEnglish = EnglishChars.Contains(leftChar);
                 englishCount += leftEnglish ? 1 : 0;
@@ -165,7 +168,9 @@ namespace Nova
                     ++flexibleCount;
                 }
                 else if ((leftEnglish && rightClose) || (leftOpen && rightEnglish) ||
-                         (leftChinese && rightEnglish) || (leftEnglish && rightChinese))
+                         (leftChinese && rightEnglish) || (leftEnglish && rightChinese) ||
+                         (leftChinese && rightMiddle) || (leftMiddle && rightChinese) ||
+                         (leftEnglish && rightMiddle) || (leftMiddle && rightEnglish))
                 {
                     idxs.Add(rightIdx);
                     kerns.Add(FlexibleSubKerning);
@@ -189,6 +194,7 @@ namespace Nova
         private static void GetFlexibleWidth(TMP_Text textBox, RectTransform rectTransform,
             TMP_CharacterInfo[] characterInfos, TMP_LineInfo lineInfo,
             float kernSum, int flexibleCount, int flexibleSubCount, List<float> canAbsorbWidths,
+            bool hasAvoidedOrphan,
             out float flexibleWidth, out float flexibleSubWidth, out float endMargin,
             out bool needFlush, out bool canAvoidOrphan)
         {
@@ -230,12 +236,11 @@ namespace Nova
             }
 
             // Evenly distribute flexible width, and add 1 for character spacing
-            float totalFlexibleCount = flexibleCount + subRatio * flexibleSubCount + 1;
-            flexibleWidth = totalFlexibleWidth / totalFlexibleCount;
+            flexibleWidth = totalFlexibleWidth / (flexibleCount + subRatio * flexibleSubCount + 1);
             flexibleSubWidth = subRatio * flexibleWidth;
 
-            flexibleWidth = RoundKern(Mathf.Clamp(flexibleWidth, -0.3333f, 0.5f));
-            flexibleSubWidth = RoundKern(Mathf.Clamp(flexibleSubWidth, 0f, 0.5f));
+            flexibleWidth = RoundKern(Mathf.Clamp(flexibleWidth, -0.3333f, hasAvoidedOrphan ? 0.5f : 0.3333f));
+            flexibleSubWidth = RoundKern(Mathf.Clamp(flexibleSubWidth, 0f, hasAvoidedOrphan ? 0.5f : 0.3333f));
 
             var newTotalFlexibleWidth = (flexibleCount + 1) * flexibleWidth + flexibleSubCount * flexibleSubWidth;
             endMargin = totalFlexibleWidth - newTotalFlexibleWidth;
@@ -255,7 +260,8 @@ namespace Nova
                 endMargin = RoundKern(endMargin);
             }
 
-            if ((totalFlexibleWidth + 1f) / totalFlexibleCount > 1f)
+            // When stretching as much as possible, do not consider subRatio
+            if ((totalFlexibleWidth + 1f) / (flexibleCount + flexibleSubCount + 1) > 0.5f)
             {
                 // Too much width
                 canAvoidOrphan = false;
@@ -280,7 +286,7 @@ namespace Nova
         // and before each opening punctuation at line beginning if left aligned
         private static void ApplyKerningLine(TMP_Text textBox, RectTransform rectTransform,
             ref string text, ref TMP_TextInfo textInfo, int lineIdx,
-            List<int> idxs, List<float> kerns, List<float> canAbsorbWidths,
+            List<int> idxs, List<float> kerns, List<float> canAbsorbWidths, bool hasAvoidedOrphan,
             out bool canAvoidOrphan)
         {
             var characterInfos = textInfo.characterInfo;
@@ -296,7 +302,7 @@ namespace Nova
             if (lineIdx < textInfo.lineCount - 1)
             {
                 GetFlexibleWidth(textBox, rectTransform, characterInfos, lineInfo,
-                    kernSum, flexibleCount, flexibleSubCount, canAbsorbWidths,
+                    kernSum, flexibleCount, flexibleSubCount, canAbsorbWidths, hasAvoidedOrphan,
                     out flexibleWidth, out flexibleSubWidth, out endMargin, out needFlush, out canAvoidOrphan);
             }
 
@@ -358,6 +364,23 @@ namespace Nova
             {
                 textInfo = textBox.GetTextInfo(text);
             }
+        }
+
+        private static bool IsFirstLineOfParagraph(TMP_TextInfo textInfo, int lineIdx)
+        {
+            if (lineIdx == 0)
+            {
+                return true;
+            }
+
+            var characterInfos = textInfo.characterInfo;
+            var lastLineInfo = textInfo.lineInfo[lineIdx - 1];
+            if (characterInfos[lastLineInfo.lastCharacterIndex].character == '\n')
+            {
+                return true;
+            }
+
+            return false;
         }
 
         // If the last line is one Chinese character and some (or zero) Chinese punctuations,
@@ -485,7 +508,15 @@ namespace Nova
                 var oldText = text;
                 var canAbsorbWidths = GetCanAbsorbWidths(textBox, textInfo, lineIdx + 1);
                 ApplyKerningLine(textBox, rectTransform, ref text, ref textInfo, lineIdx, idxs, kerns, canAbsorbWidths,
-                    out var canAvoidOrphan);
+                    false, out var canAvoidOrphan);
+
+                // If first line, allow more end margin
+                var isFirstLine = IsFirstLineOfParagraph(textInfo, lineIdx);
+                if (isFirstLine)
+                {
+                    canAvoidOrphan = true;
+                }
+
                 if (!canAvoidOrphan)
                 {
                     continue;
@@ -508,7 +539,7 @@ namespace Nova
                 text = text.Insert(idx, "\v");
                 textInfo = textBox.GetTextInfo(text);
                 ApplyKerningLine(textBox, rectTransform, ref text, ref textInfo, lineIdx, idxs, kerns, canAbsorbWidths,
-                    out canAvoidOrphan);
+                    !isFirstLine, out canAvoidOrphan);
             }
         }
 
