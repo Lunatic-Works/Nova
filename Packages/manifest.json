@@ -1,8 +1,8 @@
 {
   "scopedRegistries": [
     {
-      "name": "package.openupm.cn",
-      "url": "https://package.openupm.cn",
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
       "scopes": [
         "me.qiankanglai.loopscrollrect"
       ]

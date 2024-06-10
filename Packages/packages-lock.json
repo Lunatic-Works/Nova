@@ -142,7 +142,7 @@
       "dependencies": {
         "com.unity.ugui": "1.0.0"
       },
-      "url": "https://package.openupm.cn"
+      "url": "https://package.openupm.com"
     },
     "com.unity.modules.animation": {
       "version": "1.0.0",

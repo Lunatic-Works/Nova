@@ -25,9 +25,9 @@ MonoBehaviour:
     m_IsDefault: 1
     m_Capabilities: 7
     m_ConfigSource: 0
-  - m_Id: scoped:project:package.openupm.cn
-    m_Name: package.openupm.cn
-    m_Url: https://package.openupm.cn
+  - m_Id: scoped:project:package.openupm.com
+    m_Name: package.openupm.com
+    m_Url: https://package.openupm.com
     m_Scopes:
     - me.qiankanglai.loopscrollrect
     m_IsDefault: 0
@@ -38,17 +38,17 @@ MonoBehaviour:
   m_RegistryInfoDraft:
     m_ErrorMessage: 
     m_Original:
-      m_Id: scoped:project:package.openupm.cn
-      m_Name: package.openupm.cn
-      m_Url: https://package.openupm.cn
+      m_Id: scoped:project:package.openupm.com
+      m_Name: package.openupm.com
+      m_Url: https://package.openupm.com
       m_Scopes:
       - me.qiankanglai.loopscrollrect
       m_IsDefault: 0
       m_Capabilities: 0
       m_ConfigSource: 4
     m_Modified: 0
-    m_Name: package.openupm.cn
-    m_Url: https://package.openupm.cn
+    m_Name: package.openupm.com
+    m_Url: https://package.openupm.com
     m_Scopes:
     - me.qiankanglai.loopscrollrect
     m_SelectedScopeIndex: 0
