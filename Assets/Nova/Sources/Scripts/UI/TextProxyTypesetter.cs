@@ -437,14 +437,19 @@ namespace Nova
                 return false;
             }
 
-            var lastChar = characterInfos[lineInfo.lastCharacterIndex].character;
-            if (lastChar == '\v')
+            var lastCharIdx = lineInfo.lastCharacterIndex;
+            if (characterInfos[lastCharIdx].character == '\v')
             {
-                lastChar = characterInfos[lineInfo.lastCharacterIndex - 1].character;
+                --lastCharIdx;
             }
 
             // If the line ends with hard line break, lastChar will be \n
-            if (!IsChineseCharacter(lastChar))
+            if (!IsChineseCharacter(characterInfos[lastCharIdx].character))
+            {
+                return false;
+            }
+
+            if (ChineseOpeningPunctuations.Contains(characterInfos[lastCharIdx - 1].character))
             {
                 return false;
             }
