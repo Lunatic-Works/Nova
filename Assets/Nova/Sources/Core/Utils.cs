@@ -222,6 +222,20 @@ namespace Nova
             return float.IsNaN(a) ? 0.0f : a;
         }
 
+        // Returns true if a.Equals(b) or |a - b|^2 < eps.
+        // Addressing the case where Infinity is present.
+        public static bool ApproxEquals(this Vector2 a, Vector2 b, float eps = 1e-6f)
+        {
+            return a.Equals(b) || (a - b).sqrMagnitude < eps;
+        }
+
+        // Returns true if a.Equals(b) or |a - b|^2 < eps.
+        // Addressing the case where Infinity is present.
+        public static bool ApproxEquals(this Vector3 a, Vector3 b, float eps = 1e-6f)
+        {
+            return a.Equals(b) || (a - b).sqrMagnitude < eps;
+        }
+
         public static Vector2 CloneScale(this Vector2 a, Vector2 b)
         {
             Vector2 result = a;
@@ -342,7 +356,7 @@ namespace Nova
 
         public static bool IsNotNullOrDestroyed(this object x)
         {
-            if (x is UnityEngine.Object o)
+            if (x is UnityObject o)
             {
                 return o != null;
             }

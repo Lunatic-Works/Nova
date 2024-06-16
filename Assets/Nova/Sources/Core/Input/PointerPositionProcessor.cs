@@ -28,7 +28,7 @@ namespace Nova
         // Valid even if the cursor is hidden
         public override Vector2 Process(Vector2 value, InputControl control)
         {
-            if (!RealInput.Focused)
+            if (!RealInput.Focused || CursorManager.UsingKeyboard)
             {
                 return Vector2.positiveInfinity;
             }

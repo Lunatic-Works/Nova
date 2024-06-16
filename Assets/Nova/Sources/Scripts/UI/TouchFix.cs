@@ -14,11 +14,11 @@ namespace Nova
     {
         private const float MaxIdleTime = 0.2f;
 
-        public static bool UsingTouch;
+        public static bool IsTouchPressed;
 
         public static bool IsTouch(ExtendedPointerEventData eventData)
         {
-            return UsingTouch || eventData.pointerType == UIPointerType.Touch;
+            return IsTouchPressed || eventData?.pointerType == UIPointerType.Touch;
         }
 
         private bool inited;
@@ -53,9 +53,9 @@ namespace Nova
 
         private void OnFingerDown(Finger finger)
         {
-            if (!UsingTouch)
+            if (!IsTouchPressed)
             {
-                UsingTouch = true;
+                IsTouchPressed = true;
                 idleTime = 0.0f;
             }
         }
@@ -74,12 +74,12 @@ namespace Nova
 
             if (Touch.activeTouches.Count == 0)
             {
-                if (UsingTouch)
+                if (IsTouchPressed)
                 {
                     idleTime += Time.unscaledDeltaTime;
                     if (idleTime > MaxIdleTime)
                     {
-                        UsingTouch = false;
+                        IsTouchPressed = false;
                     }
                 }
             }
