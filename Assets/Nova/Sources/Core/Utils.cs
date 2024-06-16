@@ -222,6 +222,21 @@ namespace Nova
             return float.IsNaN(a) ? 0.0f : a;
         }
 
+        public static bool IsFinite(this float a)
+        {
+            return !float.IsInfinity(a);
+        }
+
+        public static bool IsFinite(this Vector2 a)
+        {
+            return a.x.IsFinite() && a.y.IsFinite();
+        }
+
+        public static bool IsFinite(this Vector3 a)
+        {
+            return a.x.IsFinite() && a.y.IsFinite() && a.z.IsFinite();
+        }
+
         // Returns true if a.Equals(b) or |a - b|^2 < eps.
         // Addressing the case where Infinity is present.
         public static bool ApproxEquals(this Vector2 a, Vector2 b, float eps = 1e-6f)

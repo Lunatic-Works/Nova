@@ -229,7 +229,8 @@ namespace Nova
             {
                 buttonRingTrigger.NoShowIfPointerMoved();
 
-                if (gameViewController.TryClickLink(RealInput.pointerPosition, UICameraHelper.Active))
+                if (RealInput.pointerPosition.IsFinite() &&
+                    gameViewController.TryClickLink(RealInput.pointerPosition, UICameraHelper.Active))
                 {
                     return;
                 }
