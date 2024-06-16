@@ -24,6 +24,7 @@ namespace Nova
         private SaveViewController saveViewController;
         private LogController logController;
         private ConfigViewController configViewController;
+        private ChoicesController choicesController;
 
         private void Awake()
         {
@@ -38,6 +39,7 @@ namespace Nova
             saveViewController = viewManager.GetController<SaveViewController>();
             logController = viewManager.GetController<LogController>();
             configViewController = viewManager.GetController<ConfigViewController>();
+            choicesController = GetComponentInChildren<ChoicesController>(true);
 
             LuaRuntime.Instance.BindObject("gameViewInput", this);
             gameState.AddRestorable(this);
@@ -163,6 +165,8 @@ namespace Nova
                     HandleShortcutWhenDialogueHidden();
                 }
             }
+
+            choicesController.buttonsEnabled = !buttonRingTrigger.buttonShowing;
         }
 
         [HideInInspector] public RightButtonAction rightButtonAction;

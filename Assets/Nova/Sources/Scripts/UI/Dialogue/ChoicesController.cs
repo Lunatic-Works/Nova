@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Nova
 {
@@ -11,7 +12,30 @@ namespace Nova
         [SerializeField] private string imageFolder;
 
         private GameState gameState;
-        [HideInInspector] public int activeChoiceCount;
+
+        private Button[] buttons;
+        public int activeChoiceCount { get; private set; }
+
+        private bool _buttonsEnabled = true;
+
+        public bool buttonsEnabled
+        {
+            get => _buttonsEnabled;
+            set
+            {
+                if (buttons == null || value == _buttonsEnabled)
+                {
+                    return;
+                }
+
+                foreach (var button in buttons)
+                {
+                    button.enabled = value;
+                }
+
+                _buttonsEnabled = value;
+            }
+        }
 
         private void Awake()
         {
@@ -57,6 +81,7 @@ namespace Nova
                 button.gameObject.SetActive(true);
             }
 
+            buttons = GetComponentsInChildren<Button>();
             activeChoiceCount = choices.Count;
         }
 
@@ -84,6 +109,8 @@ namespace Nova
             {
                 backPanel.SetActive(false);
             }
+
+            buttons = null;
         }
     }
 }
