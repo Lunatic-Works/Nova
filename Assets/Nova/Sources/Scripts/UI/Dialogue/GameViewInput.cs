@@ -59,6 +59,7 @@ namespace Nova
             if (inputManager.IsTriggered(AbstractKey.StepForward))
             {
                 ClickForward();
+                return;
             }
 
             if (inputManager.fastForwardShortcutEnabled)
@@ -75,51 +76,61 @@ namespace Nova
             if (inputManager.IsTriggered(AbstractKey.Auto))
             {
                 dialogueState.state = dialogueState.isAuto ? DialogueState.State.Normal : DialogueState.State.Auto;
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.Save))
             {
                 saveViewController.ShowSave();
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.Load))
             {
                 saveViewController.ShowLoad();
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.QuickSave))
             {
                 saveViewController.QuickSaveBookmarkWithAlert();
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.QuickLoad))
             {
                 saveViewController.QuickLoadBookmarkWithAlert();
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
                 gameViewController.HideUI();
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.ShowLog))
             {
                 logController.Show();
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.ShowConfig))
             {
                 configViewController.Show();
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.ReturnTitle))
             {
                 ReturnTitleWithAlert();
+                return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.QuitGame))
             {
                 Utils.QuitWithAlert();
+                return;
             }
         }
 
