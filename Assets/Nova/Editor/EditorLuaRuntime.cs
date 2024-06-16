@@ -29,8 +29,6 @@ namespace Nova.Editor
 
         private void InitLua()
         {
-            Debug.Log($"InitLua {lua}");
-
             if (lua == null)
             {
                 lua = new LuaState();
@@ -41,8 +39,6 @@ namespace Nova.Editor
 
         private void DisposeLua()
         {
-            Debug.Log($"DisposeLua {lua}");
-
             if (lua != null)
             {
                 lua.Dispose();
