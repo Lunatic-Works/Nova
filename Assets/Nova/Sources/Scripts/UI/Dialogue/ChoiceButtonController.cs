@@ -7,6 +7,8 @@ namespace Nova
 {
     public class ChoiceButtonController : MonoBehaviour
     {
+        private const float MaxIdleTime = 0.5f;
+
         public Text text;
         public Image image;
         public Button button;
@@ -14,6 +16,9 @@ namespace Nova
         private Dictionary<SystemLanguage, string> displayTexts;
         private ChoiceImageInformation imageInfo;
         private string imageFolder;
+
+        private bool allowClick;
+        private float idleTime;
 
         public void Init(Dictionary<SystemLanguage, string> displayTexts, ChoiceImageInformation imageInfo,
             string imageFolder, UnityAction onClick, bool interactable)
@@ -36,8 +41,19 @@ namespace Nova
 
             UpdateText();
 
-            button.onClick.AddListener(onClick);
+            button.onClick.AddListener(() =>
+            {
+                if (CursorManager.UsingKeyboard || allowClick)
+                {
+                    onClick?.Invoke();
+                }
+
+                idleTime = 0f;
+            });
+
             button.interactable = interactable;
+            allowClick = false;
+            idleTime = 0f;
         }
 
         private void UpdateText()
@@ -68,6 +84,23 @@ namespace Nova
         private void OnDisable()
         {
             I18n.LocaleChanged.RemoveListener(UpdateText);
+        }
+
+        private void Update()
+        {
+            if (CursorManager.MovedLastFrame)
+            {
+                allowClick = true;
+            }
+
+            if (!allowClick)
+            {
+                idleTime += Time.deltaTime;
+                if (idleTime > MaxIdleTime)
+                {
+                    allowClick = true;
+                }
+            }
         }
     }
 }
