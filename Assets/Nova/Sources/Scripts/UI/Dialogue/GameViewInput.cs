@@ -74,7 +74,7 @@ namespace Nova
 
             if (inputManager.IsTriggered(AbstractKey.Auto))
             {
-                dialogueState.state = DialogueState.State.Auto;
+                dialogueState.state = dialogueState.isAuto ? DialogueState.State.Normal : DialogueState.State.Auto;
             }
 
             if (inputManager.IsTriggered(AbstractKey.Save))
