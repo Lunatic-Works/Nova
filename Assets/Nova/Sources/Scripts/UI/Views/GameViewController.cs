@@ -123,6 +123,11 @@ namespace Nova
 
         public void ForceStep()
         {
+            if (gameState.isRestoring || gameState.isUpgrading || !dialogueState.isNormal)
+            {
+                return;
+            }
+
             NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
             gameState.Step();
         }
