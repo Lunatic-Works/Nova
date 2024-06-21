@@ -307,8 +307,6 @@ namespace Nova
             if (scroll > 0)
             {
                 dialogueState.state = DialogueState.State.Normal;
-                // TODO: Should we abort animation here?
-                gameViewController.AbortAnimation(false);
                 logController.Show();
             }
             else

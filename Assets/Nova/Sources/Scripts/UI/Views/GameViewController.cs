@@ -108,16 +108,23 @@ namespace Nova
 
         public void AbortAnimation(bool perDialogue)
         {
-            if (currentDialogueBox?.active ?? false)
+            var dirty = false;
+            if (currentDialogueBox != null)
             {
                 NovaAnimation.StopAll(AnimationType.Text);
-                currentDialogueBox?.ShowDialogueFinishIcon(true);
+                dirty = true;
             }
 
             if (perDialogue)
             {
                 NovaAnimation.StopAll(AnimationType.PerDialogue);
                 currentDialogueBox?.AbortTextAnimationDelay();
+                dirty = true;
+            }
+
+            if (dirty)
+            {
+                dialogueTime = timeAfterDialogueChange + GetDialogueTimeTextVoice();
             }
         }
 
