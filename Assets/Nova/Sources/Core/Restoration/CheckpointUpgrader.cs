@@ -107,6 +107,11 @@ namespace Nova
                     }
                 }
             }
+            else
+            {
+                // just save this record with new child and sibling
+                checkpointManager.UpdateNodeRecord(nodeRecord);
+            }
 
             if (needResetParent)
             {

@@ -371,6 +371,11 @@ namespace Nova
             return changedNode;
         }
 
+        public void UpdateNodeRecord(NodeRecord nodeRecord)
+        {
+            serializer.UpdateNodeRecord(nodeRecord);
+        }
+
         public long UpgradeNodeRecord(NodeRecord nodeRecord, int beginDialogue)
         {
             var beginCheckpoint = GetCheckpoint(NextRecord(nodeRecord.offset));
