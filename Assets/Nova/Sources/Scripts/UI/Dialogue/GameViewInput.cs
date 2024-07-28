@@ -83,54 +83,63 @@ namespace Nova
 
             if (inputManager.IsTriggered(AbstractKey.Save))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 saveViewController.ShowSave();
                 return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.Load))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 saveViewController.ShowLoad();
                 return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.QuickSave))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 saveViewController.QuickSaveBookmarkWithAlert();
                 return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.QuickLoad))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 saveViewController.QuickLoadBookmarkWithAlert();
                 return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.ToggleDialogue))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 gameViewController.HideUI();
                 return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.ShowLog))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 logController.Show();
                 return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.ShowConfig))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 configViewController.Show();
                 return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.ReturnTitle))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 ReturnTitleWithAlert();
                 return;
             }
 
             if (inputManager.IsTriggered(AbstractKey.QuitGame))
             {
+                dialogueState.state = DialogueState.State.Normal;
                 Utils.QuitWithAlert();
                 return;
             }
@@ -319,7 +328,7 @@ namespace Nova
         [HideInInspector] public bool canAbortAnimation = true;
         [HideInInspector] public bool scriptCanAbortAnimation = true;
 
-        public void ClickForward()
+        private void ClickForward()
         {
             if (!canClickForward)
             {

@@ -208,7 +208,6 @@ namespace Nova
                 var text = logEntries[i].displayData.FormatNameDialogue();
                 var height = contentForTest.GetPreferredHeight(text, contentDefaultWidth);
                 var prefixHeight = height + (i > 0 ? logEntries[i - 1].prefixHeight : 0);
-
                 logEntries[i].height = height;
                 logEntries[i].prefixHeight = prefixHeight;
             }

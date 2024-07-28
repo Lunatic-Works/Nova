@@ -168,13 +168,10 @@ namespace Nova
 
         private void OnDestroy()
         {
-            gameState.RemoveRestorable(this);
-        }
-
-        private void OnDisable()
-        {
-            StopAllCoroutines();
-            dialogueState.state = DialogueState.State.Normal;
+            if (!string.IsNullOrEmpty(luaGlobalName))
+            {
+                gameState.RemoveRestorable(this);
+            }
         }
 
         public void ShowDialogueFinishIcon(bool to)
