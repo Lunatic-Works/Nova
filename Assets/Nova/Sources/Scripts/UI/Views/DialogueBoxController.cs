@@ -161,6 +161,9 @@ namespace Nova
                 gameState.AddRestorable(this);
             }
 
+            gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
+            gameState.choiceOccurs.AddListener(OnChoiceOccurs);
+
             this.HideImmediate();
 
             return false;
@@ -172,6 +175,9 @@ namespace Nova
             {
                 gameState.RemoveRestorable(this);
             }
+
+            gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
+            gameState.choiceOccurs.RemoveListener(OnChoiceOccurs);
         }
 
         public void ShowDialogueFinishIcon(bool to)
@@ -179,9 +185,14 @@ namespace Nova
             dialogueFinishIcon.SetActive(to);
         }
 
-        public void OnDialogueWillChange()
+        private void OnDialogueWillChange()
         {
             ResetTextAnimationConfig();
+            ShowDialogueFinishIcon(false);
+        }
+
+        private void OnChoiceOccurs(ChoiceOccursData _)
+        {
             ShowDialogueFinishIcon(false);
         }
 

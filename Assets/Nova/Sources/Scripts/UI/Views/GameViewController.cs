@@ -44,6 +44,7 @@ namespace Nova
         {
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.dialogueChanged.AddListener(OnDialogueChanged);
+            gameState.choiceOccurs.AddListener(OnChoiceOccurs);
             gameState.routeEnded.AddListener(OnRouteEnded);
 
             dialogueState.autoModeStarts.AddListener(OnAutoModeStarts);
@@ -56,6 +57,7 @@ namespace Nova
         {
             gameState.dialogueWillChange.RemoveListener(OnDialogueWillChange);
             gameState.dialogueChanged.RemoveListener(OnDialogueChanged);
+            gameState.choiceOccurs.RemoveListener(OnChoiceOccurs);
             gameState.routeEnded.RemoveListener(OnRouteEnded);
 
             dialogueState.autoModeStarts.RemoveListener(OnAutoModeStarts);
@@ -102,6 +104,7 @@ namespace Nova
         {
             if (currentDialogueBox == null || !currentDialogueBox.Forward())
             {
+                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 gameState.Step();
             }
         }
@@ -109,7 +112,7 @@ namespace Nova
         public void AbortAnimation(bool perDialogue)
         {
             var dirty = false;
-            if (currentDialogueBox != null)
+            if (currentDialogueBox != null && currentDialogueBox.active)
             {
                 NovaAnimation.StopAll(AnimationType.Text);
                 dirty = true;
@@ -142,7 +145,7 @@ namespace Nova
         // TODO: Should enumerate all dialogue boxes
         public bool TryClickLink(Vector3 position, Camera camera)
         {
-            if (currentDialogueBox == null)
+            if (currentDialogueBox == null || !currentDialogueBox.active)
             {
                 return false;
             }
@@ -168,25 +171,25 @@ namespace Nova
         public float fastForwardDelay { get; set; }
         private float timeAfterDialogueChange;
         private float dialogueTime = float.MaxValue;
-        private bool dialogueAvailable;
+        private bool timerStarted;
 
         private void StopTimer()
         {
             timeAfterDialogueChange = 0f;
-            dialogueAvailable = false;
+            timerStarted = false;
         }
 
         private void RestartTimer()
         {
             timeAfterDialogueChange = 0f;
-            dialogueAvailable = true;
+            timerStarted = true;
         }
 
         private Coroutine scheduledStepCoroutine;
 
         private void TrySchedule(float scheduledDelay)
         {
-            if (dialogueAvailable)
+            if (timerStarted)
             {
                 scheduledStepCoroutine = StartCoroutine(ScheduledStep(scheduledDelay));
             }
@@ -201,7 +204,7 @@ namespace Nova
 
         private IEnumerator ScheduledStep(float scheduledDelay)
         {
-            this.RuntimeAssert(dialogueAvailable, "Dialogue not available when scheduling a step for it.");
+            this.RuntimeAssert(timerStarted, "Timer not started when scheduling a step for it.");
 
             while (scheduledDelay > timeAfterDialogueChange)
             {
@@ -279,15 +282,16 @@ namespace Nova
 
         protected override void Update()
         {
-            if (viewManager.currentView == CurrentViewType.Game && dialogueAvailable)
+            if (viewManager.currentView != CurrentViewType.Game || !timerStarted)
             {
-                timeAfterDialogueChange += Time.deltaTime;
+                return;
+            }
 
-                if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown &&
-                    dialogueState.isNormal && timeAfterDialogueChange > dialogueTime)
-                {
-                    currentDialogueBox.ShowDialogueFinishIcon(true);
-                }
+            timeAfterDialogueChange += Time.deltaTime;
+            if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown &&
+                dialogueState.isNormal && timeAfterDialogueChange > dialogueTime)
+            {
+                currentDialogueBox.ShowDialogueFinishIcon(true);
             }
         }
 
@@ -295,8 +299,6 @@ namespace Nova
         {
             StopTimer();
             autoTimeOverride = -1f;
-            // TODO: Call OnDialogueWillChange for each currentDialogueBox
-            currentDialogueBox?.OnDialogueWillChange();
         }
 
         private void OnDialogueChanged(DialogueChangedData dialogueData)
@@ -305,6 +307,11 @@ namespace Nova
             currentDialogueBox?.DisplayDialogue(dialogueData.displayData);
             SetSchedule();
             dialogueTime = GetDialogueTimeTextVoice();
+        }
+
+        private void OnChoiceOccurs(ChoiceOccursData _)
+        {
+            StopTimer();
         }
 
         private void OnRouteEnded(RouteEndedData routeEndedData)
