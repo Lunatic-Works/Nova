@@ -21,6 +21,7 @@ namespace Nova
         private CheckpointManager checkpointManager;
         private NovaAnimation novaAnimation;
         private int unlockedStartCount;
+        private bool bgmNeedFadeOut;
 
         protected override void Awake()
         {
@@ -55,8 +56,9 @@ namespace Nova
 
         public override void Hide(bool doTransition, Action onFinish)
         {
-            if (bgmController != null && !string.IsNullOrEmpty(bgmName))
+            if (bgmNeedFadeOut && bgmController != null && !string.IsNullOrEmpty(bgmName))
             {
+                bgmNeedFadeOut = false;
                 novaAnimation.Then(new VolumeAnimationProperty(bgmController, 0.0f), bgmFadeOutDuration)
                     .Then(new ActionAnimationProperty(bgmController.Stop));
             }
@@ -102,6 +104,11 @@ namespace Nova
                     configManager.SetInt(SelectChapterFirstShownKey, 1);
                 }
             }
+        }
+
+        public void ScheduleBgmFadeOut()
+        {
+            bgmNeedFadeOut = true;
         }
     }
 }

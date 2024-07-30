@@ -87,6 +87,7 @@ namespace Nova
 
         public void GameStart(string nodeName)
         {
+            viewManager.GetController<TitleController>().ScheduleBgmFadeOut();
             viewManager.SwitchView<TitleController, GameViewController>(() => { gameState.GameStart(nodeName); });
         }
 
