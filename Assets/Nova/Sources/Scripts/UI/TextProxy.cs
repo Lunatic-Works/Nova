@@ -243,13 +243,18 @@ namespace Nova
         public float GetFirstCharacterCenterY()
         {
             var textInfo = textBox.textInfo;
-            if (textInfo.characterCount <= 0)
+            if (textInfo.lineCount <= 0)
             {
                 return 0f;
             }
 
             var lineInfo = textInfo.lineInfo[0];
-            var characterInfo = textInfo.characterInfo[0];
+            if (lineInfo.characterCount <= 0)
+            {
+                return 0f;
+            }
+
+            var characterInfo = textInfo.characterInfo[lineInfo.firstCharacterIndex];
             var y = -lineInfo.ascender + (characterInfo.ascender + characterInfo.descender) / 2;
             return y;
         }
