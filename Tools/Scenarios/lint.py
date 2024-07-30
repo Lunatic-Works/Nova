@@ -138,7 +138,7 @@ def check_dialogue(chara_name, dialogue, line_num):
             print_warn(line_num, "quote with single colon")
 
     # if len(dialogue) > 54:
-    #     print(f'Line {line_num}: dialogue longer than 54 chars')
+    #     print_warn(line_num, "dialogue longer than 54 chars")
 
     if any(x in dialogue for x in ",.?!;:'\"()"):
         print_warn(line_num, "half width punctuation in dialogue")
