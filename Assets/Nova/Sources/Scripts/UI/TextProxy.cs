@@ -374,5 +374,11 @@ namespace Nova
             needRefreshLineBreak = false;
             needRefreshFade = false;
         }
+
+        public void ForceRefresh()
+        {
+            Init();
+            Refresh();
+        }
     }
 }

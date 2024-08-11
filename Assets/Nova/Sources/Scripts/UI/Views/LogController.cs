@@ -153,6 +153,7 @@ namespace Nova
             }
 
             contentForTest.GetComponent<FontSizeReader>().UpdateValue();
+            contentForTest.ForceRefresh();
         }
 
         private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,

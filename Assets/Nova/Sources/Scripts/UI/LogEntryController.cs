@@ -7,8 +7,10 @@ namespace Nova
     public class LogEntryController : MonoBehaviour
     {
         private TextProxy textProxy;
+        private RectTransform buttonsRectTransform;
+        private float buttonsOffsetMinX;
+        private float buttonsOffsetMaxX;
         private Button goBackButton;
-        private RectTransform buttons;
         private Button playVoiceButton;
         private DialogueDisplayData displayData;
         public float height { get; private set; }
@@ -19,9 +21,11 @@ namespace Nova
             if (inited) return;
             textProxy = transform.Find("Text").GetComponent<TextProxy>();
             textProxy.Init();
+            buttonsRectTransform = transform.Find("Buttons").GetComponent<RectTransform>();
+            buttonsOffsetMinX = buttonsRectTransform.offsetMin.x;
+            buttonsOffsetMaxX = buttonsRectTransform.offsetMax.x;
             goBackButton = transform.Find("Text/GoBackButton").GetComponent<Button>();
-            buttons = transform.Find("Buttons").GetComponent<RectTransform>();
-            playVoiceButton = buttons.Find("PlayVoiceButton").GetComponent<Button>();
+            playVoiceButton = buttonsRectTransform.Find("PlayVoiceButton").GetComponent<Button>();
             inited = true;
         }
 
@@ -55,6 +59,8 @@ namespace Nova
             this.height = height;
         }
 
+        private bool needUpdateButtonsPosition;
+
         // OnEnable and I18n.LocaleChanged are handled by LogController
         private void UpdateText()
         {
@@ -67,15 +73,15 @@ namespace Nova
             }
         }
 
-        bool needUpdateButtonsPosition;
-
         private void LateUpdate()
         {
             if (needUpdateButtonsPosition)
             {
-                float y = textProxy.GetFirstCharacterCenterY();
-                buttons.offsetMin = new Vector2(0f, y);
-                buttons.offsetMax = new Vector2(100f, y);
+                textProxy.GetComponent<FontSizeReader>().UpdateValue();
+                textProxy.ForceRefresh();
+                var y = textProxy.GetFirstCharacterCenterY();
+                buttonsRectTransform.offsetMin = new Vector2(buttonsOffsetMinX, y);
+                buttonsRectTransform.offsetMax = new Vector2(buttonsOffsetMaxX, y);
                 needUpdateButtonsPosition = false;
             }
         }
