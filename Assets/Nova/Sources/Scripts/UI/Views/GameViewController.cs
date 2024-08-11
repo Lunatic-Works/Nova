@@ -133,7 +133,8 @@ namespace Nova
 
         public void ForceStep()
         {
-            if (gameState.isRestoring || gameState.isUpgrading || !dialogueState.isNormal)
+            if (gameState.isRestoring || gameState.isUpgrading || !dialogueState.isNormal ||
+                NovaAnimation.StopAllCount > 0)
             {
                 return;
             }
