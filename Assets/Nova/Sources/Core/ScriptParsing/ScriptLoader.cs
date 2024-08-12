@@ -74,7 +74,6 @@ namespace Nova
 
         public void ForceInit(string path)
         {
-            currentNode = null;
             stateLocale = I18n.DefaultLocale;
 
             DialogueEntryPreprocessor.ClearPatterns();
@@ -134,11 +133,6 @@ namespace Nova
             Utils.RuntimeAssert(inited, "ScriptLoader methods should be called after Init.");
         }
 
-        /// <summary>
-        /// Get the flow chart graph.
-        /// </summary>
-        /// <remarks>This method should be called after init</remarks>
-        /// <returns>The flow chart graph</returns>
         public FlowChartGraph GetFlowChartGraph()
         {
             CheckInit();
@@ -155,11 +149,9 @@ namespace Nova
             return Utils.HashList(nodeChunks.SelectMany(chunk => chunk.SelectMany(block => block.ToList())));
         }
 
-        /// <summary>
-        /// Parse the given TextAsset to chunks and add them to currentNode.
-        /// </summary>
         private void ParseScript(TextAsset script, bool deferChunks = false)
         {
+            currentNode = null;
             LuaRuntime.Instance.GetFunction("action_new_file").Call(script.name);
 
             var chunks = Parser.Parser.ParseChunks(script.text);
@@ -171,6 +163,11 @@ namespace Nova
                 {
                     if (nodeChunks.Count > 0)
                     {
+                        if (currentNode == null)
+                        {
+                            throw new ArgumentException($"Nova: Text outside node when parsing {script.name}");
+                        }
+
                         if (stateLocale == I18n.DefaultLocale)
                         {
                             currentNode.textHash = GetNodeHash(nodeChunks);
@@ -199,11 +196,6 @@ namespace Nova
 
         private void AddDialogueChunks(ParsedChunks chunks)
         {
-            if (currentNode == null)
-            {
-                throw new ArgumentException("Nova: Dangling node text.");
-            }
-
             if (stateLocale == I18n.DefaultLocale)
             {
                 var entries = DialogueEntryParser.ParseDialogueEntries(chunks);
@@ -244,9 +236,6 @@ namespace Nova
             node.Freeze();
         }
 
-        /// <summary>
-        /// Bind all lazy binding entries
-        /// </summary>
         private void BindAllLazyBindingEntries()
         {
             foreach (var entry in lazyBindingLinks)
@@ -258,13 +247,26 @@ namespace Nova
             lazyBindingLinks.Clear();
         }
 
-        /// <summary>
-        /// Execute code in the eager execution block
-        /// </summary>
-        /// <param name="eagerExecutionBlockCode"></param>
         private static void DoEagerExecutionBlock(string eagerExecutionBlockCode)
         {
             LuaRuntime.Instance.DoString(eagerExecutionBlockCode);
+        }
+
+        private void CheckCurrentNode()
+        {
+            if (currentNode == null)
+            {
+                throw new ArgumentException("Nova: This function should be called after registering the current node.");
+            }
+        }
+
+        private void CheckCurrentNodeDefaultLocale()
+        {
+            CheckCurrentNode();
+            if (stateLocale != I18n.DefaultLocale)
+            {
+                throw new ArgumentException($"Nova: This function should be called in default locale. currentNode: {currentNode.name}");
+            }
         }
 
         #region Methods called by external scripts
@@ -280,16 +282,14 @@ namespace Nova
         /// <param name="displayName">Displayed name of the new node</param>
         public void RegisterNewNode(string name, string displayName)
         {
-            var nextNode = new FlowChartNode(name);
-            if (currentNode != null && currentNode.type == FlowChartNodeType.Normal)
+            if (currentNode != null)
             {
-                currentNode.AddBranch(BranchInformation.Default, nextNode);
+                throw new ArgumentException("Nova: Cannot register new node without ending current node. " +
+                    $"currentNode: {currentNode.name}");
             }
 
-            currentNode = nextNode;
-
+            currentNode = new FlowChartNode(name);
             flowChartGraph.AddNode(currentNode);
-
             currentNode.AddLocalizedName(stateLocale, displayName);
         }
 
@@ -313,10 +313,12 @@ namespace Nova
         /// <param name="destination">Destination of the jump</param>
         public void RegisterJump(string destination)
         {
+            CheckCurrentNodeDefaultLocale();
+
             if (destination == null)
             {
                 throw new ArgumentException(
-                    $"Nova: jump_to instruction must have a destination. Exception occurs at node: {currentNode.name}");
+                    $"Nova: jump_to instruction must have a destination. currentNode: {currentNode.name}");
             }
 
             if (currentNode.type == FlowChartNodeType.Branching)
@@ -325,7 +327,6 @@ namespace Nova
             }
 
             lazyBindingLinks.Add(new LazyBindingEntry(currentNode, destination, BranchInformation.Default));
-
             currentNode = null;
         }
 
@@ -343,28 +344,30 @@ namespace Nova
         public void RegisterBranch(string name, string destination, string text, ChoiceImageInformation imageInfo,
             BranchMode mode, LuaFunction condition)
         {
+            CheckCurrentNode();
+
             if (string.IsNullOrEmpty(destination))
             {
                 throw new ArgumentException(
-                    $"Nova: A branch must have a destination. Exception occurs at node: {currentNode.name}, text: {text}");
+                    $"Nova: A branch must have a destination. currentNode: {currentNode.name}, text: {text}");
             }
 
             if (mode == BranchMode.Normal && condition != null)
             {
                 throw new ArgumentException(
-                    $"Nova: Branch mode is Normal but condition is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+                    $"Nova: Branch mode is Normal but condition is not null. currentNode: {currentNode.name}, destination: {destination}");
             }
 
             if (mode == BranchMode.Jump && (text != null || imageInfo != null))
             {
                 throw new ArgumentException(
-                    $"Nova: Branch mode is Jump but text or imageInfo is not null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+                    $"Nova: Branch mode is Jump but text or imageInfo is not null. currentNode: {currentNode.name}, destination: {destination}");
             }
 
             if ((mode == BranchMode.Show || mode == BranchMode.Enable) && condition == null)
             {
                 throw new ArgumentException(
-                    $"Nova: Branch mode is Show or Enable but condition is null. Exception occurs at node: {currentNode.name}, destination: {destination}");
+                    $"Nova: Branch mode is Show or Enable but condition is null. currentNode: {currentNode.name}, destination: {destination}");
             }
 
             currentNode.type = FlowChartNodeType.Branching;
@@ -374,13 +377,15 @@ namespace Nova
 
         public void AddLocalizedBranch(string name, string destination, string text)
         {
+            CheckCurrentNode();
+
             var branchInfo = lazyBindingLinks.Find(x =>
                     x.from.name == currentNode.name && x.destination == destination && x.branchInfo.name == name)
                 ?.branchInfo;
             if (branchInfo == null)
             {
                 throw new ArgumentException(
-                    $"Nova: branchInfo not found. from: {currentNode.name}, destination: {destination}, branchInfo: {name}");
+                    $"Nova: branchInfo not found. currentNode: {currentNode.name}, destination: {destination}, branchInfo: {name}");
             }
 
             branchInfo.AddLocalizedText(stateLocale, text);
@@ -395,17 +400,9 @@ namespace Nova
             currentNode = null;
         }
 
-        private void CheckNode()
-        {
-            if (currentNode == null)
-            {
-                throw new ArgumentException("Nova: This function should be called after registering the current node.");
-            }
-        }
-
         public void SetCurrentAsChapter()
         {
-            CheckNode();
+            CheckCurrentNodeDefaultLocale();
             currentNode.isChapter = true;
         }
 
@@ -423,19 +420,19 @@ namespace Nova
         /// </exception>
         public void SetCurrentAsStart()
         {
-            CheckNode();
+            CheckCurrentNodeDefaultLocale();
             flowChartGraph.AddStart(currentNode, StartNodeType.Locked);
         }
 
         public void SetCurrentAsUnlockedStart()
         {
-            CheckNode();
+            CheckCurrentNodeDefaultLocale();
             flowChartGraph.AddStart(currentNode, StartNodeType.Unlocked);
         }
 
         public void SetCurrentAsDebug()
         {
-            CheckNode();
+            CheckCurrentNodeDefaultLocale();
             flowChartGraph.AddStart(currentNode, StartNodeType.Debug);
         }
 
@@ -457,24 +454,15 @@ namespace Nova
         /// </exception>
         public void SetCurrentAsEnd(string name)
         {
-            if (currentNode == null)
-            {
-                throw new ArgumentException(
-                    $"Nova: SetCurrentAsEnd({name}) should be called after registering the current node.");
-            }
+            CheckCurrentNodeDefaultLocale();
 
-            // Set the current node type as End
-            currentNode.type = FlowChartNodeType.End;
-
-            // Add the node as an end
             if (name == null)
             {
                 name = currentNode.name;
             }
 
+            currentNode.type = FlowChartNodeType.End;
             flowChartGraph.AddEnd(name, currentNode);
-
-            // Null the current node, because SetCurrentAsEnd() indicates the end of a node
             currentNode = null;
         }
 
