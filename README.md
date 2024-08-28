@@ -26,7 +26,7 @@
 
 * **支持什么版本的Unity、什么操作系统/平台？**
 
-    支持Unity 2020及更高版本，Windows/Linux/macOS/Android/iOS平台。我们已经有作品在Google Play、TapTap、App Store等平台上架。
+    支持Unity 2020及更高版本，Windows/macOS/Android/iOS平台。我们已经有作品在Google Play、TapTap、App Store等平台上架。
 
     WebGL/微信小程序可以参考[linsyking/Nova-WXM](https://github.com/linsyking/Nova-WXM)，以及一个在线编辑器[linsyking/Nova-online-editor](https://github.com/linsyking/Nova-online-editor)。
 
