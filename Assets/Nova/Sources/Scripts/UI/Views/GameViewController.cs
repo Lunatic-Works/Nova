@@ -131,18 +131,6 @@ namespace Nova
             }
         }
 
-        public void ForceStep()
-        {
-            if (gameState.isRestoring || gameState.isUpgrading || !dialogueState.isNormal ||
-                NovaAnimation.StopAllCount > 0)
-            {
-                return;
-            }
-
-            NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
-            gameState.Step();
-        }
-
         // TODO: Should enumerate all dialogue boxes
         public bool TryClickLink(Vector3 position, Camera camera)
         {
@@ -162,10 +150,16 @@ namespace Nova
         }
 
         private float autoTimeOverride = -1f;
+        private bool immediateStep = false;
 
         public void OverrideAutoTime(float secs)
         {
             autoTimeOverride = Mathf.Max(secs, 0f);
+        }
+
+        public void ScheduleImmediateStep()
+        {
+            immediateStep = true;
         }
 
         public float autoDelay { get; set; }
@@ -289,10 +283,22 @@ namespace Nova
             }
 
             timeAfterDialogueChange += Time.deltaTime;
-            if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown &&
-                dialogueState.isNormal && timeAfterDialogueChange > dialogueTime)
+            if (dialogueState.isNormal && timeAfterDialogueChange > dialogueTime)
             {
-                currentDialogueBox.ShowDialogueFinishIcon(true);
+                if (immediateStep)
+                {
+                    // All AnimationType.PerDialogue | AnimationType.Text should already be stopped,
+                    // but to prevent timing problems here we stop them again
+                    NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+                    gameState.Step();
+                }
+                else
+                {
+                    if (currentDialogueBox != null && currentDialogueBox.dialogueFinishIconShown)
+                    {
+                        currentDialogueBox.ShowDialogueFinishIcon(true);
+                    }
+                }
             }
         }
 
@@ -300,6 +306,7 @@ namespace Nova
         {
             StopTimer();
             autoTimeOverride = -1f;
+            immediateStep = false;
         }
 
         private void OnDialogueChanged(DialogueChangedData dialogueData)

@@ -8,8 +8,8 @@ function stop_ff()
     end
 end
 
-function force_step()
-    __Nova.gameViewController:ForceStep()
+function immediate_step()
+    __Nova.gameViewController:ScheduleImmediateStep()
 end
 
 function current_box()
