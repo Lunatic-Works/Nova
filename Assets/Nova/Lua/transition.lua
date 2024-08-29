@@ -445,7 +445,6 @@ make_anim_method('vfx_multi', function(self, obj, shader_layer, times, anim_prop
         for name, value in pairs(anim_properties) do
             mat:SetFloat(name, value[1])
         end
-        mat:SetFloat('_T', 1)
         set_mat(obj, mat, layer_id)
     end
 
