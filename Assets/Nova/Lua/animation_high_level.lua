@@ -154,11 +154,11 @@ local function parse_coord(obj, camera, coord)
 end
 
 local easing_func_name_map = {
-    bezier = Nova.AnimationEntry.BezierEasing,
-    cubic = Nova.AnimationEntry.CubicEasing,
     linear = Nova.AnimationEntry.LinearEasing,
+    cubic = Nova.AnimationEntry.CubicEasing,
     shake = Nova.AnimationEntry.ShakeEasing,
     shake_sqr = Nova.AnimationEntry.ShakeSquaredEasing,
+    bezier = Nova.AnimationEntry.BezierEasing,
 }
 
 function parse_easing(t)
