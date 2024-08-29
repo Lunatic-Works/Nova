@@ -118,7 +118,6 @@ namespace Nova.Editor
 
                         sprite = CreateInstance<SpriteWithOffset>();
                         sprite.sprite = _sprite;
-                        sprite.offset = Vector3.zero;
                     }
                     else
                     {

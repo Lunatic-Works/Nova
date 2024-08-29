@@ -8,5 +8,6 @@ namespace Nova
     {
         public Sprite sprite;
         public Vector3 offset;
+        public Vector3 scale = Vector3.one;
     }
 }

@@ -56,12 +56,21 @@ end
 
 local function get_renderer_pp(obj)
     local go = obj.gameObject
+
     local renderer, pp
     local _type = obj:GetType()
     if _type == typeof(Nova.CameraController) or _type == typeof(Nova.GameCharacterController) or _type == typeof(Nova.OverlaySpriteController) then
         pp = go:GetComponent(typeof(Nova.PostProcessing))
+    elseif _type == typeof(Nova.SpriteController) then
+        local resizer = obj.resizer
+        renderer = resizer:GetComponent(typeof(UnityEngine.SpriteRenderer)) or resizer:GetComponent(typeof(UnityEngine.UI.Image))
     else
-        renderer = go:GetComponent(typeof(UnityEngine.SpriteRenderer)) or go:GetComponent(typeof(UnityEngine.UI.Image)) or go:GetComponent(typeof(UnityEngine.UI.RawImage))
+        -- No FadeController
+        renderer = go:GetComponent(typeof(UnityEngine.UI.RawImage))
+    end
+
+    if renderer == nil and pp == nil then
+        warn('Cannot find renderer or PostProcessing for ' .. dump(obj))
     end
     return go, renderer, pp
 end
@@ -78,7 +87,6 @@ local function get_mat(obj, shader_name, restorable)
 
     local go, renderer, pp = get_renderer_pp(obj)
     if renderer == nil and pp == nil then
-        warn('Cannot find SpriteRenderer or Image or RawImage or PostProcessing for ' .. dump(obj))
         return nil
     end
 
@@ -114,7 +122,7 @@ local function set_mat(obj, mat, layer_id, token)
 
     if renderer then
         if layer_id ~= 0 then
-            warn('layer_id should be 0 for SpriteRenderer or Image or RawImage')
+            warn('layer_id should be 0 for renderer')
         end
         renderer.material = mat
         return -1
@@ -129,13 +137,6 @@ local function set_mat(obj, mat, layer_id, token)
         end
     end
 
-    local fade = go:GetComponent(typeof(Nova.FadeController))
-    if fade then
-        warn('Cannot set material for FadeController ' .. dump(obj))
-        return -1
-    end
-
-    warn('Cannot find SpriteRenderer or Image or RawImage or PostProcessing for ' .. dump(obj))
     return -1
 end
 
@@ -249,6 +250,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
     local action_begin, action_end, token
     if obj:GetType() == typeof(Nova.CameraController) then
         action_begin = function()
+            -- TODO: Simultaneous trans of multiple cameras with different capturedGameTexture
             __Nova.screenCapturer:CaptureGameTexture(obj.camera)
 
             auto_fade_off()
@@ -276,7 +278,7 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
             else
                 mat:SetTexture('_SubTex', nil)
             end
-            local renderer = obj:GetComponent(typeof(UnityEngine.SpriteRenderer)) or obj:GetComponent(typeof(UnityEngine.UI.Image)) or obj:GetComponent(typeof(UnityEngine.UI.RawImage))
+            local renderer = get_renderer(obj)
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 1)

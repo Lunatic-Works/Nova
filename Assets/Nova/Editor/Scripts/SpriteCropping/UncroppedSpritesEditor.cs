@@ -75,7 +75,6 @@ namespace Nova.Editor
             {
                 var meta = CreateInstance<SpriteWithOffset>();
                 meta.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
-                meta.offset = Vector3.zero;
                 var metaPath = Path.Combine(dir, Path.GetFileNameWithoutExtension(spritePath) + ".asset");
                 AssetDatabase.CreateAsset(meta, metaPath);
             }
@@ -153,13 +152,33 @@ namespace Nova.Editor
             }
         }
 
+        private static int PadToPOT(int val)
+        {
+            var i = 1;
+            while (i < val)
+            {
+                i *= 2;
+            }
+
+            return i;
+        }
+
         private static void WriteCroppedTexture(UncroppedSprites sprites, SpriteCropper cropper)
         {
             var cropRect = cropper.cropRect;
-            var cropped = new Texture2D(cropRect.width, cropRect.height, TextureFormat.RGBA32, false);
+            var width = PadToPOT(cropRect.width);
+            var height = PadToPOT(cropRect.height);
+            var cropped = new Texture2D(width, height, TextureFormat.RGBA32, false);
+
+            var background = Enumerable.Repeat(Color.clear, width * height).ToArray();
+            cropped.SetPixels(background);
+
             var texture = cropper.sprite.texture;
             var pixels = texture.GetPixels(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
-            cropped.SetPixels(pixels);
+            var x = (width - cropRect.width) / 2;
+            var y = (height - cropRect.height) / 2;
+            cropped.SetPixels(x, y, cropRect.width, cropRect.height, pixels);
+
             cropped.Apply();
 
             var fileName = cropper.sprite.name + ".png";
@@ -172,9 +191,15 @@ namespace Nova.Editor
             AssetDatabase.ImportAsset(assetPath);
             var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
             var needReimport = false;
-            if (importer.textureType != TextureImporterType.Sprite)
+            if (importer.textureType != TextureImporterType.Sprite ||
+                !importer.mipmapEnabled ||
+                importer.filterMode != FilterMode.Trilinear ||
+                importer.anisoLevel < 1)
             {
                 importer.textureType = TextureImporterType.Sprite;
+                importer.mipmapEnabled = true;
+                importer.filterMode = FilterMode.Trilinear;
+                importer.anisoLevel = 1;
                 needReimport = true;
             }
 

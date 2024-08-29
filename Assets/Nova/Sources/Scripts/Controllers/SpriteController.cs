@@ -10,6 +10,11 @@ namespace Nova
         public string luaGlobalName;
         public string imageFolder;
 
+        // An extra transform to resize the sprite according to SpriteWithOffset
+        // Set resize = this.transform to disable
+        // No need to restore resizer transform
+        public Transform resizer;
+
         public string currentImageName { get; private set; }
 
         private GameState gameState;
@@ -107,8 +112,8 @@ namespace Nova
 
         public int layer
         {
-            get => gameObject.layer;
-            set => gameObject.layer = value;
+            get => resizer.gameObject.layer;
+            set => resizer.gameObject.layer = value;
         }
 
         public int sortingOrder
@@ -140,8 +145,8 @@ namespace Nova
         private void Awake()
         {
             gameState = Utils.FindNovaController().GameState;
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            image = GetComponent<Image>();
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+            image = GetComponentInChildren<Image>();
             if (image != null && image.sprite == null)
             {
                 // Using an empty png is not working due to unknown reason..
@@ -179,8 +184,28 @@ namespace Nova
                 return;
             }
 
-            Sprite newSprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageName));
-            sprite = newSprite;
+            var imagePath = System.IO.Path.Combine(imageFolder, imageName);
+            if (resizer == transform)
+            {
+                sprite = AssetLoader.Load<Sprite>(imagePath);
+            }
+            else
+            {
+                var spriteWithOffset = AssetLoader.LoadOrNull<SpriteWithOffset>(imagePath);
+                if (spriteWithOffset != null)
+                {
+                    sprite = spriteWithOffset.sprite;
+                    resizer.localPosition = spriteWithOffset.offset;
+                    resizer.localScale = spriteWithOffset.scale;
+                }
+                else
+                {
+                    sprite = AssetLoader.Load<Sprite>(imagePath);
+                    resizer.localPosition = Vector3.zero;
+                    resizer.localScale = Vector3.one;
+                }
+            }
+
             currentImageName = imageName;
         }
 

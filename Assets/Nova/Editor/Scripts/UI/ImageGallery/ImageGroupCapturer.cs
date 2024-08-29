@@ -95,7 +95,7 @@ namespace Nova.Editor
                 return false;
             }
 
-            resourcePath = GetResourcesFolder(GetAbsoluteAssetPath(sprites[0]));
+            resourcePath = GetResourcesFolder(GetAbsoluteAssetPath(sprites[0].sprite));
             if (renderTexture != null)
             {
                 UnityEngine.Object.DestroyImmediate(renderTexture);

@@ -41,7 +41,12 @@ namespace Nova
             base.Init();
         }
 
-        public void SetPose(string pose, bool fade, float duration)
+        protected virtual void SetSprites(string pose, IReadOnlyList<SpriteWithOffset> sprites)
+        {
+            mergerPrimary.SetTextures(sprites);
+        }
+
+        public virtual void SetPose(string pose, bool fade, float duration)
         {
             if (pose == currentPose)
             {
@@ -55,8 +60,8 @@ namespace Nova
                 mergerSub.SetTextures(mergerPrimary);
             }
 
-            var sprites = LoadSprites(imageFolder, pose);
-            mergerPrimary.SetTextures(sprites);
+            var sprites = string.IsNullOrEmpty(pose) ? new List<SpriteWithOffset>() : LoadSprites(imageFolder, pose);
+            SetSprites(pose, sprites);
             if (fade)
             {
                 DoFadeAnimation(duration);
@@ -90,10 +95,24 @@ namespace Nova
             return string.IsNullOrEmpty(pose) ? Enumerable.Empty<string>() : pose.Split(PoseStringSeparator);
         }
 
+        private static SpriteWithOffset LoadSpriteMaybeOffset(string path)
+        {
+            var spriteWithOffset = AssetLoader.LoadOrNull<SpriteWithOffset>(path);
+            if (spriteWithOffset != null)
+            {
+                return spriteWithOffset;
+            }
+
+            var sprite = AssetLoader.Load<Sprite>(path);
+            spriteWithOffset = ScriptableObject.CreateInstance<SpriteWithOffset>();
+            spriteWithOffset.sprite = sprite;
+            return spriteWithOffset;
+        }
+
         public static IReadOnlyList<SpriteWithOffset> LoadSprites(string imageFolder, string pose)
         {
             return PoseToArray(pose)
-                .Select(x => AssetLoader.Load<SpriteWithOffset>(System.IO.Path.Combine(imageFolder, x)))
+                .Select(x => LoadSpriteMaybeOffset(System.IO.Path.Combine(imageFolder, x)))
                 .ToList();
         }
 
