@@ -24,10 +24,10 @@ function show(obj, image_name, coord, color, fade)
         fade = true
     end
 
-    if coord then
+    if coord and coord ~= '' then
         move(obj, coord)
     end
-    if color then
+    if color and color ~= '' then
         tint(obj, color)
     end
 
