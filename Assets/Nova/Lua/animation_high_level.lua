@@ -3,7 +3,7 @@ make_anim_method('wait', function(self, duration)
 end)
 
 make_anim_method('wait_all', function(self, entry)
-    return self:_then({ duration = entry.entry.totalTimeRemaining }):_then(Nova.ActionAnimationProperty(function() entry:stop() end))
+    return self:_then({ duration = entry.entry.totalTimeRemaining })
 end)
 
 --- usage:
