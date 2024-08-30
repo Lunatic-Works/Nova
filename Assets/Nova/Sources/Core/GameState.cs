@@ -20,16 +20,13 @@ namespace Nova
         private CheckpointManager checkpointManager;
         private GameStateCheckpoint initialCheckpoint;
 
-        private AdvancedDialogueHelper advancedDialogueHelper;
         private CoroutineHelper coroutineHelper;
 
         private void Awake()
         {
-            advancedDialogueHelper = new AdvancedDialogueHelper(this);
             coroutineHelper = new CoroutineHelper(this);
 
             LuaRuntime.Instance.BindObject("variables", variables);
-            LuaRuntime.Instance.BindObject("advancedDialogueHelper", advancedDialogueHelper);
             LuaRuntime.Instance.BindObject("coroutineHelper", coroutineHelper);
 
             try
@@ -265,7 +262,6 @@ namespace Nova
         private void ResetActionContext()
         {
             currentVoices.Clear();
-            advancedDialogueHelper.Reset();
             coroutineHelper.Reset();
             actionPauseLock.Reset();
         }
@@ -383,20 +379,6 @@ namespace Nova
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.AfterDialogue, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
-
-            if (advancedDialogueHelper.PopFallThrough())
-            {
-                Step();
-                yield break;
-            }
-
-            var pendingJumpTarget = advancedDialogueHelper.PopJump();
-            if (pendingJumpTarget != null)
-            {
-                var node = GetNode(pendingJumpTarget);
-                this.RuntimeAssert(node != null, $"Node {pendingJumpTarget} not found.");
-                MoveToNextNode(node);
-            }
         }
 
         private void StepCheckpoint(bool isReached)

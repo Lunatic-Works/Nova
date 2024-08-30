@@ -5,7 +5,6 @@ require 'built_in'
 dofile 'hook'
 dofile 'preload'
 
-dofile 'advanced_dialogue_helper'
 dofile 'alert'
 dofile 'animation'
 dofile 'animation_high_level'
