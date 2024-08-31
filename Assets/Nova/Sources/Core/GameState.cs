@@ -132,12 +132,14 @@ namespace Nova
         /// <summary>
         /// The index of the current dialogue entry in the current node
         /// </summary>
-        private int currentIndex;
+        public int currentIndex { get; private set; }
 
         /// <summary>
         /// The current dialogueEntry
         /// </summary>
         private DialogueEntry currentDialogueEntry;
+
+        public DialogueDisplayData currentDialogueDisplayData => currentDialogueEntry?.GetDisplayData();
 
         /// <summary>
         /// Variables saved by Nova
@@ -374,6 +376,11 @@ namespace Nova
             var isReachedAnyHistory = DialogueSaveReachedData(out var dialogueData);
             var dialogueChangedData = new DialogueChangedData(nodeRecord, checkpointOffset, dialogueData,
                 currentDialogueEntry.GetDisplayData(), isReached, isReachedAnyHistory);
+            if (isJumping && !isReachedAnyHistory)
+            {
+                isJumping = false;
+            }
+
             dialogueChangedEarly.Invoke(dialogueChangedData);
             dialogueChanged.Invoke(dialogueChangedData);
 
@@ -651,6 +658,7 @@ namespace Nova
 
         public void RaiseChoices(IReadOnlyList<ChoiceOccursData.Choice> choices)
         {
+            Utils.RuntimeAssert(choices.Count > 0, "Nova: Choices must not be empty.");
             choiceOccurs.Invoke(new ChoiceOccursData(choices));
         }
 
@@ -793,7 +801,7 @@ namespace Nova
             }
         }
 
-        private void SeekBackStep(int steps, IList<NodeRecord> nodeHistory, out long newCheckpointOffset,
+        private int SeekBackStep(int steps, IList<NodeRecord> nodeHistory, out long newCheckpointOffset,
             out int newDialogueIndex)
         {
             // Debug.Log($"stepback={steps}");
@@ -801,15 +809,17 @@ namespace Nova
 
             nodeHistory.Clear();
             var hasLimit = steps > 0;
+            var totSteps = 0;
 
             var curNode = nodeRecord;
             nodeHistory.Add(curNode);
             var endDialogue = currentIndex;
             while (curNode.parent != 0 && (!hasLimit || steps > endDialogue - curNode.beginDialogue))
             {
+                totSteps += endDialogue - curNode.beginDialogue;
                 if (hasLimit)
                 {
-                    steps -= endDialogue - curNode.beginDialogue;
+                    steps -= totSteps;
                 }
 
                 curNode = checkpointManager.GetNodeRecord(curNode.parent);
@@ -819,10 +829,12 @@ namespace Nova
 
             if (!hasLimit || steps > endDialogue - curNode.beginDialogue)
             {
+                totSteps += endDialogue - curNode.beginDialogue;
                 newDialogueIndex = curNode.beginDialogue;
             }
             else
             {
+                totSteps += steps;
                 newDialogueIndex = endDialogue - steps;
             }
 
@@ -842,6 +854,36 @@ namespace Nova
             }
 
             // Debug.Log($"newNode=@{nodeHistory[0].offset} newCheckpointOffset=@{newCheckpointOffset} newDialogueIndex={newDialogueIndex}");
+            return totSteps;
+        }
+
+        public void MoveBackward()
+        {
+            long newCheckpointOffset;
+            int newDialogueIndex;
+            NodeRecord newNodeRecord;
+            var i = 1;
+            while (true)
+            {
+                var list = new List<NodeRecord>();
+                var step = SeekBackStep(i, list, out newCheckpointOffset, out newDialogueIndex);
+                newNodeRecord = list[list.Count - 1];
+                if (step < i)
+                {
+                    break;
+                }
+
+                var newNode = GetNode(newNodeRecord.name);
+                var dialogueEntry = newNode.GetDialogueEntryAt(newDialogueIndex);
+                if (!dialogueEntry.IsEmpty())
+                {
+                    break;
+                }
+
+                i++;
+            }
+
+            MoveBackTo(newNodeRecord, newCheckpointOffset, newDialogueIndex);
         }
 
         public void SeekBackStep(int steps, out NodeRecord nodeRecord, out long newCheckpointOffset,
@@ -852,9 +894,9 @@ namespace Nova
             nodeRecord = list[list.Count - 1];
         }
 
-        public bool isUpgrading { get; private set; }
-
         public bool isRestoring { get; private set; }
+        public bool isUpgrading { get; private set; }
+        public bool isJumping { get; private set; }
 
         private bool CheckUnlockInRestoring()
         {
@@ -880,23 +922,24 @@ namespace Nova
         {
             this.RuntimeAssert(stepCount > 0, $"Invalid stepCount {stepCount}.");
 
+            var jumping = isJumping;
             for (var i = 0; i < stepCount; ++i)
             {
-                if (!isUpgrading && i == stepCount - 1)
+                if (!isUpgrading && !isJumping && i == stepCount - 1)
                 {
                     isRestoring = false;
                 }
 
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 Step();
-                if (!CheckUnlockInRestoring())
+                if (jumping && !isJumping)
                 {
                     return;
                 }
 
-                if (isUpgrading && i == stepCount - 1)
+                if (!CheckUnlockInRestoring())
                 {
-                    isRestoring = false;
+                    return;
                 }
             }
         }
@@ -932,7 +975,8 @@ namespace Nova
                 isRestoring = false;
             }
 
-            UpdateGameState(true, true, false, false, true);
+            // The result of invoking nodeChanged should be already in the checkpoint, so we don't invoke it here
+            UpdateGameState(false, true, false, false, true);
             if (!CheckUnlockInRestoring())
             {
                 return;
@@ -943,6 +987,7 @@ namespace Nova
                 FastForward(dialogueIndex - currentIndex);
             }
 
+            isRestoring = false;
             isUpgrading = false;
             // Debug.Log($"MoveBackTo end {nodeHistoryEntry.Key} {nodeHistoryEntry.Value} {dialogueIndex}");
         }
@@ -956,6 +1001,8 @@ namespace Nova
         {
             state = State.Normal;
             Move(newNodeRecord, checkpointManager.NextRecord(newNodeRecord.offset), lastDialogue, true);
+            // Move does not stop animations in the last step
+            NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             ResetGameState();
         }
 
@@ -1035,6 +1082,52 @@ namespace Nova
             }
 
             MoveBackTo(entryNode, offset, dialogue);
+        }
+
+        public void JumpToNextChapter()
+        {
+            var jumped = false;
+            while (true)
+            {
+                if (jumped && currentNode.isChapter)
+                {
+                    break;
+                }
+
+                isJumping = true;
+                if (currentIndex < currentNode.dialogueEntryCount - 1)
+                {
+                    FastForward(currentNode.dialogueEntryCount - currentIndex - 1);
+                }
+
+                if (!isJumping)
+                {
+                    Alert.Show("dialogue.noreadtext");
+                    break;
+                }
+
+                isJumping = false;
+                if (currentNode.type == FlowChartNodeType.End)
+                {
+                    break;
+                }
+
+                if (currentNode.IsManualBranchNode())
+                {
+                    if (!actionPauseLock.isLocked)
+                    {
+                        // Show choices
+                        NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+                        Step();
+                    }
+
+                    break;
+                }
+
+                NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
+                Step();
+                jumped = true;
+            }
         }
 
         public IEnumerable<ReachedDialoguePosition> GetDialogueHistory(int limit = 0)

@@ -173,5 +173,11 @@ end)";
 
             return LuaRuntime.Instance.GetFunction("interpolate_text").Invoke<string, string>(s);
         }
+
+        public bool IsEmpty()
+        {
+            return displayNames.Values.All(x => string.IsNullOrEmpty(x)) &&
+                dialogues.Values.All(x => string.IsNullOrEmpty(x));
+        }
     }
 }

@@ -54,7 +54,7 @@ namespace Nova
             }
 
             Init();
-            fade = fade && !gameState.isRestoring && !dialogueState.isFastForward;
+            fade = fade && !gameState.isRestoring && !gameState.isJumping && !dialogueState.isFastForward;
             if (fade)
             {
                 mergerSub.SetTextures(mergerPrimary);

@@ -104,7 +104,7 @@ namespace Nova
         private bool willSaySomething;
         private float voiceDelay;
 
-        private bool dontPlaySound => gameState.isRestoring;
+        private bool dontPlaySound => gameState.isRestoring || gameState.isJumping;
         private bool zeroVolume => audioSource.volume < 1e-3f;
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Nova
             }
         }
 
-        private void SayImmediately(AudioClip clip, float delay)
+        public void SayImmediately(AudioClip clip, float delay)
         {
             StopVoice();
             audioSource.clip = clip;

@@ -77,10 +77,9 @@ namespace Nova
         private RectTransform dialogueTextRect;
 
         public AvatarController avatar { get; private set; }
-
         public RectTransform rect { get; private set; }
 
-        public GameObject background;
+        [SerializeField] private GameObject background;
         private Image backgroundImage;
         private CanvasGroup backgroundCanvasGroup;
         private Button hideDialogueButton;
@@ -142,7 +141,6 @@ namespace Nova
             dialogueTextRect = dialogueText.transform as RectTransform;
 
             avatar = GetComponentInChildren<AvatarController>();
-
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
             backgroundImage = background.GetComponent<Image>();
@@ -286,7 +284,7 @@ namespace Nova
             var entry = dialogueText.AddEntry(displayData, textAlignment, nowTextColor, nowTextColor, materialName,
                 dialogueEntryLayoutSetting, textLeftExtraPadding);
 
-            if (needAnimation && !gameState.isRestoring && !dialogueState.isFastForward)
+            if (needAnimation && !gameState.isRestoring && !gameState.isJumping && !dialogueState.isFastForward)
             {
                 var contentProxy = entry.contentProxy;
 

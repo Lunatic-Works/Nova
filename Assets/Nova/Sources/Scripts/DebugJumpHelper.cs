@@ -44,7 +44,8 @@ namespace Nova
             if (nextChapter)
             {
                 nextChapter = false;
-                gameState.MoveToKeyPoint(true, true);
+                // gameState.MoveToKeyPoint(true, true);
+                gameState.JumpToNextChapter();
             }
 
             if (previousBranch)
@@ -65,8 +66,7 @@ namespace Nova
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             dialogueState.state = DialogueState.State.Normal;
 
-            gameState.SeekBackStep(1, out var nodeRecord, out var checkpointOffset, out var dialogueIndex);
-            gameState.MoveBackTo(nodeRecord, checkpointOffset, dialogueIndex);
+            gameState.MoveBackward();
         }
     }
 }
