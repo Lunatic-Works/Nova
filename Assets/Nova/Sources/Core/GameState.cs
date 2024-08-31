@@ -360,13 +360,15 @@ namespace Nova
                 while (actionPauseLock.isLocked) yield return null;
             }
 
-            var isReached = DialogueSaveCheckpoint(nodeChanged);
+            var isReached = currentIndex < nodeRecord.endDialogue;
+            DialogueSaveCheckpoint(nodeChanged, isReached);
             dialogueWillChange.Invoke();
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
-            var isReachedAnyHistory = DialogueSaveReachedData(out var dialogueData);
+            var isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
+            var dialogueData = DialogueSaveReachedData(isReachedAnyHistory);
             var dialogueChangedData = new DialogueChangedData(nodeRecord, checkpointOffset, dialogueData,
                 currentDialogueEntry.GetDisplayData(), isReached, isReachedAnyHistory);
             if (isJumping && !isReachedAnyHistory)
@@ -381,23 +383,7 @@ namespace Nova
             while (actionPauseLock.isLocked) yield return null;
         }
 
-        private void StepCheckpoint(bool isReached)
-        {
-            if (!isReached)
-            {
-                checkpointOffset = checkpointManager.AppendCheckpoint(currentIndex, GetCheckpoint());
-            }
-            else if (checkpointOffset == nodeRecord.offset)
-            {
-                checkpointOffset = checkpointManager.NextRecord(checkpointOffset);
-            }
-            else
-            {
-                checkpointOffset = checkpointManager.NextCheckpoint(checkpointOffset);
-            }
-        }
-
-        private bool DialogueSaveCheckpoint(bool nodeChanged)
+        private void DialogueSaveCheckpoint(bool nodeChanged, bool isReached)
         {
             if (!nodeChanged)
             {
@@ -411,7 +397,6 @@ namespace Nova
                 AppendSameNode();
             }
 
-            var isReached = currentIndex < nodeRecord.endDialogue;
             if (shouldSaveCheckpoint)
             {
                 StepCheckpoint(isReached);
@@ -434,14 +419,35 @@ namespace Nova
 
             // As the action for this dialogue will be re-run, it's fine to just reset checkpointEnsured to false
             checkpointEnsured = false;
-
-            return isReached;
         }
 
-        private bool DialogueSaveReachedData(out ReachedDialogueData dialogueData)
+        private void AppendSameNode()
         {
-            var isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
+            nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
+            checkpointOffset = nodeRecord.offset;
+            checkpointEnsured = true;
+            appendNodeEnsured = false;
+        }
 
+        private void StepCheckpoint(bool isReached)
+        {
+            if (!isReached)
+            {
+                checkpointOffset = checkpointManager.AppendCheckpoint(currentIndex, GetCheckpoint());
+            }
+            else if (checkpointOffset == nodeRecord.offset)
+            {
+                checkpointOffset = checkpointManager.NextRecord(checkpointOffset);
+            }
+            else
+            {
+                checkpointOffset = checkpointManager.NextCheckpoint(checkpointOffset);
+            }
+        }
+
+        private ReachedDialogueData DialogueSaveReachedData(bool isReachedAnyHistory)
+        {
+            ReachedDialogueData dialogueData;
             if (!isReachedAnyHistory)
             {
                 var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
@@ -454,7 +460,7 @@ namespace Nova
                 dialogueData = checkpointManager.GetReachedDialogueData(currentNode.name, currentIndex);
             }
 
-            return isReachedAnyHistory;
+            return dialogueData;
         }
 
         private void StepAtEndOfNode()
@@ -476,14 +482,6 @@ namespace Nova
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private void AppendSameNode()
-        {
-            nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
-            checkpointOffset = nodeRecord.offset;
-            checkpointEnsured = true;
-            appendNodeEnsured = false;
         }
 
         private void MoveToNextNode(FlowChartNode nextNode)
