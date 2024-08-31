@@ -320,8 +320,7 @@ namespace Nova
         /// <remarks>
         /// Trigger events according to the current states and how they were changed
         /// </remarks>
-        private void UpdateGameState(bool nodeChanged, bool dialogueChanged, bool firstEntryOfNode,
-            bool dialogueStepped, bool fromCheckpoint)
+        private void UpdateGameState(bool fromCheckpoint, bool nodeChanged)
         {
             // Debug.Log($"UpdateGameState begin {debugState}");
 
@@ -331,33 +330,27 @@ namespace Nova
 
                 this.nodeChanged.Invoke(new NodeChangedData(nodeRecord.name));
 
-                if (firstEntryOfNode)
-                {
-                    checkpointEnsured = true; // Always get a checkpoint at the beginning of the node
-                }
+                // Always get a checkpoint at the beginning of the node
+                checkpointEnsured = true;
             }
 
-            if (dialogueChanged)
+            this.RuntimeAssert(currentIndex >= 0 && (currentNode.dialogueEntryCount == 0 ||
+                                                     currentIndex < currentNode.dialogueEntryCount),
+                               "Dialogue index out of range.");
+            if (currentNode.dialogueEntryCount > 0)
             {
-                this.RuntimeAssert(
-                    currentIndex >= 0 && (currentNode.dialogueEntryCount == 0 ||
-                                          currentIndex < currentNode.dialogueEntryCount),
-                    "Dialogue index out of range.");
-                if (currentNode.dialogueEntryCount > 0)
-                {
-                    currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
-                    ExecuteAction(UpdateDialogue(firstEntryOfNode, dialogueStepped, fromCheckpoint));
-                }
-                else
-                {
-                    StepAtEndOfNode();
-                }
+                currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
+                ExecuteAction(UpdateDialogue(fromCheckpoint, nodeChanged));
+            }
+            else
+            {
+                StepAtEndOfNode();
             }
 
             // Debug.Log($"UpdateGameState end {debugState}");
         }
 
-        private IEnumerator UpdateDialogue(bool firstEntryOfNode, bool dialogueStepped, bool fromCheckpoint)
+        private IEnumerator UpdateDialogue(bool fromCheckpoint, bool nodeChanged)
         {
             if (!fromCheckpoint)
             {
@@ -367,7 +360,7 @@ namespace Nova
                 while (actionPauseLock.isLocked) yield return null;
             }
 
-            var isReached = DialogueSaveCheckpoint(firstEntryOfNode, dialogueStepped);
+            var isReached = DialogueSaveCheckpoint(nodeChanged);
             dialogueWillChange.Invoke();
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
@@ -404,9 +397,9 @@ namespace Nova
             }
         }
 
-        private bool DialogueSaveCheckpoint(bool firstEntryOfNode, bool dialogueStepped)
+        private bool DialogueSaveCheckpoint(bool nodeChanged)
         {
-            if (!firstEntryOfNode && dialogueStepped)
+            if (!nodeChanged)
             {
                 stepsFromLastCheckpoint++;
             }
@@ -506,7 +499,7 @@ namespace Nova
             }
 
             currentNode = nextNode;
-            UpdateGameState(true, true, true, true, false);
+            UpdateGameState(false, true);
         }
 
         private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos)
@@ -617,13 +610,15 @@ namespace Nova
                     return false;
                 }
 
-                if (state != State.Normal)
+                if (isEnded)
                 {
+                    Debug.LogError("Nova: Cannot step when the game is ended.");
                     return false;
                 }
 
                 if (actionPauseLock.isLocked)
                 {
+                    Debug.LogError("Nova: Cannot step when actionPauseLock is locked.");
                     return false;
                 }
 
@@ -648,7 +643,7 @@ namespace Nova
             if (currentIndex + 1 < currentNode.dialogueEntryCount)
             {
                 ++currentIndex;
-                UpdateGameState(false, true, false, true, false);
+                UpdateGameState(false, false);
             }
             else
             {
@@ -976,7 +971,7 @@ namespace Nova
             }
 
             // The result of invoking nodeChanged should be already in the checkpoint, so we don't invoke it here
-            UpdateGameState(false, true, false, false, true);
+            UpdateGameState(true, false);
             if (!CheckUnlockInRestoring())
             {
                 return;
