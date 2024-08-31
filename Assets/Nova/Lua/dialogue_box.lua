@@ -296,6 +296,16 @@ function text_duration(time)
     box:OverrideTextDuration(time)
 end
 
+function text_easing(easing)
+    local box = current_box()
+    if box == nil then
+        warn('Cannot call text_easing when the dialogue box is hidden')
+        return
+    end
+
+    box:OverrideTextEasing(parse_easing(easing))
+end
+
 function box_hide_show(duration, pos_name, style_name)
     duration = duration or 1
     set_box(pos_name, style_name)

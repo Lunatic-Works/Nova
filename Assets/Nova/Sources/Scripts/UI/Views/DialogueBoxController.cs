@@ -223,6 +223,7 @@ namespace Nova
         private AnimationEntry textAnimationDelayEntry;
         public float textAnimationDelay { get; private set; }
         private float textDurationOverride = -1f;
+        private AnimationEntry.EasingFunction textEasingOverride;
         private bool textScrollOverriden;
 
         public void AbortTextAnimationDelay()
@@ -241,6 +242,7 @@ namespace Nova
         {
             textAnimationDelay = 0f;
             textDurationOverride = -1f;
+            textEasingOverride = null;
             textScrollOverriden = false;
         }
 
@@ -252,6 +254,11 @@ namespace Nova
         public void OverrideTextDuration(float secs)
         {
             textDurationOverride = Mathf.Max(secs, 0f);
+        }
+
+        public void OverrideTextEasing(AnimationEntry.EasingFunction easing)
+        {
+            textEasingOverride = easing;
         }
 
         public void OverrideTextScroll()
@@ -314,7 +321,8 @@ namespace Nova
 
                 if (textDuration > 1e-3f)
                 {
-                    textAnimationParent.Then(new TextFadeInAnimationProperty(contentProxy), textDuration);
+                    textAnimationParent.Then(new TextFadeInAnimationProperty(contentProxy), textDuration,
+                        textEasingOverride);
 
                     if (!textScrollOverriden)
                     {

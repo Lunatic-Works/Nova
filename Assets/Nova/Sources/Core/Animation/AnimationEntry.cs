@@ -345,7 +345,7 @@ namespace Nova
 
         public static EasingFunction BezierEasing(float x0, float y0)
         {
-            if (Mathf.Abs(x0 - 0.5f) < 0.001f)
+            if (Mathf.Abs(x0 - 0.5f) < 1e-3f)
             {
                 return t => ((1.0f - 2.0f * y0) * t + 2.0f * y0) * t;
             }
