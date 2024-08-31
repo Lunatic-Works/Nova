@@ -616,7 +616,6 @@ namespace Nova
 
                 if (actionPauseLock.isLocked)
                 {
-                    Debug.LogError("Nova: Cannot step when actionPauseLock is locked.");
                     return false;
                 }
 
