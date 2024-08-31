@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -23,7 +24,7 @@ namespace Nova
         public void Init(Dictionary<SystemLanguage, string> displayTexts, ChoiceImageInformation imageInfo,
             string imageFolder, UnityAction onClick, bool interactable)
         {
-            this.displayTexts = displayTexts;
+            this.displayTexts = displayTexts.ToDictionary(x => x.Key, x => DialogueEntry.InterpolateText(x.Value));
             this.imageInfo = imageInfo;
             this.imageFolder = imageFolder;
 

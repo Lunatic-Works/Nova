@@ -164,7 +164,7 @@ end)";
             LuaRuntime.Instance.GetFunction("coroutine.stop").Call(ActionCoroutineName);
         }
 
-        private static string InterpolateText(string s)
+        public static string InterpolateText(string s)
         {
             if (string.IsNullOrEmpty(s))
             {

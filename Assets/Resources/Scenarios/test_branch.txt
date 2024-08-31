@@ -40,7 +40,7 @@ v_flag = 0
 要加一个flag吗
 @<|
 branch {
-    { dest = 'l_add_flag', text = '加一个flag'},
+    { dest = 'l_add_flag', text = '加一个flag，现在有{{v_flag}}个'},
     { dest = 'l_end_loop', text = '不加了'},
 }
 |>
