@@ -6,9 +6,15 @@ namespace Nova
 {
     public class NotificationEntryController : MonoBehaviour
     {
-        public Text text;
+        [SerializeField] private Text text;
         public RectTransform rectTransform;
         public UIViewTransitionBase transition;
+
+        [SerializeField] private float smoothTime = 0.1f;
+
+        [HideInInspector] public float targetY;
+        private float velocity;
+        private Vector3 panelPos0;
 
         private Dictionary<SystemLanguage, string> content;
 
@@ -16,6 +22,9 @@ namespace Nova
         {
             this.content = content;
             UpdateText();
+
+            velocity = 0f;
+            panelPos0 = transition.transform.localPosition;
         }
 
         private void UpdateText()
@@ -37,6 +46,24 @@ namespace Nova
         private void OnDisable()
         {
             I18n.LocaleChanged.RemoveListener(UpdateText);
+        }
+
+        private void Update()
+        {
+            var pos = transform.localPosition;
+            if (pos.y < targetY)
+            {
+                pos.y = Mathf.SmoothDamp(pos.y, targetY, ref velocity, smoothTime);
+                transform.localPosition = pos;
+            }
+        }
+
+        // UI transition can change localPosition.y, so here we change it back
+        private void LateUpdate()
+        {
+            var pos = transition.transform.localPosition;
+            pos.y = panelPos0.y;
+            transition.transform.localPosition = pos;
         }
     }
 }
