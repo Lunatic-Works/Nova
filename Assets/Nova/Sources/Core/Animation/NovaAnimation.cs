@@ -24,15 +24,11 @@ namespace Nova
 
         #region Static members
 
-        public static int StopAllCount { get; private set; }
-
         private static readonly List<NovaAnimation> Animations = new List<NovaAnimation>();
 
         // When some animation stops, it may create new animations
         public static void StopAll(AnimationType type = AnimationType.All)
         {
-            ++StopAllCount;
-
             while (true)
             {
                 var animation =
@@ -44,8 +40,6 @@ namespace Nova
 
                 animation.Stop();
             }
-
-            --StopAllCount;
         }
 
         public static bool IsPlayingAny(AnimationType type = AnimationType.All)
