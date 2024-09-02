@@ -12,7 +12,7 @@ namespace Nova.Editor
         private const string ResourcesFolderName = ImageGroupEditor.ResourcesFolderName;
 
         private GameObject gameObject;
-        private AudioLooperOld audioLooper;
+        private AudioLooper audioLooper;
         private AudioSource audioSource;
         private int previewSecondsBefore = 3;
 
@@ -22,7 +22,7 @@ namespace Nova.Editor
             if (gameObject == null)
             {
                 gameObject = EditorUtility.CreateGameObjectWithHideFlags(
-                    AudioPreviewerName, HideFlags.DontSave, typeof(AudioLooperOld)
+                    AudioPreviewerName, HideFlags.DontSave, typeof(AudioLooper)
                 );
                 var gameObject2 = EditorUtility.CreateGameObjectWithHideFlags(
                     AudioPreviewerName + "2", HideFlags.DontSave, typeof(AudioSource)
@@ -30,7 +30,7 @@ namespace Nova.Editor
                 gameObject2.transform.SetParent(gameObject.transform);
             }
 
-            audioLooper = gameObject.GetComponent<AudioLooperOld>();
+            audioLooper = gameObject.GetComponent<AudioLooper>();
             audioSource = gameObject.transform.Find(AudioPreviewerName + "2").GetComponent<AudioSource>();
             path = null;
             sampleData = null;
@@ -43,7 +43,7 @@ namespace Nova.Editor
 
         private void Update()
         {
-            if (audioLooper.enabled)
+            if (audioLooper != null && audioLooper.enabled)
             {
                 audioLooper.Update();
             }
@@ -99,7 +99,7 @@ namespace Nova.Editor
                     {
                         sampleData = null;
 
-                        audioLooper.clip = audioClip;
+                        audioLooper.SetClip(audioClip, musicEntry);
                         audioSource.clip = audioClip;
                     }
                 }
@@ -163,12 +163,7 @@ namespace Nova.Editor
                     int previewBeforeSample = previewSecondsBefore * audioClip.frequency;
                     int previewBeginSample = musicEntry.loopEndSample - previewBeforeSample;
 
-                    int pos1 = 0;
-                    if (audioLooper.currentAudioSource != null)
-                    {
-                        pos1 = audioLooper.currentAudioSource.timeSamples;
-                    }
-
+                    int pos1 = audioLooper.timeSamples;
                     if (sampleData != null)
                     {
                         Rect r = AudioCurveRendering.BeginCurveFrame(GUILayoutUtility.GetRect(1, 10000, 100, 100));
@@ -248,7 +243,8 @@ namespace Nova.Editor
                     {
                         EditorApplication.update -= Update;
                         EditorApplication.update += Update;
-                        audioLooper.musicEntry = musicEntry;
+                        // Refresh metadata
+                        audioLooper.SetClip(audioClip, musicEntry);
                         audioLooper.SetProgress(previewBeginSample);
                     }
 

@@ -25,10 +25,23 @@ namespace Nova
 
         public AudioClip clip => audioLooper != null ? audioLooper.clip : audioSource.clip;
 
-        public void SetClip(AudioClip clip, AudioClip headClip)
+        public void SetClip(AudioClip clip, MusicEntryTimes musicEntry)
         {
-            if (audioLooper != null) audioLooper.SetClip(clip, headClip);
-            else audioSource.clip = clip;
+            if (audioLooper != null)
+            {
+                if (musicEntry == null)
+                {
+                    musicEntry = clip;
+                }
+
+                audioLooper.SetClip(clip, musicEntry);
+            }
+            else
+            {
+                audioSource.clip = clip;
+                Utils.RuntimeAssert(musicEntry == null,
+                    $"MusicEntry {musicEntry} should be null on AudioSource {Utils.GetPath(audioSource)}");
+            }
         }
 
         public float volume

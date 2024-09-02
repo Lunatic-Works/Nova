@@ -65,8 +65,10 @@ namespace Nova
             if (layers.Count <= layerID || (token >= 0 && !tokens.ContainsKey(layerID)))
             {
                 Debug.LogWarning(
-                    "Nova: Post processing layer already cleared. Maybe a trans is overwritten by another. " +
-                    $"layerID: {layerID}, layers.Count: {layers.Count}, expected token: {token}");
+                    "Nova: Post processing layer already cleared. " +
+                    "Maybe a trans is overwritten by another. " +
+                    $"layerID: {layerID}, layers.Count: {layers.Count}, expected token: {token} " +
+                    $"{Utils.GetPath(this)}");
                 return;
             }
 
@@ -76,7 +78,8 @@ namespace Nova
                     "Nova: Token not match when clearing post processing layer. " +
                     "Maybe a trans is overwritten by another. " +
                     $"layerID: {layerID}, layers.Count: {layers.Count}, expected token: {token}, " +
-                    $"actual token: {tokens[layerID]}");
+                    $"actual token: {tokens[layerID]} " +
+                    $"{Utils.GetPath(this)}");
                 return;
             }
 

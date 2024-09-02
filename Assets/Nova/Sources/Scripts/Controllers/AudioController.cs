@@ -15,8 +15,8 @@ namespace Nova
         public string audioFolder;
 
         // For debug
-        [SerializeField] private Slider slider;
-        [SerializeField] private Text text;
+        [SerializeField] private Slider debugSlider;
+        [SerializeField] private Text debugText;
 
         public string currentAudioName { get; private set; }
         private string lastAudioName;
@@ -107,14 +107,14 @@ namespace Nova
         {
             if (audioSource.clip != null)
             {
-                if (slider != null)
+                if (debugSlider != null)
                 {
-                    slider.value = (float)audioSource.timeSamples / audioSource.clip.samples;
+                    debugSlider.value = (float)audioSource.timeSamples / audioSource.clip.samples;
                 }
 
-                if (text != null)
+                if (debugText != null)
                 {
-                    text.text = $"{audioSource.timeSamples} / {audioSource.clip.samples}";
+                    debugText.text = $"{audioSource.timeSamples} / {audioSource.clip.samples}";
                 }
             }
 
@@ -125,29 +125,20 @@ namespace Nova
         private void ForceUpdate()
         {
             AudioClip clip = null;
-            AudioClip headClip = null;
+            MusicEntry musicEntry = null;
 
             if (!string.IsNullOrEmpty(currentAudioName))
             {
                 var audioPath = System.IO.Path.Combine(audioFolder, currentAudioName);
-                clip = AssetLoader.LoadOrNull<AudioClip>(audioPath + "_loop");
-                if (clip != null)
-                {
-                    // To reduce the possibility of discontinuity between head and loop,
-                    // we use the full audio as head
-                    headClip = AssetLoader.LoadOrNull<AudioClip>(audioPath);
-                }
-                else
-                {
-                    clip = AssetLoader.Load<AudioClip>(audioPath);
-                }
+                clip = AssetLoader.Load<AudioClip>(audioPath);
+                musicEntry = AssetLoader.LoadOrNull<MusicEntry>(audioPath + "_entry");
             }
 
             if (currentAudioName != lastAudioName)
             {
                 if (clip != null)
                 {
-                    audioSource.SetClip(clip, headClip);
+                    audioSource.SetClip(clip, musicEntry);
                     audioSource.Play();
                 }
                 else
@@ -208,20 +199,14 @@ namespace Nova
 
         public void Preload(string audioName)
         {
-            // To reduce the possibility of discontinuity between head and loop,
-            // we use the full audio as head
             var audioPath = System.IO.Path.Combine(audioFolder, audioName);
             AssetLoader.Preload(AssetCacheType.Audio, audioPath);
-            AssetLoader.Preload(AssetCacheType.Audio, audioPath + "_loop");
         }
 
         public void Unpreload(string audioName)
         {
-            // To reduce the possibility of discontinuity between head and loop,
-            // we use the full audio as head
             var audioPath = System.IO.Path.Combine(audioFolder, audioName);
             AssetLoader.Unpreload(AssetCacheType.Audio, audioPath);
-            AssetLoader.Unpreload(AssetCacheType.Audio, audioPath + "_loop");
         }
 
         #endregion
