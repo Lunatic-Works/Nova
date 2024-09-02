@@ -28,6 +28,9 @@ namespace Nova
 
         [SerializeField] private Material blurMaterial;
 
+        public UnityEvent bookmarkSaved;
+        public UnityEvent bookmarkLoaded;
+
         private GameState gameState;
         private CheckpointManager checkpointManager;
 
@@ -321,6 +324,7 @@ namespace Nova
             bookmark.screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
             checkpointManager[saveID] = bookmark;
+            bookmarkSaved.Invoke();
 
             ShowPage();
             ShowPreviewBookmark(saveID);
@@ -348,6 +352,7 @@ namespace Nova
             }
 
             gameState.LoadBookmark(bookmark);
+            bookmarkLoaded.Invoke();
 
             var titleController = viewManager.GetController<TitleController>();
             if (titleController.active)
@@ -409,6 +414,7 @@ namespace Nova
 
             checkpointManager[saveID] = bookmark;
             Destroy(texture);
+            bookmarkSaved.Invoke();
         }
 
         public void AutoSaveBookmark()
@@ -440,6 +446,7 @@ namespace Nova
             }
 
             gameState.LoadBookmark(bookmark);
+            bookmarkLoaded.Invoke();
 
             viewManager.TryPlaySound(loadActionSound);
             Alert.Show("bookmark.load.complete");
