@@ -5,7 +5,9 @@ using UnityEngine.Events;
 
 namespace Nova
 {
-    public class NodeChangedData
+    public class GameStateEventData { }
+
+    public class NodeChangedData : GameStateEventData
     {
         public readonly string newNode;
 
@@ -18,7 +20,7 @@ namespace Nova
     [Serializable]
     public class NodeChangedEvent : UnityEvent<NodeChangedData> { }
 
-    public class DialogueChangedData
+    public class DialogueChangedData : GameStateEventData
     {
         public readonly NodeRecord nodeRecord;
         public readonly long checkpointOffset;
@@ -42,7 +44,7 @@ namespace Nova
     [Serializable]
     public class DialogueChangedEvent : UnityEvent<DialogueChangedData> { }
 
-    public class ChoiceOccursData
+    public class ChoiceOccursData : GameStateEventData
     {
         [ExportCustomType]
         public class Choice
@@ -75,7 +77,7 @@ namespace Nova
     [Serializable]
     public class ChoiceOccursEvent : UnityEvent<ChoiceOccursData> { }
 
-    public class RouteEndedData
+    public class RouteEndedData : GameStateEventData
     {
         public readonly string endName;
 
