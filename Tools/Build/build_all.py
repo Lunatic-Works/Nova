@@ -28,7 +28,7 @@ def prepare():
         raise RuntimeError("Not in project root dir")
 
     if Path("./Temp").exists():
-        raise RuntimeError("Unity is running")
+        raise RuntimeError("Unity may be running. If it's not, try delete Temp dir")
 
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], capture_output=True, encoding="utf-8"
@@ -133,7 +133,7 @@ def make_zip(out_dir):
 def build_windows():
     log_path = "./Build/build_windows.log"
 
-    run_build(log_path, "NovaBuilder.BuildWindows")
+    run_build(log_path, "Nova.Editor.NovaBuilder.BuildWindows")
 
     out_dir, product_name = wait_log(log_path)
 
@@ -146,7 +146,7 @@ def build_windows():
 def build_linux():
     log_path = "./Build/build_linux.log"
 
-    run_build(log_path, "NovaBuilder.BuildLinux")
+    run_build(log_path, "Nova.Editor.NovaBuilder.BuildLinux")
 
     out_dir, product_name = wait_log(log_path)
     os.remove(f"{out_dir}/LinuxPlayer_s.debug")
@@ -156,7 +156,7 @@ def build_linux():
 
     if sys.platform == "win32":
         print("Setting permission...")
-        zipchmod(f"{out_dir}.zip", product_name)
+        zipchmod(f"{out_dir}.zip", [product_name])
 
     if sys.platform != "linux":
         shutil.rmtree(out_dir)
@@ -165,7 +165,7 @@ def build_linux():
 def build_macos():
     log_path = "./Build/build_macos.log"
 
-    run_build(log_path, "NovaBuilder.BuildMacOS")
+    run_build(log_path, "Nova.Editor.NovaBuilder.BuildMacOS")
 
     out_dir, product_name = wait_log(log_path)
 
@@ -173,7 +173,16 @@ def build_macos():
 
     if sys.platform == "win32":
         print("Setting permission...")
-        zipchmod(f"{out_dir}.zip", f"{product_name}.app/Contents/MacOS/{product_name}")
+        zipchmod(
+            f"{out_dir}.zip",
+            [
+                f"{product_name}.app/Contents/Frameworks/UnityPlayer.dylib",
+                f"{product_name}.app/Contents/Frameworks/libMonoPosixHelper.dylib",
+                f"{product_name}.app/Contents/Frameworks/libmonobdwgc-2.0.dylib",
+                f"{product_name}.app/Contents/MacOS/{product_name}",
+                f"{product_name}.app/Contents/PlugIns/tolua.bundle/Contents/MacOS/tolua",
+            ],
+        )
 
     if sys.platform != "darwin":
         shutil.rmtree(out_dir)
@@ -183,7 +192,7 @@ def build_macos():
 def build_android():
     log_path = "./Build/build_android.log"
 
-    run_build(log_path, "NovaBuilder.BuildAndroid")
+    run_build(log_path, "Nova.Editor.NovaBuilder.BuildAndroid")
 
     out_dir, product_name = wait_log(log_path)
 
@@ -192,7 +201,7 @@ def build_android():
 def build_ios():
     log_path = "./Build/build_ios.log"
 
-    run_build(log_path, "NovaBuilder.BuildiOS")
+    run_build(log_path, "Nova.Editor.NovaBuilder.BuildiOS")
 
     out_dir, product_name = wait_log(log_path)
 
