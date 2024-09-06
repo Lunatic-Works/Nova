@@ -13,16 +13,15 @@ namespace Nova
         [SerializeField] private Button returnTitleButton;
         [SerializeField] private Button quitGameButton;
         [SerializeField] private InputMappingController inputMappingController;
+        [SerializeField] private Material blurMaterial;
 
         private ConfigManager configManager;
         private bool fromTitle;
+        private Texture2D screenTexture;
 
         protected override void Awake()
         {
             base.Awake();
-
-            returnTitleButton.onClick.AddListener(ReturnTitleWithAlert);
-            quitGameButton.onClick.AddListener(Utils.QuitWithAlert);
 
             configManager = Utils.FindNovaController().ConfigManager;
 
@@ -34,28 +33,54 @@ namespace Nova
             }
 
             backButton.onClick.AddListener(Hide);
+            returnTitleButton.onClick.AddListener(ReturnTitleWithAlert);
+            quitGameButton.onClick.AddListener(Utils.QuitWithAlert);
         }
 
         public override void Show(bool doTransition, Action onFinish)
         {
-            fromTitle = false;
+            if (!fromTitle)
+            {
+                if (screenTexture != null)
+                {
+                    Destroy(screenTexture);
+                }
+
+                screenTexture = ScreenCapturer.GetBookmarkThumbnailTexture(blurMaterial);
+            }
+
+            returnTitleButton.gameObject.SetActive(!fromTitle);
+
             base.Show(doTransition, onFinish);
+        }
+
+        public void ShowFromGame()
+        {
+            fromTitle = false;
+            Show();
         }
 
         public void ShowFromTitle()
         {
-            Show();
             fromTitle = true;
+            Show();
         }
 
         public override void Hide(bool doTransition, Action onFinish)
         {
+            if (screenTexture != null)
+            {
+                Destroy(screenTexture);
+            }
+
             configManager.Flush();
             base.Hide(doTransition, onFinish);
         }
 
         public void ReturnTitleWithCallback(Action onFinish)
         {
+            AutoSaveBookmark.Current.TrySave(screenTexture);
+            viewManager.GetController<GameViewController>().HideImmediate();
             this.SwitchView<TitleController>(onFinish);
         }
 

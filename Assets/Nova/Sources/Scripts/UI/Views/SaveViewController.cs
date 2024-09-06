@@ -398,23 +398,34 @@ namespace Nova
             );
         }
 
-        private void AutoSaveBookmark(int beginSaveID, string tagText)
+        private void AutoSaveBookmark(int beginSaveID, string tagText, Texture2D screenshot)
         {
             var bookmark = gameState.GetBookmark();
             bookmark.description = currentDialogue;
-            var texture = ScreenCapturer.GetBookmarkThumbnailTexture(blurMaterial);
-            bookmark.screenshot = texture;
+            bookmark.screenshot = screenshot;
 
-            int saveID = checkpointManager.QueryMinUnusedSaveID(beginSaveID, beginSaveID + maxSaveEntry);
+            var saveID = checkpointManager.QueryMinUnusedSaveID(beginSaveID, beginSaveID + maxSaveEntry);
             if (saveID >= beginSaveID + maxSaveEntry)
             {
                 saveID = checkpointManager.QuerySaveIDByTime(beginSaveID, beginSaveID + maxSaveEntry,
                     SaveIDQueryType.Earliest);
+                DeleteCachedThumbnailSprite(saveID);
             }
 
             checkpointManager[saveID] = bookmark;
-            Destroy(texture);
             bookmarkSaved.Invoke();
+        }
+
+        private void AutoSaveBookmark(int beginSaveID, string tagText)
+        {
+            var screenshot = ScreenCapturer.GetBookmarkThumbnailTexture(blurMaterial);
+            AutoSaveBookmark(beginSaveID, tagText, screenshot);
+            Destroy(screenshot);
+        }
+
+        public void AutoSaveBookmark(Texture2D screenshot)
+        {
+            AutoSaveBookmark((int)BookmarkType.AutoSave, I18n.__("bookmark.autosave.page"), screenshot);
         }
 
         public void AutoSaveBookmark()

@@ -11,6 +11,12 @@ namespace Nova
         {
             if (Utils.ForceQuit)
             {
+                // TODO: Auto save when UI showing
+                if (Utils.FindViewManager().currentView == CurrentViewType.Game)
+                {
+                    AutoSaveBookmark.Current.TrySave();
+                }
+
                 return true;
             }
 
@@ -18,6 +24,7 @@ namespace Nova
             return Utils.ForceQuit;
         }
 
+        // Do not trigger this in Awake
         private void Start()
         {
             Application.wantsToQuit += WantsToQuit;

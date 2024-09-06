@@ -1818,6 +1818,7 @@ MonoBehaviour:
   returnTitleButton: {fileID: 3776766838286791202}
   quitGameButton: {fileID: 6600835561785805185}
   inputMappingController: {fileID: 6508623149409498939}
+  blurMaterial: {fileID: 2100000, guid: 33a7950f5de599d4c831e47498908418, type: 2}
 --- !u!1 &3113775755298879867
 GameObject:
   m_ObjectHideFlags: 0
