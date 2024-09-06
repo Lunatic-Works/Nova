@@ -30,4 +30,5 @@ end
 -- This function resets all mutable states in Lua before restoring
 function action_before_move()
     anim_hold_has_begun = false
+    clear_anim_groups()
 end

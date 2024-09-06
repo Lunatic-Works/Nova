@@ -59,3 +59,16 @@ function pop_prefix(s, prefix, sep_len)
         return false, s
     end
 end
+
+table.pack = function(...)
+    return {...}
+end
+
+table.delete = function(t, v)
+    for i, u in ipairs(t) do
+        if u == v then
+            table.remove(t, i)
+            break
+        end
+    end
+end

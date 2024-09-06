@@ -159,6 +159,7 @@ namespace Nova
         {
             entry.property = null;
             PrefabFactory.Put(entry.gameObject);
+            LuaRuntime.Instance.GetFunction("remove_anim_entry").Call(entry);
         }
 
         /// <summary>

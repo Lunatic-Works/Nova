@@ -1,3 +1,8 @@
+-- Animation groups are only used in holding animations,
+-- so they don't need to get restored
+local anim_groups = {}
+local cs_entry_to_group_name = {}
+
 --- AnimationEntry wrapper
 
 AnimationEntry = {}
@@ -11,14 +16,25 @@ function AnimationEntry:_then(args)
     if type(args) ~= 'table' then
         args = { property = args }
     end
-    return AnimationEntry:new {
+
+    local group_name = self.group_name
+    local entry = AnimationEntry:new {
         entry = self.entry:Then(
             args.property,
             args.duration or 0,
             args.easing,
             args.repeat_num or 0
-        )
+        ),
+        group_name = group_name
     }
+
+    if group_name then
+        local cs_entry = entry.entry
+        table.insert(anim_groups[group_name], cs_entry)
+        cs_entry_to_group_name[cs_entry] = group_name
+    end
+
+    return entry
 end
 
 function AnimationEntry:_and(args)
@@ -28,25 +44,40 @@ function AnimationEntry:_and(args)
         args = { property = args }
     end
 
+    local head, group_name, entry
     if self.head then
-        return AnimationEntry:new {
-            entry = self.head.entry:Then(
+        head = self.head
+        group_name = head.group_name
+        entry = AnimationEntry:new {
+            entry = head.entry:Then(
                 args.property,
                 args.duration or 0,
                 args.easing,
                 args.repeat_num or 0
-            )
+            ),
+            group_name = group_name
         }
     else
-        return AnimationEntry:new {
-            entry = self.entry:And(
+        head = self
+        group_name = head.group_name
+        entry = AnimationEntry:new {
+            entry = head.entry:And(
                 args.property,
                 args.duration or 0,
                 args.easing,
                 args.repeat_num or 0
-            )
+            ),
+            group_name = group_name
         }
     end
+
+    if group_name then
+        local cs_entry = entry.entry
+        table.insert(anim_groups[group_name], cs_entry)
+        cs_entry_to_group_name[cs_entry] = group_name
+    end
+
+    return entry
 end
 
 function AnimationEntry:_for(duration)
@@ -82,7 +113,18 @@ end
 NovaAnimation._then = AnimationEntry._then
 
 function NovaAnimation:stop()
-    self.entry:Stop()
+    if not self.group_name then
+        self.entry:Stop()
+    else
+        -- New animation entries may be created in Stop()
+        while true do
+            local entry = anim_groups[self.group_name][1]
+            if entry == nil then
+                break
+            end
+            entry:Stop()
+        end
+    end
 end
 
 --- NovaAnimation wrapper end
@@ -116,3 +158,32 @@ function make_anim_method(func_name, func, preload_func, preload_param)
 end
 
 RELATIVE = Nova.UseRelativeValue.Yes
+
+function named_anim_hold(group_name)
+    if not check_anim_hold() then
+        error('named_anim_hold should only be called in holding animation')
+    end
+
+    anim_groups[group_name] = anim_groups[group_name] or {}
+    return NovaAnimation:new { entry = anim_hold.entry, group_name = group_name }
+end
+
+function remove_anim_entry(cs_entry)
+    local group_name = cs_entry_to_group_name[cs_entry]
+    if group_name then
+        -- When removing an entry, we need to maintain the order of other entries
+        -- TODO: Use a queue for better performance
+        table.delete(anim_groups[group_name], cs_entry)
+        cs_entry_to_group_name[cs_entry] = nil
+    end
+end
+
+function clear_anim_groups()
+    for k, v in pairs(anim_groups) do
+        if #v > 0 then
+            warn('Animation group is non empty: ' .. k)
+        end
+    end
+
+    anim_groups = {}
+end
