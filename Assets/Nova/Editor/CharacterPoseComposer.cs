@@ -26,9 +26,7 @@ namespace Nova.Editor
         private const string DefaultStandingsFolder = "Assets/Resources/Standings";
 
         private string imageFolder = DefaultStandingsFolder;
-        private bool uncropped;
         private string newImageFolder = DefaultStandingsFolder;
-        private bool newUncropped;
         private int selectedCharacterIndex = -1;
         private GameCharacterController selectedCharacter;
         private string poseString;
@@ -87,10 +85,32 @@ namespace Nova.Editor
             GUI.Label(rect, "Layers");
         }
 
+        private static SpriteWithOffset LoadSpriteMaybeOffset(string path)
+        {
+            path = Path.ChangeExtension(path, "asset");
+            var spriteWithOffset = AssetDatabase.LoadAssetAtPath<SpriteWithOffset>(path);
+            if (spriteWithOffset != null)
+            {
+                return spriteWithOffset;
+            }
+
+            path = Path.ChangeExtension(path, "png");
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (sprite != null)
+            {
+                spriteWithOffset = CreateInstance<SpriteWithOffset>();
+                spriteWithOffset.sprite = sprite;
+                return spriteWithOffset;
+            }
+
+            Debug.LogWarning($"Nova: {path} not found.");
+            return null;
+        }
+
         private void DrawElement(Rect rect, int index, bool active, bool focused)
         {
             var item = layers[index];
-            var guids = AssetDatabase.FindAssets(uncropped ? "t:Sprite" : "t:SpriteWithOffset", new[] {imageFolder});
+            var guids = AssetDatabase.FindAssets("t:Sprite", new[] {imageFolder});
 
             if (guids.Length == 0)
             {
@@ -105,28 +125,10 @@ namespace Nova.Editor
                 {
                     var path = AssetDatabase.GUIDToAssetPath(guid);
                     var layerName = Path.GetFileNameWithoutExtension(path);
-
-                    SpriteWithOffset sprite;
-                    if (uncropped)
+                    var sprite = LoadSpriteMaybeOffset(path);
+                    if (sprite == null)
                     {
-                        // Use Sprite
-                        var _sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-                        if (_sprite == null)
-                        {
-                            continue;
-                        }
-
-                        sprite = CreateInstance<SpriteWithOffset>();
-                        sprite.sprite = _sprite;
-                    }
-                    else
-                    {
-                        // Use SpriteWithOffset
-                        sprite = AssetDatabase.LoadAssetAtPath<SpriteWithOffset>(Path.ChangeExtension(path, "asset"));
-                        if (sprite == null)
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     menu.AddItem(new GUIContent(CreateSubMenu(layerName)), false, () =>
@@ -209,8 +211,7 @@ namespace Nova.Editor
                 .Select(x => new Layer
                 {
                     name = x,
-                    sprite = AssetDatabase.LoadAssetAtPath<SpriteWithOffset>(
-                        Path.ChangeExtension(Path.Combine(imageFolder, x), "asset"))
+                    sprite = LoadSpriteMaybeOffset(Path.Combine(imageFolder, x))
                 });
         }
 
@@ -222,15 +223,11 @@ namespace Nova.Editor
         }
 
         // You may edit these according to your conventions
-        private static string[] SubMenus = {"eyebrow", "eye", "mouth"};
+        private static readonly Regex SubMenuPrefix = new Regex("^(eyebrow|eye|mouth)_", RegexOptions.Compiled);
 
         private string CreateSubMenu(string s)
         {
-            foreach (var prefix in SubMenus)
-            {
-                s = Regex.Replace(s, $"^{prefix}_", $"{prefix}/");
-            }
-
+            s = SubMenuPrefix.Replace(s, "$1/", 1);
             return s;
         }
 
@@ -243,12 +240,7 @@ namespace Nova.Editor
             GUILayout.BeginVertical(GUILayout.Width(360));
             GUILayout.Space(8);
 
-            GUILayout.BeginHorizontal();
             GUILayout.Label("Character Image Folder", EditorStyles.boldLabel);
-            GUILayout.FlexibleSpace();
-            newUncropped = GUILayout.Toggle(newUncropped, "Uncropped");
-            GUILayout.EndHorizontal();
-
             newImageFolder = EditorGUILayout.TextField(newImageFolder);
 
             GUILayout.BeginHorizontal();
@@ -256,7 +248,6 @@ namespace Nova.Editor
             if (GUILayout.Button("Load Selected Folder", GUILayout.Width(180)))
             {
                 newImageFolder = EditorUtils.GetSelectedDirectory();
-                newUncropped = imageFolder.ToLower().Contains("uncrop");
                 refreshFolder = true;
             }
 
@@ -277,14 +268,12 @@ namespace Nova.Editor
             if (selectedCharacter != null && selectedCharacterIndex != oldSelectedCharacterIndex)
             {
                 newImageFolder = StandingsFolderPrefix + selectedCharacter.imageFolder;
-                newUncropped = false;
                 refreshFolder = true;
             }
 
             if (refreshFolder)
             {
                 imageFolder = newImageFolder;
-                uncropped = newUncropped;
                 if (selectedCharacter != null && imageFolder != StandingsFolderPrefix + selectedCharacter.imageFolder)
                 {
                     selectedCharacter = null;
