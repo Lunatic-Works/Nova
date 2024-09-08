@@ -66,16 +66,16 @@ function avatar(pose, color)
     end
 end
 
-function avatar_hide(chara)
+function avatar_hide(name)
     local avatar = current_avatar()
     if avatar == nil then
         return
     end
 
-    if chara == nil then
+    if name == nil then
         avatar:ClearImageDelayed()
     else
-        avatar:ClearImageDelayed(chara)
+        avatar:ClearImageDelayed(name)
     end
 
     schedule_gc()
