@@ -8,6 +8,8 @@ namespace Nova
     [ExportCustomType]
     public class RawImageController : MonoBehaviour, IRestorable
     {
+        private const string DefaultShader = "Nova/Premul/Default";
+
         public string luaGlobalName;
 
         private GameState gameState;
@@ -24,6 +26,11 @@ namespace Nova
         {
             gameState = Utils.FindNovaController().GameState;
             image = GetComponent<RawImage>();
+
+            var materialPool = gameObject.Ensure<MaterialPool>();
+            var defaultMaterial = materialPool.Get(DefaultShader);
+            image.material = defaultMaterial;
+            materialPool.defaultMaterial = defaultMaterial;
 
             if (!string.IsNullOrEmpty(luaGlobalName))
             {

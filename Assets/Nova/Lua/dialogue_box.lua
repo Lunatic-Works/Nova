@@ -70,7 +70,9 @@ function box_set_current(box)
     if type(box) == 'string' then
         box = _G[box]
     end
+    swap_last_avatar_name()
     __Nova.gameViewController:SwitchDialogueBox(box)
+    swap_last_avatar_name()
 end
 
 function box_tint(color)

@@ -54,7 +54,9 @@ namespace Nova
                 if (sprite != null)
                 {
                     layer.sprite = sprite.sprite;
-                    layer.transform.localPosition = sprite.offset;
+                    var layerTransform = layer.transform;
+                    layerTransform.localPosition = sprite.offset;
+                    layerTransform.localScale = sprite.scale;
                     layer.enabled = true;
                 }
                 else
@@ -66,13 +68,20 @@ namespace Nova
 
         public void SetTextures(CompositeSpriteMerger other)
         {
+            var otherTransform = other.transform;
+            transform.localPosition = otherTransform.localPosition;
+            transform.localScale = otherTransform.localScale;
+
             EnsureLayers(other.spriteCount);
             for (var i = 0; i < other.spriteCount; i++)
             {
                 var layer = layers[i];
                 var otherLayer = other.layers[i];
                 layer.sprite = otherLayer.sprite;
-                layer.transform.localPosition = otherLayer.transform.localPosition;
+                var layerTransform = layer.transform;
+                var otherLayerTransform = otherLayer.transform;
+                layerTransform.localPosition = otherLayerTransform.localPosition;
+                layerTransform.localScale = otherLayerTransform.localScale;
             }
         }
 
@@ -137,7 +146,7 @@ namespace Nova
             {
                 var bounds = sprite.sprite.bounds;
                 var center = bounds.center + sprite.offset;
-                var extents = bounds.extents;
+                var extents = bounds.extents.CloneScale(sprite.scale);
                 xMin = Mathf.Min(xMin, center.x - extents.x);
                 yMin = Mathf.Min(yMin, center.y - extents.y);
                 xMax = Mathf.Max(xMax, center.x + extents.x);

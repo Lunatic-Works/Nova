@@ -6,30 +6,22 @@ using UnityEngine.UI;
 
 namespace Nova
 {
-    [Serializable]
-    public class AvatarConfig
-    {
-        public string characterName;
-        public GameCharacterController characterController;
-        public string prefix;
-    }
-
     [ExportCustomType]
-    [RequireComponent(typeof(RawImage))]
     public class AvatarController : CompositeSpriteController
     {
-        [SerializeField] private List<AvatarConfig> avatarConfigs;
         [SerializeField] private int textPadding;
         [SerializeField] private Camera renderCamera;
+        [SerializeField] private RawImage image;
 
+        private AvatarConfigs configs;
         private DialogueBoxController dialogueBox;
-        private RawImage image;
         private RectTransform rectTransform;
-        private readonly Dictionary<string, AvatarConfig> nameToConfig = new Dictionary<string, AvatarConfig>();
-        private string characterName;
-        private Dictionary<string, string> characterToImageName = new Dictionary<string, string>();
+
+        [ReadOnly] public string characterName;
+        private Dictionary<string, string> characterToPose = new Dictionary<string, string>();
 
         public int textPaddingOrZero => string.IsNullOrEmpty(currentPose) ? 0 : textPadding;
+        public override string imageFolder => configs.GetImageFolder(characterName);
         public override bool renderToCamera => true;
         public override RenderTexture renderTexture => null;
 
@@ -37,13 +29,11 @@ namespace Nova
         {
             base.Awake();
 
+            configs = GetComponentInParent<AvatarConfigs>();
             dialogueBox = GetComponentInParent<DialogueBoxController>();
-            image = GetComponent<RawImage>();
             rectTransform = GetComponent<RectTransform>();
-            foreach (var config in avatarConfigs)
-            {
-                nameToConfig[config.characterName] = config;
-            }
+
+            gameState.AddRestorable(this);
 
             gameState.nodeChanged.AddListener(OnNodeChanged);
         }
@@ -52,35 +42,37 @@ namespace Nova
         {
             var referenceWidth = (int)rectTransform.rect.width;
             var referenceHeight = (int)rectTransform.rect.height;
-            var rt = new RenderTexture(referenceWidth, referenceHeight, 0, RenderTextureFormat.ARGB32);
-            rt.name = "AvatarTexture";
+            var rt = new RenderTexture(referenceWidth, referenceHeight, 0, RenderTextureFormat.ARGB32)
+            {
+                name = "AvatarTexture"
+            };
             renderCamera.targetTexture = rt;
             image.texture = rt;
             renderCamera.enabled = true;
+
+            UpdateImage(false);
         }
 
         private void OnDestroy()
         {
             Destroy(renderCamera.targetTexture);
+
+            gameState.RemoveRestorable(this);
+
             gameState.nodeChanged.RemoveListener(OnNodeChanged);
         }
 
-        public void SetCharacterName(string name)
-        {
-            characterName = name;
-        }
-
-        private bool CheckCharacterName(string imageName)
+        private bool CheckCharacterName(string pose)
         {
             if (string.IsNullOrEmpty(characterName))
             {
-                Debug.LogWarning($"Nova: Set avatar {imageName} with empty characterName.");
+                Debug.LogWarning($"Nova: Set avatar {pose} with empty characterName.");
                 return false;
             }
 
-            if (!nameToConfig.ContainsKey(characterName))
+            if (!configs.Contains(characterName))
             {
-                Debug.LogWarning($"Nova: Set avatar {imageName} with unknown characterName {characterName}");
+                Debug.LogWarning($"Nova: Set avatar {pose} with unknown characterName {characterName}");
                 return false;
             }
 
@@ -89,15 +81,7 @@ namespace Nova
 
         public GameCharacterController GetCharacterController()
         {
-            if (nameToConfig.TryGetValue(characterName, out var config))
-            {
-                return config.characterController;
-            }
-            else
-            {
-                Debug.LogWarning($"Nova: GetCharacterController with unknown characterName {characterName}");
-                return null;
-            }
+            return configs.GetCharacterController(characterName);
         }
 
         public void SetPoseDelayed(string pose)
@@ -107,47 +91,69 @@ namespace Nova
                 return;
             }
 
-            var prefix = nameToConfig[characterName].prefix;
-            pose = ArrayToPose(PoseToArray(pose).Select(x => prefix + x));
-            characterToImageName[characterName] = pose;
+            characterToPose[characterName] = pose;
         }
 
-        public void SetImageDelayed(string imageName)
+        public void ClearImageDelayed(string characterName)
         {
-            if (!CheckCharacterName(imageName))
-            {
-                return;
-            }
-
-            characterToImageName[characterName] = nameToConfig[characterName].prefix + imageName;
+            characterToPose.Remove(characterName);
         }
 
         public void ClearImageDelayed()
         {
-            if (!CheckCharacterName("<clear>"))
-            {
-                return;
-            }
-
-            characterToImageName.Remove(characterName);
+            characterToPose.Remove(characterName);
         }
 
         public void UpdateImage(bool fade = true)
         {
-            if (string.IsNullOrEmpty(characterName) || !nameToConfig.ContainsKey(characterName) ||
-                !characterToImageName.ContainsKey(characterName))
+            if (string.IsNullOrEmpty(characterName) || !configs.Contains(characterName) ||
+                !characterToPose.ContainsKey(characterName))
             {
                 ClearImage(fade);
             }
             else
             {
-                SetPose(characterToImageName[characterName], fade);
+                SetPose(characterToPose[characterName], fade);
             }
+        }
+
+        private void SetAvatarRect(float pixelsPerUnit, Rect spriteBounds, Rect rect)
+        {
+            var x = spriteBounds.xMin + rect.center.x / pixelsPerUnit;
+            var y = spriteBounds.yMax - rect.center.y / pixelsPerUnit;
+            var size = rect.height / 2f / pixelsPerUnit * renderCamera.transform.lossyScale.y;
+            var scale = renderCamera.orthographicSize / size;
+            mergerPrimary.transform.localPosition = new Vector3(-x * scale, -y * scale, 0);
+            mergerPrimary.transform.localScale = new Vector3(scale, scale, scale);
+        }
+
+        protected override void SetSprites(string pose, IReadOnlyList<SpriteWithOffset> sprites)
+        {
+            base.SetSprites(pose, sprites);
+
+            if (!string.IsNullOrEmpty(pose) && sprites.Count > 0)
+            {
+                var pixelsPerUnit = sprites[0].sprite.pixelsPerUnit;
+                var spriteBounds = CompositeSpriteMerger.GetMergedSize(sprites);
+                SetAvatarRect(pixelsPerUnit, spriteBounds, configs.GetRect(characterName, pose));
+            }
+        }
+
+        public override void SetPose(string pose, bool fade, float duration)
+        {
+            if (string.IsNullOrEmpty(currentPose) || string.IsNullOrEmpty(pose))
+            {
+                fade = false;
+            }
+
+            image.gameObject.SetActive(!string.IsNullOrEmpty(pose));
+
+            base.SetPose(pose, fade, duration);
         }
 
         public void ResetAll()
         {
-            characterToImageName.Clear();
+            characterToPose.Clear();
         }
 
         private void OnNodeChanged(NodeChangedData nodeChangedData)
@@ -168,12 +174,13 @@ namespace Nova
         [Serializable]
         private class AvatarControllerRestoreData : CompositeSpriteControllerRestoreData
         {
-            // No need to save characterName, because it will be set in the action of the dialogue entry
-            public readonly Dictionary<string, string> characterToImageName;
+            public readonly string characterName;
+            public readonly Dictionary<string, string> characterToPose;
 
             public AvatarControllerRestoreData(AvatarController parent) : base(parent)
             {
-                characterToImageName = parent.characterToImageName;
+                characterName = parent.characterName;
+                characterToPose = parent.characterToPose.ToDictionary(x => x.Key, x => x.Value);
             }
         }
 
@@ -184,10 +191,11 @@ namespace Nova
 
         public override void Restore(IRestoreData restoreData)
         {
-            base.Restore(restoreData);
-
             var data = restoreData as AvatarControllerRestoreData;
-            characterToImageName = data.characterToImageName;
+            characterName = data.characterName;
+            characterToPose = data.characterToPose;
+
+            base.Restore(restoreData);
         }
 
         #endregion

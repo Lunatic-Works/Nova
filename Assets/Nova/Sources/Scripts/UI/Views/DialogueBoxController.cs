@@ -140,7 +140,13 @@ namespace Nova
             dialogueText = GetComponentInChildren<DialogueTextController>();
             dialogueTextRect = dialogueText.transform as RectTransform;
 
-            avatar = GetComponentInChildren<AvatarController>();
+            avatar = GetComponentInChildren<AvatarController>(true);
+            if (avatar != null && !avatar.gameObject.activeSelf)
+            {
+                Destroy(avatar.gameObject);
+                avatar = null;
+            }
+
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
             backgroundImage = background.GetComponent<Image>();

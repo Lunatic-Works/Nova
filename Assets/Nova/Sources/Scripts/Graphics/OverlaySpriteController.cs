@@ -15,6 +15,8 @@ namespace Nova
         private static readonly int MainTexID = Shader.PropertyToID("_MainTex");
 
         [SerializeField] private GameObject overlayObject;
+        [SerializeField] private string _imageFolder;
+        public override string imageFolder => _imageFolder;
         public GameObject overlay => overlayObject;
 
         private static Mesh Quad;

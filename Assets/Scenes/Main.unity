@@ -1010,12 +1010,12 @@ PrefabInstance:
       value: GaotianVoice
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
-      propertyPath: imageFolder
-      value: Standings/Gaotian
-      objectReference: {fileID: 0}
-    - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: voiceFolder
       value: Voices/Gaotian
+      objectReference: {fileID: 0}
+    - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
+      propertyPath: _imageFolder
+      value: Standings/Gaotian
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: luaGlobalName
@@ -1263,12 +1263,12 @@ PrefabInstance:
       value: QianyeVoice
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
-      propertyPath: imageFolder
-      value: Standings/Qianye
-      objectReference: {fileID: 0}
-    - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: voiceFolder
       value: Voices/Qianye
+      objectReference: {fileID: 0}
+    - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
+      propertyPath: _imageFolder
+      value: Standings/Qianye
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: luaGlobalName
@@ -1725,12 +1725,12 @@ PrefabInstance:
       value: XibenVoice
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
-      propertyPath: imageFolder
-      value: Standings/Xiben
-      objectReference: {fileID: 0}
-    - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: voiceFolder
       value: Voices/Xiben
+      objectReference: {fileID: 0}
+    - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
+      propertyPath: _imageFolder
+      value: Standings/Xiben
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: luaGlobalName
@@ -1762,6 +1762,7 @@ GameObject:
   - component: {fileID: 1114866446}
   - component: {fileID: 1114866445}
   - component: {fileID: 1114866444}
+  - component: {fileID: 1114866449}
   m_Layer: 0
   m_Name: UI
   m_TagString: UIRoot
@@ -1897,6 +1898,59 @@ MonoBehaviour:
   uiAudioSource: {fileID: 880587545}
   animationsToPause: []
   audiosToPause: []
+--- !u!114 &1114866449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114866442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea7de023b92ed42499ec05f99b133066, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  configs:
+  - characterName: "\u738B\u4E8C\u5BAB"
+    characterController: {fileID: 319595391}
+    rects:
+    - key: 
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 800
+        height: 800
+  - characterName: "\u5F20\u6D45\u91CE"
+    characterController: {fileID: 1952131526}
+    rects:
+    - key: 
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 0
+        width: 800
+        height: 800
+  - characterName: "\u5B59\u897F\u672C"
+    characterController: {fileID: 2058258575}
+    rects:
+    - key: 
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 800
+        height: 800
+  - characterName: "\u9648\u9AD8\u5929"
+    characterController: {fileID: 1285618328}
+    rects:
+    - key: 
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 800
+        height: 800
 --- !u!224 &1123056130 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3745355648979271389, guid: cd6a123d28e326f4fbd7c930095cc3e0, type: 3}
@@ -2013,12 +2067,12 @@ PrefabInstance:
       value: ErgongVoice
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
-      propertyPath: imageFolder
-      value: Standings/Ergong
-      objectReference: {fileID: 0}
-    - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: voiceFolder
       value: Voices/Ergong
+      objectReference: {fileID: 0}
+    - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
+      propertyPath: _imageFolder
+      value: Standings/Ergong
       objectReference: {fileID: 0}
     - target: {fileID: 7318139140313027263, guid: d69e9accd9e3233469a7960c058dbb16, type: 3}
       propertyPath: luaGlobalName

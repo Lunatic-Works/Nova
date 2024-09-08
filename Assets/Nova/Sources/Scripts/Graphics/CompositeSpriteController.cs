@@ -12,8 +12,9 @@ namespace Nova
 
         public CompositeSpriteMerger mergerPrimary;
         public CompositeSpriteMerger mergerSub;
-        public string imageFolder;
+        public abstract string imageFolder { get; }
 
+        private string currentImageFolder;
         protected string currentPose;
         private DialogueState dialogueState;
         protected GameState gameState;
@@ -48,7 +49,7 @@ namespace Nova
 
         public virtual void SetPose(string pose, bool fade, float duration)
         {
-            if (pose == currentPose)
+            if (imageFolder == currentImageFolder && pose == currentPose)
             {
                 return;
             }
@@ -67,6 +68,7 @@ namespace Nova
                 DoFadeAnimation(duration);
             }
 
+            currentImageFolder = imageFolder;
             currentPose = pose;
         }
 

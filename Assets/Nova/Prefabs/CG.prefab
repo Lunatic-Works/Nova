@@ -136,7 +136,7 @@ MonoBehaviour:
   fadeDuration: 0.1
   mergerPrimary: {fileID: 605662334414739900}
   mergerSub: {fileID: 3417917987227954389}
-  imageFolder: CG
+  _imageFolder: CG
   luaGlobalName: cg
   overlayObject: {fileID: 7508427682765581805}
 --- !u!114 &5765478298121737571

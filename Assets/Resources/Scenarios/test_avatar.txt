@@ -9,7 +9,7 @@ set_box()
 测试头像
 
 <|
-avatar_show('normal')
+avatar('normal')
 |>
 王二宫：：第一个人的头像
 
@@ -22,12 +22,12 @@ avatar_show('normal')
 王二宫：：还是刚才的头像
 
 <|
-avatar_show('normal')
+avatar('normal')
 |>
 陈高天：：第二个人的头像
 
 <|
-avatar_show('cry')
+avatar('cry')
 |>
 陈高天：：换一个表情
 
@@ -36,9 +36,16 @@ avatar_hide()
 |>
 陈高天：：头像消失
 
-王二宫：：仍然是刚才的头像
+王二宫：：第一个人仍然是刚才的头像
 
 陈高天：：仍然没有头像
+
+<|
+avatar_clear()
+|>
+清除所有头像
+
+王二宫：：没有头像
 
 测试结束
 @<| is_end() |>

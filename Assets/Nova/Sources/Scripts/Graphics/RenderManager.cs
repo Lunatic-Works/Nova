@@ -399,8 +399,10 @@ namespace Nova
             {
                 if (_instance == null)
                 {
-                    _instance = new UICameraHelper();
-                    _instance.camera = GameObject.FindWithTag("UICamera").GetComponent<Camera>();
+                    _instance = new UICameraHelper
+                    {
+                        camera = GameObject.FindWithTag("UICamera").GetComponent<Camera>()
+                    };
                 }
 
                 return _instance.camera;
