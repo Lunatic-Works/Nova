@@ -22,8 +22,10 @@ namespace Nova.Editor
             var previewRect =
                 EditorGUILayout.GetControlRect(false, scale * texture.height, GUILayout.Width(scale * texture.width));
             EditorGUI.DrawTextureTransparent(previewRect, texture);
-            EditorUtils.DrawPreviewCaptureFrame(previewRect, cropper.boundRect.ToRect(), scale, true, Color.red);
-            EditorUtils.DrawPreviewCaptureFrame(previewRect, cropper.cropRect.ToRect(), scale, true, Color.yellow);
+            EditorUtils.DrawPreviewCaptureFrame(previewRect, cropper.boundRect.ToRect(), scale, true, Color.red,
+                Color.clear);
+            EditorUtils.DrawPreviewCaptureFrame(previewRect, cropper.cropRect.ToRect(), scale, true, Color.yellow,
+                Color.clear);
         }
 
         private static int RoundUpToFour(int x)

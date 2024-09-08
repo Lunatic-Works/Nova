@@ -372,7 +372,8 @@ namespace Nova.Editor
                 if (useCaptureBox)
                 {
                     var scale = previewRect.width / (previewBounds.width * previewSprites[0].sprite.pixelsPerUnit);
-                    EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, false, Color.red);
+                    EditorUtils.DrawPreviewCaptureFrame(previewRect, captureBox.ToRect(), scale, false, Color.red,
+                        Color.cyan);
                 }
             }
 

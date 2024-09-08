@@ -33,11 +33,24 @@ namespace Nova.Editor
             }
         }
 
-        public static void DrawFrame(Rect rect, Color color, float lineWidth = 1.0f)
+        public static void DrawFrame(Rect rect, Color color, Color auxColor, float lineWidth = 1.0f)
         {
             var offset = rect.min;
             var size = rect.size;
-            var halfLineWidth = lineWidth / 2.0f;
+            var halfLineWidth = lineWidth / 2;
+
+            if (auxColor != Color.clear)
+            {
+                EditorGUI.DrawRect(new Rect(
+                    offset.x + size.x / 2 - halfLineWidth, offset.y - halfLineWidth,
+                    lineWidth, size.y + lineWidth
+                ), auxColor);
+                EditorGUI.DrawRect(new Rect(
+                    offset.x - halfLineWidth, offset.y + size.y / 2 - halfLineWidth,
+                    size.x + lineWidth, lineWidth
+                ), auxColor);
+            }
+
             EditorGUI.DrawRect(new Rect(
                 offset.x - halfLineWidth, offset.y - halfLineWidth,
                 lineWidth, size.y + lineWidth
@@ -61,11 +74,11 @@ namespace Nova.Editor
             var offset = preview.min + preview.size * new Vector2(crop.x, 1.0f - crop.y);
             var size = preview.size * crop.size;
             size.y = -size.y;
-            DrawFrame(new Rect(offset, size), color, lineWidth);
+            DrawFrame(new Rect(offset, size), color, Color.clear, lineWidth);
         }
 
         public static void DrawPreviewCaptureFrame(Rect preview, Rect capture, float scale, bool inverseY, Color color,
-            float lineWidth = 1.0f)
+            Color auxColor, float lineWidth = 1.0f)
         {
             var offset = preview.min + scale * capture.min;
             if (inverseY)
@@ -74,7 +87,7 @@ namespace Nova.Editor
             }
 
             var size = scale * capture.size;
-            DrawFrame(new Rect(offset, size), color, lineWidth);
+            DrawFrame(new Rect(offset, size), color, auxColor, lineWidth);
         }
     }
 }
