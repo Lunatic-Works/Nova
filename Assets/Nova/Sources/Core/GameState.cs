@@ -792,11 +792,6 @@ namespace Nova
                 }
                 else
                 {
-                    if (!isUpgrading)
-                    {
-                        Debug.LogWarning($"Nova: Key {pair.Key} not found in restoreDatas. Please clear save data.");
-                    }
-
                     // fallback to initialCheckpoint state
                     pair.Value.Restore(initialCheckpoint.restoreDatas[pair.Key]);
                 }
