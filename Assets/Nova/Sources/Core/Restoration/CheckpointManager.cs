@@ -553,9 +553,9 @@ namespace Nova
             return bookmark;
         }
 
-        public void SaveBookmark(int saveID, Bookmark bookmark, bool cache = true)
+        public void SaveBookmark(int saveID, Bookmark bookmark, bool isUpgrading = false)
         {
-            if (cache)
+            if (!isUpgrading)
             {
                 var screenshot = new Texture2D(bookmark.screenshot.width, bookmark.screenshot.height,
                     bookmark.screenshot.format, false);
@@ -566,12 +566,15 @@ namespace Nova
 
             bookmark.globalSaveIdentifier = globalSave.identifier;
 
-            serializer.WriteBookmark(GetBookmarkFileName(saveID), cache ? ReplaceCache(saveID, bookmark) : bookmark);
+            serializer.WriteBookmark(GetBookmarkFileName(saveID), isUpgrading ? bookmark : ReplaceCache(saveID, bookmark));
             UpdateGlobalSave();
 
             var metadata = bookmarksMetadata.Ensure(saveID);
             metadata.saveID = saveID;
-            metadata.modifiedTime = DateTime.Now;
+            if (!isUpgrading)
+            {
+                metadata.modifiedTime = DateTime.Now;
+            }
         }
 
         public Bookmark LoadBookmark(int saveID, bool cache = true)

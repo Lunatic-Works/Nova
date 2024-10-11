@@ -186,7 +186,7 @@ namespace Nova
                 var bookmark = checkpointManager.LoadBookmark(id, false);
                 if (UpgradeBookmark(id, bookmark))
                 {
-                    checkpointManager.SaveBookmark(id, bookmark, false);
+                    checkpointManager.SaveBookmark(id, bookmark, true);
                 }
             }
         }
