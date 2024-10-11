@@ -24,7 +24,8 @@ namespace Nova.Editor
             var index = path.IndexOf(ResourcesFolderName, StringComparison.Ordinal);
             if (index == -1)
             {
-                throw new ArgumentException($"Nova: Path {path} not in Resources folder {ResourcesFolderName}");
+                Debug.LogError($"Nova: Path {path} not in Resources folder {ResourcesFolderName}");
+                return null;
             }
 
             return path.Substring(0, index + ResourcesFolderName.Length);
@@ -91,11 +92,16 @@ namespace Nova.Editor
             var sprites = CompositeSpriteController.LoadSprites(entry.resourcePath, entry.poseString);
             if (!sprites.Any() || sprites.Contains(null))
             {
-                resourcePath = "";
+                resourcePath = null;
                 return false;
             }
 
             resourcePath = GetResourcesFolder(GetAbsoluteAssetPath(sprites[0].sprite));
+            if (resourcePath == null)
+            {
+                return false;
+            }
+
             if (renderTexture != null)
             {
                 UnityEngine.Object.DestroyImmediate(renderTexture);
