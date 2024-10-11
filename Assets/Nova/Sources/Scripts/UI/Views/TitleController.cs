@@ -33,7 +33,7 @@ namespace Nova
             checkpointManager = controller.CheckpointManager;
             novaAnimation = controller.UIAnimation;
 
-            quitButton.onClick.AddListener(() => this.Hide(Utils.Quit));
+            quitButton.onClick.AddListener(Quit);
         }
 
         protected override void Start()
@@ -68,6 +68,12 @@ namespace Nova
 
         // Disable BackHide
         protected override void Update() { }
+
+        public void Quit()
+        {
+            ScheduleBgmFadeOut();
+            this.Hide(Utils.Quit);
+        }
 
         private void OnLoginSucceeded()
         {
