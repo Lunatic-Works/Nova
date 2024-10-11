@@ -241,6 +241,11 @@ namespace Nova.Editor
             showGlobalSave = EditorGUILayout.Foldout(showGlobalSave, "GlobalSave");
             if (showGlobalSave)
             {
+                var globalSave = checkpointManager.GetGlobalSave();
+                GUILayout.Label($"Begin checkpoint: {globalSave.beginCheckpoint}");
+                GUILayout.Label($"End checkpoint: {globalSave.endCheckpoint}");
+                GUILayout.Label($"Begin reached: {globalSave.beginReached}");
+                GUILayout.Label($"End reached: {globalSave.endReached}");
                 var value = checkpointManager.GetAllData();
                 GUILayout.TextArea(JsonConvert.SerializeObject(value, Formatting.Indented));
             }

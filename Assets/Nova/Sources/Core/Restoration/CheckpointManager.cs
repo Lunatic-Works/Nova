@@ -515,6 +515,11 @@ namespace Nova
             }
         }
 
+        public GlobalSave GetGlobalSave()
+        {
+            return globalSave;
+        }
+
         #endregion
 
         #region Bookmarks
