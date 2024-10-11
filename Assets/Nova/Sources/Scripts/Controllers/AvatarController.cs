@@ -25,9 +25,9 @@ namespace Nova
         public override bool renderToCamera => true;
         public override RenderTexture renderTexture => null;
 
-        protected override void Awake()
+        protected override void DoInit()
         {
-            base.Awake();
+            base.DoInit();
 
             configs = GetComponentInParent<AvatarConfigs>();
             dialogueBox = GetComponentInParent<DialogueBoxController>();

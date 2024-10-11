@@ -11,28 +11,13 @@ namespace Nova
         [SerializeField] protected GameObject myPanel;
 
         protected List<UIViewTransitionBase> transitions;
-        protected bool inited;
         public ViewManager viewManager { get; private set; }
-
-        protected virtual bool Init()
-        {
-            if (inited)
-            {
-                return true;
-            }
-
-            this.RuntimeAssert(myPanel != null, "Missing myPanel.");
-            transitions = myPanel.GetComponents<UIViewTransitionBase>().ToList();
-
-            viewManager = Utils.FindViewManager();
-
-            inited = true;
-            return false;
-        }
 
         protected virtual void Awake()
         {
-            Init();
+            this.RuntimeAssert(myPanel != null, "Missing myPanel.");
+            transitions = myPanel.GetComponents<UIViewTransitionBase>().ToList();
+            viewManager = Utils.FindViewManager();
         }
 
         public bool active => myPanel.activeSelf;

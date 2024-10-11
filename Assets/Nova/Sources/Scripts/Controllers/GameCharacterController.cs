@@ -78,9 +78,9 @@ namespace Nova
 
         private AudioSource audioSource;
 
-        protected override void Awake()
+        protected override void DoInit()
         {
-            base.Awake();
+            base.DoInit();
 
             audioSource = GetComponent<AudioSource>();
 

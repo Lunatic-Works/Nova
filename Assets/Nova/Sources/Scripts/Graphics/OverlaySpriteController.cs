@@ -43,9 +43,9 @@ namespace Nova
 
         public string luaGlobalName;
 
-        protected override void Awake()
+        protected override void DoInit()
         {
-            base.Awake();
+            base.DoInit();
 
             if (Quad == null)
             {

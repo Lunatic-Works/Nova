@@ -16,12 +16,9 @@ namespace Nova
         private DialogueState dialogueState;
         private GameUIController gameUIController;
 
-        protected override bool Init()
+        protected override void Awake()
         {
-            if (base.Init())
-            {
-                return true;
-            }
+            base.Awake();
 
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
@@ -30,8 +27,6 @@ namespace Nova
 
             LuaRuntime.Instance.BindObject("gameViewController", this);
             gameState.AddRestorable(this);
-
-            return false;
         }
 
         protected override void OnDestroy()

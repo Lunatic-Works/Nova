@@ -144,6 +144,11 @@ namespace Nova
             var yMax = float.MinValue;
             foreach (var sprite in sprites)
             {
+                if (sprite.sprite == null)
+                {
+                    continue;
+                }
+
                 var bounds = sprite.sprite.bounds;
                 var center = bounds.center + sprite.offset;
                 var extents = bounds.extents.CloneScale(sprite.scale);

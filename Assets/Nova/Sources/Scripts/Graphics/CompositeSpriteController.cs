@@ -28,18 +28,13 @@ namespace Nova
         // if layer = -1, render without considering camera's culling mask
         public virtual int layer { get; set; } = -1;
 
-        protected override void Init()
+        protected override void DoInit()
         {
-            if (inited)
-            {
-                return;
-            }
+            base.DoInit();
 
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
-
-            base.Init();
         }
 
         protected virtual void SetSprites(string pose, IReadOnlyList<SpriteWithOffset> sprites)

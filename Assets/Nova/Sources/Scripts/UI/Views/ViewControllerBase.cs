@@ -6,16 +6,12 @@ namespace Nova
     {
         protected InputManager inputManager;
 
-        protected override bool Init()
+        protected override void Awake()
         {
-            if (base.Init())
-            {
-                return true;
-            }
+            base.Awake();
 
             viewManager.SetController(this);
             inputManager = Utils.FindNovaController().InputManager;
-            return false;
         }
 
         // Extension method does not work with Unity Action
