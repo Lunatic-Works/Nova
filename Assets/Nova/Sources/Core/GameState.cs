@@ -213,6 +213,11 @@ namespace Nova
         public ChoiceOccursEvent choiceOccurs;
 
         /// <summary>
+        /// Triggered before a node which is a save point reaches its end.
+        /// </summary>
+        public SavePointEvent savePoint;
+
+        /// <summary>
         /// This event will be triggered if the story route has reached an end.
         /// </summary>
         public RouteEndedEvent routeEnded;
@@ -465,6 +470,11 @@ namespace Nova
 
         private void StepAtEndOfNode()
         {
+            if (currentNode.isSavePoint)
+            {
+                savePoint.Invoke(new SavePointEventData());
+            }
+
             switch (currentNode.type)
             {
                 case FlowChartNodeType.Normal:

@@ -126,16 +126,26 @@ function is_chapter()
         return
     end
     __Nova.scriptLoader:SetCurrentAsChapter()
+    __Nova.scriptLoader:SetCurrentAsDebug()
+end
+
+function is_save_point()
+    if not check_eager('is_save_point') then
+        return
+    end
+    __Nova.scriptLoader:SetCurrentAsSavePoint()
 end
 
 --- set the current node as a start node
 --- should be called at the end of the node
 --- a game can have multiple start points, which means this function can be called several times under
 --- different nodes
+--- indicates is_chapter()
 function is_start()
     if not check_eager('is_start') then
         return
     end
+    __Nova.scriptLoader:SetCurrentAsChapter()
     __Nova.scriptLoader:SetCurrentAsStart()
 end
 

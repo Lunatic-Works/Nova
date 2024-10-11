@@ -19,7 +19,7 @@ namespace Nova
             saveViewController = Utils.FindViewManager().GetController<SaveViewController>();
 
             gameState.choiceOccurs.AddListener(OnEvent);
-            gameState.routeEnded.AddListener(OnEvent);
+            gameState.savePoint.AddListener(OnEvent);
             saveViewController.bookmarkSaved.AddListener(UpdateSaved);
             saveViewController.bookmarkLoaded.AddListener(UpdateSaved);
         }
@@ -27,7 +27,7 @@ namespace Nova
         private void OnDestroy()
         {
             gameState.choiceOccurs.RemoveListener(OnEvent);
-            gameState.routeEnded.RemoveListener(OnEvent);
+            gameState.savePoint.RemoveListener(OnEvent);
             saveViewController.bookmarkSaved.RemoveListener(UpdateSaved);
             saveViewController.bookmarkLoaded.RemoveListener(UpdateSaved);
         }

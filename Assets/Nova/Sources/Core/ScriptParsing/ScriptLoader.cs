@@ -406,6 +406,12 @@ namespace Nova
             currentNode.isChapter = true;
         }
 
+        public void SetCurrentAsSavePoint()
+        {
+            CheckCurrentNodeDefaultLocale();
+            currentNode.isSavePoint = true;
+        }
+
         /// <summary>
         /// Set the current node as a start node.
         /// This method is designed to be called externally by scripts.

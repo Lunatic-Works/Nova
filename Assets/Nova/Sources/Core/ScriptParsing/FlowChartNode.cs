@@ -88,6 +88,18 @@ namespace Nova
             }
         }
 
+        private bool _isSavePoint;
+
+        public bool isSavePoint
+        {
+            get => _isSavePoint;
+            set
+            {
+                CheckFreeze();
+                _isSavePoint = value;
+            }
+        }
+
         #region Displayed names
 
         /// <summary>

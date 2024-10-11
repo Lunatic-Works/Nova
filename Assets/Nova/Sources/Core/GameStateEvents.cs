@@ -77,6 +77,14 @@ namespace Nova
     [Serializable]
     public class ChoiceOccursEvent : UnityEvent<ChoiceOccursData> { }
 
+    public class SavePointEventData : GameStateEventData
+    {
+        // nothing useful for now, can add node name, etc.
+    }
+
+    [Serializable]
+    public class SavePointEvent : UnityEvent<SavePointEventData> { }
+
     public class RouteEndedData : GameStateEventData
     {
         public readonly string endName;
