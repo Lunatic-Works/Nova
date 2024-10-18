@@ -186,7 +186,13 @@ public static class ToLuaExport
         "Material.ApplyPropertyOverride",
         "Material.RevertPropertyOverride",
         "Material.parent",
-        "Material.isVariant"
+        "Material.isVariant",
+        // OpenHarmony
+        "Object.InstantiateAsync",
+        "MonoBehaviour.EnableScriptReloadInCheckConsistency",
+        "Texture.InnerRefCount",
+        "Texture2D.GenerateWebStreamingData",
+        "Texture2D.GetLoadState",
     };
 
     class _MethodBase
