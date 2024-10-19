@@ -32,6 +32,8 @@
 
     WebGL/微信小程序可以参考[linsyking/Nova-WXM](https://github.com/linsyking/Nova-WXM)，以及一个在线编辑器[linsyking/Nova-online-editor](https://github.com/linsyking/Nova-online-editor)。目前WebGL版的ToLua# runtime还有一些问题，所以没有合并到master branch。
 
+    理论上可以用团结引擎编译到OpenHarmony，目前还需要更多测试。
+
 * **可以把解谜/战棋等游戏加到Nova里吗？可以把Nova作为对话系统加到解谜/战棋等游戏里吗？**
 
     绝大多数Unity能做的gameplay都可以加到Nova里，但是把Nova加到其他游戏里会比较困难。目前Nova的定位是“框架/模板”，而不是“插件/扩展包”。
