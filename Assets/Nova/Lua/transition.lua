@@ -283,13 +283,13 @@ make_anim_method('trans', function(self, obj, image_name, shader_layer, times, p
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 1)
             mat:SetColor('_SubColor', renderer.color)
-            token = set_mat(obj, mat)
+            token = set_mat(obj, mat, layer_id)
 
             show_no_fade(obj, image_name, nil, color2)
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj), nil, token)
+            set_mat(obj, get_default_mat(obj), layer_id, token)
         end
     end
 
@@ -344,7 +344,7 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
             set_mat_default_properties(mat, base_shader_name, properties)
             set_mat_properties(mat, base_shader_name, properties)
             mat:SetFloat('_T', 0)
-            token = set_mat(obj, mat)
+            token = set_mat(obj, mat, layer_id)
         end
 
         action_middle = function()
@@ -356,7 +356,7 @@ make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, 
         end
 
         action_end = function()
-            set_mat(obj, get_default_mat(obj), nil, token)
+            set_mat(obj, get_default_mat(obj), layer_id, token)
         end
     end
 
