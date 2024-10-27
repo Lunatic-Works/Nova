@@ -2,8 +2,6 @@ local shader_alias_map = {
     broken_tv = 'Broken TV',
 }
 
-local cam_trans_layer_id = 1
-
 --- convert Lua-style name to Unity-style name, e.g., 'foo_bar' -> 'Foo Bar'
 local function get_base_shader_name(s)
     return string.upper(string.sub(s, 1, 1)) .. string.gsub(string.sub(s, 2), '_(.)', function(x) return ' ' .. string.upper(x) end)
@@ -118,7 +116,7 @@ local function set_mat(obj, mat, layer_id, token)
     layer_id = layer_id or 0
     token = token or -1
 
-    local go, renderer, pp = get_renderer_pp(obj)
+    local _, renderer, pp = get_renderer_pp(obj)
 
     if renderer then
         if layer_id ~= 0 then
@@ -211,8 +209,19 @@ local function set_mat_properties(mat, base_shader_name, properties)
     end
 end
 
-local function parse_shader_layer(shader_layer, default_layer_id)
-    default_layer_id = default_layer_id or 0
+local function parse_shader_layer(obj, shader_layer, is_trans)
+    local default_layer_id
+    if is_trans then
+        local _, renderer, _ = get_renderer_pp(obj)
+        if renderer then
+            default_layer_id = 0
+        else
+            default_layer_id = 1
+        end
+    else
+        default_layer_id = 0
+    end
+
     if shader_layer == nil then
         return nil, default_layer_id
     elseif type(shader_layer) == 'string' then
@@ -241,7 +250,7 @@ end
 ---     trans(obj, 'image_name', 'shader_name', [duration, { name = value }, {r, g, b, [a]}])
 ---     trans(cam, func, 'shader_name', [duration, { name = value }, {r, g, b, [a]}])
 make_anim_method('trans', function(self, obj, image_name, shader_layer, times, properties, color2)
-    local shader_name, layer_id = parse_shader_layer(shader_layer, cam_trans_layer_id)
+    local shader_name, layer_id = parse_shader_layer(obj, shader_layer, true)
     -- mat is not RestorableMaterial
     local mat, base_shader_name, _ = get_mat(obj, shader_name, false)
     local duration, easing = parse_times(times)
@@ -308,7 +317,7 @@ end, add_preload_pattern)
 --- usage:
 ---     trans2(obj, 'image_name', 'shader_name', [duration, { name = value }, duration2, { name = value }, {r, g, b, [a]}])
 make_anim_method('trans2', function(self, obj, image_name, shader_layer, times, properties, times2, properties2, color2)
-    local shader_name, layer_id = parse_shader_layer(shader_layer, cam_trans_layer_id)
+    local shader_name, layer_id = parse_shader_layer(obj, shader_layer, true)
     -- mat is not RestorableMaterial
     local mat, base_shader_name, _ = get_mat(obj, shader_name, false)
     local duration, easing = parse_times(times)
@@ -373,7 +382,7 @@ end, add_preload_pattern)
 ---     vfx(obj, 'shader_name', [t, { name = value }])
 ---     vfx(obj, {'shader_name', layer_id}, [t, { name = value }])
 function vfx(obj, shader_layer, t, properties)
-    local shader_name, layer_id = parse_shader_layer(shader_layer)
+    local shader_name, layer_id = parse_shader_layer(obj, shader_layer, false)
     if shader_name then
         local mat, base_shader_name, _ = get_mat(obj, shader_name)
         t = t or 1
@@ -396,7 +405,7 @@ end
 --- usage:
 ---     vfx(obj, 'shader_name', {start_t, target_t}, duration, [{ name = value }])
 make_anim_method('vfx', function(self, obj, shader_layer, start_target_t, times, properties)
-    local shader_name, layer_id = parse_shader_layer(shader_layer)
+    local shader_name, layer_id = parse_shader_layer(obj, shader_layer, false)
     local mat, base_shader_name, variant = get_mat(obj, shader_name)
     local start_t, target_t = unpack(start_target_t)
     local duration, easing = parse_times(times)
@@ -432,7 +441,7 @@ end)
 --- usage:
 ---     vfx_multi(obj, 'shader_name', duration, { name = {start_value, target_value} }, [{ name = value }])
 make_anim_method('vfx_multi', function(self, obj, shader_layer, times, anim_properties, properties)
-    local shader_name, layer_id = parse_shader_layer(shader_layer)
+    local shader_name, layer_id = parse_shader_layer(obj, shader_layer, false)
     local mat, base_shader_name, _ = get_mat(obj, shader_name)
     local duration, easing = parse_times(times)
     properties = properties or {}
