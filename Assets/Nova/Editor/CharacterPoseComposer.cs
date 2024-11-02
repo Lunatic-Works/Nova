@@ -24,6 +24,7 @@ namespace Nova.Editor
 
         private const string StandingsFolderPrefix = "Assets/Resources/";
         private const string DefaultStandingsFolder = "Assets/Resources/Standings";
+        private const int ComposerLayer = 19;
 
         private string imageFolder = DefaultStandingsFolder;
         private string newImageFolder = DefaultStandingsFolder;
@@ -50,8 +51,8 @@ namespace Nova.Editor
 
         private void OnEnable()
         {
-            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("CharacterPoseComposer", out renderCamera,
-                out merger);
+            root = CompositeSpriteMerger.InstantiateSimpleSpriteMerger("CharacterPoseComposer",
+                ComposerLayer, out renderCamera, out merger);
 
             reorderableList = new ReorderableList(layers, typeof(Layer), true, true, true, true);
             reorderableList.drawHeaderCallback += DrawHeader;

@@ -14,13 +14,15 @@ namespace Nova
 
         public int spriteCount { get; private set; }
 
+        private int layer { get; set; } = MergerLayer;
+
         private void EnsureLayers(int count)
         {
             for (int i = layers.Count; i < count; i++)
             {
                 var go = new GameObject("MergingSprite" + i);
                 go.transform.SetParent(transform, false);
-                go.layer = MergerLayer;
+                go.layer = layer;
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sortingOrder = i;
                 layers.Add(sr);
@@ -162,8 +164,14 @@ namespace Nova
         }
 
 #if UNITY_EDITOR
-        public static GameObject InstantiateSimpleSpriteMerger(string name, out Camera renderCamera,
-            out CompositeSpriteMerger merger)
+        public static GameObject InstantiateSimpleSpriteMerger(string name,
+            out Camera renderCamera, out CompositeSpriteMerger merger)
+        {
+            return InstantiateSimpleSpriteMerger(name, MergerLayer, out renderCamera, out merger);
+        }
+
+        public static GameObject InstantiateSimpleSpriteMerger(string name, int layer,
+            out Camera renderCamera, out CompositeSpriteMerger merger)
         {
             var root = new GameObject(name)
             {
@@ -171,11 +179,12 @@ namespace Nova
             };
             merger = root.Ensure<CompositeSpriteMerger>();
             merger.runInEditMode = true;
+            merger.layer = layer;
 
             var camera = new GameObject("Camera");
             camera.transform.SetParent(root.transform, false);
             renderCamera = camera.Ensure<Camera>();
-            renderCamera.cullingMask = 1 << MergerLayer;
+            renderCamera.cullingMask = 1 << layer;
             renderCamera.orthographic = true;
             renderCamera.enabled = false;
             renderCamera.nearClipPlane = -1;
