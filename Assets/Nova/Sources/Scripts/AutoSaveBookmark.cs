@@ -43,8 +43,9 @@ namespace Nova
             lastSavedDialogueIndex = gameState.currentIndex;
         }
 
-        private bool isSame => gameState.currentNode.name == lastSavedNodeName &&
-                               gameState.currentIndex == lastSavedDialogueIndex;
+        private bool isSame => gameState.currentNode == null ||
+                               (gameState.currentNode.name == lastSavedNodeName &&
+                                gameState.currentIndex == lastSavedDialogueIndex);
 
         public void TrySave(Texture2D screenshot)
         {
