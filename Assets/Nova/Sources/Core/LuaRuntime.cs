@@ -171,7 +171,7 @@ namespace Nova
                         return _instance;
                     }
 
-                    var instances = FindObjectsOfType<LuaRuntime>();
+                    var instances = Utils.FindObjectsOfType<LuaRuntime>();
                     if (instances.Length == 0)
                     {
                         var singleton = new GameObject();

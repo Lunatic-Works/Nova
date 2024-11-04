@@ -377,7 +377,7 @@ namespace Nova
             {
                 RealScreen.uiSize = gameRenderTarget.rectTransform.rect.size;
                 RealScreen.isUIInitialized = true;
-                foreach (var trans in FindObjectsOfType<UIViewTransitionBase>().Where(x => !x.inAnimation))
+                foreach (var trans in Utils.FindObjectsOfType<UIViewTransitionBase>().Where(x => !x.inAnimation))
                 {
                     trans.ResetTransitionTarget();
                 }

@@ -469,5 +469,14 @@ namespace Nova
         {
             return JsonConvert.SerializeObject(data, Formatting.Indented);
         }
+
+        public static T[] FindObjectsOfType<T>() where T : UnityObject
+        {
+#if UNITY_2022_2_OR_NEWER
+            return UnityObject.FindObjectsByType<T>(FindObjectsSortMode.None);
+#else
+            return UnityObject.FindObjectsOfType<T>();
+#endif
+        }
     }
 }
