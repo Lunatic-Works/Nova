@@ -72,6 +72,8 @@ def run_build(log_path, method):
             "-quit",
             "-batchmode",
             "-nographics",
+            "-projectPath",
+            ".",
             "-logFile",
             log_path,
             "-executeMethod",
