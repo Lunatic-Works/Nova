@@ -30,7 +30,7 @@
 
     支持Windows/macOS/Android/iOS平台，我们已经有作品在Google Play、TapTap、App Store等平台上架。
 
-    Linux我们不能保证支持，因为Linux的图形界面太多了，如果遇到问题欢迎提issue。
+    Linux版可以在Steam Deck上运行，但是不一定支持其他Linux发行版，因为Linux的图形界面太多了，如果遇到问题欢迎提issue。
 
     WebGL/微信小程序可以参考[linsyking/Nova-WXM](https://github.com/linsyking/Nova-WXM)，以及一个在线编辑器[linsyking/Nova-online-editor](https://github.com/linsyking/Nova-online-editor)。目前WebGL版的ToLua# runtime还有一些问题，所以没有合并到master branch。
 
