@@ -44,9 +44,7 @@ namespace Nova
         private const string ChangeWindowSizeFirstShownKey = ConfigManager.FirstShownKeyPrefix + "ChangeWindowSize";
 
         [SerializeField] private Color marginColor;
-        [SerializeField] private float desiredAspectRatio = 16.0f / 9.0f;
         [SerializeField] private float smoothTime = 0.1f;
-        [SerializeField] private RawImage gameRenderTarget;
         [SerializeField] private string fullScreenConfigKeyName;
 
         private ConfigManager configManager;
@@ -63,8 +61,6 @@ namespace Nova
 
         private void Awake()
         {
-            this.RuntimeAssert(gameRenderTarget != null, "GameRenderTarget must be set.");
-
             if (Application.isPlaying)
             {
                 configManager = Utils.FindNovaController().ConfigManager;
@@ -120,6 +116,7 @@ namespace Nova
             }
 
             // Debug.Log($"Change full screen status {Screen.fullScreen} (logical {isLogicalFullScreen}) -> {to}");
+
             var to = configManager.GetInt(fullScreenConfigKeyName) != 0;
             if (isLogicalFullScreen == to)
             {
@@ -252,6 +249,12 @@ namespace Nova
                 return;
             }
 
+            if (!RealScreen.isScreenInitialized)
+            {
+                var canvasScaler = Utils.FindViewManager().GetComponentInChildren<CanvasScaler>();
+                RealScreen.uiSize = canvasScaler.referenceResolution;
+            }
+
             var isSmoothResizing = false;
             if (lastScreenHeight <= 0 || lastScreenWidth <= 0 ||
                 Mathf.Abs(Screen.height - lastScreenHeight) > 2 || Mathf.Abs(Screen.width - lastScreenWidth) > 2)
@@ -269,15 +272,15 @@ namespace Nova
             }
 
             var aspectRatio = (float)lastScreenWidth / lastScreenHeight;
-            if (aspectRatio < desiredAspectRatio)
+            if (aspectRatio < RealScreen.aspectRatio)
             {
-                RealScreen.fHeight = lastScreenWidth / desiredAspectRatio;
+                RealScreen.fHeight = lastScreenWidth / RealScreen.aspectRatio;
                 RealScreen.height = Mathf.RoundToInt(RealScreen.fHeight);
                 RealScreen.fWidth = RealScreen.width = lastScreenWidth;
             }
             else
             {
-                RealScreen.fWidth = lastScreenHeight * desiredAspectRatio;
+                RealScreen.fWidth = lastScreenHeight * RealScreen.aspectRatio;
                 RealScreen.width = Mathf.RoundToInt(RealScreen.fWidth);
                 RealScreen.fHeight = RealScreen.height = lastScreenHeight;
             }
@@ -376,8 +379,6 @@ namespace Nova
 
             if (shouldUpdateUIAfter == 0)
             {
-                RealScreen.uiSize = gameRenderTarget.rectTransform.rect.size;
-                RealScreen.isUIInitialized = true;
                 foreach (var trans in Utils.FindObjectsOfType<UIViewTransitionBase>().Where(x => !x.inAnimation))
                 {
                     trans.ResetTransitionTarget();

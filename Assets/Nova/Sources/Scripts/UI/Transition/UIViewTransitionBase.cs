@@ -19,7 +19,7 @@ namespace Nova
         private RawImage rawImage;
         protected CanvasGroup canvasGroup;
         protected RectTransform rectTransform;
-        protected Vector2 pos0, size0, scale0, uiSize0;
+        protected Vector2 pos0, size0, scale0;
 
         protected AnimationEntry.EasingFunction enterFunction => cubic
             ? AnimationEntry.CubicEasing(CubicSlopeStart, CubicSlopeTarget)
@@ -86,7 +86,7 @@ namespace Nova
         {
             Init();
 
-            if (!targetInited && RealScreen.isUIInitialized)
+            if (!targetInited && RealScreen.isScreenInitialized)
             {
                 ResetTransitionTarget();
             }

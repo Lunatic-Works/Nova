@@ -48,9 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   marginColor: {r: 0, g: 0, b: 0, a: 0}
-  desiredAspectRatio: 1.7777778
   smoothTime: 0.1
-  gameRenderTarget: {fileID: 0}
   fullScreenConfigKeyName: FullScreen
 --- !u!20 &717238516092458924
 Camera:

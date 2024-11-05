@@ -107,7 +107,7 @@ namespace Nova
                 LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>());
             }
 
-            if (RealScreen.isUIInitialized)
+            if (RealScreen.isScreenInitialized)
             {
                 foreach (var transition in GetComponentsInChildren<UIViewTransitionBase>())
                 {
