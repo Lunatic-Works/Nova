@@ -94,6 +94,8 @@ namespace Nova
 
         public virtual void ResetTransitionTarget()
         {
+            Init();
+
             pos0 = rectTransform.position;
             size0 = rectTransform.rect.size;
             scale0 = rectTransform.localScale;

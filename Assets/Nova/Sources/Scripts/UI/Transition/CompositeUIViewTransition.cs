@@ -125,6 +125,7 @@ namespace Nova
         public override void ResetTransitionTarget()
         {
             base.ResetTransitionTarget();
+
             foreach (var child in forwardChildTransitions)
             {
                 child.transition.ResetTransitionTarget();
