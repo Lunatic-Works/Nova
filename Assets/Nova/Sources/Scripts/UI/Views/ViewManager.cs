@@ -14,12 +14,8 @@ namespace Nova
         Alert
     }
 
-    [RequireComponent(typeof(ScreenCapturer))]
     public class ViewManager : MonoBehaviour
     {
-        [HideInInspector] public NovaAnimation uiAnimation;
-        [HideInInspector] public ScreenCapturer screenCapturer;
-
         public RawImage transitionGhost;
         [SerializeField] private GameObject transitionInputBlocker;
         [SerializeField] private AudioSource uiAudioSource;
@@ -70,9 +66,6 @@ namespace Nova
         {
             currentView = CurrentViewType.UI;
             novaController = Utils.FindNovaController();
-            uiAnimation = novaController.UIAnimation;
-            screenCapturer = GetComponent<ScreenCapturer>();
-            this.RuntimeAssert(screenCapturer != null, "Missing ScreenCapturer.");
         }
 
         public void SetController(IViewController controller)

@@ -14,6 +14,7 @@ namespace Nova
         public AudioClip enterSound;
         public AudioClip exitSound;
 
+        private NovaAnimation uiAnimation;
         private ViewManager viewManager;
 
         private RawImage rawImage;
@@ -44,6 +45,7 @@ namespace Nova
                 return;
             }
 
+            uiAnimation = Utils.FindNovaController().UIAnimation;
             viewManager = Utils.FindViewManager();
 
             if (useGhost)
@@ -79,7 +81,7 @@ namespace Nova
 
         protected AnimationEntry GetBaseAnimationEntry()
         {
-            return viewManager.uiAnimation.Then(null, delayOffset);
+            return uiAnimation.Then(null, delayOffset);
         }
 
         private void OnEnable()

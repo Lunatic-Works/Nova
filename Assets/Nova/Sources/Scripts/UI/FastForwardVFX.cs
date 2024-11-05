@@ -9,6 +9,7 @@ namespace Nova
 
         private GameState gameState;
         private DialogueState dialogueState;
+        private NovaAnimation uiAnimation;
         private ViewManager viewManager;
         private PostProcessing postProcessing;
 
@@ -43,6 +44,7 @@ namespace Nova
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
             dialogueState = controller.DialogueState;
+            uiAnimation = controller.UIAnimation;
             viewManager = Utils.FindViewManager();
             postProcessing = UICameraHelper.Active.GetComponent<PostProcessing>();
 
@@ -63,7 +65,7 @@ namespace Nova
             if (!isInitial && viewManager.currentView == CurrentViewType.Game)
             {
                 AddVFX();
-                viewManager.uiAnimation.Then(null, vfxDurationOnRestore).Then(new ActionAnimationProperty(RemoveVFX));
+                uiAnimation.Then(null, vfxDurationOnRestore).Then(new ActionAnimationProperty(RemoveVFX));
             }
         }
 
