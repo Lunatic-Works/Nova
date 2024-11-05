@@ -47,7 +47,7 @@ namespace Nova
         [SerializeField] private float desiredAspectRatio = 16.0f / 9.0f;
         [SerializeField] private float smoothTime = 0.1f;
         [SerializeField] private RawImage gameRenderTarget;
-        [SerializeField] private ConfigToggle fullScreenToggle;
+        [SerializeField] private string fullScreenConfigKeyName;
 
         private ConfigManager configManager;
         private Camera finalCamera;
@@ -64,14 +64,13 @@ namespace Nova
         private void Awake()
         {
             this.RuntimeAssert(gameRenderTarget != null, "GameRenderTarget must be set.");
-            this.RuntimeAssert(fullScreenToggle != null, "FullScreenToggle must be set.");
 
             if (Application.isPlaying)
             {
                 configManager = Utils.FindNovaController().ConfigManager;
                 isLogicalFullScreen = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
-                configManager.SetInt(fullScreenToggle.configKeyName, isLogicalFullScreen ? 1 : 0);
-                configManager.AddValueChangeListener(fullScreenToggle.configKeyName, UpdateFullScreenStatus);
+                configManager.SetInt(fullScreenConfigKeyName, isLogicalFullScreen ? 1 : 0);
+                configManager.AddValueChangeListener(fullScreenConfigKeyName, UpdateFullScreenStatus);
             }
 
             finalCamera = gameObject.Ensure<Camera>();
@@ -94,7 +93,7 @@ namespace Nova
 
             if (configManager != null)
             {
-                configManager.RemoveValueChangeListener(fullScreenToggle.configKeyName, UpdateFullScreenStatus);
+                configManager.RemoveValueChangeListener(fullScreenConfigKeyName, UpdateFullScreenStatus);
             }
         }
 
@@ -121,7 +120,7 @@ namespace Nova
             }
 
             // Debug.Log($"Change full screen status {Screen.fullScreen} (logical {isLogicalFullScreen}) -> {to}");
-            var to = configManager.GetInt(fullScreenToggle.configKeyName) != 0;
+            var to = configManager.GetInt(fullScreenConfigKeyName) != 0;
             if (isLogicalFullScreen == to)
             {
                 return;
@@ -170,7 +169,7 @@ namespace Nova
 
         public void SwitchFullScreen()
         {
-            configManager.SetInt(fullScreenToggle.configKeyName, isLogicalFullScreen ? 0 : 1);
+            configManager.SetInt(fullScreenConfigKeyName, isLogicalFullScreen ? 0 : 1);
         }
 
         #endregion

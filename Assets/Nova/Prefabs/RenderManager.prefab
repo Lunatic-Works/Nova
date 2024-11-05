@@ -51,7 +51,7 @@ MonoBehaviour:
   desiredAspectRatio: 1.7777778
   smoothTime: 0.1
   gameRenderTarget: {fileID: 0}
-  fullScreenToggle: {fileID: 0}
+  fullScreenConfigKeyName: FullScreen
 --- !u!20 &717238516092458924
 Camera:
   m_ObjectHideFlags: 0
