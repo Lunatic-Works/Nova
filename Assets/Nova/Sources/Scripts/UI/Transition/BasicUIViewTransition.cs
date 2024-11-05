@@ -40,11 +40,12 @@ namespace Nova
         public float scalingPercentage = 0.5f;
         public float rotationPercentage = 0.5f;
         public bool fade = true;
-        public float duration = 0.5f;
+        public float _enterDuration = 0.5f;
+        public float _exitDuration = 0.5f;
 
-        public override float enterDuration => duration;
+        public override float enterDuration => _enterDuration;
 
-        public override float exitDuration => duration;
+        public override float exitDuration => _exitDuration;
 
         protected internal override void OnBeforeEnter()
         {
@@ -62,7 +63,7 @@ namespace Nova
             bool hasAnimation = false;
             if (fade)
             {
-                current = current.Then(GetOpacityAnimationProperty(0f, 1f), duration);
+                current = current.Then(GetOpacityAnimationProperty(0f, 1f), enterDuration);
                 hasAnimation = true;
             }
 
@@ -73,7 +74,7 @@ namespace Nova
                 var size = size0 * (1f + Dir2Scale[(int)scalingDirection] * scalingPercentage);
                 var prop = new RectTransformAnimationProperty(rectTransform, pos0 - delta, pos0,
                     size.CloneScale(scale0), size0.CloneScale(scale0));
-                current = hasAnimation ? current.And(prop, duration) : current.Then(prop, duration);
+                current = hasAnimation ? current.And(prop, enterDuration) : current.Then(prop, enterDuration);
                 current.With(enterFunction);
                 hasAnimation = true;
             }
@@ -83,7 +84,7 @@ namespace Nova
                 var prop = new RotationAnimationProperty(rectTransform, Vector3.zero);
                 float angle = 360f * rotationPercentage * (int)rotationDirection;
                 rectTransform.rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
-                current = hasAnimation ? current.And(prop, duration) : current.Then(prop, duration);
+                current = hasAnimation ? current.And(prop, enterDuration) : current.Then(prop, enterDuration);
                 current.With(enterFunction);
             }
 
@@ -99,7 +100,7 @@ namespace Nova
             bool hasAnimation = false;
             if (fade)
             {
-                current = current.Then(GetOpacityAnimationProperty(1f, 0f), duration);
+                current = current.Then(GetOpacityAnimationProperty(1f, 0f), exitDuration);
                 hasAnimation = true;
             }
 
@@ -110,7 +111,7 @@ namespace Nova
                 var size = size0 * (1f + Dir2Scale[(int)scalingDirection] * scalingPercentage);
                 var prop = new RectTransformAnimationProperty(rectTransform, pos0, pos0 - delta,
                     size0.CloneScale(scale0), size.CloneScale(scale0));
-                current = hasAnimation ? current.And(prop, duration) : current.Then(prop, duration);
+                current = hasAnimation ? current.And(prop, exitDuration) : current.Then(prop, exitDuration);
                 current.With(exitFunction);
                 hasAnimation = true;
             }
@@ -120,7 +121,7 @@ namespace Nova
                 float angle = 360f * rotationPercentage * (int)rotationDirection;
                 var prop = new RotationAnimationProperty(rectTransform, new Vector3(0f, 0f, angle));
                 rectTransform.rotation = Quaternion.identity;
-                current = hasAnimation ? current.And(prop, duration) : current.Then(prop, duration);
+                current = hasAnimation ? current.And(prop, exitDuration) : current.Then(prop, exitDuration);
                 current.With(exitFunction);
             }
 

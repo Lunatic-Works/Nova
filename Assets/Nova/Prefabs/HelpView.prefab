@@ -77,7 +77,8 @@ MonoBehaviour:
   scalingPercentage: 0.5
   rotationPercentage: 0.5
   fade: 1
-  duration: 0.3
+  _enterDuration: 0.3
+  _exitDuration: 0.3
 --- !u!222 &1643007692870300974
 CanvasRenderer:
   m_ObjectHideFlags: 0

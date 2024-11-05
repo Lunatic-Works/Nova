@@ -1303,7 +1303,8 @@ MonoBehaviour:
   scalingPercentage: 0.5
   rotationPercentage: 0.5
   fade: 1
-  duration: 0.3
+  _enterDuration: 0.3
+  _exitDuration: 0.3
 --- !u!1 &3745355648750861162
 GameObject:
   m_ObjectHideFlags: 0

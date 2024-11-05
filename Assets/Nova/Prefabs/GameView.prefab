@@ -520,7 +520,8 @@ MonoBehaviour:
   scalingPercentage: 0.5
   rotationPercentage: 0.5
   fade: 1
-  duration: 0.2
+  _enterDuration: 0.2
+  _exitDuration: 0.2
 --- !u!225 &1701783629838775871
 CanvasGroup:
   m_ObjectHideFlags: 0
