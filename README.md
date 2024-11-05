@@ -26,7 +26,9 @@
 
 * **支持什么版本的Unity、什么操作系统/平台？**
 
-    支持Unity 2020及更高版本，Windows/macOS/Android/iOS平台。我们已经有作品在Google Play、TapTap、App Store等平台上架。
+    支持Unity 2020到2022。Unity 6需要把URP迁移到render graph，等我们有空的时候再搞。
+
+    支持Windows/macOS/Android/iOS平台，我们已经有作品在Google Play、TapTap、App Store等平台上架。
 
     Linux我们不能保证支持，因为Linux的图形界面太多了，如果遇到问题欢迎提issue。
 
