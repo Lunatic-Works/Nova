@@ -97,7 +97,13 @@ namespace Nova
             pos0 = rectTransform.position;
             size0 = rectTransform.rect.size;
             scale0 = rectTransform.localScale;
-            targetInited = true;
+
+            // Sometimes ResetTransitionTarget is called before the layout is properly initialized,
+            // such as notification entries
+            if (size0.x > 0f && size0.y > 0f)
+            {
+                targetInited = true;
+            }
         }
 
         protected void SetToTransitionTarget()
