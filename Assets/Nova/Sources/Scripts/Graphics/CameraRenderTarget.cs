@@ -68,18 +68,18 @@ namespace Nova
 
             public override RenderTexture targetTexture
             {
-                get => _targetTexture;
+                get => base.targetTexture;
                 set
                 {
                     base.targetTexture = value;
                     foreach (var img in parent.images.Where(x => x != null))
                     {
-                        img.texture = _targetTexture;
+                        img.texture = base.targetTexture;
                     }
 
                     if (parent.renderCamera != null)
                     {
-                        parent.renderCamera.targetTexture = _targetTexture;
+                        parent.renderCamera.targetTexture = base.targetTexture;
                     }
                 }
             }

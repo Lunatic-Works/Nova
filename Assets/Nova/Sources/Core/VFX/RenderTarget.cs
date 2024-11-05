@@ -19,17 +19,18 @@ namespace Nova
     {
         public const string SUFFIX = "Texture";
 
-        protected TextureRendererConfig oldConfig;
-        protected RenderManager renderManager;
-        protected bool _needUpdate = true;
-        protected bool registered;
-        protected RenderTexture _targetTexture;
+        protected TextureRendererConfig oldConfig { get; private set; }
+        protected RenderManager renderManager { get; private set; }
+        private bool _needUpdate = true;
+        private bool registered;
+        private RenderTexture _targetTexture;
 
         // these bindings are not persistent
         // need extra mechanism (e.g. RestorableMaterial or RawImageController) to be restorable
         protected readonly List<ITextureReceiver> receivers = new List<ITextureReceiver>();
 
         public abstract string textureName { get; }
+        public virtual int textureDepth => 0;
         public virtual RenderTextureFormat textureFormat => RenderTextureFormat.ARGB32;
         public abstract bool isFinal { get; }
         public bool needUpdate => _needUpdate;

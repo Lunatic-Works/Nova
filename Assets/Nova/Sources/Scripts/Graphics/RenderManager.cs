@@ -15,6 +15,7 @@ namespace Nova
     {
         RenderTexture targetTexture { get; set; }
         string textureName { get; }
+        int textureDepth { get; }
         RenderTextureFormat textureFormat { get; }
         bool isFinal { get; }
         bool needUpdate { get; }
@@ -272,13 +273,13 @@ namespace Nova
             if (aspectRatio < desiredAspectRatio)
             {
                 RealScreen.fHeight = lastScreenWidth / desiredAspectRatio;
-                RealScreen.height = (int)RealScreen.fHeight;
+                RealScreen.height = Mathf.RoundToInt(RealScreen.fHeight);
                 RealScreen.fWidth = RealScreen.width = lastScreenWidth;
             }
             else
             {
                 RealScreen.fWidth = lastScreenHeight * desiredAspectRatio;
-                RealScreen.width = (int)RealScreen.fWidth;
+                RealScreen.width = Mathf.RoundToInt(RealScreen.fWidth);
                 RealScreen.fHeight = RealScreen.height = lastScreenHeight;
             }
 
@@ -312,7 +313,8 @@ namespace Nova
 
         private static void UpdateTexture(IRenderTargetConfig rt)
         {
-            var texture = RenderTexture.GetTemporary(RealScreen.width, RealScreen.height, 0, rt.textureFormat);
+            var texture = RenderTexture.GetTemporary(RealScreen.width, RealScreen.height, rt.textureDepth,
+                rt.textureFormat);
             texture.name = rt.textureName;
             UpdateTexture(rt, texture);
         }

@@ -126,7 +126,11 @@ namespace Nova
             var bounds = GetMergedSize(sprites);
             var pixelsPerUnit = sprites[0].sprite.pixelsPerUnit;
             var size = bounds.size * pixelsPerUnit;
-            var renderTexture = new RenderTexture((int)size.x, (int)size.y, 0, RenderTextureFormat.ARGB32);
+            var renderTexture = new RenderTexture(Mathf.RoundToInt(size.x), Mathf.RoundToInt(size.y), 0,
+                RenderTextureFormat.ARGB32)
+            {
+                name = "CompositeSpriteMergerRenderTexture"
+            };
 
             RenderToTexture(sprites, renderCamera, bounds, renderTexture);
             return renderTexture;

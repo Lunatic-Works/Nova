@@ -40,11 +40,11 @@ namespace Nova
 
         private void Start()
         {
-            var referenceWidth = (int)rectTransform.rect.width;
-            var referenceHeight = (int)rectTransform.rect.height;
-            var rt = new RenderTexture(referenceWidth, referenceHeight, 0, RenderTextureFormat.ARGB32)
+            var rect = rectTransform.rect;
+            var rt = new RenderTexture(Mathf.RoundToInt(rect.width), Mathf.RoundToInt(rect.height), 0,
+                RenderTextureFormat.ARGB32)
             {
-                name = "AvatarTexture"
+                name = "AvatarRenderTexture"
             };
             renderCamera.targetTexture = rt;
             image.texture = rt;
