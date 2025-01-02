@@ -32,7 +32,7 @@
 
     Linux版可以在Steam Deck上运行，但是不一定支持其他Linux发行版，因为Linux的图形界面太多了，如果遇到问题欢迎提issue。
 
-    WebGL/微信小程序可以参考[linsyking/Nova-WXM](https://github.com/linsyking/Nova-WXM)，以及一个在线编辑器[linsyking/Nova-online-editor](https://github.com/linsyking/Nova-online-editor)。目前WebGL版的ToLua# native plugin还有一些问题，所以没有合并到master branch。
+    WebGL/微信小程序可以参考[linsyking/Nova-WXM](https://github.com/linsyking/Nova-WXM)，以及一个在线编辑器[linsyking/Nova-online-editor](https://github.com/linsyking/Nova-online-editor)。目前WebGL版的ToLua# native plugin还有一些问题，所以没有合并到master branch。如果你想把ToLua#换成纯C#的Lua runtime，比如[MoonSharp](https://github.com/moonsharp-devs/moonsharp)，欢迎来帮忙。
 
     理论上可以用团结引擎编译到OpenHarmony，但是需要重新编译ToLua# native plugin，目前还需要更多测试。
 
