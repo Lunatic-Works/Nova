@@ -109,7 +109,11 @@ function branch(branches)
 
         local cond = branch.cond
         if type(cond) == 'string' then
+            local cond_str = cond
             cond = loadstring('return ' .. cond)
+            if cond == nil then
+                warn('Failed to parse cond: ' .. cond_str)
+            end
         end
 
         if __Nova.scriptLoader.stateLocale == Nova.I18n.DefaultLocale then
