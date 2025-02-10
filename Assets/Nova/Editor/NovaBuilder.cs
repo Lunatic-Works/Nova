@@ -9,7 +9,7 @@ namespace Nova.Editor
 {
     public static class NovaBuilder
     {
-        private static void Build(BuildTarget target)
+        private static void Build(BuildTarget target, bool isDev = false)
         {
             var productName = Application.productName;
             string targetName;
@@ -43,10 +43,16 @@ namespace Nova.Editor
             var productNameShort = productName.Replace(" ", "");
             var version = Application.version.TrimStart('v');
             var date = DateTime.Now.ToString("yyyyMMdd");
+            var options = BuildOptions.CompressWithLz4HC | BuildOptions.StrictMode;
+            if (isDev)
+            {
+                options |= BuildOptions.Development;
+            }
+
             var buildPlayerOptions = new BuildPlayerOptions
             {
                 locationPathName = $"Build/{productNameShort}_{targetName}_{version}_{date}{pathSuffix}",
-                options = BuildOptions.CompressWithLz4HC | BuildOptions.StrictMode,
+                options = options,
                 scenes = new[] {"Assets/Scenes/Main.unity"},
                 target = target,
             };
@@ -62,9 +68,19 @@ namespace Nova.Editor
             Build(BuildTarget.StandaloneWindows64);
         }
 
+        public static void BuildWindowsDev()
+        {
+            Build(BuildTarget.StandaloneWindows64, isDev: true);
+        }
+
         public static void BuildLinux()
         {
             Build(BuildTarget.StandaloneLinux64);
+        }
+
+        public static void BuildLinuxDev()
+        {
+            Build(BuildTarget.StandaloneLinux64, isDev: true);
         }
 
         public static void BuildMacOS()
@@ -72,14 +88,29 @@ namespace Nova.Editor
             Build(BuildTarget.StandaloneOSX);
         }
 
+        public static void BuildMacOSDev()
+        {
+            Build(BuildTarget.StandaloneOSX, isDev: true);
+        }
+
         public static void BuildAndroid()
         {
             Build(BuildTarget.Android);
         }
 
+        public static void BuildAndroidDev()
+        {
+            Build(BuildTarget.Android, isDev: true);
+        }
+
         public static void BuildiOS()
         {
             Build(BuildTarget.iOS);
+        }
+
+        public static void BuildiOSDev()
+        {
+            Build(BuildTarget.iOS, isDev: true);
         }
     }
 }

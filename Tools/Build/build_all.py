@@ -132,78 +132,96 @@ def make_zip(out_dir):
     os.chdir("../..")
 
 
-def build_windows():
+def build_windows(is_dev=False):
     log_path = "./Build/build_windows.log"
 
-    run_build(log_path, "Nova.Editor.NovaBuilder.BuildWindows")
+    if is_dev:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildWindowsDev")
+    else:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildWindows")
 
     out_dir, product_name = wait_log(log_path)
 
-    make_zip(out_dir)
+    if not is_dev:
+        make_zip(out_dir)
 
-    if sys.platform != "win32":
-        shutil.rmtree(out_dir)
+        if sys.platform != "win32":
+            shutil.rmtree(out_dir)
 
 
-def build_linux():
+def build_linux(is_dev=False):
     log_path = "./Build/build_linux.log"
 
-    run_build(log_path, "Nova.Editor.NovaBuilder.BuildLinux")
+    if is_dev:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildLinuxDev")
+    else:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildLinux")
 
     out_dir, product_name = wait_log(log_path)
     os.remove(f"{out_dir}/LinuxPlayer_s.debug")
     os.remove(f"{out_dir}/UnityPlayer_s.debug")
 
-    make_zip(out_dir)
+    if not is_dev:
+        make_zip(out_dir)
 
-    if sys.platform == "win32":
-        print("Setting permission...")
-        zipchmod(f"{out_dir}.zip", [product_name])
+        if sys.platform == "win32":
+            print("Setting permission...")
+            zipchmod(f"{out_dir}.zip", [product_name])
 
-    if sys.platform != "linux":
-        shutil.rmtree(out_dir)
+        if sys.platform != "linux":
+            shutil.rmtree(out_dir)
 
 
-def build_macos():
+def build_macos(is_dev=False):
     log_path = "./Build/build_macos.log"
 
-    run_build(log_path, "Nova.Editor.NovaBuilder.BuildMacOS")
+    if is_dev:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildMacOSDev")
+    else:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildMacOS")
 
     out_dir, product_name = wait_log(log_path)
 
-    make_zip(out_dir)
+    if not is_dev:
+        make_zip(out_dir)
 
-    if sys.platform == "win32":
-        print("Setting permission...")
-        zipchmod(
-            f"{out_dir}.zip",
-            [
-                f"{product_name}.app/Contents/Frameworks/UnityPlayer.dylib",
-                f"{product_name}.app/Contents/Frameworks/libMonoPosixHelper.dylib",
-                f"{product_name}.app/Contents/Frameworks/libmonobdwgc-2.0.dylib",
-                f"{product_name}.app/Contents/MacOS/{product_name}",
-                f"{product_name}.app/Contents/PlugIns/tolua.bundle/Contents/MacOS/tolua",
-            ],
-        )
+        if sys.platform == "win32":
+            print("Setting permission...")
+            zipchmod(
+                f"{out_dir}.zip",
+                [
+                    f"{product_name}.app/Contents/Frameworks/UnityPlayer.dylib",
+                    f"{product_name}.app/Contents/Frameworks/libMonoPosixHelper.dylib",
+                    f"{product_name}.app/Contents/Frameworks/libmonobdwgc-2.0.dylib",
+                    f"{product_name}.app/Contents/MacOS/{product_name}",
+                    f"{product_name}.app/Contents/PlugIns/tolua.bundle/Contents/MacOS/tolua",
+                ],
+            )
 
-    if sys.platform != "darwin":
-        shutil.rmtree(out_dir)
+        if sys.platform != "darwin":
+            shutil.rmtree(out_dir)
 
 
 # Need to set signing key
-def build_android():
+def build_android(is_dev=False):
     log_path = "./Build/build_android.log"
 
-    run_build(log_path, "Nova.Editor.NovaBuilder.BuildAndroid")
+    if is_dev:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildAndroid")
+    else:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildAndroid")
 
     out_dir, product_name = wait_log(log_path)
 
 
 # TODO: Build Xcode project
-def build_ios():
+def build_ios(is_dev=False):
     log_path = "./Build/build_ios.log"
 
-    run_build(log_path, "Nova.Editor.NovaBuilder.BuildiOS")
+    if is_dev:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildiOSDev")
+    else:
+        run_build(log_path, "Nova.Editor.NovaBuilder.BuildiOS")
 
     out_dir, product_name = wait_log(log_path)
 
