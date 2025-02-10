@@ -8,6 +8,7 @@ from nova_script_parser import normalize_dialogue, parse_chapters
 in_filename = "scenario.txt"
 out_filename = "scenario_no_code.tex"
 need_parse_code = True
+highlight_chara = None
 
 translate_data = [
     ("room", "房间"),
@@ -35,6 +36,10 @@ def parse_code(code, f):
     bg_name = None
     bgm_name = None
     for func_name, args, _ in walk_functions(code):
+        if func_name == "action":
+            func_name = args[0]
+            args = args[1:]
+
         if (
             func_name
             in [
@@ -47,7 +52,7 @@ def parse_code(code, f):
                 "trans_up",
                 "trans_down",
             ]
-            and args[0] == "bg"
+            and args[0] in ["bg", "cg"]
             and isinstance(args[1], str)
         ):
             bg_name = args[1]
@@ -55,8 +60,10 @@ def parse_code(code, f):
             bg_name = args[1][0]
         elif func_name == "timeline":
             bg_name = args[0]
+
         elif func_name in ["play", "fade_in"] and args[0] == "bgm":
             bgm_name = args[1]
+
     return bg_name, bgm_name
 
 
@@ -126,12 +133,23 @@ def main():
                 dialogue = normalize_dialogue(dialogue, keep_todo=["配音"])
                 if dialogue:
                     dialogue = normalize_tex(dialogue)
+
                     if chara_name:
                         chara_name = normalize_tex(chara_name)
-                        f.write(f"{{\\color{{gray}} {chara_name}：}}{dialogue}\n\n")
+                        f.write(f"{{\\color{{gray}} {chara_name}：}}")
+
+                    if highlight_chara and highlight_chara == chara_name:
+                        f.write(f"\\hl{{{dialogue}}}\\filbreak\n\n")
+                    elif (
+                        highlight_chara and f"TODO：配音：{highlight_chara}" in dialogue
+                    ):
+                        dialogue = re.compile(
+                            f"（TODO：配音：{highlight_chara}[^）]*）"
+                        ).sub(r"\\hl{\g<0>}", dialogue)
+                        f.write(f"{dialogue}\\filbreak\n\n")
                     else:
-                        f.write(dialogue + "\n\n")
-            f.write("\\newpage\n\n")
+                        f.write(f"{dialogue}\\filbreak\n\n")
+            # f.write("\\newpage\n\n")
 
         f.write("\\end{document}\n")
 

@@ -103,6 +103,10 @@ def main():
                 continue
 
             for func_name, args, _ in walk_functions(code):
+                if func_name == "action":
+                    func_name = args[0]
+                    args = args[1:]
+
                 if func_name == "show" and args[0] == "bg" and isinstance(args[1], str):
                     now_bg_name = normalize_bg_name(args[1])
                     if len(args) >= 3:

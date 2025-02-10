@@ -10,7 +10,12 @@ def do_chapter(entries, bgm_list):
     for code, _, _, _ in entries:
         if not code:
             continue
+
         for func_name, args, _ in walk_functions(code):
+            if func_name == "action":
+                func_name = args[0]
+                args = args[1:]
+
             if func_name in ["play", "fade_in"] and args[0] == "bgm":
                 bgm_name = args[1]
                 if bgm_name not in bgm_list:

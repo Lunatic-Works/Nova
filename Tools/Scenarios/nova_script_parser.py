@@ -26,14 +26,24 @@ def parse_nodes(text):
 
 
 # DEPRECATED
-def parse_chapters(f):
+def parse_chapters(f, code_attribute=None):
     nodes = parse_nodes(f.read())
     return [
         (
             node.name,
             [
                 (
-                    "\n".join([block.content for block in entry.codeBlocks]),
+                    "\n".join(
+                        [
+                            block.content
+                            for block in entry.codeBlocks
+                            if code_attribute is None
+                            or (
+                                block.attributes is not None
+                                and code_attribute in block.attributes.Values
+                            )
+                        ]
+                    ),
                     entry.characterName,
                     entry.dialogue,
                     entry.line,
@@ -102,9 +112,9 @@ def normalize_dialogue(
             else:
                 return ""
 
-        s = re.compile(r"\r?\n?（TODO：([^：]*：)?([^（）]*（[^）]*）)*[^）]*）", re.DOTALL).sub(
-            func, s
-        )
+        s = re.compile(
+            r"\r?\n?（TODO：([^：]*：)?([^（）]*（[^）]*）)*[^）]*）", re.DOTALL
+        ).sub(func, s)
 
     s = re.compile(" +").sub(" ", s)
     s = s.strip()

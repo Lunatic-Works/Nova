@@ -31,6 +31,8 @@ def check_code(code, line_num, anim_hold_tracked):
     check_show = False
     check_trans = False
     wait_time = 0
+    is_immediate_step = False
+
     try:
         for func_name, args, env in walk_functions(code):
             for name in (func_name,) + args:
@@ -43,7 +45,7 @@ def check_code(code, line_num, anim_hold_tracked):
                     if env:
                         check_anim_hold_override = True
 
-                    if "anim_hold" in env:
+                    if "anim_hold" in env or "named_anim_hold" in env:
                         print_warn(line_num, "anim_hold_begin() in anim_hold")
 
                 elif name == "anim_hold_end":
@@ -55,7 +57,7 @@ def check_code(code, line_num, anim_hold_tracked):
                     if env:
                         check_anim_hold_override = True
 
-                    if "anim_hold" in env:
+                    if "anim_hold" in env or "named_anim_hold" in env:
                         print_warn(line_num, "anim_hold_end() in anim_hold")
 
             if func_name == "anim":
@@ -64,7 +66,7 @@ def check_code(code, line_num, anim_hold_tracked):
                 if env:
                     print_warn(line_num, "anim in anon function")
 
-            elif func_name == "anim_hold":
+            elif func_name in ["anim_hold", "named_anim_hold"]:
                 wait_time = 0
 
                 if not anim_hold_tracked:
@@ -76,7 +78,7 @@ def check_code(code, line_num, anim_hold_tracked):
                         "anim_hold overridden by anim_hold_begin() or anim_hold_end()",
                     )
 
-                if "anim_hold" in env:
+                if "anim_hold" in env or "named_anim_hold" in env:
                     print_warn(line_num, "anim_hold in anim_hold")
 
             elif func_name == "show":
@@ -98,13 +100,20 @@ def check_code(code, line_num, anim_hold_tracked):
                 if isinstance(args[0], (int, float)):
                     wait_time += args[0]
 
+            elif func_name == "move":
+                if len(args) >= 3 and isinstance(args[2], (int, float)):
+                    wait_time += args[2]
+
+            elif func_name == "immediate_step":
+                is_immediate_step = True
+
     except Exception as e:
         print_warn(line_num, f"error when parsing code: {e}")
 
     if check_show and check_trans:
         print_warn(line_num, "show() outside of trans()")
 
-    return anim_hold_tracked
+    return anim_hold_tracked, is_immediate_step
 
 
 def check_dialogue(chara_name, dialogue, line_num):
@@ -152,11 +161,14 @@ def lint_file(in_filename):
         print(chapter_name)
         anim_hold_tracked = False
         for code, chara_name, dialogue, line_num in entries:
-            if code and not dialogue:
-                print_warn(line_num, "code block with empty dialogue")
-
+            is_immediate_step = False
             if code:
-                anim_hold_tracked = check_code(code, line_num, anim_hold_tracked)
+                anim_hold_tracked, is_immediate_step = check_code(
+                    code, line_num, anim_hold_tracked
+                )
+
+            if not is_immediate_step and not dialogue:
+                print_warn(line_num, "code block with empty dialogue")
 
             if dialogue:
                 check_dialogue(chara_name, dialogue, line_num)

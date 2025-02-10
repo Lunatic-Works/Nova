@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
+import imageio
 import numpy as np
-import skimage.io
 from lua_parser import walk_functions
 from nova_script_parser import is_chapter, parse_chapters
 from scipy.stats.qmc import Sobol
+from tqdm import tqdm
 
 in_filename = "scenario.txt"
 out_filename = "scenario.png"
@@ -25,7 +26,7 @@ str_to_color_config = {
 bg_suffixes = ["blur"]
 
 str_to_color_cache = {}
-sobol = Sobol(d=3, seed=0)
+sobol = Sobol(d=3, scramble=False)
 
 
 def str_to_color(s):
@@ -50,12 +51,18 @@ def normalize_bg_name(s):
     return out
 
 
-def chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set):
-    dialogue_color = MONOLOGUE_COLOR
-    bg_color = BG_NONE_COLOR
-    timeline_color = BG_NONE_COLOR
-    bgm_color = BGM_NONE_COLOR
-    for code, chara_name, _, _ in entries:
+def chapter_to_tape(
+    entries,
+    tape,
+    chara_set,
+    bg_set,
+    timeline_set,
+    bgm_set,
+    bg_color,
+    timeline_color,
+    bgm_color,
+):
+    for code, chara_name, _, _ in tqdm(entries):
         if chara_name:
             chara_set.add(chara_name)
             dialogue_color = str_to_color(chara_name)
@@ -64,6 +71,10 @@ def chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set):
 
         if code:
             for func_name, args, _ in walk_functions(code):
+                if func_name == "action":
+                    func_name = args[0]
+                    args = args[1:]
+
                 if (
                     func_name
                     in [
@@ -78,6 +89,7 @@ def chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set):
                     ]
                     and args[0] == "bg"
                     and isinstance(args[1], str)
+                    and args[1]
                 ):
                     bg_name = normalize_bg_name(args[1])
                     bg_set.add(bg_name)
@@ -109,6 +121,8 @@ def chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set):
             _bg_color = timeline_color
         tape.append((dialogue_color, _bg_color, bgm_color))
 
+    return bg_color, timeline_color, bgm_color
+
 
 def tapes_to_img(tapes):
     tape_width = dialogue_width + bg_width + bgm_width
@@ -133,34 +147,47 @@ def main():
     bg_set = set()
     timeline_set = set()
     bgm_set = set()
+    bg_color = BG_NONE_COLOR
+    timeline_color = BG_NONE_COLOR
+    bgm_color = BGM_NONE_COLOR
     for chapter_name, entries, head_eager_code, _ in chapters:
         print(chapter_name)
         if tape and is_chapter(head_eager_code):
             tapes.append(tape)
             tape = []
-        chapter_to_tape(entries, tape, chara_set, bg_set, timeline_set, bgm_set)
+        bg_color, timeline_color, bgm_color = chapter_to_tape(
+            entries,
+            tape,
+            chara_set,
+            bg_set,
+            timeline_set,
+            bgm_set,
+            bg_color,
+            timeline_color,
+            bgm_color,
+        )
     print()
     tapes.append(tape)
 
     print("Characters:")
     for x in sorted(chara_set):
-        print(x)
+        print(x, str_to_color(x))
     print()
     print("Backgrounds:")
     for x in sorted(bg_set):
-        print(x)
+        print(x, str_to_color(x))
     print()
     print("Timelines:")
     for x in sorted(timeline_set):
-        print(x)
+        print(x, str_to_color(x))
     print()
     print("BGM:")
     for x in sorted(bgm_set):
-        print(x)
+        print(x, str_to_color(x))
     print()
 
     img = tapes_to_img(tapes)
-    skimage.io.imsave(out_filename, img, compress_level=1)
+    imageio.imsave(out_filename, img, compress_level=1)
 
 
 if __name__ == "__main__":

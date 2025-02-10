@@ -3,7 +3,7 @@
 import os
 from glob import glob
 
-import skimage.io
+import imageio
 from pytoshop.core import PsdFile
 from pytoshop.enums import Compression
 from pytoshop.layers import ChannelImageData, LayerRecord
@@ -15,7 +15,7 @@ compression = Compression.rle
 psd = PsdFile(num_channels=3, height=4096, width=2048, compression=compression)
 for in_filename in in_filenames:
     print(in_filename)
-    img = skimage.io.imread(in_filename)
+    img = imageio.imread(in_filename)
     layer_name = os.path.splitext(os.path.basename(in_filename))[0]
     layer = LayerRecord(
         channels={
