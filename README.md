@@ -26,7 +26,7 @@
 
 * **支持什么版本的Unity、什么操作系统/平台？**
 
-    支持Unity 2020到2022。Unity 6需要用兼容模式，迁移到render graph等我们有空的时候再搞。
+    支持Unity 2020到2022。Unity 6需要用兼容模式，如果你想迁移到render graph，欢迎来帮忙。
 
     支持Windows/macOS/Android/iOS平台，我们已经有作品在Google Play、TapTap、App Store等平台上架。
 
