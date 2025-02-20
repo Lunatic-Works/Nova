@@ -5,3 +5,15 @@
 @include ch3.txt
 
 @include ch4.txt
+
+@include tut01.txt
+
+@include tut02.txt
+
+@include tut03.txt
+
+@include tut04.txt
+
+@include tut05.txt
+
+@include tut06.txt

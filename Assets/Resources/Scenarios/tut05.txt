@@ -169,6 +169,7 @@ anim:move(gaotian, pos_r
 顺便说一句：：虽然`action`里可以写任何代码，但是最好不要在`action`里创建新的动画，这个需求一般可以用动画的串行和并行来实现
 
 <|
+anim_hold_begin()
 anim_hold:move(gaotian, pos_r, 10)
 |>
 上面说的动画都是在一条对话之内的，如果想让动画跨越很多条对话，就要用`anim_hold`代替`anim`
@@ -185,6 +186,7 @@ anim_hold_end()
 持续动画结束之后要写`anim_hold_end()`
 
 <|
+anim_hold_begin()
 show(gaotian, 'normal', pos_l)
 show(xiben, 'normal', pos_c)
 anim_hold:loop(function(entry)
