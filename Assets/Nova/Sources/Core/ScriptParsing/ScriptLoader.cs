@@ -1,4 +1,5 @@
 using LuaInterface;
+using Nova.Exceptions;
 using Nova.Parser;
 using System;
 using System.Collections.Generic;
@@ -249,7 +250,14 @@ namespace Nova
 
         private static void DoEagerExecutionBlock(string eagerExecutionBlockCode)
         {
-            LuaRuntime.Instance.DoString(eagerExecutionBlockCode);
+            try
+            {
+                LuaRuntime.Instance.DoString(eagerExecutionBlockCode);
+            }
+            catch (LuaException e)
+            {
+                throw new ScriptActionException($"Nova: Failed to execute eager block: {eagerExecutionBlockCode}", e);
+            }
         }
 
         private void CheckCurrentNode()
