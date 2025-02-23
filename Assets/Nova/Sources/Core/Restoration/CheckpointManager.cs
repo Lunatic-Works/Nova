@@ -325,9 +325,9 @@ namespace Nova
 
         #region Checkpoint upgrade
 
-        public Dictionary<string, Differ> CheckScriptUpgrade(FlowChartGraph flowChartGraph)
+        public bool CheckScriptUpgrade(FlowChartGraph flowChartGraph, out Dictionary<string, Differ> changedNodes)
         {
-            var changedNode = new Dictionary<string, Differ>();
+            changedNodes = new Dictionary<string, Differ>();
             var updateHashes = false;
             if (globalSave.nodeHashes != null)
             {
@@ -339,14 +339,11 @@ namespace Nova
                     {
                         updateHashes = true;
                         ScriptLoader.AddDeferredDialogueChunks(node);
-                        Differ differ = new Differ(node, dialogue);
+                        var differ = new Differ(node, dialogue);
                         differ.GetDiffs();
 
-                        if (differ.distance > 0)
-                        {
-                            Debug.Log($"Nova: Node {node.name} needs upgrade.");
-                            changedNode.Add(node.name, differ);
-                        }
+                        Debug.Log($"Nova: Node {node.name} needs upgrade.");
+                        changedNodes.Add(node.name, differ);
                     }
                 }
 
@@ -356,7 +353,7 @@ namespace Nova
                     {
                         updateHashes = true;
                         Debug.Log($"Nova: Node {node} needs delete.");
-                        changedNode.Add(node, null);
+                        changedNodes.Add(node, null);
                     }
                 }
             }
@@ -368,7 +365,7 @@ namespace Nova
                 globalSaveDirty = true;
             }
 
-            return changedNode;
+            return changedNodes.Any();
         }
 
         public void UpdateNodeRecord(NodeRecord nodeRecord)

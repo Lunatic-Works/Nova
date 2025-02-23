@@ -63,9 +63,9 @@ namespace Nova
             var success = false;
             try
             {
-                var changedNodes = checkpointManager.CheckScriptUpgrade(flowChartGraph);
+                var needUpgrade = checkpointManager.CheckScriptUpgrade(flowChartGraph, out var changedNodes);
                 // Debug.Log($"upgrade {changedNodes.Count} nodes");
-                if (changedNodes.Any())
+                if (needUpgrade)
                 {
                     checkpointManager.UpdateGlobalSave();
                     upgradeStarted = true;
