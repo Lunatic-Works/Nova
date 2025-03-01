@@ -34,7 +34,6 @@ namespace Nova
                 layoutElement.ignoreLayout = true;
 
                 image.type = Image.Type.Simple;
-                image.alphaHitTestMinimumThreshold = 0.5f;
 
                 transform.localPosition = new Vector3(imageInfo.positionX, imageInfo.positionY, 0f);
                 transform.localScale = new Vector3(imageInfo.scale, imageInfo.scale, 1f);
@@ -73,6 +72,7 @@ namespace Nova
                 // TODO: preload
                 image.sprite = AssetLoader.Load<Sprite>(System.IO.Path.Combine(imageFolder, imageInfo.name));
                 image.SetNativeSize();
+                image.alphaHitTestMinimumThreshold = 0.5f;
             }
         }
 
