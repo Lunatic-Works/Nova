@@ -79,10 +79,14 @@ namespace Nova
                         {
                             LoadBookmark(curPosition);
                         }
+                        else if (currentNode != null)
+                        {
+                            // if we cannot update the current position, we start as if enter from the beginning of the node
+                            GameStart(currentNode.name);
+                        }
                         else
                         {
-                            // if we cannot update the current position, switch to first dialogue
-                            MoveBackToFirstDialogue();
+                            Debug.LogError("Nova: Cannot reload script because the current node is deleted");
                         }
                     }
                 }
@@ -1001,17 +1005,6 @@ namespace Nova
             // Move does not stop animations in the last step
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             ResetGameState();
-        }
-
-        public void MoveBackToFirstDialogue()
-        {
-            var entryNode = nodeRecord;
-            while (entryNode.parent != 0 && entryNode.beginDialogue != 0)
-            {
-                entryNode = checkpointManager.GetNodeRecord(entryNode.parent);
-            }
-
-            MoveBackTo(entryNode, entryNode.offset, entryNode.beginDialogue);
         }
 
         /// <summary>

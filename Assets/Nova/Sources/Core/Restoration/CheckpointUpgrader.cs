@@ -180,7 +180,8 @@ namespace Nova
                 checkpointManager.InvalidateReachedData(nodeName);
             }
 
-            checkpointManager.beginNodeOffset = UpgradeNodeTree(checkpointManager.beginNodeOffset);
+            var newRoot = UpgradeNodeTree(checkpointManager.beginNodeOffset);
+            checkpointManager.beginNodeOffset = newRoot == 0 ? checkpointManager.endNodeOffset : newRoot;
             Debug.Log("Nova: Upgrade bookmarks");
             foreach (var id in checkpointManager.bookmarksMetadata.Keys)
             {

@@ -224,6 +224,8 @@ namespace Nova
             }
         }
 
+        public long endNodeOffset => globalSave.endCheckpoint;
+
         private void NewCheckpointRecord()
         {
             globalSave.endCheckpoint = serializer.NextRecord(globalSave.endCheckpoint);
