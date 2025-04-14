@@ -163,6 +163,8 @@ namespace Nova
 
             gameState.dialogueWillChange.AddListener(OnDialogueWillChange);
             gameState.choiceOccurs.AddListener(OnChoiceOccurs);
+
+            this.HideImmediate();
         }
 
         private void OnDestroy()
