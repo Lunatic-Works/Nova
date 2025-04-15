@@ -90,7 +90,7 @@ namespace Nova
                     else if (currentNode != null)
                     {
                         // if we cannot update the current position, we start as if enter from the beginning of the node
-                        GameStart(currentNode.name);
+                        GameStart(currentNode);
                     }
                     else
                     {
@@ -122,7 +122,6 @@ namespace Nova
             scriptLoader.ForceInit(scriptPath);
             flowChartGraph = scriptLoader.GetFlowChartGraph();
             CheckScriptUpgrade(true);
-            currentNode = GetNode(nodeRecord.name);
             Debug.Log("Nova: Reload complete.");
         }
 
@@ -163,11 +162,14 @@ namespace Nova
 
         #region States
 
+        /// <summary>
+        /// Represents the current node history
+        /// </summary>
         private NodeRecord nodeRecord;
 
         private long checkpointOffset;
 
-        public FlowChartNode currentNode { get; private set; }
+        public FlowChartNode currentNode => nodeRecord == null ? null : GetNode(nodeRecord.name);
 
         public int currentIndex { get; private set; }
 
@@ -219,7 +221,6 @@ namespace Nova
 
             // Reset all states
             nodeRecord = null;
-            currentNode = null;
             currentIndex = 0;
             variables.Clear();
             state = State.Ended;
@@ -367,7 +368,7 @@ namespace Nova
         #region Step forward
 
         /// <summary>
-        /// Called after the current node or the current dialogue index has changed
+        /// Called after the current node or the current dialogue index changes
         /// </summary>
         /// <remarks>
         /// Trigger events according to the current states and how they were changed
@@ -378,7 +379,7 @@ namespace Nova
 
             if (nodeChanged)
             {
-                // Debug.Log($"Node changed to {currentNode.name}");
+                // Debug.Log($"Node changed to {nodeRecord.name}");
 
                 this.nodeChanged.Invoke(new NodeChangedData(nodeRecord.name));
 
@@ -417,7 +418,7 @@ namespace Nova
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
             while (actionPauseLock.isLocked) yield return null;
 
-            var isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
+            var isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(nodeRecord.name, currentIndex);
             var dialogueData = DialogueSaveReachedData(isReachedAnyHistory);
             var dialogueChangedData = new DialogueChangedData(nodeRecord, checkpointOffset, dialogueData,
                 currentDialogueDisplayData, isReached, isReachedAnyHistory);
@@ -501,13 +502,13 @@ namespace Nova
             if (!isReachedAnyHistory)
             {
                 var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
-                dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, voices,
+                dialogueData = new ReachedDialogueData(nodeRecord.name, currentIndex, voices,
                     currentDialogueEntry.NeedInterpolate(), currentDialogueEntry.textHash);
                 checkpointManager.SetReachedDialogue(dialogueData);
             }
             else
             {
-                dialogueData = checkpointManager.GetReachedDialogue(currentNode.name, currentIndex);
+                dialogueData = checkpointManager.GetReachedDialogue(nodeRecord.name, currentIndex);
             }
 
             return dialogueData;
@@ -551,7 +552,6 @@ namespace Nova
                 checkpointOffset = nodeRecord.offset;
             }
 
-            currentNode = nextNode;
             UpdateGameState(false, true);
         }
 
@@ -959,8 +959,7 @@ namespace Nova
                 checkpointOffset = checkpointManager.NextRecord(checkpointOffset);
             }
 
-            currentNode = GetNode(nodeRecord.name);
-            // Debug.Log($"checkpoint={checkpointOffset} node={currentNode.name} dialogue={dialogueIndex} nodeDialogues={currentNode.dialogueEntryCount}");
+            // Debug.Log($"checkpoint={checkpointOffset} node={nodeRecord.name} dialogue={dialogueIndex} dialogues={currentNode.dialogueEntryCount}");
 
             isRestoring = true;
             isUpgrading = upgrade;
