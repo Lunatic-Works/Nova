@@ -163,27 +163,15 @@ namespace Nova
 
         #region States
 
-        /// <summary>
-        /// The current node record in the global save file
-        /// </summary>
         private NodeRecord nodeRecord;
 
         private long checkpointOffset;
 
-        /// <summary>
-        /// The current flow chart node
-        /// </summary>
         public FlowChartNode currentNode { get; private set; }
 
-        /// <summary>
-        /// The index of the current dialogue entry in the current node
-        /// </summary>
         public int currentIndex { get; private set; }
 
-        /// <summary>
-        /// The current dialogueEntry
-        /// </summary>
-        private DialogueEntry currentDialogueEntry;
+        private DialogueEntry currentDialogueEntry => currentNode?.GetDialogueEntryAt(currentIndex);
 
         public DialogueDisplayData currentDialogueDisplayData => currentDialogueEntry?.GetDisplayData();
 
@@ -216,7 +204,6 @@ namespace Nova
             nodeRecord = null;
             currentNode = null;
             currentIndex = 0;
-            currentDialogueEntry = null;
             variables.Clear();
             state = State.Ended;
 
@@ -386,7 +373,6 @@ namespace Nova
             {
                 this.RuntimeAssert(currentIndex >= 0 && currentIndex < currentNode.dialogueEntryCount,
                                    $"Dialogue index {currentIndex} out of range [0, {currentNode.dialogueEntryCount})");
-                currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
                 ExecuteAction(UpdateDialogue(fromCheckpoint, nodeChanged));
             }
             else
@@ -417,7 +403,7 @@ namespace Nova
             var isReachedAnyHistory = checkpointManager.IsReachedAnyHistory(currentNode.name, currentIndex);
             var dialogueData = DialogueSaveReachedData(isReachedAnyHistory);
             var dialogueChangedData = new DialogueChangedData(nodeRecord, checkpointOffset, dialogueData,
-                currentDialogueEntry.GetDisplayData(), isReached, isReachedAnyHistory);
+                currentDialogueDisplayData, isReached, isReachedAnyHistory);
             if (isJumping && !isReachedAnyHistory)
             {
                 isJumping = false;
