@@ -381,11 +381,10 @@ namespace Nova
                 checkpointEnsured = true;
             }
 
-            this.RuntimeAssert(currentIndex >= 0 && (currentNode.dialogueEntryCount == 0 ||
-                                                     currentIndex < currentNode.dialogueEntryCount),
-                               "Dialogue index out of range.");
             if (currentNode.dialogueEntryCount > 0)
             {
+                this.RuntimeAssert(currentIndex >= 0 && currentIndex < currentNode.dialogueEntryCount,
+                                   $"Dialogue index {currentIndex} out of range [0, {currentNode.dialogueEntryCount})");
                 currentDialogueEntry = currentNode.GetDialogueEntryAt(currentIndex);
                 ExecuteAction(UpdateDialogue(fromCheckpoint, nodeChanged));
             }
