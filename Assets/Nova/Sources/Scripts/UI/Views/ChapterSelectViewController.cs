@@ -62,6 +62,7 @@ namespace Nova
             }
             else if (unlockedNodes.Count == 1 && !inputManager.IsPressed(AbstractKey.EditorUnlock))
             {
+                onFinish?.Invoke();
                 GameStart(unlockedNodes.First());
                 return;
             }
