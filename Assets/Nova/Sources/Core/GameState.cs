@@ -22,6 +22,8 @@ namespace Nova
 
         private CoroutineHelper coroutineHelper;
 
+        #region Init
+
         private void Awake()
         {
             coroutineHelper = new CoroutineHelper(this);
@@ -48,6 +50,16 @@ namespace Nova
         {
             SaveInitialCheckpoint();
             CheckScriptUpgrade(false);
+        }
+
+        // Called in Start after all restorables are initialized
+        private void SaveInitialCheckpoint()
+        {
+            // Save a clean state of game scene
+            if (initialCheckpoint == null)
+            {
+                initialCheckpoint = GetCheckpoint();
+            }
         }
 
         // It can run any Lua code, so everything that can be used in Lua code should initialize before Start
@@ -118,6 +130,44 @@ namespace Nova
             currentNode = GetNode(nodeRecord.name);
             Debug.Log("Nova: Reload complete.");
         }
+
+        #endregion
+
+        #region Start node
+
+        /// <summary>
+        /// Start the game from the given node
+        /// </summary>
+        private void GameStart(FlowChartNode startNode)
+        {
+            ResetGameState();
+            state = State.Normal;
+            gameStarted.Invoke();
+            MoveToNextNode(startNode);
+        }
+
+        public void GameStart(string nodeName)
+        {
+            GameStart(GetNode(nodeName));
+        }
+
+        public FlowChartNode GetNode(string name, bool addDeferred = true)
+        {
+            var node = flowChartGraph.GetNode(name);
+            if (addDeferred)
+            {
+                ScriptLoader.AddDeferredDialogueChunks(node);
+            }
+
+            return node;
+        }
+
+        public IEnumerable<string> GetStartNodeNames(StartNodeType type = StartNodeType.Normal)
+        {
+            return flowChartGraph.GetStartNodeNames(type);
+        }
+
+        #endregion
 
         #region States
 
@@ -192,27 +242,24 @@ namespace Nova
         public UnityEvent gameStarted;
 
         /// <summary>
-        /// This event will be triggered if the node has changed. The new node name will be sent to all listeners.
+        /// Triggered after the node changes.
         /// </summary>
         public NodeChangedEvent nodeChanged;
 
         /// <summary>
-        /// This event will be triggered if the content of the dialogue will change. It will be triggered before
-        /// the lazy execution block of the new dialogue is invoked.
+        /// Triggered after the checkpoint is saved, before the default lazy execution block is invoked.
         /// </summary>
         public UnityEvent dialogueWillChange;
 
         /// <summary>
-        /// This event will be triggered if the content of the dialogue has changed. The new dialogue text will be
-        /// sent to all listeners.
+        /// Triggered after the default lazy execution block is invoked.
         /// </summary>
         public DialogueChangedEvent dialogueChangedEarly;
 
         public DialogueChangedEvent dialogueChanged;
 
         /// <summary>
-        /// This event will be triggered if choices occur, either when branches occur or when choices are
-        /// triggered from the script.
+        /// Triggered when choices occur, either when branches occur or when choices are raised from the script.
         /// </summary>
         public ChoiceOccursEvent choiceOccurs;
 
@@ -222,7 +269,7 @@ namespace Nova
         public SavePointEvent savePoint;
 
         /// <summary>
-        /// This event will be triggered if the story route has reached an end.
+        /// Triggered when the story route reaches an end.
         /// </summary>
         public RouteEndedEvent routeEnded;
 
@@ -321,7 +368,7 @@ namespace Nova
 
         #endregion
 
-        #region Update game state
+        #region Step forward
 
         /// <summary>
         /// Called after the current node or the current dialogue index has changed
@@ -561,54 +608,6 @@ namespace Nova
             MoveToNextNode(currentNode.GetNext(branchName));
         }
 
-        #endregion
-
-        #region Game start
-
-        // Called in Start after all restorables are initialized
-        private void SaveInitialCheckpoint()
-        {
-            // Save a clean state of game scene
-            if (initialCheckpoint == null)
-            {
-                initialCheckpoint = GetCheckpoint();
-            }
-        }
-
-        /// <summary>
-        /// Start the game from the given node
-        /// </summary>
-        private void GameStart(FlowChartNode startNode)
-        {
-            ResetGameState();
-            state = State.Normal;
-            gameStarted.Invoke();
-            MoveToNextNode(startNode);
-        }
-
-        public void GameStart(string nodeName)
-        {
-            GameStart(GetNode(nodeName));
-        }
-
-        public FlowChartNode GetNode(string name, bool addDeferred = true)
-        {
-            var node = flowChartGraph.GetNode(name);
-            if (addDeferred)
-            {
-                ScriptLoader.AddDeferredDialogueChunks(node);
-            }
-
-            return node;
-        }
-
-        public IEnumerable<string> GetStartNodeNames(StartNodeType type = StartNodeType.Normal)
-        {
-            return flowChartGraph.GetStartNodeNames(type);
-        }
-
-        #endregion
-
         /// <summary>
         /// Check if the current state can step forward, i.e., something will happen when calling Step
         /// </summary>
@@ -667,6 +666,8 @@ namespace Nova
             Utils.RuntimeAssert(choices.Count > 0, "Nova: Choices must not be empty.");
             choiceOccurs.Invoke(new ChoiceOccursData(choices));
         }
+
+        #endregion
 
         #region Restoration
 
