@@ -48,18 +48,12 @@ namespace Nova
 
         private void Start()
         {
-            SaveInitialCheckpoint();
-            CheckScriptUpgrade(false);
-        }
-
-        // Called in Start after all restorables are initialized
-        private void SaveInitialCheckpoint()
-        {
-            // Save a clean state of game scene
             if (initialCheckpoint == null)
             {
                 initialCheckpoint = GetCheckpoint();
             }
+
+            CheckScriptUpgrade(false);
         }
 
         // It can run any Lua code, so everything that can be used in Lua code should initialize before Start
@@ -135,9 +129,6 @@ namespace Nova
 
         #region Start node
 
-        /// <summary>
-        /// Start the game from the given node
-        /// </summary>
         private void GameStart(FlowChartNode startNode)
         {
             ResetGameState();
