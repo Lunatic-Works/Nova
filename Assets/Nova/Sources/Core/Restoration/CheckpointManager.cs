@@ -353,7 +353,10 @@ namespace Nova
                     {
                         updateHashes = true;
                         ScriptLoader.AddDeferredDialogueChunks(node);
-                        var differ = new Differ(node, dialogue);
+                        var differ = new Differ(
+                            node.GetAllDialogues().Select(x => x.textHash).ToArray(),
+                            dialogue.Select(x => x.textHash).ToArray()
+                        );
                         differ.GetDiffs();
 
                         Debug.Log($"Nova: Node {node.name} needs upgrade.");

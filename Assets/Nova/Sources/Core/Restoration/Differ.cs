@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Nova
 {
@@ -46,10 +45,10 @@ namespace Nova
             return v[(d + 1) * d / 2 + (k + d) / 2];
         }
 
-        public Differ(FlowChartNode node, IEnumerable<ReachedDialogueData> reachedData)
+        public Differ(ulong[] scriptHashes, ulong[] saveHashes)
         {
-            scriptHashes = node.GetAllDialogues().Select(x => x.textHash).ToArray();
-            saveHashes = reachedData.Select(x => x.textHash).ToArray();
+            this.scriptHashes = scriptHashes;
+            this.saveHashes = saveHashes;
             distance = -1;
         }
 
