@@ -345,32 +345,30 @@ namespace Nova
             var updateHashes = false;
             if (globalSave.nodeHashes != null)
             {
-                foreach (var node in flowChartGraph)
+                foreach (var nodeName in globalSave.nodeHashes.Keys)
                 {
-                    if (globalSave.nodeHashes.ContainsKey(node.name) &&
-                        globalSave.nodeHashes[node.name] != node.textHash &&
-                        reachedDialogues.TryGetValue(node.name, out var dialogue))
+                    if (flowChartGraph.HasNode(nodeName))
                     {
-                        updateHashes = true;
-                        ScriptLoader.AddDeferredDialogueChunks(node);
-                        var differ = new Differ(
-                            node.GetAllDialogues().Select(x => x.textHash).ToArray(),
-                            dialogue.Select(x => x.textHash).ToArray()
-                        );
-                        differ.GetDiffs();
-
-                        Debug.Log($"Nova: Node {node.name} needs upgrade.");
-                        changedNodes.Add(node.name, differ);
+                        var node = flowChartGraph.GetNode(nodeName);
+                        if (globalSave.nodeHashes[node.name] != node.textHash &&
+                            reachedDialogues.TryGetValue(node.name, out var dialogue))
+                        {
+                            updateHashes = true;
+                            ScriptLoader.AddDeferredDialogueChunks(node);
+                            var differ = new Differ(
+                                node.GetAllDialogues().Select(x => x.textHash).ToArray(),
+                                dialogue.Select(x => x.textHash).ToArray()
+                            );
+                            differ.GetDiffs();
+                            Debug.Log($"Nova: Node {node.name} needs upgrade.");
+                            changedNodes.Add(node.name, differ);
+                        }
                     }
-                }
-
-                foreach (var node in globalSave.nodeHashes.Keys)
-                {
-                    if (!flowChartGraph.HasNode(node))
+                    else
                     {
                         updateHashes = true;
-                        Debug.Log($"Nova: Node {node} needs delete.");
-                        changedNodes.Add(node, null);
+                        Debug.Log($"Nova: Node {nodeName} needs delete.");
+                        changedNodes.Add(nodeName, null);
                     }
                 }
             }
