@@ -313,12 +313,14 @@ namespace Nova
             return GetBlock(block.nextBlock);
         }
 
+        // Create a new linked list
         public long BeginRecord()
         {
             var block = AppendBlock();
             return block.dataOffset;
         }
 
+        // Get the offset of the next record in the same linked list
         public long NextRecord(long offset)
         {
             var block = GetBlockIndex(offset, out var index);

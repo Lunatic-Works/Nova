@@ -104,7 +104,7 @@ namespace Nova.Editor
                     var dialogue = -1;
                     while (dialogue < nodeRecord.lastCheckpointDialogue)
                     {
-                        dialogue = checkpointManager.GetCheckpointDialogue(offset);
+                        dialogue = checkpointManager.GetCheckpointDialogueIndex(offset);
                         var item = new TreeViewItem { id = rows.Count, displayName = $"checkpoint.{dialogue} @{offset}" };
                         rows.Add(offset);
                         root.AddChild(item);
@@ -221,7 +221,7 @@ namespace Nova.Editor
                 selectedCheckpoint.offset = selected;
                 if (selected >= 0)
                 {
-                    selectedCheckpoint.dialogueIndex = checkpointManager.GetCheckpointDialogue(selected);
+                    selectedCheckpoint.dialogueIndex = checkpointManager.GetCheckpointDialogueIndex(selected);
                     var checkpoint = checkpointManager.GetCheckpoint(selected);
                     selectedCheckpoint.checkpoint = checkpoint;
                     selectedCheckpoint.details.Clear();
