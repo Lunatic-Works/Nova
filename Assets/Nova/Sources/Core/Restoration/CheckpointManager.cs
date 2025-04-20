@@ -238,28 +238,30 @@ namespace Nova
             return NextRecord(NextRecord(offset));
         }
 
+        // Get or create the next node record
         public NodeRecord GetNextNodeRecord(NodeRecord prevRecord, string name, Variables variables, int beginDialogue)
         {
             var variablesHash = variables.hash;
-            NodeRecord record = null;
+            NodeRecord childRecord = null;
             var offset = prevRecord?.child ?? globalSave.beginCheckpoint;
             while (offset != 0 && offset < globalSave.endCheckpoint)
             {
-                record = GetNodeRecord(offset);
-                if (record.name == name && record.variablesHash == variablesHash)
+                childRecord = GetNodeRecord(offset);
+                if (childRecord.name == name && childRecord.variablesHash == variablesHash)
                 {
-                    return record;
+                    return childRecord;
                 }
 
-                offset = record.sibling;
+                offset = childRecord.sibling;
             }
 
+            // Now childRecord is prevRecord's child's last sibling or null
             offset = globalSave.endCheckpoint;
             var newRecord = new NodeRecord(offset, name, beginDialogue, variablesHash);
-            if (record != null)
+            if (childRecord != null)
             {
-                record.sibling = offset;
-                UpdateNodeRecord(record);
+                childRecord.sibling = offset;
+                UpdateNodeRecord(childRecord);
             }
             else if (prevRecord != null)
             {
