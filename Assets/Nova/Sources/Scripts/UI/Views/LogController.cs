@@ -467,7 +467,7 @@ namespace Nova
             var logEntryRestoreData = logEntriesRestoreData.FirstOrDefault();
             foreach (var pos in gameState.GetDialogueHistory(maxLogEntryNum))
             {
-                var dialogueData = checkpointManager.GetReachedDialogueData(pos.nodeRecord.name, pos.dialogueIndex);
+                var dialogueData = checkpointManager.GetReachedDialogue(pos.nodeRecord.name, pos.dialogueIndex);
                 DialogueDisplayData displayData = null;
 
                 if (logEntryRestoreData != null && logEntryRestoreData.index == logEntries.Count)

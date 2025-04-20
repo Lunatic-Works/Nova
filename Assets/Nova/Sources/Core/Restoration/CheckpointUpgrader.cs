@@ -177,7 +177,7 @@ namespace Nova
         {
             foreach (var nodeName in changedNodes.Keys)
             {
-                checkpointManager.InvalidateReachedData(nodeName);
+                checkpointManager.InvalidateReachedDialogues(nodeName);
             }
 
             var newRoot = UpgradeNodeTree(checkpointManager.beginCheckpoint);
