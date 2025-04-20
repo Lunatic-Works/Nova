@@ -35,6 +35,11 @@ namespace Nova
             return new CheckpointCorruptedException($"Record @{offset} overflow.");
         }
 
+        public static CheckpointCorruptedException InvalidRecordSize(long offset, int size)
+        {
+            return new CheckpointCorruptedException($"Record @{offset} has invalid size {size}");
+        }
+
         public static CheckpointCorruptedException SerializationError(long offset, string reason)
         {
             return new CheckpointCorruptedException($"Serialization failed @{offset}: {reason}");
@@ -174,6 +179,7 @@ namespace Nova
 
         private const bool DefaultCompress = true;
         private const int RecordHeader = 4; // sizeof(int), storing the size of the record
+        private const int MaxRecordSize = CheckpointBlock.BlockSize * 256;
 
         private readonly JsonSerializer jsonSerializer;
         private readonly string path;
@@ -254,8 +260,12 @@ namespace Nova
             }
 
             var count = segment.ReadInt(index);
-            index += RecordHeader;
+            if (count <= 0 || count > MaxRecordSize)
+            {
+                throw CheckpointCorruptedException.InvalidRecordSize(offset, count);
+            }
 
+            index += RecordHeader;
             if (index + count <= segment.Count)
             {
                 return segment.Slice(index, count);
@@ -316,10 +326,16 @@ namespace Nova
         }
 
         // Get the offset of the next record in the same linked list
+        // Allocates blocks until the next record starts
         public long NextRecord(long offset)
         {
             var block = GetBlockIndex(offset, out var index);
             var count = block.segment.ReadInt(index);
+            if (count <= 0 || count > MaxRecordSize)
+            {
+                throw CheckpointCorruptedException.InvalidRecordSize(offset, count);
+            }
+
             index += RecordHeader + count;
             while (index + RecordHeader > CheckpointBlock.DataSize)
             {
@@ -333,9 +349,15 @@ namespace Nova
         }
 
         // Create or update a record at the given offset
+        // If update, assuming that the size is unchanged
         public void AppendRecord(long offset, ByteSegment bytes)
         {
             // Debug.Log($"append record @{offset} size={bytes.Count}");
+
+            if (bytes.Count > MaxRecordSize)
+            {
+                throw CheckpointCorruptedException.InvalidRecordSize(offset, bytes.Count);
+            }
 
             var block = GetBlockIndex(offset, out var index);
             var segment = block.segment;
