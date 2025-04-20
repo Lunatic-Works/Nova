@@ -245,7 +245,7 @@ namespace Nova
             var offset = prevRecord?.child ?? globalSave.beginCheckpoint;
             while (offset != 0 && offset < globalSave.endCheckpoint)
             {
-                record = serializer.GetNodeRecord(offset);
+                record = GetNodeRecord(offset);
                 if (record.name == name && record.variablesHash == variablesHash)
                 {
                     return record;
@@ -259,12 +259,12 @@ namespace Nova
             if (record != null)
             {
                 record.sibling = offset;
-                serializer.UpdateNodeRecord(record);
+                UpdateNodeRecord(record);
             }
             else if (prevRecord != null)
             {
                 prevRecord.child = offset;
-                serializer.UpdateNodeRecord(prevRecord);
+                UpdateNodeRecord(prevRecord);
             }
 
             if (prevRecord != null)
@@ -272,14 +272,19 @@ namespace Nova
                 newRecord.parent = prevRecord.offset;
             }
 
-            serializer.UpdateNodeRecord(newRecord);
+            UpdateNodeRecord(newRecord);
             UpdateEndCheckpoint();
             return newRecord;
         }
 
         public NodeRecord GetNodeRecord(long offset)
         {
-            return serializer.GetNodeRecord(offset);
+            return new NodeRecord(offset, serializer.GetRecord(offset));
+        }
+
+        public void UpdateNodeRecord(NodeRecord record)
+        {
+            serializer.AppendRecord(record.offset, record.ToByteSegment());
         }
 
         public bool CanAppendCheckpoint(long offset)
@@ -296,7 +301,7 @@ namespace Nova
                 nodeRecord.lastCheckpointDialogue = dialogueIndex;
             }
 
-            serializer.UpdateNodeRecord(nodeRecord);
+            UpdateNodeRecord(nodeRecord);
         }
 
         public long AppendCheckpoint(int dialogueIndex, GameStateCheckpoint checkpoint)
@@ -371,11 +376,6 @@ namespace Nova
             return changedNodes.Any();
         }
 
-        public void UpdateNodeRecord(NodeRecord nodeRecord)
-        {
-            serializer.UpdateNodeRecord(nodeRecord);
-        }
-
         public long UpgradeNodeRecord(NodeRecord nodeRecord, int beginDialogue)
         {
             var beginCheckpoint = GetCheckpoint(NextRecord(nodeRecord.offset));
@@ -385,7 +385,7 @@ namespace Nova
             nodeRecord.endDialogue = beginDialogue + 1;
             nodeRecord.lastCheckpointDialogue = beginDialogue;
             nodeRecord.offset = globalSave.endCheckpoint;
-            serializer.UpdateNodeRecord(nodeRecord);
+            UpdateNodeRecord(nodeRecord);
             UpdateEndCheckpoint();
 
             AppendCheckpoint(beginDialogue, beginCheckpoint);
@@ -399,7 +399,7 @@ namespace Nova
             {
                 var child = GetNodeRecord(offset);
                 child.parent = nodeRecord.offset;
-                serializer.UpdateNodeRecord(child);
+                UpdateNodeRecord(child);
                 offset = child.sibling;
             }
         }
