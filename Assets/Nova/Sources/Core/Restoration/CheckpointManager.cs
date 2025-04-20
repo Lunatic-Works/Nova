@@ -16,7 +16,7 @@ namespace Nova
 
         private string savePathBase;
         private string globalSavePath;
-        private string backupPath;
+        private string globalSaveBackupPath;
 
         private GlobalSave globalSave;
         private bool globalSaveDirty;
@@ -48,7 +48,7 @@ namespace Nova
 
             savePathBase = Path.Combine(Application.persistentDataPath, "Save", saveFolder);
             globalSavePath = Path.Combine(savePathBase, "global.nsav");
-            backupPath = Path.Combine(savePathBase, "global.nsav.bak");
+            globalSaveBackupPath = Path.Combine(savePathBase, "global.nsav.bak");
             Directory.CreateDirectory(savePathBase);
 
             serializer = new CheckpointSerializer(globalSavePath, frozen);
@@ -121,13 +121,13 @@ namespace Nova
             for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = NextRecord(cur))
             {
                 var record = serializer.DeserializeRecord<IReachedData>(cur);
-                if (record is ReachedEndData end)
+                if (record is ReachedDialogueData dialogue)
+                {
+                    AddToReachedDialogues(dialogue);
+                }
+                else if (record is ReachedEndData end)
                 {
                     reachedEnds.Add(end.endName);
-                }
-                else if (record is ReachedDialogueData dialogue)
-                {
-                    SetReachedDialogueData(dialogue);
                 }
                 else if (record is NodeUpgradeMaker maker)
                 {
@@ -156,7 +156,7 @@ namespace Nova
             // Debug.Log($"next reached {globalSave.endReached}");
         }
 
-        private void SetReachedDialogueData(ReachedDialogueData data)
+        private void AddToReachedDialogues(ReachedDialogueData data)
         {
             var list = reachedDialogues.Ensure(data.nodeName);
             list.Ensure(data.dialogueIndex + 1);
@@ -169,14 +169,14 @@ namespace Nova
             UpdateEndReached();
         }
 
-        public void SetReached(ReachedDialogueData data)
+        public void SetReachedDialogue(ReachedDialogueData data)
         {
             if (IsReachedAnyHistory(data.nodeName, data.dialogueIndex))
             {
                 return;
             }
 
-            SetReachedDialogueData(data);
+            AddToReachedDialogues(data);
             AppendReachedRecord(data);
         }
 
@@ -198,7 +198,7 @@ namespace Nova
                    reachedDialogues[nodeName][dialogueIndex] != null;
         }
 
-        public ReachedDialogueData GetReachedDialogueData(string nodeName, int dialogueIndex)
+        public ReachedDialogueData GetReachedDialogue(string nodeName, int dialogueIndex)
         {
             return reachedDialogues[nodeName][dialogueIndex];
         }
@@ -208,7 +208,7 @@ namespace Nova
             return reachedEnds.Contains(endName);
         }
 
-        public void InvalidateReachedData(string nodeName)
+        public void InvalidateReachedDialogues(string nodeName)
         {
             reachedDialogues.Remove(nodeName);
             AppendReachedRecord(new NodeUpgradeMaker(nodeName));
@@ -476,7 +476,7 @@ namespace Nova
 
             serializer.Flush();
             // backup now
-            File.Copy(globalSavePath, backupPath, true);
+            File.Copy(globalSavePath, globalSaveBackupPath, true);
         }
 
         /// <summary>
@@ -504,9 +504,9 @@ namespace Nova
         public void RestoreGlobalSave()
         {
             serializer.Dispose();
-            if (File.Exists(backupPath))
+            if (File.Exists(globalSaveBackupPath))
             {
-                File.Copy(backupPath, globalSavePath, true);
+                File.Copy(globalSaveBackupPath, globalSavePath, true);
                 TryInitGlobalSaveReached();
                 if (globalSave == null)
                 {

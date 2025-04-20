@@ -499,11 +499,11 @@ namespace Nova
                 var voices = currentVoices.Count > 0 ? new Dictionary<string, VoiceEntry>(currentVoices) : null;
                 dialogueData = new ReachedDialogueData(currentNode.name, currentIndex, voices,
                     currentDialogueEntry.NeedInterpolate(), currentDialogueEntry.textHash);
-                checkpointManager.SetReached(dialogueData);
+                checkpointManager.SetReachedDialogue(dialogueData);
             }
             else
             {
-                dialogueData = checkpointManager.GetReachedDialogueData(currentNode.name, currentIndex);
+                dialogueData = checkpointManager.GetReachedDialogue(currentNode.name, currentIndex);
             }
 
             return dialogueData;
