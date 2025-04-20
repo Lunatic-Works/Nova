@@ -181,6 +181,9 @@ namespace Nova
         private long endBlock;
         private readonly LRUCache<long, CheckpointBlock> cachedBlocks;
         private readonly bool frozen;
+
+        // Hack: headerCorrupted is initialized to true,
+        // so UpdateFileHeader can run when the file is written for the first time
         private bool headerCorrupted = true;
 
         public CheckpointSerializer(string path, bool frozen)
