@@ -287,11 +287,6 @@ namespace Nova
             return new ByteSegment(buf);
         }
 
-        public NodeRecord GetNodeRecord(long offset)
-        {
-            return new NodeRecord(offset, GetRecord(offset));
-        }
-
         private CheckpointBlock AppendBlock()
         {
             var id = endBlock;
@@ -367,11 +362,6 @@ namespace Nova
                 segment = block.segment;
                 index = 0;
             }
-        }
-
-        public void UpdateNodeRecord(NodeRecord record)
-        {
-            AppendRecord(record.offset, record.ToByteSegment());
         }
 
         public void SerializeRecord<T>(long offset, T data, bool compress = DefaultCompress)
