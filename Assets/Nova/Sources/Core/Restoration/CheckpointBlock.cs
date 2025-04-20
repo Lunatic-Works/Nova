@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using UnityEngine;
 // using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Nova
@@ -15,6 +16,7 @@ namespace Nova
             return offset / BlockSize;
         }
 
+        // Convert offset to id of the block and index of the data in the block
         public static long GetBlockIDIndex(long offset, out int index)
         {
             var id = offset / BlockSize;
@@ -89,10 +91,16 @@ namespace Nova
             dirty = true;
         }
 
-        public void Flush(bool callback = true)
+        public void Flush(bool callback)
         {
-            if (!dirty || stream == null || !stream.CanRead)
+            if (!dirty)
             {
+                return;
+            }
+
+            if (stream == null || !stream.CanRead)
+            {
+                Debug.LogWarning($"Nova: Block is dirty but stream is closed. id: {id}, nextBlock: {nextBlock}");
                 return;
             }
 
@@ -112,6 +120,8 @@ namespace Nova
             stream.Seek(offset + startIndex, SeekOrigin.Begin);
             stream.Write(data, startIndex, BlockSize - startIndex);
             dirty = false;
+
+            // This is used to check if any block remains dirty when a block is disposed by the LRU cache
             if (callback)
             {
                 onFlush.Invoke();
@@ -123,7 +133,7 @@ namespace Nova
 
         public void Dispose()
         {
-            Flush();
+            Flush(true);
         }
     }
 }
