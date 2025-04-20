@@ -840,11 +840,11 @@ namespace Nova
             }
 
             newCheckpointOffset = checkpointManager.NextRecord(curNode.offset);
-            var checkpointDialogue = checkpointManager.GetCheckpointDialogue(newCheckpointOffset);
+            var checkpointDialogue = checkpointManager.GetCheckpointDialogueIndex(newCheckpointOffset);
             while (checkpointDialogue < curNode.lastCheckpointDialogue)
             {
                 var nextCheckpoint = checkpointManager.NextCheckpoint(newCheckpointOffset);
-                var nextCheckpointDialogue = checkpointManager.GetCheckpointDialogue(nextCheckpoint);
+                var nextCheckpointDialogue = checkpointManager.GetCheckpointDialogueIndex(nextCheckpoint);
                 if (nextCheckpointDialogue > newDialogueIndex)
                 {
                     break;
@@ -1065,7 +1065,7 @@ namespace Nova
             if (!foundHead)
             {
                 dialogue = entryNode.endDialogue - 1;
-                while (checkpointManager.GetCheckpointDialogue(offset) != entryNode.lastCheckpointDialogue)
+                while (checkpointManager.GetCheckpointDialogueIndex(offset) != entryNode.lastCheckpointDialogue)
                 {
                     offset = checkpointManager.NextCheckpoint(offset);
                 }
@@ -1139,7 +1139,7 @@ namespace Nova
                     curDialogue = curNode.beginDialogue;
                 }
 
-                var checkpointDialogue = checkpointManager.GetCheckpointDialogue(curCheckpoint);
+                var checkpointDialogue = checkpointManager.GetCheckpointDialogueIndex(curCheckpoint);
                 var endDialogue = i == 0 ? currentIndex : curNode.endDialogue;
                 while (curDialogue < endDialogue)
                 {
@@ -1148,7 +1148,7 @@ namespace Nova
                     if (checkpointDialogue < curNode.lastCheckpointDialogue)
                     {
                         nextCheckpoint = checkpointManager.NextCheckpoint(curCheckpoint);
-                        var nextCheckpointDialogue = checkpointManager.GetCheckpointDialogue(nextCheckpoint);
+                        var nextCheckpointDialogue = checkpointManager.GetCheckpointDialogueIndex(nextCheckpoint);
                         if (nextCheckpointDialogue < endDialogue)
                         {
                             curEndDialogue = nextCheckpointDialogue;

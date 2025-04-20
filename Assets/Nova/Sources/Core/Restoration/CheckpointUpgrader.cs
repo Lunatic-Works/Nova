@@ -155,7 +155,7 @@ namespace Nova
             long lastOffset = -1;
             while (true)
             {
-                var dialogue = checkpointManager.GetCheckpointDialogue(checkpointOffset);
+                var dialogue = checkpointManager.GetCheckpointDialogueIndex(checkpointOffset);
                 if (dialogue >= newNodeRecord.lastCheckpointDialogue)
                 {
                     bookmark.checkpointOffset = checkpointOffset;
