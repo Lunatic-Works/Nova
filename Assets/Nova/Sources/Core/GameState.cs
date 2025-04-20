@@ -171,7 +171,24 @@ namespace Nova
 
         public int currentIndex { get; private set; }
 
-        private DialogueEntry currentDialogueEntry => currentNode?.GetDialogueEntryAt(currentIndex);
+        private DialogueEntry currentDialogueEntry
+        {
+            get
+            {
+                var node = currentNode;
+                if (node == null)
+                {
+                    return null;
+                }
+
+                if (node.dialogueEntryCount == 0)
+                {
+                    return null;
+                }
+
+                return node.GetDialogueEntryAt(currentIndex);
+            }
+        }
 
         public DialogueDisplayData currentDialogueDisplayData => currentDialogueEntry?.GetDisplayData();
 
