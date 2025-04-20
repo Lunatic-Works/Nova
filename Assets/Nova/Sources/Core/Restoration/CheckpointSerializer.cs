@@ -332,6 +332,7 @@ namespace Nova
             return block.dataOffset + index;
         }
 
+        // Create or update a record at the given offset
         public void AppendRecord(long offset, ByteSegment bytes)
         {
             // Debug.Log($"append record @{offset} size={bytes.Count}");
