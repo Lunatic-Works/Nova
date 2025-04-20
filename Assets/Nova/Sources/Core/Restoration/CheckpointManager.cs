@@ -145,7 +145,7 @@ namespace Nova
             }
         }
 
-        private void NewReached()
+        private void UpdateEndReached()
         {
             globalSave.endReached = NextRecord(globalSave.endReached);
             globalSaveDirty = true;
@@ -162,7 +162,7 @@ namespace Nova
         private void AppendReachedRecord(IReachedData data)
         {
             serializer.SerializeRecord(globalSave.endReached, data);
-            NewReached();
+            UpdateEndReached();
         }
 
         public void SetReached(ReachedDialogueData data)
@@ -214,7 +214,7 @@ namespace Nova
 
         #region Checkpoint
 
-        public long beginNodeOffset
+        public long beginCheckpoint
         {
             get => globalSave.beginCheckpoint < globalSave.endCheckpoint ? globalSave.beginCheckpoint : 0;
             set
@@ -224,9 +224,9 @@ namespace Nova
             }
         }
 
-        public long endNodeOffset => globalSave.endCheckpoint;
+        public long endCheckpoint => globalSave.endCheckpoint;
 
-        private void NewCheckpointRecord()
+        private void UpdateEndCheckpoint()
         {
             globalSave.endCheckpoint = NextRecord(globalSave.endCheckpoint);
             globalSaveDirty = true;
@@ -238,7 +238,7 @@ namespace Nova
             return NextRecord(NextRecord(offset));
         }
 
-        public NodeRecord GetNextNode(NodeRecord prevRecord, string name, Variables variables, int beginDialogue)
+        public NodeRecord GetNextNodeRecord(NodeRecord prevRecord, string name, Variables variables, int beginDialogue)
         {
             var variablesHash = variables.hash;
             NodeRecord record = null;
@@ -273,7 +273,7 @@ namespace Nova
             }
 
             serializer.UpdateNodeRecord(newRecord);
-            NewCheckpointRecord();
+            UpdateEndCheckpoint();
             return newRecord;
         }
 
@@ -306,10 +306,10 @@ namespace Nova
             var buf = new ByteSegment(4);
             buf.WriteInt(0, dialogueIndex);
             serializer.AppendRecord(record, buf);
-            NewCheckpointRecord();
+            UpdateEndCheckpoint();
 
             serializer.SerializeRecord(globalSave.endCheckpoint, checkpoint);
-            NewCheckpointRecord();
+            UpdateEndCheckpoint();
             return record;
         }
 
@@ -385,7 +385,7 @@ namespace Nova
             nodeRecord.lastCheckpointDialogue = beginDialogue;
             nodeRecord.offset = globalSave.endCheckpoint;
             serializer.UpdateNodeRecord(nodeRecord);
-            NewCheckpointRecord();
+            UpdateEndCheckpoint();
 
             AppendCheckpoint(beginDialogue, beginCheckpoint);
             return nodeRecord.offset;
