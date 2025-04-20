@@ -248,28 +248,33 @@ namespace Nova
         {
             var block = GetBlockIndex(offset, out var index);
             var segment = block.segment;
-            if (segment.Count < index + RecordHeader)
+            if (index + RecordHeader > segment.Count)
             {
                 throw CheckpointCorruptedException.RecordOverflow(offset);
             }
 
-            var size = segment.ReadInt(index);
+            var count = segment.ReadInt(index);
             index += RecordHeader;
 
-            if (index + size <= segment.Count)
+            if (index + count <= segment.Count)
             {
-                return segment.Slice(index, size);
+                return segment.Slice(index, count);
             }
 
             // need concat multiple blocks
-            var buf = new byte[size];
-            var head = 0;
-            while (head < size)
+            var buf = new byte[count];
+            var pos = 0;
+            while (true)
             {
-                var count = Math.Min(size - head, segment.Count - index);
-                segment.ReadBytes(index, new ByteSegment(buf, head, count));
-                head += count;
-                if (head < size && block.nextBlock == 0)
+                var _count = Math.Min(count - pos, segment.Count - index);
+                segment.ReadBytes(index, new ByteSegment(buf, pos, _count));
+                pos += _count;
+                if (pos >= count)
+                {
+                    break;
+                }
+
+                if (block.nextBlock == 0)
                 {
                     throw CheckpointCorruptedException.RecordOverflow(offset);
                 }
@@ -317,14 +322,15 @@ namespace Nova
         public long NextRecord(long offset)
         {
             var block = GetBlockIndex(offset, out var index);
-            var size = block.segment.ReadInt(index);
-            index += RecordHeader + size;
+            var count = block.segment.ReadInt(index);
+            index += RecordHeader + count;
             while (index + RecordHeader > CheckpointBlock.DataSize)
             {
                 index -= CheckpointBlock.DataSize;
                 block = NextBlock(block);
             }
 
+            // index < 0 if the last block does not have enough space for RecordHeader
             index = Math.Max(index, 0);
             return block.dataOffset + index;
         }
@@ -344,18 +350,20 @@ namespace Nova
             index += RecordHeader;
 
             var pos = 0;
-            while (pos < bytes.Count)
+            while (true)
             {
-                var size = Math.Min(segment.Count - index, bytes.Count - pos);
-                segment.WriteBytes(index, bytes.Slice(pos, size));
+                var _count = Math.Min(bytes.Count - pos, segment.Count - index);
+                segment.WriteBytes(index, bytes.Slice(pos, _count));
                 block.MarkDirty();
-                pos += size;
-                if (pos < bytes.Count)
+                pos += _count;
+                if (pos >= bytes.Count)
                 {
-                    block = NextBlock(block);
-                    segment = block.segment;
-                    index = 0;
+                    break;
                 }
+
+                block = NextBlock(block);
+                segment = block.segment;
+                index = 0;
             }
         }
 
