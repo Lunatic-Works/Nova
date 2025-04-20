@@ -176,7 +176,7 @@ namespace Nova
             AppendReachedRecord(data);
         }
 
-        public void SetEndReached(string endName)
+        public void SetReachedEnd(string endName)
         {
             if (reachedEnds.Contains(endName))
             {
@@ -199,7 +199,7 @@ namespace Nova
             return reachedDialogues[nodeName][dialogueIndex];
         }
 
-        public bool IsEndReached(string endName)
+        public bool IsReachedEnd(string endName)
         {
             return reachedEnds.Contains(endName);
         }

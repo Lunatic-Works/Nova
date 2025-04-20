@@ -490,7 +490,7 @@ namespace Nova
                 case FlowChartNodeType.End:
                     state = State.Ended;
                     var endName = flowChartGraph.GetEndName(currentNode);
-                    checkpointManager.SetEndReached(endName);
+                    checkpointManager.SetReachedEnd(endName);
                     routeEnded.Invoke(new RouteEndedData(endName));
                     break;
                 default:
