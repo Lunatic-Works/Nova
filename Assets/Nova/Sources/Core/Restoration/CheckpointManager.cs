@@ -118,7 +118,7 @@ namespace Nova
         {
             reachedDialogues.Clear();
             reachedEnds.Clear();
-            for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = serializer.NextRecord(cur))
+            for (var cur = globalSave.beginReached; cur < globalSave.endReached; cur = NextRecord(cur))
             {
                 var record = serializer.DeserializeRecord<IReachedData>(cur);
                 if (record is ReachedEndData end)
@@ -147,7 +147,7 @@ namespace Nova
 
         private void NewReached()
         {
-            globalSave.endReached = serializer.NextRecord(globalSave.endReached);
+            globalSave.endReached = NextRecord(globalSave.endReached);
             globalSaveDirty = true;
             // Debug.Log($"next reached {globalSave.endReached}");
         }
@@ -228,7 +228,7 @@ namespace Nova
 
         private void NewCheckpointRecord()
         {
-            globalSave.endCheckpoint = serializer.NextRecord(globalSave.endCheckpoint);
+            globalSave.endCheckpoint = NextRecord(globalSave.endCheckpoint);
             globalSaveDirty = true;
             // Debug.Log($"next checkpoint {globalSave.endCheckpoint}");
         }
@@ -320,7 +320,7 @@ namespace Nova
 
         public GameStateCheckpoint GetCheckpoint(long offset)
         {
-            return serializer.DeserializeRecord<GameStateCheckpoint>(serializer.NextRecord(offset));
+            return serializer.DeserializeRecord<GameStateCheckpoint>(NextRecord(offset));
         }
 
         #endregion

@@ -169,11 +169,11 @@ namespace Nova
 
         public static readonly byte[] FileHeader = Encoding.ASCII.GetBytes("NOVASAVE");
         private static readonly byte[] CorruptFileHeader = Enumerable.Repeat((byte)254, FileHeader.Length).ToArray();
-        public static readonly int FileHeaderSize = 4 + FileHeader.Length; // sizeof(int) + sizeof(FileHeader)
+        public static readonly int FileHeaderSize = FileHeader.Length + 4; // size of FileHeader + Version
         public static readonly int GlobalSaveOffset = FileHeaderSize + CheckpointBlock.HeaderSize;
 
         private const bool DefaultCompress = true;
-        private const int RecordHeader = 4; // sizeof(int)
+        private const int RecordHeader = 4; // sizeof(int), storing the size of the record
 
         private readonly JsonSerializer jsonSerializer;
         private readonly string path;
@@ -248,7 +248,6 @@ namespace Nova
         {
             var block = GetBlockIndex(offset, out var index);
             var segment = block.segment;
-
             if (segment.Count < index + RecordHeader)
             {
                 throw CheckpointCorruptedException.RecordOverflow(offset);
@@ -290,7 +289,8 @@ namespace Nova
 
         private CheckpointBlock AppendBlock()
         {
-            var id = endBlock++;
+            var id = endBlock;
+            ++endBlock;
             var block = new CheckpointBlock(file, id, OnBlockFlush);
             cachedBlocks[id] = block;
             return block;

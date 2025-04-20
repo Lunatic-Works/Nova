@@ -8,7 +8,7 @@ namespace Nova
     public class CheckpointBlock : IDisposable
     {
         public const int BlockSize = 4096;
-        public const int HeaderSize = 8; // sizeof(long)
+        public const int HeaderSize = 8; // sizeof(long), storing `nextBlock`
         public const int DataSize = BlockSize - HeaderSize;
 
         public static long GetBlockID(long offset)
@@ -32,10 +32,15 @@ namespace Nova
 
         public readonly long id;
         private long offset => id * BlockSize;
-        public long dataOffset => id * BlockSize + HeaderSize;
+        public long dataOffset => offset + HeaderSize;
 
         private long _nextBlock;
 
+        // In the global save file, there are multiple linked list of blocks
+        // Each linked list contains a list of records
+        // `nextBlock` is the id of the next block in the linked list,
+        // which may not be the next block in the file
+        // 0 for no next block
         public long nextBlock
         {
             get => _nextBlock;
@@ -46,6 +51,7 @@ namespace Nova
             }
         }
 
+        // Cannot access data[:HeaderSize]
         public ByteSegment segment => new ByteSegment(data, HeaderSize, DataSize);
 
         public bool dirty { get; private set; } = true;
@@ -115,7 +121,7 @@ namespace Nova
                 index += CheckpointSerializer.FileHeaderSize;
             }
 
-            var x = BitConverter.GetBytes(_nextBlock);
+            var x = BitConverter.GetBytes(nextBlock);
             Buffer.BlockCopy(x, 0, data, index, HeaderSize);
             stream.Seek(offset + startIndex, SeekOrigin.Begin);
             stream.Write(data, startIndex, BlockSize - startIndex);
