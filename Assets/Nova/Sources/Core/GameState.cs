@@ -432,7 +432,7 @@ namespace Nova
 
         private void AppendSameNode()
         {
-            nodeRecord = checkpointManager.GetNextNode(nodeRecord, nodeRecord.name, variables, currentIndex);
+            nodeRecord = checkpointManager.GetNextNodeRecord(nodeRecord, nodeRecord.name, variables, currentIndex);
             checkpointOffset = nodeRecord.offset;
             checkpointEnsured = true;
             appendNodeEnsured = false;
@@ -505,7 +505,7 @@ namespace Nova
             // so the bookmark is left at the end of last node
             if (nextNode.dialogueEntryCount > 0)
             {
-                nodeRecord = checkpointManager.GetNextNode(nodeRecord, nextNode.name, variables, 0);
+                nodeRecord = checkpointManager.GetNextNodeRecord(nodeRecord, nextNode.name, variables, 0);
                 currentIndex = 0;
                 checkpointOffset = nodeRecord.offset;
             }

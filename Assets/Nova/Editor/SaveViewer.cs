@@ -48,7 +48,7 @@ namespace Nova.Editor
             {
                 rows.Clear();
                 var root = new TreeViewItem { id = -1, depth = -1, displayName = "root" };
-                BuildTree(checkpointManager.beginNodeOffset, root);
+                BuildTree(checkpointManager.beginCheckpoint, root);
                 if (rows.Count == 0)
                 {
                     root.AddChild(new TreeViewItem { id = 0, displayName = "" });
