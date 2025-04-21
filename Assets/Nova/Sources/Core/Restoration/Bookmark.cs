@@ -46,9 +46,9 @@ namespace Nova
 
         // NOTE: Do not use default parameters in constructor or it will fail to compile silently...
 
-        public Bookmark(NodeRecord nodeRecord, long checkpointOffset, int dialogueIndex)
+        public Bookmark(long nodeOffset, long checkpointOffset, int dialogueIndex)
         {
-            nodeOffset = nodeRecord.offset;
+            this.nodeOffset = nodeOffset;
             this.checkpointOffset = checkpointOffset;
             this.dialogueIndex = dialogueIndex;
         }
