@@ -4,7 +4,7 @@ namespace Nova
 {
     public class DebugJumpHelper : MonoBehaviour
     {
-        [SerializeField] private bool moveBackward;
+        [SerializeField] private bool stepBackward;
         [SerializeField] private bool previousChapter;
         [SerializeField] private bool nextChapter;
         [SerializeField] private bool previousBranch;
@@ -29,10 +29,10 @@ namespace Nova
                 return;
             }
 
-            if (moveBackward)
+            if (stepBackward)
             {
-                moveBackward = false;
-                MoveBackward();
+                stepBackward = false;
+                StepBackward();
             }
 
             if (previousChapter)
@@ -61,12 +61,12 @@ namespace Nova
             }
         }
 
-        private void MoveBackward()
+        private void StepBackward()
         {
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             dialogueState.state = DialogueState.State.Normal;
 
-            gameState.MoveBackward();
+            gameState.StepBackward();
         }
     }
 }
