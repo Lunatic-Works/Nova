@@ -351,13 +351,13 @@ namespace Nova
                     {
                         var node = flowChartGraph.GetNode(nodeName);
                         if (globalSave.nodeHashes[node.name] != node.textHash &&
-                            reachedDialogues.TryGetValue(node.name, out var dialogue))
+                            reachedDialogues.TryGetValue(node.name, out var dialogues))
                         {
                             updateHashes = true;
                             ScriptLoader.AddDeferredDialogueChunks(node);
                             var differ = new Differ(
                                 node.GetAllDialogues().Select(x => x.textHash).ToArray(),
-                                dialogue.Select(x => x.textHash).ToArray()
+                                dialogues.Select(x => x.textHash).ToArray()
                             );
                             differ.GetDiffs();
                             Debug.Log($"Nova: Node {node.name} needs upgrade.");
@@ -378,6 +378,7 @@ namespace Nova
                 globalSave.identifier = DateTime.Now.ToBinary();
                 globalSave.nodeHashes = flowChartGraph.ToDictionary(node => node.name, node => node.textHash);
                 globalSaveDirty = true;
+                UpdateGlobalSave();
             }
 
             return changedNodes.Any();

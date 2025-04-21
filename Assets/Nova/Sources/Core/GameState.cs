@@ -69,31 +69,32 @@ namespace Nova
             var success = false;
             try
             {
+                // Update globalSave.nodeHashes, flush and back up global save file
                 var needUpgrade = checkpointManager.CheckScriptUpgrade(flowChartGraph, out var changedNodes);
-                // Debug.Log($"upgrade {changedNodes.Count} nodes");
-                if (needUpgrade)
+                if (!needUpgrade)
                 {
-                    checkpointManager.UpdateGlobalSave();
-                    upgradeStarted = true;
-                    var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
-                    upgrader.UpgradeSaves();
-                    success = true;
+                    return;
+                }
 
-                    if (updatePosition)
+                upgradeStarted = true;
+                var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
+                upgrader.UpgradeSaves();
+                success = true;
+
+                if (updatePosition)
+                {
+                    if (upgrader.UpgradeBookmark(curPosition))
                     {
-                        if (upgrader.UpgradeBookmark(curPosition))
-                        {
-                            LoadBookmark(curPosition);
-                        }
-                        else if (currentNode != null)
-                        {
-                            // if we cannot update the current position, we start as if enter from the beginning of the node
-                            GameStart(currentNode.name);
-                        }
-                        else
-                        {
-                            Debug.LogError("Nova: Cannot reload script because the current node is deleted");
-                        }
+                        LoadBookmark(curPosition);
+                    }
+                    else if (currentNode != null)
+                    {
+                        // if we cannot update the current position, we start as if enter from the beginning of the node
+                        GameStart(currentNode.name);
+                    }
+                    else
+                    {
+                        Debug.LogError("Nova: Cannot reload script because the current node is deleted");
                     }
                 }
             }
