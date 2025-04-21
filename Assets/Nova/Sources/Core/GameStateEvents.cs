@@ -23,17 +23,15 @@ namespace Nova
     public class DialogueChangedData : GameStateEventData
     {
         public readonly NodeRecord nodeRecord;
-        public readonly long checkpointOffset;
         public readonly ReachedDialogueData dialogueData;
         public readonly DialogueDisplayData displayData;
         public readonly bool isReached;
         public readonly bool isReachedAnyHistory;
 
-        public DialogueChangedData(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
+        public DialogueChangedData(NodeRecord nodeRecord, ReachedDialogueData dialogueData,
             DialogueDisplayData displayData, bool isReached, bool isReachedAnyHistory)
         {
             this.nodeRecord = nodeRecord;
-            this.checkpointOffset = checkpointOffset;
             this.dialogueData = dialogueData;
             this.displayData = displayData;
             this.isReached = isReached;

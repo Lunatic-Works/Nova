@@ -10,7 +10,6 @@ namespace Nova
         public const int ScreenshotHeight = 180;
 
         public long nodeOffset;
-        public long checkpointOffset;
         public int dialogueIndex;
         public DialogueDisplayData description;
         public readonly DateTime creationTime = DateTime.Now;
@@ -46,10 +45,9 @@ namespace Nova
 
         // NOTE: Do not use default parameters in constructor or it will fail to compile silently...
 
-        public Bookmark(long nodeOffset, long checkpointOffset, int dialogueIndex)
+        public Bookmark(long nodeOffset, int dialogueIndex)
         {
             this.nodeOffset = nodeOffset;
-            this.checkpointOffset = checkpointOffset;
             this.dialogueIndex = dialogueIndex;
         }
 

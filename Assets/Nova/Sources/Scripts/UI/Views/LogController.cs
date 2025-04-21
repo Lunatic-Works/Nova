@@ -14,17 +14,15 @@ namespace Nova
         public float height;
         public float prefixHeight;
         public readonly long nodeOffset;
-        public readonly long checkpointOffset;
         public readonly ReachedDialogueData dialogueData;
         public readonly DialogueDisplayData displayData;
 
-        public LogEntry(float height, float prefixHeight, long nodeOffset, long checkpointOffset,
+        public LogEntry(float height, float prefixHeight, long nodeOffset,
             ReachedDialogueData dialogueData, DialogueDisplayData displayData)
         {
             this.height = height;
             this.prefixHeight = prefixHeight;
             this.nodeOffset = nodeOffset;
-            this.checkpointOffset = checkpointOffset;
             this.dialogueData = dialogueData;
             this.displayData = displayData;
         }
@@ -137,7 +135,7 @@ namespace Nova
 
             if (!gameState.isUpgrading)
             {
-                AddEntry(data.nodeRecord, data.checkpointOffset, data.dialogueData, data.displayData);
+                AddEntry(data.nodeRecord, data.dialogueData, data.displayData);
             }
         }
 
@@ -156,8 +154,7 @@ namespace Nova
             contentForTest.ForceRefresh();
         }
 
-        private void AddEntry(NodeRecord nodeRecord, long checkpointOffset, ReachedDialogueData dialogueData,
-            DialogueDisplayData displayData)
+        private void AddEntry(NodeRecord nodeRecord, ReachedDialogueData dialogueData, DialogueDisplayData displayData)
         {
             var text = displayData.FormatNameDialogue();
             if (string.IsNullOrEmpty(text))
@@ -169,8 +166,7 @@ namespace Nova
             var height = contentForTest.GetPreferredHeight(text, contentDefaultWidth);
             var cnt = logEntries.Count;
             var prefixHeight = height + (cnt > 0 ? logEntries[cnt - 1].prefixHeight : 0);
-            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, checkpointOffset, dialogueData,
-                displayData));
+            logEntries.Add(new LogEntry(height, prefixHeight, nodeRecord.offset, dialogueData, displayData));
 
             if (!RestrainLogEntryNum(maxLogEntryNum))
             {
@@ -313,7 +309,7 @@ namespace Nova
         public void MoveBackWithCallback(LogEntry logEntry, Action onFinish)
         {
             var nodeRecord = checkpointManager.GetNodeRecord(logEntry.nodeOffset);
-            gameState.MoveBackTo(nodeRecord, logEntry.checkpointOffset, logEntry.dialogueData.dialogueIndex);
+            gameState.MoveBackTo(nodeRecord, logEntry.dialogueData.dialogueIndex);
             this.Hide(onFinish);
         }
 
@@ -484,7 +480,7 @@ namespace Nova
                     displayData = entry.GetDisplayData();
                 }
 
-                AddEntry(pos.nodeRecord, pos.checkpointOffset, dialogueData, displayData);
+                AddEntry(pos.nodeRecord, dialogueData, displayData);
             }
         }
 
