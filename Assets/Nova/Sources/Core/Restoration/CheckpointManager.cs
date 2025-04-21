@@ -133,6 +133,10 @@ namespace Nova
                 {
                     reachedDialogues.Remove(maker.nodeName);
                 }
+                else
+                {
+                    Debug.LogWarning($"Nova: Unknown record type {record.GetType()} at offset {cur}");
+                }
             }
 
             // check each reached data is a prefix
