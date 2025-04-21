@@ -849,11 +849,10 @@ namespace Nova
             return false;
         }
 
-        private void JumpForward(int stepCount)
+        private void JumpForward(int stepCount, bool fromMove)
         {
             this.RuntimeAssert(stepCount > 0, $"Invalid stepCount {stepCount}.");
 
-            var jumping = isJumping;
             for (var i = 0; i < stepCount; ++i)
             {
                 if (!isUpgrading && !isJumping && i == stepCount - 1)
@@ -863,7 +862,7 @@ namespace Nova
 
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 Step();
-                if (jumping && !isJumping)
+                if (!fromMove && !isJumping)
                 {
                     return;
                 }
@@ -889,8 +888,6 @@ namespace Nova
 
             nodeRecord = newNodeRecord;
 
-            isRestoring = true;
-
             // Find the last checkpoint before or at dialogueIndex
             var checkpointOffset = checkpointManager.NextRecord(nodeRecord.offset);
             var checkpointDialogueIndex = checkpointManager.GetCheckpointDialogueIndex(checkpointOffset);
@@ -915,6 +912,7 @@ namespace Nova
             // Debug.Log($"checkpoint @{checkpointOffset} {checkpointDialogueIndex} {currentIndex} {dialogueIndex}");
 
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
+            isRestoring = true;
             RestoreCheckpoint(checkpoint);
             // Now currentIndex <= dialogueIndex
             if (dialogueIndex == currentIndex)
@@ -931,7 +929,7 @@ namespace Nova
 
             if (dialogueIndex > currentIndex)
             {
-                JumpForward(dialogueIndex - currentIndex);
+                JumpForward(dialogueIndex - currentIndex, true);
             }
 
             isRestoring = false;
@@ -1003,9 +1001,13 @@ namespace Nova
                 // special handling of current node
                 // 1. if going backward, the current node branch should not be considered
                 // 2. if going forward, or right at the beginning, the current node beginning should not be considered
-                var isBranch = allowBranch && entryNode.endDialogue == node.dialogueEntryCount &&
-                               node.IsManualBranchNode() && (!(entryNode == nodeRecord && !forward));
-                var isChapter = allowChapter && entryNode.beginDialogue == 0 && node.isChapter &&
+                var isBranch = allowBranch &&
+                               entryNode.endDialogue == node.dialogueEntryCount &&
+                               node.IsManualBranchNode() &&
+                               (!(entryNode == nodeRecord && !forward));
+                var isChapter = allowChapter &&
+                                entryNode.beginDialogue == 0 &&
+                                node.isChapter &&
                                 (!(entryNode == nodeRecord && (currentIndex == 0 || forward)));
                 if (isBranch || isChapter)
                 {
@@ -1058,7 +1060,7 @@ namespace Nova
                 isJumping = true;
                 if (currentIndex < currentNode.dialogueEntryCount - 1)
                 {
-                    JumpForward(currentNode.dialogueEntryCount - currentIndex - 1);
+                    JumpForward(currentNode.dialogueEntryCount - currentIndex - 1, false);
                 }
 
                 if (!isJumping)
