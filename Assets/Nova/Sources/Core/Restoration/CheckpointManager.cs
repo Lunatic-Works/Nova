@@ -245,6 +245,23 @@ namespace Nova
         // Get or create the next node record
         public NodeRecord GetNextNodeRecord(NodeRecord prevRecord, string name, Variables variables, int beginDialogue)
         {
+            if (prevRecord != null)
+            {
+                if (name == prevRecord.name)
+                {
+                    // Either loop to the same node or GameState.AppendSameNode
+                   this.RuntimeAssert(beginDialogue == 0 || beginDialogue == prevRecord.endDialogue,
+                        $"beginDialogue {beginDialogue} != prevRecord.endDialogue {prevRecord.endDialogue}, " +
+                        $"prevRecord @{prevRecord.offset} {prevRecord.name}, name {name}");
+                }
+                else
+                {
+                    this.RuntimeAssert(beginDialogue == 0,
+                        $"beginDialogue {beginDialogue} != 0, " +
+                        $"prevRecord @{prevRecord.offset} {prevRecord.name}, name {name}");
+                }
+            }
+
             var variablesHash = variables.hash;
             NodeRecord childRecord = null;
             var offset = prevRecord?.child ?? globalSave.beginCheckpoint;
@@ -278,6 +295,8 @@ namespace Nova
                 newRecord.parent = prevRecord.offset;
             }
 
+            // Debug.Log($"new NodeRecord {newRecord.name} @{newRecord.offset} {newRecord.beginDialogue}");
+
             UpdateNodeRecord(newRecord);
             UpdateEndCheckpoint();
             return newRecord;
@@ -294,6 +313,23 @@ namespace Nova
         {
             // Debug.Log($"UpdateNodeRecord {record.offset} {record.name} {record.beginDialogue} {record.endDialogue} {record.lastCheckpointDialogue}");
             serializer.AppendRecord(record.offset, record.ToByteSegment());
+        }
+
+        public bool IsLastNodeRecord(NodeRecord nodeRecord)
+        {
+            var offset = NextRecord(nodeRecord.offset);
+            while (offset < globalSave.endCheckpoint)
+            {
+                if (serializer.GetRecordSize(offset) != 4)
+                {
+                    // There is a NodeRecord rather than a checkpoint header at offset
+                    return false;
+                }
+
+                offset = NextCheckpoint(offset);
+            }
+
+            return true;
         }
 
         public void AppendDialogue(NodeRecord nodeRecord, int dialogueIndex, bool shouldSaveCheckpoint)

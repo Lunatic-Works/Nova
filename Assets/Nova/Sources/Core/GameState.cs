@@ -409,9 +409,7 @@ namespace Nova
                 while (actionPauseLock.isLocked) yield return null;
             }
 
-            var isReached = currentIndex < nodeRecord.endDialogue;
-            // Debug.Log($"isReached {isReached} {currentIndex} {nodeRecord.endDialogue}");
-            DialogueSaveCheckpoint(nodeChanged, isReached);
+            var isReached = DialogueSaveCheckpoint(nodeChanged);
             dialogueWillChange.Invoke();
 
             currentDialogueEntry.ExecuteAction(DialogueActionStage.Default, isRestoring);
@@ -433,24 +431,27 @@ namespace Nova
             while (actionPauseLock.isLocked) yield return null;
         }
 
-        private void DialogueSaveCheckpoint(bool nodeChanged, bool isReached)
+        private bool DialogueSaveCheckpoint(bool nodeChanged)
         {
             if (!nodeChanged)
             {
                 stepsFromLastCheckpoint++;
             }
 
-            if (atEndOfNodeRecord || appendNodeEnsured ||
-                (shouldSaveCheckpoint && currentIndex >= nodeRecord.endDialogue))
+            var isReached = currentIndex < nodeRecord.endDialogue;
+            if (appendNodeEnsured ||
+                (shouldSaveCheckpoint && !isReached && !checkpointManager.IsLastNodeRecord(nodeRecord)))
             {
-                // nodeRecord = checkpointManager.GetNextNodeRecord(nodeRecord, nodeRecord.name, variables, currentIndex);
+                AppendSameNode();
                 checkpointEnsured = true;
                 appendNodeEnsured = false;
+                isReached = currentIndex < nodeRecord.endDialogue;
             }
 
-            if (shouldSaveCheckpoint)
+            if (shouldSaveCheckpoint && !isReached)
             {
-                StepCheckpoint(isReached);
+                // Debug.Log($"AppendCheckpoint {nodeRecord.name} @{checkpointManager.endCheckpoint} {currentIndex}");
+                checkpointManager.AppendCheckpoint(currentIndex, GetCheckpoint());
             }
 
             if (!isReached)
@@ -470,15 +471,15 @@ namespace Nova
 
             // As the action for this dialogue will be re-run, it's fine to just reset checkpointEnsured to false
             checkpointEnsured = false;
+
+            return isReached;
         }
 
-        private void StepCheckpoint(bool isReached)
+        private void AppendSameNode()
         {
-            if (!isReached)
-            {
-                // Debug.Log($"AppendCheckpoint {nodeRecord.name} {currentIndex}");
-                checkpointManager.AppendCheckpoint(currentIndex, GetCheckpoint());
-            }
+            // var oldNodeRecord = nodeRecord;
+            nodeRecord = checkpointManager.GetNextNodeRecord(nodeRecord, nodeRecord.name, variables, currentIndex);
+            // Debug.Log($"AppendSameNode {oldNodeRecord.name} @{oldNodeRecord.offset} -> {nodeRecord.name} @{nodeRecord.offset} {currentIndex}");
         }
 
         private ReachedDialogueData DialogueSaveReachedData(bool isReachedAnyHistory)
@@ -732,11 +733,8 @@ namespace Nova
         // ensure a new nodeRecord + checkpoint at next UpdateDialogue
         private bool appendNodeEnsured;
 
-        private bool atEndOfNodeRecord =>
-            !isUpgrading && nodeRecord.child != 0 && currentIndex >= nodeRecord.endDialogue;
-
         private bool shouldSaveCheckpoint =>
-            checkpointEnsured || atEndOfNodeRecord ||
+            checkpointEnsured ||
             (!checkpointRestrained && stepsFromLastCheckpoint >= maxStepsFromLastCheckpoint);
 
         /// <summary>
@@ -901,9 +899,13 @@ namespace Nova
             }
         }
 
+        // If dialogueIndex >= newNodeRecord.endDialogue, then move to or create a new nodeRecord
         private void Move(NodeRecord newNodeRecord, int dialogueIndex, bool upgrade)
         {
-            // Debug.Log($"Move begin {nodeRecord.name} {nodeRecord.offset} {currentIndex} -> {newNodeRecord.name} {newNodeRecord.offset} {dialogueIndex}");
+            // Debug.Log($"Move begin {nodeRecord?.name} @{nodeRecord?.offset} {currentIndex} -> {newNodeRecord.name} @{newNodeRecord.offset} {dialogueIndex}");
+
+            this.RuntimeAssert(dialogueIndex >= newNodeRecord.beginDialogue,
+                $"dialogueIndex {dialogueIndex} < beginDialogue {newNodeRecord.beginDialogue}");
 
             CancelAction();
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
@@ -935,7 +937,7 @@ namespace Nova
                 checkpointDialogueIndex = nextCheckpointDialogueIndex;
             }
 
-            // Debug.Log($"checkpoint {checkpointOffset} {checkpointDialogueIndex} {currentIndex} {dialogueIndex}");
+            // Debug.Log($"checkpoint @{checkpointOffset} {checkpointDialogueIndex} {currentIndex} {dialogueIndex}");
 
             var checkpoint = checkpointManager.GetCheckpoint(checkpointOffset);
             RestoreCheckpoint(checkpoint);
@@ -960,7 +962,7 @@ namespace Nova
             isRestoring = false;
             isUpgrading = false;
 
-            // Debug.Log($"Move end {nodeRecord.name} {nodeRecord.offset} {currentIndex} -> {newNodeRecord.name} {newNodeRecord.offset} {dialogueIndex}");
+            // Debug.Log($"Move end {nodeRecord?.name} @{nodeRecord?.offset} {currentIndex} -> {newNodeRecord.name} @{newNodeRecord.offset} {dialogueIndex}");
         }
 
         public void MoveBackTo(NodeRecord newNodeRecord, int dialogueIndex)

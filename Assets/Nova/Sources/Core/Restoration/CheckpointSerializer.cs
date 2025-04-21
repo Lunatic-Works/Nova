@@ -297,6 +297,24 @@ namespace Nova
             return new ByteSegment(buf);
         }
 
+        public int GetRecordSize(long offset)
+        {
+            var block = GetBlockIndex(offset, out var index);
+            var segment = block.segment;
+            if (index + RecordHeader > segment.Count)
+            {
+                throw CheckpointCorruptedException.RecordOverflow(offset);
+            }
+
+            var count = segment.ReadInt(index);
+            if (count <= 0 || count > MaxRecordSize)
+            {
+                throw CheckpointCorruptedException.InvalidRecordSize(offset, count);
+            }
+
+            return count;
+        }
+
         private CheckpointBlock AppendBlock()
         {
             var id = endBlock;
