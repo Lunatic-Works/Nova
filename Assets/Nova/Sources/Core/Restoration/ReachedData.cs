@@ -10,13 +10,11 @@ namespace Nova
     public readonly struct ReachedDialoguePosition
     {
         public readonly NodeRecord nodeRecord;
-        public readonly long checkpointOffset;
         public readonly int dialogueIndex;
 
-        public ReachedDialoguePosition(NodeRecord nodeRecord, long checkpointOffset, int dialogueIndex)
+        public ReachedDialoguePosition(NodeRecord nodeRecord, int dialogueIndex)
         {
             this.nodeRecord = nodeRecord;
-            this.checkpointOffset = checkpointOffset;
             this.dialogueIndex = dialogueIndex;
         }
     }

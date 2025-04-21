@@ -285,18 +285,15 @@ namespace Nova
 
         public NodeRecord GetNodeRecord(long offset)
         {
-            return new NodeRecord(offset, serializer.GetRecord(offset));
+            var record = new NodeRecord(offset, serializer.GetRecord(offset));
+            // Debug.Log($"GetNodeRecord {offset} {record.offset} {record.name} {record.beginDialogue} {record.endDialogue} {record.lastCheckpointDialogue}");
+            return record;
         }
 
         public void UpdateNodeRecord(NodeRecord record)
         {
+            // Debug.Log($"UpdateNodeRecord {record.offset} {record.name} {record.beginDialogue} {record.endDialogue} {record.lastCheckpointDialogue}");
             serializer.AppendRecord(record.offset, record.ToByteSegment());
-        }
-
-        public bool CanAppendCheckpoint(long offset)
-        {
-            return NextRecord(offset) >= globalSave.endCheckpoint ||
-                   NextCheckpoint(offset) >= globalSave.endCheckpoint;
         }
 
         public void AppendDialogue(NodeRecord nodeRecord, int dialogueIndex, bool shouldSaveCheckpoint)
@@ -310,10 +307,8 @@ namespace Nova
             UpdateNodeRecord(nodeRecord);
         }
 
-        public long AppendCheckpoint(int dialogueIndex, GameStateCheckpoint checkpoint)
+        public void AppendCheckpoint(int dialogueIndex, GameStateCheckpoint checkpoint)
         {
-            var offset = globalSave.endCheckpoint;
-
             var buf = new ByteSegment(4);
             buf.WriteInt(0, dialogueIndex);
             serializer.AppendRecord(globalSave.endCheckpoint, buf);
@@ -321,8 +316,6 @@ namespace Nova
 
             serializer.SerializeRecord(globalSave.endCheckpoint, checkpoint);
             UpdateEndCheckpoint();
-
-            return offset;
         }
 
         public int GetCheckpointDialogueIndex(long offset)
