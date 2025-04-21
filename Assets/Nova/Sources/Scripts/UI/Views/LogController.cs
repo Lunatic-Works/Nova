@@ -309,7 +309,7 @@ namespace Nova
         public void MoveBackWithCallback(LogEntry logEntry, Action onFinish)
         {
             var nodeRecord = checkpointManager.GetNodeRecord(logEntry.nodeOffset);
-            gameState.MoveBackTo(nodeRecord, logEntry.dialogueData.dialogueIndex);
+            gameState.Move(nodeRecord, logEntry.dialogueData.dialogueIndex);
             this.Hide(onFinish);
         }
 

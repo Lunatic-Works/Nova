@@ -76,7 +76,7 @@ namespace Nova
                     needResetParent = true;
                     // Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
                     nodeRecordMap.Add(offset, newOffset);
-                    gameState.MoveToUpgrade(nodeRecord, ed1);
+                    gameState.MoveUpgrade(nodeRecord, ed1);
                 }
                 else
                 {

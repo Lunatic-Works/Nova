@@ -876,7 +876,7 @@ namespace Nova
         }
 
         // If dialogueIndex >= newNodeRecord.endDialogue, then move to or create a new nodeRecord
-        private void Move(NodeRecord newNodeRecord, int dialogueIndex, bool upgrade)
+        public void Move(NodeRecord newNodeRecord, int dialogueIndex)
         {
             // Debug.Log($"Move begin {nodeRecord?.name} @{nodeRecord?.offset} {currentIndex} -> {newNodeRecord.name} @{newNodeRecord.offset} {dialogueIndex}");
 
@@ -890,7 +890,6 @@ namespace Nova
             nodeRecord = newNodeRecord;
 
             isRestoring = true;
-            isUpgrading = upgrade;
 
             // Find the last checkpoint before or at dialogueIndex
             var checkpointOffset = checkpointManager.NextRecord(nodeRecord.offset);
@@ -936,26 +935,22 @@ namespace Nova
             }
 
             isRestoring = false;
-            isUpgrading = false;
 
             // Debug.Log($"Move end {nodeRecord?.name} @{nodeRecord?.offset} {currentIndex} -> {newNodeRecord.name} @{newNodeRecord.offset} {dialogueIndex}");
         }
 
-        public void MoveBackTo(NodeRecord newNodeRecord, int dialogueIndex)
-        {
-            Move(newNodeRecord, dialogueIndex, false);
-        }
-
-        public void MoveToUpgrade(NodeRecord newNodeRecord, int lastDialogue)
+        public void MoveUpgrade(NodeRecord newNodeRecord, int lastDialogue)
         {
             state = State.Normal;
-            Move(newNodeRecord, lastDialogue, true);
+            isUpgrading = true;
+            Move(newNodeRecord, lastDialogue);
+            isUpgrading = false;
             // Move does not stop animations in the last step
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             ResetGameState();
         }
 
-        public void MoveBackward()
+        public void StepBackward()
         {
             int newDialogueIndex;
             NodeRecord newNodeRecord;
@@ -980,7 +975,7 @@ namespace Nova
                 i++;
             }
 
-            MoveBackTo(newNodeRecord, newDialogueIndex);
+            Move(newNodeRecord, newDialogueIndex);
         }
 
         /// <summary>
@@ -1047,7 +1042,7 @@ namespace Nova
                 }
             }
 
-            MoveBackTo(entryNode, dialogue);
+            Move(entryNode, dialogue);
         }
 
         public void JumpToNextChapter()
@@ -1146,7 +1141,7 @@ namespace Nova
         public void LoadBookmark(Bookmark bookmark)
         {
             state = State.Normal;
-            MoveBackTo(checkpointManager.GetNodeRecord(bookmark.nodeOffset), bookmark.dialogueIndex);
+            Move(checkpointManager.GetNodeRecord(bookmark.nodeOffset), bookmark.dialogueIndex);
         }
 
         #endregion
