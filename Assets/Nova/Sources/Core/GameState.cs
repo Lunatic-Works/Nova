@@ -648,7 +648,7 @@ namespace Nova
 
         #endregion
 
-        #region Restoration
+        #region Restore checkpoint
 
         /// <summary>
         /// All restorable objects
@@ -780,6 +780,10 @@ namespace Nova
             }
         }
 
+        #endregion
+
+        #region Combinations of RestoreCheckpoint + Step
+
         private int SeekBackStep(int steps, IList<NodeRecord> nodeHistory, out int newDialogueIndex)
         {
             // Debug.Log($"SeekBackStep {steps}");
@@ -821,34 +825,6 @@ namespace Nova
             return totSteps;
         }
 
-        public void MoveBackward()
-        {
-            int newDialogueIndex;
-            NodeRecord newNodeRecord;
-            var i = 1;
-            while (true)
-            {
-                var list = new List<NodeRecord>();
-                var step = SeekBackStep(i, list, out newDialogueIndex);
-                newNodeRecord = list[list.Count - 1];
-                if (step < i)
-                {
-                    break;
-                }
-
-                var newNode = GetNode(newNodeRecord.name);
-                var dialogueEntry = newNode.GetDialogueEntryAt(newDialogueIndex);
-                if (!dialogueEntry.IsEmpty())
-                {
-                    break;
-                }
-
-                i++;
-            }
-
-            MoveBackTo(newNodeRecord, newDialogueIndex);
-        }
-
         public bool isRestoring { get; private set; }
         public bool isUpgrading { get; private set; }
         public bool isJumping { get; private set; }
@@ -873,7 +849,7 @@ namespace Nova
             return false;
         }
 
-        private void FastForward(int stepCount)
+        private void JumpForward(int stepCount)
         {
             this.RuntimeAssert(stepCount > 0, $"Invalid stepCount {stepCount}.");
 
@@ -956,7 +932,7 @@ namespace Nova
 
             if (dialogueIndex > currentIndex)
             {
-                FastForward(dialogueIndex - currentIndex);
+                JumpForward(dialogueIndex - currentIndex);
             }
 
             isRestoring = false;
@@ -977,6 +953,34 @@ namespace Nova
             // Move does not stop animations in the last step
             NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             ResetGameState();
+        }
+
+        public void MoveBackward()
+        {
+            int newDialogueIndex;
+            NodeRecord newNodeRecord;
+            var i = 1;
+            while (true)
+            {
+                var list = new List<NodeRecord>();
+                var step = SeekBackStep(i, list, out newDialogueIndex);
+                newNodeRecord = list[list.Count - 1];
+                if (step < i)
+                {
+                    break;
+                }
+
+                var newNode = GetNode(newNodeRecord.name);
+                var dialogueEntry = newNode.GetDialogueEntryAt(newDialogueIndex);
+                if (!dialogueEntry.IsEmpty())
+                {
+                    break;
+                }
+
+                i++;
+            }
+
+            MoveBackTo(newNodeRecord, newDialogueIndex);
         }
 
         /// <summary>
@@ -1059,7 +1063,7 @@ namespace Nova
                 isJumping = true;
                 if (currentIndex < currentNode.dialogueEntryCount - 1)
                 {
-                    FastForward(currentNode.dialogueEntryCount - currentIndex - 1);
+                    JumpForward(currentNode.dialogueEntryCount - currentIndex - 1);
                 }
 
                 if (!isJumping)
