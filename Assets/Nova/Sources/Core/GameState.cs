@@ -62,7 +62,7 @@ namespace Nova
             Bookmark curPosition = null;
             if (updatePosition)
             {
-                curPosition = new Bookmark(nodeRecord, checkpointOffset, currentIndex);
+                curPosition = new Bookmark(nodeRecord.offset, checkpointOffset, currentIndex);
             }
 
             var upgradeStarted = false;
@@ -1176,7 +1176,7 @@ namespace Nova
                 throw new InvalidOperationException("Nova: Cannot save bookmark at this point.");
             }
 
-            return new Bookmark(nodeRecord, checkpointOffset, currentIndex);
+            return new Bookmark(nodeRecord.offset, checkpointOffset, currentIndex);
         }
 
         /// <summary>
