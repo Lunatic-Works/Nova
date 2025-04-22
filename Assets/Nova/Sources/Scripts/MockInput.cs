@@ -11,7 +11,6 @@ namespace Nova
         [SerializeField] private bool unlockAllNodes;
         [SerializeField] private bool unlockDebugNodes;
         [SerializeField] private bool fastForward = true;
-        [SerializeField] private float delaySeconds = 0.001f;
         [SerializeField] private bool canGoBack = true;
         [SerializeField] private float saveRate = 0.01f;
         [SerializeField] private float loadRate = 0.01f;
@@ -71,28 +70,41 @@ namespace Nova
             steps = 0;
         }
 
-        private WaitForSeconds delay => new WaitForSeconds(delaySeconds);
-
-        private static WaitWhile DoTransition(Action<Action> action)
+        private WaitWhile DoTransition(Action<Action> action)
         {
             var inTransition = true;
             action.Invoke(() => inTransition = false);
-            return new WaitWhile(() => inTransition);
+            // action may be DelayedShow, so we try to stop animation in every frame
+            return new WaitWhile(() => {
+                if (fastForward)
+                {
+                    NovaAnimation.StopAll(AnimationType.UI);
+                }
+
+                return inTransition;
+            });
         }
 
-        private static WaitWhile Show(IViewController view)
+        private WaitWhile Show(IViewController view)
         {
             return DoTransition(view.Show);
         }
 
-        private static WaitWhile Hide(IViewController view)
+        private WaitWhile Hide(IViewController view)
         {
             return DoTransition(view.Hide);
         }
 
         private WaitUntil WaitForView(CurrentViewType viewType)
         {
-            return new WaitUntil(() => viewManager.currentView == viewType);
+            return new WaitUntil(() => {
+                if (fastForward)
+                {
+                    NovaAnimation.StopAll(AnimationType.UI);
+                }
+
+                return viewManager.currentView == viewType;
+            });
         }
 
         private IEnumerator Mock()
@@ -108,8 +120,6 @@ namespace Nova
 
         private IEnumerator MockTitle()
         {
-            yield return delay;
-
             if (!gameState.isEnded)
             {
                 if (viewManager.currentView != CurrentViewType.Game)
@@ -136,7 +146,6 @@ namespace Nova
                 var saveID = random.Next(startNormalSave, maxNormalSave);
 
                 yield return DoTransition(onFinish => saveView.ShowLoadWithCallback(true, onFinish));
-                yield return delay;
                 saveView.LoadBookmark(saveID);
             }
             else
@@ -147,9 +156,11 @@ namespace Nova
                 }
 
                 yield return Show(chapterSelectView);
-                yield return delay;
                 var node = random.Next(chapterSelectView.GetUnlockedNodes().ToList());
-                chapterSelectView.Hide(() => chapterSelectView.GameStart(node));
+                yield return DoTransition(onFinish => chapterSelectView.Hide(() => {
+                    chapterSelectView.GameStart(node);
+                    onFinish?.Invoke();
+                }));
             }
 
             yield return WaitForView(CurrentViewType.Game);
@@ -168,9 +179,7 @@ namespace Nova
                 var saveID = random.Next(startSave, maxNormalSave + 1);
 
                 yield return DoTransition(saveView.ShowSaveWithCallback);
-                yield return delay;
                 saveView.SaveBookmark(saveID);
-                yield return delay;
                 yield return Hide(saveView);
                 yield return WaitForView(CurrentViewType.Game);
             }
@@ -191,7 +200,6 @@ namespace Nova
                 var saveID = random.Next(startNormalSave, maxNormalSave);
 
                 yield return DoTransition(onFinish => saveView.ShowLoadWithCallback(false, onFinish));
-                yield return delay;
                 saveView.LoadBookmark(saveID);
                 yield return WaitForView(CurrentViewType.Game);
             }
@@ -202,14 +210,12 @@ namespace Nova
             var logEntry = logView.GetRandomLogEntry(random);
 
             yield return Show(logView);
-            yield return delay;
             yield return DoTransition(onFinish => logView.MoveBackWithCallback(logEntry, onFinish));
         }
 
         private IEnumerator MockReturnTitle()
         {
             yield return Show(configView);
-            yield return delay;
             yield return DoTransition(configView.ReturnTitleWithCallback);
         }
 
@@ -217,8 +223,6 @@ namespace Nova
         {
             while (true)
             {
-                yield return delay;
-
                 if (steps <= 0)
                 {
                     yield break;
@@ -238,7 +242,6 @@ namespace Nova
                 if (viewManager.currentView == CurrentViewType.Alert)
                 {
                     yield return DoTransition(alert.Confirm);
-                    yield return delay;
                 }
 
                 if (viewManager.currentView != CurrentViewType.Game)
