@@ -862,6 +862,11 @@ namespace Nova
 
                 NovaAnimation.StopAll(AnimationType.PerDialogue | AnimationType.Text);
                 Step();
+                if (isUpgrading && i == stepCount - 1)
+                {
+                    NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
+                }
+
                 if (!fromMove && !isJumping)
                 {
                     return;
@@ -943,8 +948,6 @@ namespace Nova
             isUpgrading = true;
             Move(newNodeRecord, lastDialogue);
             isUpgrading = false;
-            // Move does not stop animations in the last step
-            NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
             ResetGameState();
         }
 
