@@ -30,7 +30,6 @@ namespace Nova
             nodeRecord.sibling = UpgradeNodeTree(nodeRecord.sibling);
 
             var newOffset = offset;
-            var needResetParent = false;
             if (changedNodes.TryGetValue(nodeRecord.name, out var differ))
             {
                 if (differ == null)
@@ -73,9 +72,12 @@ namespace Nova
                 if (st1 < ed1)
                 {
                     newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
-                    needResetParent = true;
                     // Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
                     nodeRecordMap.Add(offset, newOffset);
+                    // Now there must be a checkpoint at the first dialogue of the new node record,
+                    // which is copied from the old node record
+                    // We assume that this checkpoint is unchanged in the upgrade,
+                    // and create the next checkpoints in this node record by jumping forward
                     gameState.MoveUpgrade(nodeRecord, ed1 - 1);
                 }
                 else
@@ -111,11 +113,6 @@ namespace Nova
             {
                 // just save this record with new child and sibling
                 checkpointManager.UpdateNodeRecord(nodeRecord);
-            }
-
-            if (needResetParent)
-            {
-                checkpointManager.ResetChildParent(newOffset);
             }
 
             return newOffset;

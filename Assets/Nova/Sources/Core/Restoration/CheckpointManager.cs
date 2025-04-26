@@ -424,6 +424,7 @@ namespace Nova
             nodeRecord.offset = globalSave.endCheckpoint;
             UpdateNodeRecord(nodeRecord);
             UpdateEndCheckpoint();
+            ResetChildParent(nodeRecord);
 
             AppendCheckpoint(beginDialogue, checkpoint);
             return nodeRecord.offset;
@@ -441,14 +442,10 @@ namespace Nova
             }
         }
 
-        public void ResetChildParent(long offset)
-        {
-            ResetChildParent(GetNodeRecord(offset));
-        }
-
         public long DeleteNodeRecord(NodeRecord nodeRecord)
         {
             nodeRecord.offset = 0;
+            // Do not UpdateNodeRecord. The offset is only used in ResetChildParent
             ResetChildParent(nodeRecord);
             return nodeRecord.sibling;
         }
