@@ -415,8 +415,8 @@ namespace Nova
 
         public long UpgradeNodeRecord(NodeRecord nodeRecord, int beginDialogue)
         {
-            var beginCheckpoint = GetCheckpoint(NextRecord(nodeRecord.offset));
-            beginCheckpoint.dialogueIndex = beginDialogue;
+            var checkpoint = GetCheckpoint(NextRecord(nodeRecord.offset));
+            checkpoint.dialogueIndex = beginDialogue;
 
             nodeRecord.beginDialogue = beginDialogue;
             nodeRecord.endDialogue = beginDialogue + 1;
@@ -425,7 +425,7 @@ namespace Nova
             UpdateNodeRecord(nodeRecord);
             UpdateEndCheckpoint();
 
-            AppendCheckpoint(beginDialogue, beginCheckpoint);
+            AppendCheckpoint(beginDialogue, checkpoint);
             return nodeRecord.offset;
         }
 
@@ -451,20 +451,6 @@ namespace Nova
             nodeRecord.offset = 0;
             ResetChildParent(nodeRecord);
             return nodeRecord.sibling;
-        }
-
-        public bool IsNodeRecordTillEnd(NodeRecord nodeRecord)
-        {
-            if (nodeRecord.child != 0)
-            {
-                NodeRecord child = GetNodeRecord(nodeRecord.child);
-                if (child.name != nodeRecord.name)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         #endregion

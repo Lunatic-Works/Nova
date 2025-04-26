@@ -50,8 +50,8 @@ namespace Nova
                 // case 0: if this is the start of a node
                 // it must map beginDialogue to 0
                 var st1 = st0 == 0 ? 0 : differ.rightMap[st0];
-                // ed1 is the mapped endDialogue - 1
-                var ed1 = differ.leftMap[ed0 - 1];
+                // ed1 is the mapped endDialogue
+                var ed1 = differ.leftMap[ed0 - 1] + 1;
                 if (nodeRecord.child != 0)
                 {
                     var child = checkpointManager.GetNodeRecord(nodeRecord.child);
@@ -59,24 +59,24 @@ namespace Nova
                     // it must map endDialogue to the end of the node
                     if (child.name != nodeRecord.name)
                     {
-                        ed1 = differ.remap.Count - 1;
+                        ed1 = differ.remap.Count;
                     }
                     // case 2: if it has a child of the same node
                     // it must map endDialogue to the last node of that node
                     else
                     {
-                        ed1 = child.beginDialogue - 1;
+                        ed1 = child.beginDialogue;
                     }
                 }
 
-                // Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1}]");
-                if (st1 <= ed1)
+                // Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1})");
+                if (st1 < ed1)
                 {
                     newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
                     needResetParent = true;
                     // Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
                     nodeRecordMap.Add(offset, newOffset);
-                    gameState.MoveUpgrade(nodeRecord, ed1);
+                    gameState.MoveUpgrade(nodeRecord, ed1 - 1);
                 }
                 else
                 {
