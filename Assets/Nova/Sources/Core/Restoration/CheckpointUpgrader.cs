@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -44,24 +45,43 @@ namespace Nova
                 var st0 = nodeRecord.beginDialogue;
                 var ed0 = nodeRecord.endDialogue;
 
-                // case 0: if this is the start of a node
-                // it must map beginDialogue to 0
-                var st1 = st0 == 0 ? 0 : differ.rightMap[st0];
-                // ed1 is the mapped endDialogue
-                var ed1 = differ.leftMap[ed0 - 1] + 1;
-                if (nodeRecord.child != 0)
+                int st1;
+                if (st0 <= 0 || differ.rightMap.Count == 0)
                 {
-                    var child = checkpointManager.GetNodeRecord(nodeRecord.child);
-                    // case 1: if it has a child of a different node
-                    // it must map endDialogue to the end of the node
-                    if (child.name != nodeRecord.name)
+                    // beginDialogue is at the beginning of the node,
+                    // then map it to the beginning of the upgraded node
+                    st1 = 0;
+                }
+                else
+                {
+                    st1 = differ.rightMap[Math.Min(st0, differ.rightMap.Count - 1)];
+                }
+
+                int ed1;
+                if (nodeRecord.child == 0)
+                {
+                    if (ed0 <= 0 || differ.leftMap.Count == 0)
                     {
-                        ed1 = differ.remap.Count;
+                        ed1 = 0;
                     }
-                    // case 2: if it has a child of the same node
-                    // it must map endDialogue to the last node of that node
                     else
                     {
+                        ed1 = differ.leftMap[Math.Min(ed0, differ.leftMap.Count) - 1] + 1;
+                    }
+                }
+                else
+                {
+                    var child = checkpointManager.GetNodeRecord(nodeRecord.child);
+                    if (child.name != nodeRecord.name)
+                    {
+                        // nodeRecord has a child of a different node,
+                        // then map endDialogue to the end of the upgraded nodeRecord
+                        ed1 = differ.remap.Count;
+                    }
+                    else
+                    {
+                        // nodeRecord has a child of the same node,
+                        // then map endDialogue to the beginning of that node
                         ed1 = child.beginDialogue;
                     }
                 }
