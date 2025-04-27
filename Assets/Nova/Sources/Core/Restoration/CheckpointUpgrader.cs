@@ -103,6 +103,8 @@ namespace Nova
         // Returns whether the updated bookmark is valid
         private bool UpgradeBookmark(int key, Bookmark bookmark)
         {
+            // Debug.Log($"Nova: Upgrade bookmark {key} @{bookmark.nodeOffset} {bookmark.dialogueIndex}");
+
             if (!nodeRecordMap.TryGetValue(bookmark.nodeOffset, out var newOffset))
             {
                 return true;
@@ -119,12 +121,23 @@ namespace Nova
             var newDialogueIndex = changedNodes[nodeRecord.name].leftMap[bookmark.dialogueIndex];
             if (newDialogueIndex < newNodeRecord.beginDialogue || newDialogueIndex >= newNodeRecord.endDialogue)
             {
+                // This may happen when the bookmark is at the beginning or the end of a node,
+                // and the original dialogue is deleted
                 Debug.LogWarning(
-                    $"Nova: Cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is out of range " +
+                    $"Nova: Dialogue {newDialogueIndex} is out of range " +
                     $"[{newNodeRecord.beginDialogue}, {newNodeRecord.endDialogue})."
                 );
-                return false;
+                if (newDialogueIndex < newNodeRecord.beginDialogue)
+                {
+                    newDialogueIndex = newNodeRecord.beginDialogue;
+                }
+                else
+                {
+                    newDialogueIndex = newNodeRecord.endDialogue - 1;
+                }
             }
+
+            Debug.Log($"Nova: Upgrade bookmark {key}: {nodeRecord} {bookmark.dialogueIndex} -> {newNodeRecord} {newDialogueIndex}");
 
             bookmark.nodeOffset = newOffset;
             bookmark.dialogueIndex = newDialogueIndex;
@@ -140,10 +153,9 @@ namespace Nova
 
             var newRoot = UpgradeNodeTree(checkpointManager.beginCheckpoint);
             checkpointManager.beginCheckpoint = newRoot == 0 ? checkpointManager.endCheckpoint : newRoot;
-            Debug.Log("Nova: Upgrade bookmarks");
             foreach (var id in checkpointManager.bookmarksMetadata.Keys)
             {
-                var bookmark = checkpointManager.LoadBookmark(id, false);
+                var bookmark = checkpointManager.LoadBookmark(id, true);
                 if (UpgradeBookmark(id, bookmark))
                 {
                     checkpointManager.SaveBookmark(id, bookmark, true);

@@ -78,6 +78,7 @@ namespace Nova
 
                 upgradeStarted = true;
                 var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
+                // UpgradeSaves may reset nodeRecord and currentIndex
                 upgrader.UpgradeSaves();
                 success = true;
 
@@ -86,11 +87,6 @@ namespace Nova
                     if (upgrader.UpgradeBookmark(curPosition))
                     {
                         LoadBookmark(curPosition);
-                    }
-                    else if (currentNode != null)
-                    {
-                        // if we cannot update the current position, we start as if enter from the beginning of the node
-                        GameStart(currentNode);
                     }
                     else
                     {
@@ -122,7 +118,7 @@ namespace Nova
             scriptLoader.ForceInit(scriptPath);
             flowChartGraph = scriptLoader.GetFlowChartGraph();
             CheckScriptUpgrade(true);
-            Debug.Log("Nova: Reload complete.");
+            Debug.Log($"Nova: Reload complete {nodeRecord} {currentIndex}");
         }
 
         #endregion
@@ -479,7 +475,7 @@ namespace Nova
         {
             // var oldNodeRecord = nodeRecord;
             nodeRecord = checkpointManager.GetNextNodeRecord(nodeRecord, nodeRecord.name, variables, currentIndex);
-            // Debug.Log($"AppendSameNode {oldNodeRecord.name} @{oldNodeRecord.offset} -> {nodeRecord.name} @{nodeRecord.offset} {currentIndex}");
+            // Debug.Log($"AppendSameNode {oldNodeRecord} -> {nodeRecord}");
         }
 
         private ReachedDialogueData DialogueSaveReachedData(bool isReachedAnyHistory)
