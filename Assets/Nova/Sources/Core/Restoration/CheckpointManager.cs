@@ -406,7 +406,6 @@ namespace Nova
 
             if (updateHashes || globalSave.nodeHashes == null)
             {
-                globalSave.identifier = DateTime.Now.ToBinary();
                 globalSave.nodeHashes = flowChartGraph.ToDictionary(node => node.name, node => node.textHash);
                 globalSaveDirty = true;
                 UpdateGlobalSave();
@@ -544,6 +543,7 @@ namespace Nova
             globalSave = new GlobalSave(serializer);
             globalSaveDirty = true;
             InitReached();
+            Debug.Log("Nova: Global save reset.");
         }
 
         public void RestoreGlobalSave()
@@ -553,7 +553,11 @@ namespace Nova
             {
                 File.Copy(globalSaveBackupPath, globalSavePath, true);
                 TryInitGlobalSaveReached();
-                if (globalSave == null)
+                if (globalSave != null)
+                {
+                    Debug.Log("Nova: Global save restored.");
+                }
+                else
                 {
                     Debug.LogError("Nova: Failed to restore global save. Trying to reset...");
                     serializer.Dispose();
@@ -641,7 +645,9 @@ namespace Nova
             var bookmark = serializer.ReadBookmark(GetBookmarkFileName(saveID));
             if (!isUpgrading && bookmark.globalSaveIdentifier != globalSave.identifier)
             {
-                Debug.LogWarning($"Nova: Save file is incompatible with the global save file. saveID: {saveID}");
+                Debug.LogWarning(
+                    $"Nova: Bookmark {saveID} " +
+                    $"globalSaveIdentifier {bookmark.globalSaveIdentifier} != {globalSave.identifier}");
                 bookmark = null;
             }
 
