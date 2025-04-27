@@ -94,7 +94,7 @@ namespace Nova
                     }
                     else
                     {
-                        Debug.LogError("Nova: Cannot reload script because the current node is deleted");
+                        Debug.LogError("Nova: Cannot reload script because the current node is deleted.");
                     }
                 }
             }
