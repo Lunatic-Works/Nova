@@ -48,7 +48,7 @@ namespace Nova
 
             savePathBase = Path.Combine(Application.persistentDataPath, "Save", saveFolder);
             globalSavePath = Path.Combine(savePathBase, "global.nsav");
-            globalSaveBackupPath = Path.Combine(savePathBase, "global.nsav.bak");
+            globalSaveBackupPath = globalSavePath + ".bak";
             Directory.CreateDirectory(savePathBase);
 
             serializer = new CheckpointSerializer(globalSavePath, frozen);
@@ -616,6 +616,20 @@ namespace Nova
             return bookmark;
         }
 
+        private void MoveBackup(string fileName)
+        {
+            var fileNameBackup = fileName + ".bak";
+            if (File.Exists(fileName))
+            {
+                if (File.Exists(fileNameBackup))
+                {
+                    File.Delete(fileNameBackup);
+                }
+
+                File.Move(fileName, fileNameBackup);
+            }
+        }
+
         public void SaveBookmark(int saveID, Bookmark bookmark, bool isUpgrading = false)
         {
             if (!isUpgrading)
@@ -629,7 +643,9 @@ namespace Nova
 
             bookmark.globalSaveIdentifier = globalSave.identifier;
 
-            serializer.WriteBookmark(GetBookmarkFileName(saveID), ReplaceCache(saveID, bookmark));
+            var fileName = GetBookmarkFileName(saveID);
+            MoveBackup(fileName);
+            serializer.WriteBookmark(fileName, ReplaceCache(saveID, bookmark));
             UpdateGlobalSave();
 
             var metadata = bookmarksMetadata.Ensure(saveID);
@@ -656,7 +672,8 @@ namespace Nova
 
         public void DeleteBookmark(int saveID)
         {
-            File.Delete(GetBookmarkFileName(saveID));
+            var fileName = GetBookmarkFileName(saveID);
+            MoveBackup(fileName);
             bookmarksMetadata.Remove(saveID);
             ReplaceCache(saveID, null);
         }
