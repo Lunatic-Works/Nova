@@ -115,13 +115,13 @@ namespace Nova
             }
         }
 
-        public bool UpgradeBookmark(Bookmark bookmark)
+        public bool TryUpgradeBookmark(Bookmark bookmark)
         {
-            return UpgradeBookmark(0, bookmark);
+            return TryUpgradeBookmark(0, bookmark);
         }
 
         // Returns whether the updated bookmark is valid
-        private bool UpgradeBookmark(int key, Bookmark bookmark)
+        private bool TryUpgradeBookmark(int key, Bookmark bookmark)
         {
             // Debug.Log($"Nova: Upgrade bookmark {key} @{bookmark.nodeOffset} {bookmark.dialogueIndex}");
 
@@ -176,9 +176,13 @@ namespace Nova
             foreach (var id in checkpointManager.bookmarksMetadata.Keys)
             {
                 var bookmark = checkpointManager.LoadBookmark(id, true);
-                if (UpgradeBookmark(id, bookmark))
+                if (TryUpgradeBookmark(id, bookmark))
                 {
                     checkpointManager.SaveBookmark(id, bookmark, true);
+                }
+                else
+                {
+                    checkpointManager.DeleteBookmark(id);
                 }
             }
         }

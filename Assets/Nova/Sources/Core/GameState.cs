@@ -84,7 +84,7 @@ namespace Nova
 
                 if (updatePosition)
                 {
-                    if (upgrader.UpgradeBookmark(curPosition))
+                    if (upgrader.TryUpgradeBookmark(curPosition))
                     {
                         LoadBookmark(curPosition);
                     }
