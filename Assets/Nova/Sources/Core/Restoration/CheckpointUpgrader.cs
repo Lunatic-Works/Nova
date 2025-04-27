@@ -100,6 +100,7 @@ namespace Nova
             return UpgradeBookmark(0, bookmark);
         }
 
+        // Returns whether the updated bookmark is valid
         private bool UpgradeBookmark(int key, Bookmark bookmark)
         {
             if (!nodeRecordMap.TryGetValue(bookmark.nodeOffset, out var newOffset))
@@ -119,7 +120,9 @@ namespace Nova
             if (newDialogueIndex < newNodeRecord.beginDialogue || newDialogueIndex >= newNodeRecord.endDialogue)
             {
                 Debug.LogWarning(
-                    $"Nova: Cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is deleted.");
+                    $"Nova: Cannot upgrade bookmark {key} because dialogue {newDialogueIndex} is out of range " +
+                    $"[{newNodeRecord.beginDialogue}, {newNodeRecord.endDialogue})."
+                );
                 return false;
             }
 

@@ -59,7 +59,7 @@ namespace Nova
 
         public override string ToString()
         {
-            return $"{name} @{offset} [{beginDialogue},{endDialogue})";
+            return $"{name} @{offset} [{beginDialogue}, {endDialogue})";
         }
     }
 }
