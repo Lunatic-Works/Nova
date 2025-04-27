@@ -29,13 +29,11 @@ namespace Nova
             nodeRecord.child = UpgradeNodeTree(nodeRecord.child);
             nodeRecord.sibling = UpgradeNodeTree(nodeRecord.sibling);
 
-            var newOffset = offset;
             if (changedNodes.TryGetValue(nodeRecord.name, out var differ))
             {
                 if (differ == null)
                 {
                     // Debug.Log($"remove nodeRecord @{offset}");
-                    // node is removed
                     nodeRecordMap.Add(offset, 0);
                     return checkpointManager.DeleteNodeRecord(nodeRecord);
                 }
@@ -71,51 +69,30 @@ namespace Nova
                 // Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1})");
                 if (st1 < ed1)
                 {
-                    newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
+                    var newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
                     // Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
                     nodeRecordMap.Add(offset, newOffset);
                     // Now there must be a checkpoint at the first dialogue of the new node record,
                     // which is copied from the old node record
                     // We assume that this checkpoint is unchanged in the upgrade,
                     // and create the next checkpoints in this node record by jumping forward
+                    // TODO: Upgrade this checkpoint
                     gameState.MoveUpgrade(nodeRecord, ed1 - 1);
+                    return newOffset;
                 }
                 else
                 {
-                    // we need to delete this node
-                    // but if both this node and its child has siblings
-                    // we cannot do such operation
-                    // this only happens in mini game cases
                     // Debug.Log($"remove nodeRecord @{offset}");
                     nodeRecordMap.Add(offset, 0);
-                    if (nodeRecord.child != 0)
-                    {
-                        var child = checkpointManager.GetNodeRecord(nodeRecord.child);
-                        if (nodeRecord.sibling != 0 && child.sibling != 0)
-                        {
-                            throw CheckpointCorruptedException.CannotUpgrade;
-                        }
-
-                        if (nodeRecord.sibling == 0)
-                        {
-                            nodeRecord.sibling = child.sibling;
-                        }
-
-                        newOffset = nodeRecord.child;
-                    }
-                    else
-                    {
-                        newOffset = nodeRecord.sibling;
-                    }
+                    return checkpointManager.DeleteNodeRecord(nodeRecord);
                 }
             }
             else
             {
                 // just save this record with new child and sibling
                 checkpointManager.UpdateNodeRecord(nodeRecord);
+                return offset;
             }
-
-            return newOffset;
         }
 
         public bool UpgradeBookmark(Bookmark bookmark)

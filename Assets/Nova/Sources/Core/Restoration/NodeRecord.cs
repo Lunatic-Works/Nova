@@ -56,5 +56,10 @@ namespace Nova
             variablesHash = segment.ReadUlong(36);
             name = segment.ReadString(HeaderSize);
         }
+
+        public override string ToString()
+        {
+            return $"{name} @{offset} [{beginDialogue},{endDialogue})";
+        }
     }
 }
