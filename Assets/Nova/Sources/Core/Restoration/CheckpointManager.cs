@@ -590,7 +590,14 @@ namespace Nova
                     return bookmark;
                 }
 
-                Destroy(old.screenshot);
+                if (bookmark != null && bookmark.screenshot == null)
+                {
+                    bookmark.screenshot = old.screenshot;
+                }
+                else
+                {
+                    Destroy(old.screenshot);
+                }
             }
 
             if (bookmark == null)
@@ -618,7 +625,7 @@ namespace Nova
 
             bookmark.globalSaveIdentifier = globalSave.identifier;
 
-            serializer.WriteBookmark(GetBookmarkFileName(saveID), isUpgrading ? bookmark : ReplaceCache(saveID, bookmark));
+            serializer.WriteBookmark(GetBookmarkFileName(saveID), ReplaceCache(saveID, bookmark));
             UpdateGlobalSave();
 
             var metadata = bookmarksMetadata.Ensure(saveID);
@@ -629,16 +636,16 @@ namespace Nova
             }
         }
 
-        public Bookmark LoadBookmark(int saveID, bool cache = true)
+        public Bookmark LoadBookmark(int saveID, bool isUpgrading = false)
         {
             var bookmark = serializer.ReadBookmark(GetBookmarkFileName(saveID));
-            if (cache && bookmark.globalSaveIdentifier != globalSave.identifier)
+            if (!isUpgrading && bookmark.globalSaveIdentifier != globalSave.identifier)
             {
                 Debug.LogWarning($"Nova: Save file is incompatible with the global save file. saveID: {saveID}");
                 bookmark = null;
             }
 
-            return cache ? ReplaceCache(saveID, bookmark) : bookmark;
+            return ReplaceCache(saveID, bookmark);
         }
 
         public void DeleteBookmark(int saveID)
