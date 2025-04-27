@@ -377,7 +377,7 @@ namespace Nova
 
             if (nodeChanged)
             {
-                // Debug.Log($"Node changed to {nodeRecord.name}");
+                // Debug.Log($"Node changed to {nodeRecord}");
 
                 this.nodeChanged.Invoke(new NodeChangedData(nodeRecord.name));
 
@@ -821,7 +821,7 @@ namespace Nova
                 newDialogueIndex = endDialogue - steps;
             }
 
-            // Debug.Log($"newNode=@{nodeHistory[0].offset} newDialogueIndex={newDialogueIndex}");
+            // Debug.Log($"newNode @{nodeHistory[0].offset} newDialogueIndex {newDialogueIndex}");
             return totSteps;
         }
 
@@ -1151,6 +1151,6 @@ namespace Nova
 
         #endregion
 
-        // private string debugState => $"{currentNode?.name} {currentIndex} {variables.hash} | {stepsFromLastCheckpoint} {stepsCheckpointRestrained} {checkpointEnsured} {shouldSaveCheckpoint}";
+        // private string debugState => $"{nodeRecord?.name} {currentIndex} {variables.hash} | {stepsFromLastCheckpoint} {stepsCheckpointRestrained} {checkpointEnsured} {shouldSaveCheckpoint}";
     }
 }

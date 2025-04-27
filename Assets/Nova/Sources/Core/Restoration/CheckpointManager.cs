@@ -135,7 +135,7 @@ namespace Nova
                 }
                 else
                 {
-                    Debug.LogWarning($"Nova: Unknown record type {record.GetType()} at offset {cur}");
+                    Debug.LogWarning($"Nova: Unknown record type {record.GetType()} @{cur}");
                 }
             }
 
@@ -153,7 +153,6 @@ namespace Nova
         {
             globalSave.endReached = NextRecord(globalSave.endReached);
             globalSaveDirty = true;
-            // Debug.Log($"next reached {globalSave.endReached}");
         }
 
         private void AddToReachedDialogues(ReachedDialogueData data)
@@ -234,7 +233,6 @@ namespace Nova
         {
             globalSave.endCheckpoint = NextRecord(globalSave.endCheckpoint);
             globalSaveDirty = true;
-            // Debug.Log($"next checkpoint {globalSave.endCheckpoint}");
         }
 
         public long NextCheckpoint(long offset)
@@ -289,13 +287,17 @@ namespace Nova
                 prevRecord.child = offset;
                 UpdateNodeRecord(prevRecord);
             }
+            else
+            {
+                // This is the first node record
+            }
 
             if (prevRecord != null)
             {
                 newRecord.parent = prevRecord.offset;
             }
 
-            // Debug.Log($"new NodeRecord {newRecord.name} @{newRecord.offset} {newRecord.beginDialogue}");
+            // Debug.Log($"new NodeRecord {newRecord}");
 
             UpdateNodeRecord(newRecord);
             UpdateEndCheckpoint();
@@ -305,13 +307,13 @@ namespace Nova
         public NodeRecord GetNodeRecord(long offset)
         {
             var record = new NodeRecord(offset, serializer.GetRecord(offset));
-            // Debug.Log($"GetNodeRecord {offset} {record.offset} {record.name} {record.beginDialogue} {record.endDialogue} {record.lastCheckpointDialogue}");
+            // Debug.Log($"GetNodeRecord {record}");
             return record;
         }
 
         public void UpdateNodeRecord(NodeRecord record)
         {
-            // Debug.Log($"UpdateNodeRecord {record.offset} {record.name} {record.beginDialogue} {record.endDialogue} {record.lastCheckpointDialogue}");
+            // Debug.Log($"UpdateNodeRecord {record}");
             serializer.AppendRecord(record.offset, record.ToByteSegment());
         }
 
@@ -418,36 +420,66 @@ namespace Nova
             var checkpoint = GetCheckpoint(NextRecord(nodeRecord.offset));
             checkpoint.dialogueIndex = beginDialogue;
 
+            nodeRecord.offset = globalSave.endCheckpoint;
             nodeRecord.beginDialogue = beginDialogue;
             nodeRecord.endDialogue = beginDialogue + 1;
             nodeRecord.lastCheckpointDialogue = beginDialogue;
-            nodeRecord.offset = globalSave.endCheckpoint;
             UpdateNodeRecord(nodeRecord);
             UpdateEndCheckpoint();
-            ResetChildParent(nodeRecord);
+            ResetChildParent(nodeRecord.child, nodeRecord.offset);
 
             AppendCheckpoint(beginDialogue, checkpoint);
             return nodeRecord.offset;
         }
 
-        private void ResetChildParent(NodeRecord nodeRecord)
+        private void ResetChildParent(long childOffset, long parentOffset)
         {
-            var offset = nodeRecord.child;
-            while (offset != 0)
+            while (childOffset != 0)
             {
-                var child = GetNodeRecord(offset);
-                child.parent = nodeRecord.offset;
+                var child = GetNodeRecord(childOffset);
+                child.parent = parentOffset;
                 UpdateNodeRecord(child);
-                offset = child.sibling;
+                childOffset = child.sibling;
             }
         }
 
         public long DeleteNodeRecord(NodeRecord nodeRecord)
         {
-            nodeRecord.offset = 0;
-            // Do not UpdateNodeRecord. The offset is only used in ResetChildParent
-            ResetChildParent(nodeRecord);
-            return nodeRecord.sibling;
+            // If nodeRecord has any sibling, then set the last sibling's sibling to nodeRecord's child
+            if (nodeRecord.child != 0 && nodeRecord.sibling != 0)
+            {
+                var sibling = GetNodeRecord(nodeRecord.sibling);
+                while (sibling.sibling != 0)
+                {
+                    sibling = GetNodeRecord(sibling.sibling);
+                }
+
+                var child = GetNodeRecord(nodeRecord.child);
+                if (child.beginDialogue != sibling.beginDialogue)
+                {
+                    // This may happen because of minigame
+                    Debug.LogWarning(
+                        $"Nova: Node record {nodeRecord} needs delete, " +
+                        $"but child {child} and sibling {sibling} have different beginDialogue."
+                    );
+                }
+
+                sibling.sibling = child.offset;
+                UpdateNodeRecord(sibling);
+            }
+
+            ResetChildParent(nodeRecord.child, nodeRecord.parent);
+            // Now no other node record points to nodeRecord in the subtree starting from nodeRecord
+            // After returning the new offset and update it in the parent,
+            // the parent will not point to nodeRecord either
+            if (nodeRecord.sibling != 0)
+            {
+                return nodeRecord.sibling;
+            }
+            else
+            {
+                return nodeRecord.child;
+            }
         }
 
         #endregion
