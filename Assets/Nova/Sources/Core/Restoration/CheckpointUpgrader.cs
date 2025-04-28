@@ -173,15 +173,24 @@ namespace Nova
 
             var newRoot = UpgradeNodeTree(checkpointManager.beginCheckpoint);
             checkpointManager.beginCheckpoint = newRoot == 0 ? checkpointManager.endCheckpoint : newRoot;
+
             foreach (var id in checkpointManager.bookmarksMetadata.Keys)
             {
-                var bookmark = checkpointManager.LoadBookmark(id, true);
-                if (TryUpgradeBookmark(id, bookmark))
+                try
                 {
-                    checkpointManager.SaveBookmark(id, bookmark, true);
+                    var bookmark = checkpointManager.LoadBookmark(id, true);
+                    if (TryUpgradeBookmark(id, bookmark))
+                    {
+                        checkpointManager.SaveBookmark(id, bookmark, true);
+                    }
+                    else
+                    {
+                        checkpointManager.DeleteBookmark(id);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
+                    Debug.LogError($"Nova: Failed to upgrade bookmark {id}: {e}");
                     checkpointManager.DeleteBookmark(id);
                 }
             }
