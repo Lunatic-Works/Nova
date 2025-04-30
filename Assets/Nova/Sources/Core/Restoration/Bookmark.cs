@@ -87,7 +87,7 @@ namespace Nova
 
         public BookmarkType type { get; private set; }
 
-        public DateTime modifiedTime;
+        public DateTime creationTime;
 
         public static BookmarkType SaveIDToBookmarkType(int saveID)
         {

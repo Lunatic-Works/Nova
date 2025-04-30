@@ -611,7 +611,7 @@ namespace Nova
                 var displayName = I18n.__(gameState.GetNode(nodeName, false).displayNames);
                 ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",
-                    checkpointManager.bookmarksMetadata[saveID].modifiedTime.ToString(DateTimeFormat),
+                    checkpointManager.bookmarksMetadata[saveID].creationTime.ToString(DateTimeFormat),
                     displayName,
                     bookmark.description.FormatNameDialogue()
                 ));

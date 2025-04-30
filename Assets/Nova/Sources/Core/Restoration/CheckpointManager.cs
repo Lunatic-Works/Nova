@@ -75,7 +75,7 @@ namespace Nova
                     bookmarksMetadata.Add(id, new BookmarkMetadata
                     {
                         saveID = id,
-                        modifiedTime = File.GetLastWriteTime(fileName)
+                        creationTime = serializer.ReadBookmark(fileName).creationTime
                     });
                 }
             }
@@ -650,10 +650,7 @@ namespace Nova
 
             var metadata = bookmarksMetadata.Ensure(saveID);
             metadata.saveID = saveID;
-            if (!isUpgrading)
-            {
-                metadata.modifiedTime = DateTime.Now;
-            }
+            metadata.creationTime = bookmark.creationTime;
         }
 
         public Bookmark LoadBookmark(int saveID, bool isUpgrading = false)
@@ -724,9 +721,9 @@ namespace Nova
             if (!filtered.Any())
                 return begin;
             if (type == SaveIDQueryType.Earliest)
-                return filtered.Aggregate((agg, val) => agg.modifiedTime < val.modifiedTime ? agg : val).saveID;
+                return filtered.Aggregate((agg, val) => agg.creationTime < val.creationTime ? agg : val).saveID;
             else
-                return filtered.Aggregate((agg, val) => agg.modifiedTime > val.modifiedTime ? agg : val).saveID;
+                return filtered.Aggregate((agg, val) => agg.creationTime > val.creationTime ? agg : val).saveID;
         }
 
         public int QueryMaxSaveID(int begin)
