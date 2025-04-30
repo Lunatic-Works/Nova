@@ -87,7 +87,7 @@ namespace Nova
             RemoveAnimation(this);
         }
 
-        public AnimationEntry Then(IAnimationProperty property, float duration = 0.0f,
+        public AnimationEntry Then(AnimationProperty property, float duration = 0.0f,
             AnimationEntry.EasingFunction easing = null, int repeatNum = 0)
         {
             var entry = AnimationEntry.CreateEntry(property, duration, easing, repeatNum, transform);

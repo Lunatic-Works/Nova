@@ -22,7 +22,7 @@ namespace Nova
         /// <summary>
         /// The property to animate. If property is null, this entry will do nothing, which can be used as waiting.
         /// </summary>
-        public IAnimationProperty property { get; private set; }
+        public AnimationProperty property { get; private set; }
 
         // For debug
         [ReadOnly] [SerializeField] private string propertyName;
@@ -102,7 +102,7 @@ namespace Nova
         #region Create entry and set properties
 
         public void Init(
-            IAnimationProperty property,
+            AnimationProperty property,
             float duration,
             EasingFunction easing,
             int repeatNum)
@@ -143,7 +143,7 @@ namespace Nova
         }
 
         public static AnimationEntry CreateEntry(
-            IAnimationProperty property,
+            AnimationProperty property,
             float duration,
             EasingFunction easing,
             int repeatNum,
@@ -155,9 +155,15 @@ namespace Nova
             return entry;
         }
 
-        public static void DestroyEntry(AnimationEntry entry)
+        private void DisposeProperty()
         {
-            entry.property = null;
+            property?.Dispose();
+            property = null;
+        }
+
+        private static void DestroyEntry(AnimationEntry entry)
+        {
+            entry.RuntimeAssert(entry.property == null, "property not disposed when destroying AnimationEntry.");
             PrefabFactory.Put(entry.gameObject);
             LuaRuntime.Instance.GetFunction("remove_anim_entry").Call(entry);
         }
@@ -165,7 +171,7 @@ namespace Nova
         /// <summary>
         /// Add a new animation entry. It will start playing together with the current animation entry.
         /// </summary>
-        public AnimationEntry And(IAnimationProperty property, float duration = 0.0f, EasingFunction easing = null,
+        public AnimationEntry And(AnimationProperty property, float duration = 0.0f, EasingFunction easing = null,
             int repeatNum = 0)
         {
             var entry = CreateEntry(property, duration, easing, repeatNum, transform.parent);
@@ -176,7 +182,7 @@ namespace Nova
         /// <summary>
         /// Add a new animation entry. It will start playing after the current animation entry finishes.
         /// </summary>
-        public AnimationEntry Then(IAnimationProperty property, float duration = 0.0f, EasingFunction easing = null,
+        public AnimationEntry Then(AnimationProperty property, float duration = 0.0f, EasingFunction easing = null,
             int repeatNum = 0)
         {
             return CreateEntry(property, duration, easing, repeatNum, transform);
@@ -229,6 +235,7 @@ namespace Nova
             if (evaluateOnStop) Terminate();
             // Even if not evaluateOnStop, set status = Stopped to avoid Terminate() multiple times
             status = AnimationEntryStatus.Stopped;
+            DisposeProperty();
 
             if (stopChildren)
             {
@@ -251,6 +258,7 @@ namespace Nova
             if (isStopped) return;
 
             status = AnimationEntryStatus.Stopped;
+            DisposeProperty();
 
             foreach (Transform child in Utils.GetChildren(transform))
             {
@@ -299,6 +307,7 @@ namespace Nova
             {
                 // No more loop
                 Terminate();
+                DisposeProperty();
                 // If duration is too small, we assume that it takes a frame
                 WakeUpChildren(timeElapsed - Mathf.Max(duration, Time.smoothDeltaTime));
                 DestroyEntry(this);

@@ -8,10 +8,10 @@ namespace Nova
         public static readonly UseRelativeValue Yes = new UseRelativeValue();
     }
 
-    public abstract class LazyComputableAnimationProperty<T, D> : IAnimationProperty
+    public abstract class LazyComputableAnimationProperty<T, D> : AnimationProperty
     {
-        private bool startValueHasSet = false;
-        private bool targetValueHasSet = false;
+        private bool startValueHasSet;
+        private bool targetValueHasSet;
         private T _startValue;
         private T _targetValue;
         private readonly D deltaValue;
@@ -63,29 +63,30 @@ namespace Nova
             }
         }
 
-        protected LazyComputableAnimationProperty(T startValue, T targetValue)
+        protected LazyComputableAnimationProperty(string key, T startValue, T targetValue) : base(key)
         {
             this.startValue = startValue;
             this.targetValue = targetValue;
         }
 
-        protected LazyComputableAnimationProperty(T targetValue)
+        protected LazyComputableAnimationProperty(string key, T targetValue) : base(key)
         {
             this.targetValue = targetValue;
         }
 
-        protected LazyComputableAnimationProperty(D deltaValue, UseRelativeValue useRelativeValue)
+        protected LazyComputableAnimationProperty(string key, D deltaValue, UseRelativeValue useRelativeValue) : base(key)
         {
             this.deltaValue = deltaValue;
         }
 
         private float _value;
 
-        public float value
+        public override float value
         {
             get => _value;
             set
             {
+                AcquireLock();
                 _value = value;
                 currentValue = Lerp(startValue, targetValue, value);
             }

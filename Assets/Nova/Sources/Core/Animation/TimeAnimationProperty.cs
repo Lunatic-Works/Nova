@@ -35,19 +35,20 @@ namespace Nova
         protected override float CombineDelta(float a, float b) =>
             Mathf.Clamp(a + b, 0.0f, (float)timeline.playableDirector.duration);
 
-        public TimeAnimationProperty(TimelineController timeline, float startValue, float targetValue) : base(
-            startValue, targetValue)
+        public TimeAnimationProperty(TimelineController timeline, float startValue, float targetValue) :
+            base(nameof(TimeAnimationProperty) + ":" + Utils.GetPath(timeline), startValue, targetValue)
         {
             this.timeline = timeline;
         }
 
-        public TimeAnimationProperty(TimelineController timeline, float targetValue) : base(targetValue)
+        public TimeAnimationProperty(TimelineController timeline, float targetValue) :
+            base(nameof(TimeAnimationProperty) + ":" + Utils.GetPath(timeline), targetValue)
         {
             this.timeline = timeline;
         }
 
         public TimeAnimationProperty(TimelineController timeline, float deltaValue, UseRelativeValue useRelativeValue) :
-            base(deltaValue, useRelativeValue)
+            base(nameof(TimeAnimationProperty) + ":" + Utils.GetPath(timeline), deltaValue, useRelativeValue)
         {
             this.timeline = timeline;
         }

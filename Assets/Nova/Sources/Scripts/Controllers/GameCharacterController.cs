@@ -68,6 +68,11 @@ namespace Nova
                 }
             }
         }
+
+        public override string ToString()
+        {
+            return Utils.GetPath(character) + ":" + type;
+        }
     }
 
     [ExportCustomType]

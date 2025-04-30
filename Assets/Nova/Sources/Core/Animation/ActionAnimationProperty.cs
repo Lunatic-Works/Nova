@@ -9,20 +9,26 @@ namespace Nova
     /// The action will be invoked for the specified repeat times, once per frame.
     /// </summary>
     [ExportCustomType]
-    public class ActionAnimationProperty : IAnimationProperty
+    public class ActionAnimationProperty : AnimationProperty
     {
         private readonly Action action;
 
-        public ActionAnimationProperty(Action action)
+        public ActionAnimationProperty(Action action) : base(null)
         {
             this.action = action;
         }
 
-        public float value
+        public override void Dispose()
+        {
+            // No need to release lock
+        }
+
+        public override float value
         {
             get => 0f;
             set
             {
+                // No need to acquire lock
                 try
                 {
                     action?.Invoke();

@@ -13,19 +13,20 @@ namespace Nova
 
         protected override float CombineDelta(float a, float b) => a * b;
 
-        public CameraSizeAnimationProperty(CameraController camera, float startValue, float targetValue) : base(
-            startValue, targetValue)
+        public CameraSizeAnimationProperty(CameraController camera, float startValue, float targetValue) :
+            base(nameof(CameraSizeAnimationProperty) + ":" + Utils.GetPath(camera), startValue, targetValue)
         {
             this.camera = camera;
         }
 
-        public CameraSizeAnimationProperty(CameraController camera, float targetValue) : base(targetValue)
+        public CameraSizeAnimationProperty(CameraController camera, float targetValue) :
+            base(nameof(CameraSizeAnimationProperty) + ":" + Utils.GetPath(camera), targetValue)
         {
             this.camera = camera;
         }
 
-        public CameraSizeAnimationProperty(CameraController camera, float deltaValue, UseRelativeValue useRelativeValue)
-            : base(deltaValue, useRelativeValue)
+        public CameraSizeAnimationProperty(CameraController camera, float deltaValue, UseRelativeValue useRelativeValue) :
+            base(nameof(CameraSizeAnimationProperty) + ":" + Utils.GetPath(camera), deltaValue, useRelativeValue)
         {
             this.camera = camera;
         }

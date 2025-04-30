@@ -101,5 +101,10 @@ namespace Nova
             if (audioLooper != null) audioLooper.UnPause();
             else audioSource.UnPause();
         }
+
+        public override string ToString()
+        {
+            return audioLooper != null ? Utils.GetPath(audioLooper) : Utils.GetPath(audioSource);
+        }
     }
 }

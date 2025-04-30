@@ -15,21 +15,23 @@ namespace Nova
         }
 
         public MaterialFloatAnimationProperty(Material material, string propertyName, float startValue,
-            float targetValue) : base(startValue, targetValue)
+            float targetValue) :
+            base(nameof(MaterialFloatAnimationProperty) + ":" + material + ":" + propertyName, startValue, targetValue)
         {
             this.material = material;
             propertyID = Shader.PropertyToID(propertyName);
         }
 
-        public MaterialFloatAnimationProperty(Material material, string propertyName, float targetValue) : base(
-            targetValue)
+        public MaterialFloatAnimationProperty(Material material, string propertyName, float targetValue) :
+            base(nameof(MaterialFloatAnimationProperty) + ":" + material + ":" + propertyName, targetValue)
         {
             this.material = material;
             propertyID = Shader.PropertyToID(propertyName);
         }
 
         public MaterialFloatAnimationProperty(Material material, string propertyName, float deltaValue,
-            UseRelativeValue useRelativeValue) : base(deltaValue, useRelativeValue)
+            UseRelativeValue useRelativeValue) :
+            base(nameof(MaterialFloatAnimationProperty) + ":" + material + ":" + propertyName, deltaValue, useRelativeValue)
         {
             this.material = material;
             propertyID = Shader.PropertyToID(propertyName);

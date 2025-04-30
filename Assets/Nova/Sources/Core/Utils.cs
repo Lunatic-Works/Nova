@@ -403,7 +403,7 @@ namespace Nova
 
         public static string GetPath(Component component)
         {
-            return GetPath(component.transform) + ":" + component.GetType();
+            return GetPath(component.transform) + ":" + component.GetType() + ":" + component.GetInstanceID();
         }
 
         // Convert OS-dependent path separator to "/"

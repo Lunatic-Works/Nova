@@ -1,24 +1,26 @@
 namespace Nova
 {
     [ExportCustomType]
-    public class TextFadeInAnimationProperty : IAnimationProperty
+    public class TextFadeInAnimationProperty : AnimationProperty
     {
         private readonly TextProxy text;
 
-        public TextFadeInAnimationProperty(TextProxy text)
+        public TextFadeInAnimationProperty(TextProxy text) :
+            base(nameof(TextFadeInAnimationProperty) + ":" + Utils.GetPath(text))
         {
             this.text = text;
             // Avoid undesired flash on the first frame
-            value = 0f;
+            text.SetFade(0f);
         }
 
         private float _value;
 
-        public float value
+        public override float value
         {
             get => _value;
             set
             {
+                AcquireLock();
                 _value = value;
                 text.SetFade(value);
             }

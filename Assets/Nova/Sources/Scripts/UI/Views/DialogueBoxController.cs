@@ -55,6 +55,11 @@ namespace Nova
                 }
             }
         }
+
+        public override string ToString()
+        {
+            return Utils.GetPath(dialogueBoxController) + ":" + type;
+        }
     }
 
     [ExportCustomType]

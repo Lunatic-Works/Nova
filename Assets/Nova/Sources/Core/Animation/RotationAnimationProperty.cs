@@ -17,19 +17,22 @@ namespace Nova
 
         protected override Quaternion Lerp(Quaternion a, Quaternion b, float t) => Quaternion.SlerpUnclamped(a, b, t);
 
-        public RotationAnimationProperty(Transform transform, Vector3 startEuler, Vector3 targetEuler)
-            : base(Quaternion.Euler(startEuler), Quaternion.Euler(targetEuler))
+        public RotationAnimationProperty(Transform transform, Vector3 startEuler, Vector3 targetEuler) :
+            base(nameof(RotationAnimationProperty) + ":" + Utils.GetPath(transform),
+            Quaternion.Euler(startEuler), Quaternion.Euler(targetEuler))
         {
             this.transform = transform;
         }
 
-        public RotationAnimationProperty(Transform transform, Vector3 targetEuler) : base(Quaternion.Euler(targetEuler))
+        public RotationAnimationProperty(Transform transform, Vector3 targetEuler) :
+            base(nameof(RotationAnimationProperty) + ":" + Utils.GetPath(transform), Quaternion.Euler(targetEuler))
         {
             this.transform = transform;
         }
 
         public RotationAnimationProperty(Transform transform, Vector3 deltaEuler, UseRelativeValue useRelativeValue) :
-            base(Quaternion.Euler(deltaEuler), useRelativeValue)
+            base(nameof(RotationAnimationProperty) + ":" + Utils.GetPath(transform),
+            Quaternion.Euler(deltaEuler), useRelativeValue)
         {
             this.transform = transform;
         }

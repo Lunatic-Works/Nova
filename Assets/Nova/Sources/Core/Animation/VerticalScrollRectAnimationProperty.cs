@@ -13,7 +13,8 @@ namespace Nova
             set => scrollRect.verticalNormalizedPosition = value;
         }
 
-        public VerticalScrollRectAnimationProperty(ScrollRect scrollRect, float targetValue) : base(targetValue)
+        public VerticalScrollRectAnimationProperty(ScrollRect scrollRect, float targetValue) :
+            base(nameof(VerticalScrollRectAnimationProperty) + ":" + Utils.GetPath(scrollRect), targetValue)
         {
             this.scrollRect = scrollRect;
         }

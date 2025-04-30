@@ -8,11 +8,13 @@ namespace Nova
 
         protected override float Lerp(float a, float b, float t) => Mathf.LerpUnclamped(a, b, t);
 
-        protected FloatBaseAnimationProperty(float startValue, float targetValue) : base(startValue, targetValue) { }
+        protected FloatBaseAnimationProperty(string key, float startValue, float targetValue) :
+            base(key, startValue, targetValue) { }
 
-        protected FloatBaseAnimationProperty(float targetValue) : base(targetValue) { }
+        protected FloatBaseAnimationProperty(string key, float targetValue) :
+            base(key, targetValue) { }
 
-        protected FloatBaseAnimationProperty(float deltaValue, UseRelativeValue useRelativeValue) : base(deltaValue,
-            useRelativeValue) { }
+        protected FloatBaseAnimationProperty(string key, float deltaValue, UseRelativeValue useRelativeValue) :
+            base(key, deltaValue, useRelativeValue) { }
     }
 }

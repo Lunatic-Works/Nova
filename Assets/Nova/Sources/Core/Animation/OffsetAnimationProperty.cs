@@ -26,19 +26,20 @@ namespace Nova
 
         protected override Vector4 Lerp(Vector4 a, Vector4 b, float t) => Vector4.LerpUnclamped(a, b, t);
 
-        public OffsetAnimationProperty(RectTransform rect, Vector4 startValue, Vector4 targetValue) : base(startValue,
-            targetValue)
+        public OffsetAnimationProperty(RectTransform rect, Vector4 startValue, Vector4 targetValue) :
+            base(nameof(OffsetAnimationProperty) + ":" + Utils.GetPath(rect), startValue, targetValue)
         {
             this.rect = rect;
         }
 
-        public OffsetAnimationProperty(RectTransform rect, Vector4 targetValue) : base(targetValue)
+        public OffsetAnimationProperty(RectTransform rect, Vector4 targetValue) :
+            base(nameof(OffsetAnimationProperty) + ":" + Utils.GetPath(rect), targetValue)
         {
             this.rect = rect;
         }
 
         public OffsetAnimationProperty(RectTransform rect, Vector4 deltaValue, UseRelativeValue useRelativeValue) :
-            base(deltaValue, useRelativeValue)
+            base(nameof(OffsetAnimationProperty) + ":" + Utils.GetPath(rect), deltaValue, useRelativeValue)
         {
             this.rect = rect;
         }

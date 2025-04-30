@@ -17,19 +17,20 @@ namespace Nova
 
         protected override Vector3 Lerp(Vector3 a, Vector3 b, float t) => Vector3.LerpUnclamped(a, b, t);
 
-        public PositionAnimationProperty(Transform transform, Vector3 startValue, Vector3 targetValue) : base(
-            startValue, targetValue)
+        public PositionAnimationProperty(Transform transform, Vector3 startValue, Vector3 targetValue) :
+            base(nameof(PositionAnimationProperty) + ":" + Utils.GetPath(transform), startValue, targetValue)
         {
             this.transform = transform;
         }
 
-        public PositionAnimationProperty(Transform transform, Vector3 targetValue) : base(targetValue)
+        public PositionAnimationProperty(Transform transform, Vector3 targetValue) :
+            base(nameof(PositionAnimationProperty) + ":" + Utils.GetPath(transform), targetValue)
         {
             this.transform = transform;
         }
 
         public PositionAnimationProperty(Transform transform, Vector3 deltaValue, UseRelativeValue useRelativeValue) :
-            base(deltaValue, useRelativeValue)
+            base(nameof(PositionAnimationProperty) + ":" + Utils.GetPath(transform), deltaValue, useRelativeValue)
         {
             this.transform = transform;
         }

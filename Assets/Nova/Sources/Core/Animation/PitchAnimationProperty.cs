@@ -32,36 +32,40 @@ namespace Nova
             }
         }
 
-        public PitchAnimationProperty(UnifiedAudioSource audioSource, float startValue, float targetValue) : base(
-            startValue, targetValue)
+        public PitchAnimationProperty(UnifiedAudioSource audioSource, float startValue, float targetValue) :
+            base(nameof(PitchAnimationProperty) + ":" + audioSource, startValue, targetValue)
         {
             this.audioSource = audioSource;
         }
 
-        public PitchAnimationProperty(UnifiedAudioSource audioSource, float targetValue) : base(targetValue)
+        public PitchAnimationProperty(UnifiedAudioSource audioSource, float targetValue) :
+            base(nameof(PitchAnimationProperty) + ":" + audioSource, targetValue)
         {
             this.audioSource = audioSource;
         }
 
         public PitchAnimationProperty(UnifiedAudioSource audioSource, float deltaValue,
-            UseRelativeValue useRelativeValue) : base(deltaValue, useRelativeValue)
+            UseRelativeValue useRelativeValue) :
+            base(nameof(PitchAnimationProperty) + ":" + audioSource, deltaValue, useRelativeValue)
         {
             this.audioSource = audioSource;
         }
 
-        public PitchAnimationProperty(AudioController audioController, float startValue, float targetValue) : base(
-            startValue, targetValue)
+        public PitchAnimationProperty(AudioController audioController, float startValue, float targetValue) :
+            base(nameof(PitchAnimationProperty) + ":" + Utils.GetPath(audioController), startValue, targetValue)
         {
             this.audioController = audioController;
         }
 
-        public PitchAnimationProperty(AudioController audioController, float targetValue) : base(targetValue)
+        public PitchAnimationProperty(AudioController audioController, float targetValue) :
+            base(nameof(PitchAnimationProperty) + ":" + Utils.GetPath(audioController), targetValue)
         {
             this.audioController = audioController;
         }
 
         public PitchAnimationProperty(AudioController audioController, float deltaValue,
-            UseRelativeValue useRelativeValue) : base(deltaValue, useRelativeValue)
+            UseRelativeValue useRelativeValue) :
+            base(nameof(PitchAnimationProperty) + ":" + Utils.GetPath(audioController), deltaValue, useRelativeValue)
         {
             this.audioController = audioController;
         }

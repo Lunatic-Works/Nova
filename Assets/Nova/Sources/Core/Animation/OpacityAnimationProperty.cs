@@ -62,71 +62,76 @@ namespace Nova
             }
         }
 
-        public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float startValue, float targetValue) : base(
-            startValue, targetValue)
+        public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float startValue, float targetValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(spriteRenderer), startValue, targetValue)
         {
             this.spriteRenderer = spriteRenderer;
         }
 
-        public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float targetValue) : base(targetValue)
+        public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float targetValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(spriteRenderer), targetValue)
         {
             this.spriteRenderer = spriteRenderer;
         }
 
         public OpacityAnimationProperty(SpriteRenderer spriteRenderer, float deltaValue, UseRelativeValue
-            useRelativeValue) : base(deltaValue, useRelativeValue)
+            useRelativeValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(spriteRenderer), deltaValue, useRelativeValue)
         {
             this.spriteRenderer = spriteRenderer;
         }
 
-        public OpacityAnimationProperty(FadeController fadeController, float startValue, float targetValue) : base(
-            startValue, targetValue)
+        public OpacityAnimationProperty(FadeController fadeController, float startValue, float targetValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(fadeController), startValue, targetValue)
         {
             this.fadeController = fadeController;
         }
 
-        public OpacityAnimationProperty(FadeController fadeController, float targetValue) : base(targetValue)
+        public OpacityAnimationProperty(FadeController fadeController, float targetValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(fadeController), targetValue)
         {
             this.fadeController = fadeController;
         }
 
         public OpacityAnimationProperty(FadeController fadeController, float deltaValue, UseRelativeValue
-            useRelativeValue) : base(deltaValue, useRelativeValue)
+            useRelativeValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(fadeController), deltaValue, useRelativeValue)
         {
             this.fadeController = fadeController;
         }
 
-        public OpacityAnimationProperty(Image image, float startValue, float targetValue) : base(startValue,
-            targetValue)
+        public OpacityAnimationProperty(Image image, float startValue, float targetValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(image), startValue, targetValue)
         {
             this.image = image;
         }
 
-        public OpacityAnimationProperty(Image image, float targetValue) : base(targetValue)
+        public OpacityAnimationProperty(Image image, float targetValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(image), targetValue)
         {
             this.image = image;
         }
 
-        public OpacityAnimationProperty(Image image, float deltaValue, UseRelativeValue useRelativeValue) : base(
-            deltaValue, useRelativeValue)
+        public OpacityAnimationProperty(Image image, float deltaValue, UseRelativeValue useRelativeValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(image), deltaValue, useRelativeValue)
         {
             this.image = image;
         }
 
-        public OpacityAnimationProperty(CanvasGroup canvasGroup, float startValue, float targetValue) : base(startValue,
-            targetValue)
+        public OpacityAnimationProperty(CanvasGroup canvasGroup, float startValue, float targetValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(canvasGroup), startValue, targetValue)
         {
             this.canvasGroup = canvasGroup;
             // For UI animation, apply startValue when this is constructed
-            value = 0f;
+            canvasGroup.alpha = startValue;
         }
 
-        public OpacityAnimationProperty(RawImage rawImage, float startValue, float targetValue) : base(startValue,
-            targetValue)
+        public OpacityAnimationProperty(RawImage rawImage, float startValue, float targetValue) :
+            base(nameof(OpacityAnimationProperty) + ":" + Utils.GetPath(rawImage), startValue, targetValue)
         {
             this.rawImage = rawImage;
             // For UI animation, apply startValue when this is constructed
-            value = 0f;
+            rawImage.color = Utils.SetAlpha(rawImage.color, startValue);
         }
     }
 }
