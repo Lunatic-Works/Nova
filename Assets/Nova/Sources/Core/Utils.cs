@@ -106,7 +106,7 @@ namespace Nova
 
         public static string Dump<T>(this IEnumerable<T> list)
         {
-            return "[ " + string.Join(", ", list.Select(x => x.ToString())) + " ]";
+            return "[" + string.Join(", ", list) + "]";
         }
 
         public static Rect ToRect(this RectInt rectInt)

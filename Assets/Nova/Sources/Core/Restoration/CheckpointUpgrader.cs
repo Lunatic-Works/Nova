@@ -37,6 +37,8 @@ namespace Nova
                     // Debug.Log($"remove nodeRecord @{offset}");
                     nodeRecordMap.Add(offset, 0);
                     return checkpointManager.DeleteNodeRecord(nodeRecord);
+                    // After deleting a node record, its parent may have duplicate children
+                    // It does not lead to error but can be optimized
                 }
 
                 // normally we map beginDialogue to its rightMap
@@ -92,7 +94,8 @@ namespace Nova
                     var newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
                     // Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
                     nodeRecordMap.Add(offset, newOffset);
-                    // Now there must be a checkpoint at the first dialogue of the new node record,
+                    // We assume that nodeRecord is non-empty,
+                    // so there must be a checkpoint at the first dialogue of the new node record,
                     // which is copied from the old node record
                     // We assume that this checkpoint is unchanged in the upgrade,
                     // and create the next checkpoints in this node record by jumping forward

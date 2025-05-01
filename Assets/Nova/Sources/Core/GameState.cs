@@ -179,6 +179,7 @@ namespace Nova
 
                 if (node.dialogueEntryCount == 0)
                 {
+                    Debug.LogWarning($"Nova: currentNode should be non-empty: {node.name}");
                     return null;
                 }
 
@@ -366,6 +367,7 @@ namespace Nova
         /// </summary>
         /// <remarks>
         /// Trigger events according to the current states and how they were changed
+        /// Assume currentNode is non-empty
         /// </remarks>
         private void UpdateGameState(bool fromCheckpoint, bool nodeChanged)
         {
@@ -376,21 +378,13 @@ namespace Nova
                 // Debug.Log($"Node changed to {nodeRecord}");
 
                 this.nodeChanged.Invoke(new NodeChangedData(nodeRecord.name));
-
                 // Always get a checkpoint at the beginning of the node
                 checkpointEnsured = true;
             }
 
-            if (currentNode.dialogueEntryCount > 0)
-            {
-                this.RuntimeAssert(currentIndex >= 0 && currentIndex < currentNode.dialogueEntryCount,
-                                   $"Dialogue index {currentIndex} out of range [0, {currentNode.dialogueEntryCount})");
-                ExecuteAction(UpdateDialogue(fromCheckpoint, nodeChanged));
-            }
-            else
-            {
-                StepAtEndOfNode();
-            }
+            this.RuntimeAssert(currentIndex >= 0 && currentIndex < currentNode.dialogueEntryCount,
+                               $"Dialogue index {currentIndex} out of range [0, {currentNode.dialogueEntryCount})");
+            ExecuteAction(UpdateDialogue(fromCheckpoint, nodeChanged));
 
             // Debug.Log($"UpdateGameState end {debugState}");
         }
@@ -496,24 +490,25 @@ namespace Nova
             return dialogueData;
         }
 
-        private void StepAtEndOfNode()
+        private void StepAtEndOfNode(FlowChartNode node)
         {
-            if (currentNode.isSavePoint)
+            if (node.isSavePoint)
             {
+                this.RuntimeAssert(node.dialogueEntryCount > 0, $"Empty node cannot be save point: {node.name}");
                 savePoint.Invoke(new SavePointEventData());
             }
 
-            switch (currentNode.type)
+            switch (node.type)
             {
                 case FlowChartNodeType.Normal:
-                    MoveToNextNode(currentNode.next);
+                    MoveToNextNode(node.next);
                     break;
                 case FlowChartNodeType.Branching:
-                    ExecuteAction(DoBranch(currentNode.GetAllBranches()));
+                    ExecuteAction(DoBranch(node));
                     break;
                 case FlowChartNodeType.End:
                     state = State.Ended;
-                    var endName = flowChartGraph.GetEndName(currentNode);
+                    var endName = flowChartGraph.GetEndName(node);
                     checkpointManager.SetReachedEnd(endName);
                     routeEnded.Invoke(new RouteEndedData(endName));
                     break;
@@ -522,31 +517,35 @@ namespace Nova
             }
         }
 
-        private void MoveToNextNode(FlowChartNode nextNode)
+        private void MoveToNextNode(FlowChartNode node)
         {
-            ScriptLoader.AddDeferredDialogueChunks(nextNode);
-            // in case of empty node, do not change any of these
-            // so the bookmark is left at the end of last node
-            if (nextNode.dialogueEntryCount > 0)
+            ScriptLoader.AddDeferredDialogueChunks(node);
+            if (node.dialogueEntryCount > 0)
             {
-                nodeRecord = checkpointManager.GetNextNodeRecord(nodeRecord, nextNode.name, variables, 0);
+                nodeRecord = checkpointManager.GetNextNodeRecord(nodeRecord, node.name, variables, 0);
                 currentIndex = 0;
+                UpdateGameState(false, true);
             }
-
-            UpdateGameState(false, true);
+            else
+            {
+                // When moving to an empty node, MoveToNextNode and StepAtEndOfNode may be called multiple times,
+                // without changing nodeRecord, currentNode, and currentIndex
+                // We assume nodeRecord and currentNode are always non-empty
+                StepAtEndOfNode(node);
+            }
         }
 
-        private IEnumerator DoBranch(IEnumerable<BranchInformation> branchInfos)
+        private IEnumerator DoBranch(FlowChartNode node)
         {
             var choices = new List<ChoiceOccursData.Choice>();
             var choiceNames = new List<string>();
-            foreach (var branchInfo in branchInfos)
+            foreach (var branchInfo in node.GetAllBranches())
             {
                 if (branchInfo.mode == BranchMode.Jump)
                 {
                     if (branchInfo.condition == null || branchInfo.condition.Invoke<bool>())
                     {
-                        SelectBranch(branchInfo.name);
+                        SelectBranch(node, branchInfo.name);
                         yield break;
                     }
 
@@ -575,12 +574,12 @@ namespace Nova
             ReleaseActionPause();
 
             var index = (int)coroutineHelper.TakeFence();
-            SelectBranch(choiceNames[index]);
+            SelectBranch(node, choiceNames[index]);
         }
 
-        private void SelectBranch(string branchName)
+        private void SelectBranch(FlowChartNode node, string branchName)
         {
-            MoveToNextNode(currentNode.GetNext(branchName));
+            MoveToNextNode(node.GetNext(branchName));
         }
 
         /// <summary>
@@ -632,7 +631,7 @@ namespace Nova
             }
             else
             {
-                StepAtEndOfNode();
+                StepAtEndOfNode(currentNode);
             }
         }
 

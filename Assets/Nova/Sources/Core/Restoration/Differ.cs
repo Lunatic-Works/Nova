@@ -197,10 +197,11 @@ namespace Nova
             CalcRemap();
             CalcLeftMap();
             CalcRightMap();
-            // Debug.Log($"distance={distance}, x={x}, y={y}");
-            // Debug.Log($"inserts={_inserts.Dump()}, deletes={_deletes.Dump()}");
-            // Debug.Log($"remap={_remap.Dump()}");
-            // Debug.Log($"leftMap={_leftMap.Dump()}, rightMap={_rightMap.Dump()}");
+        }
+
+        public override string ToString()
+        {
+            return $"remap={remap.Dump()}, leftMap={leftMap.Dump()}, rightMap={rightMap.Dump()}";
         }
     }
 }
