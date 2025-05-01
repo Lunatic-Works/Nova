@@ -915,13 +915,18 @@ namespace Nova
             isRestoring = true;
             RestoreCheckpoint(checkpoint);
             // Now currentIndex <= dialogueIndex
-            if (dialogueIndex == currentIndex)
+            if (!isUpgrading && dialogueIndex == currentIndex)
             {
                 isRestoring = false;
             }
 
             // The result of invoking nodeChanged should be already in the checkpoint, so we don't invoke it here
             UpdateGameState(true, false);
+            if (isUpgrading && dialogueIndex == currentIndex)
+            {
+                NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
+            }
+
             if (!CheckUnlockInRestoring())
             {
                 return;
