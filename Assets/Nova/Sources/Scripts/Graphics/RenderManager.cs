@@ -140,18 +140,9 @@ namespace Nova
                 var targetH = configManager.GetInt(LastWindowedHeightKey);
                 if (targetW == 0 || targetH == 0)
                 {
-                    if (Screen.resolutions.Length == 0)
-                    {
-                        // A conservative guess for the initial size
-                        targetW = 1280;
-                        targetH = 720;
-                    }
-                    else
-                    {
-                        var defaultResolution = Screen.resolutions[Screen.resolutions.Length / 2];
-                        targetW = defaultResolution.width;
-                        targetH = defaultResolution.height;
-                    }
+                    // A conservative guess for the initial size
+                    targetW = Mathf.RoundToInt(Screen.currentResolution.width * 0.6f);
+                    targetH = Mathf.RoundToInt(Screen.currentResolution.height * 0.6f);
                 }
 
                 Screen.SetResolution(targetW, targetH, FullScreenMode.Windowed);
