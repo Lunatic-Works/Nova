@@ -179,7 +179,7 @@ namespace Nova
     }
 
     [Serializable]
-    public class TextureRendererConfig
+    public struct TextureRendererConfig : IEquatable<TextureRendererConfig>
     {
         public readonly string name;
         public readonly RenderTextureFormat format;
@@ -192,21 +192,19 @@ namespace Nova
             this.final = final;
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is TextureRendererConfig config &&
-                   name == config.name &&
-                   format == config.format &&
-                   final == config.final;
-        }
+        public override bool Equals(object obj) => obj is TextureRendererConfig other && Equals(other);
+
+        public bool Equals(TextureRendererConfig other) => name == other.name &&
+                                                           format == other.format &&
+                                                           final == other.final;
 
         public override int GetHashCode()
         {
             unchecked
             {
                 var hashCode = name.GetHashCode();
-                hashCode = hashCode * -1521134295 + final.GetHashCode();
                 hashCode = hashCode * -1521134295 + format.GetHashCode();
+                hashCode = hashCode * -1521134295 + final.GetHashCode();
                 return hashCode;
             }
         }

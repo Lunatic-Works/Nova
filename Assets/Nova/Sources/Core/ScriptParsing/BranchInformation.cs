@@ -1,4 +1,5 @@
 using LuaInterface;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ namespace Nova
     /// <remarks>
     /// BranchInformation is immutable
     /// </remarks>
-    public class BranchInformation
+    public class BranchInformation : IEquatable<BranchInformation>
     {
         /// <summary>
         /// The internal name of the branch, auto generated from ScriptLoader.RegisterBranch()
@@ -77,18 +78,13 @@ namespace Nova
             texts[locale] = text;
         }
 
-        // BranchInformation are considered equal if they have the same name
-        public override bool Equals(object obj)
-        {
-            return obj is BranchInformation other && name == other.name;
-        }
+        public override bool Equals(object obj) => obj is BranchInformation other && Equals(other);
 
-        public override int GetHashCode()
-        {
-            return name.GetHashCode();
-        }
+        public bool Equals(BranchInformation other) => !(other is null) && name == other.name;
 
-        public static bool operator ==(BranchInformation a, BranchInformation b) => a.Equals(b);
+        public override int GetHashCode() => name.GetHashCode();
+
+        public static bool operator ==(BranchInformation a, BranchInformation b) => a?.Equals(b) ?? b is null;
 
         public static bool operator !=(BranchInformation a, BranchInformation b) => !(a == b);
     }

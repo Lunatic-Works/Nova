@@ -1,5 +1,6 @@
 using Nova.Exceptions;
 using Nova.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,7 +22,7 @@ namespace Nova
     /// <remarks>
     /// Everything in a node cannot be modified after it is frozen
     /// </remarks>
-    public class FlowChartNode
+    public class FlowChartNode : IEquatable<FlowChartNode>
     {
         /// <summary>
         /// Internally used name of the flow chart node.
@@ -240,16 +241,11 @@ namespace Nova
 
         #endregion
 
-        // FlowChartNode are considered equal if they have the same name
-        public override bool Equals(object obj)
-        {
-            return obj is FlowChartNode other && name == other.name;
-        }
+        public override bool Equals(object obj) => obj is FlowChartNode other && Equals(other);
 
-        public override int GetHashCode()
-        {
-            return name.GetHashCode();
-        }
+        public bool Equals(FlowChartNode other) => !(other is null) && name == other.name;
+
+        public override int GetHashCode() => name.GetHashCode();
 
         public static bool operator ==(FlowChartNode a, FlowChartNode b) => a?.Equals(b) ?? b is null;
 
