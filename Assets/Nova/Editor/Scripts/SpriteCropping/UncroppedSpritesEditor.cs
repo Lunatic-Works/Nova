@@ -205,8 +205,10 @@ namespace Nova.Editor
 
             var settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);
-            if (settings.spriteMeshType != SpriteMeshType.FullRect)
+            if (settings.spriteMode != 1 || // Single
+                settings.spriteMeshType != SpriteMeshType.FullRect)
             {
+                settings.spriteMode = 1;
                 settings.spriteMeshType = SpriteMeshType.FullRect;
                 needReimport = true;
             }
