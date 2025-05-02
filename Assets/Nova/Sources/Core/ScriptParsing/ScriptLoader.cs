@@ -142,12 +142,12 @@ namespace Nova
 
         public static ulong GetChunkHash(ParsedBlocks chunk)
         {
-            return Utils.HashList(chunk.SelectMany(block => block.ToList()));
+            return DeterministicHash.HashList(chunk);
         }
 
         private static ulong GetNodeHash(ParsedChunks nodeChunks)
         {
-            return Utils.HashList(nodeChunks.SelectMany(chunk => chunk.SelectMany(block => block.ToList())));
+            return DeterministicHash.HashList(nodeChunks.SelectMany(chunk => chunk));
         }
 
         private void ParseScript(TextAsset script, bool deferChunks = false)

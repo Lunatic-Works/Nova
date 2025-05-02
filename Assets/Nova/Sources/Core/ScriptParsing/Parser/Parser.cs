@@ -16,7 +16,7 @@ namespace Nova.Parser
         Separator
     }
 
-    public class ParsedBlock
+    public class ParsedBlock : IDeterministicHashable
     {
         public readonly int line;
         public readonly BlockType type;
@@ -31,15 +31,20 @@ namespace Nova.Parser
             this.attributes = attributes;
         }
 
-        public IEnumerable<object> ToList()
+        public ulong GetDeterministicHash()
         {
-            IEnumerable<object> ret = new object[] {type, content};
+            var r = (ulong)type;
+            r = DeterministicHash.Add(r, DeterministicHash.HashString(content));
             if (attributes != null)
             {
-                ret = ret.Concat(attributes.OrderBy(x => x.Key).Cast<object>());
+                foreach (var pair in attributes)
+                {
+                    r = DeterministicHash.Add(r, DeterministicHash.HashString(pair.Key));
+                    r = DeterministicHash.Add(r, DeterministicHash.HashString(pair.Value));
+                }
             }
 
-            return ret;
+            return r;
         }
     }
 

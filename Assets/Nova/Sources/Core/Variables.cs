@@ -1,3 +1,4 @@
+using Nova.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,17 +56,12 @@ namespace Nova
             {
                 if (needCalculateHash)
                 {
-                    _hash = GetHashULong();
+                    _hash = DeterministicHash.HashString(ToString());
                     needCalculateHash = false;
                 }
 
                 return _hash;
             }
-        }
-
-        private ulong GetHashULong()
-        {
-            return Utils.HashList(dict.SelectMany(pair => new[] {pair.Key, pair.Value.type, pair.Value.value}));
         }
 
         public VariableEntry Get(string name)
@@ -150,8 +146,7 @@ namespace Nova
 
         public override string ToString()
         {
-            return "Variables: " + string.Join(", ",
-                from pair in dict select $"{pair.Key}:{pair.Value.type}={pair.Value.value}");
+            return string.Join(", ", from pair in dict select $"{pair.Key}={pair.Value.value}");
         }
     }
 }

@@ -439,32 +439,6 @@ namespace Nova
             return list[idx];
         }
 
-        // Knuth's golden ratio multiplicative hashing
-        public static ulong HashList(IEnumerable<ulong> hashes)
-        {
-            var r = 0UL;
-            unchecked
-            {
-                foreach (var x in hashes)
-                {
-                    r += x;
-                    r *= 11400714819323199563UL;
-                }
-            }
-
-            return r;
-        }
-
-        public static ulong HashList<T>(IEnumerable<T> list) where T : class
-        {
-            return HashList(list.Select(x => (ulong)x.GetHashCode()));
-        }
-
-        public static ulong HashObjects(params object[] list)
-        {
-            return HashList(list);
-        }
-
         public static string PrettyPrint(this ISerializedData data)
         {
             return JsonConvert.SerializeObject(data, Formatting.Indented);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Nova
@@ -177,7 +178,8 @@ namespace Nova
             var newRoot = UpgradeNodeTree(checkpointManager.beginCheckpoint);
             checkpointManager.beginCheckpoint = newRoot == 0 ? checkpointManager.endCheckpoint : newRoot;
 
-            foreach (var id in checkpointManager.bookmarksMetadata.Keys)
+            // Copy Keys because it may be changed in the loop
+            foreach (var id in checkpointManager.bookmarksMetadata.Keys.ToList())
             {
                 try
                 {

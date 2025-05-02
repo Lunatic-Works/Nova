@@ -45,10 +45,10 @@ namespace Nova
             return v[(d + 1) * d / 2 + (k + d) / 2];
         }
 
-        public Differ(ulong[] scriptHashes, ulong[] saveHashes)
+        public Differ(ulong[] saveHashes, ulong[] scriptHashes)
         {
-            this.scriptHashes = scriptHashes;
             this.saveHashes = saveHashes;
+            this.scriptHashes = scriptHashes;
             distance = -1;
         }
 
