@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Nova
 {
@@ -18,9 +20,6 @@ namespace Nova
         private readonly List<int> _remap = new List<int>();
         private readonly List<int> _leftMap = new List<int>();
         private readonly List<int> _rightMap = new List<int>();
-
-        public IReadOnlyList<int> inserts => _inserts;
-        public IReadOnlyList<int> deletes => _deletes;
 
         // remap[i] == j means old list index j maps to new list index i
         // new item in new list remaps to index -1
@@ -185,6 +184,34 @@ namespace Nova
             }
         }
 
+        private void CalcNaiveRemap()
+        {
+            Debug.Log("Nova: Fallback to naive remap.");
+
+            _remap.Clear();
+            _leftMap.Clear();
+            _rightMap.Clear();
+
+            var minLength = Math.Min(saveHashes.Length, scriptHashes.Length);
+            for (var i = 0; i < minLength; ++i)
+            {
+                _remap.Add(i);
+                _leftMap.Add(i);
+                _rightMap.Add(i);
+            }
+
+            for (var i = 0; i < saveHashes.Length - minLength; ++i)
+            {
+                _remap.Add(-1);
+            }
+
+            for (var i = 0; i < scriptHashes.Length - minLength; ++i)
+            {
+                _leftMap.Add(saveHashes.Length - 1);
+                _rightMap.Add(saveHashes.Length);
+            }
+        }
+
         public void GetDiffs()
         {
             if (distance >= 0)
@@ -197,6 +224,12 @@ namespace Nova
             CalcRemap();
             CalcLeftMap();
             CalcRightMap();
+
+            // If the node is large and the diff is completely different, then fallback to naive remap
+            if (saveHashes.Length > 10 && scriptHashes.Length > 10 && _remap.All(x => x == -1))
+            {
+                CalcNaiveRemap();
+            }
         }
 
         public override string ToString()
