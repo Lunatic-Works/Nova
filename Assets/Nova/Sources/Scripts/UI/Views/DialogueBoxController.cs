@@ -148,6 +148,9 @@ namespace Nova
                 avatar = null;
             }
 
+            // Init avatar before this.HideImmediate
+            avatar?.Init();
+
             rect = transform.Find("DialoguePanel").GetComponent<RectTransform>();
 
             backgroundImage = background.GetComponent<Image>();

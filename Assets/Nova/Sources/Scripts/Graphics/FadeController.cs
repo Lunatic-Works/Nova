@@ -28,7 +28,7 @@ namespace Nova
 
         private bool inited;
 
-        protected void Init()
+        public void Init()
         {
             if (inited)
             {
