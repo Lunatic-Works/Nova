@@ -39,16 +39,15 @@
     sum += GRAB_PIXEL(WEIGHT3, +1.36649370, -0.78894551); \
     sum += GRAB_PIXEL(WEIGHT3, -0.78894551, -1.36649370); \
 
+// Gauss-Legendre quad
 #define DO_MOTION_BLUR \
-    sum += GRAB_PIXEL(WEIGHT, -1.00); \
-    sum += GRAB_PIXEL(WEIGHT, -0.75); \
-    sum += GRAB_PIXEL(WEIGHT, -0.50); \
-    sum += GRAB_PIXEL(WEIGHT, -0.25); \
-    sum += GRAB_PIXEL(WEIGHT,  0.00); \
-    sum += GRAB_PIXEL(WEIGHT, +0.25); \
-    sum += GRAB_PIXEL(WEIGHT, +0.50); \
-    sum += GRAB_PIXEL(WEIGHT, +0.75); \
-    sum += GRAB_PIXEL(WEIGHT, +1.00); \
+    sum += GRAB_PIXEL(WEIGHT1, -0.94910791); \
+    sum += GRAB_PIXEL(WEIGHT2, -0.74153119); \
+    sum += GRAB_PIXEL(WEIGHT3, -0.40584515); \
+    sum += GRAB_PIXEL(WEIGHT4,  0.00000000); \
+    sum += GRAB_PIXEL(WEIGHT3, +0.40584515); \
+    sum += GRAB_PIXEL(WEIGHT2, +0.74153119); \
+    sum += GRAB_PIXEL(WEIGHT1, +0.94910791); \
 
 // https://bartwronski.com/2022/03/07/fast-gpu-friendly-antialiasing-downsampling-filter/
 #define DO_DOWNSAMPLE \
@@ -142,12 +141,18 @@ half4 tex2DMotionBlur(sampler2D tex, half4 texelSize, half2 uv, half2 vel)
     half4 sum = half4(0.0, 0.0, 0.0, 0.0);
     half2 kernelSize = texelSize.xy * vel;
 
-    #define WEIGHT (1.0 / 9.0)
+    #define WEIGHT1 0.12948497
+    #define WEIGHT2 0.27970539
+    #define WEIGHT3 0.38183005
+    #define WEIGHT4 0.41795918
     #define GRAB_PIXEL(weight, lambda) ((weight) * tex2D(tex, uv + (lambda) * kernelSize))
 
     DO_MOTION_BLUR
 
-    #undef WEIGHT
+    #undef WEIGHT1
+    #undef WEIGHT2
+    #undef WEIGHT3
+    #undef WEIGHT4
     #undef GRAB_PIXEL
 
     return sum;
@@ -252,12 +257,18 @@ half4 tex2DProjMotionBlur(sampler2D tex, half4 texelSize, half4 pos, half2 vel)
     half4 sum = half4(0.0, 0.0, 0.0, 0.0);
     half2 kernelSize = texelSize.xy * vel;
 
-    #define WEIGHT (1.0 / 9.0)
+    #define WEIGHT1 0.12948497
+    #define WEIGHT2 0.27970539
+    #define WEIGHT3 0.38183005
+    #define WEIGHT4 0.41795918
     #define GRAB_PIXEL(weight, lambda) ((weight) * tex2Dproj(tex, UNITY_PROJ_COORD(half4(pos.xy + (lambda) * kernelSize, pos.zw))))
 
     DO_MOTION_BLUR
 
-    #undef WEIGHT
+    #undef WEIGHT1
+    #undef WEIGHT2
+    #undef WEIGHT3
+    #undef WEIGHT4
     #undef GRAB_PIXEL
 
     return sum;
