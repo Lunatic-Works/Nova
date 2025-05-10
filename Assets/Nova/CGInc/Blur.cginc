@@ -124,10 +124,10 @@ half4 tex2DMotionBlur(sampler2D tex, half4 texelSize, half2 uv, half2 vel)
     half4 sum = half4(0.0, 0.0, 0.0, 0.0);
     half2 kernelSize = texelSize.xy * vel;
 
-    #define WEIGHT1 0.12948497
-    #define WEIGHT2 0.27970539
-    #define WEIGHT3 0.38183005
-    #define WEIGHT4 0.41795918
+    #define WEIGHT1 0.06474248
+    #define WEIGHT2 0.13985270
+    #define WEIGHT3 0.19091503
+    #define WEIGHT4 0.20897959
     #define GRAB_PIXEL(weight, lambda) ((weight) * tex2D(tex, uv + (lambda) * kernelSize))
 
     DO_MOTION_BLUR
@@ -240,10 +240,10 @@ half4 tex2DProjMotionBlur(sampler2D tex, half4 texelSize, half4 pos, half2 vel)
     half4 sum = half4(0.0, 0.0, 0.0, 0.0);
     half2 kernelSize = texelSize.xy * vel;
 
-    #define WEIGHT1 0.12948497
-    #define WEIGHT2 0.27970539
-    #define WEIGHT3 0.38183005
-    #define WEIGHT4 0.41795918
+    #define WEIGHT1 0.06474248
+    #define WEIGHT2 0.13985270
+    #define WEIGHT3 0.19091503
+    #define WEIGHT4 0.20897959
     #define GRAB_PIXEL(weight, lambda) ((weight) * tex2Dproj(tex, UNITY_PROJ_COORD(half4(pos.xy + (lambda) * kernelSize, pos.zw))))
 
     DO_MOTION_BLUR
