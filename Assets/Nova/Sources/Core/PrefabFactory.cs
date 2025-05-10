@@ -11,6 +11,7 @@ namespace Nova
         public int maxBufferSize;
 
         private readonly Stack<GameObject> buffer = new Stack<GameObject>();
+        private readonly HashSet<int> bufferIDs = new HashSet<int>();
 
         // For debug
         [ReadOnly] [SerializeField] private int bufferCount;
@@ -28,6 +29,7 @@ namespace Nova
             }
 
             var go = buffer.Pop();
+            bufferIDs.Remove(go.GetInstanceID());
             bufferCount--;
             go.SetActive(true);
             return go;
@@ -44,6 +46,13 @@ namespace Nova
         /// <param name="go">the game object to put back</param>
         public void Put(GameObject go)
         {
+            var id = go.GetInstanceID();
+            if (bufferIDs.Contains(id))
+            {
+                Debug.LogWarning($"Nova: Put in PrefabFactory twice: {id} {Utils.GetPath(go)}");
+                return;
+            }
+
             if (buffer.Count == maxBufferSize)
             {
                 Destroy(go);
@@ -53,6 +62,7 @@ namespace Nova
             go.SetActive(false);
             go.transform.SetParent(transform, false);
             buffer.Push(go);
+            bufferIDs.Add(id);
             bufferCount++;
 
             if (bufferCount > historyMaxCount)
