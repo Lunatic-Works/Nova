@@ -117,8 +117,11 @@ namespace Nova
 
             foreach (var mat in EnabledMaterials())
             {
-                cmd.Blit(buffers[from], buffers[1 - from], mat);
-                from = 1 - from;
+                for (var pass = 0; pass < mat.passCount; ++pass)
+                {
+                    cmd.Blit(buffers[from], buffers[1 - from], mat, pass);
+                    from = 1 - from;
+                }
             }
 
             if (from == 0)
