@@ -428,8 +428,10 @@ namespace Nova
                 stepsFromLastCheckpoint++;
             }
 
+            var atEndOfNodeRecord = !isUpgrading && nodeRecord.child != 0 && currentIndex >= nodeRecord.endDialogue;
             var isReached = currentIndex < nodeRecord.endDialogue;
             if (appendNodeEnsured ||
+                atEndOfNodeRecord ||
                 (shouldSaveCheckpoint && !isReached && !checkpointManager.IsLastNodeRecord(nodeRecord)))
             {
                 AppendSameNode();
@@ -877,7 +879,7 @@ namespace Nova
         // If dialogueIndex >= newNodeRecord.endDialogue, then move to or create a new nodeRecord
         public void Move(NodeRecord newNodeRecord, int dialogueIndex)
         {
-            // Debug.Log($"Move begin {nodeRecord?.name} @{nodeRecord?.offset} {currentIndex} -> {newNodeRecord.name} @{newNodeRecord.offset} {dialogueIndex}");
+            // Debug.Log($"Move begin {nodeRecord} {currentIndex} -> {newNodeRecord} {dialogueIndex}");
 
             this.RuntimeAssert(dialogueIndex >= newNodeRecord.beginDialogue,
                 $"dialogueIndex {dialogueIndex} < beginDialogue {newNodeRecord.beginDialogue}");
@@ -939,7 +941,7 @@ namespace Nova
 
             isRestoring = false;
 
-            // Debug.Log($"Move end {nodeRecord?.name} @{nodeRecord?.offset} {currentIndex} -> {newNodeRecord.name} @{newNodeRecord.offset} {dialogueIndex}");
+            // Debug.Log($"Move end {nodeRecord} {currentIndex} -> {newNodeRecord} {dialogueIndex}");
         }
 
         public void MoveUpgrade(NodeRecord newNodeRecord, int lastDialogue)
@@ -1151,6 +1153,6 @@ namespace Nova
 
         #endregion
 
-        // private string debugState => $"{nodeRecord?.name} {currentIndex} {variables.hash} | {stepsFromLastCheckpoint} {stepsCheckpointRestrained} {checkpointEnsured} {shouldSaveCheckpoint}";
+        // private string debugState => $"{nodeRecord} {currentIndex} {variables.hash} | {stepsFromLastCheckpoint} {stepsCheckpointRestrained} {checkpointEnsured} {shouldSaveCheckpoint}";
     }
 }
