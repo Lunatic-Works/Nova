@@ -166,9 +166,17 @@ namespace Nova.Editor
             {
                 hideFlags = HideFlags.DontSave
             };
-            checkpointManager = root.Ensure<CheckpointManager>();
-            checkpointManager.runInEditMode = true;
-            checkpointManager.Init();
+
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                checkpointManager = Utils.FindNovaController().GetComponent<CheckpointManager>();
+            }
+            else
+            {
+                checkpointManager = root.Ensure<CheckpointManager>();
+                checkpointManager.runInEditMode = true;
+                checkpointManager.Init();
+            }
 
             saveTreeView = new SaveTreeView(checkpointManager);
             checkpointTreeView = new CheckpointTreeView(checkpointManager);
