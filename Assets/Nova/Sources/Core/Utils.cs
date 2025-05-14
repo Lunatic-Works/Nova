@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
 using Nova.Exceptions;
@@ -456,6 +457,22 @@ namespace Nova
 #else
             return UnityObject.FindObjectsOfType<T>();
 #endif
+        }
+    }
+
+    public class TemporaryInvariantCulture : IDisposable
+    {
+        private CultureInfo oldCulture;
+
+        public TemporaryInvariantCulture()
+        {
+            oldCulture = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+        }
+
+        public void Dispose()
+        {
+            CultureInfo.CurrentCulture = oldCulture;
         }
     }
 }

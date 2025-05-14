@@ -144,9 +144,15 @@ namespace Nova
             needCalculateHash = true;
         }
 
+        // TODO: Check whether double.ToString() is reproducible between C# versions and platforms,
+        // which is used for the variables hash
         public override string ToString()
         {
-            return string.Join(", ", from pair in dict select $"{pair.Key}={pair.Value.value}");
+            // double.ToString() depends on CurrentCulture
+            using (new TemporaryInvariantCulture())
+            {
+                return string.Join(", ", from pair in dict select $"{pair.Key}={pair.Value.value}");
+            }
         }
     }
 }
