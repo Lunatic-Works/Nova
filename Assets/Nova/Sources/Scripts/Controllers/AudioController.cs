@@ -36,7 +36,7 @@ namespace Nova
             {
                 _scriptVolume = value;
                 Init();
-                audioSource.volume = _scriptVolume * _configVolume;
+                audioSource.volume = Utils.LogToLinearVolume(_scriptVolume * _configVolume);
             }
         }
 
@@ -49,7 +49,7 @@ namespace Nova
             {
                 _configVolume = value;
                 Init();
-                audioSource.volume = _scriptVolume * _configVolume;
+                audioSource.volume = Utils.LogToLinearVolume(_scriptVolume * _configVolume);
             }
         }
 

@@ -14,9 +14,9 @@ namespace Nova
 
         private void LoadConfig()
         {
-            var v = configManager.GetFloat(configKey, defaultVolume);
-            audioSource.volume = v;
-            slider.value = v;
+            var volume = configManager.GetFloat(configKey, defaultVolume);
+            audioSource.volume = Utils.LogToLinearVolume(volume);
+            slider.value = volume;
         }
 
         private void Awake()
@@ -45,7 +45,7 @@ namespace Nova
 
         private void OnValueChanged(float value)
         {
-            audioSource.volume = value;
+            audioSource.volume = Utils.LogToLinearVolume(value);
         }
     }
 }

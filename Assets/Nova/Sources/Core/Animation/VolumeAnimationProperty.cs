@@ -6,24 +6,17 @@ namespace Nova
         private readonly UnifiedAudioSource audioSource;
         private readonly AudioController audioController;
 
+        private float _currentValue;
+
         protected override float currentValue
         {
-            get
-            {
-                if (audioSource != null)
-                {
-                    return audioSource.volume;
-                }
-                else
-                {
-                    return audioController.scriptVolume;
-                }
-            }
+            get => _currentValue;
             set
             {
+                _currentValue = value;
                 if (audioSource != null)
                 {
-                    audioSource.volume = value;
+                    audioSource.volume = Utils.LogToLinearVolume(value);
                 }
                 else
                 {

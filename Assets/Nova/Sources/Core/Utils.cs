@@ -384,6 +384,11 @@ namespace Nova
             return Mathf.RoundToInt((float)target.frequency / source.frequency * source.samples);
         }
 
+        public static float LogToLinearVolume(float volume)
+        {
+            return volume * Mathf.Exp(volume - 1.0f);
+        }
+
         // Avoid mutating the enumerable in the loop
         public static IEnumerable<Transform> GetChildren(Transform transform)
         {

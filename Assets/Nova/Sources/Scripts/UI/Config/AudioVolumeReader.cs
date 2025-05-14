@@ -55,18 +55,24 @@ namespace Nova
             }
         }
 
-        private float globalValue => configManager.GetFloat(GlobalConfigKeyName);
-
-        private float masterValue => configManager.GetFloat(configKeyName);
-
-        private float secondaryValue =>
-            string.IsNullOrEmpty(secondaryConfigKeyName) ? 1.0f : configManager.GetFloat(secondaryConfigKeyName);
-
-        private float combinedValue => globalValue * masterValue * secondaryValue;
-
         private void UpdateValue()
         {
-            float value = multiplier * Mathf.Pow(combinedValue, gamma);
+            var globalValue = configManager.GetFloat(GlobalConfigKeyName);
+            var masterValue = configManager.GetFloat(configKeyName);
+            float secondaryValue;
+            if (string.IsNullOrEmpty(secondaryConfigKeyName))
+            {
+                secondaryValue = 1.0f;
+                masterValue = Mathf.Pow(masterValue, gamma);
+            }
+            else
+            {
+                secondaryValue = configManager.GetFloat(secondaryConfigKeyName);
+                secondaryValue = Mathf.Pow(secondaryValue, gamma);
+            }
+
+            float value = multiplier * globalValue * masterValue * secondaryValue;
+
             if (audioController != null)
             {
                 audioController.configVolume = value;
@@ -77,11 +83,11 @@ namespace Nova
             }
             else if (audioSource != null)
             {
-                audioSource.volume = value;
+                audioSource.volume = Utils.LogToLinearVolume(value);
             }
             else
             {
-                videoController.volume = value;
+                videoController.volume = Utils.LogToLinearVolume(value);
             }
         }
     }

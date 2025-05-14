@@ -1,3 +1,6 @@
+// TODO: Use an object pool for custom one shot sound
+// TODO: Send to audio mixer
+
 using UnityEngine;
 
 namespace Nova
@@ -32,7 +35,8 @@ namespace Nova
         public void PlayClipAtPoint(AudioClip clip, Vector3 position, float clipVolume)
         {
             if (dontPlaySound) return;
-            AudioSource.PlayClipAtPoint(clip, position, clipVolume * configVolume);
+            var volume = Utils.LogToLinearVolume(clipVolume * configVolume);
+            AudioSource.PlayClipAtPoint(clip, position, volume);
         }
 
         public void PlayClipAtPoint(string audioName, Vector3 position, float clipVolume)
@@ -49,7 +53,7 @@ namespace Nova
             go.transform.position = position;
             var audioSource = go.AddComponent<AudioSource>();
             audioSource.clip = clip;
-            audioSource.volume = clipVolume * configVolume;
+            audioSource.volume = Utils.LogToLinearVolume(clipVolume * configVolume);
             audioSource.spatialBlend = 0.0f;
             audioSource.Play();
             Destroy(go, clip.length);
