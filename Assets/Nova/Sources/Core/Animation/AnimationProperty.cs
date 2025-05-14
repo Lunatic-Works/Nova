@@ -11,7 +11,7 @@ namespace Nova
     {
         protected static Dictionary<string, int> locks = new Dictionary<string, int>();
 
-        private readonly string key;
+        public readonly string key;
 
         private bool lockAcquired;
 

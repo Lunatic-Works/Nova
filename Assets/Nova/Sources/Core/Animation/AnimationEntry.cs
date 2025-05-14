@@ -25,7 +25,7 @@ namespace Nova
         public AnimationProperty property { get; private set; }
 
         // For debug
-        [ReadOnly] [SerializeField] private string propertyName;
+        [ReadOnly] [SerializeField] private string propertyKey;
 
         private float _duration;
         private float _invDuration; // Cached value for optimization.
@@ -108,7 +108,6 @@ namespace Nova
             int repeatNum)
         {
             this.property = property;
-            propertyName = property?.GetType().ToString() ?? "wait";
             For(duration);
             timeElapsed = 0.0f;
             With(easing);
@@ -117,9 +116,22 @@ namespace Nova
             status = AnimationEntryStatus.Paused;
             evaluateOnStop = true;
 
+            if (property == null)
+            {
+                propertyKey = "Wait";
+            }
+            else if (property is ActionAnimationProperty)
+            {
+                propertyKey = "Action";
+            }
+            else
+            {
+                propertyKey = property.key.Replace("AnimationProperty", "");
+            }
+
             if (duration > 0.0f && duration < 0.1f && !(property is TextFadeInAnimationProperty))
             {
-                Debug.LogWarning($"Nova: AnimationEntry duration {duration} is too small for {propertyName}. " +
+                Debug.LogWarning($"Nova: AnimationEntry duration {duration} is too small for {propertyKey}. " +
                                  "Parallel animations may not play as expected when the frame duration is " +
                                  "comparable with the animation duration.");
             }
