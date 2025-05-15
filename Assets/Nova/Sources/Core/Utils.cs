@@ -385,9 +385,26 @@ namespace Nova
             return Mathf.RoundToInt((float)target.frequency / source.frequency * source.samples);
         }
 
-        public static float LogToLinearVolume(float volume)
+        public static float LogToLinearVolume(float w)
         {
-            return volume * Mathf.Exp(volume - 1.0f);
+            return w * Mathf.Exp(w - 1f);
+        }
+
+        // https://stackoverflow.com/questions/60211021/lambert-w-function-in-c-sharp
+        public static float LinearToLogVolume(float x)
+        {
+            x *= (float)Math.E;
+
+            int nIter = Math.Max(4, Mathf.CeilToInt(Mathf.Log10(x) / 3f));
+            float w = 3f * Mathf.Log(x + 1f) / 4f;
+            for (int i = 0; i < nIter; ++i)
+            {
+                float expW = Mathf.Exp(w);
+                float res = w * expW - x;
+                w -= res / (expW * (w + 1f) - (w + 2f) * res / (2f * w + 2f));
+            }
+
+            return w;
         }
 
         // Avoid mutating the enumerable in the loop
