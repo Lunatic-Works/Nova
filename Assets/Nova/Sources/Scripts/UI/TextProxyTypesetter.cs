@@ -154,7 +154,8 @@ namespace Nova
                     kerns.Add(ChinesePunctuationKerning);
                     kernSum += ChinesePunctuationKerning;
                 }
-                else if ((leftOpen && rightOpen) || (leftClose && rightClose))
+                else if ((leftOpen && rightOpen) || (leftClose && rightClose) ||
+                         (leftMiddle && rightOpen) || (leftClose && rightMiddle))
                 {
                     idxs.Add(rightIdx);
                     kerns.Add(ChinesePunctuationSubKerning);
