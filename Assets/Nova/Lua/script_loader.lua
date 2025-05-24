@@ -178,12 +178,11 @@ end
 --- if no name is given, the name of the current node will be used
 --- all nodes without child nodes should be marked as end nodes
 --- if is_end() is not called under those nodes, they will be marked as end nodes automatically
-function is_end(name)
+function is_end()
     if not check_eager('is_end') then
         return
     end
-    name = try_get_local_name(name)
-    __Nova.scriptLoader:SetCurrentAsEnd(name)
+    __Nova.scriptLoader:SetCurrentAsEnd()
 end
 
 function text_need_interpolate(s)

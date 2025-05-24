@@ -303,14 +303,14 @@ namespace Nova
 
         public void AddLocalizedNode(string name, string displayName)
         {
-            currentNode = flowChartGraph.GetNode(name);
-            if (currentNode == null)
+            if (!flowChartGraph.HasNode(name))
             {
                 throw new ArgumentException(
                     $"Nova: Node {name} found in {stateLocale} but not in {I18n.DefaultLocale}. " +
                     "Maybe you need to delete the default English scenarios.");
             }
 
+            currentNode = flowChartGraph.GetNode(name);
             currentNode.AddLocalizedName(stateLocale, displayName);
         }
 
@@ -366,10 +366,15 @@ namespace Nova
                     $"Nova: Branch mode is Normal but condition is not null. currentNode: {currentNode.name}, destination: {destination}");
             }
 
-            if (mode == BranchMode.Jump && (text != null || imageInfo != null))
+            if (mode == BranchMode.Jump)
             {
+                if (text != null || imageInfo != null)
+                {
                 throw new ArgumentException(
                     $"Nova: Branch mode is Jump but text or imageInfo is not null. currentNode: {currentNode.name}, destination: {destination}");
+            }
+
+                text = destination;
             }
 
             if ((mode == BranchMode.Show || mode == BranchMode.Enable) && condition == null)
@@ -425,9 +430,7 @@ namespace Nova
         /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// A flow chart graph can have multiple start points.
-        /// A name can be assigned to a start point, which can differ from the node name.
-        /// The name should be unique among all start point names.
+        /// A flow chart graph can have multiple start nodes.
         /// </remarks>
         /// <exception cref="ArgumentException">
         /// ArgumentException will be thrown if called without registering the current node.
@@ -455,28 +458,16 @@ namespace Nova
         /// This method is designed to be called externally by scripts.
         /// </summary>
         /// <remarks>
-        /// A flow chart graph can have multiple end points.
-        /// A name can be assigned to an end point, which can differ from the node name.
-        /// The name should be unique among all end point names.
+        /// A flow chart graph can have multiple end nodes.
         /// </remarks>
-        /// <param name="name">
-        /// Name of the end point.
-        /// If no name is given, the name of the current node will be used.
-        /// </param>
         /// <exception cref="ArgumentException">
         /// ArgumentException will be thrown if called without registering the current node.
         /// </exception>
-        public void SetCurrentAsEnd(string name)
+        public void SetCurrentAsEnd()
         {
             CheckCurrentNodeDefaultLocale();
-
-            if (name == null)
-            {
-                name = currentNode.name;
-            }
-
             currentNode.type = FlowChartNodeType.End;
-            flowChartGraph.AddEnd(name, currentNode);
+            flowChartGraph.AddEnd(currentNode);
             currentNode = null;
         }
 

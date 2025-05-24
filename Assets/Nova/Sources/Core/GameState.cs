@@ -510,9 +510,8 @@ namespace Nova
                     break;
                 case FlowChartNodeType.End:
                     state = State.Ended;
-                    var endName = flowChartGraph.GetEndName(node);
-                    checkpointManager.SetReachedEnd(endName);
-                    routeEnded.Invoke(new RouteEndedData(endName));
+                    checkpointManager.SetReachedEnd(node.name);
+                    routeEnded.Invoke(new RouteEndedData(node.name));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -737,14 +736,14 @@ namespace Nova
         /// <summary>
         /// Get the current game state as a checkpoint
         /// </summary>
-        private GameStateCheckpoint GetCheckpoint()
+        public Dictionary<string, IRestoreData> GetRestorableDatas()
         {
-            var restoreDatas = new Dictionary<string, IRestoreData>();
-            foreach (var restorable in restorables)
-            {
-                restoreDatas[restorable.Key] = restorable.Value.GetRestoreData();
+            return restorables.ToDictionary(x => x.Key, x => x.Value.GetRestoreData());
             }
 
+        private GameStateCheckpoint GetCheckpoint()
+        {
+            var restoreDatas = GetRestorableDatas();
             return new GameStateCheckpoint(currentIndex, restoreDatas, variables, stepsCheckpointRestrained);
         }
 

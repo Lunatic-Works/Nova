@@ -1,4 +1,3 @@
-using Nova.Exceptions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,7 +43,7 @@ namespace Nova
     {
         private readonly Dictionary<string, FlowChartNode> nodes = new Dictionary<string, FlowChartNode>();
         private readonly Dictionary<string, StartNode> startNodes = new Dictionary<string, StartNode>();
-        private readonly Dictionary<FlowChartNode, string> endNodes = new Dictionary<FlowChartNode, string>();
+        private readonly Dictionary<string, FlowChartNode> endNodes = new Dictionary<string, FlowChartNode>();
 
         private bool isFrozen;
 
@@ -98,7 +97,7 @@ namespace Nova
                 throw new ArgumentException("Nova: Node name is null or empty.");
             }
 
-            if (nodes.ContainsKey(node.name))
+            if (HasNode(node))
             {
                 Debug.LogWarning($"Nova: Overwrite node: {node.name}");
             }
@@ -110,31 +109,28 @@ namespace Nova
         /// Get a node by name
         /// </summary>
         /// <param name="name">Name of the node</param>
-        /// <returns>The node if it is found, otherwise return null</returns>
         public FlowChartNode GetNode(string name)
         {
-            nodes.TryGetValue(name, out var node);
-            return node;
+            if (!HasNode(name))
+            {
+                throw new ArgumentException($"Nova: Node {name} is not in the graph.");
+            }
+
+            return nodes[name];
         }
 
         /// <summary>
         /// Check if the graph contains the node with the given name
         /// </summary>
         /// <param name="name">Name of the node</param>
-        /// <returns>True if the graph contains the given node, otherwise return false</returns>
         public bool HasNode(string name)
         {
             return nodes.ContainsKey(name);
         }
 
-        /// <summary>
-        /// Check if the graph contains the given node
-        /// </summary>
-        /// <param name="node">Node to check</param>
-        /// <returns>True if the graph contains the given node, otherwise return false</returns>
         public bool HasNode(FlowChartNode node)
         {
-            return nodes.ContainsKey(node.name);
+            return HasNode(node.name);
         }
 
         public IEnumerable<string> GetStartNodeNames(StartNodeType type)
@@ -153,108 +149,55 @@ namespace Nova
         }
 
         /// <summary>
-        /// Add a start node.
+        /// Add a start node
         /// </summary>
-        /// <remarks>
-        /// A name can be assigned to a start point, which can differ from the node name.
-        /// The name should be unique among all start point names.
-        /// This method will check if the given name is not in the graph, and the given node is already in the graph.
-        /// </remarks>
         /// <exception cref="ArgumentException">
-        /// ArgumentException will be thrown if the name is null or empty, or the node is not in the graph.
+        /// ArgumentException will be thrown if the node is not in the graph.
         /// </exception>
         public void AddStart(FlowChartNode node, StartNodeType type)
         {
             CheckNode(node);
-
-            if (startNodes.ContainsKey(node.name))
-            {
-                Debug.LogWarning($"Nova: Overwrite start point: {node.name}");
-            }
-
             startNodes[node.name] = new StartNode(node, type);
         }
 
         /// <summary>
-        /// Check if the graph contains the given start point name
+        /// Check if the graph contains the given start node
         /// </summary>
-        /// <param name="name">Name of the start point</param>
-        /// <returns>True if the graph contains the given name, otherwise return false</returns>
+        /// <param name="name">Name of the start node</param>
         public bool HasStart(string name)
         {
             return startNodes.ContainsKey(name);
         }
 
+        public bool HasStart(FlowChartNode node)
+        {
+            return HasStart(node.name);
+        }
+
         /// <summary>
-        /// Add an end node.
+        /// Add an end node
         /// </summary>
-        /// <remarks>
-        /// A name can be assigned to an end point, which can differ from the node name.
-        /// The name should be unique among all end point names.
-        /// This method will check if the given name is not in the graph, and the given node is already in the graph.
-        /// </remarks>
-        /// <param name="name">Name of the end point</param>
-        /// <param name="node">The node to add</param>
-        /// <exception cref="DuplicatedDefinitionException">
-        /// DuplicatedDefinitionException will be thrown if assigning two different end names to the same node.
-        /// </exception>
         /// <exception cref="ArgumentException">
-        /// ArgumentException will be thrown if the name is null or empty, or the node is not in the graph.
+        /// ArgumentException will be thrown if the node is not in the graph.
         /// </exception>
-        public void AddEnd(string name, FlowChartNode node)
+        public void AddEnd(FlowChartNode node)
         {
             CheckNode(node);
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Nova: End name is null or empty.");
-            }
-
-            var existingNodeName = GetEndName(node);
-            if (existingNodeName == null)
-            {
-                // The node has not been defined as an end
-                if (endNodes.ContainsValue(name))
-                {
-                    // But the name has been used
-                    Debug.LogWarning($"Nova: Overwrite end point: {name}");
-                }
-
-                // The name is unique, add the node as en and
-                endNodes[node] = name;
-                return;
-            }
-
-            // The node has already been defined as an end
-            if (existingNodeName != name)
-            {
-                // But the name of the end point is different
-                throw new DuplicatedDefinitionException(
-                    $"Nova: Assigning two different end names to the same node: {existingNodeName} and {name}");
-            }
+            endNodes[node.name] = node;
         }
 
         /// <summary>
-        /// Get the name of an end point
+        /// Check if the graph contains the given end node
         /// </summary>
-        /// <param name="node">The end node</param>
-        /// <returns>
-        /// The name of the end point if the node is an end node, otherwise return null
-        /// </returns>
-        public string GetEndName(FlowChartNode node)
-        {
-            endNodes.TryGetValue(node, out var name);
-            return name;
-        }
-
-        /// <summary>
-        /// Check if the graph contains the given end point name
-        /// </summary>
-        /// <param name="name">Name of the end point</param>
-        /// <returns>True if the graph contains the given name, otherwise return false</returns>
+        /// <param name="name">Name of the end node</param>
         public bool HasEnd(string name)
         {
-            return endNodes.ContainsValue(name);
+            return endNodes.ContainsKey(name);
+        }
+
+        public bool HasEnd(FlowChartNode node)
+        {
+            return HasEnd(node.name);
         }
 
         /// <summary>
@@ -282,7 +225,7 @@ namespace Nova
                     Debug.LogWarning(
                         $"Nova: Node {node.name} has no child. It will be marked as an end with name {node.name}.");
                     node.type = FlowChartNodeType.End;
-                    AddEnd(node.name, node);
+                    AddEnd(node);
                 }
             }
         }
