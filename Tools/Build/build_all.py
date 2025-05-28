@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import re
 import shutil
@@ -13,7 +14,7 @@ from zipchmod import zipchmod
 unity_version = "2020.3.48f1"
 
 
-def prepare():
+def prepare(args):
     path = Path.cwd()
     while True:
         if (path / ".git").exists():
@@ -35,20 +36,20 @@ def prepare():
     ).stdout.strip()
     print("Commit:", commit)
 
-    target_commit = None
-    if len(sys.argv) > 1:
-        target_commit = sys.argv[1]
-    if not target_commit:
+    if not args.ignore_commit:
+        if not args.commit:
         raise RuntimeError("Target commit not given")
-    if target_commit != "--ignore-commit":
-        if target_commit != commit:
-            raise RuntimeError(f"Wrong commit, should be {target_commit}")
-
+        if args.commit != commit:
+            raise RuntimeError(f"Wrong commit, should be {args.commit}")
         out = subprocess.run(["git", "status"], capture_output=True, encoding="utf-8")
         if "nothing to commit, working tree clean" not in out.stdout:
             raise RuntimeError("Git working tree not clean")
 
     os.makedirs("./Build", exist_ok=True)
+
+    filename = "./Library/EditorUserBuildSettings.asset"
+    if Path(filename).exists():
+        os.remove(filename)
 
 
 def get_unity_path():
@@ -123,6 +124,10 @@ def make_zip(out_dir):
         print("Warning: Remove old zip")
         os.remove(zip_filename)
 
+    if Path("../" + zip_filename).exists():
+        print("Warning: Remove old zip")
+        os.remove("../" + zip_filename)
+
     print("Making zip...")
     out = subprocess.run([zip_exe_path, "-9qr", zip_filename, "."])
     if out.returncode != 0:
@@ -132,27 +137,27 @@ def make_zip(out_dir):
     os.chdir("../..")
 
 
-def build_windows(is_dev=False):
+def build_windows(args):
     log_path = "./Build/build_windows.log"
 
-    if is_dev:
+    if args.dev:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildWindowsDev")
     else:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildWindows")
 
     out_dir, product_name = wait_log(log_path)
 
-    if not is_dev:
+    if not args.dev:
         make_zip(out_dir)
 
         if sys.platform != "win32":
             shutil.rmtree(out_dir)
 
 
-def build_linux(is_dev=False):
+def build_linux(args):
     log_path = "./Build/build_linux.log"
 
-    if is_dev:
+    if args.dev:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildLinuxDev")
     else:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildLinux")
@@ -161,7 +166,7 @@ def build_linux(is_dev=False):
     os.remove(f"{out_dir}/LinuxPlayer_s.debug")
     os.remove(f"{out_dir}/UnityPlayer_s.debug")
 
-    if not is_dev:
+    if not args.dev:
         make_zip(out_dir)
 
         if sys.platform == "win32":
@@ -172,17 +177,17 @@ def build_linux(is_dev=False):
             shutil.rmtree(out_dir)
 
 
-def build_macos(is_dev=False):
+def build_macos(args):
     log_path = "./Build/build_macos.log"
 
-    if is_dev:
+    if args.dev:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildMacOSDev")
     else:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildMacOS")
 
     out_dir, product_name = wait_log(log_path)
 
-    if not is_dev:
+    if not args.dev:
         make_zip(out_dir)
 
         if sys.platform == "win32":
@@ -203,10 +208,10 @@ def build_macos(is_dev=False):
 
 
 # Need to set signing key
-def build_android(is_dev=False):
+def build_android(args):
     log_path = "./Build/build_android.log"
 
-    if is_dev:
+    if args.dev:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildAndroid")
     else:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildAndroid")
@@ -215,10 +220,10 @@ def build_android(is_dev=False):
 
 
 # TODO: Build Xcode project
-def build_ios(is_dev=False):
+def build_ios(args):
     log_path = "./Build/build_ios.log"
 
-    if is_dev:
+    if args.dev:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildiOSDev")
     else:
         run_build(log_path, "Nova.Editor.NovaBuilder.BuildiOS")
@@ -227,12 +232,28 @@ def build_ios(is_dev=False):
 
 
 def main():
-    prepare()
-    build_windows()
-    build_linux()
-    build_macos()
-    # build_android()
-    # build_ios()
+    parser = argparse.ArgumentParser(allow_abbrev=False)
+    # Build for Windows at last, so Unity targets Windows after running this script
+    parser.add_argument("--os", type=str, default="linux,macos,android,windows")
+    parser.add_argument("--dev", action="store_true")
+    parser.add_argument("--ignore_commit", action="store_true")
+    parser.add_argument("commit", type=str, nargs="?")
+    args = parser.parse_args()
+
+    prepare(args)
+    for _os in args.os.split(","):
+        if _os == "windows":
+        build_windows(args)
+        elif _os == "linux":
+            build_linux(args)
+        elif _os == "macos":
+            build_macos(args)
+        elif _os == "android":
+            build_android(args)
+        elif _os == "ios":
+            build_ios(args)
+        else:
+            raise ValueError(f"Unknown OS: {_os}")
 
 
 if __name__ == "__main__":
