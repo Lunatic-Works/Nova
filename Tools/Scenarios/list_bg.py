@@ -55,7 +55,7 @@ def main():
 
 
 if __name__ == "__main__":
-    import subprocess
+    from utils import run_merge
 
-    subprocess.run("python merge.py", shell=True)
+    run_merge()
     main()

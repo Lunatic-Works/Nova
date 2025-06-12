@@ -33,8 +33,8 @@ def translate(s):
 
 
 def parse_code(code, f):
-    bg_name = None
-    bgm_name = None
+    bg_name = ""
+    bgm_name = ""
     for func_name, args, _ in walk_functions(code):
         if func_name == "action":
             func_name = args[0]
@@ -116,9 +116,23 @@ def main():
 
             chapter_name = normalize_tex(chapter_name)
             f.write(f"\\section*{{{chapter_name}}}\n\n")
+
+            bg_name = ""
+            bgm_name = ""
+            last_bg_name = ""
+            last_bgm_name = ""
             for code, chara_name, dialogue, _ in entries:
                 if need_parse_code:
+                    if bg_name:
+                        last_bg_name = bg_name
+                    if bgm_name:
+                        last_bgm_name = bgm_name
                     bg_name, bgm_name = parse_code(code, f)
+                    if bg_name == last_bg_name:
+                        bg_name = ""
+                    if bgm_name == last_bgm_name:
+                        bgm_name = ""
+
                     if bg_name:
                         bg_name = normalize_tex(translate(bg_name))
                         f.write(f"{{\\color{{orange}} 场景：{bg_name}}}")
@@ -157,6 +171,8 @@ def main():
 if __name__ == "__main__":
     import subprocess
 
-    subprocess.run("python merge.py", shell=True)
+    from utils import run_merge
+
+    run_merge()
     main()
-    subprocess.run(f"xelatex {out_filename}", shell=True)
+    subprocess.run(["xelatex", out_filename])

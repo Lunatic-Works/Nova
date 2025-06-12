@@ -107,13 +107,17 @@ def normalize_dialogue(
     if remove_todo:
 
         def func(m):
-            if keep_todo and m.group(1)[:-1] in keep_todo:
+            if m.group(1):
+                tag = m.group(1)[:-1]
+            else:
+                tag = m.group(2)
+            if keep_todo and tag in keep_todo:
                 return m.group(0)
             else:
                 return ""
 
         s = re.compile(
-            r"\r?\n?（TODO：([^：]*：)?([^（）]*（[^）]*）)*[^）]*）", re.DOTALL
+            r"\r?\n?（TODO：([^：]*：)?(([^（）]*（[^）]*）)*[^）]*)）", re.DOTALL
         ).sub(func, s)
 
     s = re.compile(" +").sub(" ", s)

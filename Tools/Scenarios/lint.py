@@ -34,7 +34,9 @@ def check_code(code, line_num, anim_hold_tracked):
     is_immediate_step = False
 
     try:
-        for func_name, args, env in walk_functions(code):
+        for func_name, args, env in walk_functions(
+            code, tracked_env={"anim", "anim_hold", "named_anim_hold"}
+        ):
             for name in (func_name,) + args:
                 if name == "anim_hold_begin":
                     if anim_hold_tracked:
@@ -116,6 +118,19 @@ def check_code(code, line_num, anim_hold_tracked):
     return anim_hold_tracked, is_immediate_step
 
 
+def check_tail(code, line_num):
+    try:
+        for func_name, args, _ in walk_functions(code):
+            if func_name == "branch":
+                for branch in args[0]:
+                    if branch.get("mode") != "jump" or not branch.get("cond"):
+                        break
+                else:
+                    print_warn(line_num, "No unconditional branch in jump")
+    except Exception as e:
+        print_warn(line_num, f"error when parsing code: {e}")
+
+
 def check_dialogue(chara_name, dialogue, line_num):
     for c in dialogue:
         if is_special_char(c):
@@ -157,8 +172,9 @@ def lint_file(in_filename):
     with open(in_filename, "r", encoding="utf-8") as f:
         chapters = parse_chapters(f)
 
-    for chapter_name, entries, _, _ in chapters:
+    for chapter_name, entries, _, tail_eager_code in chapters:
         print(chapter_name)
+
         anim_hold_tracked = False
         for code, chara_name, dialogue, line_num in entries:
             is_immediate_step = False
@@ -172,6 +188,8 @@ def lint_file(in_filename):
 
             if dialogue:
                 check_dialogue(chara_name, dialogue, line_num)
+
+        check_tail(tail_eager_code, line_num)
 
 
 def main():

@@ -185,11 +185,11 @@ def get_function_args_lazy(node):
     return LazyList([])
 
 
-def walk_functions_node(node, env, lazy_args):
+def walk_functions_node(node, env, lazy_args, tracked_env):
     if isinstance(node, LuaParser.FunctioncallContext):
         for child in node.children[:-1]:
             if isinstance(child, ParserRuleContext):
-                yield from walk_functions_node(child, env, lazy_args)
+                yield from walk_functions_node(child, env, lazy_args, tracked_env)
 
         name = get_function_name(node)
         if isinstance(name, tuple):
@@ -204,17 +204,19 @@ def walk_functions_node(node, env, lazy_args):
             args = get_function_args(node.args())
         yield name, args, env
 
-        if before_name:
+        if before_name in tracked_env:
             env.append(before_name)
+        if name in tracked_env:
+            env.append(name)
 
-        yield from walk_functions_node(node.children[-1], env, lazy_args)
+        yield from walk_functions_node(node.children[-1], env, lazy_args, tracked_env)
 
     elif isinstance(node, LuaParser.StatContext):
         last_env = list(env)
 
         for child in node.children:
             if isinstance(child, ParserRuleContext):
-                yield from walk_functions_node(child, env, lazy_args)
+                yield from walk_functions_node(child, env, lazy_args, tracked_env)
 
         env.clear()
         env += last_env
@@ -222,14 +224,17 @@ def walk_functions_node(node, env, lazy_args):
     else:
         for child in node.children:
             if isinstance(child, ParserRuleContext):
-                yield from walk_functions_node(child, env, lazy_args)
+                yield from walk_functions_node(child, env, lazy_args, tracked_env)
 
 
-def walk_functions(code, *, lazy_args=False):
+def walk_functions(code, *, lazy_args=False, tracked_env=None):
+    if tracked_env is None:
+        tracked_env = set()
+
     try:
         chunk = parse_chunk(code)
         for stat in chunk.block().stat():
-            yield from walk_functions_node(stat, [], lazy_args)
+            yield from walk_functions_node(stat, [], lazy_args, tracked_env)
     except Exception as e:
         print(e)
         print(code)
