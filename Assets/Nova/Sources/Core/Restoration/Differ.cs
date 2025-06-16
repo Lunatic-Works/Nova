@@ -10,7 +10,7 @@ namespace Nova
     {
         private static readonly Exception Bug = new Exception("Nova: Differ internal bug.");
 
-        private readonly ulong[] saveHashes, scriptHashes;
+        private readonly ulong[] oldHashes, newHashes;
 
         // pseudo array of V[d][k]
         // the X value of furthest reached point for a d-path on diag-k
@@ -44,10 +44,10 @@ namespace Nova
             return v[(d + 1) * d / 2 + (k + d) / 2];
         }
 
-        public Differ(ulong[] saveHashes, ulong[] scriptHashes)
+        public Differ(ulong[] oldHashes, ulong[] newHashes)
         {
-            this.saveHashes = saveHashes;
-            this.scriptHashes = scriptHashes;
+            this.oldHashes = oldHashes;
+            this.newHashes = newHashes;
             distance = -1;
         }
 
@@ -55,9 +55,9 @@ namespace Nova
         // return the path length and the end point
         private int CalcV(out int x, out int y)
         {
-            var xMax = saveHashes.Length + scriptHashes.Length;
-            var xMid = saveHashes.Length;
-            var yMax = scriptHashes.Length;
+            var xMax = oldHashes.Length + newHashes.Length;
+            var xMid = oldHashes.Length;
+            var yMax = newHashes.Length;
             // calculate V[d][k] with greedy algorithm
             for (int d = 0; d <= xMax + yMax; d++)
             {
@@ -75,7 +75,7 @@ namespace Nova
                     }
 
                     y = x - k;
-                    while (x < xMax && y < yMax && (x >= xMid || saveHashes[x] == scriptHashes[y]))
+                    while (x < xMax && y < yMax && (x >= xMid || oldHashes[x] == newHashes[y]))
                     {
                         x++;
                         y++;
@@ -117,7 +117,7 @@ namespace Nova
         private void CalcRemap()
         {
             int x = 0, i = 0, j = 0;
-            for (var y = 0; y < scriptHashes.Length; y++)
+            for (var y = 0; y < newHashes.Length; y++)
             {
                 while (i < _deletes.Count && _deletes[i] == x)
                 {
@@ -132,7 +132,7 @@ namespace Nova
                 }
                 else
                 {
-                    _remap.Add(x < saveHashes.Length ? x : -1);
+                    _remap.Add(x < oldHashes.Length ? x : -1);
                     x++;
                 }
             }
@@ -140,8 +140,8 @@ namespace Nova
 
         private void CalcLeftMap()
         {
-            var x = saveHashes.Length - 1;
-            for (var y = scriptHashes.Length - 1; y >= 0; y--)
+            var x = oldHashes.Length - 1;
+            for (var y = newHashes.Length - 1; y >= 0; y--)
             {
                 if (_remap[y] == -1)
                 {
@@ -165,22 +165,22 @@ namespace Nova
         private void CalcRightMap()
         {
             var x = 0;
-            for (var y = 0; y < scriptHashes.Length; y++)
+            for (var y = 0; y < newHashes.Length; y++)
             {
                 if (_remap[y] == -1)
                 {
                     continue;
                 }
 
-                for (; x < saveHashes.Length && x <= _remap[y]; x++)
+                for (; x < oldHashes.Length && x <= _remap[y]; x++)
                 {
                     _rightMap.Add(y);
                 }
             }
 
-            for (; x < saveHashes.Length; x++)
+            for (; x < oldHashes.Length; x++)
             {
-                _rightMap.Add(scriptHashes.Length);
+                _rightMap.Add(newHashes.Length);
             }
         }
 
@@ -192,7 +192,7 @@ namespace Nova
             _leftMap.Clear();
             _rightMap.Clear();
 
-            var minLength = Math.Min(saveHashes.Length, scriptHashes.Length);
+            var minLength = Math.Min(oldHashes.Length, newHashes.Length);
             for (var i = 0; i < minLength; ++i)
             {
                 _remap.Add(i);
@@ -200,15 +200,15 @@ namespace Nova
                 _rightMap.Add(i);
             }
 
-            for (var i = 0; i < saveHashes.Length - minLength; ++i)
+            for (var i = 0; i < oldHashes.Length - minLength; ++i)
             {
                 _remap.Add(-1);
             }
 
-            for (var i = 0; i < scriptHashes.Length - minLength; ++i)
+            for (var i = 0; i < newHashes.Length - minLength; ++i)
             {
-                _leftMap.Add(saveHashes.Length - 1);
-                _rightMap.Add(saveHashes.Length);
+                _leftMap.Add(oldHashes.Length - 1);
+                _rightMap.Add(oldHashes.Length);
             }
         }
 
@@ -226,7 +226,7 @@ namespace Nova
             CalcRightMap();
 
             // If the node is large and the diff is completely different, then fallback to naive remap
-            if (saveHashes.Length > 10 && scriptHashes.Length > 10 && _remap.All(x => x == -1))
+            if (oldHashes.Length > 10 && newHashes.Length > 10 && _remap.All(x => x == -1))
             {
                 CalcNaiveRemap();
             }
