@@ -36,7 +36,7 @@ Shader "Nova/VFX Screen/Kaleido"
                 float2 cosSinTime : TEXCOORD1;
             };
 
-            float _Repeat;
+            float _Repeat, _Freq;
 
             v2f vert(appdata v)
             {
@@ -44,13 +44,13 @@ Shader "Nova/VFX Screen/Kaleido"
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
                 o.color = v.color;
-                float t = _Time.y / _Repeat;
+                float t = _Freq * _Time.y / _Repeat;
                 o.cosSinTime = float2(cos(t), sin(t));
                 return o;
             }
 
             sampler2D _MainTex;
-            float _T, _Freq;
+            float _T;
 
             fixed4 frag(v2f i) : SV_Target
             {
