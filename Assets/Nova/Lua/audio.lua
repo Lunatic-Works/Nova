@@ -1,11 +1,8 @@
-function sound(audio_name, volume, pos, use_3d)
+function sound(audio_name, volume, pos, is_3d)
     volume = volume or 1
     pos = pos or {0, 0, 0}
-    if use_3d then
-        __Nova.soundController:PlayClipAtPoint(audio_name, Vector3(unpack(pos)), volume)
-    else
-        __Nova.soundController:PlayClipNo3D(audio_name, Vector3(unpack(pos)), volume)
-    end
+    is_3d = is_3d or false
+    __Nova.soundController:PlayClip(audio_name, volume, Vector3(unpack(pos)), is_3d)
 end
 
 function say(obj, audio_name, delay, override_auto_voice)

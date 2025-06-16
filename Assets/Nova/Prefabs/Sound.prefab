@@ -46,8 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   luaName: soundController
   audioFolder: Sounds
+  oneShotSoundPrefab: {fileID: 6475163212782637673, guid: d294641ca5440b741b334b2b737de97d, type: 3}
   configVolume: 0
-  suppressSound: 0
 --- !u!114 &1542636872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,7 +61,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configKeyName: SEVolume
-  useSecondaryConfigKeyName: 0
   secondaryConfigKeyName: 
   multiplier: 1
   gamma: 1

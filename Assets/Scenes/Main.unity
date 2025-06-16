@@ -1739,8 +1739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbbc502e224388847a16b28045ac050d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiAnimation: {fileID: 0}
-  screenCapturer: {fileID: 0}
   transitionGhost: {fileID: 909243631}
   transitionInputBlocker: {fileID: 291798994}
   uiAudioSource: {fileID: 880587545}

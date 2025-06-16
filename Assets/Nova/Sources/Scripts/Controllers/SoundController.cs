@@ -1,6 +1,4 @@
-// TODO: Use an object pool for custom one shot sound
-// TODO: Send to audio mixer
-
+using System.Collections;
 using UnityEngine;
 
 namespace Nova
@@ -8,14 +6,26 @@ namespace Nova
     [ExportCustomType]
     public class SoundController : MonoBehaviour
     {
-        public string luaName;
-        public string audioFolder;
+        private static PrefabFactory PrefabFactory;
+
+        [SerializeField] private string luaName;
+        [SerializeField] private string audioFolder;
+        [SerializeField] private GameObject oneShotSoundPrefab;
+
         [HideInInspector] public float configVolume;
 
         private GameState gameState;
 
         private void Awake()
         {
+            if (PrefabFactory == null)
+            {
+                var go = new GameObject("OneShotSoundFactory");
+                PrefabFactory = go.AddComponent<PrefabFactory>();
+                PrefabFactory.prefab = oneShotSoundPrefab;
+                PrefabFactory.maxBufferSize = 100;
+            }
+
             gameState = Utils.FindNovaController().GameState;
 
             if (!string.IsNullOrEmpty(luaName))
@@ -26,44 +36,40 @@ namespace Nova
 
         private bool dontPlaySound => gameState.isRestoring || gameState.isJumping;
 
-        /// <summary>
-        /// Play audio at a point in space, handy for sound effect
-        /// </summary>
-        /// <param name="clip">the AudioClip to play</param>
-        /// <param name="position">the position to play the audio</param>
-        /// <param name="clipVolume">the volume to play the clip</param>
-        public void PlayClipAtPoint(AudioClip clip, Vector3 position, float clipVolume)
+        public void PlayClip(AudioClip clip, float clipVolume, Vector3 position, bool is3D)
         {
             if (dontPlaySound) return;
-            var volume = Utils.LogToLinearVolume(clipVolume * configVolume);
-            AudioSource.PlayClipAtPoint(clip, position, volume);
-        }
 
-        public void PlayClipAtPoint(string audioName, Vector3 position, float clipVolume)
-        {
-            if (dontPlaySound) return;
-            var clip = AssetLoader.Load<AudioClip>(System.IO.Path.Combine(audioFolder, audioName));
-            PlayClipAtPoint(clip, position, clipVolume);
-        }
-
-        public void PlayClipNo3D(AudioClip clip, Vector3 position, float clipVolume)
-        {
-            if (dontPlaySound) return;
-            var go = new GameObject("Custom one shot sound");
-            go.transform.position = position;
-            var audioSource = go.AddComponent<AudioSource>();
+            var audioSource = PrefabFactory.Get<AudioSource>();
+            audioSource.transform.position = position;
             audioSource.clip = clip;
             audioSource.volume = Utils.LogToLinearVolume(clipVolume * configVolume);
+            if (is3D)
+            {
+                audioSource.spatialBlend = 1.0f;
+            }
+            else
+            {
             audioSource.spatialBlend = 0.0f;
-            audioSource.Play();
-            Destroy(go, clip.length);
         }
 
-        public void PlayClipNo3D(string audioName, Vector3 position, float clipVolume)
+            audioSource.Play();
+            StartCoroutine(WaitAndDestroy(audioSource, clip.length));
+        }
+
+        public void PlayClip(string audioName, float clipVolume, Vector3 position, bool is3D)
         {
             if (dontPlaySound) return;
             var clip = AssetLoader.Load<AudioClip>(System.IO.Path.Combine(audioFolder, audioName));
-            PlayClipNo3D(clip, position, clipVolume);
+            PlayClip(clip, clipVolume, position, is3D);
+        }
+
+        private IEnumerator WaitAndDestroy(AudioSource audioSource, float time)
+        {
+            yield return new WaitForSeconds(time);
+            audioSource.Stop();
+            audioSource.clip = null;
+            PrefabFactory.Put(audioSource.gameObject);
         }
     }
 }
