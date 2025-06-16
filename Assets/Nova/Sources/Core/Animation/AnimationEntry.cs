@@ -355,6 +355,23 @@ namespace Nova
             return t => ((a * t + b) * t + c) * t;
         }
 
+        public static EasingFunction SlowInEasing(float k = 0.0f)
+        {
+            float a4 = 5.0f - k;
+            float a5 = 4.0f + k;
+            return t => (a4 - a5 * t) * t * t * t * t;
+        }
+
+        public static EasingFunction SlowOutEasing(float k = 0.0f)
+        {
+            float a1 = k;
+            float a2 = 10.0f - 4.0f * k;
+            float a3 = -20.0f + 6.0f * k;
+            float a4 = 15.0f - 4.0f * k;
+            float a5 = -4.0f + k;
+            return t => (a1 + (a2 + (a3 + (a4 + a5 * t) * t) * t) * t) * t;
+        }
+
         public static EasingFunction ShakeEasing(float freq, float pow)
         {
             return t => Mathf.Sin(freq * t) * Mathf.Pow(1.0f - t, pow);
@@ -377,6 +394,13 @@ namespace Nova
                 return t => (-2.0f * (Mathf.Sqrt(x0 * x0 - x2 * t) - x0) * (x0 - y0) + t * x2 * (2.0f * y0 - 1.0f)) /
                             (x2 * x2);
             }
+        }
+
+        public static EasingFunction LadderEasing(float step, float leftPad = 0.0f, float rightPad = 0.0f)
+        {
+            return t => t < step ? 0.0f :
+                        t > 1.0f - 1e-3f ? 1.0f :
+                        Mathf.Floor(t / step) * step * (1.0f - leftPad - rightPad) + leftPad;
         }
 
         #endregion

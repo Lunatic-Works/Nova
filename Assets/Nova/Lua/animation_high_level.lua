@@ -156,9 +156,12 @@ end
 local easing_func_name_map = {
     linear = Nova.AnimationEntry.LinearEasing,
     cubic = Nova.AnimationEntry.CubicEasing,
+    slow_in = Nova.AnimationEntry.SlowInEasing,
+    slow_out = Nova.AnimationEntry.SlowOutEasing,
     shake = Nova.AnimationEntry.ShakeEasing,
     shake_sqr = Nova.AnimationEntry.ShakeSquaredEasing,
     bezier = Nova.AnimationEntry.BezierEasing,
+    ladder = Nova.AnimationEntry.LadderEasing,
 }
 
 function parse_easing(t)
@@ -169,6 +172,8 @@ function parse_easing(t)
     elseif type(t) == 'number' then
         start_slope = t
         target_slope = t
+    elseif type(t) == 'string' then
+        easing = easing_func_name_map[t]()
     elseif type(t[1]) == 'number' then
         start_slope = t[1]
         target_slope = t[2]
