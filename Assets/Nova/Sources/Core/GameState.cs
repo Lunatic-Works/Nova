@@ -1051,12 +1051,12 @@ namespace Nova
             Move(entryNode, dialogue);
         }
 
-        public void JumpToNextChapter()
+        public void JumpToNextChapter(bool allowChapter)
         {
             var jumped = false;
             while (true)
             {
-                if (jumped && currentNode.isChapter)
+                if (jumped && allowChapter && currentNode.isChapter)
                 {
                     break;
                 }

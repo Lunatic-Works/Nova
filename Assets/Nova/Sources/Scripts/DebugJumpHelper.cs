@@ -45,7 +45,7 @@ namespace Nova
             {
                 nextChapter = false;
                 // gameState.MoveToKeyPoint(true, true);
-                gameState.JumpToNextChapter();
+                gameState.JumpToNextChapter(allowChapter: true);
             }
 
             if (previousBranch)
