@@ -209,7 +209,7 @@ namespace LuaInterface
         public static int LUA_MULTRET = -1;
         public static string[] LuaTypeName = { "none", "nil", "boolean", "lightuserdata", "number", "string", "table", "function", "userdata", "thread" };
 
-#if !UNITY_EDITOR && UNITY_IPHONE
+#if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_WEBGL)
         const string LUADLL = "__Internal";
 #else
         const string LUADLL = "tolua";

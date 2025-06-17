@@ -31,7 +31,6 @@ namespace Nova
             var looper = gameObject.AddComponent<LuaLooper>();
             looper.luaState = lua;
 
-            lua.AddSearchPath(Application.dataPath + "/Nova/Lua");
             Reset();
 
             inited = true;
