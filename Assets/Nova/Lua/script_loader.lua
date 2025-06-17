@@ -168,7 +168,8 @@ function is_debug()
     if not check_eager('is_debug') then
         return
     end
-    __Nova.scriptLoader:SetCurrentAsDebug()
+    -- __Nova.scriptLoader:SetCurrentAsDebug()
+    __Nova.scriptLoader:SetCurrentAsUnlockedStart()
 end
 
 --- set the current node as an end node
