@@ -19,6 +19,7 @@ public class System_EnumWrap
 		L.RegFunction("CompareTo", CompareTo);
 		L.RegFunction("HasFlag", HasFlag);
 		L.RegFunction("GetTypeCode", GetTypeCode);
+		L.RegFunction("TryParse", TryParse);
 		L.RegFunction("Parse", Parse);
 		L.RegFunction("ToObject", ToObject);
 		L.RegFunction("ToInt", ToInt);
@@ -246,6 +247,45 @@ public class System_EnumWrap
 			System.TypeCode o = obj.GetTypeCode();
 			ToLua.Push(L, o);
 			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int TryParse(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 3)
+			{
+				System.Type arg0 = ToLua.CheckMonoType(L, 1);
+				string arg1 = ToLua.CheckString(L, 2);
+				object arg2 = null;
+				bool o = System.Enum.TryParse(arg0, arg1, out arg2);
+				LuaDLL.lua_pushboolean(L, o);
+				ToLua.Push(L, arg2);
+				return 2;
+			}
+			else if (count == 4)
+			{
+				System.Type arg0 = ToLua.CheckMonoType(L, 1);
+				string arg1 = ToLua.CheckString(L, 2);
+				bool arg2 = LuaDLL.luaL_checkboolean(L, 3);
+				object arg3 = null;
+				bool o = System.Enum.TryParse(arg0, arg1, arg2, out arg3);
+				LuaDLL.lua_pushboolean(L, o);
+				ToLua.Push(L, arg3);
+				return 2;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Enum.TryParse");
+			}
 		}
 		catch (Exception e)
 		{

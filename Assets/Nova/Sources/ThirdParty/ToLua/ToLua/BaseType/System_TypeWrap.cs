@@ -7,114 +7,251 @@ public class System_TypeWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(System.Type), typeof(System.Object));
-		L.RegFunction("GetType", GetType);
-		L.RegFunction("MakePointerType", MakePointerType);
-		L.RegFunction("MakeByRefType", MakeByRefType);
-		L.RegFunction("MakeArrayType", MakeArrayType);
-		L.RegFunction("GetTypeFromProgID", GetTypeFromProgID);
-		L.RegFunction("GetTypeFromCLSID", GetTypeFromCLSID);
-		L.RegFunction("GetTypeCode", GetTypeCode);
-		L.RegFunction("InvokeMember", InvokeMember);
-		L.RegFunction("GetTypeHandle", GetTypeHandle);
-		L.RegFunction("GetArrayRank", GetArrayRank);
-		L.RegFunction("GetInterface", GetInterface);
-		L.RegFunction("GetInterfaces", GetInterfaces);
-		L.RegFunction("FindInterfaces", FindInterfaces);
-		L.RegFunction("GetNestedTypes", GetNestedTypes);
-		L.RegFunction("GetNestedType", GetNestedType);
-		L.RegFunction("GetDefaultMembers", GetDefaultMembers);
-		L.RegFunction("FindMembers", FindMembers);
-		L.RegFunction("GetGenericParameterConstraints", GetGenericParameterConstraints);
-		L.RegFunction("MakeGenericType", MakeGenericType);
-		L.RegFunction("GetElementType", GetElementType);
-		L.RegFunction("GetGenericArguments", GetGenericArguments);
-		L.RegFunction("GetGenericTypeDefinition", GetGenericTypeDefinition);
-		L.RegFunction("GetEnumNames", GetEnumNames);
-		L.RegFunction("GetEnumValues", GetEnumValues);
-		L.RegFunction("GetEnumUnderlyingType", GetEnumUnderlyingType);
 		L.RegFunction("IsEnumDefined", IsEnumDefined);
 		L.RegFunction("GetEnumName", GetEnumName);
+		L.RegFunction("GetEnumNames", GetEnumNames);
+		L.RegFunction("FindInterfaces", FindInterfaces);
+		L.RegFunction("FindMembers", FindMembers);
 		L.RegFunction("IsSubclassOf", IsSubclassOf);
-		L.RegFunction("IsInstanceOfType", IsInstanceOfType);
 		L.RegFunction("IsAssignableFrom", IsAssignableFrom);
-		L.RegFunction("IsEquivalentTo", IsEquivalentTo);
-		L.RegFunction("ToString", ToString);
+		L.RegFunction("GetType", GetType);
+		L.RegFunction("GetElementType", GetElementType);
+		L.RegFunction("GetArrayRank", GetArrayRank);
+		L.RegFunction("GetGenericTypeDefinition", GetGenericTypeDefinition);
+		L.RegFunction("GetGenericArguments", GetGenericArguments);
+		L.RegFunction("GetGenericParameterConstraints", GetGenericParameterConstraints);
+		L.RegFunction("GetMethod", GetMethod);
+		L.RegFunction("GetNestedType", GetNestedType);
+		L.RegFunction("GetNestedTypes", GetNestedTypes);
+		L.RegFunction("GetDefaultMembers", GetDefaultMembers);
+		L.RegFunction("GetTypeHandle", GetTypeHandle);
 		L.RegFunction("GetTypeArray", GetTypeArray);
+		L.RegFunction("GetTypeCode", GetTypeCode);
+		L.RegFunction("GetTypeFromCLSID", GetTypeFromCLSID);
+		L.RegFunction("GetTypeFromProgID", GetTypeFromProgID);
+		L.RegFunction("InvokeMember", InvokeMember);
+		L.RegFunction("GetInterface", GetInterface);
+		L.RegFunction("GetInterfaces", GetInterfaces);
+		L.RegFunction("GetInterfaceMap", GetInterfaceMap);
+		L.RegFunction("IsInstanceOfType", IsInstanceOfType);
+		L.RegFunction("IsEquivalentTo", IsEquivalentTo);
+		L.RegFunction("GetEnumUnderlyingType", GetEnumUnderlyingType);
+		L.RegFunction("GetEnumValues", GetEnumValues);
+		L.RegFunction("MakeArrayType", MakeArrayType);
+		L.RegFunction("MakeByRefType", MakeByRefType);
+		L.RegFunction("MakeGenericType", MakeGenericType);
+		L.RegFunction("MakePointerType", MakePointerType);
+		L.RegFunction("MakeGenericMethodParameter", MakeGenericMethodParameter);
+		L.RegFunction("ToString", ToString);
 		L.RegFunction("Equals", Equals);
 		L.RegFunction("GetHashCode", GetHashCode);
-		L.RegFunction("GetInterfaceMap", GetInterfaceMap);
-		L.RegFunction("ReflectionOnlyGetType", ReflectionOnlyGetType);
 		L.RegFunction("GetTypeFromHandle", GetTypeFromHandle);
+		L.RegFunction("ReflectionOnlyGetType", ReflectionOnlyGetType);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
+		L.RegVar("Delimiter", get_Delimiter, null);
+		L.RegVar("EmptyTypes", get_EmptyTypes, null);
+		L.RegVar("Missing", get_Missing, null);
 		L.RegVar("FilterAttribute", get_FilterAttribute, null);
 		L.RegVar("FilterName", get_FilterName, null);
 		L.RegVar("FilterNameIgnoreCase", get_FilterNameIgnoreCase, null);
-		L.RegVar("Missing", get_Missing, null);
-		L.RegVar("Delimiter", get_Delimiter, null);
-		L.RegVar("EmptyTypes", get_EmptyTypes, null);
+		L.RegVar("IsSerializable", get_IsSerializable, null);
+		L.RegVar("ContainsGenericParameters", get_ContainsGenericParameters, null);
+		L.RegVar("IsVisible", get_IsVisible, null);
 		L.RegVar("MemberType", get_MemberType, null);
+		L.RegVar("Namespace", get_Namespace, null);
+		L.RegVar("AssemblyQualifiedName", get_AssemblyQualifiedName, null);
+		L.RegVar("FullName", get_FullName, null);
+		L.RegVar("Assembly", get_Assembly, null);
+		L.RegVar("Module", get_Module, null);
+		L.RegVar("IsNested", get_IsNested, null);
 		L.RegVar("DeclaringType", get_DeclaringType, null);
 		L.RegVar("DeclaringMethod", get_DeclaringMethod, null);
 		L.RegVar("ReflectedType", get_ReflectedType, null);
-		L.RegVar("StructLayoutAttribute", get_StructLayoutAttribute, null);
-		L.RegVar("GUID", get_GUID, null);
-		L.RegVar("DefaultBinder", get_DefaultBinder, null);
-		L.RegVar("Module", get_Module, null);
-		L.RegVar("Assembly", get_Assembly, null);
-		L.RegVar("TypeHandle", get_TypeHandle, null);
-		L.RegVar("FullName", get_FullName, null);
-		L.RegVar("Namespace", get_Namespace, null);
-		L.RegVar("AssemblyQualifiedName", get_AssemblyQualifiedName, null);
-		L.RegVar("BaseType", get_BaseType, null);
-		L.RegVar("TypeInitializer", get_TypeInitializer, null);
-		L.RegVar("IsNested", get_IsNested, null);
-		L.RegVar("Attributes", get_Attributes, null);
-		L.RegVar("GenericParameterAttributes", get_GenericParameterAttributes, null);
-		L.RegVar("IsVisible", get_IsVisible, null);
-		L.RegVar("IsNotPublic", get_IsNotPublic, null);
-		L.RegVar("IsPublic", get_IsPublic, null);
-		L.RegVar("IsNestedPublic", get_IsNestedPublic, null);
-		L.RegVar("IsNestedPrivate", get_IsNestedPrivate, null);
-		L.RegVar("IsNestedFamily", get_IsNestedFamily, null);
-		L.RegVar("IsNestedAssembly", get_IsNestedAssembly, null);
-		L.RegVar("IsNestedFamANDAssem", get_IsNestedFamANDAssem, null);
-		L.RegVar("IsNestedFamORAssem", get_IsNestedFamORAssem, null);
-		L.RegVar("IsAutoLayout", get_IsAutoLayout, null);
-		L.RegVar("IsLayoutSequential", get_IsLayoutSequential, null);
-		L.RegVar("IsExplicitLayout", get_IsExplicitLayout, null);
-		L.RegVar("IsClass", get_IsClass, null);
-		L.RegVar("IsInterface", get_IsInterface, null);
-		L.RegVar("IsValueType", get_IsValueType, null);
-		L.RegVar("IsAbstract", get_IsAbstract, null);
-		L.RegVar("IsSealed", get_IsSealed, null);
-		L.RegVar("IsEnum", get_IsEnum, null);
-		L.RegVar("IsSpecialName", get_IsSpecialName, null);
-		L.RegVar("IsImport", get_IsImport, null);
-		L.RegVar("IsSerializable", get_IsSerializable, null);
-		L.RegVar("IsAnsiClass", get_IsAnsiClass, null);
-		L.RegVar("IsUnicodeClass", get_IsUnicodeClass, null);
-		L.RegVar("IsAutoClass", get_IsAutoClass, null);
+		L.RegVar("UnderlyingSystemType", get_UnderlyingSystemType, null);
+		L.RegVar("IsTypeDefinition", get_IsTypeDefinition, null);
 		L.RegVar("IsArray", get_IsArray, null);
-		L.RegVar("IsGenericType", get_IsGenericType, null);
-		L.RegVar("IsGenericTypeDefinition", get_IsGenericTypeDefinition, null);
-		L.RegVar("IsConstructedGenericType", get_IsConstructedGenericType, null);
-		L.RegVar("IsGenericParameter", get_IsGenericParameter, null);
-		L.RegVar("GenericParameterPosition", get_GenericParameterPosition, null);
-		L.RegVar("ContainsGenericParameters", get_ContainsGenericParameters, null);
 		L.RegVar("IsByRef", get_IsByRef, null);
 		L.RegVar("IsPointer", get_IsPointer, null);
-		L.RegVar("IsPrimitive", get_IsPrimitive, null);
-		L.RegVar("IsCOMObject", get_IsCOMObject, null);
+		L.RegVar("IsConstructedGenericType", get_IsConstructedGenericType, null);
+		L.RegVar("IsGenericParameter", get_IsGenericParameter, null);
+		L.RegVar("IsGenericTypeParameter", get_IsGenericTypeParameter, null);
+		L.RegVar("IsGenericMethodParameter", get_IsGenericMethodParameter, null);
+		L.RegVar("IsGenericType", get_IsGenericType, null);
+		L.RegVar("IsGenericTypeDefinition", get_IsGenericTypeDefinition, null);
+		L.RegVar("IsVariableBoundArray", get_IsVariableBoundArray, null);
+		L.RegVar("IsByRefLike", get_IsByRefLike, null);
 		L.RegVar("HasElementType", get_HasElementType, null);
-		L.RegVar("IsContextful", get_IsContextful, null);
-		L.RegVar("IsMarshalByRef", get_IsMarshalByRef, null);
 		L.RegVar("GenericTypeArguments", get_GenericTypeArguments, null);
+		L.RegVar("GenericParameterPosition", get_GenericParameterPosition, null);
+		L.RegVar("GenericParameterAttributes", get_GenericParameterAttributes, null);
+		L.RegVar("Attributes", get_Attributes, null);
+		L.RegVar("IsAbstract", get_IsAbstract, null);
+		L.RegVar("IsImport", get_IsImport, null);
+		L.RegVar("IsSealed", get_IsSealed, null);
+		L.RegVar("IsSpecialName", get_IsSpecialName, null);
+		L.RegVar("IsClass", get_IsClass, null);
+		L.RegVar("IsNestedAssembly", get_IsNestedAssembly, null);
+		L.RegVar("IsNestedFamANDAssem", get_IsNestedFamANDAssem, null);
+		L.RegVar("IsNestedFamily", get_IsNestedFamily, null);
+		L.RegVar("IsNestedFamORAssem", get_IsNestedFamORAssem, null);
+		L.RegVar("IsNestedPrivate", get_IsNestedPrivate, null);
+		L.RegVar("IsNestedPublic", get_IsNestedPublic, null);
+		L.RegVar("IsNotPublic", get_IsNotPublic, null);
+		L.RegVar("IsPublic", get_IsPublic, null);
+		L.RegVar("IsAutoLayout", get_IsAutoLayout, null);
+		L.RegVar("IsExplicitLayout", get_IsExplicitLayout, null);
+		L.RegVar("IsLayoutSequential", get_IsLayoutSequential, null);
+		L.RegVar("IsAnsiClass", get_IsAnsiClass, null);
+		L.RegVar("IsAutoClass", get_IsAutoClass, null);
+		L.RegVar("IsUnicodeClass", get_IsUnicodeClass, null);
+		L.RegVar("IsCOMObject", get_IsCOMObject, null);
+		L.RegVar("IsContextful", get_IsContextful, null);
+		L.RegVar("IsEnum", get_IsEnum, null);
+		L.RegVar("IsMarshalByRef", get_IsMarshalByRef, null);
+		L.RegVar("IsPrimitive", get_IsPrimitive, null);
+		L.RegVar("IsValueType", get_IsValueType, null);
+		L.RegVar("IsSignatureType", get_IsSignatureType, null);
 		L.RegVar("IsSecurityCritical", get_IsSecurityCritical, null);
 		L.RegVar("IsSecuritySafeCritical", get_IsSecuritySafeCritical, null);
 		L.RegVar("IsSecurityTransparent", get_IsSecurityTransparent, null);
-		L.RegVar("UnderlyingSystemType", get_UnderlyingSystemType, null);
+		L.RegVar("StructLayoutAttribute", get_StructLayoutAttribute, null);
+		L.RegVar("TypeInitializer", get_TypeInitializer, null);
+		L.RegVar("TypeHandle", get_TypeHandle, null);
+		L.RegVar("GUID", get_GUID, null);
+		L.RegVar("BaseType", get_BaseType, null);
+		L.RegVar("DefaultBinder", get_DefaultBinder, null);
+		L.RegVar("IsInterface", get_IsInterface, null);
 		L.EndClass();
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int IsEnumDefined(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			object arg0 = ToLua.ToVarObject(L, 2);
+			bool o = obj.IsEnumDefined(arg0);
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetEnumName(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			object arg0 = ToLua.ToVarObject(L, 2);
+			string o = obj.GetEnumName(arg0);
+			LuaDLL.lua_pushstring(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetEnumNames(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			string[] o = obj.GetEnumNames();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FindInterfaces(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Reflection.TypeFilter arg0 = (System.Reflection.TypeFilter)ToLua.CheckDelegate<System.Reflection.TypeFilter>(L, 2);
+			object arg1 = ToLua.ToVarObject(L, 3);
+			System.Type[] o = obj.FindInterfaces(arg0, arg1);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int FindMembers(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 5);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Reflection.MemberTypes arg0 = (System.Reflection.MemberTypes)ToLua.CheckObject(L, 2, typeof(System.Reflection.MemberTypes));
+			System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
+			System.Reflection.MemberFilter arg2 = (System.Reflection.MemberFilter)ToLua.CheckDelegate<System.Reflection.MemberFilter>(L, 4);
+			object arg3 = ToLua.ToVarObject(L, 5);
+			System.Reflection.MemberInfo[] o = obj.FindMembers(arg0, arg1, arg2, arg3);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int IsSubclassOf(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type arg0 = ToLua.CheckMonoType(L, 2);
+			bool o = obj.IsSubclassOf(arg0);
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int IsAssignableFrom(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type arg0 = ToLua.CheckMonoType(L, 2);
+			bool o = obj.IsAssignableFrom(arg0);
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
@@ -197,13 +334,13 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int MakePointerType(IntPtr L)
+	static int GetElementType(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
 			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type o = obj.MakePointerType();
+			System.Type o = obj.GetElementType();
 			ToLua.Push(L, o);
 			return 1;
 		}
@@ -214,13 +351,30 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int MakeByRefType(IntPtr L)
+	static int GetArrayRank(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
 			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type o = obj.MakeByRefType();
+			int o = obj.GetArrayRank();
+			LuaDLL.lua_pushinteger(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetGenericTypeDefinition(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type o = obj.GetGenericTypeDefinition();
 			ToLua.Push(L, o);
 			return 1;
 		}
@@ -231,7 +385,142 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int MakeArrayType(IntPtr L)
+	static int GetGenericArguments(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type[] o = obj.GetGenericArguments();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetGenericParameterConstraints(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type[] o = obj.GetGenericParameterConstraints();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetMethod(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 4)
+			{
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
+				System.Type[] arg2 = ToLua.CheckObjectArray<System.Type>(L, 4);
+				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1, arg2);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else if (count == 5)
+			{
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
+				System.Type[] arg2 = ToLua.CheckObjectArray<System.Type>(L, 4);
+				System.Reflection.ParameterModifier[] arg3 = ToLua.CheckStructArray<System.Reflection.ParameterModifier>(L, 5);
+				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1, arg2, arg3);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else if (count == 7)
+			{
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
+				System.Reflection.BindingFlags arg2 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 4);
+				System.Reflection.Binder arg3 = (System.Reflection.Binder)ToLua.CheckObject<System.Reflection.Binder>(L, 5);
+				System.Type[] arg4 = ToLua.CheckObjectArray<System.Type>(L, 6);
+				System.Reflection.ParameterModifier[] arg5 = ToLua.CheckStructArray<System.Reflection.ParameterModifier>(L, 7);
+				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1, arg2, arg3, arg4, arg5);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else if (count == 8)
+			{
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
+				System.Reflection.BindingFlags arg2 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 4);
+				System.Reflection.Binder arg3 = (System.Reflection.Binder)ToLua.CheckObject<System.Reflection.Binder>(L, 5);
+				System.Reflection.CallingConventions arg4 = (System.Reflection.CallingConventions)ToLua.CheckObject(L, 6, typeof(System.Reflection.CallingConventions));
+				System.Type[] arg5 = ToLua.CheckObjectArray<System.Type>(L, 7);
+				System.Reflection.ParameterModifier[] arg6 = ToLua.CheckStructArray<System.Reflection.ParameterModifier>(L, 8);
+				System.Reflection.MethodInfo o = obj.GetMethod(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetMethod");
+			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetNestedType(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 2)
+			{
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				System.Type o = obj.GetNestedType(arg0);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 3)
+			{
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				string arg0 = ToLua.CheckString(L, 2);
+				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
+				System.Type o = obj.GetNestedType(arg0, arg1);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetNestedType");
+			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetNestedTypes(IntPtr L)
 	{
 		try
 		{
@@ -240,21 +529,21 @@ public class System_TypeWrap
 			if (count == 1)
 			{
 				System.Type obj = ToLua.CheckMonoType(L, 1);
-				System.Type o = obj.MakeArrayType();
+				System.Type[] o = obj.GetNestedTypes();
 				ToLua.Push(L, o);
 				return 1;
 			}
 			else if (count == 2)
 			{
 				System.Type obj = ToLua.CheckMonoType(L, 1);
-				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
-				System.Type o = obj.MakeArrayType(arg0);
+				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 2);
+				System.Type[] o = obj.GetNestedTypes(arg0);
 				ToLua.Push(L, o);
 				return 1;
 			}
 			else
 			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.MakeArrayType");
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetNestedTypes");
 			}
 		}
 		catch (Exception e)
@@ -264,48 +553,66 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetTypeFromProgID(IntPtr L)
+	static int GetDefaultMembers(IntPtr L)
 	{
 		try
 		{
-			int count = LuaDLL.lua_gettop(L);
+			ToLua.CheckArgsCount(L, 1);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Reflection.MemberInfo[] o = obj.GetDefaultMembers();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
 
-			if (count == 1)
-			{
-				string arg0 = ToLua.CheckString(L, 1);
-				System.Type o = System.Type.GetTypeFromProgID(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes<bool>(L, 2))
-			{
-				string arg0 = ToLua.CheckString(L, 1);
-				bool arg1 = LuaDLL.lua_toboolean(L, 2);
-				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes<string>(L, 2))
-			{
-				string arg0 = ToLua.CheckString(L, 1);
-				string arg1 = ToLua.ToString(L, 2);
-				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 3)
-			{
-				string arg0 = ToLua.CheckString(L, 1);
-				string arg1 = ToLua.CheckString(L, 2);
-				bool arg2 = LuaDLL.luaL_checkboolean(L, 3);
-				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1, arg2);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetTypeFromProgID");
-			}
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetTypeHandle(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			object arg0 = ToLua.ToVarObject(L, 1);
+			System.RuntimeTypeHandle o = System.Type.GetTypeHandle(arg0);
+			ToLua.PushValue(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetTypeArray(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			object[] arg0 = ToLua.CheckObjectArray(L, 1);
+			System.Type[] o = System.Type.GetTypeArray(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetTypeCode(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Type arg0 = ToLua.CheckMonoType(L, 1);
+			System.TypeCode o = System.Type.GetTypeCode(arg0);
+			ToLua.Push(L, o);
+			return 1;
 		}
 		catch (Exception e)
 		{
@@ -364,15 +671,48 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetTypeCode(IntPtr L)
+	static int GetTypeFromProgID(IntPtr L)
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type arg0 = ToLua.CheckMonoType(L, 1);
-			System.TypeCode o = System.Type.GetTypeCode(arg0);
-			ToLua.Push(L, o);
-			return 1;
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1)
+			{
+				string arg0 = ToLua.CheckString(L, 1);
+				System.Type o = System.Type.GetTypeFromProgID(arg0);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes<bool>(L, 2))
+			{
+				string arg0 = ToLua.CheckString(L, 1);
+				bool arg1 = LuaDLL.lua_toboolean(L, 2);
+				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes<string>(L, 2))
+			{
+				string arg0 = ToLua.CheckString(L, 1);
+				string arg1 = ToLua.ToString(L, 2);
+				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 3)
+			{
+				string arg0 = ToLua.CheckString(L, 1);
+				string arg1 = ToLua.CheckString(L, 2);
+				bool arg2 = LuaDLL.luaL_checkboolean(L, 3);
+				System.Type o = System.Type.GetTypeFromProgID(arg0, arg1, arg2);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetTypeFromProgID");
+			}
 		}
 		catch (Exception e)
 		{
@@ -439,40 +779,6 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetTypeHandle(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			object arg0 = ToLua.ToVarObject(L, 1);
-			System.RuntimeTypeHandle o = System.Type.GetTypeHandle(arg0);
-			ToLua.PushValue(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetArrayRank(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			int o = obj.GetArrayRank();
-			LuaDLL.lua_pushinteger(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetInterface(IntPtr L)
 	{
 		try
@@ -525,313 +831,15 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int FindInterfaces(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Reflection.TypeFilter arg0 = (System.Reflection.TypeFilter)ToLua.CheckDelegate<System.Reflection.TypeFilter>(L, 2);
-			object arg1 = ToLua.ToVarObject(L, 3);
-			System.Type[] o = obj.FindInterfaces(arg0, arg1);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetNestedTypes(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1)
-			{
-				System.Type obj = ToLua.CheckMonoType(L, 1);
-				System.Type[] o = obj.GetNestedTypes();
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2)
-			{
-				System.Type obj = ToLua.CheckMonoType(L, 1);
-				System.Reflection.BindingFlags arg0 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 2);
-				System.Type[] o = obj.GetNestedTypes(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetNestedTypes");
-			}
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetNestedType(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2)
-			{
-				System.Type obj = ToLua.CheckMonoType(L, 1);
-				string arg0 = ToLua.CheckString(L, 2);
-				System.Type o = obj.GetNestedType(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 3)
-			{
-				System.Type obj = ToLua.CheckMonoType(L, 1);
-				string arg0 = ToLua.CheckString(L, 2);
-				System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
-				System.Type o = obj.GetNestedType(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.GetNestedType");
-			}
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetDefaultMembers(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Reflection.MemberInfo[] o = obj.GetDefaultMembers();
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int FindMembers(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 5);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Reflection.MemberTypes arg0 = (System.Reflection.MemberTypes)ToLua.CheckObject(L, 2, typeof(System.Reflection.MemberTypes));
-			System.Reflection.BindingFlags arg1 = (System.Reflection.BindingFlags)LuaDLL.luaL_checknumber(L, 3);
-			System.Reflection.MemberFilter arg2 = (System.Reflection.MemberFilter)ToLua.CheckDelegate<System.Reflection.MemberFilter>(L, 4);
-			object arg3 = ToLua.ToVarObject(L, 5);
-			System.Reflection.MemberInfo[] o = obj.FindMembers(arg0, arg1, arg2, arg3);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetGenericParameterConstraints(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type[] o = obj.GetGenericParameterConstraints();
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int MakeGenericType(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type[] arg0 = ToLua.CheckParamsObject<System.Type>(L, 2, count - 1);
-			System.Type o = obj.MakeGenericType(arg0);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetElementType(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type o = obj.GetElementType();
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetGenericArguments(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type[] o = obj.GetGenericArguments();
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetGenericTypeDefinition(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type o = obj.GetGenericTypeDefinition();
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetEnumNames(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			string[] o = obj.GetEnumNames();
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetEnumValues(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Array o = obj.GetEnumValues();
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetEnumUnderlyingType(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type o = obj.GetEnumUnderlyingType();
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int IsEnumDefined(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			object arg0 = ToLua.ToVarObject(L, 2);
-			bool o = obj.IsEnumDefined(arg0);
-			LuaDLL.lua_pushboolean(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetEnumName(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			object arg0 = ToLua.ToVarObject(L, 2);
-			string o = obj.GetEnumName(arg0);
-			LuaDLL.lua_pushstring(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int IsSubclassOf(IntPtr L)
+	static int GetInterfaceMap(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
 			System.Type obj = ToLua.CheckMonoType(L, 1);
 			System.Type arg0 = ToLua.CheckMonoType(L, 2);
-			bool o = obj.IsSubclassOf(arg0);
-			LuaDLL.lua_pushboolean(L, o);
+			System.Reflection.InterfaceMapping o = obj.GetInterfaceMap(arg0);
+			ToLua.PushValue(L, o);
 			return 1;
 		}
 		catch (Exception e)
@@ -849,24 +857,6 @@ public class System_TypeWrap
 			System.Type obj = ToLua.CheckMonoType(L, 1);
 			object arg0 = ToLua.ToVarObject(L, 2);
 			bool o = obj.IsInstanceOfType(arg0);
-			LuaDLL.lua_pushboolean(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int IsAssignableFrom(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type arg0 = ToLua.CheckMonoType(L, 2);
-			bool o = obj.IsAssignableFrom(arg0);
 			LuaDLL.lua_pushboolean(L, o);
 			return 1;
 		}
@@ -895,14 +885,14 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int ToString(IntPtr L)
+	static int GetEnumUnderlyingType(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
 			System.Type obj = ToLua.CheckMonoType(L, 1);
-			string o = obj.ToString();
-			LuaDLL.lua_pushstring(L, o);
+			System.Type o = obj.GetEnumUnderlyingType();
+			ToLua.Push(L, o);
 			return 1;
 		}
 		catch (Exception e)
@@ -912,14 +902,133 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetTypeArray(IntPtr L)
+	static int GetEnumValues(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
-			object[] arg0 = ToLua.CheckObjectArray(L, 1);
-			System.Type[] o = System.Type.GetTypeArray(arg0);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Array o = obj.GetEnumValues();
 			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int MakeArrayType(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1)
+			{
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				System.Type o = obj.MakeArrayType();
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 2)
+			{
+				System.Type obj = ToLua.CheckMonoType(L, 1);
+				int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+				System.Type o = obj.MakeArrayType(arg0);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: System.Type.MakeArrayType");
+			}
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int MakeByRefType(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type o = obj.MakeByRefType();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int MakeGenericType(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type[] arg0 = ToLua.CheckParamsObject<System.Type>(L, 2, count - 1);
+			System.Type o = obj.MakeGenericType(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int MakePointerType(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			System.Type o = obj.MakePointerType();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int MakeGenericMethodParameter(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 1);
+			System.Type o = System.Type.MakeGenericMethodParameter(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ToString(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.Type obj = ToLua.CheckMonoType(L, 1);
+			string o = obj.ToString();
+			LuaDLL.lua_pushstring(L, o);
 			return 1;
 		}
 		catch (Exception e)
@@ -963,24 +1072,6 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int op_Equality(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			System.Type arg0 = (System.Type)ToLua.ToObject(L, 1);
-			System.Type arg1 = (System.Type)ToLua.ToObject(L, 2);
-			bool o = arg0 == arg1;
-			LuaDLL.lua_pushboolean(L, o);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetHashCode(IntPtr L)
 	{
 		try
@@ -998,15 +1089,32 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetInterfaceMap(IntPtr L)
+	static int GetTypeFromHandle(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			System.RuntimeTypeHandle arg0 = StackTraits<System.RuntimeTypeHandle>.Check(L, 1);
+			System.Type o = System.Type.GetTypeFromHandle(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int op_Equality(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
-			System.Type obj = ToLua.CheckMonoType(L, 1);
-			System.Type arg0 = ToLua.CheckMonoType(L, 2);
-			System.Reflection.InterfaceMapping o = obj.GetInterfaceMap(arg0);
-			ToLua.PushValue(L, o);
+			System.Type arg0 = (System.Type)ToLua.ToObject(L, 1);
+			System.Type arg1 = (System.Type)ToLua.ToObject(L, 2);
+			bool o = arg0 == arg1;
+			LuaDLL.lua_pushboolean(L, o);
 			return 1;
 		}
 		catch (Exception e)
@@ -1035,14 +1143,39 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetTypeFromHandle(IntPtr L)
+	static int get_Delimiter(IntPtr L)
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 1);
-			System.RuntimeTypeHandle arg0 = StackTraits<System.RuntimeTypeHandle>.Check(L, 1);
-			System.Type o = System.Type.GetTypeFromHandle(arg0);
-			ToLua.Push(L, o);
+			LuaDLL.lua_pushnumber(L, System.Type.Delimiter);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_EmptyTypes(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, System.Type.EmptyTypes);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Missing(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, System.Type.Missing);
 			return 1;
 		}
 		catch (Exception e)
@@ -1094,44 +1227,59 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_Missing(IntPtr L)
+	static int get_IsSerializable(IntPtr L)
 	{
+		object o = null;
+
 		try
 		{
-			ToLua.Push(L, System.Type.Missing);
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsSerializable;
+			LuaDLL.lua_pushboolean(L, ret);
 			return 1;
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSerializable on a nil value");
 		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_Delimiter(IntPtr L)
+	static int get_ContainsGenericParameters(IntPtr L)
 	{
+		object o = null;
+
 		try
 		{
-			LuaDLL.lua_pushnumber(L, System.Type.Delimiter);
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.ContainsGenericParameters;
+			LuaDLL.lua_pushboolean(L, ret);
 			return 1;
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index ContainsGenericParameters on a nil value");
 		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_EmptyTypes(IntPtr L)
+	static int get_IsVisible(IntPtr L)
 	{
+		object o = null;
+
 		try
 		{
-			ToLua.Push(L, System.Type.EmptyTypes);
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsVisible;
+			LuaDLL.lua_pushboolean(L, ret);
 			return 1;
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e);
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsVisible on a nil value");
 		}
 	}
 
@@ -1151,6 +1299,120 @@ public class System_TypeWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index MemberType on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Namespace(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			string ret = obj.Namespace;
+			LuaDLL.lua_pushstring(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Namespace on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_AssemblyQualifiedName(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			string ret = obj.AssemblyQualifiedName;
+			LuaDLL.lua_pushstring(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index AssemblyQualifiedName on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_FullName(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			string ret = obj.FullName;
+			LuaDLL.lua_pushstring(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index FullName on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Assembly(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.Reflection.Assembly ret = obj.Assembly;
+			ToLua.PushObject(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Assembly on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Module(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.Reflection.Module ret = obj.Module;
+			ToLua.PushObject(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Module on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsNested(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsNested;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNested on a nil value");
 		}
 	}
 
@@ -1212,7 +1474,7 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_StructLayoutAttribute(IntPtr L)
+	static int get_UnderlyingSystemType(IntPtr L)
 	{
 		object o = null;
 
@@ -1220,184 +1482,18 @@ public class System_TypeWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			System.Type obj = (System.Type)o;
-			System.Runtime.InteropServices.StructLayoutAttribute ret = obj.StructLayoutAttribute;
-			ToLua.PushSealed(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index StructLayoutAttribute on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_GUID(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			System.Guid ret = obj.GUID;
-			ToLua.PushValue(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GUID on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_DefaultBinder(IntPtr L)
-	{
-		try
-		{
-			ToLua.PushObject(L, System.Type.DefaultBinder);
-			return 1;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_Module(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			System.Reflection.Module ret = obj.Module;
-			ToLua.PushObject(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Module on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_Assembly(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			System.Reflection.Assembly ret = obj.Assembly;
-			ToLua.PushObject(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Assembly on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_TypeHandle(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			System.RuntimeTypeHandle ret = obj.TypeHandle;
-			ToLua.PushValue(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index TypeHandle on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_FullName(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			string ret = obj.FullName;
-			LuaDLL.lua_pushstring(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index FullName on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_Namespace(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			string ret = obj.Namespace;
-			LuaDLL.lua_pushstring(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Namespace on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_AssemblyQualifiedName(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			string ret = obj.AssemblyQualifiedName;
-			LuaDLL.lua_pushstring(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index AssemblyQualifiedName on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_BaseType(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			System.Type ret = obj.BaseType;
+			System.Type ret = obj.UnderlyingSystemType;
 			ToLua.Push(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index BaseType on a nil value");
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index UnderlyingSystemType on a nil value");
 		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_TypeInitializer(IntPtr L)
+	static int get_IsTypeDefinition(IntPtr L)
 	{
 		object o = null;
 
@@ -1405,526 +1501,13 @@ public class System_TypeWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			System.Type obj = (System.Type)o;
-			System.Reflection.ConstructorInfo ret = obj.TypeInitializer;
-			ToLua.PushObject(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index TypeInitializer on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsNested(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsNested;
+			bool ret = obj.IsTypeDefinition;
 			LuaDLL.lua_pushboolean(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNested on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_Attributes(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			System.Reflection.TypeAttributes ret = obj.Attributes;
-			ToLua.Push(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Attributes on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_GenericParameterAttributes(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			System.Reflection.GenericParameterAttributes ret = obj.GenericParameterAttributes;
-			ToLua.Push(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GenericParameterAttributes on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsVisible(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsVisible;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsVisible on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsNotPublic(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsNotPublic;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNotPublic on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsPublic(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsPublic;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsPublic on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsNestedPublic(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsNestedPublic;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedPublic on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsNestedPrivate(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsNestedPrivate;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedPrivate on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsNestedFamily(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsNestedFamily;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamily on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsNestedAssembly(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsNestedAssembly;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedAssembly on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsNestedFamANDAssem(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsNestedFamANDAssem;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamANDAssem on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsNestedFamORAssem(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsNestedFamORAssem;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamORAssem on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsAutoLayout(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsAutoLayout;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAutoLayout on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsLayoutSequential(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsLayoutSequential;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsLayoutSequential on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsExplicitLayout(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsExplicitLayout;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsExplicitLayout on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsClass(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsClass;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsClass on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsInterface(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsInterface;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsInterface on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsValueType(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsValueType;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsValueType on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsAbstract(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsAbstract;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAbstract on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsSealed(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsSealed;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSealed on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsEnum(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsEnum;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsEnum on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsSpecialName(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsSpecialName;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSpecialName on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsImport(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsImport;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsImport on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsSerializable(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsSerializable;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSerializable on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsAnsiClass(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsAnsiClass;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAnsiClass on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsUnicodeClass(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsUnicodeClass;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsUnicodeClass on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsAutoClass(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsAutoClass;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAutoClass on a nil value");
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsTypeDefinition on a nil value");
 		}
 	}
 
@@ -1944,120 +1527,6 @@ public class System_TypeWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsArray on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsGenericType(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsGenericType;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericType on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsGenericTypeDefinition(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsGenericTypeDefinition;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericTypeDefinition on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsConstructedGenericType(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsConstructedGenericType;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsConstructedGenericType on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsGenericParameter(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.IsGenericParameter;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericParameter on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_GenericParameterPosition(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			int ret = obj.GenericParameterPosition;
-			LuaDLL.lua_pushinteger(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GenericParameterPosition on a nil value");
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_ContainsGenericParameters(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			System.Type obj = (System.Type)o;
-			bool ret = obj.ContainsGenericParameters;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index ContainsGenericParameters on a nil value");
 		}
 	}
 
@@ -2100,7 +1569,7 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsPrimitive(IntPtr L)
+	static int get_IsConstructedGenericType(IntPtr L)
 	{
 		object o = null;
 
@@ -2108,18 +1577,18 @@ public class System_TypeWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			System.Type obj = (System.Type)o;
-			bool ret = obj.IsPrimitive;
+			bool ret = obj.IsConstructedGenericType;
 			LuaDLL.lua_pushboolean(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsPrimitive on a nil value");
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsConstructedGenericType on a nil value");
 		}
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsCOMObject(IntPtr L)
+	static int get_IsGenericParameter(IntPtr L)
 	{
 		object o = null;
 
@@ -2127,13 +1596,127 @@ public class System_TypeWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			System.Type obj = (System.Type)o;
-			bool ret = obj.IsCOMObject;
+			bool ret = obj.IsGenericParameter;
 			LuaDLL.lua_pushboolean(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsCOMObject on a nil value");
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericParameter on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsGenericTypeParameter(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsGenericTypeParameter;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericTypeParameter on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsGenericMethodParameter(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsGenericMethodParameter;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericMethodParameter on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsGenericType(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsGenericType;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericType on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsGenericTypeDefinition(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsGenericTypeDefinition;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsGenericTypeDefinition on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsVariableBoundArray(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsVariableBoundArray;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsVariableBoundArray on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsByRefLike(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsByRefLike;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsByRefLike on a nil value");
 		}
 	}
 
@@ -2157,6 +1740,462 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_GenericTypeArguments(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.Type[] ret = obj.GenericTypeArguments;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GenericTypeArguments on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_GenericParameterPosition(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			int ret = obj.GenericParameterPosition;
+			LuaDLL.lua_pushinteger(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GenericParameterPosition on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_GenericParameterAttributes(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.Reflection.GenericParameterAttributes ret = obj.GenericParameterAttributes;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GenericParameterAttributes on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_Attributes(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.Reflection.TypeAttributes ret = obj.Attributes;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index Attributes on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsAbstract(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsAbstract;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAbstract on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsImport(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsImport;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsImport on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsSealed(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsSealed;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSealed on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsSpecialName(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsSpecialName;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSpecialName on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsClass(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsClass;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsClass on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsNestedAssembly(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsNestedAssembly;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedAssembly on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsNestedFamANDAssem(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsNestedFamANDAssem;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamANDAssem on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsNestedFamily(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsNestedFamily;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamily on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsNestedFamORAssem(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsNestedFamORAssem;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedFamORAssem on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsNestedPrivate(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsNestedPrivate;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedPrivate on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsNestedPublic(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsNestedPublic;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNestedPublic on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsNotPublic(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsNotPublic;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsNotPublic on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsPublic(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsPublic;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsPublic on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsAutoLayout(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsAutoLayout;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAutoLayout on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsExplicitLayout(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsExplicitLayout;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsExplicitLayout on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsLayoutSequential(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsLayoutSequential;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsLayoutSequential on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsAnsiClass(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsAnsiClass;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAnsiClass on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsAutoClass(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsAutoClass;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsAutoClass on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsUnicodeClass(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsUnicodeClass;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsUnicodeClass on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsCOMObject(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsCOMObject;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsCOMObject on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_IsContextful(IntPtr L)
 	{
 		object o = null;
@@ -2172,6 +2211,25 @@ public class System_TypeWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsContextful on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsEnum(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsEnum;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsEnum on a nil value");
 		}
 	}
 
@@ -2195,7 +2253,7 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_GenericTypeArguments(IntPtr L)
+	static int get_IsPrimitive(IntPtr L)
 	{
 		object o = null;
 
@@ -2203,13 +2261,51 @@ public class System_TypeWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			System.Type obj = (System.Type)o;
-			System.Type[] ret = obj.GenericTypeArguments;
-			ToLua.Push(L, ret);
+			bool ret = obj.IsPrimitive;
+			LuaDLL.lua_pushboolean(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GenericTypeArguments on a nil value");
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsPrimitive on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsValueType(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsValueType;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsValueType on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsSignatureType(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsSignatureType;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsSignatureType on a nil value");
 		}
 	}
 
@@ -2271,7 +2367,7 @@ public class System_TypeWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_UnderlyingSystemType(IntPtr L)
+	static int get_StructLayoutAttribute(IntPtr L)
 	{
 		object o = null;
 
@@ -2279,13 +2375,122 @@ public class System_TypeWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			System.Type obj = (System.Type)o;
-			System.Type ret = obj.UnderlyingSystemType;
+			System.Runtime.InteropServices.StructLayoutAttribute ret = obj.StructLayoutAttribute;
+			ToLua.PushSealed(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index StructLayoutAttribute on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_TypeInitializer(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.Reflection.ConstructorInfo ret = obj.TypeInitializer;
+			ToLua.PushObject(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index TypeInitializer on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_TypeHandle(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.RuntimeTypeHandle ret = obj.TypeHandle;
+			ToLua.PushValue(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index TypeHandle on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_GUID(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.Guid ret = obj.GUID;
+			ToLua.PushValue(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index GUID on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_BaseType(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			System.Type ret = obj.BaseType;
 			ToLua.Push(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o, "attempt to index UnderlyingSystemType on a nil value");
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index BaseType on a nil value");
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_DefaultBinder(IntPtr L)
+	{
+		try
+		{
+			ToLua.PushObject(L, System.Type.DefaultBinder);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsInterface(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			System.Type obj = (System.Type)o;
+			bool ret = obj.IsInterface;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o, "attempt to index IsInterface on a nil value");
 		}
 	}
 }

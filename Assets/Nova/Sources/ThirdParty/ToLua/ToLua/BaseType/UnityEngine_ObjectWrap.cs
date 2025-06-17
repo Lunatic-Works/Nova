@@ -10,10 +10,8 @@ public class UnityEngine_ObjectWrap
 		L.RegFunction("GetInstanceID", GetInstanceID);
 		L.RegFunction("GetHashCode", GetHashCode);
 		L.RegFunction("Equals", Equals);
-		L.RegFunction("FindObjectsOfType", FindObjectsOfType);
 		L.RegFunction("FindObjectsByType", FindObjectsByType);
 		L.RegFunction("DontDestroyOnLoad", DontDestroyOnLoad);
-		L.RegFunction("FindObjectOfType", FindObjectOfType);
 		L.RegFunction("FindFirstObjectByType", FindFirstObjectByType);
 		L.RegFunction("FindAnyObjectByType", FindAnyObjectByType);
 		L.RegFunction("ToString", ToString);
@@ -105,39 +103,6 @@ public class UnityEngine_ObjectWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int FindObjectsOfType(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1)
-			{
-				System.Type arg0 = ToLua.CheckMonoType(L, 1);
-				UnityEngine.Object[] o = UnityEngine.Object.FindObjectsOfType(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2)
-			{
-				System.Type arg0 = ToLua.CheckMonoType(L, 1);
-				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
-				UnityEngine.Object[] o = UnityEngine.Object.FindObjectsOfType(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Object.FindObjectsOfType");
-			}
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int FindObjectsByType(IntPtr L)
 	{
 		try
@@ -181,39 +146,6 @@ public class UnityEngine_ObjectWrap
 			UnityEngine.Object arg0 = (UnityEngine.Object)ToLua.CheckObject<UnityEngine.Object>(L, 1);
 			UnityEngine.Object.DontDestroyOnLoad(arg0);
 			return 0;
-		}
-		catch (Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int FindObjectOfType(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1)
-			{
-				System.Type arg0 = ToLua.CheckMonoType(L, 1);
-				UnityEngine.Object o = UnityEngine.Object.FindObjectOfType(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2)
-			{
-				System.Type arg0 = ToLua.CheckMonoType(L, 1);
-				bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
-				UnityEngine.Object o = UnityEngine.Object.FindObjectOfType(arg0, arg1);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Object.FindObjectOfType");
-			}
 		}
 		catch (Exception e)
 		{
