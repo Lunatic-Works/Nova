@@ -38,7 +38,7 @@ def prepare(args):
 
     if not args.ignore_commit:
         if not args.commit:
-        raise RuntimeError("Target commit not given")
+            raise RuntimeError("Target commit not given")
         if args.commit != commit:
             raise RuntimeError(f"Wrong commit, should be {args.commit}")
         out = subprocess.run(["git", "status"], capture_output=True, encoding="utf-8")
@@ -243,7 +243,7 @@ def main():
     prepare(args)
     for _os in args.os.split(","):
         if _os == "windows":
-        build_windows(args)
+            build_windows(args)
         elif _os == "linux":
             build_linux(args)
         elif _os == "macos":
