@@ -3,64 +3,40 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>21A344</string>
+	<string>24F74</string>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
+	<string>en</string>
 	<key>CFBundleExecutable</key>
 	<string>tolua</string>
+	<key>CFBundleIdentifier</key>
+	<string>topameng.tolua</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>tolua</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
 	</array>
-	<key>CFBundleVersion</key>
-	<string>1</string>
-	<key>CFPlugInDynamicRegisterFunction</key>
-	<string></string>
-	<key>CFPlugInDynamicRegistration</key>
-	<string>NO</string>
-	<key>CFPlugInFactories</key>
-	<dict>
-		<key>00000000-0000-0000-0000-000000000000</key>
-		<string>MyFactoryFunction</string>
-	</dict>
-	<key>CFPlugInTypes</key>
-	<dict>
-		<key>00000000-0000-0000-0000-000000000000</key>
-		<array>
-			<string>00000000-0000-0000-0000-000000000000</string>
-		</array>
-	</dict>
-	<key>CFPlugInUnloadFunction</key>
-	<string></string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
-	<string>13C90</string>
+	<string>24F74</string>
 	<key>DTPlatformName</key>
 	<string>macosx</string>
 	<key>DTPlatformVersion</key>
-	<string>12.1</string>
+	<string>15.5</string>
 	<key>DTSDKBuild</key>
-	<string>21C46</string>
+	<string>24F74</string>
 	<key>DTSDKName</key>
-	<string>macosx12.1</string>
+	<string>macosx15.5</string>
 	<key>DTXcode</key>
-	<string>1320</string>
+	<string>1640</string>
 	<key>DTXcodeBuild</key>
-	<string>13C90</string>
+	<string>16F6</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.9</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2013 topameng. All rights reserved.</string>
+	<string>10.13</string>
 </dict>
 </plist>
