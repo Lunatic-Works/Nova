@@ -8,8 +8,8 @@ namespace Nova
     [RequireComponent(typeof(VideoPlayer))]
     public class VideoController : MonoBehaviour, IRestorable
     {
-        public string luaName;
-        public string videoFolder;
+        [SerializeField] private string luaName;
+        [SerializeField] private string videoFolder;
         public float volume;
 
         public string currentVideoName { get; private set; }

@@ -10,6 +10,7 @@ TagManager:
   - UIRoot
   - Character
   - Avatar
+  - Video
   layers:
   - Default
   - TransparentFX

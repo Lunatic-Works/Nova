@@ -189,6 +189,11 @@ namespace Nova
             return FindSingletonComponentWithTag<ViewManager>("UIRoot");
         }
 
+        public static VideoController FindVideoController()
+        {
+            return FindSingletonComponentWithTag<VideoController>("Video");
+        }
+
         public static Vector3 WorldToCanvasPosition(this Canvas canvas, Vector3 worldPosition, Camera camera = null)
         {
             if (camera == null)
