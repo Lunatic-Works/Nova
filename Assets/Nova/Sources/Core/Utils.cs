@@ -338,6 +338,7 @@ namespace Nova
 
         public static void QuitWithAlert()
         {
+            FindVideoController().ClearVideo();
             Alert.Show(null, "ingame.quit.confirm", Quit, null, "QuitConfirm");
         }
 

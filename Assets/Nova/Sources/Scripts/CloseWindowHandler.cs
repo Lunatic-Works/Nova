@@ -20,8 +20,6 @@ namespace Nova
                 return true;
             }
 
-            Utils.FindVideoController().ClearVideo();
-
             Utils.QuitWithAlert();
             return Utils.ForceQuit;
         }
