@@ -21,9 +21,9 @@ hide(__Nova.prefabLoader)
 先来一个选项
 @<|
 branch {
-    { dest = 'l_a', text = '敲妹妹的门'},
-    { dest = 'l_b', text = '去新年参拜'},
-    { dest = 'l_c', text = '带走伊莉雅'},
+    { dest = 'l_a', text = '敲妹妹的门' },
+    { dest = 'l_b', text = '去新年参拜' },
+    { dest = 'l_c', text = '带走伊莉雅' },
 }
 |>
 

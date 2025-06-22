@@ -30,7 +30,7 @@ end
 444
 @<|
 branch {
-    { dest = 'l_next', text = '普通的选项'},
+    { dest = 'l_next', text = '普通的选项' },
     { dest = 'l_next', text = '二周目才会出现', mode = 'show', cond = 'v_round_count >= 2' },
 }
 |>

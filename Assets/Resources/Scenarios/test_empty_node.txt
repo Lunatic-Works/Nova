@@ -32,7 +32,7 @@ label 'l_a'
 @<| label 'l_d' |>
 @<|
 branch {
-    { dest = 'l_end', text = '结束'},
+    { dest = 'l_end', text = '结束' },
     { dest = 'l_d', text = '不结束' },
 }
 |>

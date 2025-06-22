@@ -12,8 +12,8 @@ set_box()
 branch {
     { dest = 'l_red', image = {'red_pill', {-500, 0, 0.5}}},
     { dest = 'l_blue', image = {'blue_pill', {500, 0, 0.5}}},
-    { dest = 'l_blue', text = '测试不能选的图片', image = {'blue_pill', {500, -300, 0.5}}, mode = 'enable', cond = 'false'},
-    { dest = 'l_blue', text = '文字和图片可以一起用'},
+    { dest = 'l_blue', text = '测试不能选的图片', image = {'blue_pill', {500, -300, 0.5}}, mode = 'enable', cond = 'false' },
+    { dest = 'l_blue', text = '文字和图片可以一起用' },
 }
 |>
 
