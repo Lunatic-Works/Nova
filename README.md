@@ -72,6 +72,7 @@
 * [溢爱](https://store.steampowered.com/app/2663600)
 * [完美恋人](https://store.steampowered.com/app/2773520)
 * [机械恋心](https://store.steampowered.com/app/2980050)
+* [黄油罐头](https://store.steampowered.com/app/3713200)
 
 如果你用Nova做出了作品，欢迎来告诉我们，我们可以互相宣传一下
 
