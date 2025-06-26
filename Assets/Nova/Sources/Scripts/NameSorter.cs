@@ -8,20 +8,68 @@ namespace Nova
     public class NameSorter : MonoBehaviour
     {
         [SerializeField] private List<string> matchers;
-        [SerializeField] private int padWidth = 3;
 
-        private IEnumerable<string> NaturalSort(IEnumerable<string> names)
+        private class NaturalComparer : IComparer<string>
         {
-            return names.OrderBy(x => Regex.Replace(x, @"\d+", m => m.Value.PadLeft(padWidth, '0')));
+            public int Compare(string x, string y)
+            {
+                if (x == y) return 0;
+                if (x == null) return -1;
+                if (y == null) return 1;
+
+                int ix = 0, iy = 0;
+                while (ix < x.Length && iy < y.Length)
+                {
+                    char cx = x[ix];
+                    char cy = y[iy];
+
+                    if (char.IsDigit(cx) && char.IsDigit(cy))
+                    {
+                        long nx = 0, ny = 0;
+                        int sx = ix;
+                        while (ix < x.Length && char.IsDigit(x[ix]))
+                        {
+                            ix++;
+                        }
+
+                        long.TryParse(x.Substring(sx, ix - sx), out nx);
+
+                        int sy = iy;
+                        while (iy < y.Length && char.IsDigit(y[iy]))
+                        {
+                            iy++;
+                        }
+
+                        long.TryParse(y.Substring(sy, iy - sy), out ny);
+
+                        if (nx < ny) return -1;
+                        if (nx > ny) return 1;
+                    }
+                    else
+                    {
+                        if (cx != cy)
+                        {
+                            return cx.CompareTo(cy);
+                        }
+
+                        ix++;
+                        iy++;
+                    }
+                }
+
+                if (x.Length > y.Length) return 1;
+                if (x.Length < y.Length) return -1;
+                return 0;
+            }
+        }
+
+        private static IEnumerable<string> NaturalSort(IEnumerable<string> names)
+        {
+            return names.OrderBy(x => x, new NaturalComparer());
         }
 
         public IEnumerable<string> Sort(IEnumerable<string> names)
         {
-            if (matchers.Count <= 0)
-            {
-                return names;
-            }
-
             var buckets = new Dictionary<string, List<string>>();
             foreach (var matcher in matchers)
             {
