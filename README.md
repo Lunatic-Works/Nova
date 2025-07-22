@@ -42,7 +42,7 @@
 
     绝大多数Unity能做的gameplay都可以加到Nova里，但是把Nova加到其他游戏里会比较困难。目前Nova的定位是“框架/模板”，而不是“插件/扩展包”。
 
-    Nova的整个对话和存档系统基本上是围绕着“随时跳到之前的任何一句对话”这个功能做的。如果你的游戏不需要这个功能，那你可能并不需要Nova。为了保证这个功能，把一些gameplay加到Nova里也会比较困难。
+    Nova的整个对话和存档系统基本上是围绕着“随时回跳到之前的任何一句对话”这个功能做的。如果你的游戏不需要这个功能，那你可能并不需要Nova。为了保证这个功能，把一些gameplay加到Nova里也会比较困难。
 
 * **可以自定义UI吗？**
 
@@ -102,7 +102,7 @@
 
 * [UniGal](https://github.com/Uni-Gal/UniGal-Script)：为了解决各家视觉小说引擎的碎片化问题，而定义的通用脚本格式
 * [Yukimi Script](https://github.com/Strrationalism/YukimiScript)：为描述视觉小说而设计的领域专用语言
-* [语涵编译器](https://github.com/PrepPipe)：视觉小说的编译器框架
+* [语涵编译器](https://github.com/PrepPipe/preppipe-python)：视觉小说的编译器框架
 
 国内镜像（随缘更新）：
 
