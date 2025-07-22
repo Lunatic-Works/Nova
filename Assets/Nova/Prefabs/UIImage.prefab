@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2245917190358696981}
   - component: {fileID: 4872263701799953698}
   - component: {fileID: 3847535744722352106}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Resizer
   m_TagString: Untagged
   m_Icon: {fileID: 0}

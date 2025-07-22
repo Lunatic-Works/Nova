@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 519441213383982395}
   - component: {fileID: 4155671434645011797}
   - component: {fileID: 1677907926775512792}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: SpriteMergerCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2188679802550442466}
   - component: {fileID: 8360753444882384276}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: SimpleSpriteMerger
   m_TagString: Untagged
   m_Icon: {fileID: 0}

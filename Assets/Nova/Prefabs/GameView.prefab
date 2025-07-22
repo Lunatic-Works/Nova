@@ -1068,6 +1068,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4475942577079172311, guid: cd0f204e24e8ba940b699f8fa2b4fb6e, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4475942577760100812, guid: cd0f204e24e8ba940b699f8fa2b4fb6e, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 7947100264230001980, guid: cd0f204e24e8ba940b699f8fa2b4fb6e, type: 3}
       propertyPath: m_Name
       value: BasicBackground
@@ -1439,6 +1447,14 @@ PrefabInstance:
     - target: {fileID: 2714604345889696862, guid: 39b0b1de594fd0a428fa08d6f87ca5ad, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6712239120069005652, guid: 39b0b1de594fd0a428fa08d6f87ca5ad, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6712239120695413839, guid: 39b0b1de594fd0a428fa08d6f87ca5ad, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6712239120865747716, guid: 39b0b1de594fd0a428fa08d6f87ca5ad, type: 3}
       propertyPath: m_Pivot.x

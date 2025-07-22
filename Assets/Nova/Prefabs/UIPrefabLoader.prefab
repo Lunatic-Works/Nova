@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5647904414854803400}
   - component: {fileID: 2697100625734526681}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UIPrefabLoader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
