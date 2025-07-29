@@ -181,13 +181,16 @@ namespace Nova.Parser
                     else
                     {
                         // firstBlock is head eager block
-                        if (!string.IsNullOrEmpty(nodeName))
+                        if (string.IsNullOrEmpty(nodeName))
                         {
-                            FlushNode(firstBlock);
+                            nodeName = newNodeName;
+                            headEagerBlock = firstBlock;
                         }
-
-                        nodeName = newNodeName;
-                        headEagerBlock = firstBlock;
+                        else
+                        {
+                            throw new ParserException(
+                                $"Nova: Unmatched head eager block at line {firstBlock.line}:\n{firstBlock.content}");
+                        }
                     }
                 }
                 else
