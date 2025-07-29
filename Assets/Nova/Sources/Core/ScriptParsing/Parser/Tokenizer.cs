@@ -102,7 +102,8 @@ namespace Nova.Parser
                     break;
                 }
 
-                escaped = c == '\\';
+                // When seeing two backslashes, the second one is not escaped
+                escaped = (c == '\\' && !escaped);
             }
 
             if (PeekChar(i) == '\0')
