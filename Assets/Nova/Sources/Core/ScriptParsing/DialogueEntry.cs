@@ -151,6 +151,10 @@ namespace Nova
         public static string WrapCoroutine(string code)
         {
             return $@"
+if {ActionCoroutineName} and coroutine.status({ActionCoroutineName}) ~= 'dead' then
+    warn('Overwrite action coroutine ' .. dump({ActionCoroutineName}))
+end
+
 {ActionCoroutineName} = coroutine.start(function()
     __Nova.coroutineHelper:AcquireActionPause()
     {code}
