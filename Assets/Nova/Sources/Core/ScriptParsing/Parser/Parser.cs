@@ -186,7 +186,7 @@ namespace Nova.Parser
             }
 
             var first = str.First();
-            if (str.Length >= 2 && (first == '\'' || first == '\"' && first == str.Last()))
+            if (str.Length >= 2 && (first == '\'' || first == '\"') && first == str.Last())
             {
                 return EscapeString(str.Substring(1, str.Length - 2));
             }
