@@ -116,7 +116,7 @@ namespace Nova
                 }
 
                 // case 2: Dictionary<K, V>
-                if (serializedType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+                if (serializedType.IsGenericType && serializedType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
                 {
                     Type[] kv = serializedType.GetGenericArguments();
                     if (IsPrimitiveType(kv[0]) && IsAllowedType(kv[1]))
