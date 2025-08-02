@@ -353,8 +353,8 @@ namespace Nova
         public static EasingFunction SlowInEasing(float k = 0.0f)
         {
             float a4 = 5.0f - k;
-            float a5 = 4.0f + k;
-            return t => (a4 - a5 * t) * t * t * t * t;
+            float a5 = -4.0f + k;
+            return t => (a4 + a5 * t) * t * t * t * t;
         }
 
         public static EasingFunction SlowOutEasing(float k = 0.0f)
