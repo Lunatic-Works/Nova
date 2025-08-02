@@ -207,9 +207,6 @@ namespace Nova
         /// <summary>
         /// Reset GameState as if the game is not started
         /// </summary>
-        /// <remarks>
-        /// No event will be triggered when this method is called
-        /// </remarks>
         public void ResetGameState()
         {
             CancelAction();
