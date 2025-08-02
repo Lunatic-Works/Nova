@@ -50,13 +50,13 @@ namespace Nova
         public static float GetTotalDuration(AnimationType type = AnimationType.All)
         {
             return (from animation in Animations where type.HasFlag(animation.type) select animation.totalDuration)
-                .Max();
+                .DefaultIfEmpty(0.0f).Max();
         }
 
         public static float GetTotalTimeRemaining(AnimationType type = AnimationType.All)
         {
             return (from animation in Animations where type.HasFlag(animation.type) select animation.totalTimeRemaining)
-                .Max();
+                .DefaultIfEmpty(0.0f).Max();
         }
 
         private static void AddAnimation(NovaAnimation animation)
