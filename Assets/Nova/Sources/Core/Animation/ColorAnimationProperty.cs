@@ -65,6 +65,7 @@ namespace Nova
 
         protected override Color CombineDelta(Color a, Color b)
         {
+            // Colors should not be simply added
             throw new NotImplementedException();
         }
 

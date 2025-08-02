@@ -43,6 +43,7 @@ namespace Nova
                 locks[key] = 1;
             }
 
+            // lockAcquired will not be set to false again. ReleaseLock() is only called in Dispose()
             lockAcquired = true;
         }
 

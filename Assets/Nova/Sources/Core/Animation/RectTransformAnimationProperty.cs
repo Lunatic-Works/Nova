@@ -70,6 +70,7 @@ namespace Nova
             get => _value;
             set
             {
+                // The lock will be released in AnimationProperty.Dispose()
                 AcquireLock();
                 _value = value;
                 SetValueWithoutLock(value);
