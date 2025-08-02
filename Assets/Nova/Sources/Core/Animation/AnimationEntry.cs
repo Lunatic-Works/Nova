@@ -235,15 +235,12 @@ namespace Nova
 
         public void Stop(bool stopChildren = true)
         {
-            // Without this line, if property is ActionAnimationProperty(Stop), it will cause a following stack trace:
-            // Update -> WakeUpChildren -> Terminate (a) -> set Property.value -> Stop (b)
-            // Both a and b will call DestroyEntry
-            // and this AnimationEntry will be duplicated in factory
+            // Terminate() may trigger another Stop() on the same entry via an action
+            // We need to prevent infinite recursion or duplicated AnimationEntry in the factory
             if (isStopped) return;
 
-            if (evaluateOnStop) Terminate();
-            // Even if not evaluateOnStop, set status = Stopped to avoid Terminate() multiple times
             status = AnimationEntryStatus.Stopped;
+            if (evaluateOnStop) Terminate();
             DisposeProperty();
 
             if (stopChildren)
