@@ -222,13 +222,10 @@ namespace Nova
 
         #region Playback control
 
-        public void Play(float time = -1.0f)
+        public void Play(float time = 0.0f)
         {
             status = AnimationEntryStatus.Playing;
-            if (time >= 0.0f)
-            {
-                timeElapsed = time;
-            }
+            timeElapsed = Mathf.Max(time, 0.0f);
         }
 
         public void Pause()
@@ -295,7 +292,7 @@ namespace Nova
             property.value = easing(timeElapsed * _invDuration);
         }
 
-        private void WakeUpChildren(float time = -1.0f)
+        private void WakeUpChildren(float time = 0.0f)
         {
             foreach (Transform child in Utils.GetChildren(transform))
             {
@@ -315,7 +312,8 @@ namespace Nova
                 return;
             }
 
-            if (repeatNumElapsed >= repeatNum)
+            // If repeatNum == -1, infinite loop
+            if (repeatNum != -1 && repeatNumElapsed >= repeatNum)
             {
                 // No more loop
                 Terminate();
