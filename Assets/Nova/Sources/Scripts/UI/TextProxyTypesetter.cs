@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using TMPro;
 using UnityEngine;
 
@@ -220,7 +221,7 @@ namespace Nova
 
             // lineInfo.length is not compressed by justified alignment, and it can be larger than rectTransform.rect.width
             // lineInfo.width is compressed
-            var totalFlexibleWidth = (rectTransform.rect.width - (lineInfo.length + kernSum)) / textBox.fontSize;
+            var totalFlexibleWidth = (rectTransform.rect.width - lineInfo.length) / textBox.fontSize + kernSum;
             // var oldTotalFlexibleWidth = totalFlexibleWidth;
 
             needFlush = true;
@@ -314,7 +315,7 @@ namespace Nova
                     out flexibleWidth, out flexibleSubWidth, out endMargin, out needFlush, out canAvoidOrphan);
             }
 
-            var dirty = false;
+            var insertions = new List<(int index, string tag)>();
             needFlush &= IsLeftAligned((int)lineInfo.alignment);
             if (needFlush)
             {
@@ -332,8 +333,7 @@ namespace Nova
                     tag += '\v';
                 }
 
-                text = text.Insert(lastIdx, tag);
-                dirty = true;
+                insertions.Add((lastIdx, tag));
             }
 
             for (var i = 0; i < idxs.Count; ++i)
@@ -352,8 +352,7 @@ namespace Nova
                 // Exact float equal
                 if (kern != 0f)
                 {
-                    text = text.Insert(idxs[i], GetXmlTag("space", kern));
-                    dirty = true;
+                    insertions.Add((idxs[i], GetXmlTag("space", kern)));
                 }
             }
 
@@ -367,11 +366,19 @@ namespace Nova
                 }
 
                 var firstIdx = characterInfos[lineInfo.firstCharacterIndex].index;
-                text = text.Insert(firstIdx, tag);
+                insertions.Add((firstIdx, tag));
             }
 
-            if (dirty)
+            if (insertions.Count > 0)
             {
+                var sb = new StringBuilder(text);
+                // insertions are sorted by index descending
+                foreach (var (index, tag) in insertions)
+                {
+                    sb.Insert(index, tag);
+                }
+
+                text = sb.ToString();
                 textInfo = textBox.GetTextInfo(text);
             }
         }
