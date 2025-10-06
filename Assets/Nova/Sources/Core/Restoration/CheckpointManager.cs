@@ -248,7 +248,7 @@ namespace Nova
                 if (name == prevRecord.name)
                 {
                     // Either loop to the same node or GameState.AppendSameNode
-                   this.RuntimeAssert(beginDialogue == 0 || beginDialogue == prevRecord.endDialogue,
+                    this.RuntimeAssert(beginDialogue == 0 || beginDialogue == prevRecord.endDialogue,
                         $"beginDialogue {beginDialogue} != prevRecord.endDialogue {prevRecord.endDialogue}, " +
                         $"prevRecord @{prevRecord.offset} {prevRecord.name}, name {name}");
                 }
@@ -414,71 +414,19 @@ namespace Nova
             return changedNodes.Any();
         }
 
-        public long UpgradeNodeRecord(NodeRecord nodeRecord, int beginDialogue)
+        public NodeRecord UpgradeNodeRecord(NodeRecord nodeRecord, int beginDialogue, ref GameStateCheckpoint beginCheckpoint)
         {
-            var checkpoint = GetCheckpoint(NextRecord(nodeRecord.offset));
-            checkpoint.dialogueIndex = beginDialogue;
+            // if no beginCheckpoint is given, use the first checkpoint from the original nodeRecord
+            beginCheckpoint ??= GetCheckpoint(NextRecord(nodeRecord.offset));
+            beginCheckpoint.dialogueIndex = beginDialogue;
 
-            nodeRecord.offset = globalSave.endCheckpoint;
-            nodeRecord.beginDialogue = beginDialogue;
-            nodeRecord.endDialogue = beginDialogue + 1;
-            nodeRecord.lastCheckpointDialogue = beginDialogue;
-            UpdateNodeRecord(nodeRecord);
+            // recalculate the variablesHash
+            var variablesHash = beginCheckpoint.variables.hash;
+            var newNodeRecord = new NodeRecord(globalSave.endCheckpoint, nodeRecord.name, beginDialogue, variablesHash);
+            UpdateNodeRecord(newNodeRecord);
             UpdateEndCheckpoint();
-            ResetChildParent(nodeRecord.child, nodeRecord.offset);
 
-            AppendCheckpoint(beginDialogue, checkpoint);
-            return nodeRecord.offset;
-        }
-
-        private void ResetChildParent(long childOffset, long parentOffset)
-        {
-            while (childOffset != 0)
-            {
-                var child = GetNodeRecord(childOffset);
-                child.parent = parentOffset;
-                UpdateNodeRecord(child);
-                childOffset = child.sibling;
-            }
-        }
-
-        public long DeleteNodeRecord(NodeRecord nodeRecord)
-        {
-            // If nodeRecord has any sibling, then set the last sibling's sibling to nodeRecord's child
-            if (nodeRecord.child != 0 && nodeRecord.sibling != 0)
-            {
-                var sibling = GetNodeRecord(nodeRecord.sibling);
-                while (sibling.sibling != 0)
-                {
-                    sibling = GetNodeRecord(sibling.sibling);
-                }
-
-                var child = GetNodeRecord(nodeRecord.child);
-                if (child.beginDialogue != sibling.beginDialogue)
-                {
-                    // This may happen because of minigame
-                    Debug.LogWarning(
-                        $"Nova: Node record {nodeRecord} needs delete, " +
-                        $"but child {child} and sibling {sibling} have different beginDialogue."
-                    );
-                }
-
-                sibling.sibling = child.offset;
-                UpdateNodeRecord(sibling);
-            }
-
-            ResetChildParent(nodeRecord.child, nodeRecord.parent);
-            // Now no other node record points to nodeRecord in the subtree starting from nodeRecord
-            // After returning the new offset and update it in the parent,
-            // the parent will not point to nodeRecord either
-            if (nodeRecord.sibling != 0)
-            {
-                return nodeRecord.sibling;
-            }
-            else
-            {
-                return nodeRecord.child;
-            }
+            return newNodeRecord;
         }
 
         #endregion
