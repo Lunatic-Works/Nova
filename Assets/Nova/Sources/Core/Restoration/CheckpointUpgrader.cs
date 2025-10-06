@@ -8,36 +8,103 @@ namespace Nova
     public class CheckpointUpgrader
     {
         private readonly GameState gameState;
+        private readonly FlowChartGraph flowChartGraph;
         private readonly CheckpointManager checkpointManager;
         private readonly Dictionary<string, Differ> changedNodes;
         private readonly Dictionary<long, long> nodeRecordMap = new Dictionary<long, long>();
 
-        public CheckpointUpgrader(GameState gameState, CheckpointManager checkpointManager,
-            Dictionary<string, Differ> changedNodes)
+        public CheckpointUpgrader(GameState gameState, FlowChartGraph flowChartGraph,
+            CheckpointManager checkpointManager, Dictionary<string, Differ> changedNodes)
         {
             this.gameState = gameState;
+            this.flowChartGraph = flowChartGraph;
             this.checkpointManager = checkpointManager;
             this.changedNodes = changedNodes;
         }
 
-        private long UpgradeNodeTree(long offset)
+        // We need to do the upgrade in 2 passes:
+        //   - Pass 1: Calculate the new topology of the node record tree, and the new begin and end dialogues.
+        //             This needs to be done in reverse Polish order.
+        //             Some nodes may be deleted in this pass.
+        //   - Pass 2: Rerun scripts in each of the node that needs upgrade and create new node records.
+        //             In the meanwhile, update parent-child link.
+        private class UpgradeTreeNode
+        {
+            public NodeRecord nodeRecord;
+            public string name => nodeRecord.name;
+            // whether the FlowChartNode is changed
+            public bool nodeChanged;
+            // start and end dialogues of the new node record
+            public int st, ed;
+            public UpgradeTreeNode child;
+            public UpgradeTreeNode sibling;
+            // new node record offset
+            public long offset;
+            public bool upgraded => offset != nodeRecord.offset;
+            public GameStateCheckpoint endCheckpoint;
+
+            public bool needUpgrade(FlowChartGraph flowChartGraph, UpgradeTreeNode parent)
+            {
+                // If the FlowChartNode changed, then this node record needs upgrade.
+                if (nodeChanged)
+                {
+                    return true;
+                }
+
+                // Otherwise if no parent or parent is not upgraded, then this node record is unchanged.
+                if (parent == null || !parent.upgraded)
+                {
+                    return false;
+                }
+
+                // The beginning of a chapter is "stable", meaning that the change is supposed to stop here.
+                return st != 0 || !flowChartGraph.GetNode(name).isChapter;
+            }
+        }
+
+        // return the UpgradeTreeNode in case nodeRecord will be deleted
+        private UpgradeTreeNode DeletedUpgradeNode(NodeRecord nodeRecord, UpgradeTreeNode child, UpgradeTreeNode sibling)
+        {
+            // if both child and sibiling exist, then we need to concat all children into siblings
+            if (child != null && sibling != null)
+            {
+                var lastSibling = sibling;
+                while (lastSibling.sibling != null)
+                {
+                    lastSibling = lastSibling.sibling;
+                }
+
+                lastSibling.sibling = child;
+                if (child.st != sibling.st)
+                {
+                    // This may happen because of minigame
+                    Debug.LogWarning(
+                        $"Nova: Node record {nodeRecord} needs delete, " +
+                        $"but child {child.nodeRecord} and sibling {sibling.nodeRecord} have different beginDialogue."
+                    );
+                }
+            }
+
+            return sibling ?? child;
+        }
+
+        private UpgradeTreeNode BuildUpgradeTree(long offset)
         {
             if (offset == 0)
             {
-                return 0;
+                return null;
             }
 
             var nodeRecord = checkpointManager.GetNodeRecord(offset);
-            nodeRecord.child = UpgradeNodeTree(nodeRecord.child);
-            nodeRecord.sibling = UpgradeNodeTree(nodeRecord.sibling);
+            var child = BuildUpgradeTree(nodeRecord.child);
+            var sibling = BuildUpgradeTree(nodeRecord.sibling);
 
             if (changedNodes.TryGetValue(nodeRecord.name, out var differ))
             {
                 if (differ == null)
                 {
                     // Debug.Log($"remove nodeRecord @{offset}");
-                    nodeRecordMap.Add(offset, 0);
-                    return checkpointManager.DeleteNodeRecord(nodeRecord);
+                    return DeletedUpgradeNode(nodeRecord, child, sibling);
                     // After deleting a node record, its parent may have duplicate children
                     // It does not lead to error but can be optimized
                 }
@@ -74,7 +141,6 @@ namespace Nova
                 }
                 else
                 {
-                    var child = checkpointManager.GetNodeRecord(nodeRecord.child);
                     if (child.name != nodeRecord.name)
                     {
                         // nodeRecord has a child of a different node,
@@ -85,38 +151,90 @@ namespace Nova
                     {
                         // nodeRecord has a child of the same node,
                         // then map endDialogue to the beginning of that node
-                        ed1 = child.beginDialogue;
+                        ed1 = child.st;
                     }
                 }
 
                 // Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1})");
                 if (st1 < ed1)
                 {
-                    var newOffset = checkpointManager.UpgradeNodeRecord(nodeRecord, st1);
-                    // Debug.Log($"map nodeRecord @{offset} -> @{newOffset}");
-                    nodeRecordMap.Add(offset, newOffset);
-                    // We assume that nodeRecord is non-empty,
-                    // so there must be a checkpoint at the first dialogue of the new node record,
-                    // which is copied from the old node record
-                    // We assume that this checkpoint is unchanged in the upgrade,
-                    // and create the next checkpoints in this node record by jumping forward
-                    // TODO: Upgrade this checkpoint
-                    gameState.MoveUpgrade(nodeRecord, ed1 - 1);
-                    return newOffset;
+                    // Debug.Log($"nodeRecord @{offset} needs upgrade");
+                    return new UpgradeTreeNode()
+                    {
+                        nodeRecord = nodeRecord,
+                        nodeChanged = true,
+                        st = st1,
+                        ed = ed1,
+                        child = child,
+                        sibling = sibling,
+                        offset = nodeRecord.offset
+                    };
                 }
                 else
                 {
                     // Debug.Log($"remove nodeRecord @{offset}");
-                    nodeRecordMap.Add(offset, 0);
-                    return checkpointManager.DeleteNodeRecord(nodeRecord);
+                    return DeletedUpgradeNode(nodeRecord, child, sibling);
                 }
             }
             else
             {
-                // just save this record with new child and sibling
-                checkpointManager.UpdateNodeRecord(nodeRecord);
-                return offset;
+                // Debug.Log($"nodeRecord @{offset} does not need upgrade");
+                return new UpgradeTreeNode()
+                {
+                    nodeRecord = nodeRecord,
+                    nodeChanged = false,
+                    st = nodeRecord.beginDialogue,
+                    ed = nodeRecord.endDialogue,
+                    child = child,
+                    sibling = sibling,
+                    offset = nodeRecord.offset
+                };
             }
+        }
+
+        private void UpgradeNodeTree(UpgradeTreeNode node, UpgradeTreeNode parent)
+        {
+            if (node == null)
+            {
+                return;
+            }
+
+            var needUpgrade = node.needUpgrade(flowChartGraph, parent);
+            var newNodeRecord = node.nodeRecord;
+            if (needUpgrade)
+            {
+                var beginCheckpoint = parent?.endCheckpoint;
+                newNodeRecord = checkpointManager.UpgradeNodeRecord(node.nodeRecord, node.st, ref beginCheckpoint);
+                var oldOffset = node.offset;
+                node.offset = newNodeRecord.offset;
+                nodeRecordMap.Add(oldOffset, node.offset);
+
+                // Debug.Log($"upgrade nodeRecord @{oldOffset} -> @{node.offset} [{node.st}, {node.ed})");
+
+                node.endCheckpoint = gameState.MoveUpgrade(newNodeRecord, node.ed - 1, beginCheckpoint);
+            }
+
+            UpgradeNodeTree(node.child, node);
+            UpgradeNodeTree(node.sibling, parent);
+
+            var childOffset = node.child?.offset ?? 0;
+            var siblingOffset = node.sibling?.offset ?? 0;
+            var parentOffset = parent?.offset ?? 0;
+
+            // Debug.Log($"reset nodeRecord @{newNodeRecord.offset} child={childOffset}, " +
+            //     $"sibling={siblingOffset}, parent={parentOffset}");
+
+            newNodeRecord.child = childOffset;
+            newNodeRecord.sibling = siblingOffset;
+            newNodeRecord.parent = parentOffset;
+            checkpointManager.UpdateNodeRecord(newNodeRecord);
+        }
+
+        private long UpgradeNodeTree()
+        {
+            var root = BuildUpgradeTree(checkpointManager.beginCheckpoint);
+            UpgradeNodeTree(root, null);
+            return root.offset;
         }
 
         public bool TryUpgradeBookmark(Bookmark bookmark)
@@ -175,7 +293,7 @@ namespace Nova
                 checkpointManager.InvalidateReachedDialogues(nodeName);
             }
 
-            var newRoot = UpgradeNodeTree(checkpointManager.beginCheckpoint);
+            var newRoot = UpgradeNodeTree();
             checkpointManager.beginCheckpoint = newRoot == 0 ? checkpointManager.endCheckpoint : newRoot;
 
             // Copy Keys because it may be changed in the loop
