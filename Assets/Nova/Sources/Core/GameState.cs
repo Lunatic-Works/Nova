@@ -77,7 +77,7 @@ namespace Nova
                 }
 
                 upgradeStarted = true;
-                var upgrader = new CheckpointUpgrader(this, checkpointManager, changedNodes);
+                var upgrader = new CheckpointUpgrader(this, flowChartGraph, checkpointManager, changedNodes);
                 // UpgradeSaves may reset nodeRecord and currentIndex
                 upgrader.UpgradeSaves();
                 success = true;
@@ -736,7 +736,7 @@ namespace Nova
         public Dictionary<string, IRestoreData> GetRestorableDatas()
         {
             return restorables.ToDictionary(x => x.Key, x => x.Value.GetRestoreData());
-            }
+        }
 
         private GameStateCheckpoint GetCheckpoint()
         {
@@ -913,17 +913,13 @@ namespace Nova
             isRestoring = true;
             RestoreCheckpoint(checkpoint);
             // Now currentIndex <= dialogueIndex
-            if (!isUpgrading && dialogueIndex == currentIndex)
+            if (dialogueIndex == currentIndex)
             {
                 isRestoring = false;
             }
 
             // The result of invoking nodeChanged should be already in the checkpoint, so we don't invoke it here
             UpdateGameState(true, false);
-            if (isUpgrading && dialogueIndex == currentIndex)
-            {
-                NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
-            }
 
             if (!CheckUnlockInRestoring())
             {
@@ -940,13 +936,31 @@ namespace Nova
             // Debug.Log($"Move end {nodeRecord} {currentIndex} -> {newNodeRecord} {dialogueIndex}");
         }
 
-        public void MoveUpgrade(NodeRecord newNodeRecord, int lastDialogue)
+        public GameStateCheckpoint MoveUpgrade(NodeRecord newNodeRecord, int lastDialogue, GameStateCheckpoint beginCheckpoint)
         {
             state = State.Normal;
+            CancelAction();
+            NovaAnimation.StopAll(AnimationType.All ^ AnimationType.UI);
+            isRestoring = true;
             isUpgrading = true;
-            Move(newNodeRecord, lastDialogue);
+
+            nodeRecord = newNodeRecord;
+            RestoreCheckpoint(beginCheckpoint);
+            UpdateGameState(true, true);
+
+            // Debug.Log($"Move Upgrade {currentIndex}->{lastDialogue}");
+
+            if (lastDialogue > currentIndex)
+            {
+                JumpForward(lastDialogue - currentIndex, true);
+            }
+
+            isRestoring = false;
             isUpgrading = false;
+
+            var endCheckpoint = GetCheckpoint();
             ResetGameState();
+            return endCheckpoint;
         }
 
         public void StepBackward()
