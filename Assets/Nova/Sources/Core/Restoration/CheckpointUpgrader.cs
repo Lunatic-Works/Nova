@@ -260,7 +260,16 @@ namespace Nova
 
             var nodeRecord = checkpointManager.GetNodeRecord(bookmark.nodeOffset);
             var newNodeRecord = checkpointManager.GetNodeRecord(newOffset);
-            var newDialogueIndex = changedNodes[nodeRecord.name].leftMap[bookmark.dialogueIndex];
+            int newDialogueIndex;
+            if (changedNodes.ContainsKey(nodeRecord.name))
+            {
+                newDialogueIndex = changedNodes[nodeRecord.name].leftMap[bookmark.dialogueIndex];
+            }
+            else
+            {
+                newDialogueIndex = bookmark.dialogueIndex;
+            }
+
             if (newDialogueIndex < newNodeRecord.beginDialogue || newDialogueIndex >= newNodeRecord.endDialogue)
             {
                 // This may happen when the bookmark is at the beginning or the end of a node,
