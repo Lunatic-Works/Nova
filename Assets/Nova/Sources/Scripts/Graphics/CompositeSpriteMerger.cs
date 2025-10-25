@@ -158,6 +158,8 @@ namespace Nova
                 var bounds = sprite.sprite.bounds;
                 var center = bounds.center + sprite.offset;
                 var extents = bounds.extents.CloneScale(sprite.scale);
+                extents.x = Mathf.Abs(extents.x);
+                extents.y = Mathf.Abs(extents.y);
                 xMin = Mathf.Min(xMin, center.x - extents.x);
                 yMin = Mathf.Min(yMin, center.y - extents.y);
                 xMax = Mathf.Max(xMax, center.x + extents.x);
