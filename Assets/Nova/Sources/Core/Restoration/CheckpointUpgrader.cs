@@ -145,7 +145,7 @@ namespace Nova
                     {
                         // nodeRecord has a child of a different node,
                         // then map endDialogue to the end of the upgraded nodeRecord
-                        ed1 = differ.remap.Count;
+                        ed1 = Math.Min(differ.rightMap.Count, differ.remap.Count);
                     }
                     else
                     {
@@ -155,7 +155,7 @@ namespace Nova
                     }
                 }
 
-                // Debug.Log($"map nodeRecord @{offset} [{st0}, {ed0}) -> [{st1}, {ed1})");
+                // Debug.Log($"map nodeRecord {nodeRecord.name} @{offset} [{st0}, {ed0}) -> [{st1}, {ed1}) differ {differ.leftMap.Count} {differ.rightMap.Count} {differ.remap.Count}");
                 if (st1 < ed1)
                 {
                     // Debug.Log($"nodeRecord @{offset} needs upgrade");
@@ -209,7 +209,7 @@ namespace Nova
                 node.offset = newNodeRecord.offset;
                 nodeRecordMap.Add(oldOffset, node.offset);
 
-                // Debug.Log($"upgrade nodeRecord @{oldOffset} -> @{node.offset} [{node.st}, {node.ed})");
+                // Debug.Log($"upgrade nodeRecord {node.name} @{oldOffset} -> @{node.offset} [{node.st}, {node.ed})");
 
                 node.endCheckpoint = gameState.MoveUpgrade(newNodeRecord, node.ed - 1, beginCheckpoint);
             }
