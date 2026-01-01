@@ -20,7 +20,7 @@
 
 ## 常见问题
 
-* **网上已经有很多视觉小说引擎/框架了，Nova与它们的差异在哪里？**
+* **网上已经有很多galgame引擎/框架了，Nova与它们的差异在哪里？**
 
     这篇文章介绍了设计思路：https://zhuanlan.zhihu.com/p/272466277
 
@@ -87,17 +87,17 @@
 * [Newtonsoft Json](https://docs.unity3d.com/Packages/com.unity.nuget.newtonsoft-json@3.0/manual/index.html)
 * [Loop Scroll Rect](https://github.com/qiankanglai/LoopScrollRect)
 
-也可以看一看其他的视觉小说引擎：
+也可以看一看其他的galgame引擎：
 
 * [Ren'Py](https://github.com/renpy/renpy)：如果你没有编程基础但是想学，或者有Python基础，推荐用这个引擎
 * [WebGAL](https://github.com/MakinoharaShoko/WebGAL)：如果你信仰web，推荐用这个引擎
 * [Ayaka](https://github.com/Uni-Gal/Ayaka)：如果你信仰Rust，可以试试这个引擎
+* [VoidNovelEngine](https://github.com/VoidmatrixHeathcliff/VoidNovelEngine)：自由、现代化的视觉小说引擎
 
 以及通用游戏引擎：
 
 * [SakuraEngine](https://github.com/SakuraEngine/SakuraEngine)：为高性能而生的游戏运行时与工具箱
-* [PainterEngine](https://github.com/matrixcascade/PainterEngine)：由C语言编写的跨平台图形应用框架
-* [EtherEngine](https://github.com/EtherProject/EtherEngine)：基于Lua的跨平台游戏接口
+* [PainterEngine](https://github.com/matrixcascade/PainterEngine)：由C语言编写的跨平台图形引擎
 
 以及
 
