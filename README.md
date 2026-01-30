@@ -74,6 +74,7 @@
 * [机械恋心](https://store.steampowered.com/app/2980050)
 * [黄油罐头](https://store.steampowered.com/app/3713200)
 * [水鬼](https://store.steampowered.com/app/3111010)
+* [迷鹿](https://store.steampowered.com/app/2076290)
 
 如果你用Nova做出了作品，欢迎来告诉我们，我们可以互相宣传一下
 
