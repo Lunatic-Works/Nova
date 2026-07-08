@@ -497,22 +497,28 @@ namespace Nova
 
         public void WriteBookmark(string path, Bookmark obj, bool compress = DefaultCompress)
         {
-            using var fs = File.OpenWrite(path);
-            using var w = new BinaryWriter(fs);
-            w.Write(FileHeader);
-            w.Write(Version);
+            const int BufferSize = 1024;
+            using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+
+            {
+                using var w = new BinaryWriter(fs, Encoding.UTF8, true);
+                w.Write(FileHeader);
+                w.Write(Version);
+            }
 
             if (compress)
             {
-                using var compressor = new DeflateStream(fs, CompressionMode.Compress);
-                using var sw = new StreamWriter(compressor, Encoding.UTF8);
+                using var compressor = new DeflateStream(fs, CompressionMode.Compress, true);
+                using var sw = new StreamWriter(compressor, Encoding.UTF8, BufferSize, true);
                 jsonSerializer.Serialize(sw, obj);
             }
             else
             {
-                using var sw = new StreamWriter(fs, Encoding.UTF8);
+                using var sw = new StreamWriter(fs, Encoding.UTF8, BufferSize, true);
                 jsonSerializer.Serialize(sw, obj);
             }
+
+            fs.Flush(true);
         }
 
         public void ReadFileHeader(Stream fs, out bool matchHeader, out int version)
