@@ -32,7 +32,7 @@ namespace Nova
         public UnityEvent bookmarkLoaded;
 
         private GameState gameState;
-        private CheckpointManager checkpointManager;
+        private BookmarkManager bookmarkManager;
 
         private Button backgroundButton;
         private SaveEntryController previewEntry;
@@ -75,7 +75,7 @@ namespace Nova
 
             set
             {
-                this.RuntimeAssert(checkpointManager.bookmarksMetadata.ContainsKey(value) || value == -1,
+                this.RuntimeAssert(bookmarkManager.bookmarksMetadata.ContainsKey(value) || value == -1,
                     "selectedSaveID must be a saveID with existing bookmark, or -1.");
 
                 if (_selectedSaveID >= 0)
@@ -117,7 +117,7 @@ namespace Nova
             maxSaveEntry = maxRow * maxCol;
 
             gameState = Utils.FindNovaController().GameState;
-            checkpointManager = Utils.FindNovaController().CheckpointManager;
+            bookmarkManager = Utils.FindNovaController().BookmarkManager;
 
             backgroundButton = myPanel.transform.Find("Background").GetComponent<Button>();
             thumbnailTextProxy = myPanel.transform.Find("Background/Left/TextBox/Text").GetComponent<TextProxy>();
@@ -217,12 +217,12 @@ namespace Nova
                 if (saveViewMode == SaveViewMode.Save)
                 {
                     // Locate the first unused slot
-                    saveID = checkpointManager.QueryMinUnusedSaveID((int)BookmarkType.NormalSave, int.MaxValue);
+                    saveID = bookmarkManager.QueryMinUnusedSaveID((int)BookmarkType.NormalSave, int.MaxValue);
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
                     // Locate the latest bookmark
-                    saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue,
+                    saveID = bookmarkManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue,
                         SaveIDQueryType.Latest);
                 }
 
@@ -323,7 +323,7 @@ namespace Nova
             bookmark.description = currentDialogue;
             bookmark.screenshot = screenSprite.texture;
             DeleteCachedThumbnailSprite(saveID);
-            checkpointManager[saveID] = bookmark;
+            bookmarkManager.SaveBookmark(saveID, bookmark);
             bookmarkSaved.Invoke();
 
             ShowPage();
@@ -344,7 +344,7 @@ namespace Nova
 
         public void LoadBookmark(int saveID)
         {
-            var bookmark = checkpointManager[saveID];
+            var bookmark = bookmarkManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
             if (bookmark == null)
             {
@@ -380,7 +380,7 @@ namespace Nova
         private void DeleteBookmark(int saveID)
         {
             DeleteCachedThumbnailSprite(saveID);
-            checkpointManager.DeleteBookmark(saveID);
+            bookmarkManager.DeleteBookmark(saveID);
 
             ShowPage();
             selectedSaveID = -1;
@@ -404,15 +404,15 @@ namespace Nova
             bookmark.description = currentDialogue;
             bookmark.screenshot = screenshot;
 
-            var saveID = checkpointManager.QueryMinUnusedSaveID(beginSaveID, beginSaveID + maxSaveEntry);
+            var saveID = bookmarkManager.QueryMinUnusedSaveID(beginSaveID, beginSaveID + maxSaveEntry);
             if (saveID >= beginSaveID + maxSaveEntry)
             {
-                saveID = checkpointManager.QuerySaveIDByTime(beginSaveID, beginSaveID + maxSaveEntry,
+                saveID = bookmarkManager.QuerySaveIDByTime(beginSaveID, beginSaveID + maxSaveEntry,
                     SaveIDQueryType.Earliest);
                 DeleteCachedThumbnailSprite(saveID);
             }
 
-            checkpointManager[saveID] = bookmark;
+            bookmarkManager.SaveBookmark(saveID, bookmark);
             bookmarkSaved.Invoke();
         }
 
@@ -447,9 +447,9 @@ namespace Nova
 
         public void QuickLoadBookmark()
         {
-            int saveID = checkpointManager.QuerySaveIDByTime((int)BookmarkType.QuickSave,
+            int saveID = bookmarkManager.QuerySaveIDByTime((int)BookmarkType.QuickSave,
                 (int)BookmarkType.NormalSave, SaveIDQueryType.Latest);
-            var bookmark = checkpointManager[saveID];
+            var bookmark = bookmarkManager.LoadBookmark(saveID);
             DeleteCachedThumbnailSprite(saveID);
             if (bookmark == null)
             {
@@ -465,7 +465,7 @@ namespace Nova
 
         public void QuickLoadBookmarkWithAlert()
         {
-            if (checkpointManager.bookmarksMetadata.Values.Any(m =>
+            if (bookmarkManager.bookmarksMetadata.Values.Any(m =>
                     m.saveID >= (int)BookmarkType.QuickSave && m.saveID < (int)BookmarkType.QuickSave + maxSaveEntry))
             {
                 Alert.Show(null, "bookmark.quickload.confirm", QuickLoadBookmark, null, "BookmarkQuickLoad");
@@ -488,7 +488,7 @@ namespace Nova
             {
                 if (saveViewMode == SaveViewMode.Save)
                 {
-                    if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
+                    if (bookmarkManager.bookmarksMetadata.ContainsKey(saveID))
                     {
                         SaveBookmarkWithAlert(saveID);
                     }
@@ -500,7 +500,7 @@ namespace Nova
                 }
                 else // saveViewMode == SaveViewMode.Load
                 {
-                    if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
+                    if (bookmarkManager.bookmarksMetadata.ContainsKey(saveID))
                     {
                         LoadBookmarkWithAlert(saveID);
                     }
@@ -516,7 +516,7 @@ namespace Nova
                     }
                     else // Another bookmark selected
                     {
-                        if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
+                        if (bookmarkManager.bookmarksMetadata.ContainsKey(saveID))
                         {
                             selectedSaveID = saveID;
                         }
@@ -536,7 +536,7 @@ namespace Nova
                     }
                     else // Another bookmark selected
                     {
-                        if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
+                        if (bookmarkManager.bookmarksMetadata.ContainsKey(saveID))
                         {
                             selectedSaveID = saveID;
                         }
@@ -560,7 +560,7 @@ namespace Nova
             isMouse = !TouchFix.IsTouch(eventData);
             if (isMouse)
             {
-                if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
+                if (bookmarkManager.bookmarksMetadata.ContainsKey(saveID))
                 {
                     selectedSaveID = saveID;
                 }
@@ -606,12 +606,12 @@ namespace Nova
         {
             try
             {
-                Bookmark bookmark = checkpointManager[saveID];
-                var nodeName = checkpointManager.GetNodeRecord(bookmark.nodeOffset).name;
+                var bookmark = bookmarkManager.LoadBookmark(saveID);
+                var nodeName = bookmarkManager.GetNodeName(bookmark);
                 var displayName = I18n.__(gameState.GetNode(nodeName, false).displayNames);
                 ShowPreview(GetThumbnailSprite(saveID), Unselect, I18n.__(
                     "bookmark.summary",
-                    checkpointManager.bookmarksMetadata[saveID].creationTime.ToString(DateTimeFormat),
+                    bookmarkManager.bookmarksMetadata[saveID].creationTime.ToString(DateTimeFormat),
                     displayName,
                     bookmark.description.FormatNameDialogue()
                 ));
@@ -687,8 +687,8 @@ namespace Nova
 
             if (saveViewBookmarkType == BookmarkType.NormalSave)
             {
-                int maxSaveID = checkpointManager.QueryMaxSaveID((int)BookmarkType.NormalSave);
-                if (checkpointManager.bookmarksMetadata.ContainsKey(maxSaveID))
+                int maxSaveID = bookmarkManager.QueryMaxSaveID((int)BookmarkType.NormalSave);
+                if (bookmarkManager.bookmarksMetadata.ContainsKey(maxSaveID))
                 {
                     maxPage = SaveIDToPage(maxSaveID);
                     if (saveViewMode == SaveViewMode.Save)
@@ -733,7 +733,7 @@ namespace Nova
             rightButtonText.color = (rightButton.interactable ? defaultTextColor : disabledTextColor);
 
             int latestSaveID =
-                checkpointManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue, SaveIDQueryType.Latest);
+                bookmarkManager.QuerySaveIDByTime((int)BookmarkType.NormalSave, int.MaxValue, SaveIDQueryType.Latest);
 
             for (int i = 0; i < maxSaveEntry; ++i)
             {
@@ -746,11 +746,11 @@ namespace Nova
                 UnityAction onDeleteButtonClicked;
                 UnityAction onThumbnailButtonClicked;
 
-                if (checkpointManager.bookmarksMetadata.ContainsKey(saveID))
+                if (bookmarkManager.bookmarksMetadata.ContainsKey(saveID))
                 {
                     try
                     {
-                        newFooterText = checkpointManager[saveID].creationTime.ToString(DateTimeFormat);
+                        newFooterText = bookmarkManager.LoadBookmark(saveID).creationTime.ToString(DateTimeFormat);
                         newThumbnailSprite = GetThumbnailSprite(saveID);
                         onDeleteButtonClicked = () => DeleteBookmarkWithAlert(saveID);
                         onThumbnailButtonClicked = () => OnThumbnailButtonClicked(saveID);
@@ -809,11 +809,11 @@ namespace Nova
 
         private Sprite GetThumbnailSprite(int saveID)
         {
-            this.RuntimeAssert(checkpointManager.bookmarksMetadata.ContainsKey(saveID),
+            this.RuntimeAssert(bookmarkManager.bookmarksMetadata.ContainsKey(saveID),
                 "GetThumbnailSprite must use a saveID with existing bookmark.");
             if (!cachedThumbnailSprites.ContainsKey(saveID))
             {
-                Bookmark bookmark = checkpointManager[saveID];
+                var bookmark = bookmarkManager.LoadBookmark(saveID);
                 cachedThumbnailSprites[saveID] = Utils.Texture2DToSprite(bookmark.screenshot);
             }
 

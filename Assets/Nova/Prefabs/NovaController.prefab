@@ -129,6 +129,7 @@ GameObject:
   - component: {fileID: 114397183559913708}
   - component: {fileID: 8579560473595589777}
   - component: {fileID: 114045275974384532}
+  - component: {fileID: 1127421199805838841}
   - component: {fileID: 114842112916876254}
   - component: {fileID: 5381135131129481220}
   - component: {fileID: 114174511625809554}
@@ -200,6 +201,9 @@ MonoBehaviour:
   choiceOccurs:
     m_PersistentCalls:
       m_Calls: []
+  savePoint:
+    m_PersistentCalls:
+      m_Calls: []
   routeEnded:
     m_PersistentCalls:
       m_Calls: []
@@ -244,6 +248,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveFolder: 
+--- !u!114 &1127421199805838841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737081535048956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 154387004d348ff4c9eaa4aff794fef3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114842112916876254
 MonoBehaviour:
   m_ObjectHideFlags: 0

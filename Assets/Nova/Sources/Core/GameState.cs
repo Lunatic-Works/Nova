@@ -77,7 +77,7 @@ namespace Nova
                 }
 
                 upgradeStarted = true;
-                var upgrader = new CheckpointUpgrader(this, flowChartGraph, checkpointManager, changedNodes);
+                var upgrader = new CheckpointUpgrader(flowChartGraph, changedNodes);
                 // UpgradeSaves may reset nodeRecord and currentIndex
                 upgrader.UpgradeSaves();
                 success = true;

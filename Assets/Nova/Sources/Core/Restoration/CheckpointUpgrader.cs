@@ -10,15 +10,17 @@ namespace Nova
         private readonly GameState gameState;
         private readonly FlowChartGraph flowChartGraph;
         private readonly CheckpointManager checkpointManager;
+        private readonly BookmarkManager bookmarkManager;
         private readonly Dictionary<string, Differ> changedNodes;
         private readonly Dictionary<long, long> nodeRecordMap = new Dictionary<long, long>();
 
-        public CheckpointUpgrader(GameState gameState, FlowChartGraph flowChartGraph,
-            CheckpointManager checkpointManager, Dictionary<string, Differ> changedNodes)
+        public CheckpointUpgrader(FlowChartGraph flowChartGraph, Dictionary<string, Differ> changedNodes)
         {
-            this.gameState = gameState;
+            var controller = Utils.FindNovaController();
+            gameState = controller.GameState;
+            checkpointManager = controller.CheckpointManager;
+            bookmarkManager = controller.BookmarkManager;
             this.flowChartGraph = flowChartGraph;
-            this.checkpointManager = checkpointManager;
             this.changedNodes = changedNodes;
         }
 
@@ -306,24 +308,24 @@ namespace Nova
             checkpointManager.beginCheckpoint = newRoot == 0 ? checkpointManager.endCheckpoint : newRoot;
 
             // Copy Keys because it may be changed in the loop
-            foreach (var id in checkpointManager.bookmarksMetadata.Keys.ToList())
+            foreach (var id in bookmarkManager.bookmarksMetadata.Keys.ToList())
             {
                 try
                 {
-                    var bookmark = checkpointManager.LoadBookmark(id, true);
+                    var bookmark = bookmarkManager.LoadBookmark(id, true);
                     if (TryUpgradeBookmark(id, bookmark))
                     {
-                        checkpointManager.SaveBookmark(id, bookmark, true);
+                        bookmarkManager.SaveBookmark(id, bookmark, true);
                     }
                     else
                     {
-                        checkpointManager.DeleteBookmark(id);
+                        bookmarkManager.DeleteBookmark(id);
                     }
                 }
                 catch (Exception e)
                 {
                     Debug.LogError($"Nova: Failed to upgrade bookmark {id}: {e}");
-                    checkpointManager.DeleteBookmark(id);
+                    bookmarkManager.DeleteBookmark(id);
                 }
             }
         }

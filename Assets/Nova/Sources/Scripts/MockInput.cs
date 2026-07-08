@@ -19,7 +19,7 @@ namespace Nova
         [SerializeField] private int seed;
 
         private GameState gameState;
-        private CheckpointManager checkpointManager;
+        private BookmarkManager bookmarkManager;
         private ViewManager viewManager;
         private GameViewController gameView;
         private SaveViewController saveView;
@@ -36,7 +36,7 @@ namespace Nova
         {
             var controller = Utils.FindNovaController();
             gameState = controller.GameState;
-            checkpointManager = controller.CheckpointManager;
+            bookmarkManager = controller.BookmarkManager;
             viewManager = Utils.FindViewManager();
             gameView = viewManager.GetController<GameViewController>();
             saveView = viewManager.GetController<SaveViewController>();
@@ -140,7 +140,7 @@ namespace Nova
             yield return WaitForView(CurrentViewType.UI);
 
             var startNormalSave = (int)BookmarkType.NormalSave;
-            var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startNormalSave);
+            var maxNormalSave = bookmarkManager.QueryMinUnusedSaveID(startNormalSave);
             if (maxNormalSave > startNormalSave && random.Next(2) == 0)
             {
                 var saveID = random.Next(startNormalSave, maxNormalSave);
@@ -175,7 +175,7 @@ namespace Nova
             else
             {
                 var startSave = (int)BookmarkType.NormalSave;
-                var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startSave);
+                var maxNormalSave = bookmarkManager.QueryMinUnusedSaveID(startSave);
                 var saveID = random.Next(startSave, maxNormalSave + 1);
 
                 yield return DoTransition(saveView.ShowSaveWithCallback);
@@ -189,8 +189,8 @@ namespace Nova
         {
             var startQuickSave = (int)BookmarkType.QuickSave;
             var startNormalSave = (int)BookmarkType.NormalSave;
-            var maxQuickSave = checkpointManager.QueryMinUnusedSaveID(startQuickSave);
-            var maxNormalSave = checkpointManager.QueryMinUnusedSaveID(startNormalSave);
+            var maxQuickSave = bookmarkManager.QueryMinUnusedSaveID(startQuickSave);
+            var maxNormalSave = bookmarkManager.QueryMinUnusedSaveID(startNormalSave);
             if (maxQuickSave > startQuickSave && random.Next(2) == 0)
             {
                 saveView.QuickLoadBookmark();

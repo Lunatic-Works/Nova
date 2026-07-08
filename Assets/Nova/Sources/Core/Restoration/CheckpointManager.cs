@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Nova
@@ -14,11 +13,11 @@ namespace Nova
         // When constructed in editor, e.g. by SaveViewer, it avoids modifying the global save file
         private bool frozen;
 
-        private string savePathBase;
+        public string savePathBase { get; private set; }
         private string globalSavePath;
         private string globalSaveBackupPath;
 
-        private GlobalSave globalSave;
+        public GlobalSave globalSave { get; private set; }
         private bool globalSaveDirty;
 
         // nodeName => dialogueIndex => data
@@ -27,10 +26,7 @@ namespace Nova
 
         private readonly SerializableHashSet<string> reachedEnds = new SerializableHashSet<string>();
 
-        private readonly Dictionary<int, Bookmark> cachedBookmarks = new Dictionary<int, Bookmark>();
-        public readonly Dictionary<int, BookmarkMetadata> bookmarksMetadata = new Dictionary<int, BookmarkMetadata>();
-
-        private CheckpointSerializer serializer;
+        public CheckpointSerializer serializer { get; private set; }
 
         private bool inited;
 
@@ -66,21 +62,6 @@ namespace Nova
                 }
             }
 
-            bookmarksMetadata.Clear();
-            foreach (string fileName in Directory.GetFiles(savePathBase, "sav*.nsav"))
-            {
-                var result = Regex.Match(fileName, @"sav([0-9]+)\.nsav");
-                if (result.Groups.Count > 1 && int.TryParse(result.Groups[1].Value, out int id))
-                {
-                    bookmarksMetadata.Add(id, new BookmarkMetadata
-                    {
-                        saveID = id,
-                        creationTime = serializer.ReadBookmark(fileName).creationTime
-                    });
-                }
-            }
-
-            // Debug.Log("Nova: CheckpointManager initialized.");
             inited = true;
         }
 
@@ -92,12 +73,6 @@ namespace Nova
         private void OnDestroy()
         {
             UpdateGlobalSave();
-
-            foreach (var bookmark in cachedBookmarks.Values)
-            {
-                bookmark.DestroyTexture();
-            }
-
             serializer.Dispose();
         }
 
@@ -467,8 +442,16 @@ namespace Nova
             }
 
             serializer.Flush();
-            // backup now
-            File.Copy(globalSavePath, globalSaveBackupPath, true);
+
+            // Copy to backup with atomic move
+            var tmpPath = globalSaveBackupPath + ".tmp";
+            File.Copy(globalSavePath, tmpPath, true);
+            if (File.Exists(globalSaveBackupPath))
+            {
+                File.Delete(globalSaveBackupPath);
+            }
+
+            File.Move(tmpPath, globalSaveBackupPath);
         }
 
         /// <summary>
@@ -522,177 +505,6 @@ namespace Nova
         public GlobalSave GetGlobalSave()
         {
             return globalSave;
-        }
-
-        #endregion
-
-        #region Bookmarks
-
-        private string GetBookmarkFileName(int saveID)
-        {
-            return Path.Combine(savePathBase, $"sav{saveID:D3}.nsav");
-        }
-
-        private Bookmark ReplaceCache(int saveID, Bookmark bookmark)
-        {
-            if (cachedBookmarks.TryGetValue(saveID, out var old))
-            {
-                if (old == bookmark)
-                {
-                    return bookmark;
-                }
-
-                if (bookmark != null && bookmark.screenshot == null)
-                {
-                    bookmark.screenshot = old.screenshot;
-                }
-                else
-                {
-                    Destroy(old.screenshot);
-                }
-            }
-
-            if (bookmark == null)
-            {
-                cachedBookmarks.Remove(saveID);
-            }
-            else
-            {
-                cachedBookmarks[saveID] = bookmark;
-            }
-
-            return bookmark;
-        }
-
-        private void MoveBackup(string fileName)
-        {
-            var fileNameBackup = fileName + ".bak";
-            if (File.Exists(fileName))
-            {
-                if (File.Exists(fileNameBackup))
-                {
-                    File.Delete(fileNameBackup);
-                }
-
-                File.Move(fileName, fileNameBackup);
-            }
-        }
-
-        public void SaveBookmark(int saveID, Bookmark bookmark, bool isUpgrading = false)
-        {
-            if (!isUpgrading)
-            {
-                var screenshot = new Texture2D(bookmark.screenshot.width, bookmark.screenshot.height,
-                    bookmark.screenshot.format, false);
-                screenshot.SetPixels32(bookmark.screenshot.GetPixels32());
-                screenshot.Apply();
-                bookmark.screenshot = screenshot;
-            }
-
-            bookmark.globalSaveIdentifier = globalSave.identifier;
-
-            var fileName = GetBookmarkFileName(saveID);
-            MoveBackup(fileName);
-            serializer.WriteBookmark(fileName, ReplaceCache(saveID, bookmark));
-            UpdateGlobalSave();
-
-            var metadata = bookmarksMetadata.Ensure(saveID);
-            metadata.saveID = saveID;
-            metadata.creationTime = bookmark.creationTime;
-        }
-
-        public Bookmark LoadBookmark(int saveID, bool isUpgrading = false)
-        {
-            var bookmark = serializer.ReadBookmark(GetBookmarkFileName(saveID));
-            if (!isUpgrading && bookmark.globalSaveIdentifier != globalSave.identifier)
-            {
-                Debug.LogWarning(
-                    $"Nova: Bookmark {saveID} " +
-                    $"globalSaveIdentifier {bookmark.globalSaveIdentifier} != {globalSave.identifier}");
-                bookmark = null;
-            }
-
-            return ReplaceCache(saveID, bookmark);
-        }
-
-        public void DeleteBookmark(int saveID)
-        {
-            var fileName = GetBookmarkFileName(saveID);
-            MoveBackup(fileName);
-            bookmarksMetadata.Remove(saveID);
-            ReplaceCache(saveID, null);
-        }
-
-        /// <summary>
-        /// Load the contents of all existing bookmark in the given range eagerly.
-        /// </summary>
-        /// <param name="beginSaveID">The beginning of the range, inclusive.</param>
-        /// <param name="endSaveID">The end of the range, exclusive.</param>
-        public void EagerLoadRange(int beginSaveID, int endSaveID)
-        {
-            for (; beginSaveID < endSaveID; beginSaveID++)
-            {
-                if (bookmarksMetadata.ContainsKey(beginSaveID))
-                    LoadBookmark(beginSaveID);
-            }
-        }
-
-        /// <summary>
-        /// Load / Save a bookmark by ID. Will use cached result if exists.
-        /// </summary>
-        /// <param name="saveID">ID of the bookmark.</param>
-        /// <returns>The cached or loaded bookmark</returns>
-        public Bookmark this[int saveID]
-        {
-            get
-            {
-                if (!bookmarksMetadata.ContainsKey(saveID))
-                    return null;
-                if (!cachedBookmarks.ContainsKey(saveID))
-                    LoadBookmark(saveID);
-                return cachedBookmarks[saveID];
-            }
-
-            set => SaveBookmark(saveID, value);
-        }
-
-        /// <summary>
-        /// Query the ID of the latest / earliest bookmark.
-        /// </summary>
-        /// <param name="begin">Beginning ID of the query range, inclusive.</param>
-        /// <param name="end">Ending ID of the query range, exclusive.</param>
-        /// <param name="type">Type of this query.</param>
-        /// <returns>The ID to query. If no bookmark is found in range, the return value will be "begin".</returns>
-        public int QuerySaveIDByTime(int begin, int end, SaveIDQueryType type)
-        {
-            var filtered = bookmarksMetadata.Values.Where(m => m.saveID >= begin && m.saveID < end).ToList();
-            if (!filtered.Any())
-                return begin;
-            if (type == SaveIDQueryType.Earliest)
-                return filtered.Aggregate((agg, val) => agg.creationTime < val.creationTime ? agg : val).saveID;
-            else
-                return filtered.Aggregate((agg, val) => agg.creationTime > val.creationTime ? agg : val).saveID;
-        }
-
-        public int QueryMaxSaveID(int begin)
-        {
-            if (!bookmarksMetadata.Any())
-            {
-                return begin;
-            }
-
-            return Math.Max(bookmarksMetadata.Keys.Max(), begin);
-        }
-
-        public int QueryMinUnusedSaveID(int begin, int end = int.MaxValue)
-        {
-            int saveID = begin;
-            while (saveID < end && bookmarksMetadata.ContainsKey(saveID))
-            {
-                ++saveID;
-            }
-
-            return saveID;
         }
 
         #endregion

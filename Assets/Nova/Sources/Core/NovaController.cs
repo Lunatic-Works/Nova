@@ -11,6 +11,7 @@ namespace Nova
         public GameState GameState { get; private set; }
         public DialogueState DialogueState { get; private set; }
         public CheckpointManager CheckpointManager { get; private set; }
+        public BookmarkManager BookmarkManager { get; private set; }
         public ConfigManager ConfigManager { get; private set; }
         public InputManager InputManager { get; private set; }
         public CheckpointHelper CheckpointHelper { get; private set; }
@@ -25,6 +26,7 @@ namespace Nova
             GameState = FindComponent<GameState>();
             DialogueState = FindComponent<DialogueState>();
             CheckpointManager = FindComponent<CheckpointManager>();
+            BookmarkManager = FindComponent<BookmarkManager>();
             ConfigManager = FindComponent<ConfigManager>();
             InputManager = FindComponent<InputManager>();
             CheckpointHelper = FindComponent<CheckpointHelper>();
