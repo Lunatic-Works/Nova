@@ -200,15 +200,15 @@ namespace Nova
                 _rightMap.Add(i);
             }
 
-            for (var i = 0; i < oldHashes.Length - minLength; ++i)
+            for (var i = 0; i < newHashes.Length - minLength; ++i)
             {
                 _remap.Add(-1);
             }
 
-            for (var i = 0; i < newHashes.Length - minLength; ++i)
+            for (var i = 0; i < oldHashes.Length - minLength; ++i)
             {
-                _leftMap.Add(oldHashes.Length - 1);
-                _rightMap.Add(oldHashes.Length);
+                _leftMap.Add(newHashes.Length - 1);
+                _rightMap.Add(newHashes.Length);
             }
         }
 
