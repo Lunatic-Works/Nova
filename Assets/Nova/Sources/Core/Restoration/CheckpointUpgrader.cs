@@ -67,6 +67,9 @@ namespace Nova
         // return the UpgradeTreeNode in case nodeRecord will be deleted
         private UpgradeTreeNode DeletedUpgradeNode(NodeRecord nodeRecord, UpgradeTreeNode child, UpgradeTreeNode sibling)
         {
+            // Bookmarks in this node will be deleted
+            nodeRecordMap[nodeRecord.offset] = 0;
+
             // if both child and sibiling exist, then we need to concat all children into siblings
             if (child != null && sibling != null)
             {
@@ -143,9 +146,9 @@ namespace Nova
                 }
                 else
                 {
-                    if (child.name != nodeRecord.name)
+                    if (child == null || child.name != nodeRecord.name)
                     {
-                        // nodeRecord has a child of a different node,
+                        // nodeRecord has no child or a child of a different node after upgrade,
                         // then map endDialogue to the end of the upgraded nodeRecord
                         ed1 = Math.Min(differ.rightMap.Count, differ.remap.Count);
                     }
@@ -236,7 +239,7 @@ namespace Nova
         {
             var root = BuildUpgradeTree(checkpointManager.beginCheckpoint);
             UpgradeNodeTree(root, null);
-            return root.offset;
+            return root?.offset ?? 0;
         }
 
         public bool TryUpgradeBookmark(Bookmark bookmark)
