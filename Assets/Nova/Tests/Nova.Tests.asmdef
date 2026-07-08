@@ -3,7 +3,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Nova.Parser"
+        "Nova.Parser",
+        "Nova"
     ],
     "includePlatforms": [
         "Editor"
