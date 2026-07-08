@@ -792,10 +792,11 @@ namespace Nova
             var endDialogue = currentIndex;
             while (curNode.parent != 0 && (!hasLimit || steps > endDialogue - curNode.beginDialogue))
             {
-                totSteps += endDialogue - curNode.beginDialogue;
+                var nodeSteps = endDialogue - curNode.beginDialogue;
+                totSteps += nodeSteps;
                 if (hasLimit)
                 {
-                    steps -= totSteps;
+                    steps -= nodeSteps;
                 }
 
                 curNode = checkpointManager.GetNodeRecord(curNode.parent);
