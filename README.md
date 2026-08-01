@@ -92,7 +92,7 @@
 
 * [Ren'Py](https://github.com/renpy/renpy)：如果你没有编程基础但是想学，或者有Python基础，推荐用这个引擎
 * [WebGAL](https://github.com/MakinoharaShoko/WebGAL)：如果你信仰web，推荐用这个引擎
-* [Ayaka](https://github.com/Uni-Gal/Ayaka)：如果你信仰Rust，可以试试这个引擎
+* [MOYU](https://github.com/Icemic/moyu)：如果你信仰Rust，推荐用这个引擎
 * [VoidNovelEngine](https://github.com/VoidmatrixHeathcliff/VoidNovelEngine)：自由、现代化的视觉小说引擎
 
 以及通用游戏引擎：
